@@ -1,46 +1,72 @@
-import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { PollingStationResults } from "@kiesraad/api";
+import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
-import { usePollingStationFormController } from "../usePollingStationFormController";
+import { SubmitCurrentFormOptions } from "../state/types";
+import { useDataEntryContext } from "../state/useDataEntryContext";
 
 export type RecountedValue = Pick<PollingStationResults, "recounted">;
 
-export function useRecounted(getValues: () => RecountedValue) {
-  const { status, values, formState, submitCurrentForm, setTemporaryCache, registerCurrentForm, cache } =
-    usePollingStationFormController();
+export function useRecounted() {
+  const { error, status, pollingStationResults, formState, onSubmitForm, updateFormSection } = useDataEntryContext({
+    id: "recounted",
+    type: "recounted",
+  });
 
-  const sectionValues = React.useMemo(() => {
-    if (cache && cache.key === "recounted") {
-      const data = cache.data as RecountedValue;
-      setTemporaryCache(null);
-      return data;
+  // local state
+  const [recounted, _setRecounted] = useState<boolean | undefined>(pollingStationResults.recounted);
+
+  // derived state
+  const { errors, warnings, isSaved, hasChanges } = formState.sections.recounted;
+  const hasValidationError = errors.length > 0;
+
+  // submit and save to form contents
+  const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
+    const data: Partial<PollingStationResults> = { recounted };
+
+    if (!pollingStationResults.voters_recounts && recounted) {
+      data.voters_recounts = {
+        poll_card_count: 0,
+        proxy_certificate_count: 0,
+        voter_card_count: 0,
+        total_admitted_voters_count: 0,
+      };
     }
-    return { recounted: values.recounted };
-  }, [values, setTemporaryCache, cache]);
 
-  const errors = React.useMemo(() => {
-    return formState.sections.recounted.errors;
-  }, [formState]);
+    return onSubmitForm(data, options);
+  };
 
-  const warnings = React.useMemo(() => {
-    return formState.sections.recounted.warnings;
-  }, [formState]);
+  // form keyboard navigation
+  const formRef = useRef<HTMLFormElement>(null);
+  useFormKeyboardNavigation(formRef);
 
-  React.useEffect(() => {
-    registerCurrentForm({
-      id: "recounted",
-      type: "recounted",
-      getValues,
-    });
-  }, [registerCurrentForm, getValues]);
+  // scroll to top when saved
+  useEffect(() => {
+    if (isSaved || error) {
+      window.scrollTo(0, 0);
+    }
+  }, [isSaved, error]);
+
+  const setRecounted = (value: boolean) => {
+    if (!hasChanges) {
+      updateFormSection({ hasChanges: true, acceptWarnings: false, acceptWarningsError: false });
+    }
+    _setRecounted(value);
+  };
 
   return {
+    error,
     status,
-    sectionValues,
+    formRef,
+    recounted,
+    setRecounted,
+    pollingStationResults,
     errors,
     warnings,
-    isSaved: formState.sections.recounted.isSaved,
-    submit: submitCurrentForm,
+    hasValidationError,
+    isSaved,
+    isSaving: status === "saving",
+    onSubmit,
   };
 }

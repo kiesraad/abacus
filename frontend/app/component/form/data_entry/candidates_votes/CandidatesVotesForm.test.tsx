@@ -1,12 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import {
-  Election,
-  PoliticalGroup,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationResults,
-} from "@kiesraad/api";
+import { Election, PoliticalGroup, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@kiesraad/api";
 import {
   electionMockData,
   politicalGroupMockData,
@@ -15,27 +10,62 @@ import {
 } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, server, within } from "@kiesraad/test";
 
+import { DataEntryProvider } from "../state/DataEntryProvider";
+import { DataEntryState } from "../state/types";
 import {
+  defaultFormSection,
   emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
   getCandidateFullNamesFromMockData,
-} from "../../testHelperFunctions";
-import { PollingStationFormController } from "../PollingStationFormController";
+  overrideServerGetDataEntryResponse,
+} from "../test.util";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
-function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
+const defaultDataEntryState: DataEntryState = {
+  election: electionMockData,
+  pollingStationId: 1,
+  error: null,
+  pollingStationResults: null,
+  entryNumber: 1,
+  formState: {
+    current: "differences_counts",
+    furthest: "differences_counts",
+    sections: {
+      recounted: {
+        id: "recounted",
+        index: 1,
+        ...defaultFormSection,
+      },
+      voters_votes_counts: {
+        id: "voters_votes_counts",
+        index: 2,
+        ...defaultFormSection,
+      },
+      differences_counts: {
+        id: "differences_counts",
+        index: 3,
+        ...defaultFormSection,
+      },
+      save: {
+        id: "save",
+        index: 4,
+        ...defaultFormSection,
+      },
+    },
+  },
+  targetFormSectionId: "recounted",
+  status: "idle",
+  cache: null,
+};
+
+function renderForm({ group, election }: { group?: PoliticalGroup; election?: Required<Election> }) {
   return render(
-    <PollingStationFormController
-      election={electionMockData}
-      pollingStationId={1}
-      entryNumber={1}
-      defaultValues={defaultValues}
-    >
-      <CandidatesVotesForm group={politicalGroupMockData} />
-    </PollingStationFormController>,
+    <DataEntryProvider election={election || electionMockData} pollingStationId={1} entryNumber={1}>
+      <CandidatesVotesForm group={group || politicalGroupMockData} />
+    </DataEntryProvider>,
   );
 }
 
@@ -68,13 +98,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
-      const Component = (
-        <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
-          <CandidatesVotesForm group={politicalGroupMock} />
-        </PollingStationFormController>
-      );
-
-      render(Component);
+      renderForm({ group: politicalGroupMock });
 
       const candidateRow = await screen.findByTestId("row-candidate_votes[0].votes");
       const candidateName = within(candidateRow).getAllByRole("cell")[2];
@@ -97,13 +121,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
-      const Component = (
-        <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
-          <CandidatesVotesForm group={politicalGroupMock} />
-        </PollingStationFormController>
-      );
-
-      render(Component);
+      renderForm({ group: politicalGroupMock });
 
       const candidateRow = await screen.findByTestId("row-candidate_votes[0].votes");
       const candidateName = within(candidateRow).getAllByRole("cell")[2];
@@ -114,8 +132,14 @@ describe("Test CandidatesVotesForm", () => {
   describe("CandidatesVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
 
-      renderForm({ recounted: false });
+      renderForm({});
 
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
@@ -130,10 +154,34 @@ describe("Test CandidatesVotesForm", () => {
       expect(spy).not.toHaveBeenCalled();
     });
 
+    test("Starting input doesn't render totals warning", async () => {
+      const user = userEvent.setup();
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+
+      renderForm({});
+
+      const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
+
+      const candidate1 = await screen.findByRole("textbox", { name: `1 ${candidateNames[0]}` });
+      await user.type(candidate1, "12345");
+      expect(screen.queryByTestId("missing-total-error")).not.toBeInTheDocument();
+    });
+
     test("hitting shift+enter does result in api call", async () => {
       const user = userEvent.setup();
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
 
-      renderForm({ recounted: false });
+      renderForm({});
       const spy = vi.spyOn(global, "fetch");
 
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
@@ -141,6 +189,9 @@ describe("Test CandidatesVotesForm", () => {
       const candidate1 = await screen.findByRole("textbox", { name: `1 ${candidateNames[0]}` });
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12345");
+
+      const total = screen.getByRole("textbox", { name: "Totaal lijst 1" });
+      await user.type(total, "12345");
 
       await user.keyboard("{shift>}{enter}{/shift}");
 
@@ -153,8 +204,13 @@ describe("Test CandidatesVotesForm", () => {
       });
 
       const user = userEvent.setup();
-
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+      renderForm({});
 
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
@@ -210,10 +266,12 @@ describe("Test CandidatesVotesForm", () => {
 
       await user.keyboard("{enter}");
 
+      // this field contains 0 by default, adding '555' will result in '0555'
+      // that is why we need to use initialSelectionStart and initialSelectionEnd
       const total = screen.getByRole("textbox", { name: "Totaal lijst 1" });
       await user.click(total);
       expect(total).toHaveFocus();
-      await user.type(total, "555");
+      await user.type(total, "555", { initialSelectionStart: 0, initialSelectionEnd: 10 });
       expect(total).toHaveValue("555");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
@@ -282,11 +340,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
-      const Component = (
-        <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
-          <CandidatesVotesForm group={politicalGroupMock} />
-        </PollingStationFormController>
-      );
+      renderForm({ group: politicalGroupMock, election: electionMockData });
 
       const expectedRequest = {
         data: {
@@ -326,8 +380,6 @@ describe("Test CandidatesVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
-
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
       const candidate1 = await screen.findByRole("textbox", { name: `1 ${candidateNames[0]}` });
@@ -364,7 +416,13 @@ describe("Test CandidatesVotesForm", () => {
     test("Show error when list total is empty", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+      renderForm({});
 
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
@@ -407,7 +465,13 @@ describe("Test CandidatesVotesForm", () => {
     test("F.401 IncorrectTotal group total", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+      renderForm({});
 
       await screen.findByTestId("candidates_form_1");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -438,8 +502,13 @@ describe("Test CandidatesVotesForm", () => {
   describe("CandidatesVotesForm warnings", () => {
     test("Imagined warning on this form", async () => {
       const user = userEvent.setup();
-
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+      renderForm({});
 
       await screen.findByTestId("candidates_form_1");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {

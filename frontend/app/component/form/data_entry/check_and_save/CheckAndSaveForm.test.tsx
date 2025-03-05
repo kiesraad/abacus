@@ -1,7 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionProvider, PollingStationResults } from "@kiesraad/api";
+import { ElectionProvider } from "@kiesraad/api";
 import {
   electionMockData,
   ElectionRequestHandler,
@@ -11,24 +11,61 @@ import {
 } from "@kiesraad/api-mocks";
 import { renderReturningRouter, screen, server, spyOnHandler, within } from "@kiesraad/test";
 
-import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "../../testHelperFunctions";
-import { FormState, PollingStationFormController } from "../PollingStationFormController";
+import { DataEntryProvider } from "../state/DataEntryProvider";
+import { DataEntryState } from "../state/types";
+import {
+  defaultFormSection,
+  emptyDataEntryRequest,
+  errorWarningMocks,
+  overrideServerGetDataEntryResponse,
+} from "../test.util";
 import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
 const defaultValues = emptyDataEntryRequest.data;
 
-function renderForm(defaultFormState: Partial<FormState> = {}, defaultValues?: Partial<PollingStationResults>) {
+const defaultDataEntryState: DataEntryState = {
+  election: electionMockData,
+  pollingStationId: 1,
+  error: null,
+  pollingStationResults: null,
+  entryNumber: 1,
+  formState: {
+    current: "save",
+    furthest: "save",
+    sections: {
+      recounted: {
+        id: "recounted",
+        index: 1,
+        ...defaultFormSection,
+      },
+      voters_votes_counts: {
+        id: "voters_votes_counts",
+        index: 2,
+        ...defaultFormSection,
+      },
+      differences_counts: {
+        id: "differences_counts",
+        index: 3,
+        ...defaultFormSection,
+      },
+      save: {
+        id: "save",
+        index: 4,
+        ...defaultFormSection,
+      },
+    },
+  },
+  targetFormSectionId: "recounted",
+  status: "idle",
+  cache: null,
+};
+
+function renderForm() {
   return renderReturningRouter(
     <ElectionProvider electionId={1}>
-      <PollingStationFormController
-        election={electionMockData}
-        pollingStationId={1}
-        entryNumber={1}
-        defaultFormState={defaultFormState}
-        defaultValues={defaultValues}
-      >
+      <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
         <CheckAndSaveForm />
-      </PollingStationFormController>
+      </DataEntryProvider>
     </ElectionProvider>,
   );
 }
@@ -75,20 +112,25 @@ describe("Test CheckAndSaveForm", () => {
   });
 
   test("Data entry does not show finalise button with errors", async () => {
-    const formState = structuredClone(defaultFormState);
-    formState.sections.voters_votes_counts.errors = [
-      {
-        code: "F201",
-        fields: [
-          "data.voters_counts.poll_card_count",
-          "data.voters_counts.proxy_certificate_count",
-          "data.voters_counts.voter_card_count",
-          "data.voters_counts.total_admitted_voters_count",
+    overrideServerGetDataEntryResponse({
+      formState: defaultDataEntryState.formState,
+      pollingStationResults: defaultValues,
+      validationResults: {
+        errors: [
+          {
+            code: "F201",
+            fields: [
+              "data.voters_counts.poll_card_count",
+              "data.voters_counts.proxy_certificate_count",
+              "data.voters_counts.voter_card_count",
+              "data.voters_counts.total_admitted_voters_count",
+            ],
+          },
         ],
+        warnings: [],
       },
-    ];
-
-    renderForm(formState);
+    });
+    renderForm();
 
     // Wait for the page to be loaded and check that the save button is not visible
     expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
@@ -98,15 +140,20 @@ describe("Test CheckAndSaveForm", () => {
   });
 
   test("Data entry does not show finalise button with unaccepted warnings", async () => {
-    const formState = structuredClone(defaultFormState);
-    formState.sections.voters_votes_counts.warnings = [
-      {
-        code: "W202",
-        fields: ["data.voters_counts.invalid_votes_count"],
+    overrideServerGetDataEntryResponse({
+      formState: defaultDataEntryState.formState,
+      pollingStationResults: defaultValues,
+      validationResults: {
+        errors: [],
+        warnings: [
+          {
+            code: "W202",
+            fields: ["data.voters_counts.invalid_votes_count"],
+          },
+        ],
       },
-    ];
-
-    renderForm(formState);
+    });
+    renderForm();
 
     // Wait for the page to be loaded and check that the save button is not visible
     expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
@@ -116,16 +163,23 @@ describe("Test CheckAndSaveForm", () => {
   });
 
   test("Data entry shows finalise button with accepted warnings", async () => {
-    const formState = structuredClone(defaultFormState);
-    formState.sections.voters_votes_counts.warnings = [
-      {
-        code: "W202",
-        fields: ["data.voters_counts.invalid_votes_count"],
-      },
-    ];
-    formState.sections.voters_votes_counts.acceptWarnings = true;
+    const dataEntryState = structuredClone(defaultDataEntryState);
+    dataEntryState.formState.sections.voters_votes_counts.acceptWarnings = true;
 
-    renderForm(formState);
+    overrideServerGetDataEntryResponse({
+      formState: dataEntryState.formState,
+      pollingStationResults: defaultValues,
+      validationResults: {
+        errors: [],
+        warnings: [
+          {
+            code: "W202",
+            fields: ["data.voters_counts.invalid_votes_count"],
+          },
+        ],
+      },
+    });
+    renderForm();
 
     // Check that the save button is visible
     expect(await screen.findByRole("button", { name: "Opslaan" })).toBeInTheDocument();
@@ -137,13 +191,17 @@ describe("Test CheckAndSaveForm summary", () => {
     server.use(ElectionRequestHandler, PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
   });
   test("Blocking", async () => {
-    const formState = structuredClone(defaultFormState);
-    formState.sections.voters_votes_counts.errors = [errorWarningMocks.F201];
-    formState.sections.differences_counts.warnings = [errorWarningMocks.W301];
-
     const values = structuredClone(defaultValues);
 
-    renderForm(formState, values);
+    overrideServerGetDataEntryResponse({
+      formState: defaultDataEntryState.formState,
+      pollingStationResults: values,
+      validationResults: {
+        errors: [errorWarningMocks.F201],
+        warnings: [errorWarningMocks.W301],
+      },
+    });
+    renderForm();
 
     expect(
       await screen.findByText(
@@ -163,12 +221,17 @@ describe("Test CheckAndSaveForm summary", () => {
   });
 
   test("Accepted with warnings", async () => {
-    const formState = structuredClone(defaultFormState);
-
-    formState.sections.differences_counts.warnings = [errorWarningMocks.W301];
-    formState.sections.differences_counts.acceptWarnings = true;
-
-    renderForm(formState);
+    const dataEntryState = structuredClone(defaultDataEntryState);
+    dataEntryState.formState.sections.differences_counts.acceptWarnings = true;
+    overrideServerGetDataEntryResponse({
+      formState: dataEntryState.formState,
+      pollingStationResults: defaultValues,
+      validationResults: {
+        errors: [],
+        warnings: [errorWarningMocks.W301],
+      },
+    });
+    renderForm();
 
     expect(
       await screen.findByText(
@@ -182,11 +245,15 @@ describe("Test CheckAndSaveForm summary", () => {
   });
 
   test("Unaccepted warnings", async () => {
-    const formState = structuredClone(defaultFormState);
-
-    formState.sections.differences_counts.warnings = [errorWarningMocks.W301];
-
-    renderForm(formState);
+    overrideServerGetDataEntryResponse({
+      formState: defaultDataEntryState.formState,
+      pollingStationResults: defaultValues,
+      validationResults: {
+        errors: [],
+        warnings: [errorWarningMocks.W301],
+      },
+    });
+    renderForm();
 
     expect(
       await screen.findByText(

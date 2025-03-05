@@ -1,6 +1,5 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router";
 
-import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AdministratorLayout } from "app/module/AdministratorLayout";
 import {
   ElectionHomePage,
@@ -26,6 +25,7 @@ import { WorkstationsHomePage } from "app/module/workstations";
 import { t } from "@kiesraad/i18n";
 
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
+import { CheckAndSaveForm } from "./component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import { Logout } from "./module/account/Logout";
 import {
@@ -38,10 +38,10 @@ import {
   CandidatesVotesPage,
   DataEntryHomePage,
   DifferencesPage,
-  PollingStationLayout,
   RecountedPage,
   VotersAndVotesPage,
 } from "./module/data_entry";
+import { DataEntryLayout } from "./module/data_entry/DataEntryLayout";
 import { DevHomePage } from "./module/DevHomePage";
 import { NotFoundPage } from "./module/NotFoundPage";
 import { PollingStationCreatePage } from "./module/polling_stations/page/PollingStationCreatePage";
@@ -85,7 +85,7 @@ export const routes = createRoutesFromElements(
         </Route>
         <Route path="data-entry" element={null}>
           <Route index element={<DataEntryHomePage />} />
-          <Route path=":pollingStationId/:entryNumber" element={<PollingStationLayout />}>
+          <Route path=":pollingStationId/:entryNumber" element={<DataEntryLayout />}>
             {/* The PollingStationFormController will navigate to the correct section. */}
             <Route index element={null} />
             <Route path="recounted" element={<RecountedPage />} />

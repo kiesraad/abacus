@@ -1,27 +1,23 @@
 import { assert, describe, expect, test } from "vitest";
 
-import { PollingStationResults, ValidationResult } from "@kiesraad/api";
+import { ValidationResult } from "@kiesraad/api";
 
-import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "../testHelperFunctions";
-import { AnyFormReference, ClientValidationResult, FormSection } from "./PollingStationFormController";
+import { defaultDataEntryState, errorWarningMocks, initialValues } from "../test.util";
 import {
   addValidationResultToFormState,
-  currentFormHasChanges,
   formSectionComplete,
   getErrorsAndWarnings,
   getNextSectionID,
   getPollingStationSummary,
   hasOnlyGlobalValidationResults,
-  isFormSectionEmpty,
   isGlobalValidationResult,
   resetFormSectionState,
-} from "./pollingStationUtils";
+} from "./dataEntryUtils";
+import { ClientValidationResult } from "./types";
 
-const defaultValues: PollingStationResults = emptyDataEntryRequest.data;
-
-describe("PollingStationUtils", () => {
-  test("addValidationResultToFormState adds result to correct section", () => {
-    const formState = structuredClone(defaultFormState);
+describe("addValidationResultToFormState", () => {
+  test("should add validation result to form state", () => {
+    const formState = structuredClone(defaultDataEntryState.formState);
     formState.sections.differences_counts.isSaved = true;
     const validationResults: ValidationResult[] = [
       {
@@ -36,7 +32,7 @@ describe("PollingStationUtils", () => {
   });
 
   test("addValidationResultToFormState adds result to multiple sections", () => {
-    const formState = structuredClone(defaultFormState);
+    const formState = structuredClone(defaultDataEntryState.formState);
 
     formState.sections.voters_votes_counts.isSaved = true;
     if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
@@ -57,7 +53,7 @@ describe("PollingStationUtils", () => {
   });
 
   test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {
-    const formState = structuredClone(defaultFormState);
+    const formState = structuredClone(defaultDataEntryState.formState);
     formState.sections.differences_counts.isSaved = false;
     const validationResults: ValidationResult[] = [
       {
@@ -70,7 +66,9 @@ describe("PollingStationUtils", () => {
 
     expect(formState.sections.differences_counts.errors.length).toBe(0);
   });
+});
 
+describe("formSectionComplete", () => {
   test("formSectionComplete", () => {
     expect(
       formSectionComplete({
@@ -80,6 +78,8 @@ describe("PollingStationUtils", () => {
         acceptWarnings: false,
         errors: [],
         warnings: [],
+        hasChanges: false,
+        acceptWarningsError: false,
       }),
     ).toBe(false);
 
@@ -91,97 +91,15 @@ describe("PollingStationUtils", () => {
         acceptWarnings: false,
         errors: [],
         warnings: [],
+        hasChanges: false,
+        acceptWarningsError: false,
       }),
     ).toBe(true);
   });
+});
 
-  test("getNextSectionID", () => {
-    const formState = structuredClone(defaultFormState);
-    formState.sections.recounted.isSaved = true;
-    formState.sections.recounted.isSubmitted = true;
-
-    const nextSection = getNextSectionID(formState);
-
-    expect(nextSection).toBe("voters_votes_counts");
-  });
-
-  test("currentFormHasChanges", () => {
-    const values = {
-      ...defaultValues,
-      differences_counts: {
-        more_ballots_count: 0,
-        fewer_ballots_count: 0,
-        unreturned_ballots_count: 0,
-        too_few_ballots_handed_out_count: 0,
-        too_many_ballots_handed_out_count: 0,
-        other_explanation_count: 0,
-        no_explanation_count: 0,
-      },
-    };
-    //@ts-expect-error more_ballots count is a string for testing purposes
-    const currentForm: AnyFormReference = {
-      id: "differences_counts",
-      type: "differences",
-      getValues: () => ({
-        differences_counts: {
-          more_ballots_count: "",
-          fewer_ballots_count: 0,
-          unreturned_ballots_count: 0,
-          too_few_ballots_handed_out_count: 0,
-          too_many_ballots_handed_out_count: 0,
-          other_explanation_count: 0,
-          no_explanation_count: 0,
-        },
-      }),
-    };
-
-    expect(currentFormHasChanges(currentForm, values)).toBe(false);
-
-    values.differences_counts.more_ballots_count = 1;
-
-    expect(currentFormHasChanges(currentForm, values)).toBe(true);
-  });
-
-  test("resetFormSectionState", () => {
-    const formState = {
-      ...defaultFormState,
-    };
-    formState.sections.voters_votes_counts.errors = [
-      {
-        code: "W201",
-        fields: ["data.votes_counts.blank_votes_count"],
-      },
-    ];
-
-    resetFormSectionState(formState);
-
-    expect(formState.sections.voters_votes_counts.errors.length).toBe(0);
-  });
-
-  test("isGlobalValidationResult", () => {
-    expect(
-      isGlobalValidationResult({
-        code: "F204",
-        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
-      }),
-    ).toBe(true);
-
-    expect(
-      isGlobalValidationResult({
-        code: "F303",
-        fields: ["data.differences_counts.fewer_ballots_count"],
-      }),
-    ).toBe(false);
-
-    expect(
-      isGlobalValidationResult({
-        code: "W301",
-        fields: ["data.votes_counts.blank_votes_count"],
-      }),
-    ).toBe(false);
-  });
-
-  test("hasOnlyGlobalValidationResults", () => {
+describe("hasOnlyGlobalValidationResults", () => {
+  test("should check if array has only global validation results", () => {
     const onlyGlobalResults: ClientValidationResult[] = [
       {
         code: "F204",
@@ -221,7 +139,64 @@ describe("PollingStationUtils", () => {
 
     expect(hasOnlyGlobalValidationResults(mixedResults)).toBe(false);
   });
+});
 
+describe("resetFormSectionState", () => {
+  test("should reset form section state", () => {
+    const formState = {
+      ...defaultDataEntryState.formState,
+    };
+    formState.sections.voters_votes_counts.errors = [
+      {
+        code: "W201",
+        fields: ["data.votes_counts.blank_votes_count"],
+      },
+    ];
+
+    resetFormSectionState(formState);
+
+    expect(formState.sections.voters_votes_counts.errors.length).toBe(0);
+  });
+});
+
+describe("getNextSectionID", () => {
+  test("should get next section ID", () => {
+    const formState = structuredClone(defaultDataEntryState.formState);
+    formState.sections.recounted.isSaved = true;
+    formState.sections.recounted.isSubmitted = true;
+
+    const nextSection = getNextSectionID(formState);
+
+    expect(nextSection).toBe("voters_votes_counts");
+  });
+});
+
+describe("isGlobalValidationResult", () => {
+  test("should check if validation result is global", () => {
+    expect(
+      isGlobalValidationResult({
+        code: "F204",
+        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
+      }),
+    ).toBe(true);
+
+    expect(
+      isGlobalValidationResult({
+        code: "F303",
+        fields: ["data.differences_counts.fewer_ballots_count"],
+      }),
+    ).toBe(false);
+
+    expect(
+      isGlobalValidationResult({
+        code: "W301",
+        fields: ["data.votes_counts.blank_votes_count"],
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("getErrorsAndWarnings", () => {
   test("getErrorsAndWarnings errors", () => {
     const errors: ValidationResult[] = [
       {
@@ -288,26 +263,12 @@ describe("PollingStationUtils", () => {
       ]),
     );
   });
+});
 
-  test("isFormSectionEmpty", () => {
-    const formSection: FormSection = {
-      index: 0,
-      id: "voters_votes_counts",
-      isSaved: false,
-      acceptWarnings: false,
-      errors: [],
-      warnings: [],
-    };
-    const values = structuredClone(defaultValues);
-    expect(isFormSectionEmpty(formSection, values)).toBe(true);
-
-    values.voters_counts.poll_card_count = 1;
-    expect(isFormSectionEmpty(formSection, values)).toBe(false);
-  });
-
+describe("getPollingStationSummary", () => {
   test("getPollingStationSummary", () => {
-    const state = structuredClone(defaultFormState);
-    const values = structuredClone(defaultValues);
+    const state = structuredClone(defaultDataEntryState.formState);
+    const values = structuredClone(initialValues);
 
     values.voters_counts.poll_card_count = 4;
     values.voters_counts.total_admitted_voters_count = 4;

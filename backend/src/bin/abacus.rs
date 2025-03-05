@@ -36,11 +36,8 @@ struct Args {
 }
 
 /// Start the API server on the given port, using the given database pool.
-async fn start_server(pool: SqlitePool, port: u16) -> Result<(), Box<dyn Error>> {
+async fn start_server(pool: SqlitePool, listener: TcpListener) -> Result<(), Box<dyn Error>> {
     let app = router(pool)?;
-
-    let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
-    let listener = TcpListener::bind(&address).await?;
 
     info!("Starting API server on http://{}", listener.local_addr()?);
     let listener = listener.tap_io(|tcp_stream| {
@@ -74,7 +71,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     let pool = create_sqlite_pool(&args).await?;
 
-    start_server(pool, args.port).await
+    let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
+    let listener = TcpListener::bind(&address).await?;
+
+    start_server(pool, listener).await
 }
 
 /// Create a SQLite database if needed, then connect to it and run migrations.
@@ -134,26 +134,22 @@ async fn shutdown_signal() {
 
 #[cfg(test)]
 mod test {
-    use rand::Rng;
     use sqlx::SqlitePool;
     use test_log::test;
+    use tokio::net::TcpListener;
 
     use super::start_server;
 
-    pub fn random_port() -> u16 {
-        let mut rng = rand::rng();
-
-        rng.random_range(10_000..30_000)
-    }
-
     #[test(sqlx::test)]
     async fn test_abacus_starts(pool: SqlitePool) {
-        let random_port = random_port();
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+
         let task = tokio::spawn(async move {
-            start_server(pool, random_port).await.unwrap();
+            start_server(pool, listener).await.unwrap();
         });
 
-        let result = reqwest::get(format!("http://localhost:{random_port}/api/user/whoami"))
+        let result = reqwest::get(format!("http://{addr}/api/user/whoami"))
             .await
             .unwrap();
 

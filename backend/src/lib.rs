@@ -24,6 +24,7 @@ mod error;
 pub mod fixtures;
 pub mod pdf_gen;
 pub mod polling_station;
+pub mod report;
 pub mod summary;
 
 pub use error::{APIError, ErrorResponse};
@@ -69,15 +70,15 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route(
             "/{election_id}/download_zip_results",
-            get(election::election_download_zip_results),
+            get(report::election_download_zip_results),
         )
         .route(
             "/{election_id}/download_pdf_results",
-            get(election::election_download_pdf_results),
+            get(report::election_download_pdf_results),
         )
         .route(
             "/{election_id}/download_xml_results",
-            get(election::election_download_xml_results),
+            get(report::election_download_xml_results),
         )
         .route("/{election_id}/status", get(data_entry::election_status));
 
@@ -170,9 +171,9 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             election::election_list,
             election::election_create,
             election::election_details,
-            election::election_download_zip_results,
-            election::election_download_pdf_results,
-            election::election_download_xml_results,
+            report::election_download_zip_results,
+            report::election_download_pdf_results,
+            report::election_download_xml_results,
             data_entry::polling_station_data_entry_save,
             data_entry::polling_station_data_entry_get,
             data_entry::polling_station_data_entry_delete,

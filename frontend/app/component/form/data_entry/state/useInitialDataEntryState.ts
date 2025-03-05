@@ -24,7 +24,6 @@ async function saveDataEntryState(
   }
 
   // save data entry, continue is set to true to make sure polling station status changes to InProgress
-  // TODO: check whether this is always necessary
   const requestBody: DataEntry = {
     progress: dataEntry.progress,
     data: dataEntry.data,

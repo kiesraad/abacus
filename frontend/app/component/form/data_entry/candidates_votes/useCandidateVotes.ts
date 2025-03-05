@@ -39,12 +39,13 @@ export function useCandidateVotes(political_group_number: number) {
   const [missingTotalError, setMissingTotalError] = useState(false);
 
   // derived state
-  const section = formState.sections[`political_group_votes_${political_group_number}`];
-  if (!section) {
+  const formSection = formState.sections[`political_group_votes_${political_group_number}`];
+  if (!formSection) {
     throw new Error(`Form section not found for political group number ${political_group_number}`);
   }
 
-  const { errors, warnings, isSaved, acceptWarnings, hasChanges } = section;
+  const { errors, warnings, isSaved, acceptWarnings, hasChanges } = formSection;
+  const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0 && !hasChanges;
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? getErrorsAndWarnings(errors, warnings) : undefined,
@@ -60,7 +61,7 @@ export function useCandidateVotes(political_group_number: number) {
   };
 
   const setAcceptWarnings = (acceptWarnings: boolean) => {
-    updateFormSection({ acceptWarnings });
+    updateFormSection({ acceptWarningsError: false, acceptWarnings });
   };
 
   // form keyboard navigation
@@ -81,7 +82,7 @@ export function useCandidateVotes(political_group_number: number) {
           pg.number === political_group_number ? data : pg,
         ),
       },
-      options,
+      { ...options, showAcceptWarnings },
     );
   };
 
@@ -98,11 +99,12 @@ export function useCandidateVotes(political_group_number: number) {
     onSubmit,
     pollingStationResults,
     currentValues,
-    formSection: section,
+    formSection,
     setValues,
     status,
     setAcceptWarnings,
     defaultProps,
     missingTotalError,
+    showAcceptWarnings,
   };
 }

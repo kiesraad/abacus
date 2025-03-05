@@ -9,16 +9,16 @@ import { useDataEntryContext } from "../state/useDataEntryContext";
 export type RecountedValue = Pick<PollingStationResults, "recounted">;
 
 export function useRecounted() {
-  const { error, status, pollingStationResults, formState, onSubmitForm } = useDataEntryContext({
+  const { error, status, pollingStationResults, formState, onSubmitForm, updateFormSection } = useDataEntryContext({
     id: "recounted",
     type: "recounted",
   });
 
   // local state
-  const [recounted, setRecounted] = useState<boolean | undefined>(pollingStationResults.recounted);
+  const [recounted, _setRecounted] = useState<boolean | undefined>(pollingStationResults.recounted);
 
   // derived state
-  const { errors, warnings, isSaved } = formState.sections.recounted;
+  const { errors, warnings, isSaved, hasChanges } = formState.sections.recounted;
   const hasValidationError = errors.length > 0;
 
   // submit and save to form contents
@@ -47,6 +47,13 @@ export function useRecounted() {
       window.scrollTo(0, 0);
     }
   }, [isSaved, error]);
+
+  const setRecounted = (value: boolean) => {
+    if (!hasChanges) {
+      updateFormSection({ hasChanges: true, acceptWarnings: false, acceptWarningsError: false });
+    }
+    _setRecounted(value);
+  };
 
   return {
     error,

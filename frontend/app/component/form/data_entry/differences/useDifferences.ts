@@ -26,6 +26,8 @@ export function useDifferences() {
     errorsAndWarnings: isSaved ? getErrorsAndWarnings(errors, warnings) : undefined,
     warningsAccepted: acceptWarnings,
   };
+  const formSection = formState.sections.differences_counts;
+  const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0 && !hasChanges;
 
   // register changes when fields change
   const setValues = (values: DifferencesFormValues) => {
@@ -36,7 +38,7 @@ export function useDifferences() {
   };
 
   const setAcceptWarnings = (acceptWarnings: boolean) => {
-    updateFormSection({ acceptWarnings });
+    updateFormSection({ acceptWarningsError: false, acceptWarnings });
   };
 
   // form keyboard navigation
@@ -51,7 +53,7 @@ export function useDifferences() {
       {
         differences_counts: data,
       },
-      options,
+      { ...options, showAcceptWarnings },
     );
   };
 
@@ -73,5 +75,6 @@ export function useDifferences() {
     status,
     setAcceptWarnings,
     defaultProps,
+    showAcceptWarnings,
   };
 }

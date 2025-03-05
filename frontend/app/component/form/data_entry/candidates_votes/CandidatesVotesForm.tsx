@@ -38,9 +38,8 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     defaultProps,
     pollingStationResults,
     missingTotalError,
+    showAcceptWarnings,
   } = useCandidateVotes(group.number);
-
-  const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
 
   React.useEffect(() => {
     if (missingTotalError) {

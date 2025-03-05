@@ -20,9 +20,18 @@ import { formValuesToValues } from "./differencesValues";
 import { useDifferences } from "./useDifferences";
 
 export function DifferencesForm() {
-  const { error, formRef, onSubmit, currentValues, setValues, formSection, status, setAcceptWarnings, defaultProps } =
-    useDifferences();
-  const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
+  const {
+    error,
+    formRef,
+    onSubmit,
+    currentValues,
+    setValues,
+    formSection,
+    status,
+    setAcceptWarnings,
+    defaultProps,
+    showAcceptWarnings,
+  } = useDifferences();
 
   return (
     <Form

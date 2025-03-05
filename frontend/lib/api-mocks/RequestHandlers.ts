@@ -2,10 +2,14 @@ import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
   ErrorResponse,
+  LOGIN_REQUEST_BODY,
+  LOGIN_REQUEST_PARAMS,
+  LOGIN_REQUEST_PATH,
   LoginResponse,
   POLLING_STATION_CREATE_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS,
+  POLLING_STATION_DELETE_REQUEST_PARAMS,
   POLLING_STATION_GET_REQUEST_PARAMS,
   POLLING_STATION_LIST_REQUEST_PARAMS,
   POLLING_STATION_UPDATE_REQUEST_PARAMS,
@@ -26,11 +30,13 @@ import {
   USER_UPDATE_REQUEST_PARAMS,
   USER_UPDATE_REQUEST_PATH,
   UserListResponse,
+  WHOAMI_REQUEST_PARAMS,
+  WHOAMI_REQUEST_PATH,
 } from "@kiesraad/api";
 
 import { electionDetailsMockResponse, electionListMockResponse, electionStatusMockResponse } from "./ElectionMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
-import { userMockData } from "./UserMockData";
+import { loginResponseMockData, userMockData } from "./UserMockData";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -55,17 +61,16 @@ export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBo
   });
 });
 
+export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse, LOGIN_REQUEST_PATH>(
+  "/api/user/login",
+  () => HttpResponse.json(loginResponseMockData, { status: 200 }),
+);
+
 // get user handler
-export const WhoAmIRequestHandler = http.get("/api/user/whoami", () => {
-  const loginResponse: LoginResponse = {
-    user_id: 1,
-    fullname: "Example Name",
-    username: "admin",
-    role: "administrator",
-    needs_password_change: false,
-  };
-  return HttpResponse.json(loginResponse, { status: 200 });
-});
+export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginResponse, WHOAMI_REQUEST_PATH>(
+  "/api/user/whoami",
+  () => HttpResponse.json(loginResponseMockData, { status: 200 }),
+);
 
 // get election list handler
 export const ElectionListRequestHandler = http.get("/api/elections", () =>
@@ -129,6 +134,11 @@ export const PollingStationCreateHandler = http.post<ParamsToString<POLLING_STAT
   () => HttpResponse.json(pollingStationMockData[1]! satisfies PollingStation, { status: 201 }),
 );
 
+export const PollingStationDeleteHandler = http.delete<ParamsToString<POLLING_STATION_DELETE_REQUEST_PARAMS>>(
+  "/api/elections/:election_id/polling_stations/:polling_station_id",
+  () => HttpResponse.text("", { status: 200 }),
+);
+
 export const PollingStationUpdateHandler = http.put<ParamsToString<POLLING_STATION_UPDATE_REQUEST_PARAMS>>(
   "/api/elections/:election_id/polling_stations/:polling_station_id",
   () => HttpResponse.text("", { status: 200 }),
@@ -186,6 +196,7 @@ export const handlers: HttpHandler[] = [
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
   PollingStationCreateHandler,
+  PollingStationDeleteHandler,
   PollingStationGetHandler,
   PollingStationUpdateHandler,
   UserCreateRequestHandler,

@@ -2,7 +2,7 @@ import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { errorWarningMocks } from "app/component/form/testHelperFunctions";
+import { errorWarningMocks } from "app/component/form/data_entry/testHelperFunctions";
 import { routes } from "app/routes";
 
 import { SaveDataEntryResponse } from "@kiesraad/api";

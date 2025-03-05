@@ -1,7 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { emptyDataEntryRequest, errorWarningMocks } from "app/component/form/testHelperFunctions";
+import { emptyDataEntryRequest, errorWarningMocks } from "app/component/form/data_entry/testHelperFunctions";
 
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, SaveDataEntryResponse } from "@kiesraad/api";
 import {

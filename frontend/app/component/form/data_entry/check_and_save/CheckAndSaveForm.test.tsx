@@ -10,10 +10,10 @@ import {
 } from "@kiesraad/api-mocks";
 import { overrideOnce, renderReturningRouter, screen, server, within } from "@kiesraad/test";
 
-import { emptyDataEntryRequest, errorWarningMocks } from "../../testHelperFunctions";
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { DataEntryState } from "../state/types";
 import { defaultFormSection, overrideServerGetDataEntryResponse } from "../test.util";
+import { emptyDataEntryRequest, errorWarningMocks } from "../testHelperFunctions";
 import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
 const defaultValues = emptyDataEntryRequest.data;

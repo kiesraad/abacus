@@ -10,6 +10,9 @@ import {
 } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, server, within } from "@kiesraad/test";
 
+import { DataEntryProvider } from "../state/DataEntryProvider";
+import { DataEntryState } from "../state/types";
+import { defaultFormSection, overrideServerGetDataEntryResponse } from "../test.util";
 import {
   emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
@@ -17,10 +20,7 @@ import {
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
   getCandidateFullNamesFromMockData,
-} from "../../testHelperFunctions";
-import { DataEntryProvider } from "../state/DataEntryProvider";
-import { DataEntryState } from "../state/types";
-import { defaultFormSection, overrideServerGetDataEntryResponse } from "../test.util";
+} from "../testHelperFunctions";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const defaultDataEntryState: DataEntryState = {

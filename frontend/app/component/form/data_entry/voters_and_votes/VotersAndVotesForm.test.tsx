@@ -8,7 +8,7 @@ import {
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
-} from "app/component/form/testHelperFunctions";
+} from "app/component/form/data_entry/testHelperFunctions";
 
 import {
   GetDataEntryResponse,

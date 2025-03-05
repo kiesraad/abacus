@@ -2,8 +2,8 @@ import { assert, describe, expect, test } from "vitest";
 
 import { ValidationResult } from "@kiesraad/api";
 
-import { errorWarningMocks } from "../../testHelperFunctions";
 import { defaultDataEntryState, initialValues } from "../test.util";
+import { errorWarningMocks } from "../testHelperFunctions";
 import {
   addValidationResultToFormState,
   formSectionComplete,

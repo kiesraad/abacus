@@ -2,12 +2,14 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
+  defaultFormSection,
   emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
-} from "app/component/form/data_entry/testHelperFunctions";
+  overrideServerGetDataEntryResponse,
+} from "app/component/form/data_entry/test.util";
 
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@kiesraad/api";
 import {
@@ -19,7 +21,6 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInpu
 
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { DataEntryState } from "../state/types";
-import { defaultFormSection, overrideServerGetDataEntryResponse } from "../test.util";
 import { DifferencesForm } from "./DifferencesForm";
 
 const defaultDataEntryState: DataEntryState = {

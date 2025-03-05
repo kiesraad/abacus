@@ -12,15 +12,16 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, within } fro
 
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { DataEntryState } from "../state/types";
-import { defaultFormSection, overrideServerGetDataEntryResponse } from "../test.util";
 import {
+  defaultFormSection,
   emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
   getCandidateFullNamesFromMockData,
-} from "../testHelperFunctions";
+  overrideServerGetDataEntryResponse,
+} from "../test.util";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const defaultDataEntryState: DataEntryState = {

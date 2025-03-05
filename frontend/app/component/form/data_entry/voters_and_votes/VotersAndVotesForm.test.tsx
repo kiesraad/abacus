@@ -3,12 +3,14 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { mockElection } from "app/component/election/status/mockData";
 import {
+  defaultFormSection,
   emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
-} from "app/component/form/data_entry/testHelperFunctions";
+  overrideServerGetDataEntryResponse,
+} from "app/component/form/data_entry/test.util";
 
 import {
   GetDataEntryResponse,
@@ -25,7 +27,6 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInpu
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { getClientState } from "../state/dataEntryUtils";
 import { DataEntryState } from "../state/types";
-import { defaultFormSection, overrideServerGetDataEntryResponse } from "../test.util";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const initialValues: PollingStationResults = {

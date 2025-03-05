@@ -166,6 +166,7 @@ languages:
       - ".*[.]e2e[.]ts"
       - ".*.stories[.]tsx"
       - ".*/test-data/.*[.]ts"
+      - ".*/test[.]utils[.]ts"
     generated:
       include:
       - ".*/gen/.*[.]ts"

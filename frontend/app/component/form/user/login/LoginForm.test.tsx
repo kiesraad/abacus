@@ -1,28 +1,17 @@
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { overrideOnce, render, screen, waitFor } from "@kiesraad/test";
+import { LoginHandler } from "@kiesraad/api-mocks";
+import { overrideOnce, render, screen, server, spyOnHandler, waitFor } from "@kiesraad/test";
 
 import { LoginForm } from "./LoginForm";
 
 describe("LoginForm", () => {
   test("Successful login", async () => {
-    render(<LoginForm />);
-    let requestBody: object | null = null;
+    server.use(LoginHandler);
+    const login = spyOnHandler(LoginHandler);
 
-    overrideOnce(
-      "post",
-      "/api/user/login",
-      200,
-      {
-        user_id: 1,
-        username: "admin",
-      },
-      undefined,
-      async (request) => {
-        requestBody = (await request.json()) as object;
-      },
-    );
+    render(<LoginForm />);
 
     const user = userEvent.setup();
 
@@ -34,9 +23,7 @@ describe("LoginForm", () => {
     const submitButton = screen.getByRole("button", { name: "Inloggen" });
     await user.click(submitButton);
 
-    await waitFor(() => {
-      expect(requestBody).toStrictEqual({ username: "user", password: "password" });
-    });
+    expect(login).toHaveBeenCalledWith({ username: "user", password: "password" });
   });
 
   test("Unsuccessful login", async () => {

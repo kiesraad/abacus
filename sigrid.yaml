@@ -9,18 +9,21 @@ components:
   - name: "(Backend) Data entry"
     include:
       - ".*/backend/src/data_entry/.*"
-  - name: "(Backend) EML"
-    include:
-      - ".*/backend/src/eml/.*"
   - name: "(Backend) Election"
     include:
       - ".*/backend/src/election/.*"
+  - name: "(Backend) EML"
+    include:
+      - ".*/backend/src/eml/.*"
   - name: "(Backend) PDF generation"
     include:
       - ".*/backend/src/pdf_gen/.*"
   - name: "(Backend) Polling station"
     include:
       - ".*/backend/src/polling_station/.*"
+  - name: "(Backend) Report"
+    include:
+      - ".*/backend/src/report/.*"
   - name: "(Backend) Summary"
     include:
       - ".*/backend/src/summary/.*"

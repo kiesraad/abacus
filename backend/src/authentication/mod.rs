@@ -2,11 +2,12 @@ use chrono::TimeDelta;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-pub use self::{
-    api::*,
-    role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist},
-    user::User,
-};
+pub use self::api::*;
+pub use user::{User, Users};
+
+pub use self::role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
+#[cfg(test)]
+pub use self::session::Sessions;
 
 mod api;
 pub mod error;

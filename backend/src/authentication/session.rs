@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use axum::extract::FromRef;
 use axum_extra::extract::cookie::Cookie;
 use chrono::{DateTime, TimeDelta, Utc};
@@ -52,6 +54,14 @@ impl Session {
     #[cfg(test)]
     pub(super) fn expires_at(&self) -> DateTime<Utc> {
         self.expires_at
+    }
+
+    /// Get the age of a session
+    pub(super) fn duration(&self) -> Duration {
+        self.created_at
+            .signed_duration_since(Utc::now())
+            .to_std()
+            .unwrap_or_default()
     }
 
     /// Get a cookie containing this session key
@@ -141,6 +151,19 @@ impl Sessions {
             .await?;
 
         Ok(())
+    }
+
+    /// Count the number of active sessions
+    pub async fn count(&self) -> Result<u32, AuthenticationError> {
+        let now = Utc::now();
+        let count = sqlx::query_scalar!(
+            r#"SELECT COUNT(*) AS "count: u32" FROM sessions WHERE expires_at > ?"#,
+            now
+        )
+        .fetch_one(&self.0)
+        .await?;
+
+        Ok(count)
     }
 
     pub(super) async fn extend_session(

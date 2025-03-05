@@ -3,6 +3,9 @@ components:
   - name: "(Backend) Apportionment"
     include:
       - ".*/backend/src/apportionment/.*"
+  - name: "(Backend) Audit Log"
+    include:
+      - ".*/backend/src/audit_log/.*"
   - name: "(Backend) Authentication"
     include:
       - ".*/backend/src/authentication/.*"

@@ -19,8 +19,8 @@ required-features = ["openapi"]
 # Note: if you add a dependency here, please update the README.md for the backend as well.
 
 [dependencies]
-axum = { version = "0.8", features = ["macros", "tracing"] }
-axum-extra = { version = "0.10", default-features = false, features = ["attachment", "cookie"] }
+axum = { version = "0.8", features = ["macros", "tracing", "tokio"] }
+axum-extra = { version = "0.10", default-features = false, features = ["attachment", "cookie", "typed-header"] }
 chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
 clap = { version = "4.5", default-features = false, features = ["derive", "std", "help"] }
 hyper = { version = "1", features = ["full"] }

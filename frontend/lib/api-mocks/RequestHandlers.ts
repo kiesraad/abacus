@@ -1,6 +1,9 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
+  ACCOUNT_UPDATE_REQUEST_BODY,
+  ACCOUNT_UPDATE_REQUEST_PARAMS,
+  ACCOUNT_UPDATE_REQUEST_PATH,
   ErrorResponse,
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PARAMS,
@@ -61,16 +64,12 @@ export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBo
   });
 });
 
-export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse, LOGIN_REQUEST_PATH>(
-  "/api/user/login",
-  () => HttpResponse.json(loginResponseMockData, { status: 200 }),
-);
-
-// get user handler
-export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginResponse, WHOAMI_REQUEST_PATH>(
-  "/api/user/whoami",
-  () => HttpResponse.json(loginResponseMockData, { status: 200 }),
-);
+export const AccountUpdateRequestHandler = http.put<
+  ACCOUNT_UPDATE_REQUEST_PARAMS,
+  ACCOUNT_UPDATE_REQUEST_BODY,
+  LoginResponse,
+  ACCOUNT_UPDATE_REQUEST_PATH
+>("/api/user/account", () => HttpResponse.json(loginResponseMockData, { status: 200 }));
 
 // get election list handler
 export const ElectionListRequestHandler = http.get("/api/elections", () =>
@@ -87,6 +86,11 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
 export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id/status",
   () => HttpResponse.json(electionStatusMockResponse, { status: 200 }),
+);
+
+export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse, LOGIN_REQUEST_PATH>(
+  "/api/user/login",
+  () => HttpResponse.json(loginResponseMockData, { status: 200 }),
 );
 
 // get polling stations
@@ -184,12 +188,19 @@ export const UserDeleteRequestHandler = http.delete<
   USER_DELETE_REQUEST_PATH
 >("/api/user/1", () => new HttpResponse(null, { status: 200 }));
 
+// get user handler
+export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginResponse, WHOAMI_REQUEST_PATH>(
+  "/api/user/whoami",
+  () => HttpResponse.json(loginResponseMockData, { status: 200 }),
+);
+
 export const handlers: HttpHandler[] = [
   pingHandler,
-  WhoAmIRequestHandler,
+  AccountUpdateRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  LoginHandler,
   PollingStationListRequestHandler,
   PollingStationDataEntrySaveHandler,
   PollingStationDataEntryGetHandler,
@@ -204,4 +215,5 @@ export const handlers: HttpHandler[] = [
   UserListRequestHandler,
   UserUpdateRequestHandler,
   UserDeleteRequestHandler,
+  WhoAmIRequestHandler,
 ];

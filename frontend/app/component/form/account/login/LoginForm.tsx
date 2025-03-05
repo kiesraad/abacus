@@ -28,8 +28,13 @@ export function LoginForm() {
       setError(null);
       setUsername("");
       setPassword("");
-      // TODO: Handle successful login navigation here
-      void navigate("../setup");
+
+      const { fullname, needs_password_change } = result.data;
+      if (!fullname || needs_password_change) {
+        void navigate("../setup");
+      } else {
+        void navigate("/elections");
+      }
     }
   }
 

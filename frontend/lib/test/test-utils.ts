@@ -72,8 +72,10 @@ export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: s
 }
 
 export function spyOnHandler(handler: HttpHandler) {
-  const spy = vi.fn();
   const { method, path } = handler.info;
+
+  const spy = vi.fn();
+  spy.mockName(`${method} ${path} spy`);
 
   server.events.on("request:start", ({ request }) => {
     const url = new URL(request.url);

@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { Navigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
-import { AccountSetupForm } from "app/component/form/user/account_setup/AccountSetupForm";
+import { AccountSetupForm } from "app/component/form/account/account_setup/AccountSetupForm";
 
-import { useUser } from "@kiesraad/api";
+import { LoginResponse, useApiState } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, PageTitle } from "@kiesraad/ui";
 
 export function AccountSetupPage() {
+  const navigate = useNavigate();
   const [showAlert, setShowAlert] = useState(true);
-  const user = useUser();
+  const { user, setUser } = useApiState();
 
   if (!user) {
     return <Navigate to="/account/login" />;
@@ -17,6 +18,11 @@ export function AccountSetupPage() {
 
   function hideAlert() {
     setShowAlert(!showAlert);
+  }
+
+  function handleSaved(user: LoginResponse) {
+    setUser(user);
+    void navigate("/elections#new-account");
   }
 
   return (
@@ -35,7 +41,7 @@ export function AccountSetupPage() {
       )}
       <main>
         <article className="no_footer">
-          <AccountSetupForm />
+          <AccountSetupForm user={user} onSaved={handleSaved} />
         </article>
       </main>
     </>

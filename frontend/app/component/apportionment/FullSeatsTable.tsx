@@ -5,15 +5,15 @@ import { cn } from "@kiesraad/util";
 
 import cls from "./Apportionment.module.css";
 
-interface WholeSeatsTableProps {
+interface FullSeatsTableProps {
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
   quota: Fraction;
 }
 
-export function WholeSeatsTable({ finalStanding, politicalGroups, quota }: WholeSeatsTableProps) {
+export function FullSeatsTable({ finalStanding, politicalGroups, quota }: FullSeatsTableProps) {
   return (
-    <Table id="whole_seats_table" className={cn(cls.table, cls.wholeSeatsTable)}>
+    <Table id="full_seats_table" className={cn(cls.table, cls.fullSeatsTable)}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>
@@ -23,7 +23,7 @@ export function WholeSeatsTable({ finalStanding, politicalGroups, quota }: Whole
           {t("apportionment.quota")}
         </Table.HeaderCell>
         <Table.HeaderCell>=</Table.HeaderCell>
-        <Table.HeaderCell className="text-align-r">{t("apportionment.whole_seats_count")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.full_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
         {finalStanding.map((standing: PoliticalGroupSeatAssignment) => {
@@ -35,7 +35,7 @@ export function WholeSeatsTable({ finalStanding, politicalGroups, quota }: Whole
               <Table.Cell>:</Table.Cell>
               <Table.DisplayFractionCells>{quota}</Table.DisplayFractionCells>
               <Table.Cell>=</Table.Cell>
-              <Table.NumberCell className="font-number">{standing.whole_seats}</Table.NumberCell>
+              <Table.NumberCell className="font-number">{standing.full_seats}</Table.NumberCell>
             </Table.Row>
           );
         })}

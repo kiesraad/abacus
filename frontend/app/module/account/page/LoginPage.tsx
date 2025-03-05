@@ -6,10 +6,10 @@ import { PageTitle } from "@kiesraad/ui";
 export function LoginPage() {
   return (
     <>
-      <PageTitle title={`${t("user.login")} - Abacus`} />
+      <PageTitle title={`${t("account.login")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("user.login")}</h1>
+          <h1>{t("account.login")}</h1>
         </section>
       </header>
       <main>

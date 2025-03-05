@@ -18,6 +18,7 @@ import {
   UserCreateRolePage,
   UserCreateTypePage,
   UserListPage,
+  UserUpdatePage,
 } from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
@@ -26,12 +27,12 @@ import { t } from "@kiesraad/i18n";
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { CheckAndSaveForm } from "./component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
-import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
+import { Logout } from "./module/account/Logout";
 import {
+  ApportionmentFullSeatsPage,
   ApportionmentLayout,
   ApportionmentPage,
   ApportionmentResidualSeatsPage,
-  ApportionmentWholeSeatsPage,
 } from "./module/apportionment";
 import {
   CandidatesVotesPage,
@@ -54,8 +55,8 @@ export const routes = createRoutesFromElements(
     <Route path="account" element={<LoginLayout />}>
       <Route index element={<UserHomePage />} />
       <Route path="login" element={<LoginPage />} />
+      <Route path="logout" element={<Logout />} />
       <Route path="setup" element={<AccountSetupPage />} />
-      <Route path="change-password" element={<ChangePasswordPage />} />
     </Route>
     <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />
@@ -64,7 +65,7 @@ export const routes = createRoutesFromElements(
         <Route path="apportionment" element={<ApportionmentLayout />}>
           <Route index element={<ApportionmentPage />} />
           <Route path="details-residual-seats" element={<ApportionmentResidualSeatsPage />} />
-          <Route path="details-whole-seats" element={<ApportionmentWholeSeatsPage />} />
+          <Route path="details-full-seats" element={<ApportionmentFullSeatsPage />} />
         </Route>
         <Route
           path="report"
@@ -106,6 +107,7 @@ export const routes = createRoutesFromElements(
           <Route path="type" element={<UserCreateTypePage />} />
           <Route path="details" element={<UserCreateDetailsPage />} />
         </Route>
+        <Route path=":userId/update" element={<UserUpdatePage />} />
       </Route>
       <Route path="workstations" element={<WorkstationsHomePage />} />
     </Route>

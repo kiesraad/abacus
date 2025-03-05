@@ -65,7 +65,7 @@ describe("ApportionmentPage", () => {
     expect(links[0]).toHaveTextContent("10 zetels werden als volle zetel toegewezen");
     expect(within(links[0] as HTMLElement).getByRole("link", { name: "bekijk details" })).toHaveAttribute(
       "href",
-      "/details-whole-seats",
+      "/details-full-seats",
     );
     expect(links[1]).toHaveTextContent("5 zetels werden als restzetel toegewezen");
     expect(within(links[1] as HTMLElement).getByRole("link", { name: "bekijk details" })).toHaveAttribute(

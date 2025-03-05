@@ -5,17 +5,17 @@ use axum::{
 use axum_extra::extract::CookieJar;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{query, query_as, Error, FromRow, SqlitePool};
+use sqlx::{Error, FromRow, SqlitePool, query, query_as};
 use utoipa::ToSchema;
 
 use crate::{APIError, AppState};
 
 use super::{
+    SESSION_COOKIE_NAME,
     error::AuthenticationError,
-    password::{hash_password, verify_password},
+    password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     role::Role,
     session::Sessions,
-    SESSION_COOKIE_NAME,
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
@@ -26,13 +26,13 @@ pub struct User {
     id: u32,
     username: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
+    #[schema(value_type = String, nullable = false)]
     fullname: Option<String>,
     role: Role,
     #[serde(skip_deserializing)]
     needs_password_change: bool,
     #[serde(skip)]
-    password_hash: String,
+    password_hash: HashedPassword,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String, nullable = false)]
     last_activity_at: Option<DateTime<Utc>>,
@@ -78,14 +78,34 @@ impl User {
         }
     }
 
-    #[cfg(test)]
     pub fn fullname(&self) -> Option<&str> {
         self.fullname.as_deref()
     }
 
-    #[cfg(test)]
     pub fn role(&self) -> Role {
         self.role
+    }
+
+    pub fn needs_password_change(&self) -> bool {
+        self.needs_password_change
+    }
+
+    #[cfg(test)]
+    pub fn test_user(role: Role) -> Self {
+        Self {
+            id: 1,
+            username: "test_user_1".to_string(),
+            fullname: Some("Full Name".to_string()),
+            role,
+            needs_password_change: false,
+            password_hash: hash_password(
+                ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None).unwrap(),
+            )
+            .unwrap(),
+            last_activity_at: None,
+            updated_at: chrono::Utc::now(),
+            created_at: chrono::Utc::now(),
+        }
     }
 }
 
@@ -194,7 +214,8 @@ impl Users {
         password: &str,
         role: Role,
     ) -> Result<User, AuthenticationError> {
-        let password_hash = hash_password(password)?;
+        let password_hash: HashedPassword =
+            hash_password(ValidatedPassword::new(username, password, None)?)?;
 
         let user = sqlx::query_as!(
             User,
@@ -217,7 +238,17 @@ impl Users {
             role,
         )
         .fetch_one(&self.0)
-        .await?;
+        .await
+        .map_err(|e| {
+            if e.as_database_error()
+                .map(|e| e.is_unique_violation())
+                .unwrap_or(false)
+            {
+                AuthenticationError::UsernameAlreadyExists
+            } else {
+                e.into()
+            }
+        })?;
 
         Ok(user)
     }
@@ -261,17 +292,57 @@ impl Users {
         Ok(updated_user)
     }
 
+    /// Delete a user
+    pub async fn delete(&self, user_id: u32) -> Result<bool, AuthenticationError> {
+        let rows_affected = sqlx::query_as!(User, r#" DELETE FROM users WHERE id = ?"#, user_id)
+            .execute(&self.0)
+            .await?
+            .rows_affected();
+
+        Ok(rows_affected > 0)
+    }
+
     /// Update a user's password
     pub async fn update_password(
         &self,
         user_id: u32,
+        username: &str,
         new_password: &str,
     ) -> Result<(), AuthenticationError> {
-        let password_hash = hash_password(new_password)?;
+        let mut tx = self.0.begin().await?;
+        let old_password = sqlx::query!("SELECT password_hash FROM users WHERE id = ?", user_id)
+            .fetch_one(tx.as_mut())
+            .await?
+            .password_hash
+            .into();
+
+        let password_hash = hash_password(ValidatedPassword::new(
+            username,
+            new_password,
+            Some(&old_password),
+        )?)?;
 
         sqlx::query!(
             r#"UPDATE users SET password_hash = ?, needs_password_change = FALSE WHERE id = ?"#,
             password_hash,
+            user_id
+        )
+        .execute(tx.as_mut())
+        .await?;
+
+        tx.commit().await?;
+        Ok(())
+    }
+
+    /// Update a user's fullname
+    pub async fn update_fullname(
+        &self,
+        user_id: u32,
+        fullname: &str,
+    ) -> Result<(), AuthenticationError> {
+        sqlx::query!(
+            r#"UPDATE users SET fullname = ? WHERE id = ?"#,
+            fullname,
             user_id
         )
         .execute(&self.0)
@@ -286,7 +357,8 @@ impl Users {
         user_id: u32,
         temp_password: &str,
     ) -> Result<(), AuthenticationError> {
-        let password_hash = hash_password(temp_password)?;
+        let username = self.username_by_id(user_id).await?;
+        let password_hash = hash_password(ValidatedPassword::new(&username, temp_password, None)?)?;
         sqlx::query!(
             r#"UPDATE users SET password_hash = ?, needs_password_change = TRUE WHERE id = ?"#,
             password_hash,
@@ -371,6 +443,15 @@ impl Users {
         Ok(users)
     }
 
+    pub async fn username_by_id(&self, user_id: u32) -> Result<String, Error> {
+        Ok(
+            sqlx::query!("SELECT username FROM users WHERE id = ?", user_id)
+                .fetch_one(&self.0)
+                .await?
+                .username,
+        )
+    }
+
     pub async fn update_last_activity_at(&self, user_id: u32) -> Result<(), Error> {
         query!(
             r#"UPDATE users SET last_activity_at = CURRENT_TIMESTAMP WHERE id = ?"#,
@@ -396,6 +477,7 @@ mod tests {
 
     use crate::authentication::{
         error::AuthenticationError,
+        password,
         role::Role,
         session::Sessions,
         user::{User, Users},
@@ -406,7 +488,7 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", None, "password", Role::Typist)
+            .create("test_user", None, "TotallyValidP4ssW0rd", Role::Typist)
             .await
             .unwrap();
 
@@ -422,6 +504,28 @@ mod tests {
     }
 
     #[test(sqlx::test)]
+    async fn test_create_user_duplicate_username(pool: SqlitePool) {
+        let users = Users::new(pool.clone());
+
+        let user = users
+            .create("test_user", None, "TotallyValidP4ssW0rd", Role::Typist)
+            .await
+            .unwrap();
+
+        assert_eq!(user.username, "test_user");
+
+        // Try to create a user with the same username, case-insensitive
+        let error = users
+            .create("test_User", None, "TotallyValidP4ssW0rd", Role::Typist)
+            .await;
+
+        assert!(matches!(
+            error,
+            Err(AuthenticationError::UsernameAlreadyExists)
+        ));
+    }
+
+    #[test(sqlx::test)]
     async fn test_authenticate_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
@@ -429,13 +533,16 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "password",
+                "TotallyValidP4ssW0rd",
                 Role::Coordinator,
             )
             .await
             .unwrap();
 
-        let authenticated_user = users.authenticate("test_user", "password").await.unwrap();
+        let authenticated_user = users
+            .authenticate("test_user", "TotallyValidP4ssW0rd")
+            .await
+            .unwrap();
 
         assert_eq!(user, authenticated_user);
 
@@ -450,7 +557,7 @@ mod tests {
         ));
 
         let authenticated_user = users
-            .authenticate("other_user", "password")
+            .authenticate("other_user", "TotallyValidP4ssW0rd")
             .await
             .unwrap_err();
 
@@ -469,7 +576,7 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "password",
+                "TotallyValidP4ssW0rd",
                 Role::Administrator,
             )
             .await
@@ -503,30 +610,30 @@ mod tests {
     async fn test_change_password(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
+        let old_password = "TotallyValidP4ssW0rd";
+        let new_password = "TotallyValidNewP4ssW0rd";
+
         let user = users
             .create(
                 "test_user",
                 Some("Full Name"),
-                "password",
+                old_password,
                 Role::Administrator,
             )
             .await
             .unwrap();
 
         users
-            .update_password(user.id(), "new_password")
+            .update_password(user.id(), "test_user", new_password)
             .await
             .unwrap();
 
-        let authenticated_user = users
-            .authenticate("test_user", "new_password")
-            .await
-            .unwrap();
+        let authenticated_user = users.authenticate("test_user", new_password).await.unwrap();
 
         assert_eq!(user.id(), authenticated_user.id());
 
         let authenticated_user = users
-            .authenticate("test_user", "password")
+            .authenticate("test_user", old_password)
             .await
             .unwrap_err();
 
@@ -545,7 +652,7 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "password",
+                "TotallyValidP4ssW0rd",
                 Role::Administrator,
             )
             .await
@@ -555,7 +662,7 @@ mod tests {
         assert!(user.needs_password_change);
 
         users
-            .update_password(user.id(), "temp_password")
+            .update_password(user.id(), "test_user", "temp_password")
             .await
             .unwrap();
 
@@ -581,7 +688,7 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "password",
+                "TotallyValidP4ssW0rd",
                 Role::Administrator,
             )
             .await
@@ -600,7 +707,11 @@ mod tests {
             fullname: Some("Full Name".to_string()),
             role: Role::Typist,
             needs_password_change: false,
-            password_hash: "h4sh".to_string(),
+            password_hash: password::hash_password(
+                password::ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None)
+                    .unwrap(),
+            )
+            .unwrap(),
             last_activity_at: None,
             updated_at: chrono::Utc::now(),
             created_at: chrono::Utc::now(),

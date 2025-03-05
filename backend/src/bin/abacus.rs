@@ -1,5 +1,6 @@
 #[cfg(feature = "dev-database")]
-use abacus::{fixtures, start_server};
+use abacus::fixtures;
+use abacus::start_server;
 use clap::Parser;
 use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 use std::{
@@ -8,7 +9,9 @@ use std::{
     str::FromStr,
 };
 use tokio::net::TcpListener;
-use tracing::{info, level_filters::LevelFilter};
+#[cfg(feature = "dev-database")]
+use tracing::info;
+use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 
 /// Abacus API and asset server

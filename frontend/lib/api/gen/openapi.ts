@@ -380,6 +380,7 @@ export type ErrorReference =
   | "PollingStationSecondEntryAlreadyFinalised"
   | "PollingStationValidationErrors"
   | "UserNotFound"
+  | "UsernameNotUnique"
   | "Unauthorized"
   | "PasswordRejection";
 

@@ -49,6 +49,7 @@ pub enum ErrorReference {
     PollingStationSecondEntryAlreadyFinalised,
     PollingStationValidationErrors,
     UserNotFound,
+    UsernameNotUnique,
     Unauthorized,
     PasswordRejection,
 }
@@ -195,6 +196,14 @@ impl IntoResponse for APIError {
                         to_error(
                             "Invalid username and/or password",
                             ErrorReference::InvalidUsernameOrPassword,
+                            false,
+                        ),
+                    ),
+                    AuthenticationError::UsernameAlreadyExists => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Username already exists",
+                            ErrorReference::UsernameNotUnique,
                             false,
                         ),
                     ),

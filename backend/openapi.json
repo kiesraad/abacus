@@ -1290,6 +1290,16 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict (username already exists)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -2298,6 +2308,7 @@
           "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
           "UserNotFound",
+          "UsernameNotUnique",
           "Unauthorized",
           "PasswordRejection"
         ]

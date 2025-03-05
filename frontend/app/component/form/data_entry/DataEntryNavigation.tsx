@@ -54,6 +54,13 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
     return null;
   }
 
+  const onModalSave = async () => {
+    if (await onSubmit({ aborting: false, continueToNextSection: true, showAcceptWarnings: false })) {
+      blocker.proceed();
+    } else {
+      blocker.reset();
+    }
+  };
   // when save is chosen in the abort dialog
   const onAbortModalSave = async () => {
     if (await onSubmit({ aborting: true, continueToNextSection: false, showAcceptWarnings: false })) {
@@ -67,7 +74,7 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
     }
   };
 
-  const onAbortModalDoNoSave = () => {
+  const onModalDoNoSave = () => {
     updateFormSection({ hasChanges: false });
     blocker.proceed();
   };
@@ -94,7 +101,7 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
             size="lg"
             type="button"
             onClick={() => {
-              void onAbortModalSave();
+              void onModalSave();
             }}
           >
             {t("save_changes")}
@@ -104,7 +111,7 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
             variant="secondary"
             type="button"
             onClick={() => {
-              onAbortModalDoNoSave();
+              onModalDoNoSave();
             }}
           >
             {t("do_not_save")}

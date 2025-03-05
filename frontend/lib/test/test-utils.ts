@@ -3,10 +3,12 @@ import { createMemoryRouter, RouteObject } from "react-router";
 
 import { render, RenderOptions, screen } from "@testing-library/react";
 import { UserEvent } from "@testing-library/user-event";
-import { expect } from "vitest";
+import { HttpHandler, matchRequestUrl } from "msw";
+import { expect, vi } from "vitest";
 
 import { Providers } from "./Providers";
 import { getRouter } from "./router";
+import { server } from "./server";
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
   render(ui, { wrapper: Providers, ...options });
@@ -67,4 +69,23 @@ export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: s
     await user.type(input, value.toString());
     expect(input).toHaveValue(value.toString());
   }
+}
+
+export function spyOnHandler(handler: HttpHandler) {
+  const spy = vi.fn();
+  const { method, path } = handler.info;
+
+  server.events.on("request:start", ({ request }) => {
+    const url = new URL(request.url);
+    if (request.method === method && matchRequestUrl(url, path).matches) {
+      void request
+        .clone()
+        .text()
+        .then((body) => {
+          spy(body.length ? JSON.parse(body) : null);
+        });
+    }
+  });
+
+  return spy;
 }

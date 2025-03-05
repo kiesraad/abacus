@@ -4,8 +4,13 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider, PollingStation } from "@kiesraad/api";
-import { ElectionRequestHandler, PollingStationUpdateHandler } from "@kiesraad/api-mocks";
-import { overrideOnce, render, renderReturningRouter, server } from "@kiesraad/test";
+import {
+  ElectionRequestHandler,
+  PollingStationDeleteHandler,
+  PollingStationGetHandler,
+  PollingStationUpdateHandler,
+} from "@kiesraad/api-mocks";
+import { overrideOnce, render, renderReturningRouter, server, spyOnHandler } from "@kiesraad/test";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
@@ -28,17 +33,10 @@ describe("PollingStationUpdatePage", () => {
   };
 
   beforeEach(() => {
-    server.use(ElectionRequestHandler, PollingStationUpdateHandler);
+    server.use(ElectionRequestHandler, PollingStationGetHandler, PollingStationUpdateHandler);
   });
 
   test("Shows form", async () => {
-    overrideOnce(
-      "get",
-      `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`,
-      200,
-      testPollingStation,
-    );
-
     render(
       <ElectionProvider electionId={1}>
         <PollingStationUpdatePage />
@@ -48,18 +46,11 @@ describe("PollingStationUpdatePage", () => {
     const form = await screen.findByTestId("polling-station-form");
     expect(form).toBeVisible();
 
-    expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("1");
-    expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("test");
+    expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("33");
+    expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("Op Rolletjes");
   });
 
   test("Navigates back on save", async () => {
-    overrideOnce(
-      "get",
-      `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`,
-      200,
-      testPollingStation,
-    );
-
     const router = renderReturningRouter(
       <ElectionProvider electionId={1}>
         <PollingStationUpdatePage />
@@ -77,14 +68,8 @@ describe("PollingStationUpdatePage", () => {
 
   describe("Delete polling station", () => {
     test("Returns to list page with a message", async () => {
+      server.use(PollingStationDeleteHandler);
       const user = userEvent.setup();
-
-      overrideOnce(
-        "get",
-        `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`,
-        200,
-        testPollingStation,
-      );
 
       const router = renderReturningRouter(
         <ElectionProvider electionId={1}>
@@ -98,40 +83,21 @@ describe("PollingStationUpdatePage", () => {
       const modal = await screen.findByTestId("modal-dialog");
       expect(modal).toHaveTextContent("Stembureau verwijderen");
 
-      let request_method: string;
-      let request_url: string;
-
-      overrideOnce(
-        "delete",
-        `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`,
-        200,
-        "",
-      );
-
-      server.events.on("request:start", ({ request }) => {
-        request_method = request.method;
-        request_url = request.url;
-      });
+      const deletePollingStation = spyOnHandler(PollingStationDeleteHandler);
 
       const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
       await user.click(confirmButton);
 
-      await waitFor(() => {
-        expect(request_method).toEqual("DELETE");
-        expect(request_url).toContain(
-          `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`,
-        );
-      });
+      expect(deletePollingStation).toHaveBeenCalled();
 
       expect(router.state.location.pathname).toEqual("/elections/1/polling-stations");
-      expect(router.state.location.search).toEqual("?deleted=1%20(test)");
+      expect(router.state.location.search).toEqual("?deleted=33%20(Op%20Rolletjes)");
     });
 
     test("Shows an error message when delete was not possible", async () => {
       const user = userEvent.setup();
 
       const url = `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`;
-      overrideOnce("get", url, 200, testPollingStation);
       overrideOnce("delete", url, 422, {
         error: "Invalid data",
         fatal: false,

@@ -73,10 +73,11 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
     }
 
     if (accountUpdate.password.length === 0) {
-      errors.password = t("account.password_hint");
+      errors.password = t("account.password_rules");
     }
 
     if (accountUpdate.password !== passwordRepeat) {
+      errors.password = t("account.password_rules");
       errors.password_repeat = t("account.password_mismatch");
     }
 
@@ -96,10 +97,11 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
         </FormLayout.Alert>
       )}
 
-      {validationErrors?.password && (
+      {validationErrors && (
         <FormLayout.Alert>
           <Alert type="error">
-            <h2>{t("error.api_error.PasswordRejection")}</h2>
+            <h2>{t("account.not_saved")}</h2>
+            <p>{t("account.check_fields")}</p>
           </Alert>
         </FormLayout.Alert>
       )}

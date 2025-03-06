@@ -1,13 +1,11 @@
 use axum::extract::FromRef;
 use sqlx::{SqlitePool, query, query_as, types::Json};
 
-use super::{
-    PollingStation, PollingStationDataEntry, PollingStationResults, status::DataEntryStatus,
-};
+use super::{PollingStationDataEntry, PollingStationResults, status::DataEntryStatus};
 use crate::{
     AppState,
     data_entry::{ElectionStatusResponseEntry, PollingStationResultsEntry},
-    polling_station::repository::PollingStations,
+    polling_station::{PollingStation, repository::PollingStations},
 };
 
 pub struct PollingStationDataEntries(SqlitePool);

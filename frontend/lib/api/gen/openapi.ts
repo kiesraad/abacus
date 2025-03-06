@@ -183,6 +183,20 @@ export interface Candidate {
  */
 export type CandidateGender = "Male" | "Female" | "X";
 
+/**
+ * The result of the candidate nomination procedure.
+This contains the preference threshold and percentage that was used.
+It contains a list of all chosen candidates in alphabetical order.
+It also contains the preferential nomination of candidates, the remaining
+nomination of candidates and the final ranking of candidates for each political group.
+ */
+export interface CandidateNominationResult {
+  chosen_candidates: Candidate[];
+  political_group_candidate_nomination: PoliticalGroupCandidateNomination[];
+  preference_threshold: Fraction;
+  preference_threshold_percentage: number;
+}
+
 export interface CandidateVotes {
   number: number;
   votes: number;
@@ -247,7 +261,7 @@ export interface Election {
 }
 
 /**
- * Election details response, including the election's candidate list (political groups) and its polling stations
+ * Election apportionment response, including the seat assignment, candidate nomination and election summary
  */
 export interface ElectionApportionmentResponse {
   election_summary: ElectionSummary;
@@ -422,6 +436,19 @@ export interface PoliticalGroup {
   candidates: Candidate[];
   name: string;
   number: number;
+}
+
+/**
+ * Contains information about the chosen candidates and the candidate list ranking
+for a specific political group.
+ */
+export interface PoliticalGroupCandidateNomination {
+  candidate_ranking: CandidateVotes[];
+  other_candidate_nomination: CandidateVotes[];
+  pg_name: string;
+  pg_number: number;
+  pg_seats: number;
+  preferential_candidate_nomination: CandidateVotes[];
 }
 
 /**

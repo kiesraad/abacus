@@ -44,7 +44,7 @@ pub struct CandidateNominationResult {
     pub political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination>,
 }
 
-/// Create a vector containing just the political group numbers from an iterator of the current standing
+/// Create a vector containing just the candidate numbers from an iterator of candidate votes
 fn candidate_numbers(candidate_votes: &[CandidateVotes]) -> Vec<CandidateNumber> {
     candidate_votes
         .iter()
@@ -122,7 +122,7 @@ fn other_candidate_nomination(
 fn candidate_nomination_per_political_group(
     totals: &ElectionSummary,
     preference_threshold: Fraction,
-    final_standing: Vec<PoliticalGroupSeatAssignment>,
+    final_standing: &[PoliticalGroupSeatAssignment],
     political_groups: Vec<PoliticalGroup>,
 ) -> Result<Vec<PoliticalGroupCandidateNomination>, ApportionmentError> {
     let mut political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination> = vec![];
@@ -134,12 +134,14 @@ fn candidate_nomination_per_political_group(
             candidates_meeting_preference_threshold(preference_threshold, candidate_votes);
         let preferential_candidate_nomination =
             preferential_candidate_nomination(&candidates_meeting_preference_threshold, pg_seats)?;
+
         // [Artikel P 17 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_17&z=2025-02-12&g=2025-02-12)
         let other_candidate_nomination = other_candidate_nomination(
             &preferential_candidate_nomination,
             candidate_votes,
             pg_seats as usize - preferential_candidate_nomination.len(),
         );
+
         // TODO: #1045 Article P 19 reordering of political group candidate list if seats have been assigned
         // [Artikel P 19 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_19&z=2025-02-12&g=2025-02-12)
         let candidate_ranking = vec![];
@@ -161,7 +163,7 @@ pub fn candidate_nomination(
     election: Election,
     quota: Fraction,
     totals: &ElectionSummary,
-    final_standing: Vec<PoliticalGroupSeatAssignment>,
+    final_standing: &[PoliticalGroupSeatAssignment],
 ) -> Result<CandidateNominationResult, ApportionmentError> {
     info!("Candidate nomination");
 
@@ -185,6 +187,7 @@ pub fn candidate_nomination(
         final_standing,
         election.political_groups.unwrap_or_default(),
     )?;
+
     // TODO: Create ordered chosen candidates list
     let chosen_candidates = vec![];
 

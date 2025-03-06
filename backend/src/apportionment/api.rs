@@ -18,7 +18,7 @@ use crate::{
     summary::ElectionSummary,
 };
 
-/// Election details response, including the election's candidate list (political groups) and its polling stations
+/// Election apportionment response, including the seat assignment, candidate nomination and election summary
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionApportionmentResponse {
     pub seat_assignment: SeatAssignmentResult,

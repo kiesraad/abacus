@@ -188,9 +188,11 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             schemas(
                 ErrorResponse,
                 apportionment::AssignedSeat,
+                apportionment::CandidateNominationResult,
                 apportionment::DisplayFraction,
                 apportionment::LargestAverageAssignedSeat,
                 apportionment::LargestRemainderAssignedSeat,
+                apportionment::PoliticalGroupCandidateNomination,
                 apportionment::PoliticalGroupStanding,
                 apportionment::SeatAssignmentResult,
                 apportionment::SeatAssignmentStep,
@@ -232,6 +234,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             ),
         ),
         tags(
+            (name = "apportionment", description = "Election apportionment API"),
             (name = "authentication", description = "Authentication and user API"),
             (name = "election", description = "Election API"),
             (name = "polling_station", description = "Polling station API"),

@@ -57,6 +57,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 | Wanneer            | Hoe vaak        | Wie                                            | Wat                                                                                 |
 |--------------------|-----------------|------------------------------------------------|-------------------------------------------------------------------------------------|
 | ontwikkeling       | continu         | ontwikkelteam                                  | permanente reviews van code en documentatie, handmatig en automatisch testen, CI/CD |
+| ontwikkeling       | continu         | externe tools                                  | permanente analyse van code kwaliteit en testcoverage                               | 
 | ontwikkeling       | regelmatig      | stakeholders Kiesraad                          | feedback op applicatie en documentatie                                              |
 | tussentijds        | te bepalen      | externe stakeholders, externe geïnteresseerden | feedback op code, applicatie en documentatie                                        |
 | oefen-release      | elk half jaar   | externe partijen                               | code review, pentest                                                                |
@@ -75,7 +76,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 - één ticket/taak mag in meerdere PR's gebouwd worden.
 - Pair/ensemble programming telt als review.
 - Vraag vroeg om feedback: [editing over proof-reading](https://buttondown.email/hillelwayne/archive/code-review-vs-code-proofreading/) (Hillel Wayne)
-- Zoveel mogelijk afvangen d.m.v. linting en static code analysis, zodat menselijke code review kan focussen op architectuur e.d.
+- Zoveel mogelijk afvangen d.m.v. linting, static code analysis, code kwaliteit en testcoverage zodat menselijke code review kan focussen op architectuur e.d.
 
 #### Handmatige tests en automatische tests
 
@@ -95,6 +96,8 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
   - Integration tests
   - End-to-end tests
   - Security scan
+  - Code kwaliteit
+  - Test coverage
   - Performance test
   - Installeerbaarheidstest
 - Op zijn minst de volgende quality gates kunnen ook lokaal gedraaid worden: linting, unit tests, integration tests, end-to-end tests.

@@ -69,7 +69,7 @@ fn preferential_candidate_nomination(
     candidates_meeting_preference_threshold: &[CandidateVotes],
     mut pg_seats: u32,
 ) -> Result<Vec<CandidateVotes>, ApportionmentError> {
-    let mut preferential_candidate_nomination = vec![];
+    let mut preferential_candidate_nomination: Vec<CandidateVotes> = vec![];
     if candidates_meeting_preference_threshold.len() <= pg_seats as usize {
         preferential_candidate_nomination.extend(candidates_meeting_preference_threshold);
     } else {
@@ -125,40 +125,35 @@ fn candidate_nomination_per_political_group(
     final_standing: Vec<PoliticalGroupSeatAssignment>,
     political_groups: Vec<PoliticalGroup>,
 ) -> Result<Vec<PoliticalGroupCandidateNomination>, ApportionmentError> {
-    let political_group_candidate_nomination_list: Vec<PoliticalGroupCandidateNomination> =
-        political_groups
-            .iter()
-            .fold(vec![], |mut nomination_list, pg| {
-                let pg_index = pg.number as usize - 1;
-                let pg_seats = final_standing[pg_index].total_seats;
-                let candidate_votes = &totals.political_group_votes[pg_index].candidate_votes;
-                let candidates_meeting_preference_threshold =
-                    candidates_meeting_preference_threshold(preference_threshold, candidate_votes);
-                let preferential_candidate_nomination = preferential_candidate_nomination(
-                    &candidates_meeting_preference_threshold,
-                    pg_seats,
-                )?;
-                // [Artikel P 17 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_17&z=2025-02-12&g=2025-02-12)
-                let other_candidate_nomination = other_candidate_nomination(
-                    &preferential_candidate_nomination,
-                    candidate_votes,
-                    pg_seats as usize - preferential_candidate_nomination.len(),
-                );
-                // TODO: #1045 Article P 19 reordering of political group candidate list if seats have been assigned
-                // [Artikel P 19 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_19&z=2025-02-12&g=2025-02-12)
-                let candidate_ranking = vec![];
+    let mut political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination> = vec![];
+    for pg in political_groups {
+        let pg_index = pg.number as usize - 1;
+        let pg_seats = final_standing[pg_index].total_seats;
+        let candidate_votes = &totals.political_group_votes[pg_index].candidate_votes;
+        let candidates_meeting_preference_threshold =
+            candidates_meeting_preference_threshold(preference_threshold, candidate_votes);
+        let preferential_candidate_nomination =
+            preferential_candidate_nomination(&candidates_meeting_preference_threshold, pg_seats)?;
+        // [Artikel P 17 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_17&z=2025-02-12&g=2025-02-12)
+        let other_candidate_nomination = other_candidate_nomination(
+            &preferential_candidate_nomination,
+            candidate_votes,
+            pg_seats as usize - preferential_candidate_nomination.len(),
+        );
+        // TODO: #1045 Article P 19 reordering of political group candidate list if seats have been assigned
+        // [Artikel P 19 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_19&z=2025-02-12&g=2025-02-12)
+        let candidate_ranking = vec![];
 
-                nomination_list.push(PoliticalGroupCandidateNomination {
-                    pg_number: pg.number,
-                    pg_name: pg.name.clone(),
-                    pg_seats,
-                    preferential_candidate_nomination,
-                    other_candidate_nomination,
-                    candidate_ranking,
-                });
-                nomination_list
-            });
-    Ok(political_group_candidate_nomination_list)
+        political_group_candidate_nomination.push(PoliticalGroupCandidateNomination {
+            pg_number: pg.number,
+            pg_name: pg.name.clone(),
+            pg_seats,
+            preferential_candidate_nomination,
+            other_candidate_nomination,
+            candidate_ranking,
+        });
+    }
+    Ok(political_group_candidate_nomination)
 }
 
 /// Candidate nomination

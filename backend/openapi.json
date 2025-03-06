@@ -2457,7 +2457,7 @@
         "properties": {
           "full_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "description": "The number of full seats assigned to this group",
             "minimum": 0
           },
@@ -2477,13 +2477,13 @@
           },
           "residual_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "description": "The number of residual seats assigned to this group",
             "minimum": 0
           },
           "total_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "description": "The total number of seats assigned to this group",
             "minimum": 0
           },
@@ -2510,7 +2510,7 @@
         "properties": {
           "full_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "description": "The number of full seats this political group got assigned",
             "minimum": 0
           },
@@ -2534,7 +2534,7 @@
           },
           "residual_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "description": "The current number of residual seats this political group got assigned",
             "minimum": 0
           },
@@ -2759,7 +2759,7 @@
           },
           "full_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "quota": {
@@ -2767,12 +2767,12 @@
           },
           "residual_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "steps": {
@@ -2797,7 +2797,7 @@
           },
           "residual_seat_number": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "standing": {

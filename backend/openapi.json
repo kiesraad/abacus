@@ -251,7 +251,7 @@
     "/api/elections/{election_id}/download_pdf_results": {
       "get": {
         "tags": [
-          "election"
+          "report"
         ],
         "summary": "Download a generated PDF with election results",
         "operationId": "election_download_pdf_results",
@@ -319,7 +319,7 @@
     "/api/elections/{election_id}/download_xml_results": {
       "get": {
         "tags": [
-          "election"
+          "report"
         ],
         "summary": "Download a generated EML_NL 510 XML file with election results",
         "operationId": "election_download_xml_results",
@@ -379,7 +379,7 @@
     "/api/elections/{election_id}/download_zip_results": {
       "get": {
         "tags": [
-          "election"
+          "report"
         ],
         "summary": "Download a zip containing a PDF for the PV and the EML with election results",
         "operationId": "election_download_zip_results",

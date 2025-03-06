@@ -88,7 +88,7 @@ describe("AccountSetupForm", () => {
 
     const password = screen.getByLabelText("Kies nieuw wachtwoord");
     expect(password).toBeInvalid();
-    expect(password).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+    expect(password).toHaveAccessibleErrorMessage(/Gebruik minimaal 13 karakters/);
 
     expect(updateAccount).not.toHaveBeenCalled();
     expect(onSaved).not.toHaveBeenCalled();

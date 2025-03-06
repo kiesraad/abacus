@@ -56,7 +56,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
       } else {
         if (result instanceof ApiError && result.reference === "PasswordRejection") {
           setValidationErrors({
-            password: t("error.api_error.PasswordRejection"),
+            password: t("account.password_hint"),
           });
         } else {
           setApiError(result);
@@ -73,7 +73,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
     }
 
     if (accountUpdate.password.length === 0) {
-      errors.password = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
+      errors.password = t("account.password_hint");
     }
 
     if (accountUpdate.password !== passwordRepeat) {
@@ -92,6 +92,14 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
           <Alert type="success" onClose={hideLoginSuccess}>
             <h2>{t("account.login_success")}</h2>
             <p>{t("account.setting_up_account")}</p>
+          </Alert>
+        </FormLayout.Alert>
+      )}
+
+      {validationErrors?.password && (
+        <FormLayout.Alert>
+          <Alert type="error">
+            <h2>{t("error.api_error.PasswordRejection")}</h2>
           </Alert>
         </FormLayout.Alert>
       )}

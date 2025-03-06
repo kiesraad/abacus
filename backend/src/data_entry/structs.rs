@@ -239,7 +239,7 @@ impl PoliticalGroupVotes {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct CandidateVotes {
     #[schema(value_type = u32)]
     pub number: CandidateNumber,

@@ -1,12 +1,11 @@
-// TODO: #1046 Article P 15 assignment of seats to candidates that exceeded preference threshold
-//  & Article P 17 assignment of seats to other candidates based on list position
-
-// TODO: #1045 Article P 19 reordering of political group candidate list if seats have been assigned
-
-use crate::apportionment::Fraction;
-use crate::data_entry::CandidateVotes;
-use crate::election::PGNumber;
+use crate::{
+    apportionment::{ApportionmentError, Fraction, PoliticalGroupSeatAssignment},
+    data_entry::CandidateVotes,
+    election::{Candidate, CandidateNumber, Election, PGNumber, PoliticalGroup},
+    summary::ElectionSummary,
+};
 use serde::{Deserialize, Serialize};
+use tracing::{debug, info};
 use utoipa::ToSchema;
 
 /// Contains information about the chosen candidates and the candidate list ranking
@@ -18,16 +17,13 @@ pub struct PoliticalGroupCandidateNomination {
     pg_number: PGNumber,
     /// Political group name for which this nomination applies
     pub pg_name: String,
-    /// The total number of seats assigned to this group
-    pub total_seats: u64,
-    /// The list of chosen candidates via preferential votes, can be empty  
-    /// [Artikel P 15 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_15&z=2025-02-12&g=2025-02-12)
+    /// The number of seats assigned to this group
+    pub pg_seats: u32,
+    /// The list of chosen candidates via preferential votes, can be empty
     pub preferential_candidate_nomination: Vec<CandidateVotes>,
-    /// The list of other chosen candidates, can be empty  
-    /// [Artikel P 17 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_17&z=2025-02-12&g=2025-02-12)
+    /// The list of other chosen candidates, can be empty
     pub other_candidate_nomination: Vec<CandidateVotes>,
-    /// The ranking of the whole candidate list, can be empty  
-    /// [Artikel P 19 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_19&z=2025-02-12&g=2025-02-12)
+    /// The ranking of the whole candidate list, can be empty
     pub candidate_ranking: Vec<CandidateVotes>,
 }
 
@@ -38,12 +34,169 @@ pub struct PoliticalGroupCandidateNomination {
 /// nomination of candidates and the final ranking of candidates for each political group.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct CandidateNominationResult {
-    /// Preference threshold number of votes
-    pub preference_threshold: Fraction,
     /// Preference threshold percentage
     pub preference_threshold_percentage: u64,
+    /// Preference threshold number of votes
+    pub preference_threshold: Fraction,
     /// List of chosen candidates in alphabetical order
-    pub chosen_candidates: Vec<CandidateVotes>,
+    pub chosen_candidates: Vec<Candidate>,
     /// List of chosen candidates and candidate list ranking per political group
     pub political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination>,
+}
+
+/// Create a vector containing just the political group numbers from an iterator of the current standing
+fn candidate_numbers(candidate_votes: &[CandidateVotes]) -> Vec<CandidateNumber> {
+    candidate_votes
+        .iter()
+        .map(|candidate| candidate.number)
+        .collect()
+}
+
+fn candidates_meeting_preference_threshold(
+    preference_threshold: Fraction,
+    candidate_votes: &[CandidateVotes],
+) -> Vec<CandidateVotes> {
+    let mut candidates_meeting_preference_threshold: Vec<CandidateVotes> = candidate_votes
+        .iter()
+        .filter(|candidate_votes| Fraction::from(candidate_votes.votes) >= preference_threshold)
+        .cloned()
+        .collect();
+    candidates_meeting_preference_threshold.sort_by(|a, b| b.votes.cmp(&a.votes));
+    candidates_meeting_preference_threshold
+}
+
+fn preferential_candidate_nomination(
+    candidates_meeting_preference_threshold: &[CandidateVotes],
+    mut pg_seats: u32,
+) -> Result<Vec<CandidateVotes>, ApportionmentError> {
+    let mut preferential_candidate_nomination = vec![];
+    if candidates_meeting_preference_threshold.len() <= pg_seats as usize {
+        preferential_candidate_nomination.extend(candidates_meeting_preference_threshold);
+    } else {
+        let mut index = 0;
+        while pg_seats > 0 {
+            let same_votes_candidates: Vec<CandidateVotes> =
+                candidates_meeting_preference_threshold
+                    .iter()
+                    .filter(|candidate_votes| {
+                        candidate_votes.votes
+                            == candidates_meeting_preference_threshold[index].votes
+                    })
+                    .cloned()
+                    .collect();
+            if same_votes_candidates.len() > pg_seats as usize {
+                // TODO: #788 if multiple political groups have the same largest remainder and not enough residual seats are available, use drawing of lots
+                debug!(
+                    "Drawing of lots is required for political groups: {:?}, only {pg_seats} seat(s) available",
+                    candidate_numbers(&same_votes_candidates)
+                );
+                return Err(ApportionmentError::DrawingOfLotsNotImplemented);
+            } else {
+                preferential_candidate_nomination
+                    .push(candidates_meeting_preference_threshold[index]);
+            }
+            pg_seats -= 1;
+            index += 1;
+        }
+    }
+    Ok(preferential_candidate_nomination)
+}
+
+fn other_candidate_nomination(
+    preferential_candidate_nomination: &[CandidateVotes],
+    candidate_votes: &[CandidateVotes],
+    non_assigned_seats: usize,
+) -> Vec<CandidateVotes> {
+    let mut other_candidates_nominated: Vec<CandidateVotes> = vec![];
+    if non_assigned_seats > 0 {
+        let non_nominated_candidates: Vec<CandidateVotes> = candidate_votes
+            .iter()
+            .filter(|candidate_votes| !preferential_candidate_nomination.contains(candidate_votes))
+            .cloned()
+            .collect();
+        other_candidates_nominated = non_nominated_candidates[0..non_assigned_seats].to_vec()
+    }
+    other_candidates_nominated
+}
+
+fn candidate_nomination_per_political_group(
+    totals: &ElectionSummary,
+    preference_threshold: Fraction,
+    final_standing: Vec<PoliticalGroupSeatAssignment>,
+    political_groups: Vec<PoliticalGroup>,
+) -> Result<Vec<PoliticalGroupCandidateNomination>, ApportionmentError> {
+    let political_group_candidate_nomination_list: Vec<PoliticalGroupCandidateNomination> =
+        political_groups
+            .iter()
+            .fold(vec![], |mut nomination_list, pg| {
+                let pg_index = pg.number as usize - 1;
+                let pg_seats = final_standing[pg_index].total_seats;
+                let candidate_votes = &totals.political_group_votes[pg_index].candidate_votes;
+                let candidates_meeting_preference_threshold =
+                    candidates_meeting_preference_threshold(preference_threshold, candidate_votes);
+                let preferential_candidate_nomination = preferential_candidate_nomination(
+                    &candidates_meeting_preference_threshold,
+                    pg_seats,
+                )?;
+                // [Artikel P 17 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_17&z=2025-02-12&g=2025-02-12)
+                let other_candidate_nomination = other_candidate_nomination(
+                    &preferential_candidate_nomination,
+                    candidate_votes,
+                    pg_seats as usize - preferential_candidate_nomination.len(),
+                );
+                // TODO: #1045 Article P 19 reordering of political group candidate list if seats have been assigned
+                // [Artikel P 19 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_19&z=2025-02-12&g=2025-02-12)
+                let candidate_ranking = vec![];
+
+                nomination_list.push(PoliticalGroupCandidateNomination {
+                    pg_number: pg.number,
+                    pg_name: pg.name.clone(),
+                    pg_seats,
+                    preferential_candidate_nomination,
+                    other_candidate_nomination,
+                    candidate_ranking,
+                });
+                nomination_list
+            });
+    Ok(political_group_candidate_nomination_list)
+}
+
+/// Candidate nomination
+pub fn candidate_nomination(
+    election: Election,
+    quota: Fraction,
+    totals: &ElectionSummary,
+    final_standing: Vec<PoliticalGroupSeatAssignment>,
+) -> Result<CandidateNominationResult, ApportionmentError> {
+    info!("Candidate nomination");
+
+    // [Artikel P 15 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_15&z=2025-02-12&g=2025-02-12)
+    // Calculate preference threshold as a proper fraction
+    let preference_threshold_percentage = if election.number_of_seats >= 19 {
+        25
+    } else {
+        50
+    };
+    let preference_threshold = quota * Fraction::new(preference_threshold_percentage, 100);
+    info!(
+        "Preference threshold percentage: {}%",
+        preference_threshold_percentage
+    );
+    info!("Preference threshold: {}", preference_threshold);
+
+    let political_group_candidate_nomination = candidate_nomination_per_political_group(
+        totals,
+        preference_threshold,
+        final_standing,
+        election.political_groups.unwrap_or_default(),
+    )?;
+    // TODO: Create ordered chosen candidates list
+    let chosen_candidates = vec![];
+
+    Ok(CandidateNominationResult {
+        preference_threshold_percentage,
+        preference_threshold,
+        chosen_candidates,
+        political_group_candidate_nomination,
+    })
 }

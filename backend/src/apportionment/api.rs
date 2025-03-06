@@ -59,7 +59,7 @@ pub async fn election_apportionment(
             .list_with_polling_stations(polling_stations_repo, election.id)
             .await?;
         let election_summary = ElectionSummary::from_results(&election, &results)?;
-        let seat_assignment = seat_assignment(election.number_of_seats.into(), &election_summary)?;
+        let seat_assignment = seat_assignment(election.number_of_seats, &election_summary)?;
         Ok(Json(ElectionApportionmentResponse {
             seat_assignment,
             election_summary,

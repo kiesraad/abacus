@@ -1,3 +1,4 @@
+import { within } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
@@ -47,6 +48,31 @@ describe("AccountSetupForm", () => {
     });
 
     expect(onSaved).toHaveBeenCalledWith(loginResponseMockData);
+  });
+
+  test("Login success alert", async () => {
+    await renderForm();
+
+    const loginSuccess = screen.getByRole("alert");
+    expect(await within(loginSuccess).findByRole("heading", { name: "Inloggen gelukt" })).toBeVisible();
+
+    const user = userEvent.setup();
+    await user.click(await within(loginSuccess).findByRole("button"));
+
+    expect(loginSuccess).not.toBeInTheDocument();
+  });
+
+  test("Hide login success on submit", async () => {
+    await renderForm();
+
+    const loginSuccess = screen.getByRole("alert");
+    expect(await within(loginSuccess).findByRole("heading", { name: "Inloggen gelukt" })).toBeVisible();
+
+    const user = userEvent.setup();
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    expect(loginSuccess).not.toBeInTheDocument();
   });
 
   test("Required fields", async () => {

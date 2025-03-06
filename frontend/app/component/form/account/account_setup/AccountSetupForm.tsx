@@ -24,14 +24,20 @@ interface AccountSetupFormProps {
 }
 
 export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
+  const [showLoginSuccess, setShowLoginSuccess] = useState(true);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
 
   const url: ACCOUNT_UPDATE_REQUEST_PATH = "/api/user/account";
   const { update, requestState } = useCrud<LoginResponse>(url);
   const [apiError, setApiError] = useState<AnyApiError | null>(null);
 
+  function hideLoginSuccess() {
+    setShowLoginSuccess(false);
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    hideLoginSuccess();
 
     const formData = new FormData(event.currentTarget);
     const account: Required<AccountUpdateRequest> = {
@@ -81,6 +87,15 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
 
   return (
     <>
+      {showLoginSuccess && (
+        <FormLayout.Alert>
+          <Alert type="success" onClose={hideLoginSuccess}>
+            <h2>{t("account.login_success")}</h2>
+            <p>{t("account.setting_up_account")}</p>
+          </Alert>
+        </FormLayout.Alert>
+      )}
+
       {apiError && (
         <FormLayout.Alert>
           <Alert type="error">{apiError.message}</Alert>

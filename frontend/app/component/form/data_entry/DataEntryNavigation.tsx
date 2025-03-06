@@ -135,7 +135,7 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
     <Modal
       title={t("data_entry.abort.title")}
       onClose={() => {
-        blocker.proceed();
+        blocker.reset();
       }}
     >
       {tx("data_entry.abort.description")}

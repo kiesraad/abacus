@@ -56,7 +56,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
       } else {
         if (result instanceof ApiError && result.reference === "PasswordRejection") {
           setValidationErrors({
-            password: t("account.password_hint"),
+            password: t("account.password_rules"),
           });
         } else {
           setApiError(result);

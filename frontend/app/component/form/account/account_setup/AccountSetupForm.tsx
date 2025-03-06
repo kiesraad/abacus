@@ -1,7 +1,5 @@
 import { FormEvent, useState } from "react";
 
-import { MIN_PASSWORD_LENGTH, validatePassword } from "app/module/users/validatePassword";
-
 import {
   ACCOUNT_UPDATE_REQUEST_PATH,
   AccountUpdateRequest,
@@ -36,7 +34,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    const account: AccountUpdateRequest = {
+    const account: Required<AccountUpdateRequest> = {
       username: user.username,
       fullname: (formData.get("fullname") as string).trim(),
       password: formData.get("password") as string,
@@ -61,20 +59,19 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
     });
   }
 
-  function validate(accountUpdate: AccountUpdateRequest, passwordRepeat: string) {
+  function validate(accountUpdate: Required<AccountUpdateRequest>, passwordRepeat: string) {
     const errors: ValidationErrors = {};
 
-    if (accountUpdate.fullname !== undefined && accountUpdate.fullname.length === 0) {
+    if (accountUpdate.fullname.length === 0) {
       errors.fullname = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
+    }
+
+    if (accountUpdate.password.length === 0) {
+      errors.password = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
     }
 
     if (accountUpdate.password !== passwordRepeat) {
       errors.password_repeat = t("account.password_mismatch");
-    }
-
-    const passwordValidationError = validatePassword(accountUpdate.password);
-    if (passwordValidationError) {
-      errors.password = passwordValidationError;
     }
 
     const isValid = Object.keys(errors).length === 0;
@@ -111,7 +108,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
             <InputField
               name="password"
               label={t("account.password_new")}
-              hint={t("account.password_hint", { min_length: MIN_PASSWORD_LENGTH })}
+              hint={t("account.password_hint")}
               type="password"
               error={validationErrors?.password}
             />

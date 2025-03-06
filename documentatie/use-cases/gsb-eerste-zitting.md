@@ -12,9 +12,18 @@ __Hoofdscenario:__
 1. Het GSB opent de zitting.
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatniveau en vult Na31-2 Bijlage 2 in.
+   1. DSO: GSB controleert uitslag die SB in N 10-1 heeft vastgesteld. Kan d.m.v. invoer in de applicatie. (foutopsporingsmodus!)
+   2. DSO altijd eerst controle. Bij CSO hangt het ervan af hoe het GSB het inricht.
+   3. DSO: evt (gedeeltelijke) hertellingen per SB en noteert de wijzigingen in een corrigendum Na 14-1. => combinatie van PV en corrigendum vormen de correcte telling die ingevoerd moet worden
+
 4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
-5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-in-zee)
+   1. DSO: uit N 10-1 en Na 14-1
+   2. open punt: voer je exact dezelfde velden in bij CSO en DSO? staan ze op dezelfde plek in de modellen? => modellen controleren
+
+5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-in-zee) -> van de zitting, niet van SBs
 6. De coördinator genereert het concept-PV en het digitale bestand. En voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
+   1. DSO: niet van toepassing, want staat al in SB PVs en die gaan mee met het GSB PV.
+
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
 9. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
@@ -46,6 +55,8 @@ __Uitbreidingen:__
 ### Niet in scope
 
 - Elektronische handtekening van documenten.
+- CSO: Aanmaken en invullen van "Bijlage 2: Bezwaren van aanwezigen op stembureaus". Wordt wel toegevoegd aan concept-PV door coördinator.
+- Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Gaan we dit faciliteren in de applicatie? Nee.
 
 ### Open punten
 
@@ -54,7 +65,6 @@ __Uitbreidingen:__
   - Proces via uitwisselplatform loopt parallel.
 - Na31-2 Bijlage 2 wordt Bijlage 1 in nieuwe modellen.
 - Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het concept-PV?
-- Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Gaan we dit faciliteren in de applicatie?
 - Willen we het invoeren van het resultaat controleprotocol (handmatige controle optellingen software) in de applicatie doen?
   - Protocol wordt uitgevoerd na het afdrukken van het concept-PV, dus lastig om in applicatie te doen.
   - Alternatieven: met pen, in een bijlage.
@@ -128,6 +138,8 @@ __Hoofdscenario 2:__
 
 
 ## De coördinator voert bezwaren, bijzonderheden, etc. in. (zee)
+
+TODO: (tijdens de zitting)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

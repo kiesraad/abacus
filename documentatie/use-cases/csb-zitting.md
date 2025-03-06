@@ -43,10 +43,6 @@ __Uitbreidingen:__
 - Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier?
     - Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
     - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijst importeren.
-- Als het niet mogelijk is het digitale bestand te importeren, kan het CSB dan contact opnemen met het GSB om te proberen het probleem te verhelpen?
-    - Zodra WPV: verplicht digitaal bestand. Dus ja, dat mag.
-    - Als niet op te lossen, twee keer handmatig invoeren.
-
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
 
 
@@ -64,22 +60,17 @@ __Hoofdscenario:__
 __Uitbreidingen:__
 
 1a. Het is niet mogelijk het digitale bestand te importeren:  
-&emsp;1a1. Het CSB doet de eerste invoer handmatig.
+&emsp;1a1. Het CSB lost in overleg met het GSB het probleem op en importeert alsnog het bestand.  
+&emsp;1a1a. Het CSB slaagt er niet in het probleem op te lossen:  
+&emsp;&emsp;1a1a1. Het CSB doet de eerste invoer handmatig.
 
 3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
-
-liefst: handmatig klopt niet, handmatig weggooien, handmatig opnieuw invoeren, zodat twee volledige invoeren met elkaar kloppen  
-als dat niet kan: invoer die klopt (bestand of handmatig) als correct markeren  
-zou niet anders moeten zijn dan invoer GSB (impliceert verwijderen invoer 1 of invoer 2)
-
-als niet geliJk: je hebt een groter probleem, hoewel: is wel voorgekomen: verschil omdat digitaal wel gecorrigeerd, maar correctie op papier niet mogelijk; ontbrekende velden zijn meegenomen in nieuwe velden, dus zou niet meer voor mogen komen
-
-de wet: digitaal bestand mag je niet kiezen, want één invoer moet handmatig (en invoer als onderdeel van resultaat)
-
 &emsp; 3a1. De coördinator vergelijkt de eerste en tweede invoer met het papieren PV.  
 &emsp; 3a2. De coördinator stelt vast dat de tweede (handmatige) invoer correct is.  
-&emsp;&emsp; 3a2a. De coördinator stelt vast dat de tweede (handmatige) invoer niet correct is:  
-&emsp;&emsp;&emsp; 3a2a1. De coördinator gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
+&emsp;&emsp; 3a2a. De coördinator stelt vast dat de tweede (handmatige) invoer niet correct is en het digitale bestand correct is:  
+&emsp;&emsp;&emsp;3a2a1. De coördinator gooit de twee (handmatige) invoer weg en laat die opnieuw invoeren.  
+&emsp;&emsp;3a2b. De coördinator stelt vast dat zowel de tweede (handmatige) invoer als het digitale bestand niet correct zijn:  
+&emsp;&emsp;&emsp; 3a2b1. De coördinator gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
 &emsp; 3a3. De coördinator markeert de tweede (handmatige) invoer als correct.
 
 

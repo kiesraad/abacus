@@ -11,7 +11,7 @@ Voor DSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 __Hoofdscenario:__  
 1. Het GSB opent de zitting.
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
-3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatniveau en vult Na31-2 Bijlage 2 in.
+3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na31-2 Bijlage 2 in.
 4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
 5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-in-zee)
 6. De coördinator genereert het [concept-PV](./input-output-bestanden.md#output-voor-csb) en het [digitale bestand](./input-output-bestanden.md#output-voor-csb). En voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
@@ -47,7 +47,6 @@ __Uitbreidingen:__
 
 - Elektronische handtekening van documenten.
 - Invoeren van het resultaat controleprotocol (handmatige controle optellingen software). N.B. Als het controleprotocol verschillen oplevert, dan is er een probleem met het concept-PV uit de applicatie en kan dat PV dus niet gebruikt worden.
-
 - Het GSB faciliteren in het berekenen van een voorlopige zetelverdeling. (nooit in scope)
 
 ### Open punten

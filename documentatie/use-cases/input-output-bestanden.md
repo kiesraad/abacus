@@ -4,6 +4,7 @@
 
 - verkiezingsdefinitie (EML_NL)
 - kandidatenlijst (EML_NL)
+- stembureaus (EML_NL)
 
 
 ## GSB

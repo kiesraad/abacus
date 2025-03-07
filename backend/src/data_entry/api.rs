@@ -1,4 +1,3 @@
-use crate::data_entry::status::CurrentDataEntry;
 use crate::{
     APIError,
     authentication::{Typist, User},
@@ -6,7 +5,7 @@ use crate::{
         PollingStationResults, ValidationResults,
         entry_number::EntryNumber,
         repository::PollingStationDataEntries,
-        status::{ClientState, DataEntryStatus, DataEntryStatusName},
+        status::{ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName},
         validate_polling_station_results,
     },
     election::repository::Elections,

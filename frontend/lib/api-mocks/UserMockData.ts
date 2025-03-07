@@ -1,4 +1,4 @@
-import { User } from "@kiesraad/api";
+import { LoginResponse, User } from "@kiesraad/api";
 
 const today = new Date();
 today.setHours(10, 20);
@@ -50,3 +50,11 @@ export const userMockData: User[] = [
     updated_at,
   },
 ];
+
+export const loginResponseMockData: LoginResponse = {
+  user_id: 1,
+  username: "Sanne",
+  role: "administrator",
+  fullname: "Sanne Molenaar",
+  needs_password_change: true,
+};

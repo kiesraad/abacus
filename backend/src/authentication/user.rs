@@ -127,7 +127,9 @@ where
         };
 
         let user = users.get_by_session_key(session_cookie.value()).await?;
+
         user.update_last_activity_at(&users).await?;
+
         Ok(user)
     }
 }
@@ -214,7 +216,8 @@ impl Users {
         password: &str,
         role: Role,
     ) -> Result<User, AuthenticationError> {
-        let password_hash = hash_password(ValidatedPassword::new(username, password, None)?)?;
+        let password_hash: HashedPassword =
+            hash_password(ValidatedPassword::new(username, password, None)?)?;
 
         let user = sqlx::query_as!(
             User,
@@ -237,7 +240,17 @@ impl Users {
             role,
         )
         .fetch_one(&self.0)
-        .await?;
+        .await
+        .map_err(|e| {
+            if e.as_database_error()
+                .map(|e| e.is_unique_violation())
+                .unwrap_or(false)
+            {
+                AuthenticationError::UsernameAlreadyExists
+            } else {
+                e.into()
+            }
+        })?;
 
         Ok(user)
     }
@@ -377,7 +390,7 @@ impl Users {
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
-            FROM users WHERE username = ?
+            FROM users WHERE username = ? COLLATE NOCASE
             "#,
             username
         )
@@ -493,6 +506,28 @@ mod tests {
     }
 
     #[test(sqlx::test)]
+    async fn test_create_user_duplicate_username(pool: SqlitePool) {
+        let users = Users::new(pool.clone());
+
+        let user = users
+            .create("test_user", None, "TotallyValidP4ssW0rd", Role::Typist)
+            .await
+            .unwrap();
+
+        assert_eq!(user.username, "test_user");
+
+        // Try to create a user with the same username, case-insensitive
+        let error = users
+            .create("test_User", None, "TotallyValidP4ssW0rd", Role::Typist)
+            .await;
+
+        assert!(matches!(
+            error,
+            Err(AuthenticationError::UsernameAlreadyExists)
+        ));
+    }
+
+    #[test(sqlx::test)]
     async fn test_authenticate_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
@@ -508,6 +543,14 @@ mod tests {
 
         let authenticated_user = users
             .authenticate("test_user", "TotallyValidP4ssW0rd")
+            .await
+            .unwrap();
+
+        assert_eq!(user, authenticated_user);
+
+        // Username should be case insensitive
+        let authenticated_user = users
+            .authenticate("Test_User", "TotallyValidP4ssW0rd")
             .await
             .unwrap();
 

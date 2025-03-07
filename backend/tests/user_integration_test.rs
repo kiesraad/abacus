@@ -114,6 +114,51 @@ async fn test_user_creation(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_user_creation_duplicate_username(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let url = format!("http://{addr}/api/user");
+    let admin_cookie = shared::admin_login(&addr).await;
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&json!({
+            "role": "administrator",
+            "username": "username",
+            "fullname": "fullname",
+            "temp_password": "MyLongPassword13"
+        }))
+        .header("cookie", admin_cookie.clone())
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(
+        response.status(),
+        StatusCode::CREATED,
+        "Unexpected response status"
+    );
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&json!({
+            "role": "administrator",
+            "username": "Username",
+            "fullname": "fullname",
+            "temp_password": "MyLongPassword13"
+        }))
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(
+        response.status(),
+        StatusCode::CONFLICT,
+        "Unexpected response status"
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_creation_anonymous(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/user");
@@ -247,12 +292,23 @@ async fn test_user_get_not_found(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_delete(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/user/1");
+    let url = format!("http://{addr}/api/user/2");
+    let admin_cookie = shared::admin_login(&addr).await;
 
-    let response = reqwest::Client::new().delete(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", &admin_cookie)
+        .send()
+        .await
+        .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
 
-    let response = reqwest::Client::new().delete(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 

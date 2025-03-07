@@ -7,7 +7,7 @@
  *
  * https://github.com/oxidecomputer/console/blob/8dcddcef62b8d10dfcd3adb470439212b23b3d5e/test/unit/server.ts
  */
-import { DefaultBodyType, delay, http, HttpResponse, JsonBodyType, StrictRequest } from "msw";
+import { delay, http, HttpResponse, JsonBodyType } from "msw";
 import { setupServer } from "msw/node";
 
 export const server = setupServer();
@@ -19,16 +19,11 @@ export function overrideOnce(
   status: number,
   body: string | null | JsonBodyType,
   delayResponse?: "infinite" | number,
-  onRequest?: (request: StrictRequest<DefaultBodyType>) => Promise<void>,
 ) {
   server.use(
     http[method](
       path,
-      async ({ request }) => {
-        if (onRequest) {
-          await onRequest(request);
-        }
-
+      async () => {
         if (delayResponse) {
           await delay(delayResponse);
         }

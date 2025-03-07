@@ -10,7 +10,7 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Json, Response},
 };
-use axum_extra::extract::CookieJar;
+use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
 use cookie::{Cookie, SameSite};
 use hyper::{StatusCode, header::SET_COOKIE};
 use serde::{Deserialize, Serialize};
@@ -18,7 +18,10 @@ use sqlx::{Error, SqlitePool};
 use tracing::debug;
 use utoipa::ToSchema;
 
-use crate::{APIError, ErrorResponse};
+use crate::{
+    APIError, ErrorResponse,
+    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
+};
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Credentials {
     pub username: String,
@@ -68,9 +71,11 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     ),
 )]
 pub async fn login(
+    user_agent: Option<TypedHeader<UserAgent>>,
     State(users): State<Users>,
     State(sessions): State<Sessions>,
     jar: CookieJar,
+    audit_service: AuditService,
     Json(credentials): Json<Credentials>,
 ) -> Result<impl IntoResponse, APIError> {
     let Credentials { username, password } = credentials;
@@ -87,6 +92,19 @@ pub async fn login(
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
     sessions.delete_expired_sessions().await?;
+    let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
+
+    // Log the login event
+    audit_service
+        .with_user(user.clone())
+        .log_success(
+            AuditEvent::UserLoggedIn(UserLoggedInDetails {
+                user_agent,
+                logged_in_users_count: sessions.count().await?,
+            }),
+            None,
+        )
+        .await?;
 
     // Create a new session and cookie
     let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
@@ -171,6 +189,8 @@ pub async fn account_update(
 )]
 pub async fn logout(
     State(sessions): State<Sessions>,
+    State(users): State<Users>,
+    audit_service: AuditService,
     jar: CookieJar,
 ) -> Result<impl IntoResponse, APIError> {
     let Some(mut cookie) = jar.get(SESSION_COOKIE_NAME).cloned() else {
@@ -178,8 +198,26 @@ pub async fn logout(
         return Ok((jar, StatusCode::OK));
     };
 
-    // Remove session from the database
+    // Get the session key from the cookie
     let session_key = cookie.value();
+
+    // Log audit event when a valid session exists
+    if let Some(session) = sessions.get_by_key(session_key).await.ok().flatten() {
+        if let Some(user) = users.get_by_id(session.user_id()).await.ok().flatten() {
+            // Log the logout event
+            audit_service
+                .with_user(user)
+                .log_success(
+                    AuditEvent::UserLoggedOut(UserLoggedOutDetails {
+                        session_duration: session.duration().as_secs(),
+                    }),
+                    None,
+                )
+                .await?;
+        }
+    }
+
+    // Remove session from the database
     sessions.delete(session_key).await?;
 
     // Set cookie parameters, these are not present in the request, and have to match in order to clear the cookie
@@ -297,6 +335,7 @@ pub struct UpdateUserRequest {
     responses(
         (status = 201, description = "User created", body = User),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -322,6 +361,7 @@ pub async fn user_create(
     path = "/api/user/{user_id}",
     responses(
         (status = 200, description = "User found", body = User),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -372,11 +412,13 @@ pub async fn user_update(
     path = "/api/user/{user_id}",
     responses(
         (status = 200, description = "User deleted successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 pub async fn user_delete(
+    _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,
 ) -> Result<StatusCode, APIError> {

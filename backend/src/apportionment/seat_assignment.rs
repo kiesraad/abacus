@@ -676,57 +676,13 @@ pub fn get_total_seats_from_apportionment_result(result: SeatAssignmentResult) -
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts},
-        election::PGNumber,
-        summary::{ElectionSummary, SummaryDifferencesCounts},
-    };
-
-    fn get_election_summary(
-        total_votes: Count,
-        political_group_votes: Vec<PoliticalGroupVotes>,
-    ) -> ElectionSummary {
-        ElectionSummary {
-            voters_counts: VotersCounts {
-                poll_card_count: total_votes,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: total_votes,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_count: total_votes,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: total_votes,
-            },
-            differences_counts: SummaryDifferencesCounts::zero(),
-            recounted_polling_stations: vec![],
-            political_group_votes,
-        }
-    }
-
-    fn get_election_summary_with_default_50_candidates(pg_votes: Vec<Count>) -> ElectionSummary {
-        let total_votes = pg_votes.iter().sum();
-        let mut political_group_votes: Vec<PoliticalGroupVotes> = vec![];
-        for (index, votes) in pg_votes.iter().enumerate() {
-            // Create list with 50 candidates with 0 votes
-            let mut candidate_votes: Vec<Count> = vec![0; 50];
-            // Set votes to first candidate
-            candidate_votes[0] = *votes;
-            political_group_votes.push(PoliticalGroupVotes::from_test_data_auto(
-                PGNumber::try_from(index + 1).unwrap(),
-                *votes,
-                &candidate_votes,
-            ))
-        }
-        get_election_summary(total_votes, political_group_votes)
-    }
-
     /// Tests apportionment for councils with less than 19 seats
     mod lt_19_seats {
-        use crate::apportionment::{
-            ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
-            seat_assignment::tests::get_election_summary_with_default_50_candidates,
+        use crate::{
+            apportionment::{
+                ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
+            },
+            summary::tests::election_summary_fixture_with_default_50_candidates,
         };
         use test_log::test;
 
@@ -735,7 +691,7 @@ mod tests {
         /// Full seats: [6, 2, 2, 2, 1, 1, 1] - Remainder seats: 0
         #[test]
         fn test_without_remainder_seats() {
-            let totals = get_election_summary_with_default_50_candidates(vec![
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
                 480, 160, 160, 160, 80, 80, 80,
             ]);
             let result = seat_assignment(15, &totals).unwrap();
@@ -752,7 +708,7 @@ mod tests {
         /// 2 - largest remainder: seat assigned to list 7
         #[test]
         fn test_with_residual_seats_assigned_with_remainder_system() {
-            let totals = get_election_summary_with_default_50_candidates(vec![
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
                 540, 160, 160, 80, 80, 80, 60, 40,
             ]);
             let result = seat_assignment(15, &totals).unwrap();
@@ -775,7 +731,7 @@ mod tests {
         /// 5 - largest average: [62 2/13, 29 1/2, 29, 57, 56, 55, 54, 53] seat assigned to list 4
         #[test]
         fn test_with_1_list_that_meets_threshold() {
-            let totals = get_election_summary_with_default_50_candidates(vec![
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
                 808, 59, 58, 57, 56, 55, 54, 53,
             ]);
             let result = seat_assignment(15, &totals).unwrap();
@@ -798,7 +754,7 @@ mod tests {
         /// 3 - largest remainder: seat assigned to list 3
         #[test]
         fn test_with_3_lists_that_meet_threshold_0_remainders() {
-            let totals = get_election_summary_with_default_50_candidates(vec![
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
                 480, 240, 240, 55, 50, 45, 45, 45,
             ]);
             let result = seat_assignment(15, &totals).unwrap();
@@ -820,8 +776,9 @@ mod tests {
         /// 3 - largest average: [4, 3 1/2, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 3
         #[test]
         fn test_with_0_lists_that_meet_threshold() {
-            let totals =
-                get_election_summary_with_default_50_candidates(vec![8, 7, 6, 5, 4, 3, 2, 1, 1, 1]);
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
+                8, 7, 6, 5, 4, 3, 2, 1, 1, 1,
+            ]);
             let result = seat_assignment(3, &totals).unwrap();
             assert_eq!(result.steps.len(), 3);
             assert_eq!(result.steps[0].change.political_group_number(), 1);
@@ -848,7 +805,7 @@ mod tests {
         /// 10 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 5
         #[test]
         fn test_with_0_votes() {
-            let totals = get_election_summary_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
+            let totals = election_summary_fixture_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
             let result = seat_assignment(10, &totals).unwrap();
             assert_eq!(result.steps.len(), 10);
             assert_eq!(result.steps[0].change.political_group_number(), 1);
@@ -877,7 +834,7 @@ mod tests {
         #[test]
         fn test_with_absolute_majority_of_votes_but_not_seats() {
             let totals =
-                get_election_summary_with_default_50_candidates(vec![2571, 977, 567, 536, 453]);
+                election_summary_fixture_with_default_50_candidates(vec![2571, 977, 567, 536, 453]);
             let result = seat_assignment(15, &totals).unwrap();
             assert_eq!(result.steps.len(), 4);
             assert_eq!(result.steps[0].change.political_group_number(), 2);
@@ -903,7 +860,7 @@ mod tests {
         /// 4 - Drawing of lots is required for political groups: [2, 3, 4] to pick a political group which the residual seat gets retracted from
         #[test]
         fn test_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error() {
-            let totals = get_election_summary_with_default_50_candidates(vec![
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
                 2552, 511, 511, 511, 509, 509,
             ]);
             let result = seat_assignment(15, &totals);
@@ -930,7 +887,7 @@ mod tests {
         /// 12 - Drawing of lots is required for political groups: [1, 2, 3, 4, 5], only 4 seats available
         #[test]
         fn test_with_0_votes_with_drawing_of_lots_error_in_2nd_round_averages_system() {
-            let totals = get_election_summary_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
+            let totals = election_summary_fixture_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
             let result = seat_assignment(15, &totals);
             assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
         }
@@ -943,7 +900,7 @@ mod tests {
         /// 2 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 1 seat available
         #[test]
         fn test_with_0_remainders_drawing_of_lots_error() {
-            let totals = get_election_summary_with_default_50_candidates(vec![
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
                 540, 160, 160, 80, 80, 80, 55, 45,
             ]);
             let result = seat_assignment(15, &totals);
@@ -957,8 +914,9 @@ mod tests {
         /// 1 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 4 seats available
         #[test]
         fn test_with_drawing_of_lots_error() {
-            let totals =
-                get_election_summary_with_default_50_candidates(vec![500, 140, 140, 140, 140, 140]);
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
+                500, 140, 140, 140, 140, 140,
+            ]);
             let result = seat_assignment(15, &totals);
             assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
         }
@@ -966,9 +924,11 @@ mod tests {
 
     /// Tests apportionment for councils with 19 or more seats
     mod gte_19_seats {
-        use crate::apportionment::{
-            ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
-            seat_assignment::tests::get_election_summary_with_default_50_candidates,
+        use crate::{
+            apportionment::{
+                ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
+            },
+            summary::tests::election_summary_fixture_with_default_50_candidates,
         };
         use test_log::test;
 
@@ -978,7 +938,7 @@ mod tests {
         #[test]
         fn test_without_remainder_seats() {
             let totals =
-                get_election_summary_with_default_50_candidates(vec![576, 288, 96, 96, 96, 48]);
+                election_summary_fixture_with_default_50_candidates(vec![576, 288, 96, 96, 96, 48]);
             let result = seat_assignment(25, &totals).unwrap();
             assert_eq!(result.steps.len(), 0);
             let total_seats = get_total_seats_from_apportionment_result(result);
@@ -995,7 +955,7 @@ mod tests {
         #[test]
         fn test_with_remainder_seats() {
             let totals =
-                get_election_summary_with_default_50_candidates(vec![600, 302, 98, 99, 101]);
+                election_summary_fixture_with_default_50_candidates(vec![600, 302, 98, 99, 101]);
             let result = seat_assignment(23, &totals).unwrap();
             assert_eq!(result.steps.len(), 4);
             assert_eq!(result.steps[0].change.political_group_number(), 5);
@@ -1018,7 +978,7 @@ mod tests {
         /// 7 - largest average: [53 13/15, 28 1/2, 28, 27 1/2, 27, 53, 52, 51, 14] seat assigned to list 1
         #[test]
         fn test_with_multiple_remainder_seats_assigned_to_one_list() {
-            let totals = get_election_summary_with_default_50_candidates(vec![
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
                 808, 57, 56, 55, 54, 53, 52, 51, 14,
             ]);
             let result = seat_assignment(19, &totals).unwrap();
@@ -1040,7 +1000,7 @@ mod tests {
         /// 1-19 - largest average: [0/1] seat assigned to list 1
         #[test]
         fn test_with_0_votes() {
-            let totals = get_election_summary_with_default_50_candidates(vec![0]);
+            let totals = election_summary_fixture_with_default_50_candidates(vec![0]);
             let result = seat_assignment(19, &totals).unwrap();
             assert_eq!(result.steps.len(), 19);
             let total_seats = get_total_seats_from_apportionment_result(result);
@@ -1060,7 +1020,7 @@ mod tests {
         /// 7 - Residual seat first assigned to list 7 has been re-assigned to list 1 in accordance with Article P 9 Kieswet
         #[test]
         fn test_with_absolute_majority_of_votes_but_not_seats() {
-            let totals = get_election_summary_with_default_50_candidates(vec![
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
                 7501, 1249, 1249, 1249, 1249, 1249, 1248, 7,
             ]);
             let result = seat_assignment(24, &totals).unwrap();
@@ -1088,7 +1048,7 @@ mod tests {
         /// 7 - Drawing of lots is required for political groups: [6, 7] to pick a political group which the residual seat gets retracted from
         #[test]
         fn test_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error() {
-            let totals = get_election_summary_with_default_50_candidates(vec![
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
                 7501, 1249, 1249, 1249, 1249, 1248, 1248, 8,
             ]);
             let result = seat_assignment(24, &totals);
@@ -1102,7 +1062,7 @@ mod tests {
         /// 16 - Drawing of lots is required for political groups: [1, 2, 3, 4, 5], only 4 seats available
         #[test]
         fn test_with_0_votes_with_drawing_of_lots_error() {
-            let totals = get_election_summary_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
+            let totals = election_summary_fixture_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
             let result = seat_assignment(19, &totals);
             assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
         }
@@ -1114,8 +1074,9 @@ mod tests {
         /// 2 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 3 seats available
         #[test]
         fn test_with_drawing_of_lots_error() {
-            let totals =
-                get_election_summary_with_default_50_candidates(vec![500, 140, 140, 140, 140, 140]);
+            let totals = election_summary_fixture_with_default_50_candidates(vec![
+                500, 140, 140, 140, 140, 140,
+            ]);
             let result = seat_assignment(23, &totals);
             assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
         }

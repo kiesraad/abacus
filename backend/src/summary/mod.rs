@@ -256,8 +256,8 @@ pub(crate) mod tests {
         }
     }
 
-    /// Create a test election summary with given votes per political group.
-    /// The number of political groups is the length of the `pg_votes` vector.
+    /// Create a test election summary with given votes per political group.  
+    /// The number of political groups is the length of the `pg_votes` vector.  
     /// The number of candidates in each political group is by default 50.
     pub fn election_summary_fixture_with_default_50_candidates(
         pg_votes: Vec<Count>,
@@ -278,8 +278,8 @@ pub(crate) mod tests {
         election_summary_fixture_given_political_group_votes(total_votes, political_group_votes)
     }
 
-    /// Create a test election summary with given candidate votes per political group.
-    /// The number of political groups is the length of the `candidate_votes` vector.
+    /// Create a test election summary with given candidate votes per political group.  
+    /// The number of political groups is the length of the `candidate_votes` vector.  
     /// The number of candidates in each political group is equal to the value in the vector at that index.
     pub fn election_summary_fixture_with_given_candidate_votes(
         candidate_votes: Vec<Vec<Count>>,

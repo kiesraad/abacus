@@ -143,7 +143,7 @@ fn initial_full_seats_per_political_group(
         .collect()
 }
 
-/// Compute the political groups with the largest average votes per seats.
+/// Compute the political groups with the largest average votes per seats.  
 /// This is determined based on seeing what would happen to the average votes
 /// per seat if one additional seat would be assigned to each political group.
 ///
@@ -198,7 +198,7 @@ fn political_groups_with_largest_average<'a>(
 
 /// Compute the political groups with the largest votes remainder.
 ///
-/// It returns all the political groups for which this remainder fraction is the largest.
+/// It returns all the political groups for which this remainder fraction is the largest.  
 /// If there are more political groups than there are residual seats to be assigned,
 /// a drawing of lots is required.
 ///
@@ -247,7 +247,7 @@ fn political_groups_with_largest_remainder<'a>(
 }
 
 /// If a political group got the absolute majority of votes but not the absolute majority of seats,
-/// re-assign the last residual seat to the political group with the absolute majority.
+/// re-assign the last residual seat to the political group with the absolute majority.  
 /// This re-assignment is done according to article P 9 of the Kieswet.
 fn reassign_residual_seat_for_absolute_majority(
     seats: u32,
@@ -349,7 +349,7 @@ pub fn seat_assignment(
     })
 }
 
-/// This function assigns the residual seats that remain after full seat assignment is finished.
+/// This function assigns the residual seats that remain after full seat assignment is finished.  
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
 fn assign_remainder(
@@ -425,7 +425,7 @@ fn assign_remainder(
     Ok((steps, current_standing))
 }
 
-/// Get a vector with the political group number that was assigned the last residual seat.
+/// Get a vector with the political group number that was assigned the last residual seat.  
 /// If the last residual seat was assigned to a political group with the same
 /// remainder/votes per seat as political groups assigned a seat in previous steps,
 /// return all political group numbers that had the same remainder/votes per seat.
@@ -449,7 +449,7 @@ fn pg_assigned_from_previous_step(
     pg_assigned
 }
 
-/// Assign the next residual seat, and return which group that seat was assigned to.
+/// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with 19 seats or more.
 fn step_assign_remainder_using_largest_averages(
     standing: &[PoliticalGroupStanding],
@@ -488,7 +488,7 @@ fn political_groups_qualifying_for_largest_remainder<'a>(
     })
 }
 
-/// Get an iterator that lists all the parties that qualify for unique largest average.
+/// Get an iterator that lists all the parties that qualify for unique largest average.  
 /// This checks the previously assigned seats to make sure that every group that already
 /// got a residual seat through the largest average procedure does not qualify.
 fn political_groups_qualifying_for_unique_largest_average<'a>(
@@ -503,7 +503,7 @@ fn political_groups_qualifying_for_unique_largest_average<'a>(
     })
 }
 
-/// Assign the next residual seat, and return which group that seat was assigned to.
+/// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with less than 19 seats.
 fn step_assign_remainder_using_largest_remainder(
     assigned_seats: &[PoliticalGroupStanding],

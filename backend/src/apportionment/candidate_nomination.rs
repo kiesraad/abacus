@@ -44,6 +44,7 @@ pub struct CandidateNominationResult {
     pub political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination>,
 }
 
+/// List and sort the candidates whose votes meet the preference threshold
 fn candidates_meeting_preference_threshold(
     preference_threshold: Fraction,
     candidate_votes: &[CandidateVotes],
@@ -57,6 +58,7 @@ fn candidates_meeting_preference_threshold(
     candidates_meeting_preference_threshold
 }
 
+/// List the candidates nominated with preferential votes
 fn preferential_candidate_nomination(
     candidates_meeting_preference_threshold: &[CandidateVotes],
     pg_seats: u32,
@@ -65,7 +67,9 @@ fn preferential_candidate_nomination(
     if candidates_meeting_preference_threshold.len() <= pg_seats as usize {
         preferential_candidate_nomination.extend(candidates_meeting_preference_threshold);
     } else {
+        // Loop over non-assigned seats
         for (index, non_assigned_seats) in (1..pg_seats + 1).rev().enumerate() {
+            // List all candidates with the same number of votes that have not been nominated yet
             let same_votes_candidates: Vec<CandidateVotes> =
                 candidates_meeting_preference_threshold
                     .iter()
@@ -76,6 +80,7 @@ fn preferential_candidate_nomination(
                     })
                     .copied()
                     .collect();
+            // Check if we can actually nominate all these candidates, otherwise we would need to draw lots
             if same_votes_candidates.len() > non_assigned_seats as usize {
                 // TODO: #788 if multiple political groups have the same largest remainder and not enough residual seats are available, use drawing of lots
                 info!(
@@ -84,6 +89,7 @@ fn preferential_candidate_nomination(
                 );
                 return Err(ApportionmentError::DrawingOfLotsNotImplemented);
             } else {
+                // Nominate candidate to seat
                 preferential_candidate_nomination
                     .push(candidates_meeting_preference_threshold[index]);
             }
@@ -92,6 +98,7 @@ fn preferential_candidate_nomination(
     Ok(preferential_candidate_nomination)
 }
 
+/// List the other candidates nominated
 fn other_candidate_nomination(
     preferential_candidate_nomination: &[CandidateVotes],
     candidate_votes: &[CandidateVotes],
@@ -109,6 +116,9 @@ fn other_candidate_nomination(
     other_candidates_nominated
 }
 
+/// This function nominates candidates for the seats each political group has been assigned.  
+/// The candidate nomination is first done based on preferential votes and then the other
+/// candidates are nominated.
 fn candidate_nomination_per_political_group(
     totals: &ElectionSummary,
     preference_threshold: Fraction,
@@ -182,7 +192,7 @@ pub fn candidate_nomination(
         political_group_candidate_nomination
     );
 
-    // TODO: Create ordered chosen candidates list
+    // TODO: #1045 Create ordered chosen candidates list
     let chosen_candidates = vec![];
 
     Ok(CandidateNominationResult {

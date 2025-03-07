@@ -57,9 +57,17 @@ test.describe("resume data entry flow", () => {
       await recountedPage.abortInput.click();
 
       const abortInputModal = new AbortInputModal(page);
-      await abortInputModal.close.click();
 
-      expect(recountedPage.no.isChecked()).toBeTruthy();
+      let requestMade = false;
+      page.on("request", (request) => {
+        if (request.url().includes("/api/polling_stations")) {
+          requestMade = true;
+        }
+      });
+      await abortInputModal.close.click();
+      expect(requestMade).toBe(false);
+
+      await expect(recountedPage.no).toBeChecked();
     });
   });
 

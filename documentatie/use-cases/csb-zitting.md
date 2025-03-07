@@ -70,7 +70,7 @@ __Uitbreidingen:__
 &emsp;&emsp;3a2a. De coördinator stelt vast dat de tweede (handmatige) invoer niet correct is en het digitale bestand correct is:  
 &emsp;&emsp;&emsp;3a2a1. De coördinator gooit de tweede (handmatige) invoer weg en laat die opnieuw invoeren.  
 &emsp;&emsp;3a2b. De coördinator stelt vast dat zowel de tweede (handmatige) invoer als het digitale bestand niet correct zijn:  
-&emsp;&emsp;&emsp; 3a2b1. De coördinator gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
+&emsp;&emsp;&emsp;3a2b1. De coördinator gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
 &emsp; 3a3. De coördinator markeert de tweede (handmatige) invoer als correct.
 
 

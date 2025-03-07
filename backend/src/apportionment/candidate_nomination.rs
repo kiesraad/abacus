@@ -65,20 +65,21 @@ fn preferential_candidate_nomination(
     if candidates_meeting_preference_threshold.len() <= pg_seats as usize {
         preferential_candidate_nomination.extend(candidates_meeting_preference_threshold);
     } else {
-        for (index, pg_seats) in (1..pg_seats).rev().enumerate() {
+        for (index, non_assigned_seats) in (1..pg_seats + 1).rev().enumerate() {
             let same_votes_candidates: Vec<CandidateVotes> =
                 candidates_meeting_preference_threshold
                     .iter()
                     .filter(|candidate_votes| {
-                        candidate_votes.votes
-                            == candidates_meeting_preference_threshold[index].votes
+                        !preferential_candidate_nomination.contains(candidate_votes)
+                            && candidate_votes.votes
+                                == candidates_meeting_preference_threshold[index].votes
                     })
                     .copied()
                     .collect();
-            if same_votes_candidates.len() > pg_seats as usize {
+            if same_votes_candidates.len() > non_assigned_seats as usize {
                 // TODO: #788 if multiple political groups have the same largest remainder and not enough residual seats are available, use drawing of lots
                 debug!(
-                    "Drawing of lots is required for political groups: {:?}, only {pg_seats} seat(s) available",
+                    "Drawing of lots is required for candidates: {:?}, only {non_assigned_seats} seat(s) available",
                     candidate_numbers(&same_votes_candidates)
                 );
                 return Err(ApportionmentError::DrawingOfLotsNotImplemented);
@@ -193,7 +194,7 @@ pub fn candidate_nomination(
 }
 
 /// Create a vector containing just the candidate numbers from an iterator of candidate votes
-fn candidate_numbers(candidate_votes: &[CandidateVotes]) -> Vec<CandidateNumber> {
+pub fn candidate_numbers(candidate_votes: &[CandidateVotes]) -> Vec<CandidateNumber> {
     candidate_votes
         .iter()
         .map(|candidate| candidate.number)
@@ -202,9 +203,8 @@ fn candidate_numbers(candidate_votes: &[CandidateVotes]) -> Vec<CandidateNumber>
 
 #[cfg(test)]
 mod tests {
-    use crate::apportionment::candidate_nomination::candidate_numbers;
     use crate::{
-        apportionment::{Fraction, candidate_nomination},
+        apportionment::{ApportionmentError, Fraction, candidate_nomination, candidate_numbers},
         election::tests::election_fixture_with_given_number_of_seats,
         summary::tests::election_summary_fixture_with_given_candidate_votes,
     };
@@ -222,6 +222,7 @@ mod tests {
     #[test]
     fn test_with_lt_19_seats_and_preferential_candidate_nomination_ranking_change() {
         let election = election_fixture_with_given_number_of_seats(&[12, 17, 11, 6, 6], 15);
+        let quota = Fraction::new(5104, 15);
         let totals = election_summary_fixture_with_given_candidate_votes(vec![
             vec![1069, 303, 321, 210, 36, 101, 79, 121, 150, 149, 15, 17],
             vec![
@@ -231,15 +232,12 @@ mod tests {
             vec![347, 33, 14, 82, 30, 30],
             vec![266, 36, 39, 36, 38, 38],
         ]);
-        let result = candidate_nomination(
-            election,
-            Fraction::new(5100, 15),
-            &totals,
-            vec![8, 3, 2, 1, 1],
-        )
-        .unwrap();
-        assert_eq!(result.preference_threshold, Fraction::new(170, 1));
+        let result = candidate_nomination(election, quota, &totals, vec![8, 3, 2, 1, 1]).unwrap();
         assert_eq!(result.preference_threshold_percentage, 50);
+        assert_eq!(
+            result.preference_threshold,
+            quota * Fraction::new(result.preference_threshold_percentage, 100)
+        );
         assert_eq!(
             candidate_numbers(
                 &result.political_group_candidate_nomination[0].preferential_candidate_nomination
@@ -300,5 +298,116 @@ mod tests {
                 .len(),
             0
         );
+    }
+
+    /// Candidate nomination with more candidates eligible for preferential nomination than seats
+    ///
+    /// PG seats: [6, 5, 4, 2, 2]
+    /// PG 1: Preferential candidate nominations of candidates 1, 2, 3, 4, 5 and 6 no other candidate nominations  
+    /// PG 2: Preferential candidate nomination of candidates 1, 2, 3, 4 and 5 and no other candidate nominations  
+    ///  Candidate 6 also meets the preferential threshold but does not get a seat  
+    /// PG 3: Preferential candidate nomination of candidate 1, 2, 3 and 4 and no other candidate nominations  
+    ///  Candidates 5 and 6 also meet the preferential threshold but do not get seats  
+    /// PG 4: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations
+    ///  Candidates 3, 4, 5 and 6 also meet the preferential threshold but do not get seats  
+    /// PG 5: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations
+    ///  Candidates 3, 4, 5 and 6 also meet the preferential threshold but do not get seats  
+    #[test]
+    fn test_with_ge_19_seats_and_more_candidates_eligible_for_preferential_nomination_than_seats() {
+        let election = election_fixture_with_given_number_of_seats(&[6, 6, 6, 6, 6], 19);
+        let quota = Fraction::new(9580, 19);
+        let totals = election_summary_fixture_with_given_candidate_votes(vec![
+            vec![500, 500, 500, 500, 500, 500],
+            vec![400, 400, 400, 400, 400, 399],
+            vec![300, 300, 300, 300, 299, 298],
+            vec![200, 200, 199, 198, 197, 196],
+            vec![200, 200, 199, 199, 198, 198],
+        ]);
+        let result = candidate_nomination(election, quota, &totals, vec![6, 5, 4, 2, 2]).unwrap();
+        assert_eq!(result.preference_threshold_percentage, 25);
+        assert_eq!(
+            result.preference_threshold,
+            quota * Fraction::new(result.preference_threshold_percentage, 100)
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[0].preferential_candidate_nomination
+            ),
+            vec![1, 2, 3, 4, 5, 6]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[0]
+                .other_candidate_nomination
+                .len(),
+            0
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[1].preferential_candidate_nomination
+            ),
+            vec![1, 2, 3, 4, 5]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[1]
+                .other_candidate_nomination
+                .len(),
+            0
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[2].preferential_candidate_nomination
+            ),
+            vec![1, 2, 3, 4]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[2]
+                .other_candidate_nomination
+                .len(),
+            0
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[3].preferential_candidate_nomination
+            ),
+            vec![1, 2]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[3]
+                .other_candidate_nomination
+                .len(),
+            0
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[4].preferential_candidate_nomination
+            ),
+            vec![1, 2]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[4]
+                .other_candidate_nomination
+                .len(),
+            0
+        );
+    }
+
+    /// Candidate nomination with more candidates eligible for preferential nomination than seats
+    ///
+    /// PG seats: [6, 5, 4, 2, 2]  
+    /// PG 1: Preferential candidate nominations of candidates 1, 2, 3, 4, 5 and 6 no other candidate nominations  
+    /// PG 2: Drawing of lots is required for candidates: [1, 2, 3, 4, 5, 6], only 5 seats available
+    #[test]
+    fn test_with_drawing_of_lots_error() {
+        let election = election_fixture_with_given_number_of_seats(&[6, 6, 6, 6, 6], 19);
+        let quota = Fraction::new(9600, 19);
+        let totals = election_summary_fixture_with_given_candidate_votes(vec![
+            vec![500, 500, 500, 500, 500, 500],
+            vec![400, 400, 400, 400, 400, 400],
+            vec![300, 300, 300, 300, 300, 300],
+            vec![200, 200, 200, 200, 200, 200],
+            vec![200, 200, 200, 200, 200, 200],
+        ]);
+        let result = candidate_nomination(election, quota, &totals, vec![6, 5, 4, 2, 2]);
+        assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 }

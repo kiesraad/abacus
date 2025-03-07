@@ -59,7 +59,7 @@ fn candidates_meeting_preference_threshold(
     let mut candidates_meeting_preference_threshold: Vec<CandidateVotes> = candidate_votes
         .iter()
         .filter(|candidate_votes| Fraction::from(candidate_votes.votes) >= preference_threshold)
-        .cloned()
+        .copied()
         .collect();
     candidates_meeting_preference_threshold.sort_by(|a, b| b.votes.cmp(&a.votes));
     candidates_meeting_preference_threshold
@@ -67,14 +67,13 @@ fn candidates_meeting_preference_threshold(
 
 fn preferential_candidate_nomination(
     candidates_meeting_preference_threshold: &[CandidateVotes],
-    mut pg_seats: u32,
+    pg_seats: u32,
 ) -> Result<Vec<CandidateVotes>, ApportionmentError> {
     let mut preferential_candidate_nomination: Vec<CandidateVotes> = vec![];
     if candidates_meeting_preference_threshold.len() <= pg_seats as usize {
         preferential_candidate_nomination.extend(candidates_meeting_preference_threshold);
     } else {
-        let mut index = 0;
-        while pg_seats > 0 {
+        for (index, pg_seats) in (1..pg_seats).rev().enumerate() {
             let same_votes_candidates: Vec<CandidateVotes> =
                 candidates_meeting_preference_threshold
                     .iter()
@@ -82,7 +81,7 @@ fn preferential_candidate_nomination(
                         candidate_votes.votes
                             == candidates_meeting_preference_threshold[index].votes
                     })
-                    .cloned()
+                    .copied()
                     .collect();
             if same_votes_candidates.len() > pg_seats as usize {
                 // TODO: #788 if multiple political groups have the same largest remainder and not enough residual seats are available, use drawing of lots
@@ -95,8 +94,6 @@ fn preferential_candidate_nomination(
                 preferential_candidate_nomination
                     .push(candidates_meeting_preference_threshold[index]);
             }
-            pg_seats -= 1;
-            index += 1;
         }
     }
     Ok(preferential_candidate_nomination)
@@ -112,7 +109,7 @@ fn other_candidate_nomination(
         let non_nominated_candidates: Vec<CandidateVotes> = candidate_votes
             .iter()
             .filter(|candidate_votes| !preferential_candidate_nomination.contains(candidate_votes))
-            .cloned()
+            .copied()
             .collect();
         other_candidates_nominated = non_nominated_candidates[0..non_assigned_seats].to_vec()
     }
@@ -122,13 +119,13 @@ fn other_candidate_nomination(
 fn candidate_nomination_per_political_group(
     totals: &ElectionSummary,
     preference_threshold: Fraction,
-    final_standing: &[PoliticalGroupSeatAssignment],
+    total_seats: Vec<u32>,
     political_groups: Vec<PoliticalGroup>,
 ) -> Result<Vec<PoliticalGroupCandidateNomination>, ApportionmentError> {
     let mut political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination> = vec![];
     for pg in political_groups {
         let pg_index = pg.number as usize - 1;
-        let pg_seats = final_standing[pg_index].total_seats;
+        let pg_seats = total_seats[pg_index];
         let candidate_votes = &totals.political_group_votes[pg_index].candidate_votes;
         let candidates_meeting_preference_threshold =
             candidates_meeting_preference_threshold(preference_threshold, candidate_votes);
@@ -163,7 +160,7 @@ pub fn candidate_nomination(
     election: Election,
     quota: Fraction,
     totals: &ElectionSummary,
-    final_standing: &[PoliticalGroupSeatAssignment],
+    total_seats: Vec<u32>,
 ) -> Result<CandidateNominationResult, ApportionmentError> {
     info!("Candidate nomination");
 
@@ -184,9 +181,13 @@ pub fn candidate_nomination(
     let political_group_candidate_nomination = candidate_nomination_per_political_group(
         totals,
         preference_threshold,
-        final_standing,
+        total_seats,
         election.political_groups.unwrap_or_default(),
     )?;
+    debug!(
+        "Political group candidate nomination: {:#?}",
+        political_group_candidate_nomination
+    );
 
     // TODO: Create ordered chosen candidates list
     let chosen_candidates = vec![];

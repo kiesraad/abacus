@@ -12,23 +12,19 @@ __Hoofdscenario:__
 1. Het GSB opent de zitting.
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatniveau en vult Na31-2 Bijlage 2 in.
-   1. DSO: GSB controleert uitslag die SB in N 10-1 heeft vastgesteld. Kan d.m.v. invoer in de applicatie. (foutopsporingsmodus!)
-   2. DSO altijd eerst controle. Bij CSO hangt het ervan af hoe het GSB het inricht.
-   3. DSO: evt (gedeeltelijke) hertellingen per SB en noteert de wijzigingen in een corrigendum Na 14-1. => combinatie van PV en corrigendum vormen de correcte telling die ingevoerd moet worden
 
 4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
-   1. DSO: uit N 10-1 en Na 14-1
-   2. open punt: voer je exact dezelfde velden in bij CSO en DSO? staan ze op dezelfde plek in de modellen? => modellen controleren
 
-5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-in-zee) -> van de zitting, niet van SBs
-6. De coördinator genereert het concept-PV en het digitale bestand. En voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
-   1. DSO: niet van toepassing, want staat al in SB PVs en die gaan mee met het GSB PV.
+5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
+6. De coördinator genereert het concept-PV en het digitale bestand.
 
-7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
-8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
-9. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
-10. Het GSB stelt het PV GSB (inc. bijlagen) beschikbaar aan de burgemeester.
-11. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
+7. De coördinator voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
+
+8. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
+9. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
+10. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+11. Het GSB stelt het PV GSB (inc. bijlagen) beschikbaar aan de burgemeester.
+12. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
 
 __Uitbreidingen:__  
 4a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
@@ -39,18 +35,18 @@ __Uitbreidingen:__
 &emsp; 4b3. Het GSB voert de nieuwe Bijlage 2 in de applicatie in.  
 &emsp; 4b4. Het GSB vermeldt het stembureau bij "extra onderzoeken van het GSB" in het concept-PV.
 
-7a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
-&emsp; 7a1. Het GSB controleert de resultaten van het controleprotocol.  
-&emsp; 7a2. Het GSB vindt een fout en corrigeert de resultaten van het controleprotocol.  
-&emsp;&emsp; 7a2a. Het GSB vindt geen fout en bevestigt een verschil tussen de controles en de resultaten van de applicatie:  
-&emsp;&emsp;&emsp; 7a2a1. Het GSB neemt contact op met de Kiesraad.  
+8a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
+&emsp; 8a1. Het GSB controleert de resultaten van het controleprotocol.  
+&emsp; 8a2. Het GSB vindt een fout en corrigeert de resultaten van het controleprotocol.  
+&emsp;&emsp; 8a2a. Het GSB vindt geen fout en bevestigt een verschil tussen de controles en de resultaten van de applicatie:  
+&emsp;&emsp;&emsp; 8a2a1. Het GSB neemt contact op met de Kiesraad.  
 
-8a. Het GSB stelt een probleem vast met het concept-PV:  
-&emsp; 8a1. Het GSB stelt het bezwaar vast.  
-&emsp; 8a2. Het GSB gaat over tot hertelling. (zie uitbreiding 4b)
+9a. Het GSB stelt een probleem vast met het concept-PV:  
+&emsp; 9a1. Het GSB stelt het bezwaar vast.  
+&emsp; 9a2. Het GSB gaat over tot hertelling. (zie uitbreiding 4b)
 
-8b. Er zijn bezwaren en/of bijzonderheden tijdens het voorlezen van het concept-PV:  
-&emsp;8b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren concept-PV.
+9b. Er zijn bezwaren en/of bijzonderheden tijdens het voorlezen van het concept-PV:  
+&emsp;9b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren concept-PV.
 
 ### Niet in scope
 
@@ -78,7 +74,7 @@ __Uitbreidingen:__
 
 ## Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting d.m.v. DSO (wolk)
 
-_Niveau:_ hoog-over, wolk, ☁️
+__Niveau:__ hoog-over, wolk, ☁️
 
 Voor CSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting d.m.v. CSO (wolk)](#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-eerste-zitting-dmv-cso-wolk).
 
@@ -86,24 +82,33 @@ Voor CSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 
 __Hoofdscenario:__
 
-Nog op te stellen o.b.v. Hoofdscenario CSO.
-
-__Verschillen met CSO:__  
-
-- Model van resultaten SB is anders dan Bijlage 2 (straks: BIjlage 1) bij CSO.
-- Geen "Is er herteld?" op SB PV
-- toetsing van tellingen avond daarvoor, evt door foutopsporingsmodus
-  - extra feature foutopsporingsmodus: applicatie genereert corrigendum-template met oorspronkelijke/oude telling
-- Een hertelling van een stembureau leidt tot corrigendum op het SB PV. PV en corrigendum worden daarna samen ingevoerd in de applicatie.
-- ...?
+1. Het GSB opent de zitting.
+2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
+3. (voor elk stembureau) Het GSB stelt met de hand vast dat de tellingen die het stembureau heeft vastgesteld in N 10-1, kloppen.
+4. (voor elk stembureau) [Het GSB voert de tellingen uit N 10-1 en evt. Na 14-1 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
+5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-in-zee) -> van de zitting, niet van SBs
+6. De coördinator genereert het concept-PV en het digitale bestand.
+7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
+8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
+9. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+10. Het GSB stelt het PV GSB (inc. bijlagen) beschikbaar aan de burgemeester.
+11. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
 
 __Uitbreidingen:__
 
-Nog op te stellen o.b.v. Uitbreidingen CSO.
+3a. Het GSB gebruikt de applicatie om het SB PV te contoleren:
+
+3b. Het GSB stelt vast dat de tellingen van het stembureau mogelijk niet kloppen:  
+&emsp;3b1. het GSB doet een (gedeeltelijke) hertelling van het stembureau.  
+&emsp;3b1. Het GSB noteert de wijzigingen in een corrigendum Na 14-1.
 
 #### Open punten
 
-- Is het wenselijk om een 'leeg' corrigendum (wel ingevuld: kandidatenlijsten (keuze welke lijsten), stembureau(?), gemeente, oorspronkelijke resultaten?) te kunnen genereren in applicatie?
+- Is het wenselijk om een 'leeg' SB-corrigendum (wel ingevuld: kandidatenlijsten (keuze welke lijsten), stembureau(?), gemeente, oorspronkelijke resultaten?) te kunnen genereren in applicatie?
+- Zijn de invoervelden voor de tellingen van een stembureau voor DSO gelijk aan die van CSO?
+  - Waarschijnlijk niet, bijvoorbeeld geen "Is er herteld?" op SB PV.
+  - Nieuwe modellen op nalopen.
+
 
 
 
@@ -137,9 +142,7 @@ __Hoofdscenario 2:__
 
 
 
-## De coördinator voert bezwaren, bijzonderheden, etc. in. (zee)
-
-TODO: (tijdens de zitting)
+## De coördinator voert bezwaren, bijzonderheden, etc. van de GSB-zitting in. (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

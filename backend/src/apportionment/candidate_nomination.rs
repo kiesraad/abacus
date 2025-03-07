@@ -78,7 +78,7 @@ fn preferential_candidate_nomination(
                     .collect();
             if same_votes_candidates.len() > non_assigned_seats as usize {
                 // TODO: #788 if multiple political groups have the same largest remainder and not enough residual seats are available, use drawing of lots
-                debug!(
+                info!(
                     "Drawing of lots is required for candidates: {:?}, only {non_assigned_seats} seat(s) available",
                     candidate_numbers(&same_votes_candidates)
                 );

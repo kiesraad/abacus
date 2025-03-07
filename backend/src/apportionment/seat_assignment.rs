@@ -186,7 +186,7 @@ fn political_groups_with_largest_average<'a>(
     // Check if we can actually assign all these political groups a seat, otherwise we would need to draw lots
     if political_groups.len() > residual_seats as usize {
         // TODO: #788 if multiple political groups have the same largest average and not enough residual seats are available, use drawing of lots
-        debug!(
+        info!(
             "Drawing of lots is required for political groups: {:?}, only {residual_seats} seat(s) available",
             political_group_numbers(&political_groups)
         );
@@ -236,7 +236,7 @@ fn political_groups_with_largest_remainder<'a>(
     // Check if we can actually assign all these political groups
     if political_groups.len() > residual_seats as usize {
         // TODO: #788 if multiple political groups have the same largest remainder and not enough residual seats are available, use drawing of lots
-        debug!(
+        info!(
             "Drawing of lots is required for political groups: {:?}, only {residual_seats} seat(s) available",
             political_group_numbers(&political_groups)
         );
@@ -277,7 +277,7 @@ fn reassign_residual_seat_for_absolute_majority(
 
     if pg_seats <= half_of_seats_count {
         if pgs_last_residual_seat.len() > 1 {
-            debug!(
+            info!(
                 "Drawing of lots is required for political groups: {:?} to pick a political group which the residual seat gets retracted from",
                 pgs_last_residual_seat
             );

@@ -1,3 +1,4 @@
+use crate::data_entry::status::CurrentDataEntry;
 use crate::{
     APIError,
     authentication::{Typist, User},
@@ -125,7 +126,7 @@ impl IntoResponse for SaveDataEntryResponse {
     ),
 )]
 pub async fn polling_station_data_entry_save(
-    _user: Typist,
+    user: Typist,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
@@ -137,26 +138,28 @@ pub async fn polling_station_data_entry_save(
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
     let state = polling_station_data_entries.get_or_default(id).await?;
-    let DataEntry {
-        progress,
-        data,
-        client_state,
-    } = data_entry_request;
+
+    let current_data_entry = CurrentDataEntry {
+        progress: Some(data_entry_request.progress),
+        user_id: user.0.id(),
+        entry: data_entry_request.data,
+        client_state: Some(data_entry_request.client_state),
+    };
 
     // transition to the new state
     let new_state = match entry_number {
         EntryNumber::FirstEntry => {
             if let DataEntryStatus::FirstEntryNotStarted = state {
-                state.claim_first_entry(progress, data, client_state)?
+                state.claim_first_entry(current_data_entry)?
             } else {
-                state.update_first_entry(progress, data, client_state)?
+                state.update_first_entry(current_data_entry)?
             }
         }
         EntryNumber::SecondEntry => {
             if let DataEntryStatus::SecondEntryNotStarted(_) = state {
-                state.claim_second_entry(progress, data, client_state)?
+                state.claim_second_entry(current_data_entry)?
             } else {
-                state.update_second_entry(progress, data, client_state)?
+                state.update_second_entry(current_data_entry)?
             }
         }
     };
@@ -191,14 +194,15 @@ pub async fn polling_station_data_entry_save(
     ),
 )]
 pub async fn polling_station_data_entry_delete(
-    _user: Typist,
+    user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<StatusCode, APIError> {
+    let user_id = user.0.id();
     let state = polling_station_data_entries.get_or_default(id).await?;
     let new_state = match entry_number {
-        EntryNumber::FirstEntry => state.delete_first_entry()?,
-        EntryNumber::SecondEntry => state.delete_second_entry()?,
+        EntryNumber::FirstEntry => state.delete_first_entry(user_id)?,
+        EntryNumber::SecondEntry => state.delete_second_entry(user_id)?,
     };
     polling_station_data_entries.upsert(id, &new_state).await?;
 
@@ -223,7 +227,7 @@ pub async fn polling_station_data_entry_delete(
     ),
 )]
 pub async fn polling_station_data_entry_finalise(
-    _user: Typist,
+    user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
@@ -233,14 +237,16 @@ pub async fn polling_station_data_entry_finalise(
 
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections_repo.get(polling_station.election_id).await?;
+    let user_id = user.0.id();
 
     match entry_number {
         EntryNumber::FirstEntry => {
-            let new_state = state.finalise_first_entry(&polling_station, &election)?;
+            let new_state = state.finalise_first_entry(&polling_station, &election, user_id)?;
             polling_station_data_entries.upsert(id, &new_state).await?;
         }
         EntryNumber::SecondEntry => {
-            let (new_state, data) = state.finalise_second_entry(&polling_station, &election)?;
+            let (new_state, data) =
+                state.finalise_second_entry(&polling_station, &election, user_id)?;
 
             match (&new_state, data) {
                 (DataEntryStatus::Definitive(_), Some(data)) => {

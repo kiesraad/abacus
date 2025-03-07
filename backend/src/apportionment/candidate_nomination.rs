@@ -1,5 +1,5 @@
 use crate::{
-    apportionment::{ApportionmentError, Fraction, PoliticalGroupSeatAssignment},
+    apportionment::{ApportionmentError, Fraction},
     data_entry::CandidateVotes,
     election::{Candidate, CandidateNumber, Election, PGNumber, PoliticalGroup},
     summary::ElectionSummary,
@@ -42,14 +42,6 @@ pub struct CandidateNominationResult {
     pub chosen_candidates: Vec<Candidate>,
     /// List of chosen candidates and candidate list ranking per political group
     pub political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination>,
-}
-
-/// Create a vector containing just the candidate numbers from an iterator of candidate votes
-fn candidate_numbers(candidate_votes: &[CandidateVotes]) -> Vec<CandidateNumber> {
-    candidate_votes
-        .iter()
-        .map(|candidate| candidate.number)
-        .collect()
 }
 
 fn candidates_meeting_preference_threshold(
@@ -198,4 +190,115 @@ pub fn candidate_nomination(
         chosen_candidates,
         political_group_candidate_nomination,
     })
+}
+
+/// Create a vector containing just the candidate numbers from an iterator of candidate votes
+fn candidate_numbers(candidate_votes: &[CandidateVotes]) -> Vec<CandidateNumber> {
+    candidate_votes
+        .iter()
+        .map(|candidate| candidate.number)
+        .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::apportionment::candidate_nomination::candidate_numbers;
+    use crate::{
+        apportionment::{Fraction, candidate_nomination},
+        election::tests::election_fixture_with_given_number_of_seats,
+        summary::tests::election_summary_fixture_with_given_candidate_votes,
+    };
+    use test_log::test;
+
+    /// Candidate nomination with ranking change due to preferential candidate nomination  
+    ///
+    /// Actual case from GR2022  
+    /// PG seats: [8, 3, 2, 1, 1]  
+    /// PG 1: Preferential candidate nominations of candidates 1, 3, 2 and 4 and other candidate nominations of candidates 5, 6, 7 and 8  
+    /// PG 2: Preferential candidate nomination of candidate 1 and other candidate nomination of candidates 2 and 3  
+    /// PG 3: Preferential candidate nomination of candidate 1 and other candidate nomination of candidate 2  
+    /// PG 4: Preferential candidate nomination of candidate 1 and no other candidate nominations  
+    /// PG 5: Preferential candidate nomination of candidate 1 and no other candidate nominations
+    #[test]
+    fn test_with_lt_19_seats_and_preferential_candidate_nomination_ranking_change() {
+        let election = election_fixture_with_given_number_of_seats(&[12, 17, 11, 6, 6], 15);
+        let totals = election_summary_fixture_with_given_candidate_votes(vec![
+            vec![1069, 303, 321, 210, 36, 101, 79, 121, 150, 149, 15, 17],
+            vec![
+                452, 39, 81, 76, 35, 109, 29, 25, 17, 6, 18, 9, 25, 30, 5, 18, 3,
+            ],
+            vec![229, 63, 65, 9, 10, 58, 29, 50, 6, 11, 37],
+            vec![347, 33, 14, 82, 30, 30],
+            vec![266, 36, 39, 36, 38, 38],
+        ]);
+        let result = candidate_nomination(
+            election,
+            Fraction::new(5100, 15),
+            &totals,
+            vec![8, 3, 2, 1, 1],
+        )
+        .unwrap();
+        assert_eq!(result.preference_threshold, Fraction::new(170, 1));
+        assert_eq!(result.preference_threshold_percentage, 50);
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[0].preferential_candidate_nomination
+            ),
+            vec![1, 3, 2, 4]
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[0].other_candidate_nomination
+            ),
+            vec![5, 6, 7, 8]
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[1].preferential_candidate_nomination
+            ),
+            vec![1]
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[1].other_candidate_nomination
+            ),
+            vec![2, 3]
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[2].preferential_candidate_nomination
+            ),
+            vec![1]
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[2].other_candidate_nomination
+            ),
+            vec![2]
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[3].preferential_candidate_nomination
+            ),
+            vec![1]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[3]
+                .other_candidate_nomination
+                .len(),
+            0
+        );
+        assert_eq!(
+            candidate_numbers(
+                &result.political_group_candidate_nomination[4].preferential_candidate_nomination
+            ),
+            vec![1]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[4]
+                .other_candidate_nomination
+                .len(),
+            0
+        );
+    }
 }

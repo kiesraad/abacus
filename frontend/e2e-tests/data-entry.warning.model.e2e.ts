@@ -25,6 +25,10 @@ import { test } from "./fixtures";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
 
 const dataEntryMachineDefinition = {
+  // TODOs
+  // - fill in valid data, retyrn and change into error
+  // - nav to polling station page, nav to elections page
+
   initial: "voterVotesPageEmpty",
   states: {
     recountedPageWarning: {
@@ -76,7 +80,11 @@ const dataEntryMachineDefinition = {
     pollingStationsPageDiscarded: {},
     differencesPageWarningAccepted: {},
     differencesPageCorrected: {},
-    votersVotesPageWarningReminder: {},
+    votersVotesPageWarningReminder: {
+      on: {
+        ACCEPT_WARNING: "voterVotesPageWarningAccepted",
+      },
+    },
     votersVotesPageError: {},
     votersVotesPageAfterResumeWarning: {},
   },

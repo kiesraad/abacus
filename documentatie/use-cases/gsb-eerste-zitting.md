@@ -11,8 +11,8 @@ Voor DSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 __Hoofdscenario:__  
 1. Het GSB opent de zitting.
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
-3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na31-2 Bijlage 2 in.
-4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
+3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na 31-2 Bijlage 1 in.
+4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 1 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
 5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
 6. De coördinator genereert het concept-PV en het digitale bestand.
 7. De coördinator voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.

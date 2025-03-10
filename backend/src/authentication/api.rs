@@ -98,7 +98,7 @@ pub async fn login(
     audit_service
         .with_user(user.clone())
         .log_success(
-            AuditEvent::UserLoggedIn(UserLoggedInDetails {
+            &AuditEvent::UserLoggedIn(UserLoggedInDetails {
                 user_agent,
                 logged_in_users_count: sessions.count().await?,
             }),
@@ -208,7 +208,7 @@ pub async fn logout(
             audit_service
                 .with_user(user)
                 .log_success(
-                    AuditEvent::UserLoggedOut(UserLoggedOutDetails {
+                    &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
                         session_duration: session.duration().as_secs(),
                     }),
                     None,

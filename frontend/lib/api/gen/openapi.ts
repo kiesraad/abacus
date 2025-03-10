@@ -202,20 +202,23 @@ export type AuditEventLevel = "info" | "success" | "warning" | "error";
 
 export interface AuditLogEvent {
   event: AuditEvent;
-  event_level: AuditEventLevel;
+  eventLevel: AuditEventLevel;
   id: number;
   ip: string;
   message?: string | null;
   time: string;
-  user_fullname?: string;
-  user_id: number;
-  user_role?: string;
+  userFullname?: string;
+  userId: number;
+  userRole?: string;
   username: string;
   workstation?: number | null;
 }
 
 export interface AuditLogListResponse {
   events: AuditLogEvent[];
+  page: number;
+  pages: number;
+  perPage: number;
 }
 
 /**
@@ -470,6 +473,11 @@ export interface LoginResponse {
   username: string;
 }
 
+export interface Pagination {
+  page?: number;
+  perPage?: number;
+}
+
 /**
  * Political group with its candidates
  */
@@ -624,12 +632,12 @@ export interface UserListResponse {
 }
 
 export interface UserLoggedInDetails {
-  logged_in_users_count: number;
-  user_agent: string;
+  loggedInUsersCount: number;
+  userAgent: string;
 }
 
 export interface UserLoggedOutDetails {
-  session_duration: number;
+  sessionDuration: number;
 }
 
 export interface ValidationResult {

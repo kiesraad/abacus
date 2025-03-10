@@ -17,7 +17,7 @@ use super::{
 
 /// A session object, corresponds to a row in the sessions table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
-pub(super) struct Session {
+pub(crate) struct Session {
     session_key: String,
     user_id: u32,
     expires_at: DateTime<Utc>,
@@ -65,7 +65,7 @@ impl Session {
     }
 
     /// Get a cookie containing this session key
-    pub(super) fn get_cookie(&self) -> Cookie<'static> {
+    pub(crate) fn get_cookie(&self) -> Cookie<'static> {
         CookieBuilder::new(SESSION_COOKIE_NAME, self.session_key.clone())
             .max_age(cookie::time::Duration::seconds(
                 SESSION_LIFE_TIME.num_seconds(),
@@ -83,7 +83,7 @@ impl Sessions {
     }
 
     /// Create a new session, note this converts any i64 timestamps to i64
-    pub(super) async fn create(
+    pub(crate) async fn create(
         &self,
         user_id: u32,
         life_time: TimeDelta,

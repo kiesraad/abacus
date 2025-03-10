@@ -1955,8 +1955,8 @@
           "id",
           "time",
           "event",
-          "event_level",
-          "user_id",
+          "eventLevel",
+          "userId",
           "username",
           "ip"
         ],
@@ -1964,7 +1964,7 @@
           "event": {
             "$ref": "#/components/schemas/AuditEvent"
           },
-          "event_level": {
+          "eventLevel": {
             "$ref": "#/components/schemas/AuditEventLevel"
           },
           "id": {
@@ -1984,16 +1984,16 @@
           "time": {
             "type": "string"
           },
-          "user_fullname": {
+          "userFullname": {
             "type": "string",
             "description": "user defaults"
           },
-          "user_id": {
+          "userId": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "user_role": {
+          "userRole": {
             "type": "string"
           },
           "username": {
@@ -2012,7 +2012,10 @@
       "AuditLogListResponse": {
         "type": "object",
         "required": [
-          "events"
+          "events",
+          "page",
+          "pages",
+          "perPage"
         ],
         "properties": {
           "events": {
@@ -2020,6 +2023,21 @@
             "items": {
               "$ref": "#/components/schemas/AuditLogEvent"
             }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "perPage": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         }
       },
@@ -2701,6 +2719,21 @@
           }
         }
       },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "perPage": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "PoliticalGroup": {
         "type": "object",
         "description": "Political group with its candidates",
@@ -3146,16 +3179,16 @@
       "UserLoggedInDetails": {
         "type": "object",
         "required": [
-          "user_agent",
-          "logged_in_users_count"
+          "userAgent",
+          "loggedInUsersCount"
         ],
         "properties": {
-          "logged_in_users_count": {
+          "loggedInUsersCount": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "user_agent": {
+          "userAgent": {
             "type": "string"
           }
         }
@@ -3163,10 +3196,10 @@
       "UserLoggedOutDetails": {
         "type": "object",
         "required": [
-          "session_duration"
+          "sessionDuration"
         ],
         "properties": {
-          "session_duration": {
+          "sessionDuration": {
             "type": "integer",
             "format": "int64",
             "minimum": 0

@@ -37,6 +37,15 @@ where
 }
 
 impl AuditService {
+    #[cfg(test)]
+    pub fn new(log: AuditLog, ip: IpAddr, user: User) -> Self {
+        Self {
+            log,
+            ip: Some(ip),
+            user: Some(user),
+        }
+    }
+
     pub fn with_user(mut self, user: User) -> Self {
         self.user = Some(user);
 
@@ -45,7 +54,7 @@ impl AuditService {
 
     pub async fn log_error(
         &self,
-        event: AuditEvent,
+        event: &AuditEvent,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
         self.log(event, AuditEventLevel::Error, message).await
@@ -53,7 +62,7 @@ impl AuditService {
 
     pub async fn log_warning(
         &self,
-        event: AuditEvent,
+        event: &AuditEvent,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
         self.log(event, AuditEventLevel::Warning, message).await
@@ -61,7 +70,7 @@ impl AuditService {
 
     pub async fn log_info(
         &self,
-        event: AuditEvent,
+        event: &AuditEvent,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
         self.log(event, AuditEventLevel::Info, message).await
@@ -69,7 +78,7 @@ impl AuditService {
 
     pub async fn log_success(
         &self,
-        event: AuditEvent,
+        event: &AuditEvent,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
         self.log(event, AuditEventLevel::Success, message).await
@@ -77,7 +86,7 @@ impl AuditService {
 
     pub async fn log(
         &self,
-        event: AuditEvent,
+        event: &AuditEvent,
         event_type: AuditEventLevel,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
@@ -86,7 +95,7 @@ impl AuditService {
         };
 
         self.log
-            .create(user.clone(), event, event_type, message, self.ip)
+            .create(user, event, event_type, message, self.ip)
             .await
     }
 }
@@ -122,13 +131,13 @@ mod test {
             let message = Some("User logged in".to_string());
 
             let event = match level {
-                AuditEventLevel::Error => service.log_error(audit_event, message).await.unwrap(),
+                AuditEventLevel::Error => service.log_error(&audit_event, message).await.unwrap(),
                 AuditEventLevel::Warning => {
-                    service.log_warning(audit_event, message).await.unwrap()
+                    service.log_warning(&audit_event, message).await.unwrap()
                 }
-                AuditEventLevel::Info => service.log_info(audit_event, message).await.unwrap(),
+                AuditEventLevel::Info => service.log_info(&audit_event, message).await.unwrap(),
                 AuditEventLevel::Success => {
-                    service.log_success(audit_event, message).await.unwrap()
+                    service.log_success(&audit_event, message).await.unwrap()
                 }
             };
 
@@ -161,7 +170,7 @@ mod test {
             logged_in_users_count: 5,
         });
 
-        let error = service.log_info(audit_event, None).await.unwrap_err();
+        let error = service.log_info(&audit_event, None).await.unwrap_err();
 
         assert!(
             matches!(

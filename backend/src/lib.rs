@@ -204,6 +204,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::LargestAverageAssignedSeat,
                 apportionment::LargestRemainderAssignedSeat,
                 audit_log::AuditLogListResponse,
+                audit_log::Pagination,
                 authentication::Credentials,
                 authentication::LoginResponse,
                 authentication::AccountUpdateRequest,

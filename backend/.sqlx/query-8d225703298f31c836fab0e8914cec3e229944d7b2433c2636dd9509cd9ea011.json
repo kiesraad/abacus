@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                audit_log.username,\n                ip as \"ip: String\",\n                users.fullname as \"user_fullname\",\n                users.role as \"user_role?: Role\"\n            FROM audit_log\n            LEFT JOIN users ON audit_log.user_id = users.id\n            ORDER BY time DESC",
+  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                audit_log.username,\n                ip as \"ip: String\",\n                users.fullname as \"user_fullname\",\n                users.role as \"user_role?: Role\"\n            FROM audit_log\n            LEFT JOIN users ON audit_log.user_id = users.id\n            ORDER BY time DESC\n            LIMIT ? OFFSET ?\n            ",
   "describe": {
     "columns": [
       {
@@ -16,7 +16,7 @@
       {
         "name": "event: serde_json::Value",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Null"
       },
       {
         "name": "event_level: _",
@@ -60,7 +60,7 @@
       }
     ],
     "parameters": {
-      "Right": 0
+      "Right": 2
     },
     "nullable": [
       false,
@@ -76,5 +76,5 @@
       true
     ]
   },
-  "hash": "04d8a56ecca77ac9f9e50de6712a2dda56283aced5b535661202b41bc6b861ab"
+  "hash": "8d225703298f31c836fab0e8914cec3e229944d7b2433c2636dd9509cd9ea011"
 }

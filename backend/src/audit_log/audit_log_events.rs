@@ -11,12 +11,14 @@ use crate::{
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UserLoggedInDetails {
     pub user_agent: String,
     pub logged_in_users_count: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UserLoggedOutDetails {
     pub session_duration: u64,
 }
@@ -67,6 +69,7 @@ impl From<Option<String>> for Ip {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, FromRow, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct AuditLogEvent {
     id: u32,
     #[schema(value_type = String)]
@@ -119,6 +122,7 @@ impl AuditLogEvent {
     }
 }
 
+#[derive(Clone)]
 pub struct AuditLog(SqlitePool);
 
 impl FromRef<AppState> for AuditLog {
@@ -135,8 +139,8 @@ impl AuditLog {
 
     pub async fn create(
         &self,
-        user: User,
-        event: AuditEvent,
+        user: &User,
+        event: &AuditEvent,
         event_level: AuditEventLevel,
         message: Option<String>,
         ip: Option<IpAddr>,
@@ -185,7 +189,7 @@ impl AuditLog {
         Ok(event)
     }
 
-    pub async fn list(&self) -> Result<Vec<AuditLogEvent>, APIError> {
+    pub async fn list(&self, offset: u32, limit: u32) -> Result<Vec<AuditLogEvent>, APIError> {
         let events = sqlx::query_as!(
             AuditLogEvent,
             r#"SELECT
@@ -202,11 +206,23 @@ impl AuditLog {
                 users.role as "user_role?: Role"
             FROM audit_log
             LEFT JOIN users ON audit_log.user_id = users.id
-            ORDER BY time DESC"#
+            ORDER BY time DESC
+            LIMIT ? OFFSET ?
+            "#,
+            limit,
+            offset
         )
         .fetch_all(&self.0)
         .await?;
 
         Ok(events)
+    }
+
+    pub async fn count(&self) -> Result<u32, APIError> {
+        let row_count = sqlx::query!(r#"SELECT COUNT(*) AS "count: u32" FROM audit_log"#)
+            .fetch_one(&self.0)
+            .await?;
+
+        Ok(row_count.count)
     }
 }

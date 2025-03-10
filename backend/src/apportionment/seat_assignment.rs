@@ -451,8 +451,8 @@ fn pg_assigned_from_previous_step(
 
 /// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with 19 seats or more.
-fn step_assign_remainder_using_largest_averages(
-    standing: &[PoliticalGroupStanding],
+fn step_assign_remainder_using_largest_averages<'a>(
+    standing: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
     residual_seats: u32,
     previous: &[SeatAssignmentStep],
 ) -> Result<AssignedSeat, ApportionmentError> {
@@ -538,9 +538,9 @@ fn step_assign_remainder_using_largest_remainder(
         let mut qualifying_for_unique_largest_average =
             political_groups_qualifying_for_unique_largest_average(assigned_seats, previous)
                 .peekable();
-        if let Some(&&assigned_seats) = qualifying_for_unique_largest_average.peek() {
+        if qualifying_for_unique_largest_average.peek().is_some() {
             step_assign_remainder_using_largest_averages(
-                &[assigned_seats],
+                qualifying_for_unique_largest_average,
                 residual_seats,
                 previous,
             )
@@ -790,7 +790,24 @@ mod tests {
 
         /// Apportionment with residual seats assigned with remainder and averages system
         ///
-        /// Full seats: [0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 10
+        /// Full seats: [0, 0, 0, 0, 0, 7] - Remainder seats: 3
+        /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list [6] meets the threshold of 75% of the quota
+        ///  1 - largest remainder: seat assigned to list 6
+        /// 1st round of largest averages system (assignment to unique political groups):
+        ///  2 - largest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6
+        ///  3 - largest average: [0/1, 3, 5, 6, 7, 7 9/10] seat assigned to list 5
+        #[test]
+        fn test_1st_round_unique_largest_averages_system_regression() {
+            let votes = vec![0, 3, 5, 6, 7, 79];
+            let totals = election_summary_fixture_with_default_50_candidates(votes);
+            let result = seat_assignment(10, &totals).unwrap();
+            let total_seats = get_total_seats_from_apportionment_result(result);
+            assert_eq!(total_seats, [0, 0, 0, 0, 1, 9]);
+        }
+
+        /// Apportionment with residual seats assigned with remainder and averages system
+        ///
+        /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 10
         /// Remainders: [0/10, 0/10, 0/10, 0/10, 0/10]
         ///  1 - largest remainder: seat assigned to list 1
         ///  2 - largest remainder: seat assigned to list 2

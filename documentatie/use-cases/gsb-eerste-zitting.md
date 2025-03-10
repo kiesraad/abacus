@@ -27,8 +27,8 @@ __Uitbreidingen:__
 
 4b. Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
 &emsp; 4b1. Het GSB voert de hertelling uit.  
-&emsp; 4b2. Het GSB corrigeert de Bijlage 2 of vult een nieuwe Bijlage 2 in.  
-&emsp; 4b3. Het GSB voert de nieuwe Bijlage 2 in de applicatie in.  
+&emsp; 4b2. Het GSB corrigeert de Bijlage 1 of vult een nieuwe Bijlage 1 in.  
+&emsp; 4b3. Het GSB voert de nieuwe Bijlage 1 in de applicatie in.  
 &emsp; 4b4. Het GSB vermeldt het stembureau bij "extra onderzoeken van het GSB" in het concept-PV.
 
 8a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
@@ -55,7 +55,6 @@ __Uitbreidingen:__
 - Hoe ziet de overdracht van het digitale bestand van GSB naar CSB binnen de applicatie er precies uit?
   - De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
   - Proces via uitwisselplatform loopt parallel.
-- Na31-2 Bijlage 2 wordt Bijlage 1 in nieuwe modellen.
 - Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het concept-PV?
 - Willen we het invoeren van het resultaat controleprotocol (handmatige controle optellingen software) in de applicatie doen?
   - Protocol wordt uitgevoerd na het afdrukken van het concept-PV, dus lastig om in applicatie te doen.

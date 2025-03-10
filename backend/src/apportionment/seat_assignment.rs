@@ -678,11 +678,9 @@ pub fn get_total_seats_from_apportionment_result(result: SeatAssignmentResult) -
 mod tests {
     /// Tests apportionment for councils with less than 19 seats
     mod lt_19_seats {
-        use crate::{
-            apportionment::{
-                ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
-            },
-            summary::tests::election_summary_fixture_with_default_50_candidates,
+        use crate::apportionment::{
+            ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
+            test_helpers::election_summary_fixture_with_default_50_candidates,
         };
         use test_log::test;
 
@@ -941,11 +939,9 @@ mod tests {
 
     /// Tests apportionment for councils with 19 or more seats
     mod gte_19_seats {
-        use crate::{
-            apportionment::{
-                ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
-            },
-            summary::tests::election_summary_fixture_with_default_50_candidates,
+        use crate::apportionment::{
+            ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
+            test_helpers::election_summary_fixture_with_default_50_candidates,
         };
         use test_log::test;
 

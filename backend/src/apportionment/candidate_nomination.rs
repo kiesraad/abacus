@@ -214,9 +214,11 @@ pub fn candidate_numbers(candidate_votes: &[CandidateVotes]) -> Vec<CandidateNum
 #[cfg(test)]
 mod tests {
     use crate::{
-        apportionment::{ApportionmentError, Fraction, candidate_nomination, candidate_numbers},
+        apportionment::{
+            ApportionmentError, Fraction, candidate_nomination, candidate_numbers,
+            test_helpers::election_summary_fixture_with_given_candidate_votes,
+        },
         election::tests::election_fixture_with_given_number_of_seats,
-        summary::tests::election_summary_fixture_with_given_candidate_votes,
     };
     use test_log::test;
 

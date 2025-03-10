@@ -128,9 +128,9 @@ pub(crate) mod tests {
                     .map(|j| Candidate {
                         number: j + 1,
                         initials: "A.B.".to_string(),
-                        first_name: Some("John".to_string()),
+                        first_name: Some(format!("Candidate {}", j + 1)),
                         last_name_prefix: Some("van".to_string()),
-                        last_name: "Doe".to_string(),
+                        last_name: format!("PG {}", i + 1),
                         locality: "Juinen".to_string(),
                         country_code: Some("NL".to_string()),
                         gender: Some(X),

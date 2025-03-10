@@ -158,9 +158,37 @@ fn candidate_nomination_per_political_group(
     Ok(political_group_candidate_nomination)
 }
 
+fn all_sorted_chosen_candidates(
+    pgs: Vec<PoliticalGroup>,
+    political_group_candidate_nomination: &[PoliticalGroupCandidateNomination],
+) -> Vec<Candidate> {
+    let mut chosen_candidates: Vec<Candidate> = vec![];
+    for pg in pgs {
+        let pg_candidate_nomination = &political_group_candidate_nomination[pg.number as usize - 1];
+        chosen_candidates.extend(
+            pg.candidates
+                .iter()
+                .filter(|candidate| {
+                    pg_candidate_nomination
+                        .preferential_candidate_nomination
+                        .iter()
+                        .any(|cv| cv.number == candidate.number)
+                        || pg_candidate_nomination
+                            .other_candidate_nomination
+                            .iter()
+                            .any(|cv| cv.number == candidate.number)
+                })
+                .cloned()
+                .collect::<Vec<Candidate>>(),
+        );
+    }
+    chosen_candidates.sort_by(|a, b| a.last_name.cmp(&b.last_name));
+    chosen_candidates
+}
+
 /// Candidate nomination
 pub fn candidate_nomination(
-    election: Election,
+    election: &Election,
     quota: Fraction,
     totals: &ElectionSummary,
     total_seats: Vec<u32>,
@@ -185,15 +213,22 @@ pub fn candidate_nomination(
         totals,
         preference_threshold,
         total_seats,
-        election.political_groups.unwrap_or_default(),
+        election.political_groups.clone().unwrap_or_default(),
     )?;
     debug!(
         "Political group candidate nomination: {:#?}",
         political_group_candidate_nomination
     );
 
-    // TODO: #1045 Create ordered chosen candidates list
-    let chosen_candidates = vec![];
+    // Create alphabetically ordered chosen candidates list
+    let chosen_candidates = all_sorted_chosen_candidates(
+        election.political_groups.clone().unwrap_or_default(),
+        &political_group_candidate_nomination,
+    );
+    debug!(
+        "Chosen candidates (sorted alphabetically): {:#?}",
+        chosen_candidates
+    );
 
     Ok(CandidateNominationResult {
         preference_threshold_percentage,
@@ -244,7 +279,7 @@ mod tests {
             vec![347, 33, 14, 82, 30, 30],
             vec![266, 36, 39, 36, 38, 38],
         ]);
-        let result = candidate_nomination(election, quota, &totals, vec![8, 3, 2, 1, 1]).unwrap();
+        let result = candidate_nomination(&election, quota, &totals, vec![8, 3, 2, 1, 1]).unwrap();
         assert_eq!(result.preference_threshold_percentage, 50);
         assert_eq!(
             result.preference_threshold,
@@ -310,6 +345,57 @@ mod tests {
                 .len(),
             0
         );
+        let pgs = election.political_groups.unwrap_or_default();
+        assert!(
+            pgs[0].candidates[..8]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[0].candidates[9..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[1].candidates[..3]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[1].candidates[4..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[2].candidates[..2]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[2].candidates[3..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[3].candidates[..1]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[3].candidates[2..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[4].candidates[..1]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[4].candidates[2..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
     }
 
     /// Candidate nomination with more candidates eligible for preferential nomination than seats
@@ -335,7 +421,7 @@ mod tests {
             vec![200, 200, 199, 198, 197, 196],
             vec![200, 200, 199, 199, 198, 198],
         ]);
-        let result = candidate_nomination(election, quota, &totals, vec![6, 5, 4, 2, 2]).unwrap();
+        let result = candidate_nomination(&election, quota, &totals, vec![6, 5, 4, 2, 2]).unwrap();
         assert_eq!(result.preference_threshold_percentage, 25);
         assert_eq!(
             result.preference_threshold,
@@ -401,6 +487,53 @@ mod tests {
                 .len(),
             0
         );
+        let pgs = election.political_groups.unwrap_or_default();
+        assert!(
+            pgs[0]
+                .candidates
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[1].candidates[..4]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[1].candidates[5..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[2].candidates[..3]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[2].candidates[4..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[3].candidates[..1]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[3].candidates[2..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[4].candidates[..1]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[4].candidates[2..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
     }
 
     /// Candidate nomination with more candidates eligible for preferential nomination than seats
@@ -419,7 +552,7 @@ mod tests {
             vec![200, 200, 200, 200, 200, 200],
             vec![200, 200, 200, 200, 200, 200],
         ]);
-        let result = candidate_nomination(election, quota, &totals, vec![6, 5, 4, 2, 2]);
+        let result = candidate_nomination(&election, quota, &totals, vec![6, 5, 4, 2, 2]);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 }

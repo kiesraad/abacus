@@ -48,7 +48,7 @@ __Uitbreidingen:__
 
 - Elektronische handtekening van documenten.
 - CSO: Aanmaken en invullen van "Bijlage 2: Bezwaren van aanwezigen op stembureaus". Wordt wel toegevoegd aan concept-PV door coördinator.
-- Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Gaan we dit faciliteren in de applicatie? Nee.
+- Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Dit gaan we niet faciliteren in de applicatie.
 
 ### Open punten
 
@@ -86,8 +86,8 @@ __Hoofdscenario:__
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
 9. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
-10. Het GSB stelt het PV GSB (inc. bijlagen) beschikbaar aan de burgemeester.
-11. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
+10. Het GSB stelt het PV GSB (inclusief bijlagen) beschikbaar aan de burgemeester.
+11. De burgemeester publiceert het PV GSB (inclusief bijlagen) en brengt het over naar het CSB.
 
 __Uitbreidingen:__
 

@@ -11,7 +11,7 @@ __Trigger:__ één of meer stembureaus moeten herteld worden n.a.v. verzoek CSB
 __Hoofdscenario:__  
 
 1. Het GSB ontvangt één of meerdere verzoeken tot onderzoek/hertelling van het CSB.
-2. Het GSB opent de zitting. (Wanneer is een afweging van het GSB: liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten.)
+2. Het GSB opent de zitting. (Wanneer dat gebeurt is een afweging van het GSB: liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten)
 3. [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
 4. (voor elk herteld stembureau met gewijzigde uitslag) [Het GSB voert de corrigendum PV's in de applicatie in.](./gsb-invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)
 5. Het GSB voert de andere onderdelen van het GSB-corrigendum in.

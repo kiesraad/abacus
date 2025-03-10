@@ -47,6 +47,7 @@ const dataEntryMachineDefinition = {
         SUBMIT: "votersVotesPageWarningReminder",
         ACCEPT_WARNING: "voterVotesPageWarningAccepted",
         CORRECT_WARNING: "voterVotesPageWarningCorrected",
+        CHANGE_TO_ERROR_AND_SUBMIT: "votersVotesPageError",
         GO_TO_RECOUNTED_PAGE: "recountedPageWarning",
       },
     },
@@ -63,6 +64,7 @@ const dataEntryMachineDefinition = {
     differencesPageWarningAccepted: {},
     differencesPageCorrected: {},
     votersVotesPageWarningReminder: {},
+    votersVotesPageError: {},
   },
 };
 
@@ -81,6 +83,13 @@ const votersEmpty: VotersCounts = {
   proxy_certificate_count: 0,
   voter_card_count: 0,
   total_admitted_voters_count: 0,
+};
+
+const votersError: VotersCounts = {
+  poll_card_count: 70,
+  proxy_certificate_count: 30,
+  voter_card_count: 0,
+  total_admitted_voters_count: 90, // incorrect total
 };
 
 const votesWarning: VotesCounts = {
@@ -181,6 +190,12 @@ test.describe("Data entry model test", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesValid });
           },
+          votersVotesPageError: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes: votesWarning });
+          },
         };
 
         const votersAndVotesPageEvents = {
@@ -198,6 +213,12 @@ test.describe("Data entry model test", () => {
             await votersAndVotesPage.inputVotesCounts(votesValid);
             // Tab press needed for page to register change after Playwright's fill()
             await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
+          },
+          CHANGE_TO_ERROR_AND_SUBMIT: async () => {
+            await votersAndVotesPage.inputVotersCounts(votersError);
+            // Tab press needed for page to register change after Playwright's fill()
+            await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
+            await votersAndVotesPage.next.click();
           },
           GO_TO_RECOUNTED_PAGE: async () => {
             await votersAndVotesPage.navPanel.recounted.click();

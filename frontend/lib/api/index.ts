@@ -18,3 +18,4 @@ export * from "./useElectionListRequest";
 export * from "./useElectionStatusRequest";
 export * from "./useUser";
 export * from "./useUserRole";
+export * from "./log";

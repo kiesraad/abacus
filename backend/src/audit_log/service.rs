@@ -4,7 +4,7 @@ use axum::{
 };
 use std::net::{IpAddr, SocketAddr};
 
-use super::audit_log_events::{AuditEvent, AuditEventType, AuditLog, AuditLogEvent};
+use super::audit_log_events::{AuditEvent, AuditEventLevel, AuditLog, AuditLogEvent};
 use crate::{
     APIError,
     authentication::{User, Users, error::AuthenticationError},
@@ -48,7 +48,7 @@ impl AuditService {
         event: AuditEvent,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
-        self.log(event, AuditEventType::Error, message).await
+        self.log(event, AuditEventLevel::Error, message).await
     }
 
     pub async fn log_warning(
@@ -56,7 +56,7 @@ impl AuditService {
         event: AuditEvent,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
-        self.log(event, AuditEventType::Warning, message).await
+        self.log(event, AuditEventLevel::Warning, message).await
     }
 
     pub async fn log_info(
@@ -64,7 +64,7 @@ impl AuditService {
         event: AuditEvent,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
-        self.log(event, AuditEventType::Info, message).await
+        self.log(event, AuditEventLevel::Info, message).await
     }
 
     pub async fn log_success(
@@ -72,13 +72,13 @@ impl AuditService {
         event: AuditEvent,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
-        self.log(event, AuditEventType::Success, message).await
+        self.log(event, AuditEventLevel::Success, message).await
     }
 
     pub async fn log(
         &self,
         event: AuditEvent,
-        event_type: AuditEventType,
+        event_type: AuditEventLevel,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
         let Some(user) = &self.user else {
@@ -110,10 +110,10 @@ mod test {
         };
 
         for level in [
-            AuditEventType::Error,
-            AuditEventType::Warning,
-            AuditEventType::Info,
-            AuditEventType::Success,
+            AuditEventLevel::Error,
+            AuditEventLevel::Warning,
+            AuditEventLevel::Info,
+            AuditEventLevel::Success,
         ] {
             let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
                 user_agent: "Mozilla/5.0".to_string(),
@@ -122,10 +122,14 @@ mod test {
             let message = Some("User logged in".to_string());
 
             let event = match level {
-                AuditEventType::Error => service.log_error(audit_event, message).await.unwrap(),
-                AuditEventType::Warning => service.log_warning(audit_event, message).await.unwrap(),
-                AuditEventType::Info => service.log_info(audit_event, message).await.unwrap(),
-                AuditEventType::Success => service.log_success(audit_event, message).await.unwrap(),
+                AuditEventLevel::Error => service.log_error(audit_event, message).await.unwrap(),
+                AuditEventLevel::Warning => {
+                    service.log_warning(audit_event, message).await.unwrap()
+                }
+                AuditEventLevel::Info => service.log_info(audit_event, message).await.unwrap(),
+                AuditEventLevel::Success => {
+                    service.log_success(audit_event, message).await.unwrap()
+                }
             };
 
             assert_eq!(
@@ -136,7 +140,7 @@ mod test {
                 })
             );
 
-            assert_eq!(event.event_type(), &level);
+            assert_eq!(event.event_level(), &level);
             assert_eq!(event.message(), Some(&"User logged in".to_string()));
             assert_eq!(event.user_id(), 1);
             assert_eq!(event.username(), "admin");

@@ -1,0 +1,26 @@
+{
+  "no_events": "Geen gebeurtenissen gevonden",
+  "action": {
+    "filter": "Filteren",
+    "details": "Details"
+  },
+  "header": {
+    "workstation": "Werkplek",
+    "time": "Tijdstip",
+    "level": "Type",
+    "event": "Gebeurtenis",
+    "message": "Toelichting",
+    "user": "Gebruiker"
+  },
+  "level": {
+    "error": "Fout",
+    "warning": "Waarschuwing",
+    "info": "Informatie",
+    "success": "Succes"
+  },
+  "event": {
+    "userloggedin": "Gebruiker ingelogd",
+    "userloggedout": "Gebruiker uitgelogd",
+    "unknownevent": "Onbekende gebeurtenis"
+  }
+}

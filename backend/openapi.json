@@ -871,6 +871,47 @@
         }
       }
     },
+    "/api/log": {
+      "get": {
+        "tags": [
+          "audit_log"
+        ],
+        "summary": "Lists all users",
+        "operationId": "audit_log_list",
+        "responses": {
+          "200": {
+            "description": "Audit log event list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "get": {
         "tags": [
@@ -1838,6 +1879,149 @@
           }
         ],
         "description": "Records the political group and specific change for a specific residual seat"
+      },
+      "AuditEvent": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserLoggedInDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "userloggedin"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserLoggedOutDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "userloggedout"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "unknownevent"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "AuditEventLevel": {
+        "type": "string",
+        "enum": [
+          "info",
+          "success",
+          "warning",
+          "error"
+        ]
+      },
+      "AuditLogEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "time",
+          "event",
+          "event_level",
+          "user_id",
+          "username",
+          "ip"
+        ],
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/AuditEvent"
+          },
+          "event_level": {
+            "$ref": "#/components/schemas/AuditEventLevel"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "ip": {
+            "type": "string"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "time": {
+            "type": "string"
+          },
+          "user_fullname": {
+            "type": "string",
+            "description": "user defaults"
+          },
+          "user_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "user_role": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "workstation": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "AuditLogListResponse": {
+        "type": "object",
+        "required": [
+          "events"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLogEvent"
+            }
+          }
+        }
       },
       "Candidate": {
         "type": "object",
@@ -2956,6 +3140,36 @@
             "items": {
               "$ref": "#/components/schemas/User"
             }
+          }
+        }
+      },
+      "UserLoggedInDetails": {
+        "type": "object",
+        "required": [
+          "user_agent",
+          "logged_in_users_count"
+        ],
+        "properties": {
+          "logged_in_users_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "user_agent": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLoggedOutDetails": {
+        "type": "object",
+        "required": [
+          "session_duration"
+        ],
+        "properties": {
+          "session_duration": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           }
         }
       },

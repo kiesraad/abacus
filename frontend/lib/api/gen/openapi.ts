@@ -74,6 +74,10 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
+// /api/log
+export type AUDIT_LOG_LIST_REQUEST_PARAMS = Record<string, never>;
+export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
+
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS {
   polling_station_id: number;
@@ -188,6 +192,31 @@ export type AssignedSeat =
   | (LargestAverageAssignedSeat & { assigned_by: "LargestAverage" })
   | (LargestRemainderAssignedSeat & { assigned_by: "LargestRemainder" })
   | (AbsoluteMajorityChange & { assigned_by: "AbsoluteMajorityChange" });
+
+export type AuditEvent =
+  | (UserLoggedInDetails & { event_type: "userloggedin" })
+  | (UserLoggedOutDetails & { event_type: "userloggedout" })
+  | { event_type: "unknownevent" };
+
+export type AuditEventLevel = "info" | "success" | "warning" | "error";
+
+export interface AuditLogEvent {
+  event: AuditEvent;
+  event_level: AuditEventLevel;
+  id: number;
+  ip: string;
+  message?: string | null;
+  time: string;
+  user_fullname?: string;
+  user_id: number;
+  user_role?: string;
+  username: string;
+  workstation?: number | null;
+}
+
+export interface AuditLogListResponse {
+  events: AuditLogEvent[];
+}
 
 /**
  * Candidate
@@ -592,6 +621,15 @@ export interface User {
 
 export interface UserListResponse {
   users: User[];
+}
+
+export interface UserLoggedInDetails {
+  logged_in_users_count: number;
+  user_agent: string;
+}
+
+export interface UserLoggedOutDetails {
+  session_duration: number;
 }
 
 export interface ValidationResult {

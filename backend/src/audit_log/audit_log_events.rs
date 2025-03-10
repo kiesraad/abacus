@@ -5,7 +5,10 @@ use sqlx::{SqlitePool, Type, prelude::FromRow};
 use std::{fmt, net::IpAddr};
 use utoipa::ToSchema;
 
-use crate::{APIError, AppState, authentication::User};
+use crate::{
+    APIError, AppState,
+    authentication::{Role, User},
+};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
 pub struct UserLoggedInDetails {
@@ -46,7 +49,7 @@ impl fmt::Display for AuditEvent {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, ToSchema, Type)]
 #[serde(rename_all = "lowercase")]
 #[sqlx(rename_all = "snake_case")]
-pub enum AuditEventType {
+pub enum AuditEventLevel {
     Info,
     Success,
     Warning,
@@ -69,13 +72,24 @@ pub struct AuditLogEvent {
     #[schema(value_type = String)]
     time: DateTime<Utc>,
     event: AuditEvent,
-    event_type: AuditEventType,
+    event_level: AuditEventLevel,
     message: Option<String>,
     workstation: Option<u32>,
     user_id: u32,
     username: String,
     #[schema(value_type = String)]
     ip: Ip,
+
+    /// user defaults
+    #[sqlx(skip)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    user_fullname: Option<String>,
+
+    #[sqlx(skip)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    user_role: Option<Role>,
 }
 
 #[cfg(test)]
@@ -84,8 +98,8 @@ impl AuditLogEvent {
         &self.event
     }
 
-    pub fn event_type(&self) -> &AuditEventType {
-        &self.event_type
+    pub fn event_level(&self) -> &AuditEventLevel {
+        &self.event_level
     }
 
     pub fn message(&self) -> Option<&String> {
@@ -123,7 +137,7 @@ impl AuditLog {
         &self,
         user: User,
         event: AuditEvent,
-        event_type: AuditEventType,
+        event_level: AuditEventLevel,
         message: Option<String>,
         ip: Option<IpAddr>,
     ) -> Result<AuditLogEvent, APIError> {
@@ -133,35 +147,66 @@ impl AuditLog {
         let event = serde_json::to_value(event)?;
         let user_id = user.id();
         let username = user.username();
+        let fullname = user.fullname();
+        let role = user.role();
         let ip = ip.map(|ip| ip.to_string());
 
         let event = sqlx::query_as!(
             AuditLogEvent,
-            r#"INSERT INTO audit_log (event, event_name, event_type, message, workstation, user_id, username, ip)
+            r#"INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, ip)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
                 id as "id: u32",
                 time as "time: _",
                 event as "event: serde_json::Value",
-                event_type as "event_type: _",
+                event_level as "event_level: _",
                 message,
                 workstation as "workstation: _",
                 user_id as "user_id: u32",
                 username,
-                ip as "ip: String"
+                ip as "ip: String",
+                ? as "user_fullname?: String",
+                ? as "user_role?: Role"
             "#,
             event,
             event_name,
-            event_type,
+            event_level,
             message,
             workstation,
             user_id,
             username,
             ip,
+            fullname,
+            role
         )
         .fetch_one(&self.0)
         .await?;
 
         Ok(event)
+    }
+
+    pub async fn list(&self) -> Result<Vec<AuditLogEvent>, APIError> {
+        let events = sqlx::query_as!(
+            AuditLogEvent,
+            r#"SELECT
+                audit_log.id as "id: u32",
+                time as "time: _",
+                event as "event: serde_json::Value",
+                event_level as "event_level: _",
+                message,
+                workstation as "workstation: _",
+                user_id as "user_id: u32",
+                audit_log.username,
+                ip as "ip: String",
+                users.fullname as "user_fullname",
+                users.role as "user_role?: Role"
+            FROM audit_log
+            LEFT JOIN users ON audit_log.user_id = users.id
+            ORDER BY time DESC"#
+        )
+        .fetch_all(&self.0)
+        .await?;
+
+        Ok(events)
     }
 }

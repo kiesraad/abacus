@@ -11,7 +11,7 @@
 import { expect } from "@playwright/test";
 import { createTestModel } from "@xstate/graph";
 import {
-  //   AbortInputModal,
+  AbortInputModal,
   DifferencesPage,
   PollingStationChoicePage,
   RecountedPage,
@@ -49,6 +49,7 @@ const dataEntryMachineDefinition = {
         CORRECT_WARNING: "voterVotesPageWarningCorrected",
         CHANGE_TO_ERROR_AND_SUBMIT: "votersVotesPageError",
         GO_TO_RECOUNTED_PAGE: "recountedPageWarning",
+        CLICK_ABORT: "abortInputModalWarning",
       },
     },
     voterVotesPageWarningAccepted: {
@@ -61,10 +62,23 @@ const dataEntryMachineDefinition = {
         SUBMIT: "differencesPageCorrected",
       },
     },
+    abortInputModalWarning: {
+      on: {
+        SAVE_INPUT: "pollingStationsPageWarningSaved",
+        DISCARD_INPUT: "pollingStationsPageDiscarded",
+      },
+    },
+    pollingStationsPageWarningSaved: {
+      on: {
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeWarning",
+      },
+    },
+    pollingStationsPageDiscarded: {},
     differencesPageWarningAccepted: {},
     differencesPageCorrected: {},
     votersVotesPageWarningReminder: {},
     votersVotesPageError: {},
+    votersVotesPageAfterResumeWarning: {},
   },
 };
 
@@ -127,10 +141,25 @@ test.describe("Data entry model test", () => {
         const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
-        // const abortModal = new AbortInputModal(page);
+        const abortModal = new AbortInputModal(page);
 
-        const pollingStationsPageStates = {};
-        const PollingStationsPageEvents = {};
+        const pollingStationsPageStates = {
+          pollingStationsPageWarningSaved: async () => {
+            await expect(pollingStationChoicePage.fieldset).toBeVisible();
+            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
+              `${pollingStation.number} - ${pollingStation.name}`,
+            ]);
+          },
+          pollingStationsPageDiscarded: async () => {
+            await expect(pollingStationChoicePage.fieldset).toBeVisible();
+            await expect(pollingStationChoicePage.alertDataEntryInProgress).toBeHidden();
+          },
+        };
+        const PollingStationsPageEvents = {
+          RESUME_DATA_ENTRY: async () => {
+            await pollingStationChoicePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
+          },
+        };
 
         const recountedPageStates = {
           recountedPageWarning: async () => {
@@ -196,6 +225,14 @@ test.describe("Data entry model test", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes: votesWarning });
           },
+          votersVotesPageAfterResumeWarning: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.warning).toBeHidden();
+            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+          },
+          abortInputModalWarning: async () => {
+            await expect(abortModal.heading).toBeVisible();
+          },
         };
 
         const votersAndVotesPageEvents = {
@@ -223,6 +260,9 @@ test.describe("Data entry model test", () => {
           GO_TO_RECOUNTED_PAGE: async () => {
             await votersAndVotesPage.navPanel.recounted.click();
           },
+          CLICK_ABORT: async () => {
+            await votersAndVotesPage.abortInput.click();
+          },
         };
 
         const differencesPageStates = {
@@ -237,8 +277,26 @@ test.describe("Data entry model test", () => {
         };
         const differencesPageEvents = {};
 
-        const abortInputModalStates = {};
-        const abortInputModalEvents = {};
+        const abortInputModalStates = {
+          pollingStationsPageWarningSaved: async () => {
+            await expect(pollingStationChoicePage.fieldset).toBeVisible();
+            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
+              `${pollingStation.number} - ${pollingStation.name}`,
+            ]);
+          },
+          pollingStationsPageDiscarded: async () => {
+            await expect(pollingStationChoicePage.fieldset).toBeVisible();
+            await expect(pollingStationChoicePage.alertDataEntryInProgress).toBeHidden();
+          },
+        };
+        const abortInputModalEvents = {
+          SAVE_INPUT: async () => {
+            await abortModal.saveInput.click();
+          },
+          DISCARD_INPUT: async () => {
+            await abortModal.discardInput.click();
+          },
+        };
 
         const { states, events } = getStatesAndEventsFromTest(
           [

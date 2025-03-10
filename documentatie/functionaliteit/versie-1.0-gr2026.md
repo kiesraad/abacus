@@ -16,36 +16,37 @@
 - Er is een installatieprogramma/-instructie voor de Abacus-server.
 - Het EML_NL-bestand met de verkiezingsdefinitie voor de betreffende verkiezing kan worden geïmporteerd.
 - Het EML_NL-bestand met de kandidatenlijst voor de betreffende verkiezing kan worden geïmporteerd.
-- Het EML_NL-bestand met de stembureaus van een gemeente kan worden geïmporteerd.
-- De beheerder kan stembureaus aanmaken.
+- Het EML_NL-bestand met de stembureaus van een gemeente kan worden geïmporteerd en geëxporteerd.
+- De beheerder kan stembureaus aanmaken, aanpassen, verwijderen.
 
-### Invoeren van resultaten GSB
+### Invoeren van uitslagen GSB
 
 - Invoerders kunnen uitslagen van stembureaus invoeren voor DSO en CSO.
+- Invoerders kunnen het stembureaucorrigendum voor DSO invoeren.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders.
-- Verschillen tussen de twee invoeren worden opgelost door de coördinator.
-- Validatie en consistentiechecks (controleprotocol) worden uitgevoerd op de ingevoerde tellingen van stembureaus.
+- Verschillen tussen de twee invoeren oplossen: de coördinator kiest een van beide invoeren of laat dubbel herinvoeren.
+- Validatie, consistentiechecks en controleprotocol opmerkelijke uitslagen worden uitgevoerd op de ingevoerde tellingen van stembureaus.
 
 ### Uitslagbepaling GSB
 
 - De uitslagen per stembureau kunnen worden opgeteld en dit leidt vervolgens tot de uitslag van het gemeentelijk stembureau (GSB).
 - De uitslagen kunnen worden geëxporteerd als XML-bestand volgens de EML_NL-standaard.
 - De uitslag van het GSB wordt gegenereerd als proces-verbaal in PDF-formaat.
-- De processen-verbaal kunnen worden gegenereerd in het Nederlands en Fries.
+- De processen-verbaal kunnen worden gegenereerd aan de hand van de vastgestelde modellen.
 - De uitslag kan na de eerste zitting worden gecorrigeerd met behulp van een corrigendum.
 
-### Invoeren van resultaten CSB
+### Invoeren van uitslagen CSB
 
-- De uitslag van het GSB kan worden geïmporteerd als EML_NL-bestand.
+- De uitslag van het GSB kan worden geïmporteerd als XML-bestand volgens de EML_NL-standaard.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders. Een import van een EML_NL-bestand telt ook als invoer, waardoor nog maar één handmatige invoer nodig is.
-- Verschillen tussen de twee invoeren worden opgelost door de coördinator.
+- Verschillen tussen de twee invoeren oplossen: de coördinator kiest de handmatige invoer of laat dubbel herinvoeren.
 
 ### Uitslagbepaling CSB
 
-- De zetelverdeling voor de gemeenteraad wordt uitgerekend.
+- De zetelverdeling voor de gemeenteraad wordt uitgerekend en de zetels worden aan kandidaten toegewezen.
 - De uitslagen kunnen worden geëxporteerd als XML-bestand volgens de EML_NL-standaard.
 - De uitslag van het CSB wordt gegenereerd als proces-verbaal in PDF-formaat.
-- De processen-verbaal kunnen worden gegenereerd in het Nederlands en Fries.
+- De processen-verbaal kunnen worden gegenereerd aan de hand van de vastgestelde modellen.
 
 ### Ondersteunende functies
 
@@ -59,10 +60,8 @@
 
 - De Abacus-clients kunnen de afwezigheid van een internetverbinding detecteren (airgapdetectie).
 - Er vindt logging van gebruikershandelingen plaats.
-- Het PDF-bestand van het proces-verbaal voldoen aan de WCAG-toegankelijkheidseisen.
-- Verschillen kunnen worden opgelost door nieuwe invoer op lijstniveau.
 - Bijhouden van statistieken over gebruik.
-- Aanmaken van geloofsbrieven.
+- Aanmaken van benoemingsbrieven en kennisgevingen die strekken tot geloofsbrief
 - De coördinator GSB kan invoerders van het GSB beheren,
   en de coördinator CSB kan invoerders van het CSB beheren.
 
@@ -71,11 +70,13 @@
 *Deze eisen zullen alleen aan bod komen als er tijd genoeg is.*
 
 - De uitslag GSB wordt voorzien van een cryptografische handtekening.
+- Het PDF-bestand van het proces-verbaal voldoet aan de WCAG-toegankelijkheidseisen.
 - Invoer van bezwaren en bijzonderheden per stembureau (afhankelijk van ontwikkeling modellen).
+- Verschillen kunnen worden opgelost door nieuwe invoer op lijstniveau.
 - Beheer van werkplekken (aanvullen, design).
 - De software biedt ondersteuning voor meerdere verkiezingen tegelijkertijd. Dit is een vereiste die we sowieso zullen uitwerken na de GSB-fase, maar hier kan al in deze fase al een aanzet toe worden gedaan.
-- De interface is beschikbaar in meerdere talen: Nederlands, Engels, Fries en Papiaments.
-- Abacus is beschikbaar voor macOS.
+- De interface is beschikbaar in meerdere talen: Nederlands, Engels, Fries en Papiaments, Nedersaksisch
+- Abacus is officieel beschikbaar voor macOS.
 - Er is een installatieprogramma voor de Abacus-werkstations.
 
 ## Versie 1.0: niet binnen scope (won't have)

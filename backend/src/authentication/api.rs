@@ -1,24 +1,27 @@
 use super::{
+    Admin, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
     error::AuthenticationError,
     role::Role,
     session::Sessions,
     user::{User, Users},
-    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
 };
 use axum::{
     extract::{Path, Request, State},
     middleware::Next,
     response::{IntoResponse, Json, Response},
 };
-use axum_extra::extract::CookieJar;
+use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
 use cookie::{Cookie, SameSite};
-use hyper::{header::SET_COOKIE, StatusCode};
+use hyper::{StatusCode, header::SET_COOKIE};
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
+use sqlx::{Error, SqlitePool};
 use tracing::debug;
 use utoipa::ToSchema;
 
-use crate::{APIError, ErrorResponse};
+use crate::{
+    APIError, ErrorResponse,
+    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
+};
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Credentials {
     pub username: String,
@@ -28,14 +31,22 @@ pub struct Credentials {
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct LoginResponse {
     pub user_id: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    pub fullname: Option<String>,
     pub username: String,
+    pub role: Role,
+    pub needs_password_change: bool,
 }
 
 impl From<&User> for LoginResponse {
     fn from(user: &User) -> Self {
         Self {
             user_id: user.id(),
+            fullname: user.fullname().map(|u| u.to_string()),
             username: user.username().to_string(),
+            role: user.role(),
+            needs_password_change: user.needs_password_change(),
         }
     }
 }
@@ -60,9 +71,11 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     ),
 )]
 pub async fn login(
+    user_agent: Option<TypedHeader<UserAgent>>,
     State(users): State<Users>,
     State(sessions): State<Sessions>,
     jar: CookieJar,
+    audit_service: AuditService,
     Json(credentials): Json<Credentials>,
 ) -> Result<impl IntoResponse, APIError> {
     let Credentials { username, password } = credentials;
@@ -79,6 +92,19 @@ pub async fn login(
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
     sessions.delete_expired_sessions().await?;
+    let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
+
+    // Log the login event
+    audit_service
+        .with_user(user.clone())
+        .log_success(
+            AuditEvent::UserLoggedIn(UserLoggedInDetails {
+                user_agent,
+                logged_in_users_count: sessions.count().await?,
+            }),
+            None,
+        )
+        .await?;
 
     // Create a new session and cookie
     let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
@@ -92,10 +118,12 @@ pub async fn login(
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct ChangePasswordRequest {
+pub struct AccountUpdateRequest {
     pub username: String,
     pub password: String,
-    pub new_password: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    pub fullname: Option<String>,
 }
 
 /// Get current logged-in user endpoint
@@ -114,41 +142,40 @@ pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     Ok(Json(LoginResponse::from(&user)))
 }
 
-/// Change password endpoint, updates a user password
+/// Update the user's account with a new password and optionally new fullname
 #[utoipa::path(
-  post,
-  path = "/api/user/change-password",
-  request_body = ChangePasswordRequest,
+  put,
+  path = "/api/user/account",
+  request_body = AccountUpdateRequest,
   responses(
-      (status = 200, description = "The current user name and id", body = LoginResponse),
-      (status = 401, description = "Invalid credentials", body = ErrorResponse),
+      (status = 200, description = "The logged in user", body = LoginResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
-pub async fn change_password(
-    State(users): State<Users>,
+pub async fn account_update(
     user: User,
-    Json(credentials): Json<ChangePasswordRequest>,
+    State(users): State<Users>,
+    Json(account): Json<AccountUpdateRequest>,
 ) -> Result<impl IntoResponse, APIError> {
-    if user.username() != credentials.username {
+    if user.username() != account.username {
         return Err(AuthenticationError::UserNotFound.into());
-    }
-
-    // Check the username + password combination
-    let authenticated = users
-        .authenticate(&credentials.username, &credentials.password)
-        .await?;
-
-    if authenticated.id() != user.id() {
-        return Err(AuthenticationError::InvalidPassword.into());
     }
 
     // Update the password
     users
-        .update_password(user.id(), &credentials.new_password)
+        .update_password(user.id(), &account.username, &account.password)
         .await?;
 
-    Ok(Json(LoginResponse::from(&user)))
+    // Update the fullname
+    if let Some(fullname) = account.fullname {
+        users.update_fullname(user.id(), &fullname).await?;
+    }
+
+    let Some(updated_user) = users.get_by_username(user.username()).await? else {
+        return Err(AuthenticationError::UserNotFound.into());
+    };
+
+    Ok(Json(LoginResponse::from(&updated_user)))
 }
 
 /// Logout endpoint, deletes the session cookie
@@ -162,6 +189,8 @@ pub async fn change_password(
 )]
 pub async fn logout(
     State(sessions): State<Sessions>,
+    State(users): State<Users>,
+    audit_service: AuditService,
     jar: CookieJar,
 ) -> Result<impl IntoResponse, APIError> {
     let Some(mut cookie) = jar.get(SESSION_COOKIE_NAME).cloned() else {
@@ -169,8 +198,26 @@ pub async fn logout(
         return Ok((jar, StatusCode::OK));
     };
 
-    // Remove session from the database
+    // Get the session key from the cookie
     let session_key = cookie.value();
+
+    // Log audit event when a valid session exists
+    if let Some(session) = sessions.get_by_key(session_key).await.ok().flatten() {
+        if let Some(user) = users.get_by_id(session.user_id()).await.ok().flatten() {
+            // Log the logout event
+            audit_service
+                .with_user(user)
+                .log_success(
+                    AuditEvent::UserLoggedOut(UserLoggedOutDetails {
+                        session_duration: session.duration().as_secs(),
+                    }),
+                    None,
+                )
+                .await?;
+        }
+    }
+
+    // Remove session from the database
     sessions.delete(session_key).await?;
 
     // Set cookie parameters, these are not present in the request, and have to match in order to clear the cookie
@@ -235,44 +282,6 @@ pub async fn development_create_user(
     Ok(StatusCode::CREATED)
 }
 
-/// Development endpoint: login as a user (unauthenticated)
-#[cfg(debug_assertions)]
-#[utoipa::path(
-  get,
-  path = "/api/user/development/login",
-  responses(
-    (status = 200, description = "The logged in user id and user name", body = LoginResponse),
-    (status = 500, description = "Internal server error", body = ErrorResponse),
-  ),
-)]
-pub async fn development_login(
-    State(users): State<Users>,
-    State(sessions): State<Sessions>,
-    jar: CookieJar,
-) -> Result<impl IntoResponse, APIError> {
-    // Get or create the test user
-
-    use super::role::Role;
-    let user = match users.get_by_username("user").await? {
-        Some(u) => u,
-        None => {
-            users
-                .create("user", Some("Full Name"), "password", Role::Administrator)
-                .await?
-        }
-    };
-
-    // Create a new session and cookie
-    let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
-
-    // Add the session cookie to the response
-    let mut cookie = session.get_cookie();
-    set_default_cookie_properties(&mut cookie);
-    let updated_jar = jar.add(cookie);
-
-    Ok((updated_jar, Json(LoginResponse::from(&user))))
-}
-
 #[derive(Serialize, Deserialize, ToSchema)]
 pub struct UserListResponse {
     pub users: Vec<User>,
@@ -284,10 +293,12 @@ pub struct UserListResponse {
     path = "/api/user",
     responses(
         (status = 200, description = "User list", body = UserListResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 pub async fn user_list(
+    _user: Admin,
     State(users_repo): State<Users>,
 ) -> Result<Json<UserListResponse>, APIError> {
     Ok(Json(UserListResponse {
@@ -306,6 +317,7 @@ pub struct CreateUserRequest {
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateUserRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -322,10 +334,13 @@ pub struct UpdateUserRequest {
     request_body = CreateUserRequest,
     responses(
         (status = 201, description = "User created", body = User),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 pub async fn user_create(
+    _user: Admin,
     State(users_repo): State<Users>,
     Json(create_user_req): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
@@ -340,6 +355,29 @@ pub async fn user_create(
     Ok((StatusCode::CREATED, Json(user)))
 }
 
+/// Get a user
+#[utoipa::path(
+    get,
+    path = "/api/user/{user_id}",
+    responses(
+        (status = 200, description = "User found", body = User),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "User not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("user_id" = u32, description = "User id"),
+    ),
+)]
+pub async fn user_get(
+    _user: Admin,
+    State(users_repo): State<Users>,
+    Path(user_id): Path<u32>,
+) -> Result<Json<User>, APIError> {
+    let user = users_repo.get_by_id(user_id).await?;
+    Ok(Json(user.ok_or(Error::RowNotFound)?))
+}
+
 /// Update a user
 #[utoipa::path(
     put,
@@ -347,11 +385,13 @@ pub async fn user_create(
     request_body = UpdateUserRequest,
     responses(
         (status = 200, description = "User updated", body = User),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 pub async fn user_update(
+    _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,
     Json(update_user_req): Json<UpdateUserRequest>,
@@ -364,4 +404,29 @@ pub async fn user_update(
         )
         .await?;
     Ok(Json(user))
+}
+
+/// Delete a user
+#[utoipa::path(
+    delete,
+    path = "/api/user/{user_id}",
+    responses(
+        (status = 200, description = "User deleted successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "User not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+pub async fn user_delete(
+    _user: Admin,
+    State(users_repo): State<Users>,
+    Path(user_id): Path<u32>,
+) -> Result<StatusCode, APIError> {
+    let deleted = users_repo.delete(user_id).await?;
+
+    if deleted {
+        Ok(StatusCode::OK)
+    } else {
+        Ok(StatusCode::NOT_FOUND)
+    }
 }

@@ -9,6 +9,8 @@ import { formatDateTime, useQueryParam } from "@kiesraad/util";
 export function UserListPage() {
   const { requestState } = useUserListRequest();
   const [createdMessage, clearCreatedMessage] = useQueryParam("created");
+  const [updatedMessage, clearUpdatedMessage] = useQueryParam("updated");
+  const [deletedMessage, clearDeletedMessage] = useQueryParam("deleted");
 
   if (requestState.status === "loading") {
     return <Loader />;
@@ -45,6 +47,20 @@ export function UserListPage() {
         </Alert>
       )}
 
+      {updatedMessage && (
+        <Alert type="success" onClose={clearUpdatedMessage}>
+          <h2>{t("users.user_updated")}</h2>
+          <p>{updatedMessage}</p>
+        </Alert>
+      )}
+
+      {deletedMessage && (
+        <Alert type="success" onClose={clearDeletedMessage}>
+          <h2>{t("users.user_deleted")}</h2>
+          <p>{deletedMessage}</p>
+        </Alert>
+      )}
+
       <main>
         <article>
           <Toolbar>
@@ -65,7 +81,7 @@ export function UserListPage() {
                 <Table.LinkRow key={user.id} to={`${user.id}/update`}>
                   <Table.Cell>{user.username}</Table.Cell>
                   <Table.Cell>{t(user.role)}</Table.Cell>
-                  <Table.Cell>{user.fullname ?? <span className="text-muted">{t("users.not_used")}</span>}</Table.Cell>
+                  <Table.Cell>{user.fullname || <span className="text-muted">{t("users.not_used")}</span>}</Table.Cell>
                   <Table.Cell>
                     {user.last_activity_at ? formatDateTime(new Date(user.last_activity_at)) : "–"}
                   </Table.Cell>

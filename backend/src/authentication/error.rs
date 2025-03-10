@@ -4,11 +4,14 @@ pub enum AuthenticationError {
     InvalidUsernameOrPassword,
     InvalidPassword,
     InvalidSessionDuration,
+    UsernameAlreadyExists,
     SessionKeyNotFound,
     NoSessionCookie,
     Database(sqlx::Error),
     HashPassword(password_hash::Error),
     BackwardTimeTravel,
+    Unauthorized,
+    PasswordRejection,
 }
 
 impl From<password_hash::Error> for AuthenticationError {

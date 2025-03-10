@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use crate::{
+    APIError,
     data_entry::{
         CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
         Validate, ValidationResults, VotersCounts, VotesCounts,
@@ -9,7 +10,6 @@ use crate::{
     election::Election,
     error::ErrorReference,
     polling_station::PollingStation,
-    APIError,
 };
 
 /// Contains a summary of the election results, added up from the votes of all polling stations.
@@ -351,11 +351,13 @@ mod tests {
 
         // this field should not have any recorded polling stations
         assert_eq!(totals.differences_counts.no_explanation_count.count, 0);
-        assert!(totals
-            .differences_counts
-            .no_explanation_count
-            .polling_stations
-            .is_empty());
+        assert!(
+            totals
+                .differences_counts
+                .no_explanation_count
+                .polling_stations
+                .is_empty()
+        );
 
         // tests for voters counts
         assert_eq!(totals.voters_counts.total_admitted_voters_count, 85);

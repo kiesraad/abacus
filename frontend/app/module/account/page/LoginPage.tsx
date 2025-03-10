@@ -1,4 +1,4 @@
-import { LoginForm } from "app/component/form/user/login/LoginForm";
+import { LoginForm } from "app/component/form/account/login/LoginForm";
 
 import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
@@ -6,10 +6,10 @@ import { PageTitle } from "@kiesraad/ui";
 export function LoginPage() {
   return (
     <>
-      <PageTitle title={`${t("user.login")} - Abacus`} />
+      <PageTitle title={`${t("account.login")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("user.login")}</h1>
+          <h1>{t("account.login")}</h1>
         </section>
       </header>
       <main>

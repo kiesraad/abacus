@@ -1,20 +1,24 @@
 #[cfg(feature = "memory-serve")]
 use axum::http::StatusCode;
 use axum::{
+    Router,
     extract::FromRef,
     middleware,
     routing::{get, post, put},
-    Router,
+    serve::ListenerExt,
 };
 #[cfg(feature = "memory-serve")]
 use memory_serve::MemoryServe;
 use sqlx::SqlitePool;
-use std::error::Error;
+use std::{error::Error, net::SocketAddr};
+use tokio::{net::TcpListener, signal};
 use tower_http::trace::TraceLayer;
+use tracing::{info, trace};
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod apportionment;
+pub mod audit_log;
 pub mod authentication;
 pub mod data_entry;
 pub mod election;
@@ -24,6 +28,7 @@ mod error;
 pub mod fixtures;
 pub mod pdf_gen;
 pub mod polling_station;
+pub mod report;
 pub mod summary;
 
 pub use error::{APIError, ErrorResponse};
@@ -69,15 +74,15 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route(
             "/{election_id}/download_zip_results",
-            get(election::election_download_zip_results),
+            get(report::election_download_zip_results),
         )
         .route(
             "/{election_id}/download_pdf_results",
-            get(election::election_download_pdf_results),
+            get(report::election_download_pdf_results),
         )
         .route(
             "/{election_id}/download_xml_results",
-            get(election::election_download_xml_results),
+            get(report::election_download_xml_results),
         )
         .route("/{election_id}/status", get(data_entry::election_status));
 
@@ -89,23 +94,26 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             "/",
             get(authentication::user_list).post(authentication::user_create),
         )
-        .route("/{user_id}", put(authentication::user_update))
+        .route(
+            "/{user_id}",
+            get(authentication::user_get)
+                .put(authentication::user_update)
+                .delete(authentication::user_delete),
+        )
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout))
         .route("/whoami", get(authentication::whoami))
-        .route("/change-password", post(authentication::change_password))
+        .route("/account", put(authentication::account_update))
         .layer(middleware::from_fn_with_state(
             pool.clone(),
             authentication::extend_session,
         ));
 
     #[cfg(debug_assertions)]
-    let user_router = user_router
-        .route(
-            "/development/create",
-            post(authentication::development_create_user),
-        )
-        .route("/development/login", get(authentication::development_login));
+    let user_router = user_router.route(
+        "/development/create",
+        post(authentication::development_create_user),
+    );
 
     let app = Router::new()
         .nest("/api/user", user_router)
@@ -158,16 +166,18 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             authentication::login,
             authentication::logout,
             authentication::whoami,
-            authentication::change_password,
+            authentication::account_update,
             authentication::user_list,
             authentication::user_create,
+            authentication::user_get,
             authentication::user_update,
+            authentication::user_delete,
             election::election_list,
             election::election_create,
             election::election_details,
-            election::election_download_zip_results,
-            election::election_download_pdf_results,
-            election::election_download_xml_results,
+            report::election_download_zip_results,
+            report::election_download_pdf_results,
+            report::election_download_xml_results,
             data_entry::polling_station_data_entry_save,
             data_entry::polling_station_data_entry_get,
             data_entry::polling_station_data_entry_delete,
@@ -187,11 +197,11 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::PoliticalGroupStanding,
                 apportionment::ApportionmentStep,
                 apportionment::AssignedSeat,
-                apportionment::HighestAverageAssignedSeat,
-                apportionment::HighestSurplusAssignedSeat,
+                apportionment::LargestAverageAssignedSeat,
+                apportionment::LargestRemainderAssignedSeat,
                 authentication::Credentials,
                 authentication::LoginResponse,
-                authentication::ChangePasswordRequest,
+                authentication::AccountUpdateRequest,
                 authentication::UserListResponse,
                 authentication::UpdateUserRequest,
                 authentication::CreateUserRequest,
@@ -234,4 +244,82 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     )]
     struct ApiDoc;
     ApiDoc::openapi()
+}
+
+/// Start the API server on the given port, using the given database pool.
+pub async fn start_server(pool: SqlitePool, listener: TcpListener) -> Result<(), Box<dyn Error>> {
+    let app = router(pool)?;
+
+    info!("Starting API server on http://{}", listener.local_addr()?);
+    let listener = listener.tap_io(|tcp_stream| {
+        if let Err(err) = tcp_stream.set_nodelay(true) {
+            trace!("failed to set TCP_NODELAY on incoming connection: {err:#}");
+        }
+    });
+
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .with_graceful_shutdown(shutdown_signal())
+    .await?;
+
+    Ok(())
+}
+
+/// Graceful shutdown, useful for Docker containers.
+///
+/// Copied from the
+/// [axum graceful-shutdown example](https://github.com/tokio-rs/axum/blob/6318b57fda6b524b4d3c7909e07946e2b246ebd2/examples/graceful-shutdown/src/main.rs)
+/// (under the MIT license).
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use sqlx::SqlitePool;
+    use test_log::test;
+    use tokio::net::TcpListener;
+
+    use super::start_server;
+
+    #[test(sqlx::test)]
+    async fn test_abacus_starts(pool: SqlitePool) {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+
+        let task = tokio::spawn(async move {
+            start_server(pool, listener).await.unwrap();
+        });
+
+        let result = reqwest::get(format!("http://{addr}/api/user/whoami"))
+            .await
+            .unwrap();
+
+        assert_eq!(result.status(), 401);
+
+        task.abort();
+        let _ = task.await;
+    }
 }

@@ -2,33 +2,15 @@ import { Link } from "react-router";
 
 import { MockTest } from "app/component/MockTest";
 
-import { ElectionListProvider, useElectionList } from "@kiesraad/api";
+import { ElectionListProvider, useApiState, useElectionList, useUserRole } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { AppLayout, PageTitle } from "@kiesraad/ui";
 
-function DevLinks() {
+function TypistLinks() {
   const { electionList } = useElectionList();
 
   return (
     <>
-      <p>Dit is een ontwikkelversie van Abacus. Kies hieronder welk deel van de applicatie je wilt gebruiken.</p>
-      <strong>{t("general")}</strong>
-      <ul>
-        <li>
-          <Link to={`/account`}>{t("user.account")}</Link>
-          <ul>
-            <li>
-              <Link to={`/account/login`}>{t("user.login")}</Link>
-            </li>
-            <li>
-              <Link to={`/account/setup`}>{t("user.account_setup")}</Link>
-            </li>
-            <li>
-              <Link to={`/account/change-password`}>{t("user.change_password")}</Link>
-            </li>
-          </ul>
-        </li>
-      </ul>
       <strong>{t("typist")}</strong>
       <ul>
         <li>
@@ -42,43 +24,130 @@ function DevLinks() {
           ))}
         </ul>
       </ul>
+    </>
+  );
+}
+
+function AdministratorCoordinatorLinks() {
+  const { electionList } = useElectionList();
+
+  return (
+    <>
       <strong>
         {t("administrator")} / {t("coordinator")}
       </strong>
       <ul>
         <li>
-          <Link to={"/elections#administrator"}>{t("election.manage")}</Link>
+          <Link to={"/elections"}>{t("election.manage")}</Link>
         </li>
         <ul>
           {electionList.map((election) => (
             <li key={election.id}>
-              <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
+              <Link to={`/elections/${election.id}`}>{election.name}</Link>
               <ul>
                 <li>
-                  <Link to={`/elections/${election.id}/apportionment#coordinator`}>{t("apportionment.title")}</Link>
+                  <Link to={`/elections/${election.id}/status`}>{t("election_status.main_title")}</Link>
                 </li>
                 <li>
-                  <Link to={`/elections/${election.id}/status#coordinator`}>{t("election_status.main_title")}</Link>
+                  <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
                 </li>
                 <li>
-                  <Link to={`/elections/${election.id}/polling-stations#coordinator`}>
-                    {t("polling_station.title.plural")}
-                  </Link>
+                  <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
                 </li>
               </ul>
             </li>
           ))}
         </ul>
         <li>
-          <Link to={`/users#administratorcoordinator`}>{t("users.management")}</Link>
+          <Link to={`/users`}>{t("users.management")}</Link>
         </li>
         <li>
-          <Link to={`/workstations#administrator`}>{t("workstations.manage")}</Link>
+          <Link to={`/workstations`}>{t("workstations.manage")}</Link>
         </li>
         <li>
-          <Link to={`/logs#administratorcoordinator`}>{t("activity_log")}</Link>
+          <Link to={`/logs`}>{t("activity_log")}</Link>
         </li>
       </ul>
+    </>
+  );
+}
+
+function DevLinks() {
+  const { user, login, logout } = useApiState();
+  const { isTypist, isAdministrator, isCoordinator } = useUserRole();
+
+  return (
+    <>
+      <p>Dit is een ontwikkelversie van Abacus. Kies hieronder welk deel van de applicatie je wilt gebruiken.</p>
+      <strong>Inloggen als</strong>
+      <ul>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("admin", "AdminPassword01");
+            }}
+          >
+            {t("administrator")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("typist", "TypistPassword01");
+            }}
+          >
+            {t("typist")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("coordinator", "CoordinatorPassword01");
+            }}
+          >
+            {t("coordinator")}
+          </Link>
+        </li>
+        {user && (
+          <li>
+            <Link
+              to="/dev"
+              onClick={() => {
+                void logout();
+              }}
+            >
+              {t("account.logout")}: {user.fullname || user.username} ({user.role})
+            </Link>
+          </li>
+        )}
+      </ul>
+      <strong>{t("general")}</strong>
+      <ul>
+        <li>
+          <Link to={`/account`}>{t("account.account")}</Link>
+          <ul>
+            <li>
+              <Link to={`/account/login`}>{t("account.login")}</Link>
+            </li>
+            <li>
+              <Link to={`/account/setup`}>{t("account.account_setup")}</Link>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      {isTypist && (
+        <ElectionListProvider>
+          <TypistLinks />
+        </ElectionListProvider>
+      )}
+      {(isAdministrator || isCoordinator) && (
+        <ElectionListProvider>
+          <AdministratorCoordinatorLinks />
+        </ElectionListProvider>
+      )}
     </>
   );
 }
@@ -94,9 +163,7 @@ export function DevHomePage() {
       </header>
       <main>
         <article>
-          <ElectionListProvider>
-            <DevLinks />
-          </ElectionListProvider>
+          <DevLinks />
           {__API_MSW__ && <MockTest />}
         </article>
       </main>

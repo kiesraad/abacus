@@ -2,12 +2,12 @@ use std::collections::HashMap;
 
 use super::models::PdfModel;
 use typst::{
+    Library, World,
     diag::{FileError, FileResult},
     foundations::{Bytes, Datetime},
     syntax::{FileId, Source, VirtualPath},
     text::{Font, FontBook},
     utils::LazyHash,
-    Library, World,
 };
 
 /// Contains the context for rendering PDFs.
@@ -41,7 +41,7 @@ impl PdfWorld {
             main_source: Source::new(FileId::new(None, VirtualPath::new("empty.typ")), "".into()),
             input_data: (
                 FileId::new(None, VirtualPath::new("input.json")),
-                Bytes::from_static(&[]),
+                Bytes::new([]),
             ),
         }
     }
@@ -127,18 +127,14 @@ impl World for PdfWorld {
 /// In a debug build, this is done at runtime, for a release build this is
 /// done at compile time.
 macro_rules! include_filedata {
-    ($path:literal) => {{
-        include_bytes!(concat!("../../templates/", $path)) as &'static [u8]
-    }};
+    ($path:literal) => {{ include_bytes!(concat!("../../templates/", $path)) as &'static [u8] }};
 }
 
 /// Macro that loads data as a string from a file
 /// In a debug build, this is done at runtime, for a release build this is
 /// done at compile time.
 macro_rules! include_strdata {
-    ($path:literal) => {{
-        include_str!(concat!("../../templates/", $path)) as &'static str
-    }};
+    ($path:literal) => {{ include_str!(concat!("../../templates/", $path)) as &'static str }};
 }
 
 /// Load all sources available from the `templates/` directory (i.e. all typst
@@ -172,7 +168,7 @@ fn load_fonts() -> (Vec<Font>, FontBook) {
     macro_rules! include_font {
         ($path:literal) => {
             let fontdata = include_filedata!($path);
-            let font = Font::new(Bytes::from_static(fontdata), 0).expect("Error reading font file");
+            let font = Font::new(Bytes::new(fontdata), 0).expect("Error reading font file");
             fontbook.push(font.info().clone());
             fonts.push(font);
         };

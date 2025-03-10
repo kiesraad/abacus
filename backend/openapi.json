@@ -28,6 +28,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -77,6 +87,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -117,6 +137,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ElectionDetailsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -175,6 +205,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
             "content": {
@@ -211,7 +251,7 @@
     "/api/elections/{election_id}/download_pdf_results": {
       "get": {
         "tags": [
-          "election"
+          "report"
         ],
         "summary": "Download a generated PDF with election results",
         "operationId": "election_download_pdf_results",
@@ -243,6 +283,16 @@
               "application/pdf": {}
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
             "content": {
@@ -269,7 +319,7 @@
     "/api/elections/{election_id}/download_xml_results": {
       "get": {
         "tags": [
-          "election"
+          "report"
         ],
         "summary": "Download a generated EML_NL 510 XML file with election results",
         "operationId": "election_download_xml_results",
@@ -291,6 +341,16 @@
             "description": "XML",
             "content": {
               "text/xml": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
             }
           },
           "404": {
@@ -319,7 +379,7 @@
     "/api/elections/{election_id}/download_zip_results": {
       "get": {
         "tags": [
-          "election"
+          "report"
         ],
         "summary": "Download a zip containing a PDF for the PV and the EML with election results",
         "operationId": "election_download_zip_results",
@@ -349,6 +409,16 @@
             },
             "content": {
               "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
             }
           },
           "404": {
@@ -401,6 +471,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PollingStationListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -463,6 +543,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PollingStation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -542,6 +632,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Polling station not found",
             "content": {
@@ -608,6 +708,16 @@
           "200": {
             "description": "Polling station updated successfully"
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Polling station not found",
             "content": {
@@ -664,6 +774,16 @@
           "200": {
             "description": "Polling station deleted successfully"
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Polling station not found",
             "content": {
@@ -714,6 +834,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ElectionStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -779,6 +909,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetDataEntryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -852,6 +992,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SaveDataEntryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -932,6 +1082,16 @@
           "204": {
             "description": "Data entry deleted successfully"
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
             "content": {
@@ -1000,6 +1160,16 @@
           "200": {
             "description": "Data entry finalised successfully"
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
             "content": {
@@ -1061,6 +1231,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -1100,6 +1280,26 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (username already exists)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -1113,18 +1313,18 @@
         }
       }
     },
-    "/api/user/change-password": {
-      "post": {
+    "/api/user/account": {
+      "put": {
         "tags": [
           "authentication"
         ],
-        "summary": "Change password endpoint, updates a user password",
-        "operationId": "change_password",
+        "summary": "Update the user's account with a new password and optionally new fullname",
+        "operationId": "account_update",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePasswordRequest"
+                "$ref": "#/components/schemas/AccountUpdateRequest"
               }
             }
           },
@@ -1132,21 +1332,11 @@
         },
         "responses": {
           "200": {
-            "description": "The current user name and id",
+            "description": "The logged in user",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1281,6 +1471,68 @@
       }
     },
     "/api/user/{user_id}": {
+      "get": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Get a user",
+        "operationId": "user_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "authentication"
@@ -1320,6 +1572,70 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Delete a user",
+        "operationId": "user_delete",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "User not found",
             "content": {
@@ -1346,12 +1662,52 @@
   },
   "components": {
     "schemas": {
+      "AbsoluteMajorityChange": {
+        "type": "object",
+        "description": "Contains information about the enactment of article P 9 of the Kieswet.",
+        "required": [
+          "pg_retracted_seat",
+          "pg_assigned_seat"
+        ],
+        "properties": {
+          "pg_assigned_seat": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number which the residual seat is assigned to",
+            "minimum": 0
+          },
+          "pg_retracted_seat": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number which the residual seat is retracted from",
+            "minimum": 0
+          }
+        }
+      },
+      "AccountUpdateRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "fullname": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
       "ApportionmentResult": {
         "type": "object",
-        "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after whole seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
+        "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
         "required": [
           "seats",
-          "whole_seats",
+          "full_seats",
           "residual_seats",
           "quota",
           "steps",
@@ -1363,6 +1719,11 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroupSeatAssignment"
             }
+          },
+          "full_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           },
           "quota": {
             "$ref": "#/components/schemas/Fraction"
@@ -1382,11 +1743,6 @@
             "items": {
               "$ref": "#/components/schemas/ApportionmentStep"
             }
-          },
-          "whole_seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
           }
         }
       },
@@ -1420,7 +1776,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+                "$ref": "#/components/schemas/LargestAverageAssignedSeat"
               },
               {
                 "type": "object",
@@ -1431,7 +1787,7 @@
                   "assigned_by": {
                     "type": "string",
                     "enum": [
-                      "HighestAverage"
+                      "LargestAverage"
                     ]
                   }
                 }
@@ -1441,7 +1797,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/HighestSurplusAssignedSeat"
+                "$ref": "#/components/schemas/LargestRemainderAssignedSeat"
               },
               {
                 "type": "object",
@@ -1452,7 +1808,28 @@
                   "assigned_by": {
                     "type": "string",
                     "enum": [
-                      "HighestSurplus"
+                      "LargestRemainder"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AbsoluteMajorityChange"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "assigned_by"
+                ],
+                "properties": {
+                  "assigned_by": {
+                    "type": "string",
+                    "enum": [
+                      "AbsoluteMajorityChange"
                     ]
                   }
                 }
@@ -1525,25 +1902,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          }
-        }
-      },
-      "ChangePasswordRequest": {
-        "type": "object",
-        "required": [
-          "username",
-          "password",
-          "new_password"
-        ],
-        "properties": {
-          "new_password": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
           }
         }
       },
@@ -1969,7 +2327,10 @@
           "PollingStationResultsAlreadyFinalised",
           "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
-          "UserNotFound"
+          "UserNotFound",
+          "UsernameNotUnique",
+          "Unauthorized",
+          "PasswordRejection"
         ]
       },
       "ErrorResponse": {
@@ -2048,15 +2409,25 @@
           }
         }
       },
-      "HighestAverageAssignedSeat": {
+      "LargestAverageAssignedSeat": {
         "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the highest average method.",
+        "description": "Contains the details for an assigned seat, assigned through the largest average method.",
         "required": [
           "selected_pg_number",
           "pg_options",
+          "pg_assigned",
           "votes_per_seat"
         ],
         "properties": {
+          "pg_assigned": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The list of political groups with the same average, that have been assigned a seat"
+          },
           "pg_options": {
             "type": "array",
             "items": {
@@ -2064,7 +2435,7 @@
               "format": "int32",
               "minimum": 0
             },
-            "description": "The list from which the political group was selected, all of them having the same votes per seat"
+            "description": "The list of political groups with the same average, that have not been assigned a seat"
           },
           "selected_pg_number": {
             "type": "integer",
@@ -2078,15 +2449,25 @@
           }
         }
       },
-      "HighestSurplusAssignedSeat": {
+      "LargestRemainderAssignedSeat": {
         "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the highest surplus method.",
+        "description": "Contains the details for an assigned seat, assigned through the largest remainder method.",
         "required": [
           "selected_pg_number",
           "pg_options",
-          "surplus_votes"
+          "pg_assigned",
+          "remainder_votes"
         ],
         "properties": {
+          "pg_assigned": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The list of political groups with the same remainder, that have been assigned a seat"
+          },
           "pg_options": {
             "type": "array",
             "items": {
@@ -2094,17 +2475,17 @@
               "format": "int32",
               "minimum": 0
             },
-            "description": "The list from which the political group was selected, all of them having the same number of surplus votes"
+            "description": "The list of political groups with the same remainder, that have not been assigned a seat"
+          },
+          "remainder_votes": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The number of remainder votes achieved by the selected political group"
           },
           "selected_pg_number": {
             "type": "integer",
             "format": "int32",
             "description": "The political group that was selected for this seat has this political group number",
             "minimum": 0
-          },
-          "surplus_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The number of surplus votes achieved by the selected political group"
           }
         }
       },
@@ -2112,9 +2493,20 @@
         "type": "object",
         "required": [
           "user_id",
-          "username"
+          "username",
+          "role",
+          "needs_password_change"
         ],
         "properties": {
+          "fullname": {
+            "type": "string"
+          },
+          "needs_password_change": {
+            "type": "boolean"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
           "user_id": {
             "type": "integer",
             "format": "int32",
@@ -2156,16 +2548,22 @@
         "required": [
           "pg_number",
           "votes_cast",
-          "surplus_votes",
-          "meets_surplus_threshold",
-          "whole_seats",
+          "remainder_votes",
+          "meets_remainder_threshold",
+          "full_seats",
           "residual_seats",
           "total_seats"
         ],
         "properties": {
-          "meets_surplus_threshold": {
+          "full_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of full seats assigned to this group",
+            "minimum": 0
+          },
+          "meets_remainder_threshold": {
             "type": "boolean",
-            "description": "Whether this group met the threshold for surplus seat assignment"
+            "description": "Whether this group met the threshold for largest remainder seat assignment"
           },
           "pg_number": {
             "type": "integer",
@@ -2173,15 +2571,15 @@
             "description": "Political group number for which this assignment applies",
             "minimum": 0
           },
+          "remainder_votes": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The remainder votes that were not used to get full seats assigned to this political group"
+          },
           "residual_seats": {
             "type": "integer",
             "format": "int64",
             "description": "The number of residual seats assigned to this group",
             "minimum": 0
-          },
-          "surplus_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The surplus votes that were not used to get whole seats assigned to this political group"
           },
           "total_seats": {
             "type": "integer",
@@ -2194,12 +2592,6 @@
             "format": "int64",
             "description": "The number of votes cast for this group",
             "minimum": 0
-          },
-          "whole_seats": {
-            "type": "integer",
-            "format": "int64",
-            "description": "The number of whole seats assigned to this group",
-            "minimum": 0
           }
         }
       },
@@ -2209,16 +2601,22 @@
         "required": [
           "pg_number",
           "votes_cast",
-          "surplus_votes",
-          "meets_surplus_threshold",
+          "remainder_votes",
+          "meets_remainder_threshold",
           "next_votes_per_seat",
-          "whole_seats",
+          "full_seats",
           "residual_seats"
         ],
         "properties": {
-          "meets_surplus_threshold": {
+          "full_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of full seats this political group got assigned",
+            "minimum": 0
+          },
+          "meets_remainder_threshold": {
             "type": "boolean",
-            "description": "Whether the surplus votes meet the threshold to be applicable for surplus seat assignment"
+            "description": "Whether the remainder votes meet the threshold to be applicable for largest remainder seat assignment"
           },
           "next_votes_per_seat": {
             "$ref": "#/components/schemas/Fraction",
@@ -2230,26 +2628,20 @@
             "description": "Political group number for which this standing applies",
             "minimum": 0
           },
+          "remainder_votes": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The remainder of votes that was not used to get full seats (does not have to be a whole number of votes)"
+          },
           "residual_seats": {
             "type": "integer",
             "format": "int64",
-            "description": "The current number of residual seats this political group got",
+            "description": "The current number of residual seats this political group got assigned",
             "minimum": 0
-          },
-          "surplus_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The surplus of votes that was not used to get whole seats (does not have to be a whole number of votes)"
           },
           "votes_cast": {
             "type": "integer",
             "format": "int64",
             "description": "The number of votes cast for this group",
-            "minimum": 0
-          },
-          "whole_seats": {
-            "type": "integer",
-            "format": "int64",
-            "description": "The number of whole seats this political group got",
             "minimum": 0
           }
         }
@@ -2514,7 +2906,8 @@
           "temp_password": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "User": {
         "type": "object",

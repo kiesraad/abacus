@@ -3,13 +3,13 @@ use std::error::Error;
 use crate::{
     apportionment::ApportionmentError,
     authentication::error::AuthenticationError,
-    data_entry::{status::DataEntryTransitionError, DataError},
+    data_entry::{DataError, status::DataEntryTransitionError},
 };
 use axum::{
+    Json,
     extract::rejection::JsonRejection,
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
 };
 use hyper::header::InvalidHeaderValue;
 use quick_xml::SeError;
@@ -49,6 +49,9 @@ pub enum ErrorReference {
     PollingStationSecondEntryAlreadyFinalised,
     PollingStationValidationErrors,
     UserNotFound,
+    UsernameNotUnique,
+    Unauthorized,
+    PasswordRejection,
 }
 
 /// Response structure for errors
@@ -196,6 +199,14 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
+                    AuthenticationError::UsernameAlreadyExists => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Username already exists",
+                            ErrorReference::UsernameNotUnique,
+                            false,
+                        ),
+                    ),
                     AuthenticationError::UserNotFound => (
                         StatusCode::UNAUTHORIZED,
                         to_error("User not found", ErrorReference::UserNotFound, false),
@@ -212,6 +223,14 @@ impl IntoResponse for APIError {
                     | AuthenticationError::NoSessionCookie => (
                         StatusCode::UNAUTHORIZED,
                         to_error("Invalid session", ErrorReference::InvalidSession, false),
+                    ),
+                    AuthenticationError::Unauthorized => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error("Unauthorized", ErrorReference::Unauthorized, false),
+                    ),
+                    AuthenticationError::PasswordRejection => (
+                        StatusCode::BAD_REQUEST,
+                        to_error("Invalid password", ErrorReference::PasswordRejection, false),
                     ),
                     // server errors
                     AuthenticationError::Database(_)

@@ -5,14 +5,14 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { routes } from "app/routes";
 
-import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
+import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 import {
   electionDetailsMockResponse,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@kiesraad/api-mocks";
-import { overrideOnce, Providers, render, screen, server, setupTestRouter, waitFor, within } from "@kiesraad/test";
+import { overrideOnce, Providers, render, screen, server, setupTestRouter, within } from "@kiesraad/test";
 
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
@@ -95,52 +95,6 @@ describe("DataEntryHomePage", () => {
     // Ensure the page is rendered before testing
     await screen.findByText("Gemeenteraadsverkiezingen 2026");
     expect(screen.queryByRole("alert")).toBeNull();
-  });
-
-  test("Rerender re-fetches election status", async () => {
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { polling_station_id: 1, status: "first_entry_not_started" },
-        { polling_station_id: 2, status: "first_entry_not_started" },
-      ],
-    } satisfies ElectionStatusResponse);
-
-    // render and expect the initial status to be fetched
-    const { rerender } = renderDataEntryHomePage();
-    await waitFor(() => {
-      expect(screen.queryByText("Welk stembureau ga je invoeren?")).not.toBeInTheDocument();
-    });
-    expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
-
-    // unmount DataEntryHomePage, but keep the providers as-is
-    rerender(
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <></>
-        </ElectionStatusProvider>
-      </ElectionProvider>,
-    );
-    await waitFor(() => {
-      expect(screen.queryByText("Welk stembureau ga je invoeren?")).not.toBeInTheDocument();
-    });
-
-    // new status is that all polling stations are definitive, so the alert should be visible
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { polling_station_id: 1, status: "definitive" },
-        { polling_station_id: 2, status: "definitive" },
-      ],
-    } satisfies ElectionStatusResponse);
-
-    // rerender DataEntryHomePage and expect the new status to be fetched
-    rerender(
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <DataEntryHomePage />
-        </ElectionStatusProvider>
-      </ElectionProvider>,
-    );
-    expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
   });
 
   test("Data entry saved alert works", async () => {

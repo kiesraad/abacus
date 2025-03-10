@@ -28,8 +28,12 @@ translations
 test-results
 coverage
 mock
-test-report.junit.xml
+*.junit.xml
 playwright-report/
 
 # Automatically created: https://github.com/mswjs/msw/discussions/1015#discussioncomment-1747585
 mockServiceWorker.js
+
+# playwright state
+e2e-tests/state/
+!e2e-tests/state/.gitkeep

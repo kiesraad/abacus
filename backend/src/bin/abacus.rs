@@ -1,16 +1,17 @@
 #[cfg(feature = "dev-database")]
 use abacus::fixtures;
-use abacus::router;
-use axum::serve::ListenerExt;
+use abacus::start_server;
 use clap::Parser;
-use sqlx::{sqlite::SqliteConnectOptions, SqlitePool};
+use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 use std::{
     error::Error,
     net::{Ipv4Addr, SocketAddr},
     str::FromStr,
 };
-use tokio::{net::TcpListener, signal};
-use tracing::{info, level_filters::LevelFilter, trace};
+use tokio::net::TcpListener;
+#[cfg(feature = "dev-database")]
+use tracing::info;
+use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 
 /// Abacus API and asset server
@@ -50,20 +51,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     let pool = create_sqlite_pool(&args).await?;
 
-    let app = router(pool)?;
-
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(&address).await?;
-    info!("Starting API server on http://{}", listener.local_addr()?);
-    let listener = listener.tap_io(|tcp_stream| {
-        if let Err(err) = tcp_stream.set_nodelay(true) {
-            trace!("failed to set TCP_NODELAY on incoming connection: {err:#}");
-        }
-    });
-    axum::serve(listener, app.into_make_service())
-        .with_graceful_shutdown(shutdown_signal())
-        .await?;
-    Ok(())
+
+    start_server(pool, listener).await
 }
 
 /// Create a SQLite database if needed, then connect to it and run migrations.
@@ -90,33 +81,4 @@ async fn create_sqlite_pool(
     }
 
     Ok(pool)
-}
-
-/// Graceful shutdown, useful for Docker containers.
-///
-/// Copied from the
-/// [axum graceful-shutdown example](https://github.com/tokio-rs/axum/blob/6318b57fda6b524b4d3c7909e07946e2b246ebd2/examples/graceful-shutdown/src/main.rs)
-/// (under the MIT license).
-async fn shutdown_signal() {
-    let ctrl_c = async {
-        signal::ctrl_c()
-            .await
-            .expect("failed to install Ctrl+C handler");
-    };
-
-    #[cfg(unix)]
-    let terminate = async {
-        signal::unix::signal(signal::unix::SignalKind::terminate())
-            .expect("failed to install signal handler")
-            .recv()
-            .await;
-    };
-
-    #[cfg(not(unix))]
-    let terminate = std::future::pending::<()>();
-
-    tokio::select! {
-        _ = ctrl_c => {},
-        _ = terminate => {},
-    }
 }

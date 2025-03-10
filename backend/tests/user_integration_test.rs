@@ -327,3 +327,56 @@ async fn test_can_delete_logged_in_user(pool: SqlitePool) {
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
 }
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_1", "users"))))]
+async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let url = format!("http://{addr}/api/user/2");
+    let admin_cookie = shared::admin_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", &admin_cookie)
+        .json(&json!({
+            "temp_password": "TotallyValidTempP4ssW0rd"
+        }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // Can't call arbitrary endpoint
+    let some_endpoint = format!("http://{addr}/api/elections/1/polling_stations");
+    let response = reqwest::Client::new()
+        .get(&some_endpoint)
+        .header("cookie", &typist_cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+    // User sets password
+    let url = format!("http://{addr}/api/user/account");
+    let response = reqwest::Client::new()
+        .put(&url)
+        .json(&json!({
+            "username": "typist",
+            "password": "TypistPassword02",
+        }))
+        .header("cookie", &typist_cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // Can call the endpoint again to test that the user can call it again
+    let some_endpoint = format!("http://{addr}/api/elections/1/polling_stations");
+    let response = reqwest::Client::new()
+        .get(&some_endpoint)
+        .header("cookie", &typist_cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+}

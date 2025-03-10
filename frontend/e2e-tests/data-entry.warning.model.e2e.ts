@@ -98,6 +98,10 @@ const votesEmpty: VotesCounts = {
   total_votes_cast_count: 0,
 };
 
+test.use({
+  storageState: "e2e-tests/state/typist.json",
+});
+
 test.describe("Data entry model test", () => {
   createTestModel(machine)
     .getSimplePaths()

@@ -56,4 +56,4 @@ __Uitbreidingen:__
 ### Open punten
 
 - Hoe zorgt het GSB ervoor dat de bevindingen in het PV Na 14-1 worden opgenomen?
-- Wat als bij hertelling de uitslag ongewijzigd is ten op zichte van de oorspronkelijke telling? Wat als dit het geval is voor al de hertelde stembureaus?
+- Wat als bij hertelling de uitslag ongewijzigd is ten opzichte van de oorspronkelijke telling? Wat als dit het geval is voor al de hertelde stembureaus?

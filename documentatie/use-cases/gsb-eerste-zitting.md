@@ -11,15 +11,11 @@ Voor DSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 __Hoofdscenario:__  
 1. Het GSB opent de zitting.
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
-3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatniveau en vult Na31-2 Bijlage 2 in.
-
+3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na31-2 Bijlage 2 in.
 4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
-
 5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
 6. De coördinator genereert het concept-PV en het digitale bestand.
-
 7. De coördinator voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
-
 8. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 9. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
 10. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
@@ -46,7 +42,7 @@ __Uitbreidingen:__
 &emsp; 9a2. Het GSB gaat over tot hertelling. (zie uitbreiding 4b)
 
 9b. Er zijn bezwaren en/of bijzonderheden tijdens het voorlezen van het concept-PV:  
-&emsp;9b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren concept-PV.
+&emsp; 9b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren concept-PV.
 
 ### Niet in scope
 
@@ -86,7 +82,7 @@ __Hoofdscenario:__
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. (voor elk stembureau) Het GSB stelt met de hand vast dat de tellingen die het stembureau heeft vastgesteld in N 10-1, kloppen.
 4. (voor elk stembureau) [Het GSB voert de tellingen uit N 10-1 en evt. Na 14-1 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
-5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-in-zee) -> van de zitting, niet van SBs
+5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
 6. De coördinator genereert het concept-PV en het digitale bestand.
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
@@ -96,7 +92,7 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__
 
-3a. Het GSB gebruikt de applicatie om het SB PV te contoleren:
+3a. Het GSB gebruikt de applicatie om het SB PV te controleren:
 
 3b. Het GSB stelt vast dat de tellingen van het stembureau mogelijk niet kloppen:  
 &emsp;3b1. het GSB doet een (gedeeltelijke) hertelling van het stembureau.  
@@ -108,7 +104,6 @@ __Uitbreidingen:__
 - Zijn de invoervelden voor de tellingen van een stembureau voor DSO gelijk aan die van CSO?
   - Waarschijnlijk niet, bijvoorbeeld geen "Is er herteld?" op SB PV.
   - Nieuwe modellen op nalopen.
-
 
 
 

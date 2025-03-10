@@ -27,6 +27,11 @@ import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } f
 const dataEntryMachineDefinition = {
   initial: "voterVotesPageEmpty",
   states: {
+    recountedPageWarning: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageWarning",
+      },
+    },
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_WARNING: "votersVotesPageWarningFilled",
@@ -42,6 +47,7 @@ const dataEntryMachineDefinition = {
         SUBMIT: "votersVotesPageWarningReminder",
         ACCEPT_WARNING: "voterVotesPageWarningAccepted",
         CORRECT_WARNING: "voterVotesPageWarningCorrected",
+        GO_TO_RECOUNTED_PAGE: "recountedPageWarning",
       },
     },
     voterVotesPageWarningAccepted: {
@@ -117,8 +123,18 @@ test.describe("Data entry model test", () => {
         const pollingStationsPageStates = {};
         const PollingStationsPageEvents = {};
 
-        const recountedPageStates = {};
-        const recountedPageEvents = {};
+        const recountedPageStates = {
+          recountedPageWarning: async () => {
+            await expect(recountedPage.fieldset).toBeVisible();
+            await expect(recountedPage.no).toBeChecked();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
+          },
+        };
+        const recountedPageEvents = {
+          GO_TO_VOTERS_VOTES_PAGE: async () => {
+            await recountedPage.navPanel.votersAndVotes.click();
+          },
+        };
 
         const votersVotesPageStates = {
           voterVotesPageEmpty: async () => {
@@ -182,6 +198,9 @@ test.describe("Data entry model test", () => {
             await votersAndVotesPage.inputVotesCounts(votesValid);
             // Tab press needed for page to register change after Playwright's fill()
             await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
+          },
+          GO_TO_RECOUNTED_PAGE: async () => {
+            await votersAndVotesPage.navPanel.recounted.click();
           },
         };
 

@@ -50,6 +50,8 @@ __Uitbreidingen:__
 
 __Niveau:__ hoog-over, vlieger, 🪁
 
+### Hoofdscenario en uitbreidingen
+
 __Hoofdscenario:__  
 
 1. Het CSB leest het digitale bestand in als eerste invoer. (controle hash-code en importeren)
@@ -72,6 +74,9 @@ __Uitbreidingen:__
 &emsp;&emsp;3a2b. De coördinator stelt vast dat zowel de tweede (handmatige) invoer als het digitale bestand niet correct zijn:  
 &emsp;&emsp;&emsp;3a2b1. De coördinator gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
 &emsp; 3a3. De coördinator markeert de tweede (handmatige) invoer als correct.
+
+### Open punten
+- De Wet Programmatuur Verkiezingsuitslagen stelt dat er twee keer invoer gedaan wordt, waarvan tenminste één handmatig. Vraag is of dit betekent dat als de twee invoeren niet gelijk zijn, de enige oplossing is één invoer (of beide invoeren) weg te gooien en opnieuw te laten doen. Antwoord zal afhangen van de vraag of het alleen zo is dat de invoer twee keer gedaan moet worden waarvan één handmatig, of dat de definitieve ingevoerde telling alleen het resultaat mag zijn van twee invoeren waarvan minstens één handmatig. Als dat tweede het geval is, dan is het markeren van bijv. de tweede handmatige invoer als correct, niet toegestaan.
 
 
 ## Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan (vlieger)

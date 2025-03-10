@@ -1,9 +1,8 @@
 import { t } from "@kiesraad/i18n";
-import { Button, Loader, PageTitle, Table, Toolbar, ToolbarSection } from "@kiesraad/ui";
+import { Button, Loader, PageTitle, Table, Toolbar, ToolbarSection, Pagination } from "@kiesraad/ui";
 import { Role, useAuditLog } from "@kiesraad/api";
 import { ErrorModal } from "app/component/error";
 import { IconFilter } from "@kiesraad/icon";
-import { Pagination } from "@kiesraad/ui";
 
 export function LogsHomePage() {
   const { pagination, events, requestState, onPageChange } = useAuditLog();

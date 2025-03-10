@@ -12,11 +12,21 @@ export interface PaginationProps {
 export function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
   return (
     <div className={cls.pagination}>
-      <Button disabled={page === 1} onClick={() => onPageChange(page - 1)}>
+      <Button
+        disabled={page === 1}
+        onClick={() => {
+          onPageChange(page - 1);
+        }}
+      >
         {t("previous")}
       </Button>
       <span>{t("page_number", { page, totalPages })}</span>
-      <Button disabled={page === totalPages} onClick={() => onPageChange(page + 1)}>
+      <Button
+        disabled={page === totalPages}
+        onClick={() => {
+          onPageChange(page + 1);
+        }}
+      >
         {t("next")}
       </Button>
     </div>

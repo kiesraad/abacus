@@ -14,11 +14,11 @@ __Hoofdscenario:__
 3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na 31-2 Bijlage 1 in.
 4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 1 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
 5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
-6. De coördinator genereert het concept-PV en het digitale bestand.
+6. De coördinator genereert het concept-PV en het EML_NL bestand.
 7. De coördinator voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
 8. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 9. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
-10. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+10. Het GSB stelt de benodigde EML_NL bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 11. Het GSB stelt het PV GSB (inc. bijlagen) beschikbaar aan de burgemeester.
 12. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
 
@@ -47,12 +47,12 @@ __Uitbreidingen:__
 ### Niet in scope
 
 - Elektronische handtekening van documenten.
-- CSO: Aanmaken en invullen van "Bijlage 2: Bezwaren van aanwezigen op stembureaus". Wordt wel toegevoegd aan concept-PV door coördinator.
+- CSO: Invullen van "Bijlage 2: Bezwaren van aanwezigen op stembureaus" in de applicatie. Wordt wel handmatig toegevoegd aan het geprinte concept-PV door coördinator.
 - Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Dit gaan we niet faciliteren in de applicatie.
 
 ### Open punten
 
-- Hoe ziet de overdracht van het digitale bestand van GSB naar CSB binnen de applicatie er precies uit?
+- Hoe ziet de overdracht van het EML_NL bestand van GSB naar CSB binnen de applicatie er precies uit?
   - De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
   - Proces via uitwisselplatform loopt parallel.
 - Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het concept-PV?
@@ -62,7 +62,7 @@ __Uitbreidingen:__
   - Geen alternatief: in een ODT-bestand.
   - Overweging: Als het resultaat is "verschillen geconstateerd", dan moet alles handmatig overgedaan worden en komt er een nieuw 'handmatig' PV. Dus als het PV dat uit de applicatie komt, geldig is, dan staat er een vinkje bij "geen verschillen geconstateerd".
 - Ondertekenen gebeurt in een bijlage. Waar komt die vandaan?
-- Wat zit er precies in het digitale bestand?
+- Wat zit er precies in het EML_NL bestand?
 - Moet de applicatie een preview van het te genereren PV tonen, zodat de coördinator die kan controleren en eventuele fouten kan herstellen?
 
 
@@ -82,10 +82,10 @@ __Hoofdscenario:__
 3. (voor elk stembureau) Het GSB stelt met de hand vast dat de tellingen die het stembureau heeft vastgesteld in N 10-1, kloppen.
 4. (voor elk stembureau) [Het GSB voert de tellingen uit N 10-1 en evt. Na 14-1 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
 5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
-6. De coördinator genereert het concept-PV en het digitale bestand.
+6. De coördinator genereert het concept-PV en het EML_NL bestand.
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
-9. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+9. Het GSB stelt de benodigde EML_NL bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 10. Het GSB stelt het PV GSB (inclusief bijlagen) beschikbaar aan de burgemeester.
 11. De burgemeester publiceert het PV GSB (inclusief bijlagen) en brengt het over naar het CSB.
 

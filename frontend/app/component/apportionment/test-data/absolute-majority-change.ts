@@ -1,6 +1,6 @@
-import { ApportionmentResult, Election, ElectionSummary } from "@kiesraad/api";
+import { Election, ElectionSummary, SeatAssignmentResult } from "@kiesraad/api";
 
-export const apportionment: ApportionmentResult = {
+export const seat_assignment: SeatAssignmentResult = {
   seats: 15,
   full_seats: 12,
   residual_seats: 3,

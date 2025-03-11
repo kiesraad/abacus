@@ -12,7 +12,7 @@ describe("LogsHomePage", () => {
     server.use(LogRequestHandler);
   });
 
-  test("Show polling stations", async () => {
+  test("Show audit log events", async () => {
     render(<LogsHomePage />);
 
     const table = await screen.findByRole("table");

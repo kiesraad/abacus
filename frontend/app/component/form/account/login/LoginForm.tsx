@@ -11,7 +11,7 @@ interface UnauthorizedState {
 
 export function LoginForm() {
   const navigate = useNavigate();
-  const location = useLocation() as Location<UnauthorizedState>;
+  const location = useLocation() as Location<null | UnauthorizedState>;
   const { login, expiration } = useApiState();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -20,7 +20,7 @@ export function LoginForm() {
 
   // show warning if the user is unauthorized or the session expired
   let warning: TranslationPath | null = null;
-  if (location.state.unauthorized === true) {
+  if (location.state?.unauthorized === true) {
     const now = new Date();
     if (expiration !== null && expiration.getTime() < now.getTime()) {
       warning = "users.session_expired";

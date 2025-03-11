@@ -241,50 +241,21 @@ pub async fn create_result_with_non_example_data_entry(
 
 /// Calls the login endpoint for an Admin user and returns the session cookie
 pub async fn admin_login(addr: &SocketAddr) -> HeaderValue {
-    let url = format!("http://{addr}/api/user/login");
-
-    let response = reqwest::Client::new()
-        .post(&url)
-        .header(CONTENT_TYPE, "application/json")
-        .body(Body::from(
-            json!({
-                "username": "admin",
-                "password": "AdminPassword01",
-            })
-            .to_string(),
-        ))
-        .send()
-        .await
-        .unwrap();
-
-    assert_eq!(response.status(), StatusCode::OK);
-    response.headers().get("set-cookie").cloned().unwrap()
+    login(addr, "admin", "AdminPassword01").await
 }
 
 /// Calls the login endpoint for a Coordinator user and returns the session cookie
 pub async fn coordinator_login(addr: &SocketAddr) -> HeaderValue {
-    let url = format!("http://{addr}/api/user/login");
-
-    let response = reqwest::Client::new()
-        .post(&url)
-        .header(CONTENT_TYPE, "application/json")
-        .body(Body::from(
-            json!({
-                "username": "coordinator",
-                "password": "CoordinatorPassword01",
-            })
-            .to_string(),
-        ))
-        .send()
-        .await
-        .unwrap();
-
-    assert_eq!(response.status(), StatusCode::OK);
-    response.headers().get("set-cookie").cloned().unwrap()
+    login(addr, "coordinator", "CoordinatorPassword01").await
 }
 
 /// Calls the login endpoint for a Typist user and returns the session cookie
 pub async fn typist_login(addr: &SocketAddr) -> HeaderValue {
+    login(addr, "typist", "TypistPassword01").await
+}
+
+/// Calls the login endpoint with a username and password
+pub async fn login(addr: &SocketAddr, username: &str, password: &str) -> HeaderValue {
     let url = format!("http://{addr}/api/user/login");
 
     let response = reqwest::Client::new()
@@ -292,8 +263,8 @@ pub async fn typist_login(addr: &SocketAddr) -> HeaderValue {
         .header(CONTENT_TYPE, "application/json")
         .body(Body::from(
             json!({
-                "username": "typist",
-                "password": "TypistPassword01",
+                "username": username,
+                "password": password,
             })
             .to_string(),
         ))

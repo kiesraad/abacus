@@ -356,6 +356,9 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
         .unwrap();
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 
+    // Login again with the temporary password
+    let typist_cookie = shared::login(&addr, "typist", "TotallyValidTempP4ssW0rd").await;
+
     // User sets password
     let url = format!("http://{addr}/api/user/account");
     let response = reqwest::Client::new()

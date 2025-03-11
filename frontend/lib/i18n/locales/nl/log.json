@@ -27,6 +27,6 @@
     "userAgent": "User agent",
     "ip": "IP-adres",
     "loggedInUsersCount": "Aantal ingelogde gebruikers",
-    "sessionDuration": "Sessieduur"
+    "sessionDuration": "Sessieduur (seconden)"
   }
 }

@@ -58,8 +58,8 @@ impl Session {
 
     /// Get the age of a session
     pub(super) fn duration(&self) -> Duration {
-        self.created_at
-            .signed_duration_since(Utc::now())
+        Utc::now()
+            .signed_duration_since(self.created_at)
             .to_std()
             .unwrap_or_default()
     }

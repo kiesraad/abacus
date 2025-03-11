@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 import { ErrorModal } from "app/component/error";
 
@@ -6,7 +6,7 @@ import { AuditLogEvent, Role, useAuditLog } from "@kiesraad/api";
 import { t, TranslationPath } from "@kiesraad/i18n";
 import { IconFilter } from "@kiesraad/icon";
 import { Button, Loader, Modal, PageTitle, Pagination, Table, Toolbar, ToolbarSection } from "@kiesraad/ui";
-import { formatDateTime } from "@kiesraad/util";
+import { formatDateTime, formatDateTimeFull } from "@kiesraad/util";
 
 import cls from "./LogsHomePage.module.css";
 
@@ -55,7 +55,7 @@ export function LogsHomePage() {
               <div>
                 <dl className={cls.details}>
                   <dt>{t("log.header.time")}</dt>
-                  <dd>{formatDateTime(new Date(details.time), false)}</dd>
+                  <dd>{formatDateTimeFull(new Date(details.time))}</dd>
                   <dt>{t("log.header.user")}</dt>
                   <dd>
                     {details.userFullname || details.username}
@@ -66,21 +66,12 @@ export function LogsHomePage() {
                   {Object.entries(details.event)
                     .filter(([k]) => k !== "eventType")
                     .map(([key, value]) => (
-                      <>
+                      <Fragment key={key}>
                         <dt>{t(`log.field.${key}` as TranslationPath)}</dt>
                         <dd>{value}</dd>
-                      </>
+                      </Fragment>
                     ))}
                 </dl>
-                <nav>
-                  <Button
-                    onClick={() => {
-                      setDetails(null);
-                    }}
-                  >
-                    {t("close")}
-                  </Button>
-                </nav>
               </div>
             </Modal>
           )}

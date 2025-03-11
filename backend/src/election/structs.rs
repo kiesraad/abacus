@@ -40,7 +40,7 @@ pub struct ElectionRequest {
 }
 
 /// Election category (limited for now)
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type)]
 pub enum ElectionCategory {
     Municipal,
 }

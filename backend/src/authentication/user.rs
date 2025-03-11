@@ -4,7 +4,6 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use chrono::{DateTime, Utc};
-use hyper::Method;
 use serde::{Deserialize, Serialize};
 use sqlx::{Error, FromRow, SqlitePool, query, query_as};
 use utoipa::ToSchema;
@@ -128,12 +127,6 @@ where
         };
 
         let user = users.get_by_session_key(session_cookie.value()).await?;
-
-        // Don't allow users that need to change their password, but make an exception
-        // for the `account_update` method
-        if user.needs_password_change && parts.uri != "/account" && parts.method != Method::PUT {
-            return Err(AuthenticationError::Unauthorized.into());
-        }
 
         user.update_last_activity_at(&users).await?;
 

@@ -60,6 +60,22 @@ impl TryFrom<User> for Admin {
     }
 }
 
+/// A user that has _any_ role
+#[allow(unused)]
+pub struct AnyRole(pub User);
+
+impl TryFrom<User> for AnyRole {
+    type Error = ();
+
+    fn try_from(user: User) -> Result<Self, Self::Error> {
+        match user.role() {
+            Role::Administrator => Ok(Self(user)),
+            Role::Coordinator => Ok(Self(user)),
+            Role::Typist => Ok(Self(user)),
+        }
+    }
+}
+
 impl TryFrom<User> for Coordinator {
     type Error = ();
 
@@ -146,5 +162,19 @@ where
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
         AdminOrCoordinator::try_from(user).map_err(|_| AuthenticationError::Unauthorized.into())
+    }
+}
+
+impl<S> FromRequestParts<S> for AnyRole
+where
+    Users: FromRef<S>,
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
+
+        AnyRole::try_from(user).map_err(|_| AuthenticationError::Unauthorized.into())
     }
 }

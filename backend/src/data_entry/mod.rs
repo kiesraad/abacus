@@ -1,5 +1,5 @@
 use crate::{
-    authentication::{Typist, User},
+    authentication::{AnyRole, Typist},
     data_entry::repository::PollingStationDataEntries,
     election::repository::Elections,
     error::{APIError, ErrorReference, ErrorResponse},
@@ -302,7 +302,7 @@ pub struct ElectionStatusResponseEntry {
     ),
 )]
 pub async fn election_status(
-    _user: User,
+    _user: AnyRole,
     State(data_entry_repo): State<PollingStationDataEntries>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
@@ -316,7 +316,7 @@ pub mod tests {
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
-    use crate::authentication::Role;
+    use crate::authentication::{Role, User};
 
     use super::*;
 

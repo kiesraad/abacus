@@ -76,7 +76,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 - één ticket/taak mag in meerdere PR's gebouwd worden.
 - Pair/ensemble programming telt als review.
 - Vraag vroeg om feedback: [editing over proof-reading](https://buttondown.email/hillelwayne/archive/code-review-vs-code-proofreading/) (Hillel Wayne)
-- Zoveel mogelijk afvangen d.m.v. linting, static code analysis, code kwaliteit en testcoverage zodat menselijke code review kan focussen op architectuur e.d.
+- Zoveel mogelijk afvangen d.m.v. linting, static code analysis, codekwaliteit en testcoverage zodat menselijke code review kan focussen op architectuur e.d.
 
 #### Handmatige tests en automatische tests
 
@@ -96,7 +96,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
   - Integration tests
   - End-to-end tests
   - Security scan
-  - Code kwaliteit
+  - Codekwaliteit
   - Test coverage
   - Performance test
   - Installeerbaarheidstest

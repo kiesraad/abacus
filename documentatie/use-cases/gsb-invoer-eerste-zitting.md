@@ -142,7 +142,7 @@ __Hoofdscenario:__
 1. De coördinator bekijkt de verschillen tussen de twee invoeren.
 2. De coördinator stelt vast dat één van de twee invoeren correct is.
 3. De coördinator accepteert de correcte invoer.
-4. De coördinator geeft het PV aan een invoerder om nogmaals in te voeren
+4. De coördinator geeft het PV aan een invoerder om nogmaals in te voeren.
 
 __Uitbreidingen:__  
 2a. Geen van beide invoeren is correct:  

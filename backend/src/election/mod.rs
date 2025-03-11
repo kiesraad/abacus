@@ -10,7 +10,7 @@ use self::repository::Elections;
 pub use self::structs::*;
 use crate::{
     APIError, ErrorResponse,
-    authentication::AnyRole,
+    authentication::User,
     polling_station::{repository::PollingStations, structs::PollingStation},
 };
 
@@ -55,7 +55,7 @@ impl IntoResponse for Election {
     ),
 )]
 pub async fn election_list(
-    _user: AnyRole,
+    _user: User,
     State(elections_repo): State<Elections>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
     let elections = elections_repo.list().await?;
@@ -77,7 +77,7 @@ pub async fn election_list(
     ),
 )]
 pub async fn election_details(
-    _user: AnyRole,
+    _user: User,
     State(elections_repo): State<Elections>,
     State(polling_stations): State<PollingStations>,
     Path(id): Path<u32>,

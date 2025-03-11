@@ -1,5 +1,5 @@
 use crate::{
-    authentication::{AnyRole, Typist},
+    authentication::{Typist, User},
     data_entry::repository::PollingStationDataEntries,
     election::repository::Elections,
     error::{APIError, ErrorReference, ErrorResponse},
@@ -302,7 +302,7 @@ pub struct ElectionStatusResponseEntry {
     ),
 )]
 pub async fn election_status(
-    _user: AnyRole,
+    _user: User,
     State(data_entry_repo): State<PollingStationDataEntries>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {

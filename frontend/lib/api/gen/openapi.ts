@@ -194,9 +194,9 @@ export type AssignedSeat =
   | (AbsoluteMajorityChange & { assigned_by: "AbsoluteMajorityChange" });
 
 export type AuditEvent =
-  | (UserLoggedInDetails & { event_type: "userloggedin" })
-  | (UserLoggedOutDetails & { event_type: "userloggedout" })
-  | { event_type: "unknownevent" };
+  | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
+  | (UserLoggedOutDetails & { eventType: "UserLoggedOut" })
+  | { eventType: "UnknownEvent" };
 
 export type AuditEventLevel = "info" | "success" | "warning" | "error";
 

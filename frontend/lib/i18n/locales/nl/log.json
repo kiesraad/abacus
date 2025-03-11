@@ -19,8 +19,14 @@
     "success": "Succes"
   },
   "event": {
-    "userloggedin": "Gebruiker ingelogd",
-    "userloggedout": "Gebruiker uitgelogd",
-    "unknownevent": "Onbekende gebeurtenis"
+    "UserLoggedIn": "Gebruiker ingelogd",
+    "UserLoggedOut": "Gebruiker uitgelogd",
+    "UnknownEvent": "Onbekende gebeurtenis"
+  },
+  "field": {
+    "userAgent": "User agent",
+    "ip": "IP-adres",
+    "loggedInUsersCount": "Aantal ingelogde gebruikers",
+    "sessionDuration": "Sessieduur"
   }
 }

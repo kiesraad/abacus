@@ -24,7 +24,7 @@ pub struct UserLoggedOutDetails {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema, Default)]
-#[serde(rename_all = "lowercase", tag = "event_type")]
+#[serde(rename_all = "PascalCase", tag = "eventType")]
 pub enum AuditEvent {
     UserLoggedIn(UserLoggedInDetails),
     UserLoggedOut(UserLoggedOutDetails),

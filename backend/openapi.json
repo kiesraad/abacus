@@ -1890,13 +1890,13 @@
               {
                 "type": "object",
                 "required": [
-                  "event_type"
+                  "eventType"
                 ],
                 "properties": {
-                  "event_type": {
+                  "eventType": {
                     "type": "string",
                     "enum": [
-                      "userloggedin"
+                      "UserLoggedIn"
                     ]
                   }
                 }
@@ -1911,13 +1911,13 @@
               {
                 "type": "object",
                 "required": [
-                  "event_type"
+                  "eventType"
                 ],
                 "properties": {
-                  "event_type": {
+                  "eventType": {
                     "type": "string",
                     "enum": [
-                      "userloggedout"
+                      "UserLoggedOut"
                     ]
                   }
                 }
@@ -1927,13 +1927,13 @@
           {
             "type": "object",
             "required": [
-              "event_type"
+              "eventType"
             ],
             "properties": {
-              "event_type": {
+              "eventType": {
                 "type": "string",
                 "enum": [
-                  "unknownevent"
+                  "UnknownEvent"
                 ]
               }
             }

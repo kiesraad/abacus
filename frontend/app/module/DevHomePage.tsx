@@ -100,20 +100,20 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("typist", "TypistPassword01");
+              void login("coordinator", "CoordinatorPassword01");
             }}
           >
-            {t("typist")}
+            {t("coordinator")}
           </Link>
         </li>
         <li>
           <Link
             to="/dev"
             onClick={() => {
-              void login("coordinator", "CoordinatorPassword01");
+              void login("typist", "TypistPassword01");
             }}
           >
-            {t("coordinator")}
+            {t("typist")}
           </Link>
         </li>
         {user && (

@@ -4,8 +4,15 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
   maximumFractionDigits: 0,
 });
 
-export function formatNumber(s: string | number | null | undefined | readonly string[]) {
-  if (typeof s !== "string" && typeof s !== "number") return "";
+export function formatNumber(s: string | number | null | undefined | readonly string[]): string {
+  if (typeof s !== "string" && typeof s !== "number") {
+    return "";
+  }
+
+  if (typeof s === "number" && s === 0) {
+    return "";
+  }
+
   const result = `${s}`.replace(/\D/g, "");
   if (result === "") {
     return "";
@@ -14,8 +21,18 @@ export function formatNumber(s: string | number | null | undefined | readonly st
   }
 }
 
-export function deformatNumber(s: string) {
-  const cleaned = s.replace(/[.]/g, "");
+const separator = numberFormatter.format(11111).replace(/\p{Number}/gu, "");
+const escapedSeparator = separator.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+const cleanRegex = new RegExp(escapedSeparator, "g");
+
+export function deformatNumber(s: FormDataEntryValue | string | null): number {
+  if (s === null || typeof s !== "string") {
+    return 0;
+  }
+
+  const cleaned = s.replace(cleanRegex, "");
+
+  // Make sure empty value is converted to 0 instead of null
   if (cleaned == "") {
     // An empty value should be parsed as 0
     return 0;

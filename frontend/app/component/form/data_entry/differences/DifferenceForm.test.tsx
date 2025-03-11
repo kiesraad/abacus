@@ -2,14 +2,16 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
+  defaultFormSection,
   emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
-} from "app/component/form/testHelperFunctions";
+  overrideServerGetDataEntryResponse,
+} from "app/component/form/data_entry/test.util";
 
-import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@kiesraad/api";
+import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@kiesraad/api";
 import {
   electionMockData,
   PollingStationDataEntryGetHandler,
@@ -17,19 +19,52 @@ import {
 } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs } from "@kiesraad/test";
 
-import { PollingStationFormController } from "../PollingStationFormController";
+import { DataEntryProvider } from "../state/DataEntryProvider";
+import { DataEntryState } from "../state/types";
 import { DifferencesForm } from "./DifferencesForm";
 
-function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
+const defaultDataEntryState: DataEntryState = {
+  election: electionMockData,
+  pollingStationId: 1,
+  error: null,
+  pollingStationResults: null,
+  entryNumber: 1,
+  formState: {
+    current: "differences_counts",
+    furthest: "differences_counts",
+    sections: {
+      recounted: {
+        id: "recounted",
+        index: 1,
+        ...defaultFormSection,
+      },
+      voters_votes_counts: {
+        id: "voters_votes_counts",
+        index: 2,
+        ...defaultFormSection,
+      },
+      differences_counts: {
+        id: "differences_counts",
+        index: 3,
+        ...defaultFormSection,
+      },
+      save: {
+        id: "save",
+        index: 4,
+        ...defaultFormSection,
+      },
+    },
+  },
+  targetFormSectionId: "recounted",
+  status: "idle",
+  cache: null,
+};
+
+function renderForm() {
   return render(
-    <PollingStationFormController
-      election={electionMockData}
-      pollingStationId={1}
-      entryNumber={1}
-      defaultValues={defaultValues}
-    >
+    <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
       <DifferencesForm />
-    </PollingStationFormController>,
+    </DataEntryProvider>,
   );
 }
 
@@ -52,7 +87,13 @@ describe("Test DifferencesForm", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+      renderForm();
 
       const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
       await user.type(moreBallotsCount, "12345");
@@ -67,8 +108,14 @@ describe("Test DifferencesForm", () => {
 
     test("hitting shift+enter does result in api call", async () => {
       const user = userEvent.setup();
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
 
-      renderForm({ recounted: false });
+      renderForm();
       const spy = vi.spyOn(global, "fetch");
 
       const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
@@ -86,8 +133,13 @@ describe("Test DifferencesForm", () => {
       });
 
       const user = userEvent.setup();
-
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+      renderForm();
 
       const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
       expect(moreBallotsCount.closest("fieldset")).toHaveAccessibleName(
@@ -185,8 +237,14 @@ describe("Test DifferencesForm", () => {
       };
 
       const user = userEvent.setup();
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          ...votersAndVotesValues,
+        },
+      });
 
-      renderForm({ ...votersAndVotesValues });
+      renderForm();
 
       await screen.findByTestId("differences_form");
       const spy = vi.spyOn(global, "fetch");
@@ -211,7 +269,13 @@ describe("Test DifferencesForm", () => {
     test("F.301 IncorrectDifference", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+      renderForm();
 
       await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -245,8 +309,13 @@ describe("Test DifferencesForm", () => {
 
     test("F.302 Should be empty", async () => {
       const user = userEvent.setup();
-
-      renderForm({ recounted: true });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: true,
+        },
+      });
+      renderForm();
 
       await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -281,7 +350,14 @@ describe("Test DifferencesForm", () => {
     test("F.303 IncorrectDifference", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+
+      renderForm();
 
       await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -316,7 +392,14 @@ describe("Test DifferencesForm", () => {
     test("F.304 Should be empty", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: true });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: true,
+        },
+      });
+
+      renderForm();
 
       await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -351,7 +434,14 @@ describe("Test DifferencesForm", () => {
     test("F.305 No difference expected", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+
+      renderForm();
 
       await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -400,7 +490,14 @@ describe("Test DifferencesForm", () => {
     test("clicking next without accepting warning results in alert shown and then accept warning", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+
+      renderForm();
 
       await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -468,7 +565,14 @@ describe("Test DifferencesForm", () => {
     test("W.301 Incorrect total", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+
+      renderForm();
 
       await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -515,7 +619,14 @@ describe("Test DifferencesForm", () => {
     test("W.302 Incorrect total", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+
+      renderForm();
 
       await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {

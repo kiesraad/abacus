@@ -13,12 +13,12 @@ async function run() {
     return;
   }
 
+  const result = await generate(fileString);
+
   if (fs.existsSync(TARGET_PATH)) {
     fs.rmSync(TARGET_PATH, { recursive: true });
   }
   fs.mkdirSync(TARGET_PATH);
-
-  const result = await generate(fileString);
   fs.writeFileSync(`${TARGET_PATH}/${FILE_NAME}`, result);
 }
 

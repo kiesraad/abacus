@@ -51,7 +51,6 @@ impl Session {
     }
 
     /// Get the session expiration time
-    #[cfg(test)]
     pub(super) fn expires_at(&self) -> DateTime<Utc> {
         self.expires_at
     }

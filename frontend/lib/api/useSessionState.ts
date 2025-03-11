@@ -13,6 +13,7 @@ import {
 
 export interface SessionState {
   user: LoginResponse | null;
+  loading: boolean;
   setUser: (user: LoginResponse | null) => void;
   logout: () => Promise<void>;
   login: (username: string, password: string) => Promise<ApiResult<LoginResponse>>;
@@ -24,6 +25,7 @@ export interface SessionState {
 export default function useSessionState(fetchInitialUser: boolean): SessionState {
   const [user, setUser] = useState<LoginResponse | null>(null);
   const [error, setError] = useState<AnyApiError | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Propagate any unexpected API errors to the router
   useEffect(() => {
@@ -74,6 +76,8 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
         } else {
           setUser(null);
         }
+
+        setLoading(false);
       })();
 
       return () => {
@@ -82,5 +86,5 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
     }
   }, [fetchInitialUser]);
 
-  return { user, setUser, login, logout };
+  return { user, setUser, loading, login, logout };
 }

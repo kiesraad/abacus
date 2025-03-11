@@ -18,10 +18,10 @@ mod user;
 mod util;
 
 /// Session lifetime, for both cookie and database
-pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 30); // 30 minutes
+pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60); // 30 minutes
 
 /// Minimum session lifetime, refresh if only this much time or less is left before expiration
-pub const SESSION_MIN_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 15); // 15 minutes
+pub const SESSION_MIN_LIFE_TIME: TimeDelta = TimeDelta::seconds(30); // 15 minutes
 
 /// Session cookie name
 pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";

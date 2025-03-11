@@ -30,6 +30,7 @@ function TypistLinks() {
 
 function AdministratorCoordinatorLinks() {
   const { electionList } = useElectionList();
+  const { isAdministrator } = useUserRole();
 
   return (
     <>
@@ -58,12 +59,16 @@ function AdministratorCoordinatorLinks() {
             </li>
           ))}
         </ul>
-        <li>
-          <Link to={`/users`}>{t("users.management")}</Link>
-        </li>
-        <li>
-          <Link to={`/workstations`}>{t("workstations.manage")}</Link>
-        </li>
+        {isAdministrator && (
+          <>
+            <li>
+              <Link to={`/users`}>{t("users.management")}</Link>
+            </li>
+            <li>
+              <Link to={`/workstations`}>{t("workstations.manage")}</Link>
+            </li>
+          </>
+        )}
         <li>
           <Link to={`/logs`}>{t("activity_log")}</Link>
         </li>

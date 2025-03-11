@@ -1,60 +1,86 @@
-import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { PollingStationResults } from "@kiesraad/api";
+import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
-import { usePollingStationFormController } from "../usePollingStationFormController";
+import { getErrorsAndWarnings } from "../state/dataEntryUtils";
+import { SubmitCurrentFormOptions } from "../state/types";
+import { useDataEntryContext } from "../state/useDataEntryContext";
+import {
+  formValuesToValues,
+  valuesToFormValues,
+  VotersAndVotesFormValues,
+  VotersAndVotesValues,
+} from "./votersAndVotesValues";
 
-export type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">;
-
-export function useVotersAndVotes(getValues: () => VotersAndVotesValues, getAcceptWarnings?: () => boolean) {
-  const { status, values, formState, setTemporaryCache, cache, registerCurrentForm, submitCurrentForm } =
-    usePollingStationFormController();
-
-  const sectionValues = React.useMemo(() => {
-    if (cache && cache.key === "voters_votes_counts") {
-      const data = cache.data as VotersAndVotesValues;
-      setTemporaryCache(null);
-      return data;
-    }
-
-    const result: VotersAndVotesValues = {
-      voters_counts: values.voters_counts,
-      votes_counts: values.votes_counts,
-      voters_recounts: undefined,
-    };
-
-    if (values.voters_recounts) {
-      result.voters_recounts = values.voters_recounts;
-    }
-
-    return result;
-  }, [values, setTemporaryCache, cache]);
-
-  React.useEffect(() => {
-    registerCurrentForm({
+export function useVotersAndVotes() {
+  const { error, cache, status, pollingStationResults, formState, onSubmitForm, updateFormSection } =
+    useDataEntryContext({
       id: "voters_votes_counts",
       type: "voters_and_votes",
-      getValues,
-      getAcceptWarnings: getAcceptWarnings,
     });
-  }, [registerCurrentForm, getValues, getAcceptWarnings]);
 
-  const errors = React.useMemo(() => {
-    return formState.sections.voters_votes_counts.errors;
-  }, [formState]);
+  // local form state
+  const defaultValues =
+    cache?.key === "voters_votes_counts"
+      ? (cache.data as VotersAndVotesValues)
+      : {
+          voters_counts: pollingStationResults.voters_counts,
+          votes_counts: pollingStationResults.votes_counts,
+          voters_recounts: pollingStationResults.voters_recounts || undefined,
+        };
 
-  const warnings = React.useMemo(() => {
-    return formState.sections.voters_votes_counts.warnings;
-  }, [formState]);
+  const [currentValues, setCurrentValues] = useState<VotersAndVotesFormValues>(valuesToFormValues(defaultValues));
+
+  // derived state
+  const { errors, warnings, isSaved, acceptWarnings, hasChanges } = formState.sections.voters_votes_counts;
+  const defaultProps = {
+    errorsAndWarnings: isSaved ? getErrorsAndWarnings(errors, warnings) : undefined,
+    warningsAccepted: acceptWarnings,
+  };
+  const formSection = formState.sections.voters_votes_counts;
+  const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0 && !hasChanges;
+
+  // register changes when fields change
+  const setValues = (values: VotersAndVotesFormValues) => {
+    if (!hasChanges) {
+      updateFormSection({ hasChanges: true, acceptWarnings: false, acceptWarningsError: false });
+    }
+    setCurrentValues(values);
+  };
+
+  const setAcceptWarnings = (acceptWarnings: boolean) => {
+    updateFormSection({ acceptWarningsError: false, acceptWarnings });
+  };
+
+  // form keyboard navigation
+  const formRef = useRef<HTMLFormElement>(null);
+  useFormKeyboardNavigation(formRef);
+
+  // submit and save to form contents
+  const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
+    const data: VotersAndVotesValues = formValuesToValues(currentValues, pollingStationResults.recounted || false);
+
+    return await onSubmitForm(data, { ...options, showAcceptWarnings });
+  };
+
+  // scroll to top when saved
+  useEffect(() => {
+    if (isSaved || error) {
+      window.scrollTo(0, 0);
+    }
+  }, [isSaved, error]);
 
   return {
+    error,
+    formRef,
+    onSubmit,
+    pollingStationResults,
+    currentValues,
+    formSection,
+    setValues,
     status,
-    sectionValues,
-    errors,
-    warnings,
-    isSaved: formState.sections.voters_votes_counts.isSaved,
-    acceptWarnings: formState.sections.voters_votes_counts.acceptWarnings,
-    submit: submitCurrentForm,
-    recounted: values.recounted,
+    setAcceptWarnings,
+    defaultProps,
+    showAcceptWarnings,
   };
 }

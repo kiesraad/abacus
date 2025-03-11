@@ -5,15 +5,15 @@ import { useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { MenuStatus, ProgressList } from "@kiesraad/ui";
 
-import { FormSection, FormSectionID } from "../form/data_entry/PollingStationFormController";
-import { isFormSectionEmpty } from "../form/data_entry/pollingStationUtils";
-import { usePollingStationFormController } from "../form/data_entry/usePollingStationFormController";
+import { isFormSectionEmpty } from "./state/dataEntryUtils";
+import { FormSection, FormSectionId } from "./state/types";
+import { useDataEntryContext } from "./state/useDataEntryContext";
 
-export function PollingStationProgress() {
+export function DataEntryProgress() {
   const { pollingStationId } = useParams();
   const { election } = useElection();
 
-  const { formState, values, entryNumber } = usePollingStationFormController();
+  const { formState, pollingStationResults, entryNumber } = useDataEntryContext();
 
   const menuStatusForFormSection = React.useCallback(
     (formSection?: FormSection): MenuStatus => {
@@ -33,7 +33,7 @@ export function PollingStationProgress() {
       if (currentSection) {
         //check if section has been left empty
         if (formSection.index < currentSection.index) {
-          if (isFormSectionEmpty(formSection, values)) {
+          if (isFormSectionEmpty(formSection, pollingStationResults)) {
             return "empty";
           }
         }
@@ -45,7 +45,7 @@ export function PollingStationProgress() {
 
       return "idle";
     },
-    [formState, values],
+    [formState, pollingStationResults],
   );
 
   const lists = election.political_groups;
@@ -104,7 +104,7 @@ export function PollingStationProgress() {
       <ProgressList.Scroll>
         {lists.map((list, index) => {
           const listId = `${index + 1}`;
-          const formSection = formState.sections[`political_group_votes_${listId}` as FormSectionID];
+          const formSection = formState.sections[`political_group_votes_${listId}` as FormSectionId];
           if (!formSection) return null;
           return (
             <ProgressList.Item

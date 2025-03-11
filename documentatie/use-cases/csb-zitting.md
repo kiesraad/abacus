@@ -68,7 +68,7 @@ __Uitbreidingen:__
 &emsp; 3a2. De coördinator stelt vast dat de tweede (handmatige) invoer correct is.  
 &emsp;&emsp; 3a2a. De coördinator stelt vast dat de tweede (handmatige) invoer niet correct is:  
 &emsp;&emsp;&emsp; 3a2a1. De coördinator gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
-&emsp; 3a3. De coördinator markeert de tweede (handmatige) invoer als correct.  
+&emsp; 3a3. De coördinator markeert de tweede (handmatige) invoer als correct en gooit de andere invoer weg.
 &emsp; 3a4. De coördinator geeft het PV aan een invoerder om nogmaals in te voeren.
 
 ## Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan (vlieger)

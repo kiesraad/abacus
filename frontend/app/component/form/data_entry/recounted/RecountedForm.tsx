@@ -1,61 +1,28 @@
-import * as React from "react";
+import { ErrorModal } from "app/component/error";
 
+import { ApiError } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import {
-  BottomBar,
-  Button,
-  ChoiceList,
-  Feedback,
-  Form,
-  KeyboardKey,
-  KeyboardKeys,
-  useFormKeyboardNavigation,
-} from "@kiesraad/ui";
+import { BottomBar, Button, ChoiceList, Feedback, Form, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 
+import { DataEntryNavigation } from "../DataEntryNavigation";
 import { useRecounted } from "./useRecounted";
 
-interface FormElements extends HTMLFormControlsCollection {
-  yes: HTMLInputElement;
-  no: HTMLInputElement;
-}
-
-interface RecountedFormElement extends HTMLFormElement {
-  readonly elements: FormElements;
-}
-
 export function RecountedForm() {
-  const formRef = React.useRef<RecountedFormElement>(null);
-
-  useFormKeyboardNavigation(formRef);
-
-  const getValues = React.useCallback(() => {
-    const form = formRef.current;
-    if (!form) {
-      return { recounted: undefined };
-    }
-    const elements = form.elements;
-    return { recounted: elements.yes.checked ? true : elements.no.checked ? false : undefined };
-  }, []);
-
-  const { status, sectionValues, errors, isSaved, submit } = useRecounted(getValues);
-
-  const handleSubmit = (event: React.FormEvent<RecountedFormElement>) =>
-    void (async (event: React.FormEvent<RecountedFormElement>) => {
-      event.preventDefault();
-
-      await submit();
-    })(event);
-
-  React.useEffect(() => {
-    if (isSaved) {
-      window.scrollTo(0, 0);
-    }
-  }, [isSaved, errors]);
-
-  const hasValidationError = errors.length > 0;
+  const { error, recounted, formRef, setRecounted, errors, hasValidationError, isSaved, isSaving, onSubmit } =
+    useRecounted();
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form" title={t("recounted.recounted_form_title")}>
+    <Form
+      onSubmit={(e) => {
+        e.preventDefault();
+        void onSubmit();
+      }}
+      ref={formRef}
+      id="recounted_form"
+      title={t("recounted.recounted_form_title")}
+    >
+      <DataEntryNavigation onSubmit={onSubmit} currentValues={{ recounted }} />
+      {error instanceof ApiError && <ErrorModal error={error} />}
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
@@ -67,21 +34,27 @@ export function RecountedForm() {
             value="yes"
             name="recounted"
             autoFocus
-            defaultChecked={sectionValues.recounted === true}
+            checked={recounted === true}
+            onChange={(e) => {
+              setRecounted(e.target.checked);
+            }}
             label={t("recounted.recounted_yes")}
           />
           <ChoiceList.Radio
             id="no"
             value="no"
             name="recounted"
-            defaultChecked={sectionValues.recounted === false}
+            checked={recounted === false}
+            onChange={(e) => {
+              setRecounted(!e.target.checked);
+            }}
             label={t("recounted.recounted_no")}
           />
         </ChoiceList>
       </div>
       <BottomBar type="form">
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={status.current === "saving"}>
+          <Button type="submit" size="lg" disabled={isSaving}>
             {t("next")}
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

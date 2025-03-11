@@ -1,17 +1,16 @@
 import { Outlet } from "react-router";
 
-import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
-import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
-import { AbortDataEntryControl } from "app/module/data_entry";
+import { DataEntryProgress } from "app/component/form/data_entry/DataEntryProgress";
+import { DataEntryProvider } from "app/component/form/data_entry/state/DataEntryProvider";
 
 import { NotFoundError, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Badge, PageTitle, PollingStationNumber, StickyNav } from "@kiesraad/ui";
 import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
 
-import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
+import { AbortDataEntryControl } from "./AbortDataEntryControl";
 
-export function PollingStationLayout() {
+export function DataEntryLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
   const entryNumber = useNumericParam("entryNumber");
   const { election, pollingStation } = useElection(pollingStationId);
@@ -26,7 +25,7 @@ export function PollingStationLayout() {
   }
 
   return (
-    <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={entryNumber}>
+    <DataEntryProvider election={election} pollingStationId={pollingStation.id} entryNumber={entryNumber}>
       <PageTitle title={`${t("data_entry.title")} ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <header>
         <section className="smaller-gap">
@@ -40,13 +39,12 @@ export function PollingStationLayout() {
       </header>
       <main>
         <StickyNav>
-          <PollingStationProgress />
+          <DataEntryProgress />
         </StickyNav>
         <article>
-          <PollingStationFormNavigation pollingStationId={pollingStation.id} election={election} />
           <Outlet />
         </article>
       </main>
-    </PollingStationFormController>
+    </DataEntryProvider>
   );
 }

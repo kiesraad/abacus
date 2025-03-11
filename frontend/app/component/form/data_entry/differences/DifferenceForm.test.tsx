@@ -1,16 +1,6 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import {
-  defaultFormSection,
-  emptyDataEntryRequest,
-  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
-  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
-  expectFieldsToHaveIconAndToHaveAccessibleName,
-  expectFieldsToNotHaveIcon,
-  overrideServerGetDataEntryResponse,
-} from "app/component/form/data_entry/test.util";
-
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@kiesraad/api";
 import {
   electionMockData,
@@ -21,6 +11,15 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInpu
 
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { DataEntryState } from "../state/types";
+import {
+  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
+  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
+  expectFieldsToHaveIconAndToHaveAccessibleName,
+  expectFieldsToNotHaveIcon,
+  getDefaultFormSection,
+  getEmptyDataEntryRequest,
+  overrideServerGetDataEntryResponse,
+} from "../test-data";
 import { DifferencesForm } from "./DifferencesForm";
 
 const defaultDataEntryState: DataEntryState = {
@@ -36,22 +35,22 @@ const defaultDataEntryState: DataEntryState = {
       recounted: {
         id: "recounted",
         index: 1,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
       voters_votes_counts: {
         id: "voters_votes_counts",
         index: 2,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
       differences_counts: {
         id: "differences_counts",
         index: 3,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
       save: {
         id: "save",
         index: 4,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
     },
   },
@@ -221,7 +220,7 @@ describe("Test DifferencesForm", () => {
 
       const expectedRequest = {
         data: {
-          ...emptyDataEntryRequest.data,
+          ...getEmptyDataEntryRequest().data,
           ...votersAndVotesValues,
           differences_counts: {
             more_ballots_count: 2,

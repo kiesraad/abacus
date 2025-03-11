@@ -13,15 +13,15 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, within } fro
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { DataEntryState } from "../state/types";
 import {
-  defaultFormSection,
-  emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
   getCandidateFullNamesFromMockData,
+  getDefaultFormSection,
+  getEmptyDataEntryRequest,
   overrideServerGetDataEntryResponse,
-} from "../test.util";
+} from "../test-data";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const defaultDataEntryState: DataEntryState = {
@@ -37,22 +37,22 @@ const defaultDataEntryState: DataEntryState = {
       recounted: {
         id: "recounted",
         index: 1,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
       voters_votes_counts: {
         id: "voters_votes_counts",
         index: 2,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
       differences_counts: {
         id: "differences_counts",
         index: 3,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
       save: {
         id: "save",
         index: 4,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
     },
   },
@@ -344,7 +344,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const expectedRequest = {
         data: {
-          ...emptyDataEntryRequest.data,
+          ...getEmptyDataEntryRequest().data,
           political_group_votes: [
             {
               number: 1,

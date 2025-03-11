@@ -2,15 +2,6 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { mockElection } from "app/component/election/status/mockData";
-import {
-  defaultFormSection,
-  emptyDataEntryRequest,
-  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
-  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
-  expectFieldsToHaveIconAndToHaveAccessibleName,
-  expectFieldsToNotHaveIcon,
-  overrideServerGetDataEntryResponse,
-} from "app/component/form/data_entry/test.util";
 
 import {
   GetDataEntryResponse,
@@ -27,6 +18,15 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInpu
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { getClientState } from "../state/dataEntryUtils";
 import { DataEntryState } from "../state/types";
+import {
+  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
+  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
+  expectFieldsToHaveIconAndToHaveAccessibleName,
+  expectFieldsToNotHaveIcon,
+  getDefaultFormSection,
+  getEmptyDataEntryRequest,
+  overrideServerGetDataEntryResponse,
+} from "../test-data";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const initialValues: PollingStationResults = {
@@ -76,22 +76,22 @@ const defaultDataEntryState: DataEntryState = {
       recounted: {
         id: "recounted",
         index: 1,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
       voters_votes_counts: {
         id: "voters_votes_counts",
         index: 2,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
       differences_counts: {
         id: "differences_counts",
         index: 3,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
       save: {
         id: "save",
         index: 4,
-        ...defaultFormSection,
+        ...getDefaultFormSection(),
       },
     },
   },
@@ -287,7 +287,7 @@ describe("Test VotersAndVotesForm", () => {
     test("VotersAndVotesForm without recount: request body is equal to the form data", async () => {
       const expectedRequest = {
         data: {
-          ...emptyDataEntryRequest.data,
+          ...getEmptyDataEntryRequest().data,
           recounted: false,
           voters_counts: {
             poll_card_count: 1,
@@ -338,7 +338,7 @@ describe("Test VotersAndVotesForm", () => {
     test("VotersAndVotesForm with recount: request body is equal to the form data", async () => {
       const expectedRequest = {
         data: {
-          ...emptyDataEntryRequest.data,
+          ...getEmptyDataEntryRequest().data,
           recounted: true,
           voters_counts: {
             poll_card_count: 1,

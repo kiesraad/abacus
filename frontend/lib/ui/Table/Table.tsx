@@ -26,6 +26,7 @@ Table.HeaderCell = HeaderCell;
 Table.Body = Body;
 Table.Row = Row;
 Table.LinkRow = LinkRow;
+Table.ClickRow = ClickRow;
 Table.TotalRow = TotalRow;
 Table.Cell = Cell;
 Table.NumberCell = NumberCell;
@@ -68,6 +69,22 @@ function Body({ children, className }: { children: React.ReactNode; className?: 
 
 function Row({ children, className }: { children: React.ReactNode; className?: string }) {
   return <tr className={className}>{children}</tr>;
+}
+
+function ClickRow({
+  children,
+  onClick,
+  className,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <tr className={cn(cls.rowLink, className)} onClick={onClick}>
+      {children}
+    </tr>
+  );
 }
 
 function LinkRow({ children, to, className }: { children: React.ReactNode; to: To; className?: string }) {

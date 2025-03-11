@@ -55,7 +55,7 @@ export function LogsHomePage() {
               <div>
                 <dl className={cls.details}>
                   <dt>{t("log.header.time")}</dt>
-                  <dd>{formatDateTime(new Date(details.time))}</dd>
+                  <dd>{formatDateTime(new Date(details.time), false)}</dd>
                   <dt>{t("log.header.user")}</dt>
                   <dd>
                     {details.userFullname || details.username}
@@ -94,7 +94,6 @@ export function LogsHomePage() {
               <Table.HeaderCell>{t("log.header.event")}</Table.HeaderCell>
               <Table.HeaderCell>{t("log.header.message")}</Table.HeaderCell>
               <Table.HeaderCell>{t("log.header.user")}</Table.HeaderCell>
-              <Table.HeaderCell></Table.HeaderCell>
             </Table.Header>
             <Table.Body className="fs-md">
               {events.length == 0 && (
@@ -103,9 +102,14 @@ export function LogsHomePage() {
                 </Table.Row>
               )}
               {events.map((event) => (
-                <Table.Row key={event.id}>
+                <Table.ClickRow
+                  key={event.id}
+                  onClick={() => {
+                    setDetails(event);
+                  }}
+                >
                   <Table.Cell>{event.id}</Table.Cell>
-                  <Table.Cell>{formatDateTime(new Date(event.time))}</Table.Cell>
+                  <Table.Cell>{formatDateTime(new Date(event.time), false)}</Table.Cell>
                   <Table.Cell>{event.workstation || "-"}</Table.Cell>
                   <Table.Cell>{t(`log.level.${event.eventLevel}`)}</Table.Cell>
                   <Table.Cell>{t(`log.event.${event.event.eventType}`)}</Table.Cell>
@@ -114,18 +118,7 @@ export function LogsHomePage() {
                     {event.userFullname || event.username}
                     {event.userRole && ` (${t(event.userRole as Role)})`}
                   </Table.Cell>
-                  <Table.Cell className="text-align-r">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => {
-                        setDetails(event);
-                      }}
-                    >
-                      {t("log.action.details")}
-                    </Button>
-                  </Table.Cell>
-                </Table.Row>
+                </Table.ClickRow>
               ))}
             </Table.Body>
           </Table>

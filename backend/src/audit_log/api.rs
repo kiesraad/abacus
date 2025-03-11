@@ -5,7 +5,7 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::{APIError, ErrorResponse, authentication::Admin};
+use crate::{APIError, ErrorResponse, authentication::AdminOrCoordinator};
 
 use super::{AuditLog, AuditLogEvent};
 
@@ -48,7 +48,7 @@ pub struct Pagination {
     ),
 )]
 pub async fn audit_log_list(
-    _user: Admin,
+    _user: AdminOrCoordinator,
     pagination: Query<Pagination>,
     State(audit_log): State<AuditLog>,
 ) -> Result<Json<AuditLogListResponse>, APIError> {

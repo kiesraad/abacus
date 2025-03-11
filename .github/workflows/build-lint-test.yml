@@ -9,6 +9,9 @@ on:
     branches:
       - main
 
+env:
+  TZ: "Europe/Amsterdam"
+
 jobs:
   backend:
     name: Backend (${{ matrix.target.os }})

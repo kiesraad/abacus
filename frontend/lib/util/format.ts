@@ -49,25 +49,33 @@ function isYesterday(date: Date): boolean {
   );
 }
 
-export function formatDateTime(date: Date) {
-  const today = new Date();
+export function formatDateTime(date: Date, relative = true) {
   const timeString = date.toLocaleTimeString(t("date_locale"), { hour: "numeric", minute: "numeric" });
-  if (isToday(date)) {
-    // Today
-    return `${t("today")} ${timeString}`;
-  } else if (isYesterday(date)) {
-    // Yesterday
-    return `${t("yesterday")} ${timeString}`;
-  } else if (Math.round(Math.abs(Number(today) - Number(date)) / (24 * 60 * 60 * 1000)) < 7) {
-    // Within the past 3-6 days
-    return date.toLocaleString(t("date_locale"), {
-      weekday: "long",
-      hour: "numeric",
-      minute: "numeric",
-    });
-  } else {
-    // More than 6 days ago (or in the future)
-    const dateString = date.toLocaleDateString(t("date_locale"), { day: "numeric", month: "short" });
-    return `${dateString} ${timeString}`;
+
+  if (relative) {
+    const today = new Date();
+
+    if (isToday(date)) {
+      // Today
+      return `${t("today")} ${timeString}`;
+    }
+
+    if (isYesterday(date)) {
+      // Yesterday
+      return `${t("yesterday")} ${timeString}`;
+    }
+
+    if (Math.round(Math.abs(Number(today) - Number(date)) / (24 * 60 * 60 * 1000)) < 7) {
+      // Within the past 3-6 days
+      return date.toLocaleString(t("date_locale"), {
+        weekday: "long",
+        hour: "numeric",
+        minute: "numeric",
+      });
+    }
   }
+
+  // More than 6 days ago (or in the future)
+  const dateString = date.toLocaleDateString(t("date_locale"), { day: "numeric", month: "short" });
+  return `${dateString} ${timeString}`;
 }

@@ -61,6 +61,8 @@ export function LogsHomePage() {
                     {details.userFullname || details.username}
                     {details.userRole && ` (${t(details.userRole as Role)})`}
                   </dd>
+                  <dt>{t("log.header.message")}</dt>
+                  <dd>{details.message || "-"}</dd>
                   <dt>{t("log.field.ip")}</dt>
                   <dd>{details.ip}</dd>
                   {Object.entries(details.event)
@@ -83,7 +85,6 @@ export function LogsHomePage() {
               <Table.HeaderCell>{t("log.header.workstation")}</Table.HeaderCell>
               <Table.HeaderCell>{t("log.header.level")}</Table.HeaderCell>
               <Table.HeaderCell>{t("log.header.event")}</Table.HeaderCell>
-              <Table.HeaderCell>{t("log.header.message")}</Table.HeaderCell>
               <Table.HeaderCell>{t("log.header.user")}</Table.HeaderCell>
             </Table.Header>
             <Table.Body className="fs-md">
@@ -104,7 +105,6 @@ export function LogsHomePage() {
                   <Table.Cell>{event.workstation || "-"}</Table.Cell>
                   <Table.Cell>{t(`log.level.${event.eventLevel}`)}</Table.Cell>
                   <Table.Cell>{t(`log.event.${event.event.eventType}`)}</Table.Cell>
-                  <Table.Cell>{event.message}</Table.Cell>
                   <Table.Cell>
                     {event.userFullname || event.username}
                     {event.userRole && ` (${t(event.userRole as Role)})`}

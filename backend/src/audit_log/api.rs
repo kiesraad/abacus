@@ -25,7 +25,7 @@ fn default_page() -> u32 {
 
 /// Number of items per page
 fn default_per_page() -> u32 {
-    10
+    200
 }
 
 #[derive(Debug, Deserialize, ToSchema)]

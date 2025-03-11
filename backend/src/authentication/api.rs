@@ -94,6 +94,9 @@ pub async fn login(
     sessions.delete_expired_sessions().await?;
     let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
 
+    // Create a new session and cookie
+    let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
+
     // Log the login event
     audit_service
         .with_user(user.clone())
@@ -105,9 +108,6 @@ pub async fn login(
             None,
         )
         .await?;
-
-    // Create a new session and cookie
-    let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
 
     // Add the session cookie to the response
     let mut cookie = session.get_cookie();

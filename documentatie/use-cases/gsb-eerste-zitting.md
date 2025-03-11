@@ -11,10 +11,10 @@ Voor DSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 __Hoofdscenario:__  
 1. Het GSB opent de zitting.
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
-3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatniveau en vult Na31-2 Bijlage 2 in.
+3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na31-2 Bijlage 2 in.
 4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
 5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-in-zee)
-6. De coördinator genereert het concept-PV en het digitale bestand. En voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
+6. De coördinator genereert het [concept-PV](./input-output-bestanden.md#output-voor-csb) en het [digitale bestand](./input-output-bestanden.md#output-voor-csb). En voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
 9. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
@@ -46,6 +46,8 @@ __Uitbreidingen:__
 ### Niet in scope
 
 - Elektronische handtekening van documenten.
+- Invoeren van het resultaat controleprotocol (handmatige controle optellingen software). N.B. Als het controleprotocol verschillen oplevert, dan is er een probleem met het concept-PV uit de applicatie en kan dat PV dus niet gebruikt worden.
+- Het GSB faciliteren in het berekenen van een voorlopige zetelverdeling. (nooit in scope)
 
 ### Open punten
 
@@ -54,16 +56,8 @@ __Uitbreidingen:__
   - Proces via uitwisselplatform loopt parallel.
 - Na31-2 Bijlage 2 wordt Bijlage 1 in nieuwe modellen.
 - Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het concept-PV?
-- Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Gaan we dit faciliteren in de applicatie?
-- Willen we het invoeren van het resultaat controleprotocol (handmatige controle optellingen software) in de applicatie doen?
-  - Protocol wordt uitgevoerd na het afdrukken van het concept-PV, dus lastig om in applicatie te doen.
-  - Alternatieven: met pen, in een bijlage.
-  - Geen alternatief: in een ODT-bestand.
-  - Overweging: Als het resultaat is "verschillen geconstateerd", dan moet alles handmatig overgedaan worden en komt er een nieuw 'handmatig' PV. Dus als het PV dat uit de applicatie komt, geldig is, dan staat er een vinkje bij "geen verschillen geconstateerd".
-- Ondertekenen gebeurt in een bijlage. Waar komt die vandaan?
-- Wat zit er precies in het digitale bestand?
 - Moet de applicatie een preview van het te genereren PV tonen, zodat de coördinator die kan controleren en eventuele fouten kan herstellen?
-
+  - Preview: bestand genereren met "concept" in watermerk en in bestandsnaam.
 
 
 ## Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting d.m.v. DSO (wolk)
@@ -94,6 +88,12 @@ Nog op te stellen o.b.v. Uitbreidingen CSO.
 #### Open punten
 
 - Is het wenselijk om een 'leeg' corrigendum (wel ingevuld: kandidatenlijsten (keuze welke lijsten), stembureau(?), gemeente, oorspronkelijke resultaten?) te kunnen genereren in applicatie?
+  - N 10-1 (PV SB DSO) en Na 14-1 (corrigendum op PV SB DSO)
+  - Ja.
+  - Meerdere opties mogelijk:
+    - minimaal kandidatenlijst en gemeente
+    - extra: stembureau en oorspronkelijke resultaten SB
+
 
 
 

@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
-    apportionment::{ApportionmentError, ApportionmentResult, apportionment},
+    apportionment::{ApportionmentError, SeatAssignmentResult, seat_assignment},
     authentication::Coordinator,
     data_entry::{
         repository::{PollingStationDataEntries, PollingStationResultsEntries},
@@ -18,14 +18,14 @@ use crate::{
     summary::ElectionSummary,
 };
 
-/// Election details response, including the election's candidate list (political groups) and its polling stations
+/// Election apportionment response, including the seat assignment, candidate nomination and election summary
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionApportionmentResponse {
-    pub apportionment: ApportionmentResult,
+    pub seat_assignment: SeatAssignmentResult,
     pub election_summary: ElectionSummary,
 }
 
-/// Get the seat allocation for an election
+/// Get the apportionment for an election
 #[utoipa::path(
   post,
   path = "/api/elections/{election_id}/apportionment",
@@ -59,9 +59,9 @@ pub async fn election_apportionment(
             .list_with_polling_stations(polling_stations_repo, election.id)
             .await?;
         let election_summary = ElectionSummary::from_results(&election, &results)?;
-        let apportionment = apportionment(election.number_of_seats.into(), &election_summary)?;
+        let seat_assignment = seat_assignment(election.number_of_seats, &election_summary)?;
         Ok(Json(ElectionApportionmentResponse {
-            apportionment,
+            seat_assignment,
             election_summary,
         }))
     } else {

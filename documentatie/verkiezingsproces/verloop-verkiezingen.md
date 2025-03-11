@@ -49,7 +49,7 @@ Voor de processen-verbaal (PV's) zijn de volgende modellen beschikbaar:
 Modellen zijn vernoemd naar de desbetreffende artikelen in de [Kieswet]. De
 modellen zijn te vinden op de pagina [Modellen] van de Verkiezingentoolkit.
 
-[Kieswet]: https://wetten.overheid.nl/BWBR0004627/2023-06-20
+[Kieswet]: https://wetten.overheid.nl/BWBR0004627/
 [Modellen]:
     https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen
 

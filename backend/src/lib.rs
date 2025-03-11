@@ -109,12 +109,6 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             authentication::extend_session,
         ));
 
-    #[cfg(debug_assertions)]
-    let user_routes = user_routes.route(
-        "/development/create",
-        post(authentication::development_create_user),
-    );
-
     let audit_log_routes = Router::new().route("/", get(audit_log::audit_log_list));
 
     let app = Router::new()
@@ -196,13 +190,15 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
-                apportionment::DisplayFraction,
-                apportionment::ApportionmentResult,
-                apportionment::PoliticalGroupStanding,
-                apportionment::ApportionmentStep,
                 apportionment::AssignedSeat,
+                apportionment::CandidateNominationResult,
+                apportionment::DisplayFraction,
                 apportionment::LargestAverageAssignedSeat,
                 apportionment::LargestRemainderAssignedSeat,
+                apportionment::PoliticalGroupCandidateNomination,
+                apportionment::PoliticalGroupStanding,
+                apportionment::SeatAssignmentResult,
+                apportionment::SeatAssignmentStep,
                 audit_log::AuditLogListResponse,
                 audit_log::Pagination,
                 authentication::Credentials,
@@ -243,6 +239,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             ),
         ),
         tags(
+            (name = "apportionment", description = "Election apportionment API"),
             (name = "authentication", description = "Authentication and user API"),
             (name = "election", description = "Election API"),
             (name = "polling_station", description = "Polling station API"),

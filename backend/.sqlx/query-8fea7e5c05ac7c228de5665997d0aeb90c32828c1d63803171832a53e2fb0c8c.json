@@ -1,0 +1,68 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO audit_log (event, event_name, event_type, message, workstation, user_id, username, ip)\n            VALUES (?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_type as \"event_type: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                username,\n                ip as \"ip: String\"\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "time: _",
+        "ordinal": 1,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "event: serde_json::Value",
+        "ordinal": 2,
+        "type_info": "Null"
+      },
+      {
+        "name": "event_type: _",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "message",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "workstation: _",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "user_id: u32",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "username",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "ip: String",
+        "ordinal": 8,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "8fea7e5c05ac7c228de5665997d0aeb90c32828c1d63803171832a53e2fb0c8c"
+}

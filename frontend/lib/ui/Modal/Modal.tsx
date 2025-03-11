@@ -41,6 +41,7 @@ export function Modal({ title, onClose, children }: ModalProps): ReactNode {
             title={t("cancel")}
             size="lg"
             variant="tertiary"
+            type="button"
           />
         )}
         <div className={cls["modal-body"]}>

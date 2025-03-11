@@ -127,7 +127,9 @@ where
         };
 
         let user = users.get_by_session_key(session_cookie.value()).await?;
+
         user.update_last_activity_at(&users).await?;
+
         Ok(user)
     }
 }
@@ -388,7 +390,7 @@ impl Users {
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
-            FROM users WHERE username = ?
+            FROM users WHERE username = ? COLLATE NOCASE
             "#,
             username
         )
@@ -541,6 +543,14 @@ mod tests {
 
         let authenticated_user = users
             .authenticate("test_user", "TotallyValidP4ssW0rd")
+            .await
+            .unwrap();
+
+        assert_eq!(user, authenticated_user);
+
+        // Username should be case insensitive
+        let authenticated_user = users
+            .authenticate("Test_User", "TotallyValidP4ssW0rd")
             .await
             .unwrap();
 

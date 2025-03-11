@@ -16,6 +16,8 @@ export interface InputGridRowProps {
   errorMessageId?: string;
   addSeparator?: boolean;
   autoFocusInput?: boolean;
+  value?: string | number;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function InputGridRow({
@@ -31,6 +33,8 @@ export function InputGridRow({
   errorMessageId,
   addSeparator,
   autoFocusInput,
+  value,
+  onChange,
 }: InputGridRowProps) {
   const errors = errorsAndWarnings?.get(id)?.errors;
   const warnings = errorsAndWarnings?.get(id)?.warnings;
@@ -49,6 +53,8 @@ export function InputGridRow({
           name={name || id}
           defaultValue={defaultValue}
           autoFocus={autoFocusInput}
+          value={value}
+          onChange={onChange}
           aria-labelledby={`field-${id} title-${id}`}
           aria-invalid={!!errorMessageId || hasError || (hasWarning && !warningsAccepted) ? "true" : "false"}
           aria-errormessage={

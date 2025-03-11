@@ -8,10 +8,10 @@ test.describe("authentication", () => {
     await page.getByLabel("Wachtwoord").fill("AdminPassword01");
     await page.getByRole("button", { name: "Inloggen" }).click();
 
-    await page.waitForURL("/account/setup");
+    await page.waitForURL("/elections");
 
     // TODO: use new page object when we know which page to render
-    await expect(page.getByRole("alert")).toContainText("Inloggen gelukt");
+    await expect(page.getByText("Sanne Molenaar(Beheerder)")).toBeVisible();
   });
 
   test("login unhappy path", async ({ page }) => {

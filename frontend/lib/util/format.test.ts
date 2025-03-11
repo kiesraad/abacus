@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { t } from "@kiesraad/i18n";
 
-import { deformatNumber, formatDateTime, formatNumber, validateNumberString } from "./format";
+import { deformatNumber, formatDateTime, formatNumber, formatTimeToGo, validateNumberString } from "./format";
 
 describe("Format util", () => {
   test.each([
@@ -65,5 +65,20 @@ describe("Format util", () => {
     [one_week_ago, `${one_week_ago.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} 10:20`],
   ])("Date format string %s as %s", (input: Date, expected: string) => {
     expect(formatDateTime(input)).toEqual(expected);
+  });
+
+  test.each([
+    [0, ""],
+    [0.6, "1 seconde"],
+    [1, "1 seconde"],
+    [10, "10 seconden"],
+    [60, "1 minuut"],
+    [61, "1 minuut en 1 seconde"],
+    [70, "1 minuut en 10 seconden"],
+    [1000, "16 minuten en 40 seconden"],
+    [1337 * 60, "1337 minuten"],
+    [1337 * 60 + 42, "1337 minuten en 42 seconden"],
+  ])("Time to go %s formatted as %s", (input: number, expected: string) => {
+    expect(formatTimeToGo(input)).toBe(expected);
   });
 });

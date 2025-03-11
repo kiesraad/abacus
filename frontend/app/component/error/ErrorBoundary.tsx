@@ -11,8 +11,7 @@ export function ErrorBoundary() {
   // redirect to login page if the user is not authenticated
   if (error instanceof ApiError && error.code === 401) {
     // redirect to login page
-    // TODO: add state to show session expiration warning message when redirecting to login page
-    return <Navigate to="/account/login" />;
+    return <Navigate to="/account/login" state={{ unauthorized: true }} />;
   }
 
   // debug print the error to the console

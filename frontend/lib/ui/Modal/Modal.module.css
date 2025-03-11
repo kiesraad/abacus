@@ -57,3 +57,10 @@
     }
   }
 }
+
+.no-flex {
+  p {
+    display: block;
+    margin-bottom: 2rem;
+  }
+}

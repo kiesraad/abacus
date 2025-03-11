@@ -306,7 +306,7 @@ mod tests {
             candidate_votes_numbers,
             test_helpers::election_summary_fixture_with_given_candidate_votes,
         },
-        election::tests::election_fixture_with_given_number_of_seats,
+        election::{Candidate, tests::election_fixture_with_given_number_of_seats},
     };
     use test_log::test;
 
@@ -483,26 +483,26 @@ mod tests {
 
     /// Candidate nomination with more candidates eligible for preferential nomination than seats
     ///
-    /// PG seats: [6, 5, 4, 2, 2]
-    /// PG 1: Preferential candidate nominations of candidates 1, 2, 3, 4, 5 and 6 no other candidate nominations  
-    /// PG 2: Preferential candidate nomination of candidates 1, 2, 3, 4 and 5 and no other candidate nominations  
-    ///  Candidate 6 also meets the preferential threshold but does not get a seat  
-    /// PG 3: Preferential candidate nomination of candidate 1, 2, 3 and 4 and no other candidate nominations  
-    ///  Candidates 5 and 6 also meet the preferential threshold but do not get seats  
-    /// PG 4: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations
-    ///  Candidates 3, 4, 5 and 6 also meet the preferential threshold but do not get seats  
-    /// PG 5: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations
-    ///  Candidates 3, 4, 5 and 6 also meet the preferential threshold but do not get seats  
+    /// PG seats: [6, 5, 4, 2, 2]  
+    /// PG 1: Preferential candidate nominations of candidates 1, 3, 4, 5, 6 and 7 no other candidate nominations  
+    /// PG 2: Preferential candidate nomination of candidates 1, 2, 4, 5 and 6 and no other candidate nominations  
+    ///       Candidate 7 also meets the preferential threshold but does not get a seat  
+    /// PG 3: Preferential candidate nomination of candidate 1, 2, 3 and 5 and no other candidate nominations  
+    ///       Candidates 6 and 7 also meet the preferential threshold but do not get seats  
+    /// PG 4: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations  
+    ///       Candidates 3, 4, 6 and 7 also meet the preferential threshold but do not get seats  
+    /// PG 5: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations  
+    ///       Candidates 4, 5 and 7 also meet the preferential threshold but do not get seats  
     #[test]
     fn test_with_ge_19_seats_and_more_candidates_eligible_for_preferential_nomination_than_seats() {
-        let election = election_fixture_with_given_number_of_seats(&[6, 6, 6, 6, 6], 19);
-        let quota = Fraction::new(9580, 19);
+        let election = election_fixture_with_given_number_of_seats(&[7, 7, 7, 7, 7], 19);
+        let quota = Fraction::new(9500, 19);
         let totals = election_summary_fixture_with_given_candidate_votes(vec![
-            vec![500, 500, 500, 500, 500, 500],
-            vec![400, 400, 400, 400, 400, 399],
-            vec![300, 300, 300, 300, 299, 298],
-            vec![200, 200, 199, 198, 197, 196],
-            vec![200, 200, 199, 199, 198, 198],
+            vec![500, 0, 500, 500, 500, 500, 500],
+            vec![400, 400, 0, 400, 400, 400, 399],
+            vec![300, 300, 300, 0, 300, 299, 298],
+            vec![200, 200, 199, 198, 0, 197, 196],
+            vec![200, 200, 199, 198, 198, 119, 0],
         ]);
         let result = candidate_nomination(&election, quota, &totals, vec![6, 5, 4, 2, 2]).unwrap();
         assert_eq!(result.preference_threshold_percentage, 25);
@@ -510,89 +510,103 @@ mod tests {
             result.preference_threshold,
             quota * Fraction::new(result.preference_threshold_percentage, 100)
         );
+        let pg_0_preferential_nominated_candidate_numbers = vec![1, 3, 4, 5, 6, 7];
         assert_eq!(
             candidate_votes_numbers(
                 &result.political_group_candidate_nomination[0].preferential_candidate_nomination
             ),
-            vec![1, 2, 3, 4, 5, 6]
+            pg_0_preferential_nominated_candidate_numbers
+        );
+        let pg_0_other_nominated_candidate_numbers = vec![];
+        assert_eq!(
+            candidate_votes_numbers(
+                &result.political_group_candidate_nomination[0].other_candidate_nomination
+            ),
+            pg_0_other_nominated_candidate_numbers
         );
         assert_eq!(
-            result.political_group_candidate_nomination[0]
-                .other_candidate_nomination
-                .len(),
-            0
+            candidate_numbers(
+                &result.political_group_candidate_nomination[0].updated_candidate_ranking
+            ),
+            vec![1, 3, 4, 5, 6, 7, 2]
         );
-        assert_eq!(
-            result.political_group_candidate_nomination[0]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
+
+        let pg_1_preferential_nominated_candidate_numbers = vec![1, 2, 4, 5, 6];
         assert_eq!(
             candidate_votes_numbers(
                 &result.political_group_candidate_nomination[1].preferential_candidate_nomination
             ),
-            vec![1, 2, 3, 4, 5]
+            pg_1_preferential_nominated_candidate_numbers
+        );
+        let pg_1_other_nominated_candidate_numbers = vec![];
+        assert_eq!(
+            candidate_votes_numbers(
+                &result.political_group_candidate_nomination[1].other_candidate_nomination
+            ),
+            pg_1_other_nominated_candidate_numbers
         );
         assert_eq!(
-            result.political_group_candidate_nomination[1]
-                .other_candidate_nomination
-                .len(),
-            0
+            candidate_numbers(
+                &result.political_group_candidate_nomination[1].updated_candidate_ranking
+            ),
+            vec![1, 2, 4, 5, 6, 7, 3]
         );
-        assert_eq!(
-            result.political_group_candidate_nomination[1]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
+
+        let pg_2_preferential_nominated_candidate_numbers = vec![1, 2, 3, 5];
         assert_eq!(
             candidate_votes_numbers(
                 &result.political_group_candidate_nomination[2].preferential_candidate_nomination
             ),
-            vec![1, 2, 3, 4]
+            pg_2_preferential_nominated_candidate_numbers
+        );
+        let pg_2_other_nominated_candidate_numbers = vec![];
+        assert_eq!(
+            candidate_votes_numbers(
+                &result.political_group_candidate_nomination[2].other_candidate_nomination
+            ),
+            pg_2_other_nominated_candidate_numbers
         );
         assert_eq!(
-            result.political_group_candidate_nomination[2]
-                .other_candidate_nomination
-                .len(),
-            0
+            candidate_numbers(
+                &result.political_group_candidate_nomination[2].updated_candidate_ranking
+            ),
+            vec![1, 2, 3, 5, 6, 7, 4]
         );
-        assert_eq!(
-            result.political_group_candidate_nomination[2]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
+
+        let pg_3_preferential_nominated_candidate_numbers = vec![1, 2];
         assert_eq!(
             candidate_votes_numbers(
                 &result.political_group_candidate_nomination[3].preferential_candidate_nomination
             ),
-            vec![1, 2]
+            pg_3_preferential_nominated_candidate_numbers
+        );
+        let pg_3_other_nominated_candidate_numbers = vec![];
+        assert_eq!(
+            candidate_votes_numbers(
+                &result.political_group_candidate_nomination[3].other_candidate_nomination
+            ),
+            pg_3_other_nominated_candidate_numbers
         );
         assert_eq!(
-            result.political_group_candidate_nomination[3]
-                .other_candidate_nomination
-                .len(),
-            0
+            candidate_numbers(
+                &result.political_group_candidate_nomination[3].updated_candidate_ranking
+            ),
+            vec![1, 2, 3, 4, 6, 7, 5]
         );
-        assert_eq!(
-            result.political_group_candidate_nomination[3]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
+
+        let pg_4_preferential_nominated_candidate_numbers = vec![1, 2];
         assert_eq!(
             candidate_votes_numbers(
                 &result.political_group_candidate_nomination[4].preferential_candidate_nomination
             ),
-            vec![1, 2]
+            pg_4_preferential_nominated_candidate_numbers
         );
+        let pg_4_other_nominated_candidate_numbers = vec![];
         assert_eq!(
-            result.political_group_candidate_nomination[4]
-                .other_candidate_nomination
-                .len(),
-            0
+            candidate_votes_numbers(
+                &result.political_group_candidate_nomination[4].other_candidate_nomination
+            ),
+            pg_4_other_nominated_candidate_numbers
         );
         assert_eq!(
             result.political_group_candidate_nomination[4]
@@ -600,50 +614,134 @@ mod tests {
                 .len(),
             0
         );
-        let pgs = election.political_groups.unwrap_or_default();
+
+        let pgs = election.political_groups.clone().unwrap_or_default();
+        let pg_0_chosen_candidates: Vec<Candidate> = pgs[0]
+            .candidates
+            .iter()
+            .filter(|&c| {
+                pg_0_preferential_nominated_candidate_numbers.contains(&c.number)
+                    || pg_0_other_nominated_candidate_numbers.contains(&c.number)
+            })
+            .cloned()
+            .collect();
+        let pg_0_not_chosen_candidates: Vec<Candidate> = pgs[0]
+            .candidates
+            .iter()
+            .filter(|&c| !pg_0_chosen_candidates.contains(c))
+            .cloned()
+            .collect();
         assert!(
-            pgs[0]
-                .candidates
+            pg_0_chosen_candidates
                 .iter()
                 .all(|item| result.chosen_candidates.contains(item))
         );
         assert!(
-            pgs[1].candidates[..4]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[1].candidates[5..]
+            pg_0_not_chosen_candidates
                 .iter()
                 .all(|item| !result.chosen_candidates.contains(item))
         );
+
+        let pg_1_chosen_candidates: Vec<Candidate> = pgs[1]
+            .candidates
+            .iter()
+            .filter(|&c| {
+                pg_1_preferential_nominated_candidate_numbers.contains(&c.number)
+                    || pg_1_other_nominated_candidate_numbers.contains(&c.number)
+            })
+            .cloned()
+            .collect();
+        let pg_1_not_chosen_candidates: Vec<Candidate> = pgs[1]
+            .candidates
+            .iter()
+            .filter(|&c| !pg_1_chosen_candidates.contains(c))
+            .cloned()
+            .collect();
         assert!(
-            pgs[2].candidates[..3]
+            pg_1_chosen_candidates
                 .iter()
                 .all(|item| result.chosen_candidates.contains(item))
         );
         assert!(
-            pgs[2].candidates[4..]
+            pg_1_not_chosen_candidates
                 .iter()
                 .all(|item| !result.chosen_candidates.contains(item))
         );
+
+        let pg_2_chosen_candidates: Vec<Candidate> = pgs[2]
+            .candidates
+            .iter()
+            .filter(|&c| {
+                pg_2_preferential_nominated_candidate_numbers.contains(&c.number)
+                    || pg_2_other_nominated_candidate_numbers.contains(&c.number)
+            })
+            .cloned()
+            .collect();
+        let pg_2_not_chosen_candidates: Vec<Candidate> = pgs[2]
+            .candidates
+            .iter()
+            .filter(|&c| !pg_2_chosen_candidates.contains(c))
+            .cloned()
+            .collect();
         assert!(
-            pgs[3].candidates[..1]
+            pg_2_chosen_candidates
                 .iter()
                 .all(|item| result.chosen_candidates.contains(item))
         );
         assert!(
-            pgs[3].candidates[2..]
+            pg_2_not_chosen_candidates
                 .iter()
                 .all(|item| !result.chosen_candidates.contains(item))
         );
+
+        let pg_3_chosen_candidates: Vec<Candidate> = pgs[3]
+            .candidates
+            .iter()
+            .filter(|&c| {
+                pg_3_preferential_nominated_candidate_numbers.contains(&c.number)
+                    || pg_3_other_nominated_candidate_numbers.contains(&c.number)
+            })
+            .cloned()
+            .collect();
+        let pg_3_not_chosen_candidates: Vec<Candidate> = pgs[3]
+            .candidates
+            .iter()
+            .filter(|&c| !pg_3_chosen_candidates.contains(c))
+            .cloned()
+            .collect();
         assert!(
-            pgs[4].candidates[..1]
+            pg_3_chosen_candidates
                 .iter()
                 .all(|item| result.chosen_candidates.contains(item))
         );
         assert!(
-            pgs[4].candidates[2..]
+            pg_3_not_chosen_candidates
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+
+        let pg_4_chosen_candidates: Vec<Candidate> = pgs[4]
+            .candidates
+            .iter()
+            .filter(|&c| {
+                pg_4_preferential_nominated_candidate_numbers.contains(&c.number)
+                    || pg_4_other_nominated_candidate_numbers.contains(&c.number)
+            })
+            .cloned()
+            .collect();
+        let pg_4_not_chosen_candidates: Vec<Candidate> = pgs[4]
+            .candidates
+            .iter()
+            .filter(|&c| !pg_4_chosen_candidates.contains(c))
+            .cloned()
+            .collect();
+        assert!(
+            pg_4_chosen_candidates
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pg_4_not_chosen_candidates
                 .iter()
                 .all(|item| !result.chosen_candidates.contains(item))
         );

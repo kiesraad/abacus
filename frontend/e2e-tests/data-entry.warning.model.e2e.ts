@@ -26,8 +26,7 @@ import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } f
 
 const dataEntryMachineDefinition = {
   // TODOs
-  // - fill in valid data, retyrn and change into error
-  // - nav to polling station page, nav to elections page
+  // - fill in valid data, retyrn and change into warning
 
   initial: "voterVotesPageEmpty",
   states: {
@@ -54,13 +53,16 @@ const dataEntryMachineDefinition = {
         CHANGE_TO_ERROR_AND_SUBMIT: "votersVotesPageError",
         GO_TO_RECOUNTED_PAGE: "recountedPageWarning",
         CLICK_ABORT: "abortInputModalWarning",
+        NAV_TO_POLLING_STATION_PAGE: "abortInputModalWarning",
       },
     },
     voterVotesPageWarningAccepted: {
       on: {
         SUBMIT: "differencesPageWarningAccepted",
+        UNACCEPT_WARNING: "votersVotesPageWarningUnaccepted",
       },
     },
+    votersVotesPageWarningUnaccepted: {},
     voterVotesPageWarningCorrected: {
       on: {
         SUBMIT: "differencesPageCorrected",
@@ -78,8 +80,12 @@ const dataEntryMachineDefinition = {
       },
     },
     pollingStationsPageDiscarded: {},
-    differencesPageWarningAccepted: {},
-    differencesPageCorrected: {},
+    differencesPageWarningAccepted: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageWarningAccepted",
+      },
+    },
+    differencesPageCorrected: {}, // return and change to warning? or valid then warning?
     votersVotesPageWarningReminder: {
       on: {
         ACCEPT_WARNING: "voterVotesPageWarningAccepted",
@@ -144,7 +150,7 @@ test.describe("Data entry model test", () => {
     .getSimplePaths()
     .forEach((path) => {
       // eslint-disable-next-line playwright/valid-title
-      test(path.description, async ({ page, pollingStation /*election*/ }) => {
+      test(path.description, async ({ page, pollingStation, election }) => {
         const pollingStationChoicePage = new PollingStationChoicePage(page);
         const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -208,6 +214,14 @@ test.describe("Data entry model test", () => {
             await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
             await expect(votersAndVotesPage.acceptWarnings).toBeChecked();
           },
+          votersVotesPageWarningUnaccepted: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.warning).toContainText(
+              "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
+            );
+            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+            await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
+          },
           votersVotesPageWarningReminder: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
@@ -259,6 +273,9 @@ test.describe("Data entry model test", () => {
             // Tab press needed for page to register change after Playwright's fill()
             await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
           },
+          UNACCEPT_WARNING: async () => {
+            await votersAndVotesPage.acceptWarnings.uncheck();
+          },
           CHANGE_TO_ERROR_AND_SUBMIT: async () => {
             await votersAndVotesPage.inputVotersCounts(votersError);
             // Tab press needed for page to register change after Playwright's fill()
@@ -270,6 +287,9 @@ test.describe("Data entry model test", () => {
           },
           CLICK_ABORT: async () => {
             await votersAndVotesPage.abortInput.click();
+          },
+          NAV_TO_POLLING_STATION_PAGE: async () => {
+            await votersAndVotesPage.clickElectionInNavBar(election.election.location, election.election.name);
           },
         };
 
@@ -283,7 +303,11 @@ test.describe("Data entry model test", () => {
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
         };
-        const differencesPageEvents = {};
+        const differencesPageEvents = {
+          GO_TO_VOTERS_VOTES_PAGE: async () => {
+            await differencesPage.navPanel.votersAndVotes.click();
+          },
+        };
 
         const abortInputModalStates = {
           pollingStationsPageWarningSaved: async () => {

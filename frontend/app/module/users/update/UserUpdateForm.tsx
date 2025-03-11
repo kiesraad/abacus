@@ -13,8 +13,6 @@ import { t } from "@kiesraad/i18n";
 import { IconPencil } from "@kiesraad/icon";
 import { Alert, Button, Form, FormLayout, InputField } from "@kiesraad/ui";
 
-import { MIN_PASSWORD_LENGTH } from "../validatePassword";
-
 export interface UserUpdateFormProps {
   user: User;
   onSaved: (user: User) => void;
@@ -108,7 +106,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
                 id="temp_password"
                 name="temp_password"
                 label={t("users.new_password")}
-                hint={t("users.temporary_password_hint", { min_length: MIN_PASSWORD_LENGTH })}
+                hint={t("users.temporary_password_hint")}
                 error={validationErrors?.temp_password}
               />
             ) : (

@@ -109,12 +109,6 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             authentication::extend_session,
         ));
 
-    #[cfg(debug_assertions)]
-    let user_router = user_router.route(
-        "/development/create",
-        post(authentication::development_create_user),
-    );
-
     let app = Router::new()
         .nest("/api/user", user_router)
         .nest("/api/elections", election_routes)

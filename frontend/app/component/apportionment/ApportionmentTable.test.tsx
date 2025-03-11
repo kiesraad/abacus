@@ -4,17 +4,17 @@ import { PoliticalGroup } from "@kiesraad/api";
 import { render, screen } from "@kiesraad/test";
 
 import { ApportionmentTable } from "./ApportionmentTable";
-import { apportionment, election } from "./test-data/19-or-more-seats";
+import { election, seat_assignment } from "./test-data/19-or-more-seats";
 
 describe("ApportionmentTable", () => {
   test("renders a table with the apportionment", async () => {
     render(
       <ApportionmentTable
-        finalStanding={apportionment.final_standing}
+        finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
-        fullSeats={apportionment.full_seats}
-        residualSeats={apportionment.residual_seats}
-        seats={apportionment.seats}
+        fullSeats={seat_assignment.full_seats}
+        residualSeats={seat_assignment.residual_seats}
+        seats={seat_assignment.seats}
       />,
     );
 

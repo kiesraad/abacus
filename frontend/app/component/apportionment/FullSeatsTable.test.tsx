@@ -3,15 +3,15 @@ import { describe, expect, test } from "vitest";
 import { render, screen } from "@kiesraad/test";
 
 import { FullSeatsTable } from "./FullSeatsTable";
-import { apportionment, election } from "./test-data/19-or-more-seats";
+import { election, seat_assignment } from "./test-data/19-or-more-seats";
 
 describe("FullSeatsTable", () => {
   test("renders a table with the full seats assignment", async () => {
     render(
       <FullSeatsTable
-        finalStanding={apportionment.final_standing}
+        finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups!}
-        quota={apportionment.quota}
+        quota={seat_assignment.quota}
       />,
     );
 

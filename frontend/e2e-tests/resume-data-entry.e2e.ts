@@ -49,6 +49,28 @@ test.describe("resume data entry flow", () => {
     return new AbortInputModal(page);
   };
 
+  test.describe("abort data entry", () => {
+    test("Closing abort modal with X only closes the modal", async ({ page, pollingStation }) => {
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+      const recountedPage = new RecountedPage(page);
+      await recountedPage.no.click();
+      await recountedPage.abortInput.click();
+
+      const abortInputModal = new AbortInputModal(page);
+
+      let requestMade = false;
+      page.on("request", (request) => {
+        if (request.url().includes("/api/polling_stations")) {
+          requestMade = true;
+        }
+      });
+      await abortInputModal.close.click();
+      expect(requestMade).toBe(false);
+
+      await expect(recountedPage.no).toBeChecked();
+    });
+  });
+
   test.describe("resume after saving", () => {
     test("resuming data entry shows previous data", async ({ page, pollingStation }) => {
       const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation);

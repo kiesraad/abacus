@@ -10,7 +10,7 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
     maxLength: 9,
     autoComplete: "off",
     ...inputProps,
-    defaultValue: inputProps.defaultValue ? formatNumber(inputProps.defaultValue) : "",
+    defaultValue: inputProps.defaultValue ? formatNumber(inputProps.defaultValue) : undefined,
     type: "text",
   };
 
@@ -27,7 +27,7 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
       {...props}
       onPaste={onPaste}
       onFocus={onFocus}
-      onBlur={onBlur}
+      onBlur={onBlur(props.onChange)}
       onKeyDown={onKeyDown}
       id={id}
       name={props.name || id}
@@ -49,10 +49,20 @@ function onFocus(event: React.FocusEvent<HTMLInputElement>) {
     input.setSelectionRange(0, event.currentTarget.value.length);
   }
 }
-//format number on blur
-function onBlur(event: React.FocusEvent<HTMLInputElement>) {
-  if (event.target.value === "") return;
-  event.target.value = formatNumber(event.target.value);
+//format number on blur and call onChange if provided
+function onBlur(onChange?: React.ChangeEventHandler<HTMLInputElement>) {
+  return function (event: React.FocusEvent<HTMLInputElement>) {
+    if (event.target.value === "") return;
+    const oldValue = event.target.value;
+    const newValue = formatNumber(event.target.value);
+    event.target.value = newValue;
+    if (onChange) {
+      //only call onChange if the value has changed
+      if (oldValue !== newValue) {
+        onChange(event);
+      }
+    }
+  };
 }
 
 //only accept numbers

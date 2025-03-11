@@ -43,13 +43,14 @@ __Uitbreidingen:__
 - Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier?
     - Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
     - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijst importeren.
-- Als het niet mogelijk is het digitale bestand te importeren, kan het CSB dan contact opnemen met het GSB om te proberen het probleem te verhelpen?
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
 
 
 ## Het CSB voert de tellingen van het GSB in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
+
+### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__  
 
@@ -61,13 +62,17 @@ __Hoofdscenario:__
 __Uitbreidingen:__
 
 1a. Het is niet mogelijk het digitale bestand te importeren:  
-&emsp;1a1. Het CSB doet de eerste invoer handmatig.
+&emsp;1a1. Het CSB lost in overleg met het GSB het probleem op en importeert alsnog het bestand.  
+&emsp;1a1a. Het CSB slaagt er niet in het probleem op te lossen:  
+&emsp;&emsp;1a1a1. Het CSB doet de eerste invoer handmatig.
 
 3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 3a1. De coördinator vergelijkt de eerste en tweede invoer met het papieren PV.  
 &emsp; 3a2. De coördinator stelt vast dat de tweede (handmatige) invoer correct is.  
-&emsp;&emsp; 3a2a. De coördinator stelt vast dat de tweede (handmatige) invoer niet correct is:  
-&emsp;&emsp;&emsp; 3a2a1. De coördinator gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
+&emsp;&emsp;3a2a. De coördinator stelt vast dat de tweede (handmatige) invoer niet correct is en het digitale bestand correct is:  
+&emsp;&emsp;&emsp;3a2a1. De coördinator gooit de tweede (handmatige) invoer weg en laat die opnieuw invoeren.  
+&emsp;&emsp;3a2b. De coördinator stelt vast dat zowel de tweede (handmatige) invoer als het digitale bestand niet correct zijn:  
+&emsp;&emsp;&emsp;3a2b1. De coördinator gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
 &emsp; 3a3. De coördinator markeert de tweede (handmatige) invoer als correct en gooit de andere invoer weg.
 &emsp; 3a4. De coördinator geeft het PV aan een invoerder om nogmaals in te voeren.
 

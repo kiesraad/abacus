@@ -71,10 +71,6 @@ components:
   - name: "(Frontend) app/component/form/data_entry"
     include:
       - ".*/frontend/app/component/form/data_entry/.*"
-      - ".*/frontend/app/component/form/testHelperFunctions.ts"
-      - ".*/frontend/app/component/form/useWatchForChanges.test.ts"
-      - ".*/frontend/app/component/form/useWatchForChanges.ts"
-      - ".*/frontend/app/component/pollingstation/.*"
   - name: "(Frontend) app/component/form/polling_station"
     include:
       - ".*/frontend/app/component/form/polling_station/.*"
@@ -176,6 +172,7 @@ languages:
       - ".*[.]e2e[.]ts"
       - ".*.stories[.]tsx"
       - ".*/test-data/.*[.]ts"
+      - ".*/test[.]utils[.]ts"
     generated:
       include:
       - ".*/gen/.*[.]ts"

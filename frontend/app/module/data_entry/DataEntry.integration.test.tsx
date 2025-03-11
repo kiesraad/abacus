@@ -1,8 +1,8 @@
-import { render as rtlRender } from "@testing-library/react";
-import { userEvent } from "@testing-library/user-event";
+import { render as rtlRender, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { errorWarningMocks } from "app/component/form/testHelperFunctions";
+import { errorWarningMocks } from "app/component/form/data_entry/test.util";
 import { routes } from "app/routes";
 
 import { SaveDataEntryResponse } from "@kiesraad/api";
@@ -24,7 +24,6 @@ import {
   setupTestRouter,
   userTypeInputs,
   waitFor,
-  within,
 } from "@kiesraad/test";
 
 function renderWithRouter() {
@@ -501,19 +500,16 @@ describe("Polling Station data entry integration tests", () => {
       await expectDifferencesForm();
       await fillDifferencesForm();
       await submit();
-
       for (const pg of electionMockData.political_groups) {
         await expectPoliticalGroupCandidatesForm(pg.number);
         await fillPoliticalGroupCandidatesVotesForm();
         await submit();
       }
-
       await expectCheckAndSavePage(router);
       await expectElementContainsIcon("list-item-save", "je bent hier");
       await gotoForm("recounted");
       await expectElementContainsIcon("list-item-save", "nog niet afgerond");
       await fillRecountedFormYes();
-
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [errorWarningMocks.F301], warnings: [] },
       } as SaveDataEntryResponse);
@@ -528,13 +524,14 @@ describe("Polling Station data entry integration tests", () => {
       await expectRecountedForm();
       await fillRecountedFormNo();
       await submit();
+
       await expectVotersAndVotesForm();
       await fillVotersAndVotesForm();
       await submit();
+
       await expectDifferencesForm();
       await gotoForm("voters_and_votes");
       await expectElementContainsIcon("list-item-differences", "nog niet afgerond");
-
       await gotoForm("differences");
       await fillDifferencesForm();
       await submit();
@@ -548,7 +545,6 @@ describe("Polling Station data entry integration tests", () => {
       await expectCheckAndSavePage(router);
       await expectElementContainsIcon("list-item-recounted", "opgeslagen");
       await expectElementContainsIcon("list-item-differences", "leeg");
-
       await gotoForm("voters_and_votes");
       await expectElementContainsIcon("list-item-voters-and-votes", "je bent hier");
       await fillVotersAndVotesForm({
@@ -560,7 +556,6 @@ describe("Polling Station data entry integration tests", () => {
       await submit();
       await expectDifferencesForm(false);
       await fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 });
-
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W302] },
       } as SaveDataEntryResponse);
@@ -568,20 +563,18 @@ describe("Polling Station data entry integration tests", () => {
       await expectFeedbackWarning("W.302");
       await acceptWarnings();
       await submit();
-
       await expectPoliticalGroupCandidatesForm(1);
       await expectElementContainsIcon("list-item-differences", "opgeslagen");
-
       await gotoForm("voters_and_votes");
       await userTypeInputs(user, {
         total_admitted_voters_count: 1,
       });
-
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [errorWarningMocks.F201], warnings: [] },
       } as SaveDataEntryResponse);
       await submit();
       await expectVotersAndVotesForm(false);
+      await expectFeedbackError("F.201");
       await gotoForm("differences", false);
       await expectElementContainsIcon("list-item-voters-and-votes", "bevat een fout");
     });

@@ -71,13 +71,15 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
         const client = new ApiClient();
         const response = await client.getRequest<LoginResponse>(path, abortController);
 
-        if (isSuccess(response)) {
-          setUser(response.data);
-        } else {
-          setUser(null);
-        }
+        if (!abortController.signal.aborted) {
+          if (isSuccess(response)) {
+            setUser(response.data);
+          } else {
+            setUser(null);
+          }
 
-        setLoading(false);
+          setLoading(false);
+        }
       })();
 
       return () => {

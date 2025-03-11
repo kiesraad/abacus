@@ -1,24 +1,37 @@
 import { FormEvent, useState } from "react";
 
-import { UpdateUserRequest, User } from "@kiesraad/api";
+import {
+  AnyApiError,
+  ApiError,
+  isSuccess,
+  UpdateUserRequest,
+  useCrud,
+  User,
+  USER_UPDATE_REQUEST_PATH,
+} from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconPencil } from "@kiesraad/icon";
-import { Button, Form, FormLayout, InputField } from "@kiesraad/ui";
+import { Alert, Button, Form, FormLayout, InputField } from "@kiesraad/ui";
 
-import { MIN_PASSWORD_LENGTH, validatePassword } from "../validatePassword";
+import { MIN_PASSWORD_LENGTH } from "../validatePassword";
 
 export interface UserUpdateFormProps {
   user: User;
-  onSave: (userUpdate: UpdateUserRequest) => void;
+  onSaved: (user: User) => void;
   onAbort: () => void;
-  saving: boolean;
 }
 
 type ValidationErrors = Partial<UpdateUserRequest>;
 
-export function UserUpdateForm({ user, onSave, onAbort, saving }: UserUpdateFormProps) {
+export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) {
   const [editPassword, setEditPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>();
+  const { update, requestState } = useCrud<User>(`/api/user/${user.id}` satisfies USER_UPDATE_REQUEST_PATH);
+  const [error, setError] = useState<AnyApiError>();
+
+  if (error && !(error instanceof ApiError)) {
+    throw error;
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,9 +49,8 @@ export function UserUpdateForm({ user, onSave, onAbort, saving }: UserUpdateForm
 
     if (editPassword) {
       userUpdate.temp_password = formData.get("temp_password") as string;
-      const passwordError = validatePassword(userUpdate.temp_password);
-      if (passwordError) {
-        errors.temp_password = passwordError;
+      if (userUpdate.temp_password.length === 0) {
+        errors.temp_password = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
       }
     }
 
@@ -46,12 +58,28 @@ export function UserUpdateForm({ user, onSave, onAbort, saving }: UserUpdateForm
     setValidationErrors(isValid ? undefined : errors);
 
     if (isValid) {
-      onSave(userUpdate);
+      void update(userUpdate).then((result) => {
+        if (isSuccess(result)) {
+          onSaved(result.data);
+        } else if (result instanceof ApiError && result.reference === "PasswordRejection") {
+          setValidationErrors({ temp_password: t("error.api_error.PasswordRejection") });
+        } else {
+          setError(result);
+        }
+      });
     }
   }
 
+  const saving = requestState.status === "loading";
+
   return (
     <>
+      {error && (
+        <FormLayout.Alert>
+          <Alert type="error">{t(`error.api_error.${error.reference}`)}</Alert>
+        </FormLayout.Alert>
+      )}
+
       <Form onSubmit={handleSubmit}>
         <FormLayout width="medium" disabled={saving}>
           <FormLayout.Section title={t("users.details_title")}>

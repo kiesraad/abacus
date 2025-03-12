@@ -20,9 +20,6 @@ import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } f
 // - after changing to warning: abort or go to Recounted
 // - after submitting changed to warning: anything but abort and save
 
-// TODO:
-// - submit valid, return, change to error, nav to recounted, save in popup, discard in popup
-
 const dataEntryMachineDefinition = {
   initial: "voterVotesPageEmpty",
   states: {
@@ -37,6 +34,8 @@ const dataEntryMachineDefinition = {
         GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageWarningSubmitted",
       },
     },
+    recountedPageChangedToWarningSubmitted: {},
+    recountedPageChangedToWarningDiscarded: {},
     pollingStationsPageChangedToWarningSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChangedToWarning",
@@ -88,6 +87,7 @@ const dataEntryMachineDefinition = {
     votersVotesPageChangedToWarning: {
       on: {
         SUBMIT: "votersVotesPageChangedToWarningSubmitted",
+        GO_TO_RECOUNTED_PAGE: "unsavedChangesModalChangedToWarning",
       },
     },
     votersVotesPageChangedToWarningSubmitted: {
@@ -103,6 +103,12 @@ const dataEntryMachineDefinition = {
     votersVotesPageError: {},
     votersVotesPageAfterResumeWarning: {},
     votersVotesPageAfterResumeChangedToWarning: {},
+    unsavedChangesModalChangedToWarning: {
+      on: {
+        SAVE_UNSUBMITTED_CHANGES: "recountedPageChangedToWarningSubmitted",
+        DISCARD_UNSUBMITTED_CHANGES: "recountedPageChangedToWarningDiscarded",
+      },
+    },
     differencesPageWarningAccepted: {
       on: {
         GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageWarningAccepted",
@@ -214,6 +220,16 @@ test.describe("Data entry model test - warnings", () => {
             await expect(recountedPage.no).toBeChecked();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
           },
+          recountedPageChangedToWarningSubmitted: async () => {
+            await expect(recountedPage.fieldset).toBeVisible();
+            await expect(recountedPage.no).toBeChecked();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
+          },
+          recountedPageChangedToWarningDiscarded: async () => {
+            await expect(recountedPage.fieldset).toBeVisible();
+            await expect(recountedPage.no).toBeChecked();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+          },
         };
         const recountedPageEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
@@ -318,6 +334,9 @@ test.describe("Data entry model test - warnings", () => {
           abortInputModalWarning: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
+          unsavedChangesModalChangedToWarning: async () => {
+            await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
+          },
         };
 
         const votersAndVotesPageEvents = {
@@ -365,6 +384,12 @@ test.describe("Data entry model test - warnings", () => {
           },
           NAV_TO_POLLING_STATION_PAGE: async () => {
             await votersAndVotesPage.clickElectionInNavBar(election.election.location, election.election.name);
+          },
+          SAVE_UNSUBMITTED_CHANGES: async () => {
+            await votersAndVotesPage.unsavedChangesModal.saveInput.click();
+          },
+          DISCARD_UNSUBMITTED_CHANGES: async () => {
+            await votersAndVotesPage.unsavedChangesModal.discardInput.click();
           },
         };
 

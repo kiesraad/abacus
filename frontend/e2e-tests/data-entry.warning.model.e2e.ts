@@ -1,13 +1,3 @@
-// transitions
-// empty -> warning
-// valid submitted -> warning
-// error -> warning
-// warning -> accept
-// warning -> correct
-// warning -> error
-// warning -> other warning
-// warning -> submit! -> warning
-// nav, abort, draft
 import { expect } from "@playwright/test";
 import { createTestModel } from "@xstate/graph";
 import {
@@ -25,10 +15,6 @@ import { test } from "./fixtures";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
 
 const dataEntryMachineDefinition = {
-  // TODOs
-  // - in other file: resume data entry on not-latest page with error -> error is shown, because not furthest page
-  // - change warning to different warning; no similar test exists for errors
-
   initial: "voterVotesPageEmpty",
   states: {
     recountedPageWarning: {
@@ -116,7 +102,7 @@ const dataEntryMachineDefinition = {
         GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageValid",
       },
     },
-    differencesPageCorrected: {}, // return and change to warning? or valid then warning?
+    differencesPageCorrected: {},
     votersVotesPageWarningReminder: {
       on: {
         ACCEPT_WARNING: "voterVotesPageWarningAccepted",

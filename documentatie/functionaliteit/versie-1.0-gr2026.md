@@ -25,7 +25,7 @@
 - Invoerders kunnen uitslagen van stembureaus invoeren voor DSO en CSO.
 - Invoerders kunnen het stembureaucorrigendum voor DSO invoeren.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders.
-- Verschillen tussen de twee invoeren oplossen: de coördinator kiest een van beide invoeren en laat herinvoeren.
+- Verschillen tussen de twee invoeren oplossen: de coördinator kiest een van beide invoeren en laat deze herinvoeren.
 - Validatie, consistentiechecks en controleprotocol opmerkelijke uitslagen worden uitgevoerd op de ingevoerde tellingen van stembureaus.
 
 ### Uitslagbepaling GSB
@@ -39,7 +39,7 @@
 
 - De uitslag van het GSB kan worden geïmporteerd als XML-bestand volgens de EML_NL-standaard.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders. Een import van een EML_NL-bestand telt ook als invoer, waardoor nog maar één handmatige invoer nodig is.
-- Verschillen tussen de twee invoeren oplossen: de coördinator kiest een van beide invoeren en laat herinvoeren.
+- Verschillen tussen de twee invoeren oplossen: de coördinator kiest een van beide invoeren en laat deze herinvoeren.
 
 ### Uitslagbepaling CSB
 

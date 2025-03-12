@@ -26,9 +26,8 @@ import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } f
 
 const dataEntryMachineDefinition = {
   // TODOs
-  // - resume data entry on not-latest page with warning -> warning is shown; same works for errors
-  // - change warning to different warning
-  // - edit when warning -> warning disppears !check if covered, make explicit in test
+  // - in other file: resume data entry on not-latest page with error -> error is shown, because not furthest page
+  // - change warning to different warning; no similar test exists for errors
 
   initial: "voterVotesPageEmpty",
   states: {
@@ -77,15 +76,24 @@ const dataEntryMachineDefinition = {
     },
     votersVotesPageValid: {
       on: {
-        FILL_WITH_WARNING: "votersVotesPageValidToWarning",
+        FILL_WITH_WARNING: "votersVotesPageChangedToWarning",
       },
     },
-    votersVotesPageValidToWarning: {
+    votersVotesPageChangedToWarning: {
       on: {
-        SUBMIT: "votersVotesPageWarningEnd",
+        SUBMIT: "votersVotesPageChangedToWarningSubmitted",
       },
     },
-    votersVotesPageWarningEnd: {},
+    votersVotesPageChangedToWarningSubmitted: {
+      on: {
+        ABORT_AND_SAVE: "pollingStationsPageChangedToWarningSaved",
+      },
+    },
+    pollingStationsPageChangedToWarningSaved: {
+      on: {
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChangedToWarning",
+      },
+    },
     abortInputModalWarning: {
       on: {
         SAVE_INPUT: "pollingStationsPageWarningSaved",
@@ -116,6 +124,7 @@ const dataEntryMachineDefinition = {
     },
     votersVotesPageError: {},
     votersVotesPageAfterResumeWarning: {},
+    votersVotesPageAfterResumeChangedToWarning: {},
   },
 };
 
@@ -187,6 +196,12 @@ test.describe("Data entry model test - warnings", () => {
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
+          pollingStationsPageChangedToWarningSaved: async () => {
+            await expect(pollingStationChoicePage.fieldset).toBeVisible();
+            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
+              `${pollingStation.number} - ${pollingStation.name}`,
+            ]);
+          },
           pollingStationsPageDiscarded: async () => {
             await expect(pollingStationChoicePage.fieldset).toBeVisible();
             await expect(pollingStationChoicePage.alertDataEntryInProgress).toBeHidden();
@@ -222,7 +237,7 @@ test.describe("Data entry model test - warnings", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },
-          votersVotesPageValidToWarning: async () => {
+          votersVotesPageChangedToWarning: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
@@ -234,7 +249,7 @@ test.describe("Data entry model test - warnings", () => {
             );
             await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
           },
-          votersVotesPageWarningEnd: async () => {
+          votersVotesPageChangedToWarningSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
@@ -295,6 +310,17 @@ test.describe("Data entry model test - warnings", () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toBeHidden();
             await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
+          },
+          votersVotesPageAfterResumeChangedToWarning: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.warning).toContainText(
+              "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
+            );
+            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },
           abortInputModalWarning: async () => {
             await expect(abortModal.heading).toBeVisible();
@@ -336,6 +362,10 @@ test.describe("Data entry model test - warnings", () => {
           },
           CLICK_ABORT: async () => {
             await votersAndVotesPage.abortInput.click();
+          },
+          ABORT_AND_SAVE: async () => {
+            await votersAndVotesPage.abortInput.click();
+            await abortModal.saveInput.click();
           },
           NAV_TO_POLLING_STATION_PAGE: async () => {
             await votersAndVotesPage.clickElectionInNavBar(election.election.location, election.election.name);

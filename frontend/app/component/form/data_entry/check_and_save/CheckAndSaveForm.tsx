@@ -17,7 +17,7 @@ import {
   useFormKeyboardNavigation,
 } from "@kiesraad/ui";
 
-import { getPollingStationSummary, PollingStationFormSectionStatus } from "../state/dataEntryUtils";
+import { DataEntryFormSectionStatus, getDataEntrySummary } from "../state/dataEntryUtils";
 import { FormSectionId } from "../state/types";
 import { useDataEntryContext } from "../state/useDataEntryContext";
 import { getUrlForFormSectionID } from "../utils";
@@ -41,7 +41,7 @@ export function CheckAndSaveForm() {
   );
 
   const summary = React.useMemo(() => {
-    return getPollingStationSummary(formState);
+    return getDataEntrySummary(formState);
   }, [formState]);
 
   const finalisationAllowed = Object.values(formState.sections).every(
@@ -133,7 +133,7 @@ export function CheckAndSaveForm() {
   );
 }
 
-function menuStatusForFormSectionStatus(status: PollingStationFormSectionStatus): MenuStatus {
+function menuStatusForFormSectionStatus(status: DataEntryFormSectionStatus): MenuStatus {
   switch (status) {
     case "empty":
       return "empty";

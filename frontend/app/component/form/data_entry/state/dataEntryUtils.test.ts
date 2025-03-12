@@ -6,9 +6,9 @@ import { defaultDataEntryState, errorWarningMocks, initialValues } from "../test
 import {
   addValidationResultToFormState,
   formSectionComplete,
+  getDataEntrySummary,
   getErrorsAndWarnings,
   getNextSectionID,
-  getPollingStationSummary,
   hasOnlyGlobalValidationResults,
   isGlobalValidationResult,
   resetFormSectionState,
@@ -286,7 +286,7 @@ describe("getPollingStationSummary", () => {
       ],
     };
 
-    let summary = getPollingStationSummary(state);
+    let summary = getDataEntrySummary(state);
     expect(summary.countsAddUp).toBe(true);
     expect(summary.hasBlocks).toBe(false);
     expect(summary.hasWarnings).toBe(false);
@@ -295,7 +295,7 @@ describe("getPollingStationSummary", () => {
     state.sections.differences_counts.acceptWarnings = true;
     state.sections.differences_counts.warnings = [errorWarningMocks.W301];
 
-    summary = getPollingStationSummary(state);
+    summary = getDataEntrySummary(state);
     expect(summary.countsAddUp).toBe(true);
     expect(summary.hasBlocks).toBe(false);
     expect(summary.hasWarnings).toBe(true);
@@ -308,7 +308,7 @@ describe("getPollingStationSummary", () => {
 
     state.sections.voters_votes_counts.errors = [errorWarningMocks.F201];
 
-    summary = getPollingStationSummary(state);
+    summary = getDataEntrySummary(state);
 
     expect(summary.countsAddUp).toBe(false);
     expect(summary.hasBlocks).toBe(true);
@@ -322,7 +322,7 @@ describe("getPollingStationSummary", () => {
 
     state.sections.differences_counts.acceptWarnings = false;
 
-    summary = getPollingStationSummary(state);
+    summary = getDataEntrySummary(state);
 
     expect(summary.countsAddUp).toBe(false);
     expect(summary.hasBlocks).toBe(true);

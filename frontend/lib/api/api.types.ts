@@ -1,13 +1,6 @@
-import {
-  ApiClient,
-  ApiError,
-  ApiResponseStatus,
-  FatalApiError,
-  LoginResponse,
-  NetworkError,
-  NotFoundError,
-  type ValidationResultCode,
-} from "@kiesraad/api";
+import type { ApiError, FatalApiError, NetworkError, NotFoundError } from "./ApiError";
+import type { ApiResponseStatus } from "./ApiResponseStatus";
+import type { ValidationResultCode } from "./gen/openapi";
 
 export type ResultCode = ValidationResultCode | "REFORMAT_WARNING";
 
@@ -36,12 +29,4 @@ export interface ApiResponse<T> {
   status: ApiResponseStatus.Success;
   code: number;
   data: T;
-}
-
-export interface ApiState {
-  client: ApiClient;
-  user: LoginResponse | null;
-  setUser: (user: LoginResponse | null) => void;
-  logout: () => Promise<void>;
-  login: (username: string, password: string) => Promise<ApiResult<LoginResponse>>;
 }

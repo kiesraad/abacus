@@ -1,8 +1,7 @@
 import { useContext } from "react";
 
-import { ApiState } from "./api.types";
 import { ApiClient } from "./ApiClient";
-import { ApiProviderContext } from "./ApiProviderContext";
+import { ApiProviderContext, ApiState } from "./ApiProviderContext";
 
 export function useApiClient(): ApiClient {
   const apiState = useContext<ApiState | null>(ApiProviderContext);

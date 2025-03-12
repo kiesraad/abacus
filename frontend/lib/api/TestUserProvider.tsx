@@ -1,8 +1,7 @@
 import { ReactNode } from "react";
 
-import { ApiState } from "./api.types";
 import { ApiClient } from "./ApiClient";
-import { ApiProviderContext } from "./ApiProviderContext";
+import { ApiProviderContext, ApiState } from "./ApiProviderContext";
 import { Role } from "./gen/openapi";
 
 interface TestUserProviderProps {

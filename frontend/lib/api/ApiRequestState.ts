@@ -1,5 +1,4 @@
 import { ApiError, ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
-import { CrudRequestState } from "./useCrud";
 
 export type ApiRequestStateWithoutFatalErrors<T> =
   | {
@@ -29,9 +28,7 @@ export type ApiRequestFatalErrorState =
 // All possible states, including errors
 export type ApiRequestState<T> = ApiRequestStateWithoutFatalErrors<T> | ApiRequestFatalErrorState;
 
-export function isFatalRequestState<T>(
-  requestState: ApiRequestState<T> | CrudRequestState<T>,
-): requestState is ApiRequestFatalErrorState {
+export function isFatalRequestState<T>(requestState: ApiRequestState<T>): requestState is ApiRequestFatalErrorState {
   return (
     requestState.status === "fatal-api-error" ||
     requestState.status === "not-found-error" ||

@@ -54,7 +54,9 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     this.totalAdmittedVotersRecount = page.getByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" });
 
     this.acceptWarnings = page.getByLabel("Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.");
-    this.acceptWarningsReminder = page.getByRole("alert");
+    this.acceptWarningsReminder = page
+      .getByRole("alert")
+      .filter({ hasText: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd." });
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }

@@ -264,9 +264,7 @@ test.describe("Data entry model test - warnings", () => {
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
             await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
-            await expect(votersAndVotesPage.acceptWarningsReminder).toHaveText(
-              "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
-            );
+            await expect(votersAndVotesPage.acceptWarningsReminder).toBeVisible();
           },
           voterVotesPageWarningCorrected: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();

@@ -9,7 +9,7 @@ export * from "./ApiProvider";
 export * from "./ApiResponseStatus";
 export * from "./ApiProviderContext";
 export * from "./TestUserProvider";
-export * from "./useApi";
+export * from "./useApiClient";
 export * from "./useApiRequest";
 export * from "./useApiState";
 export * from "./useCrud";

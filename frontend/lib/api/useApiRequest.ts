@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ApiResult } from "./api.types";
 import { DEFAULT_CANCEL_REASON } from "./ApiClient";
 import { ApiError, FatalApiError, NetworkError, NotFoundError } from "./ApiError";
-import { useApi } from "./useApi";
+import { useApiClient } from "./useApiClient";
 import { CrudRequestState } from "./useCrud";
 
 // Happy path states, possible errors are thrown
@@ -88,7 +88,7 @@ function useApiRequestInner<T>(
   path: string,
   throwErrors: boolean,
 ): UseApiRequestReturn<T> | UseApiRequestReturnWithoutFatalErrors<T> {
-  const client = useApi();
+  const client = useApiClient();
   const [requestState, setRequestState] = useState<ApiRequestState<T>>({ status: "loading" });
 
   // throw fatal errors

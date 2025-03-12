@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { ApiResult } from "./api.types";
-import { useApi } from "./useApi";
+import { useApiClient } from "./useApiClient";
 import { ApiRequestState, fatalRequestState, handleApiResult } from "./useApiRequest";
 
 export type CrudRequestState<T> =
@@ -29,7 +29,7 @@ export type ApiPaths =
 
 // Call the api and return the current status of the request, optionally throws an error when the request fails
 export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
-  const client = useApi();
+  const client = useApiClient();
   const [requestState, setRequestState] = useState<CrudRequestState<T>>({ status: "idle" });
   const paths = typeof path === "string" ? { get: path, create: path, update: path, remove: path } : path;
 

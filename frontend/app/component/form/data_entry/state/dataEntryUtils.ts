@@ -1,7 +1,5 @@
-import { ErrorsAndWarnings } from "lib/api/api.types";
-
 import { Election, PollingStationResults, ValidationResult, ValidationResults } from "@kiesraad/api";
-import { ValidationResultType } from "@kiesraad/ui";
+import { ErrorsAndWarnings, ValidationResultType } from "@kiesraad/ui";
 import { fieldNameFromPath, FieldSection, objectHasOnlyEmptyValues, rootFieldSection } from "@kiesraad/util";
 
 import { INITIAL_FORM_SECTION_ID } from "./reducer";

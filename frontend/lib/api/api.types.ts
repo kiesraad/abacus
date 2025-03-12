@@ -1,19 +1,5 @@
 import type { ApiError, FatalApiError, NetworkError, NotFoundError } from "./ApiError";
 import type { ApiResponseStatus } from "./ApiResponseStatus";
-import type { ValidationResultCode } from "./gen/openapi";
-
-export type ResultCode = ValidationResultCode | "REFORMAT_WARNING";
-
-export type FieldValidationResult = {
-  code: ResultCode;
-  id: string;
-  value?: string;
-};
-
-export type ErrorsAndWarnings = {
-  errors: FieldValidationResult[];
-  warnings: FieldValidationResult[];
-};
 
 export type AnyApiError = ApiError | FatalApiError | NetworkError | NotFoundError;
 

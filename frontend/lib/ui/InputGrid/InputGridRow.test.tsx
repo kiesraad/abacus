@@ -1,9 +1,8 @@
 import { within } from "@testing-library/dom";
 import { describe, expect, test } from "vitest";
 
-import { ErrorsAndWarnings, FieldValidationResult } from "@kiesraad/api";
 import { render, screen } from "@kiesraad/test";
-import { InputGrid, InputGridRow, InputGridRowProps } from "@kiesraad/ui";
+import { ErrorsAndWarnings, FieldValidationResult, InputGrid, InputGridRow, InputGridRowProps } from "@kiesraad/ui";
 
 const defaultProps: InputGridRowProps = {
   id: "this-row-id",

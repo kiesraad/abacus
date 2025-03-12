@@ -26,7 +26,9 @@ import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } f
 
 const dataEntryMachineDefinition = {
   // TODOs
-  // - fill in valid data, retyrn and change into warning
+  // - resume data entry on not-latest page with warning -> warning is shown; same works for errors
+  // - change warning to different warning
+  // - edit when warning -> warning disppears !check if covered, make explicit in test
 
   initial: "voterVotesPageEmpty",
   states: {
@@ -38,6 +40,7 @@ const dataEntryMachineDefinition = {
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_WARNING: "votersVotesPageWarningFilled",
+        FILL_VALID_DATA_AND_SUBMIT: "differencesPageValid",
       },
     },
     votersVotesPageWarningFilled: {
@@ -62,12 +65,27 @@ const dataEntryMachineDefinition = {
         UNACCEPT_WARNING: "votersVotesPageWarningUnaccepted",
       },
     },
-    votersVotesPageWarningUnaccepted: {},
+    votersVotesPageWarningUnaccepted: {
+      on: {
+        SUBMIT: "votersVotesPageWarningReminder",
+      },
+    },
     voterVotesPageWarningCorrected: {
       on: {
         SUBMIT: "differencesPageCorrected",
       },
     },
+    votersVotesPageValid: {
+      on: {
+        FILL_WITH_WARNING: "votersVotesPageValidToWarning",
+      },
+    },
+    votersVotesPageValidToWarning: {
+      on: {
+        SUBMIT: "votersVotesPageWarningEnd",
+      },
+    },
+    votersVotesPageWarningEnd: {},
     abortInputModalWarning: {
       on: {
         SAVE_INPUT: "pollingStationsPageWarningSaved",
@@ -83,6 +101,11 @@ const dataEntryMachineDefinition = {
     differencesPageWarningAccepted: {
       on: {
         GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageWarningAccepted",
+      },
+    },
+    differencesPageValid: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageValid",
       },
     },
     differencesPageCorrected: {}, // return and change to warning? or valid then warning?
@@ -145,7 +168,7 @@ test.use({
   storageState: "e2e-tests/state/typist.json",
 });
 
-test.describe("Data entry model test", () => {
+test.describe("Data entry model test - warnings", () => {
   createTestModel(machine)
     .getSimplePaths()
     .forEach((path) => {
@@ -199,7 +222,19 @@ test.describe("Data entry model test", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },
+          votersVotesPageValidToWarning: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
+          },
           votersVotesPageWarning: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.warning).toContainText(
+              "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
+            );
+            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+          },
+          votersVotesPageWarningEnd: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
@@ -241,8 +276,17 @@ test.describe("Data entry model test", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesValid });
           },
+          votersVotesPageValid: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.warning).toBeHidden();
+            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters, votes: votesValid });
+          },
           votersVotesPageError: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.error).toBeVisible();
+            await expect(votersAndVotesPage.warning).toBeHidden();
             await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes: votesWarning });
@@ -261,6 +305,11 @@ test.describe("Data entry model test", () => {
           FILL_WITH_WARNING: async () => {
             await votersAndVotesPage.inputVotersCounts(voters);
             await votersAndVotesPage.inputVotesCounts(votesWarning);
+          },
+          FILL_VALID_DATA_AND_SUBMIT: async () => {
+            await votersAndVotesPage.inputVotersCounts(voters);
+            await votersAndVotesPage.inputVotesCounts(votesValid);
+            await votersAndVotesPage.next.click();
           },
           SUBMIT: async () => {
             await votersAndVotesPage.next.click();
@@ -299,6 +348,10 @@ test.describe("Data entry model test", () => {
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
           differencesPageCorrected: async () => {
+            await expect(differencesPage.fieldset).toBeVisible();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+          },
+          differencesPageValid: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },

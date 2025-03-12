@@ -176,7 +176,7 @@ test.use({
   storageState: "e2e-tests/state/typist.json",
 });
 
-test.describe("Data entry model test", () => {
+test.describe("Data entry model test - errors", () => {
   createTestModel(machine)
     .getSimplePaths()
     .forEach((path) => {

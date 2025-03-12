@@ -6,7 +6,7 @@ import {
 } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
-import { DataEntryState, FormSection } from "../state/types";
+import { DataEntryState, FormSection, FormSectionId } from "../state/types";
 
 export function getInitialValues(): PollingStationResults {
   return {
@@ -44,8 +44,10 @@ export function getInitialValues(): PollingStationResults {
   };
 }
 
-export function getDefaultFormSection(): Omit<FormSection, "id" | "index"> {
+export function getDefaultFormSection(id: FormSectionId, index: number): FormSection {
   return {
+    id,
+    index,
     title: "Toegelaten kiezers en uitgebrachte stemmen",
     isSaved: false,
     acceptWarnings: false,
@@ -57,7 +59,6 @@ export function getDefaultFormSection(): Omit<FormSection, "id" | "index"> {
 }
 
 export function getDefaultDataEntryState(): DataEntryState {
-  const defaultFormSection = getDefaultFormSection();
   return {
     election: electionMockData,
     pollingStationId: 1,
@@ -68,31 +69,11 @@ export function getDefaultDataEntryState(): DataEntryState {
       current: "recounted",
       furthest: "recounted",
       sections: {
-        recounted: {
-          id: "recounted",
-          index: 1,
-          ...defaultFormSection,
-        },
-        voters_votes_counts: {
-          id: "voters_votes_counts",
-          index: 2,
-          ...defaultFormSection,
-        },
-        differences_counts: {
-          id: "differences_counts",
-          index: 3,
-          ...defaultFormSection,
-        },
-        political_group_votes_1: {
-          id: "political_group_votes_1",
-          index: 4,
-          ...defaultFormSection,
-        },
-        save: {
-          id: "save",
-          index: 5,
-          ...defaultFormSection,
-        },
+        recounted: getDefaultFormSection("recounted", 1),
+        voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
+        differences_counts: getDefaultFormSection("differences_counts", 3),
+        political_group_votes_1: getDefaultFormSection("political_group_votes_1", 4),
+        save: getDefaultFormSection("save", 5),
       },
     },
     targetFormSectionId: "recounted",

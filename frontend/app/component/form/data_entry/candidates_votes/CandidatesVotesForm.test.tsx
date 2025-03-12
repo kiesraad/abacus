@@ -34,26 +34,10 @@ const defaultDataEntryState: DataEntryState = {
     current: "differences_counts",
     furthest: "differences_counts",
     sections: {
-      recounted: {
-        id: "recounted",
-        index: 1,
-        ...getDefaultFormSection(),
-      },
-      voters_votes_counts: {
-        id: "voters_votes_counts",
-        index: 2,
-        ...getDefaultFormSection(),
-      },
-      differences_counts: {
-        id: "differences_counts",
-        index: 3,
-        ...getDefaultFormSection(),
-      },
-      save: {
-        id: "save",
-        index: 4,
-        ...getDefaultFormSection(),
-      },
+      recounted: getDefaultFormSection("recounted", 1),
+      voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
+      differences_counts: getDefaultFormSection("differences_counts", 3),
+      save: getDefaultFormSection("save", 4),
     },
   },
   targetFormSectionId: "recounted",

@@ -52,88 +52,76 @@ components:
   # Frontend components
   - name: "(Frontend) App Root Files"
     include:
-      - ".*/frontend/app/app.test.ts"
-      - ".*/frontend/app/main.tsx"
-      - ".*/frontend/app/routes.test.tsx"
-      - ".*/frontend/app/routes.tsx"
-  - name: "(Frontend) Components/apportionment"
-    include:
-      - ".*/frontend/app/component/apportionment/.*"
-  - name: "(Frontend) Components/election"
-    include:
-      - ".*/frontend/app/component/election/.*"
+      - ".*/frontend/src/app/.*"
+
   - name: "(Frontend) Components/error"
     include:
-      - ".*/frontend/app/component/error/.*"
+      - ".*/frontend/src/components/error/.*"
+
   - name: "(Frontend) Components/footer"
     include:
-      - ".*/frontend/app/component/footer/.*"
-  - name: "(Frontend) app/component/form/data_entry"
-    include:
-      - ".*/frontend/app/component/form/data_entry/.*"
-  - name: "(Frontend) app/component/form/polling_station"
-    include:
-      - ".*/frontend/app/component/form/polling_station/.*"
-  - name: "(Frontend) app/component/form/user"
-    include:
-      - ".*/frontend/app/component/form/user/.*"
+      - ".*/frontend/src/components/Footer.tsx"
+
   - name: "(Frontend) Components/navbar"
     include:
-      - ".*/frontend/app/component/navbar/.*"
+      - ".*/frontend/src/component/navbar/.*"
 
-  - name: "(Frontend) Modules/Root files"
-    include:
-      - ".*/frontend/app/module/AdministratorLayout.tsx"
-      - ".*/frontend/app/module/FatalError.tsx"
-      - ".*/frontend/app/module/NotFound.tsx"
-      - ".*/frontend/app/module/RootLayout.tsx"
   - name: "(Frontend) Modules/account"
     include:
-      - ".*/frontend/app/module/account/.*"
+      - ".*/frontend/src/features/account/.*"
+
+  - name: "(Frontend) Modules/administrator"
+    include:
+      - ".*/frontend/src/features/administrator/.*"
+
   - name: "(Frontend) Modules/apportionment"
     include:
-      - ".*/frontend/app/module/apportionment/.*"
+      - ".*/frontend/src/features/apportionment/.*"
+
   - name: "(Frontend) Modules/data_entry"
     include:
-      - ".*/frontend/app/module/data_entry/.*"
+      - ".*/frontend/src/features/data_entry/.*"
+
   - name: "(Frontend) Modules/election"
     include:
-      - ".*/frontend/app/module/election/.*"
-  - name: "(Frontend) Modules/logs"
-    include:
-      - ".*/frontend/app/module/logs/.*"
+      - ".*/frontend/src/features/election/.*"
+
   - name: "(Frontend) Modules/polling_stations"
     include:
-      - ".*/frontend/app/module/polling_stations/.*"
+      - ".*/frontend/src/features/polling_stations/.*"
+
   - name: "(Frontend) Modules/users"
     include:
-      - ".*/frontend/app/module/users/.*"
+      - ".*/frontend/src/features/users/.*"
+
   - name: "(Frontend) Modules/workstations"
     include:
-      - ".*/frontend/app/module/workstations/.*"
+      - ".*/frontend/src/features/workstations/.*"
 
   - name: "(Frontend) Lib/API"
     include:
-      - ".*/frontend/lib/api/.*"
-  - name: "(Frontend) lib/API-Mocks"
-    include:
-      - ".*/frontend/lib/api-mocks/.*"
+      - ".*/frontend/src/api/.*"
+
   - name: "(Frontend) Lib/i18n"
     include:
-      - ".*/frontend/lib/i18n/.*"
+      - ".*/frontend/src/lib/i18n/.*"
+
   - name: "(Frontend) Unit tests"
     include:
-      - ".*/frontend/lib/test/.*"
+      - ".*/frontend/src/testing/.*"
+
   - name: "(Frontend) Lib/UI"
     include:
-      - ".*/frontend/lib/ui/.*"
+      - ".*/frontend/src/components/ui/.*"
+
   - name: "(Frontend) Lib/Util"
     include:
-      - ".*/frontend/lib/util/.*"
+      - ".*/frontend/src/utils/.*"
 
   - name: "(Frontend) e2e tests"
     include:
       - ".*/frontend/e2e-tests/.*"
+
   - name: "(Frontend) Scripts"
     include:
       - ".*/frontend/scripts/.*"
@@ -164,18 +152,17 @@ languages:
     production:
     test:
       include:
-      - ".*DevHomePage[.]tsx"
-      - ".*NotAvailableInMock[.]tsx"
-      - ".*msw-mock-api[.]ts"
-      - ".*/lib/api-mocks/.*[.]ts"
-      - ".*/lib/api-mocks/.*[.]tsx"
-      - ".*[.]e2e[.]ts"
-      - ".*.stories[.]tsx"
-      - ".*/test-data/.*[.]ts"
-      - ".*/test[.]utils[.]ts"
+        - ".*DevHomePage[.]tsx"
+        - ".*NotAvailableInMock[.]tsx"
+        - ".*msw-mock-api[.]ts"
+        - ".*/frontend/src/testing/.*"
+        - ".*[.]e2e[.]ts"
+        - ".*.stories[.]tsx"
+        - ".*/test-data/.*[.]ts"
+        - ".*/test[.]utils[.]ts"
     generated:
       include:
-      - ".*/gen/.*[.]ts"
+        - ".*/gen/.*[.]ts"
 
 exclude:
   - ".*/backend/[.]sqlx/.*"
@@ -187,7 +174,7 @@ exclude:
 
 dependencychecker:
   blocklist:
-  - "backend"
+    - "backend"
   transitive: true
 
 architecture:

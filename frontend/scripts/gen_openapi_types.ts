@@ -4,7 +4,7 @@ import path from "path";
 import { generate } from "./openapi/generator";
 
 const PROJECT_ROOT = path.join(__dirname, "..");
-const TARGET_PATH = `${PROJECT_ROOT}/lib/api/gen`;
+const TARGET_PATH = `${PROJECT_ROOT}/src/types/generated`;
 const FILE_NAME = "openapi.ts";
 
 async function run() {

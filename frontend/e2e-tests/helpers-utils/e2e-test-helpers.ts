@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 
-import { PollingStationResults } from "@kiesraad/api";
+import { PollingStationResults } from "@/types/generated/openapi";
 
 import {
   CandidatesListPage,

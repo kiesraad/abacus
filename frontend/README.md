@@ -134,7 +134,7 @@ Generate Typescript types from `/backend/openapi.json`:
 npm run gen:openapi
 ```
 
-This results in `/frontend/lib/api/gen/openapi.ts`.
+This results in `/frontend/src/types/generated/openapi.ts`.
 
 #### gen_icons
 

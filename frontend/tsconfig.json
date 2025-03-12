@@ -21,13 +21,13 @@
     "paths": {
       "ladle/*": [".ladle/*"],
       "app/*": ["app/*"],
-      "@kiesraad/api": ["lib/api/index.ts"],
-      "@kiesraad/api-mocks": ["lib/api-mocks/index.ts"],
-      "@kiesraad/ui": ["lib/ui/index.ts"],
-      "@kiesraad/icon": ["lib/icon/index.ts"],
-      "@kiesraad/test": ["lib/test/index.ts"],
-      "@kiesraad/util": ["lib/util/index.ts"],
-      "@kiesraad/i18n": ["lib/i18n/index.ts"]
+      "@/*": ["src/*"],
+      "@kiesraad/api": ["src/api/index.ts"],
+      "@kiesraad/ui": ["src/components/ui/index.ts"],
+      "@kiesraad/icon": ["src/lib/icon/index.ts"],
+      "@kiesraad/test": ["src/testing/index.ts"],
+      "@kiesraad/util": ["src/utils/index.ts"],
+      "@kiesraad/i18n": ["src/lib/i18n/index.ts"]
     },
     "types": ["node", "vite/client", "vitest/importMeta"]
   },
@@ -36,6 +36,7 @@
     "app/**/*",
     "lib/**/*",
     "scripts/**/*",
+    "src/**/*",
     "playwright.e2e.config.ts",
     "playwright.ladle.config.ts",
     "vite.config.ts",

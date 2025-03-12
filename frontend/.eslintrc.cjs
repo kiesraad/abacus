@@ -48,21 +48,16 @@ module.exports = {
       plugins: ["@typescript-eslint", "prettier"],
       rules: {
         "@typescript-eslint/no-floating-promises": "error",
-        "react-hooks/rules-of-hooks": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
-      },
-    },
-    {
-      files: ["*.test.tsx", "lib/api-mocks/**/*.ts", "lib/test/**/*.ts"],
-      rules: {
-        "@typescript-eslint/no-non-null-assertion": "off",
-      },
-    },
-    {
-      files: ["lib/ui/**/*.e2e.ts"],
-      rules: {
         // Needed for Ladle, page.waitForSelector("[data-storyloaded]")
         "playwright/no-wait-for-selector": "off",
+        "react-hooks/rules-of-hooks": "off",
+      },
+    },
+    {
+      files: ["*.test.tsx", "src/testing/**/*.ts"],
+      rules: {
+        "@typescript-eslint/no-non-null-assertion": "off",
       },
     },
   ],

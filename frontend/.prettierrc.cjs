@@ -7,6 +7,7 @@ module.exports = {
     "^ladle/.*$", // ladle
     "^app/.*$", // app
     "^@kiesraad/.*$", // lib
+    "^@/.*$", // src
     "^(\\.||\\.\\.)/.*$", // local imports
   ],
   importOrderSeparation: true, // ensures new line separation between sorted import declarations group

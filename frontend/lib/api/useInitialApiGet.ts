@@ -10,12 +10,12 @@ import {
 import { ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
 
-export interface UseApiRequestReturn<T> {
+export interface UseInitialApiGetReturn<T> {
   requestState: ApiRequestState<T>;
   refetch: (controller?: AbortController) => Promise<ApiResult<T>>;
 }
 
-export interface UseApiRequestReturnWithoutFatalErrors<T> extends UseApiRequestReturn<T> {
+export interface UseInitialApiGetReturnWithoutFatalErrors<T> extends UseInitialApiGetReturn<T> {
   requestState: ApiRequestStateWithoutFatalErrors<T>;
 }
 
@@ -35,12 +35,12 @@ export function handleApiResult<T>(
   return result;
 }
 
-function useApiRequestInner<T>(path: string, throwFatalErrors: true): UseApiRequestReturnWithoutFatalErrors<T>;
-function useApiRequestInner<T>(path: string, throwFatalErrors: false): UseApiRequestReturn<T>;
-function useApiRequestInner<T>(
+function useInitialApiGetInner<T>(path: string, throwFatalErrors: true): UseInitialApiGetReturnWithoutFatalErrors<T>;
+function useInitialApiGetInner<T>(path: string, throwFatalErrors: false): UseInitialApiGetReturn<T>;
+function useInitialApiGetInner<T>(
   path: string,
   throwFatalErrors: boolean,
-): UseApiRequestReturn<T> | UseApiRequestReturnWithoutFatalErrors<T> {
+): UseInitialApiGetReturn<T> | UseInitialApiGetReturnWithoutFatalErrors<T> {
   const client = useApiClient();
   const [requestState, setRequestState] = useState<ApiRequestState<T>>({ status: "loading" });
 
@@ -81,11 +81,11 @@ function useApiRequestInner<T>(
   };
 }
 
-export function useApiRequestWithErrors<T>(path: string): UseApiRequestReturn<T> {
-  return useApiRequestInner(path, false);
+export function useInitialApiGetWithErrors<T>(path: string): UseInitialApiGetReturn<T> {
+  return useInitialApiGetInner(path, false);
 }
 
 // Call the api and return the current status of the request, optionally throws an error when the request fails
-export function useApiRequest<T>(path: string): UseApiRequestReturnWithoutFatalErrors<T> {
-  return useApiRequestInner(path, true);
+export function useInitialApiGet<T>(path: string): UseInitialApiGetReturnWithoutFatalErrors<T> {
+  return useInitialApiGetInner(path, true);
 }

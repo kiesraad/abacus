@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ApiRequestState, isFatalRequestState } from "./ApiRequestState";
 import { ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
-import { handleApiResult } from "./useApiRequest";
+import { handleApiResult } from "./useInitialApiGet";
 
 export type CrudRequestState<T> =
   | {

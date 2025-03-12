@@ -14,11 +14,15 @@ import { VotersCounts, VotesCounts } from "@kiesraad/api";
 import { test } from "./fixtures";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
 
-// comparison with error tests
-// - no unsavedChangedModal
-// - no abort and discard
-// - after changing to warning: abort or go to Recounted
-// - after submitting changed to warning: anything but abort and save
+/*
+The names of the states in the machine keep track of two states:
+1. the current page
+2. the state of the data on the voters and votes page
+
+So the state pollingStationsPageChangedSaved means that we're on the polling stations page, we have
+changed the initial input on the voters and votes page, and we have saved it as part of navigating
+to the polling stations page.
+*/
 
 const dataEntryMachineDefinition = {
   initial: "voterVotesPageEmpty",
@@ -245,11 +249,15 @@ test.describe("Data entry model test - warnings", () => {
           },
           votersVotesPageWarningFilled: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.warning).toBeHidden();
+            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },
           votersVotesPageChangedToWarning: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.warning).toBeHidden();
+            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },
@@ -258,21 +266,20 @@ test.describe("Data entry model test - warnings", () => {
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+            await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
           },
           votersVotesPageChangedToWarningSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+            await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
           },
           voterVotesPageWarningAccepted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
             await expect(votersAndVotesPage.acceptWarnings).toBeChecked();
           },
           votersVotesPageWarningUnaccepted: async () => {
@@ -280,7 +287,6 @@ test.describe("Data entry model test - warnings", () => {
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
             await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
           },
           votersVotesPageWarningReminder: async () => {
@@ -288,7 +294,7 @@ test.describe("Data entry model test - warnings", () => {
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+            await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
             await expect(votersAndVotesPage.acceptWarningsReminder).toBeVisible();
           },
           voterVotesPageWarningCorrected: async () => {
@@ -327,7 +333,7 @@ test.describe("Data entry model test - warnings", () => {
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+            await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },

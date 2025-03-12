@@ -14,6 +14,16 @@ import { VotersCounts, VotesCounts } from "@kiesraad/api";
 import { test } from "./fixtures";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
 
+/*
+The names of the states in the machine keep track of two states:
+1. the current page
+2. the state of the data on the voters and votes page
+
+So the state pollingStationsPageChangedSaved means that we're on the polling stations page, we have
+changed the initial input on the voters and votes page, and we have saved it as part of navigating
+to the polling stations page.
+*/
+
 const dataEntryMachineDefinition = {
   initial: "voterVotesPageEmpty",
   states: {

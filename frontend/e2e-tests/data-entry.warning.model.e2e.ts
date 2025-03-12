@@ -14,32 +14,52 @@ import { VotersCounts, VotesCounts } from "@kiesraad/api";
 import { test } from "./fixtures";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
 
+// comparison with error tests
+// - no unsavedChangedModal
+// - no abort and discard
+// - after changing to warning: abort or go to Recounted
+// - after submitting changed to warning: anything but abort and save
+
+// TODO:
+// - submit valid, return, change to error, nav to recounted, save in popup, discard in popup
+
 const dataEntryMachineDefinition = {
   initial: "voterVotesPageEmpty",
   states: {
-    recountedPageWarning: {
+    pollingStationsPageWarningSaved: {
       on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageWarning",
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeWarning",
+      },
+    },
+    pollingStationsPageDiscarded: {},
+    recountedPageWarningSubmitted: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageWarningSubmitted",
+      },
+    },
+    pollingStationsPageChangedToWarningSaved: {
+      on: {
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChangedToWarning",
       },
     },
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_WARNING: "votersVotesPageWarningFilled",
-        FILL_VALID_DATA_AND_SUBMIT: "differencesPageValid",
+        FILL_VALID_DATA_AND_SUBMIT: "differencesPageValidSubmitted",
       },
     },
     votersVotesPageWarningFilled: {
       on: {
-        SUBMIT: "votersVotesPageWarning",
+        SUBMIT: "votersVotesPageWarningSubmitted",
       },
     },
-    votersVotesPageWarning: {
+    votersVotesPageWarningSubmitted: {
       on: {
         SUBMIT: "votersVotesPageWarningReminder",
         ACCEPT_WARNING: "voterVotesPageWarningAccepted",
         CORRECT_WARNING: "voterVotesPageWarningCorrected",
         CHANGE_TO_ERROR_AND_SUBMIT: "votersVotesPageError",
-        GO_TO_RECOUNTED_PAGE: "recountedPageWarning",
+        GO_TO_RECOUNTED_PAGE: "recountedPageWarningSubmitted",
         CLICK_ABORT: "abortInputModalWarning",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModalWarning",
       },
@@ -60,9 +80,9 @@ const dataEntryMachineDefinition = {
         SUBMIT: "differencesPageCorrected",
       },
     },
-    votersVotesPageValid: {
+    votersVotesPageValidSubmitted: {
       on: {
-        FILL_WITH_WARNING: "votersVotesPageChangedToWarning",
+        CHANGE_TO_WARNING: "votersVotesPageChangedToWarning",
       },
     },
     votersVotesPageChangedToWarning: {
@@ -75,34 +95,6 @@ const dataEntryMachineDefinition = {
         ABORT_AND_SAVE: "pollingStationsPageChangedToWarningSaved",
       },
     },
-    pollingStationsPageChangedToWarningSaved: {
-      on: {
-        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChangedToWarning",
-      },
-    },
-    abortInputModalWarning: {
-      on: {
-        SAVE_INPUT: "pollingStationsPageWarningSaved",
-        DISCARD_INPUT: "pollingStationsPageDiscarded",
-      },
-    },
-    pollingStationsPageWarningSaved: {
-      on: {
-        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeWarning",
-      },
-    },
-    pollingStationsPageDiscarded: {},
-    differencesPageWarningAccepted: {
-      on: {
-        GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageWarningAccepted",
-      },
-    },
-    differencesPageValid: {
-      on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageValid",
-      },
-    },
-    differencesPageCorrected: {},
     votersVotesPageWarningReminder: {
       on: {
         ACCEPT_WARNING: "voterVotesPageWarningAccepted",
@@ -111,6 +103,23 @@ const dataEntryMachineDefinition = {
     votersVotesPageError: {},
     votersVotesPageAfterResumeWarning: {},
     votersVotesPageAfterResumeChangedToWarning: {},
+    differencesPageWarningAccepted: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageWarningAccepted",
+      },
+    },
+    differencesPageValidSubmitted: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageValidSubmitted",
+      },
+    },
+    differencesPageCorrected: {},
+    abortInputModalWarning: {
+      on: {
+        SAVE_INPUT: "pollingStationsPageWarningSaved",
+        DISCARD_INPUT: "pollingStationsPageDiscarded",
+      },
+    },
   },
 };
 
@@ -200,7 +209,7 @@ test.describe("Data entry model test - warnings", () => {
         };
 
         const recountedPageStates = {
-          recountedPageWarning: async () => {
+          recountedPageWarningSubmitted: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
@@ -228,7 +237,7 @@ test.describe("Data entry model test - warnings", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },
-          votersVotesPageWarning: async () => {
+          votersVotesPageWarningSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
@@ -275,7 +284,7 @@ test.describe("Data entry model test - warnings", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesValid });
           },
-          votersVotesPageValid: async () => {
+          votersVotesPageValidSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toBeHidden();
             await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
@@ -314,6 +323,9 @@ test.describe("Data entry model test - warnings", () => {
         const votersAndVotesPageEvents = {
           FILL_WITH_WARNING: async () => {
             await votersAndVotesPage.inputVotersCounts(voters);
+            await votersAndVotesPage.inputVotesCounts(votesWarning);
+          },
+          CHANGE_TO_WARNING: async () => {
             await votersAndVotesPage.inputVotesCounts(votesWarning);
           },
           FILL_VALID_DATA_AND_SUBMIT: async () => {
@@ -365,7 +377,7 @@ test.describe("Data entry model test - warnings", () => {
             await expect(differencesPage.fieldset).toBeVisible();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
-          differencesPageValid: async () => {
+          differencesPageValidSubmitted: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },

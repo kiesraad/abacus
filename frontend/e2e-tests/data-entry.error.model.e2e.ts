@@ -22,7 +22,7 @@ const dataEntryMachineDefinition = {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeError",
       },
     },
-    pollingStationsPageChangedErrorSaved: {
+    pollingStationsPageChangedToErrorSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeErrorChanged",
       },
@@ -33,8 +33,8 @@ const dataEntryMachineDefinition = {
         GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageErrorSubmitted",
       },
     },
-    recountedPageChangedErrorSubmitted: {},
-    recountedPageChangedErrorDiscarded: {},
+    recountedPageChangedToErrorSubmitted: {},
+    recountedPageChangedToErrorDiscarded: {},
     recountedPageFilledError: {},
     voterVotesPageEmpty: {
       on: {
@@ -49,14 +49,14 @@ const dataEntryMachineDefinition = {
     },
     votersVotesPageValidSubmitted: {
       on: {
-        CHANGE_TO_ERROR_DATA: "votersVotesPageChangedError",
+        CHANGE_TO_ERROR_DATA: "votersVotesPageChangedToError",
       },
     },
-    votersVotesPageChangedError: {
+    votersVotesPageChangedToError: {
       on: {
-        SUBMIT: "votersVotesPageChangedErrorSubmitted",
-        CLICK_ABORT: "abortInputModalChangedErrorSubmitted",
-        GO_TO_RECOUNTED_PAGE: "unsavedChangesModalChanged",
+        SUBMIT: "votersVotesPageChangedToErrorSubmitted",
+        CLICK_ABORT: "abortInputModalChangedToErrorSubmitted",
+        GO_TO_RECOUNTED_PAGE: "unsavedChangesModalChangedToError",
       },
     },
     VotersVotesPageFilledError: {
@@ -75,11 +75,11 @@ const dataEntryMachineDefinition = {
         // no GO_TO_DIFFERENCES_PAGE, because unreachable
       },
     },
-    votersVotesPageChangedErrorSubmitted: {
+    votersVotesPageChangedToErrorSubmitted: {
       on: {
         CORRECT_ERROR_DATA: "votersVotesPageCorrected",
-        CLICK_ABORT: "abortInputModalChangedErrorSubmitted",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalChangedErrorSubmitted",
+        CLICK_ABORT: "abortInputModalChangedToErrorSubmitted",
+        NAV_TO_POLLING_STATION_PAGE: "abortInputModalChangedToErrorSubmitted",
         // no GO_TO_RECOUNTED_PAGE because too similar to same action on votersVotesPageErrorSubmitted
         GO_TO_DIFFERENCES_PAGE: "differencesPageError",
       },
@@ -105,16 +105,16 @@ const dataEntryMachineDefinition = {
         DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
-    abortInputModalChangedErrorSubmitted: {
+    abortInputModalChangedToErrorSubmitted: {
       on: {
-        SAVE_INPUT: "pollingStationsPageChangedErrorSaved",
+        SAVE_INPUT: "pollingStationsPageChangedToErrorSaved",
         DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
-    unsavedChangesModalChanged: {
+    unsavedChangesModalChangedToError: {
       on: {
-        SAVE_UNSUBMITTED_CHANGES: "recountedPageChangedErrorSubmitted",
-        DISCARD_UNSUBMITTED_CHANGES: "recountedPageChangedErrorDiscarded",
+        SAVE_UNSUBMITTED_CHANGES: "recountedPageChangedToErrorSubmitted",
+        DISCARD_UNSUBMITTED_CHANGES: "recountedPageChangedToErrorDiscarded",
       },
     },
   },
@@ -195,7 +195,7 @@ test.describe("Data entry model test - errors", () => {
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
-          pollingStationsPageChangedErrorSaved: async () => {
+          pollingStationsPageChangedToErrorSaved: async () => {
             await expect(pollingStationChoicePage.fieldset).toBeVisible();
             await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
@@ -217,7 +217,7 @@ test.describe("Data entry model test - errors", () => {
             await expect(recountedPage.no).toBeChecked();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
           },
-          recountedPageChangedErrorSubmitted: async () => {
+          recountedPageChangedToErrorSubmitted: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
@@ -227,7 +227,7 @@ test.describe("Data entry model test - errors", () => {
             await expect(recountedPage.no).toBeChecked();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("nog niet afgerond");
           },
-          recountedPageChangedErrorDiscarded: async () => {
+          recountedPageChangedToErrorDiscarded: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
@@ -254,7 +254,7 @@ test.describe("Data entry model test - errors", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes });
           },
-          votersVotesPageChangedError: async () => {
+          votersVotesPageChangedToError: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
@@ -272,7 +272,7 @@ test.describe("Data entry model test - errors", () => {
               "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
             );
           },
-          votersVotesPageChangedErrorSubmitted: async () => {
+          votersVotesPageChangedToErrorSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
@@ -307,7 +307,7 @@ test.describe("Data entry model test - errors", () => {
               "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.",
             );
           },
-          unsavedChangesModalChanged: async () => {
+          unsavedChangesModalChangedToError: async () => {
             await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
           },
         };
@@ -378,7 +378,7 @@ test.describe("Data entry model test - errors", () => {
           abortInputModalErrorSubmitted: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
-          abortInputModalChangedErrorSubmitted: async () => {
+          abortInputModalChangedToErrorSubmitted: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
         };

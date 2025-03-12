@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { isFatalError } from "../ApiError";
+import { isFatalError } from "../ApiResult";
 import { ApportionmentProviderContext } from "./ApportionmentProviderContext";
 import { useApportionmentRequest } from "./useApportionmentRequest";
 

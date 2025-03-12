@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { ApiResult } from "./api.types";
 import { DEFAULT_CANCEL_REASON } from "./ApiClient";
-import { ApiError, FatalApiError, NetworkError, NotFoundError } from "./ApiError";
+import { ApiError, ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
 import { CrudRequestState } from "./useCrud";
 

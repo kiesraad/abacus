@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { TranslationPath } from "@kiesraad/i18n";
 import { Loader } from "@kiesraad/ui";
 
-import { NotFoundError } from "./ApiError";
+import { NotFoundError } from "./ApiResult";
 import { ApiRequestState } from "./useApiRequest";
 
 interface RequestStateHandlerProps<T> {

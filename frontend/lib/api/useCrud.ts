@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { ApiResult } from "./api.types";
+import { ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
 import { ApiRequestState, fatalRequestState, handleApiResult } from "./useApiRequest";
 

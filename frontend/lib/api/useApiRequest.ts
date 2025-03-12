@@ -1,40 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { DEFAULT_CANCEL_REASON } from "./ApiClient";
-import { ApiError, ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
+import {
+  ApiRequestState,
+  ApiRequestStateWithoutFatalErrors,
+  fromApiResult,
+  isFatalRequestState,
+} from "./ApiRequestState";
+import { ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
-import { CrudRequestState } from "./useCrud";
-
-// Happy path states, possible errors are thrown
-export type ApiRequestStateWithoutFatalErrors<T> =
-  | {
-      status: "loading";
-    }
-  | {
-      status: "success";
-      data: T;
-    }
-  | {
-      status: "api-error";
-      error: ApiError;
-    };
-
-export type ApiRequestFatalErrorState =
-  | {
-      status: "fatal-api-error";
-      error: FatalApiError;
-    }
-  | {
-      status: "not-found-error";
-      error: NotFoundError;
-    }
-  | {
-      status: "network-error";
-      error: NetworkError;
-    };
-
-// All possible states, including errors
-export type ApiRequestState<T> = ApiRequestStateWithoutFatalErrors<T> | ApiRequestFatalErrorState;
 
 export interface UseApiRequestReturn<T> {
   requestState: ApiRequestState<T>;
@@ -56,46 +30,26 @@ export function handleApiResult<T>(
     return result;
   }
 
-  if (result instanceof ApiError) {
-    setRequestState({ status: "api-error", error: result });
-  } else if (result instanceof FatalApiError) {
-    setRequestState({ status: "fatal-api-error", error: result });
-  } else if (result instanceof NotFoundError) {
-    setRequestState({ status: "not-found-error", error: result });
-  } else if (result instanceof NetworkError) {
-    setRequestState({ status: "network-error", error: result });
-  } else {
-    setRequestState({ status: "success", data: result.data });
-  }
+  setRequestState(fromApiResult(result));
 
   return result;
 }
 
-export function fatalRequestState<T>(
-  requestState: ApiRequestState<T> | CrudRequestState<T>,
-): requestState is ApiRequestFatalErrorState {
-  return (
-    requestState.status === "fatal-api-error" ||
-    requestState.status === "not-found-error" ||
-    requestState.status === "network-error"
-  );
-}
-
-function useApiRequestInner<T>(path: string, throwErrors: true): UseApiRequestReturnWithoutFatalErrors<T>;
-function useApiRequestInner<T>(path: string, throwErrors: false): UseApiRequestReturn<T>;
+function useApiRequestInner<T>(path: string, throwFatalErrors: true): UseApiRequestReturnWithoutFatalErrors<T>;
+function useApiRequestInner<T>(path: string, throwFatalErrors: false): UseApiRequestReturn<T>;
 function useApiRequestInner<T>(
   path: string,
-  throwErrors: boolean,
+  throwFatalErrors: boolean,
 ): UseApiRequestReturn<T> | UseApiRequestReturnWithoutFatalErrors<T> {
   const client = useApiClient();
   const [requestState, setRequestState] = useState<ApiRequestState<T>>({ status: "loading" });
 
   // throw fatal errors
   useEffect(() => {
-    if (throwErrors && fatalRequestState(requestState)) {
+    if (throwFatalErrors && isFatalRequestState(requestState)) {
       throw requestState.error;
     }
-  }, [requestState, throwErrors]);
+  }, [requestState, throwFatalErrors]);
 
   // Perform the API request and set the state accordingly
   const refetch = useCallback(
@@ -119,7 +73,7 @@ function useApiRequestInner<T>(
     return () => {
       controller.abort(DEFAULT_CANCEL_REASON);
     };
-  }, [client, path, throwErrors]);
+  }, [client, path, throwFatalErrors]);
 
   return {
     requestState,

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
+import { ApiRequestState, isFatalRequestState } from "./ApiRequestState";
 import { ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
-import { ApiRequestState, fatalRequestState, handleApiResult } from "./useApiRequest";
+import { handleApiResult } from "./useApiRequest";
 
 export type CrudRequestState<T> =
   | {
@@ -35,7 +36,7 @@ export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
 
   // throw fatal errors
   useEffect(() => {
-    if (fatalRequestState(requestState)) {
+    if (isFatalRequestState(requestState)) {
       throw requestState.error;
     }
   }, [requestState]);

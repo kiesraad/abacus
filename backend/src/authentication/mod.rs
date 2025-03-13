@@ -562,7 +562,7 @@ mod tests {
             .to_str()
             .unwrap();
 
-        assert!(response_cookie.contains("Max-Age=1800"));
+        assert!(response_cookie.contains(&format!("Max-Age={}", SESSION_LIFE_TIME.num_seconds())));
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

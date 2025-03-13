@@ -260,6 +260,7 @@ mod test {
     async fn test_extend_session(pool: SqlitePool) {
         let sessions = Sessions::new(pool);
 
+        // do not extend sessions that have a long life time
         let session: crate::authentication::session::Session = sessions
             .create(1, TimeDelta::seconds(60 * 60 * 60))
             .await
@@ -270,7 +271,8 @@ mod test {
             .unwrap();
         assert_eq!(session_from_db, None);
 
-        let session = sessions.create(1, TimeDelta::seconds(60)).await.unwrap();
+        // extend sessions that have a short life time
+        let session = sessions.create(1, TimeDelta::seconds(10)).await.unwrap();
         let session_from_db = sessions
             .extend_session(session.session_key())
             .await

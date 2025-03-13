@@ -10,7 +10,7 @@ use utoipa::ToSchema;
 
 /// Contains information about the chosen candidates and the candidate list ranking
 /// for a specific political group.
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupCandidateNomination {
     /// Political group number for which this nomination applies
     #[schema(value_type = u32)]
@@ -68,7 +68,7 @@ fn preferential_candidate_nomination(
         preferential_candidate_nomination.extend(candidates_meeting_preference_threshold);
     } else {
         // Loop over non-assigned seats
-        for (index, non_assigned_seats) in (1..pg_seats + 1).rev().enumerate() {
+        for (index, non_assigned_seats) in (1..=pg_seats).rev().enumerate() {
             // List all candidates with the same number of votes that have not been nominated yet
             let same_votes_candidates: Vec<CandidateVotes> =
                 candidates_meeting_preference_threshold
@@ -104,16 +104,16 @@ fn other_candidate_nomination(
     candidate_votes: &[CandidateVotes],
     non_assigned_seats: usize,
 ) -> Vec<CandidateVotes> {
-    let mut other_candidates_nominated: Vec<CandidateVotes> = vec![];
     if non_assigned_seats > 0 {
-        let non_nominated_candidates: Vec<CandidateVotes> = candidate_votes
-            .iter()
-            .filter(|candidate_votes| !preferential_candidate_nomination.contains(candidate_votes))
-            .copied()
-            .collect();
-        other_candidates_nominated = non_nominated_candidates[0..non_assigned_seats].to_vec()
+        return vec![];
     }
-    other_candidates_nominated
+
+    candidate_votes
+        .iter()
+        .filter(|candidate_votes| !preferential_candidate_nomination.contains(candidate_votes))
+        .copied()
+        .take(non_assigned_seats)
+        .collect()
 }
 
 fn update_candidate_ranking(
@@ -125,7 +125,7 @@ fn update_candidate_ranking(
     let mut updated_candidate_ranking: Vec<Candidate> = vec![];
     // Add candidates meeting preference threshold to the top of the ranking
     for candidate_votes in candidate_votes_meeting_preference_threshold {
-        updated_candidate_ranking.push(candidates[candidate_votes.number as usize - 1].clone())
+        updated_candidate_ranking.push(candidates[candidate_votes.number as usize - 1].clone());
     }
 
     // Add the remaining candidates in the order of the original candidate list
@@ -146,7 +146,7 @@ fn candidate_nomination_per_political_group(
     election: &Election,
     totals: &ElectionSummary,
     preference_threshold: Fraction,
-    total_seats: Vec<u32>,
+    total_seats: &[u32],
 ) -> Result<Vec<PoliticalGroupCandidateNomination>, ApportionmentError> {
     let mut political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination> = vec![];
     for pg in election.political_groups.clone().unwrap_or_default() {
@@ -229,8 +229,7 @@ fn all_sorted_chosen_candidates(
                             .iter()
                             .any(|cv| cv.number == candidate.number)
                 })
-                .cloned()
-                .collect::<Vec<Candidate>>(),
+                .cloned(),
         );
     }
     chosen_candidates = sort_candidates_on_last_name_alphabetically(chosen_candidates);
@@ -264,7 +263,7 @@ pub fn candidate_nomination(
         election,
         totals,
         preference_threshold,
-        total_seats,
+        &total_seats,
     )?;
     debug!(
         "Political group candidate nomination: {:#?}",

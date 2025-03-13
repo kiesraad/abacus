@@ -202,6 +202,13 @@ fn candidate_nomination_per_political_group(
     Ok(political_group_candidate_nomination)
 }
 
+pub fn sort_candidates_on_last_name_alphabetically(
+    mut candidates: Vec<Candidate>,
+) -> Vec<Candidate> {
+    candidates.sort_by(|a, b| a.last_name.cmp(&b.last_name));
+    candidates
+}
+
 fn all_sorted_chosen_candidates(
     pgs: Vec<PoliticalGroup>,
     political_group_candidate_nomination: &[PoliticalGroupCandidateNomination],
@@ -226,7 +233,7 @@ fn all_sorted_chosen_candidates(
                 .collect::<Vec<Candidate>>(),
         );
     }
-    chosen_candidates.sort_by(|a, b| a.last_name.cmp(&b.last_name));
+    chosen_candidates = sort_candidates_on_last_name_alphabetically(chosen_candidates);
     chosen_candidates
 }
 
@@ -303,10 +310,12 @@ mod tests {
     use crate::{
         apportionment::{
             ApportionmentError, Fraction, candidate_nomination, candidate_numbers,
-            candidate_votes_numbers,
+            candidate_votes_numbers, sort_candidates_on_last_name_alphabetically,
             test_helpers::election_summary_fixture_with_given_candidate_votes,
         },
-        election::{Candidate, tests::election_fixture_with_given_number_of_seats},
+        election::{
+            Candidate, CandidateGender::X, tests::election_fixture_with_given_number_of_seats,
+        },
     };
     use test_log::test;
 
@@ -481,6 +490,174 @@ mod tests {
         );
     }
 
+    /// Candidate nomination with no preferential candidate nomination
+    ///
+    /// PG seats: [1, 1, 1, 1, 1]  
+    /// PG 1: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// PG 2: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// PG 3: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// PG 4: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// PG 5: No preferential candidate nominations and other candidate nomination of candidate 1
+    #[test]
+    fn test_with_lt_19_seats_and_no_preferential_candidate_nomination() {
+        let election = election_fixture_with_given_number_of_seats(&[5, 5, 5, 5, 5], 5);
+        let quota = Fraction::new(105, 5);
+        let totals = election_summary_fixture_with_given_candidate_votes(vec![
+            vec![5, 4, 4, 4, 4],
+            vec![4, 5, 4, 4, 4],
+            vec![4, 4, 5, 4, 4],
+            vec![4, 4, 4, 5, 4],
+            vec![4, 4, 4, 4, 5],
+        ]);
+        let result = candidate_nomination(&election, quota, &totals, vec![1, 1, 1, 1, 1]).unwrap();
+        assert_eq!(result.preference_threshold_percentage, 50);
+        assert_eq!(
+            result.preference_threshold,
+            quota * Fraction::new(result.preference_threshold_percentage, 100)
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[0]
+                .preferential_candidate_nomination
+                .len(),
+            0
+        );
+        assert_eq!(
+            candidate_votes_numbers(
+                &result.political_group_candidate_nomination[0].other_candidate_nomination
+            ),
+            vec![1]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[0]
+                .updated_candidate_ranking
+                .len(),
+            0
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[1]
+                .preferential_candidate_nomination
+                .len(),
+            0
+        );
+        assert_eq!(
+            candidate_votes_numbers(
+                &result.political_group_candidate_nomination[1].other_candidate_nomination
+            ),
+            vec![1]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[1]
+                .updated_candidate_ranking
+                .len(),
+            0
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[2]
+                .preferential_candidate_nomination
+                .len(),
+            0
+        );
+        assert_eq!(
+            candidate_votes_numbers(
+                &result.political_group_candidate_nomination[2].other_candidate_nomination
+            ),
+            vec![1]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[2]
+                .updated_candidate_ranking
+                .len(),
+            0
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[3]
+                .preferential_candidate_nomination
+                .len(),
+            0
+        );
+        assert_eq!(
+            candidate_votes_numbers(
+                &result.political_group_candidate_nomination[3].other_candidate_nomination
+            ),
+            vec![1]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[3]
+                .updated_candidate_ranking
+                .len(),
+            0
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[4]
+                .preferential_candidate_nomination
+                .len(),
+            0
+        );
+        assert_eq!(
+            candidate_votes_numbers(
+                &result.political_group_candidate_nomination[4].other_candidate_nomination
+            ),
+            vec![1]
+        );
+        assert_eq!(
+            result.political_group_candidate_nomination[4]
+                .updated_candidate_ranking
+                .len(),
+            0
+        );
+        let pgs = election.political_groups.unwrap_or_default();
+        assert!(
+            pgs[0].candidates[..1]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[0].candidates[2..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[1].candidates[..1]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[1].candidates[2..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[2].candidates[..1]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[2].candidates[2..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[3].candidates[..1]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[3].candidates[2..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[4].candidates[..1]
+                .iter()
+                .all(|item| result.chosen_candidates.contains(item))
+        );
+        assert!(
+            pgs[4].candidates[2..]
+                .iter()
+                .all(|item| !result.chosen_candidates.contains(item))
+        );
+    }
+
     /// Candidate nomination with more candidates eligible for preferential nomination than seats
     ///
     /// PG seats: [6, 5, 4, 2, 2]  
@@ -502,7 +679,7 @@ mod tests {
             vec![400, 400, 0, 400, 400, 400, 399],
             vec![300, 300, 300, 0, 300, 299, 298],
             vec![200, 200, 199, 198, 0, 197, 196],
-            vec![200, 200, 199, 198, 198, 119, 0],
+            vec![200, 200, 199, 198, 198, 0, 119],
         ]);
         let result = candidate_nomination(&election, quota, &totals, vec![6, 5, 4, 2, 2]).unwrap();
         assert_eq!(result.preference_threshold_percentage, 25);
@@ -765,5 +942,29 @@ mod tests {
         ]);
         let result = candidate_nomination(&election, quota, &totals, vec![6, 5, 4, 2, 2]);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+    }
+
+    /// Test for function sort_candidates_on_last_name_alphabetically
+    #[test]
+    fn test_sort_candidates_on_last_name_alphabetically() {
+        let names = ["Duin", "Korte", "Appel", "Zee", "Groen"];
+        let candidates: Vec<Candidate> = (0..5)
+            .map(|i| Candidate {
+                number: i + 1,
+                initials: "A.B.".to_string(),
+                first_name: Some(format!("Candidate {}", i + 1)),
+                last_name_prefix: if (i % 2) == 0 {
+                    Some("van".to_string())
+                } else {
+                    None
+                },
+                last_name: names[i as usize].to_string(),
+                locality: "Juinen".to_string(),
+                country_code: Some("NL".to_string()),
+                gender: Some(X),
+            })
+            .collect();
+        let sorted_candidates = sort_candidates_on_last_name_alphabetically(candidates);
+        assert_eq!(candidate_numbers(&sorted_candidates), vec![3, 1, 5, 2, 4]);
     }
 }

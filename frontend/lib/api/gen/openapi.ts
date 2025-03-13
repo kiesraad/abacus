@@ -157,31 +157,6 @@ export interface AccountUpdateRequest {
 }
 
 /**
- * The result of the apportionment procedure. This contains the number of seats and the quota
-that was used. It then contains the initial standing after full seats were assigned,
-and each of the changes and intermediate standings. The final standing contains the
-number of seats per political group that was assigned after all seats were assigned.
- */
-export interface ApportionmentResult {
-  final_standing: PoliticalGroupSeatAssignment[];
-  full_seats: number;
-  quota: Fraction;
-  residual_seats: number;
-  seats: number;
-  steps: ApportionmentStep[];
-}
-
-/**
- * Records the details for a specific residual seat, and how the standing is
-once that residual seat was assigned
- */
-export interface ApportionmentStep {
-  change: AssignedSeat;
-  residual_seat_number: number;
-  standing: PoliticalGroupStanding[];
-}
-
-/**
  * Records the political group and specific change for a specific residual seat
  */
 export type AssignedSeat =
@@ -207,6 +182,20 @@ export interface Candidate {
  * Candidate gender
  */
 export type CandidateGender = "Male" | "Female" | "X";
+
+/**
+ * The result of the candidate nomination procedure.
+This contains the preference threshold and percentage that was used.
+It contains a list of all chosen candidates in alphabetical order.
+It also contains the preferential nomination of candidates, the remaining
+nomination of candidates and the final ranking of candidates for each political group.
+ */
+export interface CandidateNominationResult {
+  chosen_candidates: Candidate[];
+  political_group_candidate_nomination: PoliticalGroupCandidateNomination[];
+  preference_threshold: Fraction;
+  preference_threshold_percentage: number;
+}
 
 export interface CandidateVotes {
   number: number;
@@ -272,11 +261,11 @@ export interface Election {
 }
 
 /**
- * Election details response, including the election's candidate list (political groups) and its polling stations
+ * Election apportionment response, including the seat assignment, candidate nomination and election summary
  */
 export interface ElectionApportionmentResponse {
-  apportionment: ApportionmentResult;
   election_summary: ElectionSummary;
+  seat_assignment: SeatAssignmentResult;
 }
 
 /**
@@ -451,6 +440,19 @@ export interface PoliticalGroup {
 }
 
 /**
+ * Contains information about the chosen candidates and the candidate list ranking
+for a specific political group.
+ */
+export interface PoliticalGroupCandidateNomination {
+  candidate_ranking: CandidateVotes[];
+  other_candidate_nomination: CandidateVotes[];
+  pg_name: string;
+  pg_number: number;
+  pg_seats: number;
+  preferential_candidate_nomination: CandidateVotes[];
+}
+
+/**
  * Contains information about the final assignment of seats for a specific political group.
  */
 export interface PoliticalGroupSeatAssignment {
@@ -548,6 +550,31 @@ export type Role = "administrator" | "typist" | "coordinator";
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
+}
+
+/**
+ * The result of the seat assignment procedure. This contains the number of seats and the quota
+that was used. It then contains the initial standing after full seats were assigned,
+and each of the changes and intermediate standings. The final standing contains the
+number of seats per political group that was assigned after all seats were assigned.
+ */
+export interface SeatAssignmentResult {
+  final_standing: PoliticalGroupSeatAssignment[];
+  full_seats: number;
+  quota: Fraction;
+  residual_seats: number;
+  seats: number;
+  steps: SeatAssignmentStep[];
+}
+
+/**
+ * Records the details for a specific residual seat, and how the standing is
+once that residual seat was assigned
+ */
+export interface SeatAssignmentStep {
+  change: AssignedSeat;
+  residual_seat_number: number;
+  standing: PoliticalGroupStanding[];
 }
 
 /**

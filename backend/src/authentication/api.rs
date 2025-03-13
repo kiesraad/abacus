@@ -265,33 +265,6 @@ pub async fn extend_session(State(pool): State<SqlitePool>, req: Request, next: 
     res
 }
 
-/// Development endpoint: create a new user (unauthenticated)
-#[cfg(debug_assertions)]
-#[utoipa::path(
-  post,
-  path = "/api/user/development/create",
-  request_body = Credentials,
-  responses(
-      (status = 201, description = "User was successfully created"),
-      (status = 500, description = "Internal server error", body = ErrorResponse),
-  ),
-)]
-pub async fn development_create_user(
-    State(users): State<Users>,
-    Json(credentials): Json<Credentials>,
-) -> Result<impl IntoResponse, APIError> {
-    use super::role::Role;
-
-    let Credentials { username, password } = credentials;
-
-    // Create a new user
-    users
-        .create(&username, None, &password, Role::Typist)
-        .await?;
-
-    Ok(StatusCode::CREATED)
-}
-
 #[derive(Serialize, Deserialize, ToSchema)]
 pub struct UserListResponse {
     pub users: Vec<User>,

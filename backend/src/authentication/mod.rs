@@ -84,12 +84,6 @@ mod tests {
             .route("/api/user/account", put(api::account_update))
             .layer(middleware::from_fn_with_state(pool, extend_session));
 
-        #[cfg(debug_assertions)]
-        let router = router.route(
-            "/api/user/development/create",
-            post(api::development_create_user),
-        );
-
         router.with_state(state)
     }
 
@@ -346,55 +340,6 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
-    }
-
-    #[cfg(debug_assertions)]
-    #[test(sqlx::test)]
-    async fn test_development_create_user(pool: SqlitePool) {
-        let app = create_app(pool);
-
-        // create a new user
-        let response = app
-            .clone()
-            .oneshot(
-                Request::builder()
-                    .method(Method::POST)
-                    .uri("/api/user/development/create")
-                    .header(CONTENT_TYPE, "application/json")
-                    .body(Body::from(
-                        serde_json::to_vec(&Credentials {
-                            username: "user_test".to_string(),
-                            password: "password_test".to_string(),
-                        })
-                        .unwrap(),
-                    ))
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::CREATED);
-
-        // test login
-        let response = app
-            .oneshot(
-                Request::builder()
-                    .method(Method::POST)
-                    .uri("/api/user/login")
-                    .header(CONTENT_TYPE, "application/json")
-                    .body(Body::from(
-                        serde_json::to_vec(&Credentials {
-                            username: "user_test".to_string(),
-                            password: "password_test".to_string(),
-                        })
-                        .unwrap(),
-                    ))
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

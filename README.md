@@ -25,7 +25,9 @@ De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de 
 
 Voor meer context over het gebruik van Abacus lees je [Het verkiezingsproces en Abacus](documentatie/gebruikersdocumentatie/verkiezingsproces-en-abacus.md). Je kunt hiervoor ook kijken naar de presentatie [Abacus: Software for Secure and Transparent Voting Results](https://youtu.be/qhYd_LNS2nQ) die we in november 2024 hebben gegeven op WICCON (in het Engels).
 
-Abacus is werk in uitvoering! Dit betekent dat de functionaliteit stapsgewijs wordt gebouwd. Kijk bij [Functionaliteit van Abacus: eisen en wensen](/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md) om te zien welke mijlpalen we hebben gesteld en hoe versie 1.0 eruit komt te zien voor de gemeenteraadsverkiezingen in maart 2026.
+Abacus is werk in uitvoering! Dit betekent dat de functionaliteit stapsgewijs wordt gebouwd. Kijk bij [Functionaliteit van Abacus: eisen en wensen](/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md) om te zien welke mijlpalen we hebben gesteld. 
+
+OSV2020 is de huidige software die bij verkiezingen wordt gebruikt. Het ontwikkelteam werkt nu aan een versie van Abacus die geschikt is voor toepassing bij de verkiezingen voor de Gemeenteraad. Abacus kan worden ingezet als het af is, aan alle eisen voldoet en de Kiesraad besloten heeft over de toepassing. 
 
 ### Techniek
 

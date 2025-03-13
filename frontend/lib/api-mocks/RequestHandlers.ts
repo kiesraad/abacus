@@ -158,7 +158,7 @@ export const UserCreateRequestHandler = http.post<
   USER_CREATE_REQUEST_BODY,
   User,
   USER_CREATE_REQUEST_PATH
->("/api/user", () => HttpResponse.json(userMockData[userMockData.length - 1], { status: 200 }));
+>("/api/user", () => HttpResponse.json(userMockData[0], { status: 200 }));
 
 export const UserGetRequestHandler = http.get<
   ParamsToString<USER_GET_REQUEST_PARAMS>,

@@ -704,10 +704,26 @@ mod tests {
         assert!(matches!(next, DataEntryStatus::FirstEntryInProgress(_)));
     }
 
+    /// FirstEntryInProgress --> FirstEntryInProgress: claim with same user
     #[test]
     fn first_entry_in_progress_claim_first_entry_ok() {
         let next = first_entry_in_progress().claim_first_entry(empty_current_data_entry());
         assert!(matches!(next, Ok(DataEntryStatus::FirstEntryInProgress(_))));
+    }
+
+    /// FirstEntryInProgress --> FirstEntryInProgress: claim with different user returns error
+    #[test]
+    fn first_entry_in_progress_claim_first_entry_other_user_error() {
+        let current_data_entry = CurrentDataEntry {
+            progress: None,
+            user_id: 1,
+            entry: polling_station_result(),
+            client_state: None,
+        };
+        assert_eq!(
+            first_entry_in_progress().claim_first_entry(current_data_entry),
+            Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
+        );
     }
 
     #[test]
@@ -865,6 +881,7 @@ mod tests {
         ));
     }
 
+    /// SecondEntryInProgress --> SecondEntryInProgress: claim with same user
     #[test]
     fn second_entry_in_progress_claim_second_entry_ok() {
         let next = second_entry_in_progress().claim_second_entry(empty_current_data_entry());
@@ -872,6 +889,21 @@ mod tests {
             next,
             Ok(DataEntryStatus::SecondEntryInProgress(_))
         ));
+    }
+
+    /// SecondEntryInProgress --> SecondEntryInProgress: claim with different user returns error
+    #[test]
+    fn second_entry_in_progress_claim_second_entry_other_user_error() {
+        let current_data_entry = CurrentDataEntry {
+            progress: None,
+            user_id: 1,
+            entry: polling_station_result(),
+            client_state: None,
+        };
+        assert_eq!(
+            second_entry_in_progress().claim_second_entry(current_data_entry),
+            Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
+        );
     }
 
     #[test]

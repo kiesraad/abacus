@@ -13,17 +13,23 @@ import {
 
 export interface SessionState {
   user: LoginResponse | null;
+  loading: boolean;
   setUser: (user: LoginResponse | null) => void;
   logout: () => Promise<void>;
   login: (username: string, password: string) => Promise<ApiResult<LoginResponse>>;
+  expiration: Date | null;
+  setExpiration: (expiration: Date | null) => void;
+  extendSession: () => Promise<void>;
 }
 
 // Keep track of the currently logged-in user
 // By initially fetching the user data from the server
 // and then updating it when the user logs in or out
-export default function useSessionState(fetchInitialUser: boolean): SessionState {
+export default function useSessionState(client: ApiClient, fetchInitialUser: boolean): SessionState {
   const [user, setUser] = useState<LoginResponse | null>(null);
   const [error, setError] = useState<AnyApiError | null>(null);
+  const [expiration, setExpiration] = useState<Date | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Propagate any unexpected API errors to the router
   useEffect(() => {
@@ -35,7 +41,6 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
   // Log out the current user
   const logout = async () => {
     const path: LOGOUT_REQUEST_PATH = "/api/user/logout";
-    const client = new ApiClient();
     const response = await client.postRequest(path);
 
     if (isSuccess(response)) {
@@ -49,7 +54,6 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
   const login = async (username: string, password: string) => {
     const requestPath: LOGIN_REQUEST_PATH = "/api/user/login";
     const requestBody: LOGIN_REQUEST_BODY = { username, password };
-    const client = new ApiClient();
     const response = await client.postRequest<LoginResponse>(requestPath, requestBody);
 
     if (isSuccess(response)) {
@@ -57,6 +61,11 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
     }
 
     return response;
+  };
+
+  const extendSession = async () => {
+    const path: WHOAMI_REQUEST_PATH = "/api/user/whoami";
+    void (await client.getRequest<LoginResponse>(path));
   };
 
   // Fetch the user data from the server when the component mounts
@@ -69,10 +78,14 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
         const client = new ApiClient();
         const response = await client.getRequest<LoginResponse>(path, abortController);
 
-        if (isSuccess(response)) {
-          setUser(response.data);
-        } else {
-          setUser(null);
+        if (!abortController.signal.aborted) {
+          if (isSuccess(response)) {
+            setUser(response.data);
+          } else {
+            setUser(null);
+          }
+
+          setLoading(false);
         }
       })();
 
@@ -82,5 +95,14 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
     }
   }, [fetchInitialUser]);
 
-  return { user, setUser, login, logout };
+  return {
+    expiration,
+    loading,
+    login,
+    logout,
+    setExpiration,
+    setUser,
+    user,
+    extendSession,
+  };
 }

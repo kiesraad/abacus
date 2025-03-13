@@ -1,17 +1,33 @@
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router";
+import { Location, useLocation, useNavigate } from "react-router";
 
 import { AnyApiError, FatalError, isError, useApiState } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
+import { t, TranslationPath, tx } from "@kiesraad/i18n";
 import { Alert, BottomBar, Button, FormLayout, InputField } from "@kiesraad/ui";
+
+interface UnauthorizedState {
+  unauthorized?: boolean;
+}
 
 export function LoginForm() {
   const navigate = useNavigate();
-  const { login } = useApiState();
+  const location = useLocation() as Location<null | UnauthorizedState>;
+  const { login, expiration } = useApiState();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<AnyApiError | null>(null);
+
+  // show notification if the user is unauthorized or the session expired
+  let notification: TranslationPath | null = null;
+  if (location.state?.unauthorized === true) {
+    const now = new Date();
+    if (expiration !== null && expiration.getTime() < now.getTime()) {
+      notification = "users.session_expired";
+    } else {
+      notification = "users.unauthorized";
+    }
+  }
 
   // Handle form submission
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -51,6 +67,14 @@ export function LoginForm() {
       }}
     >
       <FormLayout>
+        {notification && (
+          <FormLayout.Alert>
+            <Alert type="notify" margin="mb-lg">
+              <h2>{t(`${notification}_title`)}</h2>
+              <p>{tx(notification)}</p>
+            </Alert>
+          </FormLayout.Alert>
+        )}
         {error && (
           <FormLayout.Alert>
             <Alert type="error" margin="mb-lg">

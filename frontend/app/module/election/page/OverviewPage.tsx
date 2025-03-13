@@ -20,9 +20,9 @@ export function OverviewPage() {
   function electionLink(election: Election): To {
     if (isAdminOrCoordinator) {
       return `/elections/${election.id}`;
-    } else {
-      return `/elections/${election.id}/data-entry`;
     }
+
+    return `/elections/${election.id}/data-entry`;
   }
 
   function closeNewAccountAlert() {

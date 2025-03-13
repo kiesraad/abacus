@@ -88,3 +88,33 @@ export function formatDateTime(date: Date) {
     return `${dateString} ${timeString}`;
   }
 }
+
+export function formatTimeToGo(seconds: number) {
+  const secondsRounded = Math.round(seconds);
+  const remainingMinutes = Math.floor(secondsRounded / 60);
+  const remainingSeconds = secondsRounded % 60;
+
+  let secondsFormatted = "";
+
+  if (remainingSeconds === 1) {
+    secondsFormatted = t("one_second");
+  } else if (remainingSeconds > 1) {
+    secondsFormatted = t("seconds", { seconds: remainingSeconds });
+  }
+
+  let minutesFormatted = "";
+
+  if (remainingMinutes === 1) {
+    minutesFormatted = t("one_minute");
+  } else if (remainingMinutes > 1) {
+    minutesFormatted = t("minutes", { minutes: remainingMinutes });
+  } else {
+    return secondsFormatted;
+  }
+
+  if (minutesFormatted && secondsFormatted) {
+    return `${minutesFormatted} ${t("and")} ${secondsFormatted}`;
+  }
+
+  return minutesFormatted;
+}

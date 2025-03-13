@@ -16,10 +16,12 @@ export function useCandidateVotes(political_group_number: number) {
       type: "political_group_votes",
       number: political_group_number,
     },
-    getDefaultFormValues: (results) =>
-      valuesToFormValues(
-        results.political_group_votes.find((pg) => pg.number === political_group_number) as CandidateVotesValues,
-      ),
+    getDefaultFormValues: (results, cache) =>
+      cache?.key === `political_group_votes_${political_group_number}`
+        ? valuesToFormValues(cache.data as CandidateVotesValues)
+        : valuesToFormValues(
+            results.political_group_votes.find((pg) => pg.number === political_group_number) as CandidateVotesValues,
+          ),
   });
 
   const [missingTotalError, setMissingTotalError] = React.useState(false);

@@ -4,11 +4,11 @@ import { PollingStationResults } from "@kiesraad/api";
 import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
 import { getErrorsAndWarnings } from "./dataEntryUtils";
-import { FormSectionReference, SubmitCurrentFormOptions } from "./types";
+import { FormSectionReference, SubmitCurrentFormOptions, TemporaryCache } from "./types";
 import { useDataEntryContext } from "./useDataEntryContext";
 
 export interface UseDataEntryFormSectionParams<FORM_VALUES> {
-  getDefaultFormValues: (results: PollingStationResults) => FORM_VALUES;
+  getDefaultFormValues: (results: PollingStationResults, cache?: TemporaryCache | null) => FORM_VALUES;
   section: FormSectionReference;
 }
 
@@ -20,9 +20,8 @@ export function useDataEntryFormSection<FORM_VALUES>({
     useDataEntryContext(section);
 
   //local form state
-
-  const [currentValues, setCurrentValues] = React.useState<FORM_VALUES>(() =>
-    cache?.key === section.id ? (cache.data as FORM_VALUES) : getDefaultFormValues(pollingStationResults),
+  const [currentValues, setCurrentValues] = React.useState<FORM_VALUES>(
+    getDefaultFormValues(pollingStationResults, cache),
   );
 
   // derived state

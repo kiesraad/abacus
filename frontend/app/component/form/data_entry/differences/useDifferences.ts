@@ -8,7 +8,10 @@ export function useDifferences() {
       id: "differences_counts",
       type: "differences",
     },
-    getDefaultFormValues: (results) => valuesToFormValues(results.differences_counts),
+    getDefaultFormValues: (results, cache) =>
+      cache?.key === "differences_counts"
+        ? valuesToFormValues(cache.data as DifferencesValues)
+        : valuesToFormValues(results.differences_counts),
   });
 
   // submit and save to form contents

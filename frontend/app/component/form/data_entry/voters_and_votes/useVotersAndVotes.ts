@@ -13,12 +13,14 @@ export function useVotersAndVotes() {
       id: "voters_votes_counts",
       type: "voters_and_votes",
     },
-    getDefaultFormValues: (results) =>
-      valuesToFormValues({
-        voters_counts: results.voters_counts,
-        votes_counts: results.votes_counts,
-        voters_recounts: results.voters_recounts || undefined,
-      }),
+    getDefaultFormValues: (results, cache) =>
+      cache?.key === "voters_votes_counts"
+        ? valuesToFormValues(cache.data as VotersAndVotesValues)
+        : valuesToFormValues({
+            voters_counts: results.voters_counts,
+            votes_counts: results.votes_counts,
+            voters_recounts: results.voters_recounts || undefined,
+          }),
   });
 
   // submit and save to form contents

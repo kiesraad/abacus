@@ -25,12 +25,15 @@
 ///         elements: Vec<Element>,
 ///     }
 ///
-///     gen_wrap_list!(mod test_serde as element: Element => Elements);
+///     gen_wrap_list!(test_serde, Element, "Element");
 /// }
 /// ```
 #[macro_export]
 macro_rules! gen_wrap_list {
-    (mod $modname:ident as $singular:ident: $typename:ident => $plural:ident) => {
+    ($modname:ident, $typename:ident, $xml_name:literal) => {
+        $crate::gen_wrap_list!($modname, $typename, $xml_name, $xml_name);
+    };
+    ($modname:ident, $typename:ident, $serialize:literal, $deserialize:literal) => {
         mod $modname {
             use super::$typename;
 
@@ -41,15 +44,12 @@ macro_rules! gen_wrap_list {
                 use serde::Serialize;
 
                 #[derive(serde::Serialize)]
-                #[serde(rename_all = "PascalCase")]
-                pub struct $plural<'a> {
-                    pub $singular: &'a [$typename],
+                pub struct Values<'a> {
+                    #[serde(rename(serialize = $serialize))]
+                    pub values: &'a [$typename],
                 }
 
-                $plural {
-                    $singular: &value[..],
-                }
-                .serialize(serializer)
+                Values { values: &value[..] }.serialize(serializer)
             }
 
             pub fn deserialize<'de, D>(deserializer: D) -> Result<Vec<$typename>, D::Error>
@@ -59,12 +59,12 @@ macro_rules! gen_wrap_list {
                 use serde::Deserialize;
 
                 #[derive(serde::Deserialize)]
-                #[serde(rename_all = "PascalCase")]
-                pub struct $plural {
-                    pub $singular: Vec<$typename>,
+                pub struct Values {
+                    #[serde(rename(deserialize = $deserialize))]
+                    pub values: Vec<$typename>,
                 }
 
-                $plural::deserialize(deserializer).map(|inner| inner.$singular)
+                Values::deserialize(deserializer).map(|inner| inner.values)
             }
         }
     };

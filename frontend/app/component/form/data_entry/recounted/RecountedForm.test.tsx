@@ -1,8 +1,6 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { emptyDataEntryRequest, errorWarningMocks } from "app/component/form/data_entry/test.util";
-
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, SaveDataEntryResponse } from "@kiesraad/api";
 import {
   electionMockData,
@@ -12,6 +10,7 @@ import {
 import { getUrlMethodAndBody, overrideOnce, render, screen, server } from "@kiesraad/test";
 
 import { DataEntryProvider } from "../state/DataEntryProvider";
+import { errorWarningMocks, getEmptyDataEntryRequest } from "../test-data";
 import { RecountedForm } from "./RecountedForm";
 
 const Component = (
@@ -87,7 +86,7 @@ describe("Test RecountedForm", () => {
     test("RecountedForm request body is equal to the form data", async () => {
       const expectedRequest = {
         data: {
-          ...emptyDataEntryRequest.data,
+          ...getEmptyDataEntryRequest().data,
           recounted: true,
           voters_recounts: {
             poll_card_count: 0,

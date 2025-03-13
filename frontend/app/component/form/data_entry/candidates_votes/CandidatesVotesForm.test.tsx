@@ -13,15 +13,15 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, within } fro
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { DataEntryState } from "../state/types";
 import {
-  defaultFormSection,
-  emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
   getCandidateFullNamesFromMockData,
+  getDefaultFormSection,
+  getEmptyDataEntryRequest,
   overrideServerClaimDataEntryResponse,
-} from "../test.util";
+} from "../test-data";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const defaultDataEntryState: DataEntryState = {
@@ -34,26 +34,10 @@ const defaultDataEntryState: DataEntryState = {
     current: "differences_counts",
     furthest: "differences_counts",
     sections: {
-      recounted: {
-        id: "recounted",
-        index: 1,
-        ...defaultFormSection,
-      },
-      voters_votes_counts: {
-        id: "voters_votes_counts",
-        index: 2,
-        ...defaultFormSection,
-      },
-      differences_counts: {
-        id: "differences_counts",
-        index: 3,
-        ...defaultFormSection,
-      },
-      save: {
-        id: "save",
-        index: 4,
-        ...defaultFormSection,
-      },
+      recounted: getDefaultFormSection("recounted", 1),
+      voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
+      differences_counts: getDefaultFormSection("differences_counts", 3),
+      save: getDefaultFormSection("save", 4),
     },
   },
   targetFormSectionId: "recounted",
@@ -343,7 +327,7 @@ describe("Test CandidatesVotesForm", () => {
       overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
-          ...emptyDataEntryRequest.data,
+          ...getEmptyDataEntryRequest().data,
           political_group_votes: [
             {
               number: 1,
@@ -380,7 +364,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const expectedRequest = {
         data: {
-          ...emptyDataEntryRequest.data,
+          ...getEmptyDataEntryRequest().data,
           political_group_votes: [
             {
               number: 1,

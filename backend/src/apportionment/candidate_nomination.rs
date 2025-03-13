@@ -10,7 +10,7 @@ use utoipa::ToSchema;
 
 /// Contains information about the chosen candidates and the candidate list ranking
 /// for a specific political group.
-#[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupCandidateNomination {
     /// Political group number for which this nomination applies
     #[schema(value_type = u32)]
@@ -118,31 +118,25 @@ fn other_candidate_nomination(
 
 fn update_candidate_ranking(
     preference_threshold: Fraction,
-    candidate_votes_meeting_preference_threshold: Vec<CandidateVotes>,
+    candidate_votes_meeting_preference_threshold: &[CandidateVotes],
     candidate_votes: &[CandidateVotes],
-    candidates: Vec<Candidate>,
+    candidates: &[Candidate],
 ) -> Vec<Candidate> {
     let mut updated_candidate_ranking: Vec<Candidate> = vec![];
     // Add candidates meeting preference threshold to the top of the ranking
     for candidate_votes in candidate_votes_meeting_preference_threshold {
         updated_candidate_ranking.push(candidates[candidate_votes.number as usize - 1].clone())
     }
-    let candidates_not_meeting_preference_threshold: Vec<CandidateVotes> = candidate_votes
+
+    // Add the remaining candidates in the order of the original candidate list
+    for candidate_votes in candidate_votes
         .iter()
         .filter(|candidate_votes| Fraction::from(candidate_votes.votes) < preference_threshold)
-        .copied()
-        .collect();
-    // Add the remaining candidates in the order of the original candidate list
-    for candidate_votes in candidates_not_meeting_preference_threshold {
-        updated_candidate_ranking.push(candidates[candidate_votes.number as usize - 1].clone())
+    {
+        updated_candidate_ranking.push(candidates[candidate_votes.number as usize - 1].clone());
     }
-    // If the updated candidate ranking is the same as the original candidate list,
-    // return an empty list, otherwise return the updated list
-    if updated_candidate_ranking == candidates {
-        vec![]
-    } else {
-        updated_candidate_ranking
-    }
+
+    updated_candidate_ranking
 }
 
 /// This function nominates candidates for the seats each political group has been assigned.  
@@ -175,19 +169,25 @@ fn candidate_nomination_per_political_group(
 
         // [Artikel P 19 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_19&z=2025-02-12&g=2025-02-12)
         let updated_candidate_ranking: Vec<Candidate> =
-            if !candidate_votes_meeting_preference_threshold.is_empty() {
-                if election.number_of_seats >= 19 && pg_seats == 0 {
+            if candidate_votes_meeting_preference_threshold.is_empty()
+                || (election.number_of_seats >= 19 && pg_seats == 0)
+            {
+                vec![]
+            } else {
+                let updated_ranking = update_candidate_ranking(
+                    preference_threshold,
+                    &candidate_votes_meeting_preference_threshold,
+                    candidate_votes,
+                    &pg.candidates,
+                );
+
+                // If the updated candidate ranking is the same as the original candidate list,
+                // return an empty list, otherwise return the updated list
+                if updated_ranking == pg.candidates {
                     vec![]
                 } else {
-                    update_candidate_ranking(
-                        preference_threshold,
-                        candidate_votes_meeting_preference_threshold,
-                        candidate_votes,
-                        pg.candidates,
-                    )
+                    updated_ranking
                 }
-            } else {
-                vec![]
             };
 
         political_group_candidate_nomination.push(PoliticalGroupCandidateNomination {

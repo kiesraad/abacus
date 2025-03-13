@@ -104,7 +104,7 @@ fn other_candidate_nomination(
     candidate_votes: &[CandidateVotes],
     non_assigned_seats: usize,
 ) -> Vec<CandidateVotes> {
-    if non_assigned_seats > 0 {
+    if non_assigned_seats == 0 {
         return vec![];
     }
 

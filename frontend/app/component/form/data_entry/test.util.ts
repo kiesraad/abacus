@@ -1,14 +1,15 @@
 import { expect } from "vitest";
 
 import {
-  GetDataEntryResponse,
+  ClaimDataEntryResponse,
   PoliticalGroup,
+  POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationResults,
   ValidationResult,
   ValidationResultCode,
 } from "@kiesraad/api";
-import { electionMockData } from "@kiesraad/api-mocks";
+import { electionMockData, emptyData } from "@kiesraad/api-mocks";
 import { overrideOnce, screen, within } from "@kiesraad/test";
 
 import { getClientState } from "./state/dataEntryUtils";
@@ -106,27 +107,29 @@ export interface OverrideServerGetDataEntryResponseProps {
   acceptWarnings?: boolean;
   continueToNextSection?: boolean;
   progress?: number;
-  validationResults?: GetDataEntryResponse["validation_results"];
+  validationResults?: ClaimDataEntryResponse["validation_results"];
 }
 
-export function overrideServerGetDataEntryResponse({
+export function overrideServerClaimDataEntryResponse({
   formState,
   pollingStationResults,
   acceptWarnings = false,
   continueToNextSection = true,
-  progress = 1,
   validationResults = { errors: [], warnings: [] },
 }: OverrideServerGetDataEntryResponseProps) {
-  overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
-    client_state: getClientState(formState, acceptWarnings, continueToNextSection),
-    data: {
-      ...initialValues,
-      ...pollingStationResults,
-    },
-    progress,
-    updated_at: "",
-    validation_results: validationResults,
-  } satisfies GetDataEntryResponse);
+  overrideOnce(
+    "post",
+    "/api/polling_stations/1/data_entries/1/claim" satisfies POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
+    200,
+    {
+      client_state: getClientState(formState, acceptWarnings, continueToNextSection),
+      data: {
+        ...initialValues,
+        ...pollingStationResults,
+      },
+      validation_results: validationResults,
+    } satisfies ClaimDataEntryResponse,
+  );
 }
 
 export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: Array<string>, feedbackMessage: string) {
@@ -161,37 +164,7 @@ export function expectFieldsToNotHaveIcon(fields: Array<string>) {
 
 export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = {
   progress: 0,
-  data: {
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      votes_candidates_count: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
-    political_group_votes: electionMockData.political_groups.map((group) => ({
-      number: group.number,
-      total: 0,
-      candidate_votes: group.candidates.map((candidate) => ({
-        number: candidate.number,
-        votes: 0,
-      })),
-    })),
-  },
+  data: emptyData,
   client_state: {
     test: "test",
   },

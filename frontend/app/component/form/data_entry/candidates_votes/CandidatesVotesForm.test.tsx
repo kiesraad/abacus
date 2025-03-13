@@ -5,7 +5,7 @@ import { Election, PoliticalGroup, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY 
 import {
   electionMockData,
   politicalGroupMockData,
-  PollingStationDataEntryGetHandler,
+  PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, server, within } from "@kiesraad/test";
@@ -20,7 +20,7 @@ import {
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
   getCandidateFullNamesFromMockData,
-  overrideServerGetDataEntryResponse,
+  overrideServerClaimDataEntryResponse,
 } from "../test.util";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
@@ -77,7 +77,7 @@ const candidatesFieldIds = {
 
 describe("Test CandidatesVotesForm", () => {
   beforeEach(() => {
-    server.use(PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+    server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 
   describe("CandidatesVotesForm renders correctly", () => {
@@ -132,7 +132,7 @@ describe("Test CandidatesVotesForm", () => {
   describe("CandidatesVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -156,7 +156,7 @@ describe("Test CandidatesVotesForm", () => {
 
     test("Starting input doesn't render totals warning", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -174,7 +174,7 @@ describe("Test CandidatesVotesForm", () => {
 
     test("hitting shift+enter does result in api call", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -204,7 +204,7 @@ describe("Test CandidatesVotesForm", () => {
       });
 
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -340,6 +340,42 @@ describe("Test CandidatesVotesForm", () => {
 
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
+      overrideServerClaimDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          ...emptyDataEntryRequest.data,
+          political_group_votes: [
+            {
+              number: 1,
+              total: 0,
+              candidate_votes: [
+                {
+                  number: 1,
+                  votes: 0,
+                },
+                {
+                  number: 2,
+                  votes: 0,
+                },
+              ],
+            },
+            {
+              number: 2,
+              total: 0,
+              candidate_votes: [
+                {
+                  number: 1,
+                  votes: 0,
+                },
+                {
+                  number: 2,
+                  votes: 0,
+                },
+              ],
+            },
+          ],
+        },
+      });
       renderForm({ group: politicalGroupMock, election: electionMockData });
 
       const expectedRequest = {
@@ -416,7 +452,7 @@ describe("Test CandidatesVotesForm", () => {
     test("Show error when list total is empty", async () => {
       const user = userEvent.setup();
 
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -465,7 +501,7 @@ describe("Test CandidatesVotesForm", () => {
     test("F.401 IncorrectTotal group total", async () => {
       const user = userEvent.setup();
 
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -502,7 +538,7 @@ describe("Test CandidatesVotesForm", () => {
   describe("CandidatesVotesForm warnings", () => {
     test("Imagined warning on this form", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,

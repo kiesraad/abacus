@@ -6,7 +6,7 @@ import { emptyDataEntryRequest, errorWarningMocks } from "app/component/form/dat
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, SaveDataEntryResponse } from "@kiesraad/api";
 import {
   electionMockData,
-  PollingStationDataEntryGetHandler,
+  PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, server } from "@kiesraad/test";
@@ -22,7 +22,7 @@ const Component = (
 
 describe("Test RecountedForm", () => {
   beforeEach(() => {
-    server.use(PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+    server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
   describe("RecountedForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {

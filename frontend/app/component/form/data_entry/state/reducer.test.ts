@@ -16,12 +16,10 @@ test("should handle DATA_ENTRY_LOADED with client_state", () => {
     dataEntry: {
       client_state: null,
       data: initialValues,
-      progress: 0,
       validation_results: {
         errors: [],
         warnings: [],
       },
-      updated_at: "",
     },
   };
   const state = dataEntryReducer(initialState, action);

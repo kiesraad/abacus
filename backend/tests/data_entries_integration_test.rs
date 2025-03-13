@@ -7,14 +7,15 @@ use sqlx::SqlitePool;
 use std::{collections::BTreeMap, net::SocketAddr};
 use test_log::test;
 
+use crate::shared::claim_data_entry;
 use crate::{
-    shared::{create_and_finalise_data_entry, create_and_save_data_entry},
+    shared::{create_and_finalise_data_entry, save_data_entry},
     utils::serve_api,
 };
 use abacus::{
     ErrorResponse,
     data_entry::{
-        ElectionStatusResponse, ElectionStatusResponseEntry, GetDataEntryResponse,
+        ClaimDataEntryResponse, ElectionStatusResponse, ElectionStatusResponseEntry,
         SaveDataEntryResponse, ValidationResultCode, status::DataEntryStatusName::*,
     },
 };
@@ -33,6 +34,16 @@ async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
 async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::typist_login(&addr).await;
+
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", cookie.clone())
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
     let request_body = json!({
       "data": {
         "recounted": false,
@@ -217,13 +228,23 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
 
 /// test that we can get a data entry after saving it
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_get(pool: SqlitePool) {
+async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::typist_login(&addr).await;
 
     let request_body = shared::example_data_entry(None);
 
-    // create a data entry
+    // claim a data entry
+    let claim_url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
+    let response = reqwest::Client::new()
+        .post(&claim_url)
+        .header("cookie", cookie.clone())
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // save a data entry
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
     let response = reqwest::Client::new()
         .post(&url)
@@ -235,9 +256,9 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
     let save_response: SaveDataEntryResponse = response.json().await.unwrap();
 
-    // get the data entry
+    // claim the data entry again
     let response = reqwest::Client::new()
-        .get(&url)
+        .post(&claim_url)
         .header("cookie", cookie)
         .send()
         .await
@@ -245,33 +266,33 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 
     // check that the data entry is the same
-    let get_response: GetDataEntryResponse = response.json().await.unwrap();
-    assert_eq!(get_response.data, request_body.data);
+    let claim_response: ClaimDataEntryResponse = response.json().await.unwrap();
+    assert_eq!(claim_response.data, request_body.data);
     assert_eq!(
-        get_response.client_state.as_ref(),
+        claim_response.client_state.as_ref(),
         request_body.client_state.as_ref()
     );
     assert_eq!(
-        get_response.validation_results,
+        claim_response.validation_results,
         save_response.validation_results
     );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
+async fn test_polling_station_data_entry_claim_finalised(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::typist_login(&addr).await;
     create_and_finalise_data_entry(&addr, cookie.clone(), 1, 1).await;
 
-    // get the data entry and expect 404 Not Found
-    let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
+    // claim the data entry and expect 409 Conflict
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
     let response = reqwest::Client::new()
-        .get(&url)
+        .post(&url)
         .header("cookie", cookie)
         .send()
         .await
         .unwrap();
-    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -279,6 +300,16 @@ async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::typist_login(&addr).await;
     let request_body = shared::example_data_entry(None);
+
+    // claim a data entry
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", cookie.clone())
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
 
     // create a data entry
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
@@ -347,9 +378,12 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].first_data_entry_progress, None);
     assert_eq!(statuses[&2].second_data_entry_progress, None);
 
-    // Finalise the first entry of one and set the other in progress
+    // Finalise the first data entry for polling station 1
     create_and_finalise_data_entry(&addr, typist_cookie.clone(), 1, 1).await;
-    create_and_save_data_entry(
+
+    // Set polling station 2 first entry to in progress
+    claim_data_entry(&addr, typist_cookie.clone(), 2, 1).await;
+    save_data_entry(
         &addr,
         typist_cookie.clone(),
         2,
@@ -367,8 +401,9 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].first_data_entry_progress, Some(60));
     assert_eq!(statuses[&2].second_data_entry_progress, None);
 
-    // Save the entries
-    create_and_save_data_entry(
+    // Claim and save the entries
+    claim_data_entry(&addr, typist_cookie.clone(), 1, 2).await;
+    save_data_entry(
         &addr,
         typist_cookie.clone(),
         1,
@@ -376,7 +411,7 @@ async fn test_election_details_status(pool: SqlitePool) {
         Some(r#"{"continue": true}"#),
     )
     .await;
-    create_and_save_data_entry(
+    save_data_entry(
         &addr,
         typist_cookie.clone(),
         2,
@@ -414,7 +449,8 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
     let typist_cookie = shared::typist_login(&addr).await;
 
     // Save data entry for election 1, polling station 1
-    create_and_save_data_entry(
+    claim_data_entry(&addr, typist_cookie.clone(), 1, 1).await;
+    save_data_entry(
         &addr,
         typist_cookie.clone(),
         1,
@@ -424,7 +460,8 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
     .await;
 
     // Save data entry for election 2, polling station 3
-    create_and_save_data_entry(
+    claim_data_entry(&addr, typist_cookie.clone(), 3, 1).await;
+    save_data_entry(
         &addr,
         typist_cookie.clone(),
         3,

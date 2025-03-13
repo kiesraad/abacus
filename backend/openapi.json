@@ -872,84 +872,11 @@
       }
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
-      "get": {
-        "tags": [
-          "data_entry"
-        ],
-        "summary": "Get an in-progress (not finalised) data entry for a polling station",
-        "operationId": "polling_station_data_entry_get",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Data entry retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetDataEntryResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      },
       "post": {
         "tags": [
           "data_entry"
         ],
-        "summary": "Save or update a data entry for a polling station",
+        "summary": "Save a data entry for a polling station",
         "operationId": "polling_station_data_entry_save",
         "parameters": [
           {
@@ -1104,6 +1031,71 @@
           },
           "409": {
             "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim": {
+      "post": {
+        "tags": [
+          "data_entry"
+        ],
+        "summary": "Claim a data entry for a polling station, returning any existing progress",
+        "operationId": "polling_station_data_entry_claim",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "entry_number",
+            "in": "path",
+            "description": "Data entry number (first or second data entry)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data entry claimed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimDataEntryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -1872,6 +1864,26 @@
           }
         }
       },
+      "ClaimDataEntryResponse": {
+        "type": "object",
+        "description": "Response structure for getting data entry of polling station results",
+        "required": [
+          "data",
+          "client_state",
+          "validation_results"
+        ],
+        "properties": {
+          "client_state": {
+            "type": "object"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "validation_results": {
+            "$ref": "#/components/schemas/ValidationResults"
+          }
+        }
+      },
       "CreateUserRequest": {
         "type": "object",
         "required": [
@@ -2343,36 +2355,6 @@
             "type": "integer",
             "format": "int64",
             "minimum": 0
-          }
-        }
-      },
-      "GetDataEntryResponse": {
-        "type": "object",
-        "description": "Response structure for getting data entry of polling station results",
-        "required": [
-          "progress",
-          "data",
-          "client_state",
-          "validation_results",
-          "updated_at"
-        ],
-        "properties": {
-          "client_state": {
-            "type": "object"
-          },
-          "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
-          },
-          "progress": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "updated_at": {
-            "type": "string"
-          },
-          "validation_results": {
-            "$ref": "#/components/schemas/ValidationResults"
           }
         }
       },

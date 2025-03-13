@@ -2,7 +2,8 @@ import { AppLayout } from "@kiesraad/ui";
 
 import { Footer } from "@/components/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
-import { t, TranslationPath, tx } from "@/lib/i18n";
+import { t, tx } from "@/utils/i18n/i18n";
+import { TranslationPath } from "@/utils/i18n/i18n.types";
 
 import { Error } from "./Error";
 

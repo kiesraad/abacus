@@ -3,7 +3,7 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 
 import { t, tx } from "./i18n";
-import { locale, translations } from "./index";
+import { locale, translations } from "./locale";
 
 function updateTestTranslation(value: string) {
   translations[locale].test = value;

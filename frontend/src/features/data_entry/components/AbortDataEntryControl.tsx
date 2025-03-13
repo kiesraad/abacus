@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { Button } from "@kiesraad/ui";
 
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 export function AbortDataEntryControl() {
   const navigate = useNavigate();

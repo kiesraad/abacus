@@ -1,10 +1,10 @@
 import { Link } from "react-router";
 
-import { t, tx } from "@kiesraad/i18n";
 import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
 import { useApportionmentContext } from "@/features/apportionment/hooks/useApportionmentContext";
 import { useElection } from "@/hooks/election/useElection";
+import { t, tx } from "@/utils/i18n/i18n";
 
 import cls from "../Apportionment.module.css";
 import { FullSeatsTable } from "./FullSeatsTable";

@@ -1,7 +1,7 @@
 import { ApiError } from "@/api";
 import { ErrorModal } from "@/components/error/ErrorModal";
 import { BottomBar, Button, ChoiceList, Feedback, Form, KeyboardKey, KeyboardKeys } from "@/components/ui";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 import { DataEntryNavigation } from "../DataEntryNavigation";
 import { useRecounted } from "./useRecounted";

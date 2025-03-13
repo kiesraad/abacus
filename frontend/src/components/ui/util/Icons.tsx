@@ -9,7 +9,7 @@ import {
   IconWarning,
 } from "@/components/generated/icons";
 import { AlertType, MenuStatus } from "@/components/ui";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 export function renderIconForType(type: AlertType) {
   switch (type) {

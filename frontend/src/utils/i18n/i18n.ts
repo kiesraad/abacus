@@ -1,7 +1,9 @@
 import { ReactElement } from "react";
 
+import { DEFAULT_ALLOWED_TAGS, parse, renderAst } from "@/utils/i18n/format";
+
 import { TranslationPath } from "./i18n.types";
-import { DEFAULT_ALLOWED_TAGS, locale, parse, renderAst, translations } from "./index";
+import { locale, translations } from "./locale";
 
 export type RenderCallback = (contents: ReactElement) => ReactElement;
 

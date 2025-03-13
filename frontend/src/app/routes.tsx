@@ -1,7 +1,5 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router";
 
-import { t } from "@kiesraad/i18n";
-
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { NotFoundPage } from "@/components/error/NotFoundPage";
 import { AccountSetupPage } from "@/features/account/components/AccountSetupPage";
@@ -40,6 +38,7 @@ import { UserCreateTypePage } from "@/features/users/components/create/UserCreat
 import { UserUpdatePage } from "@/features/users/components/update/UserUpdatePage";
 import { UserListPage } from "@/features/users/components/UserListPage";
 import { WorkstationsHomePage } from "@/features/workstations/components/WorkstationsHomePage";
+import { t } from "@/utils/i18n/i18n";
 
 import { NotAvailableInMock } from "./NotAvailableInMock";
 import { RootLayout } from "./RootLayout";

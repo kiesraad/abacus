@@ -1,4 +1,4 @@
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 const numberFormatter = new Intl.NumberFormat("nl-NL", {
   maximumFractionDigits: 0,

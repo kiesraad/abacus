@@ -3,8 +3,8 @@ import { useNavigate } from "react-router";
 import { PageTitle } from "@kiesraad/ui";
 
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
 import { PollingStation } from "@/types/generated/openapi";
+import { t } from "@/utils/i18n/i18n";
 
 import { PollingStationForm } from "./PollingStationForm";
 

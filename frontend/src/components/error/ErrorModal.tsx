@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { Button, Modal } from "@kiesraad/ui";
 
 import { AnyApiError, ApiError } from "@/api";
-import { t, TranslationPath } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
+import { TranslationPath } from "@/utils/i18n/i18n.types";
 
 import cls from "./ErrorModal.module.css";
 

@@ -1,9 +1,6 @@
-import { Locale, Translation } from "./i18n.types";
-import nl from "./locales/nl/nl";
+import nl from "@/assets/i18n/nl/nl";
 
-export * from "./i18n.types";
-export * from "./i18n";
-export * from "./format";
+import { Locale, Translation } from "./i18n.types";
 
 export let locale: Locale = Locale.nl;
 

@@ -5,7 +5,7 @@ import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@kiesraad/ui";
 
 import { UserType } from "@/features/users/components/create/UserCreateContext";
 import { useUserCreateContext } from "@/features/users/hooks/useUserCreateContext";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 export function UserCreateTypePage() {
   const navigate = useNavigate();

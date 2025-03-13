@@ -1,6 +1,6 @@
 import { PageTitle } from "@kiesraad/ui";
 
-import { tx } from "@/lib/i18n";
+import { tx } from "@/utils/i18n/i18n";
 
 interface NotAvailableInMockProps {
   title?: string;

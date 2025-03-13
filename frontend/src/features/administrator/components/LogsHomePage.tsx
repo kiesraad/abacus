@@ -1,6 +1,6 @@
 import { PageTitle } from "@kiesraad/ui";
 
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 export function LogsHomePage() {
   return (

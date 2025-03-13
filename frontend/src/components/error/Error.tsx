@@ -3,8 +3,8 @@ import { useNavigate } from "react-router";
 
 import { IconArrowLeft } from "@/components/generated/icons";
 import { Button } from "@/components/ui";
-import { t } from "@/lib/i18n";
 import { isDevelopment } from "@/utils";
+import { t } from "@/utils/i18n/i18n";
 
 import cls from "./Error.module.css";
 import errorImage from "./error.png";

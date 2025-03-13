@@ -4,7 +4,7 @@ import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
 import { useApportionmentContext } from "@/features/apportionment/hooks/useApportionmentContext";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 import cls from "./Apportionment.module.css";
 import { ApportionmentTable } from "./ApportionmentTable";

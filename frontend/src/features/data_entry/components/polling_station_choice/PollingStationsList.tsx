@@ -1,8 +1,8 @@
 import { Badge, Table } from "@/components/ui";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { t } from "@/lib/i18n";
 import { PollingStation } from "@/types/generated/openapi";
 import { getUrlForDataEntry } from "@/utils";
+import { t } from "@/utils/i18n/i18n";
 
 export interface PollingStationsListProps {
   pollingStations: PollingStation[];

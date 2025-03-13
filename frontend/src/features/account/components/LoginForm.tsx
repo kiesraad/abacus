@@ -2,8 +2,9 @@ import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { AnyApiError, FatalError, isError, useApiState } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
 import { Alert, BottomBar, Button, FormLayout, InputField } from "@kiesraad/ui";
+
+import { t } from "@/utils/i18n/i18n";
 
 export function LoginForm() {
   const navigate = useNavigate();

@@ -18,7 +18,7 @@ import { getPollingStationSummary, PollingStationFormSectionStatus } from "@/fea
 import { FormSectionId } from "@/features/data_entry/stores/types";
 import { useDataEntryContext } from "@/features/data_entry/stores/useDataEntryContext";
 import { useElection } from "@/hooks/election/useElection";
-import { t, tx } from "@/lib/i18n";
+import { t, tx } from "@/utils/i18n/i18n";
 
 import { getUrlForFormSectionID } from "../utils";
 

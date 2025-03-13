@@ -1,6 +1,5 @@
-import { TranslationPath } from "@kiesraad/i18n";
-
 import { ErrorReference } from "@/types/generated/openapi";
+import { TranslationPath } from "@/utils/i18n/i18n.types";
 
 import { ApiResponse, ApiResult } from "./api.types";
 import { ApiResponseStatus } from "./ApiResponseStatus";

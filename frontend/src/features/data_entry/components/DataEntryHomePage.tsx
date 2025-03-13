@@ -7,7 +7,7 @@ import { DEFAULT_CANCEL_REASON } from "@/api";
 import { Footer } from "@/components/Footer";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 import { ElectionProgress } from "./ElectionProgress";
 import { PollingStationChoiceForm } from "./polling_station_choice/PollingStationChoiceForm";

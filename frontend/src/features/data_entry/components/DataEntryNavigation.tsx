@@ -3,8 +3,8 @@ import { useBlocker } from "react-router";
 import { Button, Modal } from "@/components/ui";
 import { SubmitCurrentFormOptions } from "@/features/data_entry/stores/types";
 import { useDataEntryContext } from "@/features/data_entry/stores/useDataEntryContext";
-import { t, tx } from "@/lib/i18n";
 import { PollingStationResults } from "@/types/generated/openapi";
+import { t, tx } from "@/utils/i18n/i18n";
 
 export interface DataEntryNavigationProps {
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;

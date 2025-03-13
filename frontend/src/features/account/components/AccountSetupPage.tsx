@@ -1,10 +1,10 @@
 import { Navigate, useNavigate } from "react-router";
 
 import { useApiState } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
 import { LoginResponse } from "@/types/generated/openapi";
+import { t } from "@/utils/i18n/i18n";
 
 import { AccountSetupForm } from "./AccountSetupForm";
 

@@ -1,9 +1,9 @@
 import { DisplayFraction, Table } from "@kiesraad/ui";
 
 import cls from "@/features/apportionment/components/ApportionmentTable.module.css";
-import { t } from "@/lib/i18n";
 import { Fraction, VotesCounts } from "@/types/generated/openapi";
 import { cn, formatNumber } from "@/utils";
+import { t } from "@/utils/i18n/i18n";
 
 interface ElectionSummaryTableProps {
   votesCounts: VotesCounts;

@@ -3,9 +3,9 @@ import { Dispatch, SetStateAction } from "react";
 import { IconError, IconWarning } from "@/components/generated/icons";
 import { Badge, Icon, InputField, Spinner } from "@/components/ui";
 import { usePollingStationStatus } from "@/features/data_entry/hooks/usePollingStationStatus";
-import { t, tx } from "@/lib/i18n";
 import { DataEntryStatusName, PollingStation } from "@/types/generated/openapi";
 import { cn, removeLeadingZeros } from "@/utils";
+import { t, tx } from "@/utils/i18n/i18n";
 
 import cls from "./PollingStationSelector.module.css";
 

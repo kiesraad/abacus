@@ -1,7 +1,7 @@
-import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
 import { LoginForm } from "@/features/account/components/LoginForm";
+import { t } from "@/utils/i18n/i18n";
 
 export function LoginPage() {
   return (

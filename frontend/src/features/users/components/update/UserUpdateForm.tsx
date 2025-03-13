@@ -3,8 +3,8 @@ import { FormEvent, useState } from "react";
 import { Button, Form, FormLayout, InputField } from "@kiesraad/ui";
 
 import { IconPencil } from "@/components/generated/icons";
-import { t } from "@/lib/i18n";
 import { UpdateUserRequest, User } from "@/types/generated/openapi";
+import { t } from "@/utils/i18n/i18n";
 
 import { MIN_PASSWORD_LENGTH, validatePassword } from "../../utils/validatePassword";
 

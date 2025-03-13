@@ -5,7 +5,7 @@ import { PageTitle } from "@kiesraad/ui";
 import { useUserRole } from "@/api";
 import { Footer } from "@/components/Footer";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 export function ElectionHomePage() {
   const { isTypist } = useUserRole();

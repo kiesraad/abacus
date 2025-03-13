@@ -2,8 +2,8 @@ import { ReactElement, useEffect, useRef } from "react";
 import { Link } from "react-router";
 
 import { AlertType, FeedbackId, renderIconForType } from "@/components/ui";
-import { t, tx } from "@/lib/i18n";
 import { cn } from "@/utils";
+import { t, tx } from "@/utils/i18n/i18n";
 
 import cls from "./Feedback.module.css";
 import { ClientValidationResultCode, FeedbackItem } from "./Feedback.types";

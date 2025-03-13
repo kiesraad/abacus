@@ -3,9 +3,9 @@ import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
 import { IconPlus } from "@/components/generated/icons";
 import { useQueryParam } from "@/features/users/hooks/useQueryParam";
 import { useUserListRequest } from "@/features/users/hooks/useUserListRequest";
-import { t } from "@/lib/i18n";
 import { Role } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils";
+import { t } from "@/utils/i18n/i18n";
 
 export function UserListPage() {
   const { requestState } = useUserListRequest();

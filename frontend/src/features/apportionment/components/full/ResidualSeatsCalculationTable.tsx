@@ -1,8 +1,8 @@
 import { Table } from "@kiesraad/ui";
 
 import cls from "@/features/apportionment/components/ApportionmentTable.module.css";
-import { t } from "@/lib/i18n";
 import { cn } from "@/utils";
+import { t } from "@/utils/i18n/i18n";
 
 interface ResidualSeatsCalculationTableProps {
   seats: number;

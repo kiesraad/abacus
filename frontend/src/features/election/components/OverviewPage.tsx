@@ -6,8 +6,8 @@ import { useUserRole } from "@/api";
 import { Footer } from "@/components/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { useElectionList } from "@/hooks/election/useElectionList";
-import { t } from "@/lib/i18n";
 import { Election } from "@/types/generated/openapi";
+import { t } from "@/utils/i18n/i18n";
 
 import { ElectionStatusWithIcon } from "./ElectionStatusWithIcon";
 

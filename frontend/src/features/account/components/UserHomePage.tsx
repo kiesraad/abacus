@@ -1,8 +1,9 @@
 import { Link, Navigate } from "react-router";
 
 import { useUser } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
+
+import { t } from "@/utils/i18n/i18n";
 
 export function UserHomePage() {
   const user = useUser();

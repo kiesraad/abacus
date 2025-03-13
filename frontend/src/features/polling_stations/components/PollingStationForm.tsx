@@ -3,9 +3,9 @@ import * as React from "react";
 import { isSuccess, useCrud } from "@/api";
 import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@/components/ui";
 import { useForm } from "@/features/polling_stations/hooks/useForm";
-import { t } from "@/lib/i18n";
 import { PollingStation, PollingStationRequest } from "@/types/generated/openapi";
 import { FormFields, ValidationError } from "@/utils";
+import { t } from "@/utils/i18n/i18n";
 
 export interface PollingStationFormProps {
   electionId: number;

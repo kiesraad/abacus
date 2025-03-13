@@ -8,7 +8,7 @@ import { usePollingStationStatus } from "@/features/data_entry/hooks/usePollingS
 import { DataEntryProvider } from "@/features/data_entry/stores/DataEntryProvider";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 import { AbortDataEntryControl } from "./AbortDataEntryControl";
 

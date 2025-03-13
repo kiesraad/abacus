@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 import cls from "./Loader.module.css";
 

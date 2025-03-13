@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button, Modal } from "@kiesraad/ui";
 
 import { IconTrash } from "@/components/generated/icons";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 interface UserDeleteProps {
   onDelete: () => void;

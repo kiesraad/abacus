@@ -1,10 +1,10 @@
 import { FormEvent, useState } from "react";
 
 import { AnyApiError, ApiError, isSuccess, useCrud } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
 import { Alert, BottomBar, Button, Form, FormLayout, InputField } from "@kiesraad/ui";
 
 import { ACCOUNT_UPDATE_REQUEST_PATH, AccountUpdateRequest, LoginResponse } from "@/types/generated/openapi";
+import { t } from "@/utils/i18n/i18n";
 
 type ValidationErrors = {
   fullname?: string;

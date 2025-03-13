@@ -1,7 +1,7 @@
 import { IconCheckHeart, IconCheckVerified } from "@/components/generated/icons";
 import { Icon } from "@/components/ui";
-import { t } from "@/lib/i18n";
 import { ElectionStatus } from "@/types/generated/openapi";
+import { t } from "@/utils/i18n/i18n";
 
 function statusIcon(status: ElectionStatus) {
   switch (status) {

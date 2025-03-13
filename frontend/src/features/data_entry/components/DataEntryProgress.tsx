@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router";
 import { MenuStatus, ProgressList } from "@/components/ui";
 import { isFormSectionEmpty } from "@/features/data_entry/stores/dataEntryUtils";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 import { FormSection, FormSectionId } from "../stores/types";
 import { useDataEntryContext } from "../stores/useDataEntryContext";

@@ -5,7 +5,7 @@ import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
 import { IconPlus } from "@/components/generated/icons";
 import { usePollingStationListRequest } from "@/features/polling_stations/hooks/usePollingStationListRequest";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 export function PollingStationListPage() {
   const { election } = useElection();

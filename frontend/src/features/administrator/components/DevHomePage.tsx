@@ -6,7 +6,7 @@ import { useApiState, useUserRole } from "@/api";
 import { MockTest } from "@/features/administrator/components/MockTest";
 import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { useElectionList } from "@/hooks/election/useElectionList";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 function TypistLinks() {
   const { electionList } = useElectionList();

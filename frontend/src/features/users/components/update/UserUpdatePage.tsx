@@ -4,8 +4,8 @@ import { Alert, FormLayout, Loader, PageTitle } from "@kiesraad/ui";
 
 import { useApiRequest } from "@/api";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/lib/i18n";
 import { UpdateUserRequest, User, USER_GET_REQUEST_PATH } from "@/types/generated/openapi";
+import { t } from "@/utils/i18n/i18n";
 
 import { useUserUpdate } from "../../hooks/useUserUpdate";
 import { UserDelete } from "./UserDelete";

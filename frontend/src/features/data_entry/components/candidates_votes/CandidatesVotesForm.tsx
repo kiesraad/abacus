@@ -14,8 +14,8 @@ import {
   KeyboardKey,
   KeyboardKeys,
 } from "@/components/ui";
-import { t } from "@/lib/i18n";
 import { PoliticalGroup } from "@/types/generated/openapi";
+import { t } from "@/utils/i18n/i18n";
 
 import { DataEntryNavigation } from "../DataEntryNavigation";
 import { formValuesToValues } from "./candidatesVotesValues";

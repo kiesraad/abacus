@@ -3,7 +3,7 @@ import { Button, FormLayout, PageTitle } from "@kiesraad/ui";
 import { Footer } from "@/components/Footer";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { t, tx } from "@/lib/i18n";
+import { t, tx } from "@/utils/i18n/i18n";
 
 import cls from "./ElectionReportPage.module.css";
 

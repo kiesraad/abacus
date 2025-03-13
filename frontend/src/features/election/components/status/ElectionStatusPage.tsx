@@ -5,7 +5,7 @@ import { Alert, Button, PageTitle } from "@kiesraad/ui";
 import { Footer } from "@/components/Footer";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 import { HeaderElectionStatusWithIcon } from "../ElectionStatusWithIcon";
 import { ElectionStatus } from "./ElectionStatus";

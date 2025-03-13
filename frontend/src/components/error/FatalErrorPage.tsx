@@ -2,9 +2,9 @@ import { AppLayout } from "@kiesraad/ui";
 
 import { Footer } from "@/components/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
-import { t, tx } from "@/lib/i18n";
 import { ErrorReference } from "@/types/generated/openapi";
 import { isDevelopment } from "@/utils";
+import { t, tx } from "@/utils/i18n/i18n";
 
 import { Error } from "./Error";
 

@@ -4,8 +4,8 @@ import { Navigate, useNavigate } from "react-router";
 import { Alert, Button, Form, FormLayout, InputField, PageTitle } from "@kiesraad/ui";
 
 import { isSuccess } from "@/api";
-import { t } from "@/lib/i18n";
 import { CreateUserRequest, Role } from "@/types/generated/openapi";
+import { t } from "@/utils/i18n/i18n";
 
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 import { MIN_PASSWORD_LENGTH, validatePassword } from "../../utils/validatePassword";

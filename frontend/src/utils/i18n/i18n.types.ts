@@ -1,4 +1,4 @@
-import nl from "./locales/nl/nl";
+import nl from "@/assets/i18n/nl/nl";
 
 export type TranslationKey = keyof Translation;
 

@@ -1,9 +1,9 @@
 import { Table } from "@kiesraad/ui";
 
 import cls from "@/features/apportionment/components/ApportionmentTable.module.css";
-import { t } from "@/lib/i18n";
 import { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils";
+import { t } from "@/utils/i18n/i18n";
 
 interface ApportionmentTableProps {
   finalStanding: PoliticalGroupSeatAssignment[];

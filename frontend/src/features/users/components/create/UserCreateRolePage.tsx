@@ -4,8 +4,8 @@ import { useNavigate } from "react-router";
 import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@kiesraad/ui";
 
 import { useUserCreateContext } from "@/features/users/hooks/useUserCreateContext";
-import { t } from "@/lib/i18n";
 import { Role } from "@/types/generated/openapi";
+import { t } from "@/utils/i18n/i18n";
 
 export function UserCreateRolePage() {
   const navigate = useNavigate();

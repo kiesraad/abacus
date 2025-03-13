@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useRef } from "react";
 
 import { IconCross } from "@/components/generated/icons";
 import { IconButton } from "@/components/ui";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 import cls from "./Modal.module.css";
 

@@ -7,7 +7,7 @@ import { IconTrash } from "@/components/generated/icons";
 import { usePollingStationGet } from "@/features/polling_stations/hooks/usePollingStationGet";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";
 import { PollingStationForm } from "./PollingStationForm";

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 import { Loader } from "@kiesraad/ui";
 
-import { TranslationPath } from "@/lib/i18n";
+import { TranslationPath } from "@/utils/i18n/i18n.types";
 
 import { NotFoundError } from "./ApiError";
 import { ApiRequestState } from "./useApiRequest";

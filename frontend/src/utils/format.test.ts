@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { t } from "@/lib/i18n";
+import { t } from "@/utils/i18n/i18n";
 
 import { deformatNumber, formatDateTime, formatNumber, validateNumberString } from "./format";
 

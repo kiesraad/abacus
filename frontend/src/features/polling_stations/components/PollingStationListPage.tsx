@@ -2,10 +2,10 @@ import { useSearchParams } from "react-router";
 
 import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
 
+import { IconPlus } from "@/components/generated/icons";
 import { usePollingStationListRequest } from "@/features/polling_stations/hooks/usePollingStationListRequest";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/lib/i18n";
-import { IconPlus } from "@/lib/icon";
 
 export function PollingStationListPage() {
   const { election } = useElection();

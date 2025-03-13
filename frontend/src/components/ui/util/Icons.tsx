@@ -1,5 +1,3 @@
-import { AlertType, MenuStatus } from "@/components/ui";
-import { t } from "@/lib/i18n";
 import {
   IconArrowNarrowRight,
   IconCheckmark,
@@ -9,7 +7,9 @@ import {
   IconPencil,
   IconThumbsUp,
   IconWarning,
-} from "@/lib/icon";
+} from "@/components/generated/icons";
+import { AlertType, MenuStatus } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
 export function renderIconForType(type: AlertType) {
   switch (type) {

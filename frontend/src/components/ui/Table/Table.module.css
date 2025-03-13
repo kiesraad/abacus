@@ -22,6 +22,7 @@
     height: 2.75rem;
     line-height: 1.125rem;
     padding: 0.75rem 1.5rem;
+
     &:global(.link-cell-padding) {
       padding-right: 4.5rem;
     }
@@ -32,17 +33,19 @@
     height: 3.5rem;
     line-height: 1.25rem;
     padding: 1rem 1.5rem;
+
     &:global(.link-cell-padding) {
       padding-right: 4.5rem;
     }
   }
 
-  /* Vertical center child inline-blocks */
   td > * {
+    /* Vertical center child inline-blocks */
     vertical-align: middle;
   }
 
   /* Gap between children */
+
   td > * + * {
     margin-left: 0.5rem;
   }
@@ -63,6 +66,7 @@
     text-align: left;
     font-size: var(--font-size-xs);
   }
+
   td.fraction-cell:empty {
     width: 0;
     padding-left: 0;
@@ -75,10 +79,10 @@
       background: var(--color-hover);
     }
 
-    /* Cell with the chevron icon */
     td:last-of-type {
+      /* Cell with the chevron icon */
       padding-right: 4.5rem;
-      background-image: url("../../../lib/icon/svg/chevronRight.svg");
+      background-image: url("../../../assets/icons/chevronRight.svg");
       background-size: 1.25rem;
       background-position: center right 1.5rem;
       background-repeat: no-repeat;

@@ -1,7 +1,7 @@
 import type { Story } from "@ladle/react";
 
+import { IconCross } from "@/components/generated/icons";
 import { ButtonVariant, Size } from "@/components/ui";
-import { IconCross } from "@/lib/icon";
 
 import { IconButton } from "./IconButton";
 

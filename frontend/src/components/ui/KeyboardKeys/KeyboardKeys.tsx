@@ -1,7 +1,12 @@
 import * as React from "react";
 
+import {
+  IconArrowBlockUp,
+  IconArrowNarrowDown,
+  IconArrowNarrowUp,
+  IconCornerDownLeft,
+} from "@/components/generated/icons";
 import { KeyboardKey } from "@/components/ui";
-import { IconArrowBlockUp, IconArrowNarrowDown, IconArrowNarrowUp, IconCornerDownLeft } from "@/lib/icon";
 import { cn } from "@/utils";
 
 import cls from "./KeyboardKeys.module.css";

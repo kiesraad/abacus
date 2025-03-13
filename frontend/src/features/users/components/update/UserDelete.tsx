@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { Button, Modal } from "@kiesraad/ui";
 
+import { IconTrash } from "@/components/generated/icons";
 import { t } from "@/lib/i18n";
-import { IconTrash } from "@/lib/icon";
 
 interface UserDeleteProps {
   onDelete: () => void;

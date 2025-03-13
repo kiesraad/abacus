@@ -1,7 +1,7 @@
 import type { Story } from "@ladle/react";
 
+import { IconCheckHeart } from "@/components/generated/icons";
 import { Size } from "@/components/ui";
-import { IconCheckHeart } from "@/lib/icon";
 
 import { Icon } from "./Icon";
 

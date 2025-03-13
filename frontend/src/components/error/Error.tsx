@@ -1,9 +1,9 @@
 import { ReactNode } from "react";
 import { useNavigate } from "react-router";
 
+import { IconArrowLeft } from "@/components/generated/icons";
 import { Button } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { IconArrowLeft } from "@/lib/icon";
 import { isDevelopment } from "@/utils";
 
 import cls from "./Error.module.css";

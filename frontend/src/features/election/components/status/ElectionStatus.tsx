@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { IconPlus } from "@/components/generated/icons";
 import {
   Badge,
   Button,
@@ -11,7 +12,6 @@ import {
   Table,
 } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { IconPlus } from "@/lib/icon";
 import { DataEntryStatusName, Election, ElectionStatusResponseEntry, PollingStation } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils";
 

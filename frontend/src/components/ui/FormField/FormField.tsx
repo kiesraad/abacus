@@ -1,7 +1,7 @@
 import * as React from "react";
 
+import { IconError, IconWarning } from "@/components/generated/icons";
 import { t } from "@/lib/i18n";
-import { IconError, IconWarning } from "@/lib/icon";
 import { cn } from "@/utils";
 
 import cls from "./FormField.module.css";

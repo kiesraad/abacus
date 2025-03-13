@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
+import { IconError } from "@/components/generated/icons";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@/components/ui";
 import { useDebouncedCallback } from "@/features/data_entry/hooks/useDebouncedCallback";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t, tx } from "@/lib/i18n";
-import { IconError } from "@/lib/icon";
 import { DataEntryStatusName, PollingStation } from "@/types/generated/openapi";
 import { cn, getUrlForDataEntry, parseIntUserInput } from "@/utils";
 

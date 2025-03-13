@@ -1,7 +1,7 @@
 import { Story } from "@ladle/react";
 
+import { IconPlus } from "@/components/generated/icons";
 import { Button } from "@/components/ui";
-import { IconPlus } from "@/lib/icon";
 
 import { Toolbar, ToolbarSection } from "./Toolbar";
 

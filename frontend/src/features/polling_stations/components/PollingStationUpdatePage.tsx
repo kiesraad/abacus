@@ -3,11 +3,11 @@ import { useNavigate } from "react-router";
 
 import { Alert, Button, Loader, PageTitle } from "@kiesraad/ui";
 
+import { IconTrash } from "@/components/generated/icons";
 import { usePollingStationGet } from "@/features/polling_stations/hooks/usePollingStationGet";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";
-import { IconTrash } from "@/lib/icon";
 
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";
 import { PollingStationForm } from "./PollingStationForm";

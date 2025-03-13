@@ -39,18 +39,22 @@
     font-size: var(--font-size-md);
     font-style: normal;
     line-height: 1.5rem;
+
     &:global(.label) {
       color: var(--text-color-header);
       font-weight: bold;
     }
+
     &:global(.subtext) {
       font-weight: normal;
     }
+
     &:global(.hint) {
       color: var(--color-help-text);
       font-weight: normal;
       margin-top: 0.5rem;
     }
+
     &:global(.error) {
       color: var(--color-error-darker);
       font-weight: normal;
@@ -66,18 +70,22 @@
     justify-content: space-between;
     align-items: center;
     align-self: stretch;
+
     :global(.small) & {
       height: 3rem;
       border-width: 1px;
     }
+
     :global(.medium) & {
       height: 3.5rem;
       border-width: 2px;
     }
+
     :global(.large) & {
       height: 4.5rem;
       border-width: 2px;
     }
+
     :global(.text-area) & {
       border-width: 2px;
     }
@@ -90,6 +98,7 @@
   }
 
   /* Firefox */
+
   input[type="number"] {
     -moz-appearance: textfield;
   }
@@ -98,26 +107,30 @@
   textarea {
     border: solid var(--bg-gray-darkest);
     background: var(--base-white);
+
     &:hover,
     &:focus,
     &:focus-visible {
       outline: none;
       border: solid var(--border-color-focus);
     }
+
     &:focus,
     &:focus-visible {
       :global(.large) &,
       :global(.text-area) & {
         box-shadow: 0 0 0 4px var(--shadow-color-focus);
       }
+
       :global(.medium) &,
       :global(.small) & {
         box-shadow: 0 0 0 3px var(--shadow-color-focus);
       }
     }
+
     :global(.error) & {
       border: solid var(--color-error-darker);
-      background-image: url("../../../lib/icon/svg/error.svg");
+      background-image: url("../../../assets/icons/error.svg");
       background-size: 1.5rem 1.5rem;
       background-repeat: no-repeat;
       background-position: right 1.5rem center;
@@ -128,13 +141,16 @@
   textarea {
     align-items: flex-start;
     resize: none;
+
     :global(.error) & {
       background-position: right 1.5rem top 1rem;
     }
   }
+
   div:global(.disabled_input) {
     border: solid var(--bg-gray-darkest);
     background: var(--bg-gray-darker);
+
     :global(.text-area) & {
       min-height: 12.75rem;
       word-wrap: anywhere;

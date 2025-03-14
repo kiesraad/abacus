@@ -512,8 +512,6 @@ export interface PoliticalGroup {
  * for a specific political group.
  */
 export interface PoliticalGroupCandidateNomination {
-  /** The ranking of the whole candidate list, can be empty */
-  candidate_ranking: CandidateVotes[];
   /** The list of other chosen candidates, can be empty */
   other_candidate_nomination: CandidateVotes[];
   /** Political group name for which this nomination applies */
@@ -524,6 +522,8 @@ export interface PoliticalGroupCandidateNomination {
   pg_seats: number;
   /** The list of chosen candidates via preferential votes, can be empty */
   preferential_candidate_nomination: CandidateVotes[];
+  /** The updated ranking of the whole candidate list, can be empty */
+  updated_candidate_ranking: Candidate[];
 }
 
 /**

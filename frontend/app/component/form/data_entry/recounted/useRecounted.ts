@@ -1,31 +1,24 @@
-import { useEffect, useRef, useState } from "react";
-
 import { PollingStationResults } from "@kiesraad/api";
-import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
 import { SubmitCurrentFormOptions } from "../state/types";
-import { useDataEntryContext } from "../state/useDataEntryContext";
+import { useDataEntryFormSection } from "../state/useDataEntryFormSection";
 
 export type RecountedValue = Pick<PollingStationResults, "recounted">;
 
 export function useRecounted() {
-  const { error, status, pollingStationResults, formState, onSubmitForm, updateFormSection } = useDataEntryContext({
-    id: "recounted",
-    type: "recounted",
+  const { onSubmit: _onSubmit, ...section } = useDataEntryFormSection<boolean | undefined>({
+    section: {
+      id: "recounted",
+      type: "recounted",
+    },
+    getDefaultFormValues: (results) => results.recounted,
   });
-
-  // local state
-  const [recounted, _setRecounted] = useState<boolean | undefined>(pollingStationResults.recounted);
-
-  // derived state
-  const { errors, warnings, isSaved, hasChanges } = formState.sections.recounted;
-  const hasValidationError = errors.length > 0;
 
   // submit and save to form contents
   const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
-    const data: Partial<PollingStationResults> = { recounted };
+    const data: Partial<PollingStationResults> = { recounted: section.currentValues };
 
-    if (!pollingStationResults.voters_recounts && recounted) {
+    if (!section.pollingStationResults.voters_recounts && section.currentValues) {
       data.voters_recounts = {
         poll_card_count: 0,
         proxy_certificate_count: 0,
@@ -34,39 +27,13 @@ export function useRecounted() {
       };
     }
 
-    return onSubmitForm(data, options);
-  };
-
-  // form keyboard navigation
-  const formRef = useRef<HTMLFormElement>(null);
-  useFormKeyboardNavigation(formRef);
-
-  // scroll to top when saved
-  useEffect(() => {
-    if (isSaved || error) {
-      window.scrollTo(0, 0);
-    }
-  }, [isSaved, error]);
-
-  const setRecounted = (value: boolean) => {
-    if (!hasChanges) {
-      updateFormSection({ hasChanges: true, acceptWarnings: false, acceptWarningsError: false });
-    }
-    _setRecounted(value);
+    return _onSubmit(data, options);
   };
 
   return {
-    error,
-    status,
-    formRef,
-    recounted,
-    setRecounted,
-    pollingStationResults,
-    errors,
-    warnings,
-    hasValidationError,
-    isSaved,
-    isSaving: status === "saving",
+    ...section,
+    recounted: section.currentValues,
+    setRecounted: section.setValues,
     onSubmit,
   };
 }

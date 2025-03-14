@@ -8,8 +8,7 @@ import { DataEntryNavigation } from "../DataEntryNavigation";
 import { useRecounted } from "./useRecounted";
 
 export function RecountedForm() {
-  const { error, recounted, formRef, setRecounted, errors, hasValidationError, isSaved, isSaving, onSubmit } =
-    useRecounted();
+  const { error, recounted, formRef, setRecounted, formSection, isSaving, onSubmit } = useRecounted();
 
   return (
     <Form
@@ -23,8 +22,8 @@ export function RecountedForm() {
     >
       <DataEntryNavigation onSubmit={onSubmit} currentValues={{ recounted }} />
       {error instanceof ApiError && <ErrorModal error={error} />}
-      {isSaved && hasValidationError && (
-        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
+      {formSection.isSaved && formSection.errors.length > 0 && (
+        <Feedback id="feedback-error" type="error" data={formSection.errors.map((error) => error.code)} />
       )}
       <p className="form-paragraph md">{t("recounted.message")}</p>
       <div className="radio-form">

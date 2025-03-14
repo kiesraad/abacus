@@ -351,9 +351,19 @@ describe("Test PollingStationChoiceForm", () => {
       overrideOnce("get", "api/elections/1/status", 200, {
         statuses: [
           { polling_station_id: 1, status: "first_entry_not_started" },
-          { polling_station_id: 2, status: "first_entry_in_progress", first_data_entry_progress: 42 },
-          { polling_station_id: 3, status: "first_entry_in_progress", first_data_entry_progress: 42 },
-          { polling_station_id: 4, status: "definitive" },
+          {
+            polling_station_id: 2,
+            status: "first_entry_in_progress",
+            first_entry_user_id: 1,
+            first_entry_progress: 42,
+          },
+          {
+            polling_station_id: 3,
+            status: "first_entry_in_progress",
+            first_entry_user_id: 1,
+            first_entry_progress: 42,
+          },
+          { polling_station_id: 4, status: "definitive", first_entry_user_id: 1, second_entry_user_id: 2 },
         ],
       } satisfies ElectionStatusResponse);
 

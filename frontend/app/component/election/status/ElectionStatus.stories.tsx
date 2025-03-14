@@ -26,13 +26,16 @@ export const PollingStationStatus: Story<StoryProps> = ({ navigate }) => {
         {
           polling_station_id: 3,
           status: "first_entry_in_progress",
-          first_data_entry_progress: 60,
+          first_entry_user_id: 1,
+          first_entry_progress: 60,
         },
         {
           polling_station_id: 4,
           status: "second_entry_in_progress",
-          first_data_entry_progress: 100,
-          second_data_entry_progress: 20,
+          first_entry_user_id: 1,
+          second_entry_user_id: 2,
+          first_entry_progress: 100,
+          second_entry_progress: 20,
         },
       ]}
       election={mockElection}

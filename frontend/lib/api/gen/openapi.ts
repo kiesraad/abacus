@@ -366,9 +366,11 @@ export interface ElectionStatusResponse {
  */
 export interface ElectionStatusResponseEntry {
   finished_at?: string;
-  first_data_entry_progress?: number;
+  first_entry_progress?: number;
+  first_entry_user_id?: number;
   polling_station_id: number;
-  second_data_entry_progress?: number;
+  second_entry_progress?: number;
+  second_entry_user_id?: number;
   status: DataEntryStatusName;
 }
 

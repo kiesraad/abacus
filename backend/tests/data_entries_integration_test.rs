@@ -370,12 +370,18 @@ async fn test_election_details_status(pool: SqlitePool) {
 
     // Ensure the statuses are "NotStarted"
     let statuses = get_statuses(&addr, coordinator_cookie.clone()).await;
+
     assert_eq!(statuses[&1].status, FirstEntryNotStarted);
-    assert_eq!(statuses[&1].first_data_entry_progress, None);
-    assert_eq!(statuses[&1].second_data_entry_progress, None);
+    assert_eq!(statuses[&1].first_entry_user_id, None);
+    assert_eq!(statuses[&1].second_entry_user_id, None);
+    assert_eq!(statuses[&1].first_entry_progress, None);
+    assert_eq!(statuses[&1].second_entry_progress, None);
+
     assert_eq!(statuses[&2].status, FirstEntryNotStarted);
-    assert_eq!(statuses[&2].first_data_entry_progress, None);
-    assert_eq!(statuses[&2].second_data_entry_progress, None);
+    assert_eq!(statuses[&2].first_entry_user_id, None);
+    assert_eq!(statuses[&2].second_entry_user_id, None);
+    assert_eq!(statuses[&2].first_entry_progress, None);
+    assert_eq!(statuses[&2].second_entry_progress, None);
 
     // Finalise the first data entry for polling station 1
     create_and_finalise_data_entry(&addr, typist_cookie.clone(), 1, 1).await;
@@ -393,12 +399,18 @@ async fn test_election_details_status(pool: SqlitePool) {
 
     // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
     let statuses = get_statuses(&addr, coordinator_cookie.clone()).await;
+
     assert_eq!(statuses[&1].status, SecondEntryNotStarted);
-    assert_eq!(statuses[&1].first_data_entry_progress, Some(100));
-    assert_eq!(statuses[&1].second_data_entry_progress, None);
+    assert_eq!(statuses[&1].first_entry_user_id, Some(2));
+    assert_eq!(statuses[&1].second_entry_user_id, None);
+    assert_eq!(statuses[&1].first_entry_progress, Some(100));
+    assert_eq!(statuses[&1].second_entry_progress, None);
+
     assert_eq!(statuses[&2].status, FirstEntryInProgress);
-    assert_eq!(statuses[&2].first_data_entry_progress, Some(60));
-    assert_eq!(statuses[&2].second_data_entry_progress, None);
+    assert_eq!(statuses[&2].first_entry_user_id, Some(2));
+    assert_eq!(statuses[&2].second_entry_user_id, None);
+    assert_eq!(statuses[&2].first_entry_progress, Some(60));
+    assert_eq!(statuses[&2].second_entry_progress, None);
 
     // Claim and save the entries
     claim_data_entry(&addr, typist_cookie.clone(), 1, 2).await;
@@ -421,24 +433,36 @@ async fn test_election_details_status(pool: SqlitePool) {
 
     // polling station 1 should now be SecondEntryInProgress, polling station 2 is still in the FirstEntryInProgress state
     let statuses = get_statuses(&addr, coordinator_cookie.clone()).await;
+
     assert_eq!(statuses[&1].status, SecondEntryInProgress);
-    assert_eq!(statuses[&1].first_data_entry_progress, Some(100));
-    assert_eq!(statuses[&1].second_data_entry_progress, Some(60));
+    assert_eq!(statuses[&1].first_entry_user_id, Some(2));
+    assert_eq!(statuses[&1].second_entry_user_id, Some(2));
+    assert_eq!(statuses[&1].first_entry_progress, Some(100));
+    assert_eq!(statuses[&1].second_entry_progress, Some(60));
+
     assert_eq!(statuses[&2].status, FirstEntryInProgress);
-    assert_eq!(statuses[&2].first_data_entry_progress, Some(60));
-    assert_eq!(statuses[&2].second_data_entry_progress, None);
+    assert_eq!(statuses[&2].first_entry_user_id, Some(2));
+    assert_eq!(statuses[&2].second_entry_user_id, None);
+    assert_eq!(statuses[&2].first_entry_progress, Some(60));
+    assert_eq!(statuses[&2].second_entry_progress, None);
 
     // finalise second data entry for polling station 1
     create_and_finalise_data_entry(&addr, typist_cookie.clone(), 1, 2).await;
 
     // polling station 1 should now be definitive
     let statuses = get_statuses(&addr, coordinator_cookie).await;
+
     assert_eq!(statuses[&1].status, Definitive);
-    assert_eq!(statuses[&1].first_data_entry_progress, Some(100));
-    assert_eq!(statuses[&1].second_data_entry_progress, Some(100));
+    assert_eq!(statuses[&1].first_entry_user_id, Some(2));
+    assert_eq!(statuses[&1].second_entry_user_id, Some(2));
+    assert_eq!(statuses[&1].first_entry_progress, Some(100));
+    assert_eq!(statuses[&1].second_entry_progress, Some(100));
+
     assert_eq!(statuses[&2].status, FirstEntryInProgress);
-    assert_eq!(statuses[&2].first_data_entry_progress, Some(60));
-    assert_eq!(statuses[&2].second_data_entry_progress, None);
+    assert_eq!(statuses[&2].first_entry_user_id, Some(2));
+    assert_eq!(statuses[&2].second_entry_user_id, None);
+    assert_eq!(statuses[&2].first_entry_progress, Some(60));
+    assert_eq!(statuses[&2].second_entry_progress, None);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3", "users"))))]

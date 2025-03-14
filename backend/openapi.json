@@ -871,6 +871,47 @@
         }
       }
     },
+    "/api/log": {
+      "get": {
+        "tags": [
+          "audit_log"
+        ],
+        "summary": "Lists all users",
+        "operationId": "audit_log_list",
+        "responses": {
+          "200": {
+            "description": "Audit log event list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "get": {
         "tags": [
@@ -1770,6 +1811,167 @@
         ],
         "description": "Records the political group and specific change for a specific residual seat"
       },
+      "AuditEvent": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserLoggedInDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserLoggedIn"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserLoggedOutDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserLoggedOut"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "eventType"
+            ],
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "enum": [
+                  "UnknownEvent"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "AuditEventLevel": {
+        "type": "string",
+        "enum": [
+          "info",
+          "success",
+          "warning",
+          "error"
+        ]
+      },
+      "AuditLogEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "time",
+          "event",
+          "eventLevel",
+          "userId",
+          "username",
+          "ip"
+        ],
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/AuditEvent"
+          },
+          "eventLevel": {
+            "$ref": "#/components/schemas/AuditEventLevel"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "ip": {
+            "type": "string"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "time": {
+            "type": "string"
+          },
+          "userFullname": {
+            "type": "string",
+            "description": "user defaults"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "userRole": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "workstation": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "AuditLogListResponse": {
+        "type": "object",
+        "required": [
+          "events",
+          "page",
+          "pages",
+          "perPage"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLogEvent"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "perPage": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -2484,6 +2686,21 @@
           }
         }
       },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "perPage": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "PoliticalGroup": {
         "type": "object",
         "description": "Political group with its candidates",
@@ -3043,6 +3260,36 @@
             "items": {
               "$ref": "#/components/schemas/User"
             }
+          }
+        }
+      },
+      "UserLoggedInDetails": {
+        "type": "object",
+        "required": [
+          "userAgent",
+          "loggedInUsersCount"
+        ],
+        "properties": {
+          "loggedInUsersCount": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "userAgent": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLoggedOutDetails": {
+        "type": "object",
+        "required": [
+          "sessionDuration"
+        ],
+        "properties": {
+          "sessionDuration": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           }
         }
       },

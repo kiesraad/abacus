@@ -11,6 +11,7 @@ import error from "./error.json";
 import feedback from "./feedback.json";
 import form_errors from "./form_errors.json";
 import generic from "./generic.json";
+import log from "./log.json";
 import messages from "./messages.json";
 import polling_station from "./polling_station.json";
 import polling_station_choice from "./polling_station_choice.json";
@@ -34,6 +35,7 @@ const nl = {
   error,
   feedback,
   form_errors,
+  log,
   messages,
   polling_station,
   polling_station_choice,

@@ -74,6 +74,10 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
+// /api/log
+export type AUDIT_LOG_LIST_REQUEST_PARAMS = Record<string, never>;
+export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
+
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS {
   polling_station_id: number;
@@ -163,6 +167,34 @@ export type AssignedSeat =
   | (LargestAverageAssignedSeat & { assigned_by: "LargestAverage" })
   | (LargestRemainderAssignedSeat & { assigned_by: "LargestRemainder" })
   | (AbsoluteMajorityChange & { assigned_by: "AbsoluteMajorityChange" });
+
+export type AuditEvent =
+  | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
+  | (UserLoggedOutDetails & { eventType: "UserLoggedOut" })
+  | { eventType: "UnknownEvent" };
+
+export type AuditEventLevel = "info" | "success" | "warning" | "error";
+
+export interface AuditLogEvent {
+  event: AuditEvent;
+  eventLevel: AuditEventLevel;
+  id: number;
+  ip: string;
+  message?: string | null;
+  time: string;
+  userFullname?: string;
+  userId: number;
+  userRole?: string;
+  username: string;
+  workstation?: number | null;
+}
+
+export interface AuditLogListResponse {
+  events: AuditLogEvent[];
+  page: number;
+  pages: number;
+  perPage: number;
+}
 
 /**
  * Candidate
@@ -430,6 +462,11 @@ export interface LoginResponse {
   username: string;
 }
 
+export interface Pagination {
+  page?: number;
+  perPage?: number;
+}
+
 /**
  * Political group with its candidates
  */
@@ -619,6 +656,15 @@ export interface User {
 
 export interface UserListResponse {
   users: User[];
+}
+
+export interface UserLoggedInDetails {
+  loggedInUsersCount: number;
+  userAgent: string;
+}
+
+export interface UserLoggedOutDetails {
+  sessionDuration: number;
 }
 
 export interface ValidationResult {

@@ -38,6 +38,8 @@ import {
 } from "@kiesraad/api";
 
 import { electionDetailsMockResponse, electionListMockResponse, electionStatusMockResponse } from "./ElectionMockData";
+import logMockResponse1 from "./LogMockData1.json";
+import logMockResponse2 from "./LogMockData2.json";
 import { pollingStationMockData } from "./PollingStationMockData";
 import { loginResponseMockData, userMockData } from "./UserMockData";
 
@@ -70,6 +72,13 @@ export const AccountUpdateRequestHandler = http.put<
   LoginResponse,
   ACCOUNT_UPDATE_REQUEST_PATH
 >("/api/user/account", () => HttpResponse.json(loginResponseMockData, { status: 200 }));
+
+export const LogRequestHandler = http.get("/api/log", ({ request }) => {
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page")?.toString() || "1");
+
+  return HttpResponse.json(page === 2 ? logMockResponse2 : logMockResponse1, { status: 200 });
+});
 
 // get election list handler
 export const ElectionListRequestHandler = http.get("/api/elections", () =>

@@ -89,7 +89,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     #[cfg(feature = "dev-database")]
     let election_routes = election_routes.route("/", post(election::election_create));
 
-    let user_router = Router::new()
+    let user_routes = Router::new()
         .route(
             "/",
             get(authentication::user_list).post(authentication::user_create),
@@ -109,8 +109,11 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             authentication::extend_session,
         ));
 
+    let audit_log_routes = Router::new().route("/", get(audit_log::audit_log_list));
+
     let app = Router::new()
-        .nest("/api/user", user_router)
+        .nest("/api/user", user_routes)
+        .nest("/api/log", audit_log_routes)
         .nest("/api/elections", election_routes)
         .nest(
             "/api/elections/{election_id}/polling_stations",
@@ -157,6 +160,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[openapi(
         paths(
             apportionment::election_apportionment,
+            audit_log::audit_log_list,
             authentication::login,
             authentication::logout,
             authentication::whoami,
@@ -195,6 +199,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::PoliticalGroupStanding,
                 apportionment::SeatAssignmentResult,
                 apportionment::SeatAssignmentStep,
+                audit_log::AuditLogListResponse,
+                audit_log::Pagination,
                 authentication::Credentials,
                 authentication::LoginResponse,
                 authentication::AccountUpdateRequest,

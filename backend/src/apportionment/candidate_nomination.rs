@@ -308,15 +308,54 @@ pub fn candidate_numbers(candidates: &[Candidate]) -> Vec<CandidateNumber> {
 mod tests {
     use crate::{
         apportionment::{
-            ApportionmentError, Fraction, candidate_nomination, candidate_numbers,
-            candidate_votes_numbers, sort_candidates_on_last_name_alphabetically,
+            ApportionmentError, Fraction, PoliticalGroupCandidateNomination, candidate_nomination,
+            candidate_numbers, candidate_votes_numbers,
+            sort_candidates_on_last_name_alphabetically,
             test_helpers::election_summary_fixture_with_given_candidate_votes,
         },
         election::{
-            Candidate, CandidateGender::X, tests::election_fixture_with_given_number_of_seats,
+            Candidate, CandidateGender::X, CandidateNumber,
+            tests::election_fixture_with_given_number_of_seats,
         },
     };
     use test_log::test;
+
+    fn check_political_group_candidate_nomination(
+        nomination: &PoliticalGroupCandidateNomination,
+        expected_preferential_nomination: &[CandidateNumber],
+        expected_other_nomination: &[CandidateNumber],
+        expected_updated_ranking: &[CandidateNumber],
+    ) {
+        assert_eq!(
+            candidate_votes_numbers(&nomination.preferential_candidate_nomination),
+            expected_preferential_nomination
+        );
+        assert_eq!(
+            candidate_votes_numbers(&nomination.other_candidate_nomination),
+            expected_other_nomination
+        );
+        assert_eq!(
+            candidate_numbers(&nomination.updated_candidate_ranking),
+            expected_updated_ranking
+        );
+    }
+
+    fn check_chosen_candidates(
+        chosen_candidates: &[Candidate],
+        expected_chosen_candidates: &[Candidate],
+        expected_not_chosen_candidates: &[Candidate],
+    ) {
+        assert!(
+            expected_chosen_candidates
+                .iter()
+                .all(|item| chosen_candidates.contains(item))
+        );
+        assert!(
+            expected_not_chosen_candidates
+                .iter()
+                .all(|item| !chosen_candidates.contains(item))
+        );
+    }
 
     /// Candidate nomination with ranking change due to preferential candidate nomination
     ///
@@ -346,146 +385,62 @@ mod tests {
             result.preference_threshold,
             quota * Fraction::new(result.preference_threshold_percentage, 100)
         );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[0].preferential_candidate_nomination
-            ),
-            vec![1, 3, 2, 4]
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[0],
+            &[1, 3, 2, 4],
+            &[5, 6, 7, 8],
+            &[1, 3, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[0].other_candidate_nomination
-            ),
-            vec![5, 6, 7, 8]
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[1],
+            &[1],
+            &[2, 3],
+            &[],
         );
-        assert_eq!(
-            candidate_numbers(
-                &result.political_group_candidate_nomination[0].updated_candidate_ranking
-            ),
-            vec![1, 3, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[2],
+            &[1],
+            &[2],
+            &[],
         );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[1].preferential_candidate_nomination
-            ),
-            vec![1]
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[3],
+            &[1],
+            &[],
+            &[],
         );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[1].other_candidate_nomination
-            ),
-            vec![2, 3]
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[4],
+            &[1],
+            &[],
+            &[],
         );
-        assert_eq!(
-            result.political_group_candidate_nomination[1]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[2].preferential_candidate_nomination
-            ),
-            vec![1]
-        );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[2].other_candidate_nomination
-            ),
-            vec![2]
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[2]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[3].preferential_candidate_nomination
-            ),
-            vec![1]
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[3]
-                .other_candidate_nomination
-                .len(),
-            0
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[3]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[4].preferential_candidate_nomination
-            ),
-            vec![1]
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[4]
-                .other_candidate_nomination
-                .len(),
-            0
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[4]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
+
         let pgs = election.political_groups.unwrap_or_default();
-        assert!(
-            pgs[0].candidates[..8]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[0].candidates[..8],
+            &pgs[0].candidates[9..],
         );
-        assert!(
-            pgs[0].candidates[9..]
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[1].candidates[..3],
+            &pgs[1].candidates[4..],
         );
-        assert!(
-            pgs[1].candidates[..3]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[2].candidates[..2],
+            &pgs[2].candidates[3..],
         );
-        assert!(
-            pgs[1].candidates[4..]
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[3].candidates[..1],
+            &pgs[3].candidates[2..],
         );
-        assert!(
-            pgs[2].candidates[..2]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[2].candidates[3..]
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[3].candidates[..1]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[3].candidates[2..]
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[4].candidates[..1]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[4].candidates[2..]
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[4].candidates[..1],
+            &pgs[4].candidates[2..],
         );
     }
 
@@ -514,146 +469,62 @@ mod tests {
             result.preference_threshold,
             quota * Fraction::new(result.preference_threshold_percentage, 100)
         );
-        assert_eq!(
-            result.political_group_candidate_nomination[0]
-                .preferential_candidate_nomination
-                .len(),
-            0
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[0],
+            &[],
+            &[1],
+            &[],
         );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[0].other_candidate_nomination
-            ),
-            vec![1]
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[1],
+            &[],
+            &[1],
+            &[],
         );
-        assert_eq!(
-            result.political_group_candidate_nomination[0]
-                .updated_candidate_ranking
-                .len(),
-            0
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[2],
+            &[],
+            &[1],
+            &[],
         );
-        assert_eq!(
-            result.political_group_candidate_nomination[1]
-                .preferential_candidate_nomination
-                .len(),
-            0
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[3],
+            &[],
+            &[1],
+            &[],
         );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[1].other_candidate_nomination
-            ),
-            vec![1]
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[4],
+            &[],
+            &[1],
+            &[],
         );
-        assert_eq!(
-            result.political_group_candidate_nomination[1]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[2]
-                .preferential_candidate_nomination
-                .len(),
-            0
-        );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[2].other_candidate_nomination
-            ),
-            vec![1]
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[2]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[3]
-                .preferential_candidate_nomination
-                .len(),
-            0
-        );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[3].other_candidate_nomination
-            ),
-            vec![1]
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[3]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[4]
-                .preferential_candidate_nomination
-                .len(),
-            0
-        );
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[4].other_candidate_nomination
-            ),
-            vec![1]
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[4]
-                .updated_candidate_ranking
-                .len(),
-            0
-        );
+
         let pgs = election.political_groups.unwrap_or_default();
-        assert!(
-            pgs[0].candidates[..1]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[0].candidates[..1],
+            &pgs[0].candidates[2..],
         );
-        assert!(
-            pgs[0].candidates[2..]
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[1].candidates[..1],
+            &pgs[1].candidates[2..],
         );
-        assert!(
-            pgs[1].candidates[..1]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[2].candidates[..1],
+            &pgs[2].candidates[2..],
         );
-        assert!(
-            pgs[1].candidates[2..]
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[3].candidates[..1],
+            &pgs[3].candidates[2..],
         );
-        assert!(
-            pgs[2].candidates[..1]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[2].candidates[2..]
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[3].candidates[..1]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[3].candidates[2..]
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[4].candidates[..1]
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pgs[4].candidates[2..]
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[4].candidates[..1],
+            &pgs[4].candidates[2..],
         );
     }
 
@@ -686,109 +557,49 @@ mod tests {
             result.preference_threshold,
             quota * Fraction::new(result.preference_threshold_percentage, 100)
         );
-        let pg_0_preferential_nominated_candidate_numbers = vec![1, 3, 4, 5, 6, 7];
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[0].preferential_candidate_nomination
-            ),
-            pg_0_preferential_nominated_candidate_numbers
-        );
-        let pg_0_other_nominated_candidate_numbers = vec![];
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[0].other_candidate_nomination
-            ),
-            pg_0_other_nominated_candidate_numbers
-        );
-        assert_eq!(
-            candidate_numbers(
-                &result.political_group_candidate_nomination[0].updated_candidate_ranking
-            ),
-            vec![1, 3, 4, 5, 6, 7, 2]
+        let pg_0_preferential_nominated_candidate_numbers = &[1, 3, 4, 5, 6, 7];
+        let pg_0_other_nominated_candidate_numbers = &[];
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[0],
+            pg_0_preferential_nominated_candidate_numbers,
+            pg_0_other_nominated_candidate_numbers,
+            &[1, 3, 4, 5, 6, 7, 2],
         );
 
-        let pg_1_preferential_nominated_candidate_numbers = vec![1, 2, 4, 5, 6];
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[1].preferential_candidate_nomination
-            ),
-            pg_1_preferential_nominated_candidate_numbers
-        );
-        let pg_1_other_nominated_candidate_numbers = vec![];
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[1].other_candidate_nomination
-            ),
-            pg_1_other_nominated_candidate_numbers
-        );
-        assert_eq!(
-            candidate_numbers(
-                &result.political_group_candidate_nomination[1].updated_candidate_ranking
-            ),
-            vec![1, 2, 4, 5, 6, 7, 3]
+        let pg_1_preferential_nominated_candidate_numbers = &[1, 2, 4, 5, 6];
+        let pg_1_other_nominated_candidate_numbers = &[];
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[1],
+            pg_1_preferential_nominated_candidate_numbers,
+            pg_1_other_nominated_candidate_numbers,
+            &[1, 2, 4, 5, 6, 7, 3],
         );
 
-        let pg_2_preferential_nominated_candidate_numbers = vec![1, 2, 3, 5];
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[2].preferential_candidate_nomination
-            ),
-            pg_2_preferential_nominated_candidate_numbers
-        );
-        let pg_2_other_nominated_candidate_numbers = vec![];
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[2].other_candidate_nomination
-            ),
-            pg_2_other_nominated_candidate_numbers
-        );
-        assert_eq!(
-            candidate_numbers(
-                &result.political_group_candidate_nomination[2].updated_candidate_ranking
-            ),
-            vec![1, 2, 3, 5, 6, 7, 4]
+        let pg_2_preferential_nominated_candidate_numbers = &[1, 2, 3, 5];
+        let pg_2_other_nominated_candidate_numbers = &[];
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[2],
+            pg_2_preferential_nominated_candidate_numbers,
+            pg_2_other_nominated_candidate_numbers,
+            &[1, 2, 3, 5, 6, 7, 4],
         );
 
-        let pg_3_preferential_nominated_candidate_numbers = vec![1, 2];
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[3].preferential_candidate_nomination
-            ),
-            pg_3_preferential_nominated_candidate_numbers
-        );
-        let pg_3_other_nominated_candidate_numbers = vec![];
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[3].other_candidate_nomination
-            ),
-            pg_3_other_nominated_candidate_numbers
-        );
-        assert_eq!(
-            candidate_numbers(
-                &result.political_group_candidate_nomination[3].updated_candidate_ranking
-            ),
-            vec![1, 2, 3, 4, 6, 7, 5]
+        let pg_3_preferential_nominated_candidate_numbers = &[1, 2];
+        let pg_3_other_nominated_candidate_numbers = &[];
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[3],
+            pg_3_preferential_nominated_candidate_numbers,
+            pg_3_other_nominated_candidate_numbers,
+            &[1, 2, 3, 4, 6, 7, 5],
         );
 
-        let pg_4_preferential_nominated_candidate_numbers = vec![1, 2];
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[4].preferential_candidate_nomination
-            ),
-            pg_4_preferential_nominated_candidate_numbers
-        );
-        let pg_4_other_nominated_candidate_numbers = vec![];
-        assert_eq!(
-            candidate_votes_numbers(
-                &result.political_group_candidate_nomination[4].other_candidate_nomination
-            ),
-            pg_4_other_nominated_candidate_numbers
-        );
-        assert_eq!(
-            result.political_group_candidate_nomination[4]
-                .updated_candidate_ranking
-                .len(),
-            0
+        let pg_4_preferential_nominated_candidate_numbers = &[1, 2];
+        let pg_4_other_nominated_candidate_numbers = &[];
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[4],
+            pg_4_preferential_nominated_candidate_numbers,
+            pg_4_other_nominated_candidate_numbers,
+            &[],
         );
 
         let pgs = election.political_groups.clone().unwrap_or_default();
@@ -807,15 +618,10 @@ mod tests {
             .filter(|&c| !pg_0_chosen_candidates.contains(c))
             .cloned()
             .collect();
-        assert!(
-            pg_0_chosen_candidates
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pg_0_not_chosen_candidates
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pg_0_chosen_candidates,
+            &pg_0_not_chosen_candidates,
         );
 
         let pg_1_chosen_candidates: Vec<Candidate> = pgs[1]
@@ -833,15 +639,10 @@ mod tests {
             .filter(|&c| !pg_1_chosen_candidates.contains(c))
             .cloned()
             .collect();
-        assert!(
-            pg_1_chosen_candidates
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pg_1_not_chosen_candidates
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pg_1_chosen_candidates,
+            &pg_1_not_chosen_candidates,
         );
 
         let pg_2_chosen_candidates: Vec<Candidate> = pgs[2]
@@ -859,15 +660,10 @@ mod tests {
             .filter(|&c| !pg_2_chosen_candidates.contains(c))
             .cloned()
             .collect();
-        assert!(
-            pg_2_chosen_candidates
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pg_2_not_chosen_candidates
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pg_2_chosen_candidates,
+            &pg_2_not_chosen_candidates,
         );
 
         let pg_3_chosen_candidates: Vec<Candidate> = pgs[3]
@@ -885,15 +681,10 @@ mod tests {
             .filter(|&c| !pg_3_chosen_candidates.contains(c))
             .cloned()
             .collect();
-        assert!(
-            pg_3_chosen_candidates
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pg_3_not_chosen_candidates
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pg_3_chosen_candidates,
+            &pg_3_not_chosen_candidates,
         );
 
         let pg_4_chosen_candidates: Vec<Candidate> = pgs[4]
@@ -911,15 +702,10 @@ mod tests {
             .filter(|&c| !pg_4_chosen_candidates.contains(c))
             .cloned()
             .collect();
-        assert!(
-            pg_4_chosen_candidates
-                .iter()
-                .all(|item| result.chosen_candidates.contains(item))
-        );
-        assert!(
-            pg_4_not_chosen_candidates
-                .iter()
-                .all(|item| !result.chosen_candidates.contains(item))
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pg_4_chosen_candidates,
+            &pg_4_not_chosen_candidates,
         );
     }
 

@@ -357,6 +357,27 @@ mod tests {
         );
     }
 
+    fn get_chosen_and_not_chosen_candidates_for_a_pg(
+        pg_candidates: &[Candidate],
+        pg_preferential_nominated_candidate_numbers: &[CandidateNumber],
+        pg_other_nominated_candidate_numbers: &[CandidateNumber],
+    ) -> (Vec<Candidate>, Vec<Candidate>) {
+        let pg_0_chosen_candidates: Vec<Candidate> = pg_candidates
+            .iter()
+            .filter(|&c| {
+                pg_preferential_nominated_candidate_numbers.contains(&c.number)
+                    || pg_other_nominated_candidate_numbers.contains(&c.number)
+            })
+            .cloned()
+            .collect();
+        let pg_0_not_chosen_candidates: Vec<Candidate> = pg_candidates
+            .iter()
+            .filter(|&c| !pg_0_chosen_candidates.contains(c))
+            .cloned()
+            .collect();
+        (pg_0_chosen_candidates, pg_0_not_chosen_candidates)
+    }
+
     /// Candidate nomination with ranking change due to preferential candidate nomination
     ///
     /// Actual case from GR2022  
@@ -603,105 +624,60 @@ mod tests {
         );
 
         let pgs = election.political_groups.clone().unwrap_or_default();
-        let pg_0_chosen_candidates: Vec<Candidate> = pgs[0]
-            .candidates
-            .iter()
-            .filter(|&c| {
-                pg_0_preferential_nominated_candidate_numbers.contains(&c.number)
-                    || pg_0_other_nominated_candidate_numbers.contains(&c.number)
-            })
-            .cloned()
-            .collect();
-        let pg_0_not_chosen_candidates: Vec<Candidate> = pgs[0]
-            .candidates
-            .iter()
-            .filter(|&c| !pg_0_chosen_candidates.contains(c))
-            .cloned()
-            .collect();
+        let (pg_0_chosen_candidates, pg_0_not_chosen_candidates) =
+            get_chosen_and_not_chosen_candidates_for_a_pg(
+                &pgs[0].candidates,
+                pg_0_preferential_nominated_candidate_numbers,
+                pg_0_other_nominated_candidate_numbers,
+            );
         check_chosen_candidates(
             &result.chosen_candidates,
             &pg_0_chosen_candidates,
             &pg_0_not_chosen_candidates,
         );
 
-        let pg_1_chosen_candidates: Vec<Candidate> = pgs[1]
-            .candidates
-            .iter()
-            .filter(|&c| {
-                pg_1_preferential_nominated_candidate_numbers.contains(&c.number)
-                    || pg_1_other_nominated_candidate_numbers.contains(&c.number)
-            })
-            .cloned()
-            .collect();
-        let pg_1_not_chosen_candidates: Vec<Candidate> = pgs[1]
-            .candidates
-            .iter()
-            .filter(|&c| !pg_1_chosen_candidates.contains(c))
-            .cloned()
-            .collect();
+        let (pg_1_chosen_candidates, pg_1_not_chosen_candidates) =
+            get_chosen_and_not_chosen_candidates_for_a_pg(
+                &pgs[1].candidates,
+                pg_1_preferential_nominated_candidate_numbers,
+                pg_1_other_nominated_candidate_numbers,
+            );
         check_chosen_candidates(
             &result.chosen_candidates,
             &pg_1_chosen_candidates,
             &pg_1_not_chosen_candidates,
         );
 
-        let pg_2_chosen_candidates: Vec<Candidate> = pgs[2]
-            .candidates
-            .iter()
-            .filter(|&c| {
-                pg_2_preferential_nominated_candidate_numbers.contains(&c.number)
-                    || pg_2_other_nominated_candidate_numbers.contains(&c.number)
-            })
-            .cloned()
-            .collect();
-        let pg_2_not_chosen_candidates: Vec<Candidate> = pgs[2]
-            .candidates
-            .iter()
-            .filter(|&c| !pg_2_chosen_candidates.contains(c))
-            .cloned()
-            .collect();
+        let (pg_2_chosen_candidates, pg_2_not_chosen_candidates) =
+            get_chosen_and_not_chosen_candidates_for_a_pg(
+                &pgs[2].candidates,
+                pg_2_preferential_nominated_candidate_numbers,
+                pg_2_other_nominated_candidate_numbers,
+            );
         check_chosen_candidates(
             &result.chosen_candidates,
             &pg_2_chosen_candidates,
             &pg_2_not_chosen_candidates,
         );
 
-        let pg_3_chosen_candidates: Vec<Candidate> = pgs[3]
-            .candidates
-            .iter()
-            .filter(|&c| {
-                pg_3_preferential_nominated_candidate_numbers.contains(&c.number)
-                    || pg_3_other_nominated_candidate_numbers.contains(&c.number)
-            })
-            .cloned()
-            .collect();
-        let pg_3_not_chosen_candidates: Vec<Candidate> = pgs[3]
-            .candidates
-            .iter()
-            .filter(|&c| !pg_3_chosen_candidates.contains(c))
-            .cloned()
-            .collect();
+        let (pg_3_chosen_candidates, pg_3_not_chosen_candidates) =
+            get_chosen_and_not_chosen_candidates_for_a_pg(
+                &pgs[3].candidates,
+                pg_3_preferential_nominated_candidate_numbers,
+                pg_3_other_nominated_candidate_numbers,
+            );
         check_chosen_candidates(
             &result.chosen_candidates,
             &pg_3_chosen_candidates,
             &pg_3_not_chosen_candidates,
         );
 
-        let pg_4_chosen_candidates: Vec<Candidate> = pgs[4]
-            .candidates
-            .iter()
-            .filter(|&c| {
-                pg_4_preferential_nominated_candidate_numbers.contains(&c.number)
-                    || pg_4_other_nominated_candidate_numbers.contains(&c.number)
-            })
-            .cloned()
-            .collect();
-        let pg_4_not_chosen_candidates: Vec<Candidate> = pgs[4]
-            .candidates
-            .iter()
-            .filter(|&c| !pg_4_chosen_candidates.contains(c))
-            .cloned()
-            .collect();
+        let (pg_4_chosen_candidates, pg_4_not_chosen_candidates) =
+            get_chosen_and_not_chosen_candidates_for_a_pg(
+                &pgs[4].candidates,
+                pg_4_preferential_nominated_candidate_numbers,
+                pg_4_other_nominated_candidate_numbers,
+            );
         check_chosen_candidates(
             &result.chosen_candidates,
             &pg_4_chosen_candidates,

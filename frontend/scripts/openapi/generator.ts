@@ -158,6 +158,9 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
       if (s.properties) {
         type = "{";
         Object.entries(s.properties).forEach(([k, v2]) => {
+          if ("description" in v2 && v2.description) {
+            type += `\n  /** ${v2.description} */\n`;
+          }
           type += `  ${k}${isRequired(k, s.required)}: ${tsType(v2)};`;
         });
         type += "}";

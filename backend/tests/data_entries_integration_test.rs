@@ -7,9 +7,8 @@ use sqlx::SqlitePool;
 use std::{collections::BTreeMap, net::SocketAddr};
 use test_log::test;
 
-use crate::shared::claim_data_entry;
 use crate::{
-    shared::{create_and_finalise_data_entry, save_data_entry},
+    shared::{claim_data_entry, create_and_finalise_data_entry, save_data_entry},
     utils::serve_api,
 };
 use abacus::{

@@ -1,8 +1,7 @@
-use crate::election::PoliticalGroup;
 use crate::{
     APIError,
     data_entry::status::DataEntryStatus,
-    election::{CandidateNumber, PGNumber},
+    election::{CandidateNumber, PGNumber, PoliticalGroup},
     error::ErrorReference,
 };
 use chrono::{DateTime, Utc};

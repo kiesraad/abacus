@@ -108,7 +108,7 @@ function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
   const result: string[] = [];
   if (v.description) {
     result.push("/**");
-    result.push(` * ${v.description}`);
+    result.push(" * " + v.description.split("\n").join("\n * "));
     result.push(" */");
   }
 

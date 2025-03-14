@@ -220,10 +220,10 @@ export type CandidateGender = "Male" | "Female" | "X";
 
 /**
  * The result of the candidate nomination procedure.
-This contains the preference threshold and percentage that was used.
-It contains a list of all chosen candidates in alphabetical order.
-It also contains the preferential nomination of candidates, the remaining
-nomination of candidates and the final ranking of candidates for each political group.
+ * This contains the preference threshold and percentage that was used.
+ * It contains a list of all chosen candidates in alphabetical order.
+ * It also contains the preferential nomination of candidates, the remaining
+ * nomination of candidates and the final ranking of candidates for each political group.
  */
 export interface CandidateNominationResult {
   chosen_candidates: Candidate[];
@@ -327,8 +327,8 @@ export interface ElectionDetailsResponse {
 
 /**
  * Election list response
-
-Does not include the candidate list (political groups) to keep the response size small.
+ *
+ * Does not include the candidate list (political groups) to keep the response size small.
  */
 export interface ElectionListResponse {
   elections: Election[];
@@ -479,7 +479,7 @@ export interface PoliticalGroup {
 
 /**
  * Contains information about the chosen candidates and the candidate list ranking
-for a specific political group.
+ * for a specific political group.
  */
 export interface PoliticalGroupCandidateNomination {
   candidate_ranking: CandidateVotes[];
@@ -505,7 +505,7 @@ export interface PoliticalGroupSeatAssignment {
 
 /**
  * Contains the standing for a specific political group. This is all the information
-that is needed to compute the apportionment for that specific political group.
+ * that is needed to compute the apportionment for that specific political group.
  */
 export interface PoliticalGroupStanding {
   full_seats: number;
@@ -560,12 +560,12 @@ export interface PollingStationRequest {
 
 /**
  * PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.
-
-See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
-lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
-Bijlage 2: uitkomsten per stembureau" from the
-[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
-[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+ *
+ * See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
+ * lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
+ * Bijlage 2: uitkomsten per stembureau" from the
+ * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
+ * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
  */
 export interface PollingStationResults {
   differences_counts: DifferencesCounts;
@@ -592,9 +592,9 @@ export interface SaveDataEntryResponse {
 
 /**
  * The result of the seat assignment procedure. This contains the number of seats and the quota
-that was used. It then contains the initial standing after full seats were assigned,
-and each of the changes and intermediate standings. The final standing contains the
-number of seats per political group that was assigned after all seats were assigned.
+ * that was used. It then contains the initial standing after full seats were assigned,
+ * and each of the changes and intermediate standings. The final standing contains the
+ * number of seats per political group that was assigned after all seats were assigned.
  */
 export interface SeatAssignmentResult {
   final_standing: PoliticalGroupSeatAssignment[];
@@ -607,7 +607,7 @@ export interface SeatAssignmentResult {
 
 /**
  * Records the details for a specific residual seat, and how the standing is
-once that residual seat was assigned
+ * once that residual seat was assigned
  */
 export interface SeatAssignmentStep {
   change: AssignedSeat;
@@ -617,7 +617,7 @@ export interface SeatAssignmentStep {
 
 /**
  * Contains a summary count, containing both the count and a list of polling
-stations that contributed to it.
+ * stations that contributed to it.
  */
 export interface SumCount {
   count: number;

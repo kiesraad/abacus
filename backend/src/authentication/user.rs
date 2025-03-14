@@ -155,11 +155,12 @@ where
         };
 
         match users.get_by_session_key(session_cookie.value()).await {
-            Ok(user) => {
+            Ok(user) if !user.needs_password_change => {
                 user.update_last_activity_at(&users).await?;
                 Ok(Some(user))
             }
-            Err(AuthenticationError::UserNotFound)
+            Ok(_)
+            | Err(AuthenticationError::UserNotFound)
             | Err(AuthenticationError::SessionKeyNotFound) => Ok(None),
             Err(e) => Err(e.into()),
         }
@@ -253,45 +254,6 @@ impl Users {
         })?;
 
         Ok(user)
-    }
-
-    /// Update a user
-    pub async fn update(
-        &self,
-        user_id: u32,
-        fullname: Option<&str>,
-        temp_password: Option<&str>,
-    ) -> Result<User, AuthenticationError> {
-        if let Some(pw) = temp_password {
-            self.set_temporary_password(user_id, pw).await?;
-        }
-
-        let updated_user = sqlx::query_as!(
-            User,
-            r#"
-              UPDATE
-                users
-              SET
-                fullname = ?
-              WHERE id = ?
-            RETURNING
-                id as "id: u32",
-                username,
-                fullname,
-                password_hash,
-                needs_password_change,
-                role,
-                last_activity_at as "last_activity_at: _",
-                updated_at as "updated_at: _",
-                created_at as "created_at: _"
-            "#,
-            fullname,
-            user_id
-        )
-        .fetch_one(&self.0)
-        .await?;
-
-        Ok(updated_user)
     }
 
     /// Delete a user
@@ -682,10 +644,12 @@ mod tests {
         assert!(!user.needs_password_change);
 
         // Set a temporary password via update
-        let user = users
-            .update(user.id(), user.fullname(), Some("temp_password"))
+        users
+            .set_temporary_password(user.id(), "temp_password")
             .await
             .unwrap();
+
+        let user = users.get_by_id(user.id()).await.unwrap().unwrap();
 
         // User needs to change their password again
         assert!(user.needs_password_change);

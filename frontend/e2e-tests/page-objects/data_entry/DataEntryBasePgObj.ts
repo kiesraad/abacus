@@ -23,9 +23,4 @@ export class DataEntryBasePage {
     this.warning = page.getByTestId("feedback-warning");
     this.feedbackHeader = page.getByRole("heading", { level: 3 });
   }
-
-  async clickElectionInNavBar(electionLocation: string, electionName: string) {
-    const linkText = `${electionLocation} — ${electionName}`;
-    await this.page.getByRole("navigation").getByRole("link", { name: linkText }).click();
-  }
 }

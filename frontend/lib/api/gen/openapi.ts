@@ -482,12 +482,12 @@ export interface PoliticalGroup {
 for a specific political group.
  */
 export interface PoliticalGroupCandidateNomination {
-  candidate_ranking: CandidateVotes[];
   other_candidate_nomination: CandidateVotes[];
   pg_name: string;
   pg_number: number;
   pg_seats: number;
   preferential_candidate_nomination: CandidateVotes[];
+  updated_candidate_ranking: Candidate[];
 }
 
 /**

@@ -7,6 +7,7 @@ import {
   ELECTION_DETAILS_REQUEST_PATH,
   ElectionDetailsResponse,
   POLLING_STATION_CREATE_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   POLLING_STATION_GET_REQUEST_PATH,
@@ -82,11 +83,16 @@ export const test = base.extend<Fixtures>({
   pollingStationFirstEntryDone: async ({ request, pollingStation }, use) => {
     await loginAs(request, "typist");
     // first data entry of the existing polling station
-    const saveResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1`, {
+    const save_url: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStation.id}/data_entries/1`;
+    const claim_url: POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH = `${save_url}/claim`;
+    const finalise_url: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH = `${save_url}/finalise`;
+    const claimResponse = await request.post(claim_url);
+    expect(claimResponse.ok()).toBeTruthy();
+    const saveResponse = await request.post(save_url, {
       data: noRecountNoDifferencesRequest,
     });
     expect(saveResponse.ok()).toBeTruthy();
-    const finaliseResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/finalise`);
+    const finaliseResponse = await request.post(finalise_url);
     expect(finaliseResponse.ok()).toBeTruthy();
 
     await use(pollingStation);
@@ -97,6 +103,9 @@ export const test = base.extend<Fixtures>({
     for (const pollingStationId of election.polling_stations.map((ps) => ps.id)) {
       for (const entryNumber of [1, 2]) {
         const save_url: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+        const claim_url: POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH = `${save_url}/claim`;
+        const claimResponse = await request.post(claim_url);
+        expect(claimResponse.ok()).toBeTruthy();
         const saveResponse = await request.post(save_url, {
           data: noRecountNoDifferencesRequest,
         });

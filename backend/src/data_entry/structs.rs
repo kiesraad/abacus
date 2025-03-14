@@ -1,7 +1,7 @@
 use crate::{
     APIError,
     data_entry::status::DataEntryStatus,
-    election::{CandidateNumber, PGNumber},
+    election::{CandidateNumber, PGNumber, PoliticalGroup},
     error::ErrorReference,
 };
 use chrono::{DateTime, Utc};
@@ -33,7 +33,7 @@ pub struct PollingStationResultsEntry {
 /// Bijlage 2: uitkomsten per stembureau" from the
 /// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
 /// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResults {
     /// Recounted ("Is er herteld? - See form for official long description of the checkbox")
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,6 +58,28 @@ impl PollingStationResults {
     /// This returns the recounts if those are available, otherwise it returns the normal voters counts
     pub fn latest_voters_counts(&self) -> &VotersCounts {
         self.voters_recounts.as_ref().unwrap_or(&self.voters_counts)
+    }
+
+    /// Create a default value for `political_group_votes` (type `Vec<PoliticalGroup>`)
+    /// for the given political groups, with all votes set to 0.
+    pub fn default_political_group_votes(
+        political_groups: &[PoliticalGroup],
+    ) -> Vec<PoliticalGroupVotes> {
+        political_groups
+            .iter()
+            .map(|pg| PoliticalGroupVotes {
+                number: pg.number,
+                total: 0,
+                candidate_votes: pg
+                    .candidates
+                    .iter()
+                    .map(|c| CandidateVotes {
+                        number: c.number,
+                        votes: 0,
+                    })
+                    .collect(),
+            })
+            .collect()
     }
 }
 

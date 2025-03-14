@@ -5,7 +5,7 @@ use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
-    shared::{create_and_save_data_entry, create_result},
+    shared::{claim_data_entry, create_result, save_data_entry},
     utils::serve_api,
 };
 use abacus::{
@@ -264,9 +264,10 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
 async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
-    let admin_cookie = shared::admin_login(&addr).await;
-    create_and_save_data_entry(&addr, typist_cookie, 2, 1, None).await;
+    claim_data_entry(&addr, typist_cookie.clone(), 2, 1).await;
+    save_data_entry(&addr, typist_cookie, 2, 1, None).await;
 
+    let admin_cookie = shared::admin_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
     let response = reqwest::Client::new()
         .delete(&url)

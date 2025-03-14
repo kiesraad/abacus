@@ -11,8 +11,8 @@ import {
   electionMockData,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  PollingStationDataEntryClaimHandler,
   PollingStationDataEntryDeleteHandler,
-  PollingStationDataEntryGetHandler,
   PollingStationDataEntrySaveHandler,
 } from "@kiesraad/api-mocks";
 import {
@@ -311,7 +311,7 @@ describe("Polling Station data entry integration tests", () => {
       ElectionListRequestHandler,
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
-      PollingStationDataEntryGetHandler,
+      PollingStationDataEntryClaimHandler,
       PollingStationDataEntrySaveHandler,
       PollingStationDataEntryDeleteHandler,
     );

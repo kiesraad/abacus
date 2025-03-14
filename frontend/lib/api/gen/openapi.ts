@@ -79,11 +79,6 @@ export type AUDIT_LOG_LIST_REQUEST_PARAMS = Record<string, never>;
 export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
-export interface POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS {
-  polling_station_id: number;
-  entry_number: number;
-}
-export type POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;
   entry_number: number;
@@ -95,6 +90,14 @@ export interface POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS {
   entry_number: number;
 }
 export type POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
+
+// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim
+export interface POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PARAMS {
+  polling_station_id: number;
+  entry_number: number;
+}
+export type POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH =
+  `/api/polling_stations/${number}/data_entries/${number}/claim`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
 export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
@@ -232,6 +235,15 @@ export interface CandidateNominationResult {
 export interface CandidateVotes {
   number: number;
   votes: number;
+}
+
+/**
+ * Response structure for getting data entry of polling station results
+ */
+export interface ClaimDataEntryResponse {
+  client_state: unknown;
+  data: PollingStationResults;
+  validation_results: ValidationResults;
 }
 
 export interface CreateUserRequest {
@@ -421,17 +433,6 @@ export interface Fraction {
   denominator: number;
   integer: number;
   numerator: number;
-}
-
-/**
- * Response structure for getting data entry of polling station results
- */
-export interface GetDataEntryResponse {
-  client_state: unknown;
-  data: PollingStationResults;
-  progress: number;
-  updated_at: string;
-  validation_results: ValidationResults;
 }
 
 /**

@@ -5,8 +5,8 @@ import { ElectionProvider } from "@kiesraad/api";
 import {
   electionMockData,
   ElectionRequestHandler,
+  PollingStationDataEntryClaimHandler,
   PollingStationDataEntryFinaliseHandler,
-  PollingStationDataEntryGetHandler,
   PollingStationDataEntrySaveHandler,
 } from "@kiesraad/api-mocks";
 import { renderReturningRouter, screen, server, spyOnHandler, within } from "@kiesraad/test";
@@ -17,7 +17,7 @@ import {
   errorWarningMocks,
   getDefaultFormSection,
   getEmptyDataEntryRequest,
-  overrideServerGetDataEntryResponse,
+  overrideServerClaimDataEntryResponse,
 } from "../test-data";
 import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
@@ -62,7 +62,7 @@ describe("Test CheckAndSaveForm", () => {
   beforeEach(() => {
     server.use(
       ElectionRequestHandler,
-      PollingStationDataEntryGetHandler,
+      PollingStationDataEntryClaimHandler,
       PollingStationDataEntrySaveHandler,
       PollingStationDataEntryFinaliseHandler,
     );
@@ -100,7 +100,7 @@ describe("Test CheckAndSaveForm", () => {
   });
 
   test("Data entry does not show finalise button with errors", async () => {
-    overrideServerGetDataEntryResponse({
+    overrideServerClaimDataEntryResponse({
       formState: getDefaultDataEntryState().formState,
       pollingStationResults: getDefaultValues(),
       validationResults: {
@@ -128,7 +128,7 @@ describe("Test CheckAndSaveForm", () => {
   });
 
   test("Data entry does not show finalise button with unaccepted warnings", async () => {
-    overrideServerGetDataEntryResponse({
+    overrideServerClaimDataEntryResponse({
       formState: getDefaultDataEntryState().formState,
       pollingStationResults: getDefaultValues(),
       validationResults: {
@@ -154,7 +154,7 @@ describe("Test CheckAndSaveForm", () => {
     const dataEntryState = getDefaultDataEntryState();
     dataEntryState.formState.sections.voters_votes_counts.acceptWarnings = true;
 
-    overrideServerGetDataEntryResponse({
+    overrideServerClaimDataEntryResponse({
       formState: dataEntryState.formState,
       pollingStationResults: getDefaultValues(),
       validationResults: {
@@ -176,12 +176,12 @@ describe("Test CheckAndSaveForm", () => {
 
 describe("Test CheckAndSaveForm summary", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+    server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
   test("Blocking", async () => {
     const values = getDefaultValues();
 
-    overrideServerGetDataEntryResponse({
+    overrideServerClaimDataEntryResponse({
       formState: getDefaultDataEntryState().formState,
       pollingStationResults: values,
       validationResults: {
@@ -211,7 +211,7 @@ describe("Test CheckAndSaveForm summary", () => {
   test("Accepted with warnings", async () => {
     const dataEntryState = getDefaultDataEntryState();
     dataEntryState.formState.sections.differences_counts.acceptWarnings = true;
-    overrideServerGetDataEntryResponse({
+    overrideServerClaimDataEntryResponse({
       formState: dataEntryState.formState,
       pollingStationResults: getDefaultValues(),
       validationResults: {
@@ -233,7 +233,7 @@ describe("Test CheckAndSaveForm summary", () => {
   });
 
   test("Unaccepted warnings", async () => {
-    overrideServerGetDataEntryResponse({
+    overrideServerClaimDataEntryResponse({
       formState: getDefaultDataEntryState().formState,
       pollingStationResults: getDefaultValues(),
       validationResults: {

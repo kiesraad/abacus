@@ -1,40 +1,46 @@
 import { expect } from "vitest";
 
-import { GetDataEntryResponse, PoliticalGroup, PollingStationResults } from "@kiesraad/api";
+import {
+  ClaimDataEntryResponse,
+  PoliticalGroup,
+  POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
+  PollingStationResults,
+} from "@kiesraad/api";
 import { overrideOnce, screen, within } from "@kiesraad/test";
 
 import { getClientState } from "../state/dataEntryUtils";
 import { FormState } from "../state/types";
 import { getInitialValues } from "./mock-data";
 
-export interface OverrideServerGetDataEntryResponseProps {
+export interface OverrideServerClaimDataEntryResponseProps {
   formState: FormState;
   pollingStationResults: Partial<PollingStationResults>;
   acceptWarnings?: boolean;
   continueToNextSection?: boolean;
   progress?: number;
-  validationResults?: GetDataEntryResponse["validation_results"];
+  validationResults?: ClaimDataEntryResponse["validation_results"];
 }
 
-export function overrideServerGetDataEntryResponse({
+export function overrideServerClaimDataEntryResponse({
   formState,
   pollingStationResults,
   acceptWarnings = false,
   continueToNextSection = true,
-  progress = 1,
   validationResults = { errors: [], warnings: [] },
-}: OverrideServerGetDataEntryResponseProps) {
-  const initialValues = getInitialValues();
-  overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
-    client_state: getClientState(formState, acceptWarnings, continueToNextSection),
-    data: {
-      ...initialValues,
-      ...pollingStationResults,
-    },
-    progress,
-    updated_at: "",
-    validation_results: validationResults,
-  } satisfies GetDataEntryResponse);
+}: OverrideServerClaimDataEntryResponseProps) {
+  overrideOnce(
+    "post",
+    "/api/polling_stations/1/data_entries/1/claim" satisfies POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
+    200,
+    {
+      client_state: getClientState(formState, acceptWarnings, continueToNextSection),
+      data: {
+        ...getInitialValues(),
+        ...pollingStationResults,
+      },
+      validation_results: validationResults,
+    } satisfies ClaimDataEntryResponse,
+  );
 }
 
 export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: Array<string>, feedbackMessage: string) {

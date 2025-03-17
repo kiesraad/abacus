@@ -58,7 +58,12 @@ export function useDataEntryFormSection<FORM_VALUES>({
     data: Partial<PollingStationResults>,
     options?: SubmitCurrentFormOptions,
   ): Promise<boolean> => {
-    return await onSubmitForm(data, { ...options, showAcceptWarnings });
+    const result = await onSubmitForm(data, { ...options, showAcceptWarnings });
+    if (formSection.errors.length) {
+      // scroll to top when there are errors, this is mainly necesarry when users click "volgende" a second time without chaning anything
+      window.scrollTo(0, 0);
+    }
+    return result;
   };
 
   // scroll to top when saved

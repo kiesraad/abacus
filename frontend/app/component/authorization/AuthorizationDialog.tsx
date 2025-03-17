@@ -12,7 +12,9 @@ export function AuthorizationDialog() {
   const { user, loading, expiration, extendSession, setUser } = useApiState();
   const location = useLocation();
   const path = location.pathname;
-  const [sessionValidFor, setSessionValidFor] = useState<number | null>(null);
+  const [sessionValidFor, setSessionValidFor] = useState<number | null>(
+    expiration !== null ? (expiration.getTime() - new Date().getTime()) / 1000 : null,
+  );
   const [hideDialog, setHideDialog] = useState(false);
 
   // update the current time every second when there is a session expiration

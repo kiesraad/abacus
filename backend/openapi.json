@@ -1866,6 +1866,90 @@
               "eventType": {
                 "type": "string",
                 "enum": [
+                  "UserUpdateFailed"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "eventType"
+            ],
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "enum": [
+                  "UserUpdateSuccess"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "eventType"
+            ],
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "enum": [
+                  "UserSessionExtended"
+                ]
+              }
+            }
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LoginResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LoginResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserUpdated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "eventType"
+            ],
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "enum": [
                   "UnknownEvent"
                 ]
               }

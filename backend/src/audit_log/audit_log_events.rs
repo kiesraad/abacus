@@ -7,27 +7,32 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, AppState,
-    authentication::{Role, User},
+    authentication::{Role, User, api::LoginResponse},
 };
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserLoggedInDetails {
     pub user_agent: String,
     pub logged_in_users_count: u32,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserLoggedOutDetails {
     pub session_duration: u64,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema, Default)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema, Default)]
 #[serde(rename_all = "PascalCase", tag = "eventType")]
 pub enum AuditEvent {
     UserLoggedIn(UserLoggedInDetails),
     UserLoggedOut(UserLoggedOutDetails),
+    UserUpdateFailed,
+    UserUpdateSuccess,
+    UserSessionExtended,
+    UserCreated(LoginResponse),
+    UserUpdated(LoginResponse),
     #[default]
     UnknownEvent,
 }
@@ -43,6 +48,11 @@ impl fmt::Display for AuditEvent {
         match self {
             AuditEvent::UserLoggedIn(..) => write!(f, "UserLoggedIn"),
             AuditEvent::UserLoggedOut(..) => write!(f, "UserLoggedOut"),
+            AuditEvent::UserUpdateFailed => write!(f, "UserUpdateFailed"),
+            AuditEvent::UserUpdateSuccess => write!(f, "UserUpdateSuccess"),
+            AuditEvent::UserSessionExtended => write!(f, "UserSessionExtended"),
+            AuditEvent::UserCreated(..) => write!(f, "UserCreated"),
+            AuditEvent::UserUpdated(..) => write!(f, "UserUpdated"),
             AuditEvent::UnknownEvent => write!(f, "UnknownEvent"),
         }
     }
@@ -68,7 +78,7 @@ impl From<Option<String>> for Ip {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, FromRow, ToSchema)]
+#[derive(Serialize, Deserialize, Debug, FromRow, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct AuditLogEvent {
     id: u32,

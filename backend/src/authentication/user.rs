@@ -169,7 +169,6 @@ where
 pub struct Users(SqlitePool);
 
 impl Users {
-    #[cfg(test)]
     pub fn new(pool: SqlitePool) -> Self {
         Self(pool)
     }

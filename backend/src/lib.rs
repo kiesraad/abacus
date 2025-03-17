@@ -40,6 +40,8 @@ pub struct AppState {
 
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
+    let state = AppState { pool };
+
     let data_entry_routes = Router::new()
         .route(
             "/{entry_number}",
@@ -107,8 +109,8 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/logout", post(authentication::logout))
         .route("/whoami", get(authentication::whoami))
         .route("/account", put(authentication::account_update))
-        .layer(middleware::from_fn_with_state(
-            pool.clone(),
+        .layer(middleware::map_response_with_state(
+            state.clone(),
             authentication::extend_session,
         ));
 
@@ -141,7 +143,6 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     };
 
     // Add the state to the app
-    let state = AppState { pool };
     let app = app.with_state(state);
 
     // Only include the OpenAPI spec if the feature is enabled

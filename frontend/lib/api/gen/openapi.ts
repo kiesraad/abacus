@@ -176,6 +176,11 @@ export type AssignedSeat =
 export type AuditEvent =
   | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
   | (UserLoggedOutDetails & { eventType: "UserLoggedOut" })
+  | { eventType: "UserUpdateFailed" }
+  | { eventType: "UserUpdateSuccess" }
+  | { eventType: "UserSessionExtended" }
+  | (LoginResponse & { eventType: "UserCreated" })
+  | (LoginResponse & { eventType: "UserUpdated" })
   | { eventType: "UnknownEvent" };
 
 export type AuditEventLevel = "info" | "success" | "warning" | "error";

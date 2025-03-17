@@ -9,7 +9,7 @@ pub use self::role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
 #[cfg(test)]
 pub use self::session::Sessions;
 
-mod api;
+pub mod api;
 pub mod error;
 mod password;
 mod role;
@@ -35,7 +35,7 @@ pub struct Credentials {
     password: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Clone, Deserialize, PartialEq, Eq, ToSchema)]
 pub struct LoginResponse {
     user_id: u32,
     username: String,
@@ -82,7 +82,10 @@ mod tests {
             .route("/api/user/logout", post(api::logout))
             .route("/api/user/whoami", get(api::whoami))
             .route("/api/user/account", put(api::account_update))
-            .layer(middleware::from_fn_with_state(pool, extend_session));
+            .layer(middleware::map_response_with_state(
+                state.clone(),
+                extend_session,
+            ));
 
         router.with_state(state)
     }

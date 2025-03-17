@@ -70,6 +70,7 @@ export function AuthorizationDialog() {
             size="lg"
             onClick={() => {
               void extendSession();
+              setHideDialog(true);
             }}
           >
             {t("users.stay_logged_in")}

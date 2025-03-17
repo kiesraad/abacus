@@ -6,7 +6,7 @@ import { ApiProviderContext } from "./ApiProviderContext";
 import { LoginResponse, Role } from "./gen/openapi";
 
 interface TestUserProviderProps {
-  userRole: Role;
+  userRole: Role | null;
   children: ReactNode;
   overrideExpiration?: Date;
 }
@@ -22,13 +22,15 @@ export function TestUserProvider({ userRole, children, overrideExpiration }: Tes
   const apiState: ApiState = {
     client: new ApiClient(),
     setUser: () => {},
-    user: {
-      user_id: 1,
-      role: userRole,
-      needs_password_change: false,
-      fullname: "Test User",
-      username: "test",
-    },
+    user: userRole
+      ? {
+          user_id: 1,
+          role: userRole,
+          needs_password_change: false,
+          fullname: "Test User",
+          username: "test",
+        }
+      : null,
     logout: async () => {},
     login: async () => {
       return Promise.resolve({} as ApiResult<LoginResponse>);

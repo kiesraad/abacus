@@ -23,7 +23,7 @@ export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderPr
   // indicating that the sessions has expired or the user is not authenticated anymore
   useEffect(() => {
     const callback = (error: ApiError) => {
-      if (error.reference === "InvalidSession" && user) {
+      if ((error.reference === "InvalidSession" || error.reference === "Unauthorized") && user) {
         setUser(null);
       }
     };
@@ -52,6 +52,10 @@ export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderPr
     expiration,
     extendSession,
   };
+
+  if (loading && fetchInitialUser) {
+    return null;
+  }
 
   return <ApiProviderContext.Provider value={apiState}>{children}</ApiProviderContext.Provider>;
 }

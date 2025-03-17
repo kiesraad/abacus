@@ -204,7 +204,11 @@ export const UserDeleteRequestHandler = http.delete<
 // get user handler
 export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginResponse, WHOAMI_REQUEST_PATH>(
   "/api/user/whoami",
-  () => HttpResponse.json(loginResponseMockData, { status: 200 }),
+  () =>
+    HttpResponse.json(loginResponseMockData, {
+      status: 200,
+      headers: { "x-session-expires-at": new Date(Date.now() + 1000 * 60 * 30).toString() },
+    }),
 );
 
 export const handlers: HttpHandler[] = [

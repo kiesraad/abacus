@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { AnyApiError, ApiResult } from "./api.types";
+import { ApiResult } from "./api.types";
 import { ApiClient, DEFAULT_CANCEL_REASON } from "./ApiClient";
 import { isSuccess } from "./ApiError";
 import {
@@ -25,18 +25,10 @@ export interface SessionState {
 // Keep track of the currently logged-in user
 // By initially fetching the user data from the server
 // and then updating it when the user logs in or out
-export default function useSessionState(client: ApiClient, fetchInitialUser: boolean): SessionState {
+export default function useSessionState(client: ApiClient, fetchInitialUser: boolean = true): SessionState {
   const [user, setUser] = useState<LoginResponse | null>(null);
-  const [error, setError] = useState<AnyApiError | null>(null);
   const [expiration, setExpiration] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Propagate any unexpected API errors to the router
-  useEffect(() => {
-    if (error) {
-      throw error;
-    }
-  }, [error]);
 
   // Log out the current user
   const logout = async () => {
@@ -45,8 +37,6 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
 
     if (isSuccess(response)) {
       setUser(null);
-    } else {
-      setError(response);
     }
   };
 
@@ -65,7 +55,13 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
 
   const extendSession = async () => {
     const path: WHOAMI_REQUEST_PATH = "/api/user/whoami";
-    void (await client.getRequest<LoginResponse>(path));
+    const response = await client.getRequest<LoginResponse>(path);
+
+    if (isSuccess(response)) {
+      setUser(response.data);
+    } else {
+      setUser(null);
+    }
   };
 
   // Fetch the user data from the server when the component mounts

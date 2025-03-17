@@ -10,11 +10,24 @@ Voor DSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 
 __Hoofdscenario:__  
 1. Het GSB opent de zitting.
+   1. Tijdstip start zitting moet ingevoerd worden in applicatie door coördinator GSB.
+   2. Concept zitting in applicatie nodig: welke data hoort bij welke zitting?
+   3. De coördinator kan invoer starten (als zitting open), pauzeren, afronden.
+   4. De coördinator kan de zitting in de applicatie sluiten. Na het sluiten van de zitting door het GSB.
+      1. Alleen sluiten. Geen invoer van data nodig. Dus optioneel TOTDAT tweede zitting of CSB-zitting.
+      2. Melding als je zitting lang (een dag?) open staat: "Moet je geen andere zitting openen?"
+
+   5. De coördinator kan een latere zitting openen. (als geen andere open zitting)
+   6. Kan de coördinator een zitting heropenen, bijv. als per ongeluk gesloten? Ja. Niet meer, zodra invoer gedaan in nieuwe zitting. Zelfde geldt voor verwijderen van een zitting.
+   7. Geen PV maken totdat alle stembureaus definitieve invoer hebben en invoer is afgesloten.
+
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na 31-2 Bijlage 1 in.
 4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 1 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
 5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
 6. De coördinator genereert het [concept-PV](./input-output-bestanden.md#output-voor-csb) en het [digitale bestand](./input-output-bestanden.md#output-voor-csb). En voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
+   1. concept-PV => PV? want geen voorlopige PVs genereren
+
 7. De coördinator voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
 8. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 9. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
@@ -160,6 +173,8 @@ __Uitbreidingen:__
 4a. De coördinator vult in: "zie bijlage".
 
 ### Open punten
+
+- Of datum/tijd en locatie zitting invoeren tijdens openen van de zitting in de applicatie? Liever niet, want dan informatie nodig als je invoer wil starten. En later corrigeren moet mogelijk zijn.
 
 - Voert de coördinator de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de applicatie dat?
   - Nieuw model GSB PV heeft drie vinkjes: toegelaten kiezers opnieuw vastgesteld, onderzocht vanwege andere redenen, stembiljetten (deels) herteld.

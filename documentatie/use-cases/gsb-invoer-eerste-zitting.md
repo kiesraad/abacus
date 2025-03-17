@@ -131,6 +131,8 @@ __Uitbreidingen:__
 
 ## De coördinator lost de verschillen tussen de twee invoeren op (zee)
 
+TODO: betere titel, want wordt niets opgelost
+
 __Niveau:__ gebruikersdoel, zee, 🌊
 
 ### Hoofdscenario en uitbreidingen
@@ -149,7 +151,13 @@ __Uitbreidingen:__
 &emsp; 2a1. De coördinator verwijdert beide invoeren.  
 &emsp; 2a2. De coördinator laat het stembureau opnieuw invoeren door twee invoerders.
 
-### Open punten
+3a. De eerste invoer is incorrect:
+&emsp; 3a1. De tweede invoer wordt als eerste invoer behandeld. De andere invoer wordt weggegooid. Dus bij opnieuw invoeren krijg je waarschuwing over verschillen met de eerdere, correcte invoer.
+
+3b. De tweede invoer is incorrect:
+&emsp;3b1. Tweede invoer verwijderen en opnieuw laten doen.
+
+### Niet in scope
 
 - Als gebruiksvriendelijker alternatief op de uitbreiding waar geen van beide invoeren correct zijn: "De coördinator laat alleen de afwijkende lijsten opnieuw twee keer invoeren."
 

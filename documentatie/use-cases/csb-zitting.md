@@ -15,9 +15,14 @@ __Hoofdscenario:__
 5. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
 6. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)
 7. De applicatie genereert de benodigde bestanden: concept-PV, digitaal bestand(en). Locatie en datum, namen stembureauleden, opmerkelijkheden, ...?
+   1. Geen concept-PV. (zie ook GSB)
+
 8. De voorzitter CSB (burgemeester) tekent de brieven.
 9. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)
 10. Het CSB opent de zitting.
+    1. N.B. CSB doet alles in de applicatie voordat de zitting start.
+    2. Geen tweede zitting. Nieuwe aantallen opnieuw invoeren in "eerste zitting" in applicatie.
+
 11. Het CSB stelt de uitslag vast obv het concept-PV: controleren op compleetheid, voorlezen, er zijn geen bezwaren, ondertekenen. En sluit daarmee de zitting.
 12. Het CSB publiceert het digitaal bestand en het PV op de website van de gemeente.
 13. Het CSB stuurt alle PVs naar de gemeenteraad.
@@ -65,6 +70,8 @@ __Uitbreidingen:__
 &emsp;1a1. Het CSB lost in overleg met het GSB het probleem op en importeert alsnog het bestand.  
 &emsp;1a1a. Het CSB slaagt er niet in het probleem op te lossen:  
 &emsp;&emsp;1a1a1. Het CSB doet de eerste invoer handmatig.
+
+TODO: hier ook bij 3a uitwerken over waarschuwingen zoals bij GSB
 
 3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 3a1. De coördinator vergelijkt de eerste en tweede invoer met het papieren PV.  

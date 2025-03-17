@@ -81,11 +81,12 @@ function useInitialApiGetInner<T>(
   };
 }
 
+// Call the api and return the current status of the request, also returns fatal errors
 export function useInitialApiGetWithErrors<T>(path: string): UseInitialApiGetReturn<T> {
   return useInitialApiGetInner(path, false);
 }
 
-// Call the api and return the current status of the request, optionally throws an error when the request fails
+// Call the api and return the current status of the request, throws fatal errors instead of returning them
 export function useInitialApiGet<T>(path: string): UseInitialApiGetReturnWithoutFatalErrors<T> {
   return useInitialApiGetInner(path, true);
 }

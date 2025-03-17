@@ -5,6 +5,10 @@ use super::{
     session::Sessions,
     user::{User, Users},
 };
+use crate::{
+    APIError, AppState, ErrorResponse,
+    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
+};
 use axum::{
     extract::{Path, Request, State},
     http::HeaderValue,
@@ -18,11 +22,21 @@ use serde::{Deserialize, Serialize};
 use sqlx::{Error, SqlitePool};
 use tracing::{debug, info};
 use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::{
-    APIError, ErrorResponse,
-    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
-};
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::default()
+        .routes(routes!(login))
+        .routes(routes!(whoami))
+        .routes(routes!(account_update))
+        .routes(routes!(logout))
+        .routes(routes!(user_list))
+        .routes(routes!(user_create))
+        .routes(routes!(user_get))
+        .routes(routes!(user_update))
+        .routes(routes!(user_delete))
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Credentials {
     pub username: String,

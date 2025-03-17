@@ -9,19 +9,30 @@ use utoipa::ToSchema;
 use self::repository::Elections;
 pub use self::structs::*;
 use crate::{
-    APIError, ErrorResponse,
+    APIError, AppState, ErrorResponse,
     authentication::User,
     polling_station::{repository::PollingStations, structs::PollingStation},
 };
 
 #[cfg(feature = "dev-database")]
-use axum::http::StatusCode;
-
-#[cfg(feature = "dev-database")]
 use crate::authentication::Admin;
+#[cfg(feature = "dev-database")]
+use axum::http::StatusCode;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub(crate) mod repository;
 pub mod structs;
+
+pub fn router() -> OpenApiRouter<AppState> {
+    let router = OpenApiRouter::default()
+        .routes(routes!(election_list))
+        .routes(routes!(election_details));
+
+    #[cfg(feature = "dev-database")]
+    let router = router.routes(routes!(election_create));
+
+    router
+}
 
 /// Election list response
 ///

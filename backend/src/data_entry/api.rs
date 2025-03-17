@@ -1,5 +1,5 @@
 use crate::{
-    APIError,
+    APIError, AppState,
     authentication::{Typist, User},
     data_entry::{
         PollingStationResults, ValidationResults,
@@ -21,6 +21,7 @@ use axum::{
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 /// Response structure for getting data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -29,6 +30,15 @@ pub struct ClaimDataEntryResponse {
     #[schema(value_type = Object)]
     pub client_state: Option<serde_json::Value>,
     pub validation_results: ValidationResults,
+}
+
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::default()
+        .routes(routes!(polling_station_data_entry_claim))
+        .routes(routes!(polling_station_data_entry_save))
+        .routes(routes!(polling_station_data_entry_delete))
+        .routes(routes!(polling_station_data_entry_finalise))
+        .routes(routes!(election_status))
 }
 
 /// Claim a data entry for a polling station, returning any existing progress

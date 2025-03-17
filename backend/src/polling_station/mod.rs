@@ -1,3 +1,10 @@
+use self::repository::PollingStations;
+pub use self::structs::*;
+use crate::{
+    APIError, AppState, ErrorResponse,
+    authentication::{AdminOrCoordinator, User},
+    election::repository::Elections,
+};
 use axum::{
     Json,
     extract::{Path, State},
@@ -6,17 +13,19 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-
-use self::repository::PollingStations;
-pub use self::structs::*;
-use crate::{
-    APIError, ErrorResponse,
-    authentication::{AdminOrCoordinator, User},
-    election::repository::Elections,
-};
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub mod repository;
 pub mod structs;
+
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::default()
+        .routes(routes!(polling_station_list))
+        .routes(routes!(polling_station_create))
+        .routes(routes!(polling_station_get))
+        .routes(routes!(polling_station_update))
+        .routes(routes!(polling_station_delete))
+}
 
 /// Polling station list response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]

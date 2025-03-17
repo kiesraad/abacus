@@ -1,5 +1,5 @@
 use crate::{
-    APIError, ErrorResponse,
+    APIError, AppState, ErrorResponse,
     authentication::Coordinator,
     data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
     election::{Election, repository::Elections},
@@ -13,7 +13,16 @@ use crate::{
 };
 use axum::extract::{Path, State};
 use axum_extra::response::Attachment;
+use utoipa_axum::router::OpenApiRouter;
+use utoipa_axum::routes;
 use zip::{result::ZipError, write::SimpleFileOptions};
+
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::default()
+        .routes(routes!(election_download_zip_results))
+        .routes(routes!(election_download_pdf_results))
+        .routes(routes!(election_download_xml_results))
+}
 
 struct ResultsInput {
     election: Election,

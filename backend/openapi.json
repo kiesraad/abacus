@@ -12,9 +12,6 @@
   "paths": {
     "/api/elections": {
       "get": {
-        "tags": [
-          "election"
-        ],
         "summary": "Get a list of all elections, without their candidate lists",
         "operationId": "election_list",
         "responses": {
@@ -51,9 +48,6 @@
         }
       },
       "post": {
-        "tags": [
-          "election"
-        ],
         "summary": "Create an election. For test usage only!",
         "operationId": "election_create",
         "requestBody": {
@@ -112,9 +106,6 @@
     },
     "/api/elections/{election_id}": {
       "get": {
-        "tags": [
-          "election"
-        ],
         "summary": "Get election details including the election's candidate list (political groups) and its polling stations",
         "operationId": "election_details",
         "parameters": [
@@ -176,9 +167,6 @@
     },
     "/api/elections/{election_id}/apportionment": {
       "post": {
-        "tags": [
-          "apportionment"
-        ],
         "summary": "Get the apportionment for an election",
         "operationId": "election_apportionment",
         "parameters": [
@@ -250,9 +238,6 @@
     },
     "/api/elections/{election_id}/download_pdf_results": {
       "get": {
-        "tags": [
-          "report"
-        ],
         "summary": "Download a generated PDF with election results",
         "operationId": "election_download_pdf_results",
         "parameters": [
@@ -318,9 +303,6 @@
     },
     "/api/elections/{election_id}/download_xml_results": {
       "get": {
-        "tags": [
-          "report"
-        ],
         "summary": "Download a generated EML_NL 510 XML file with election results",
         "operationId": "election_download_xml_results",
         "parameters": [
@@ -378,9 +360,6 @@
     },
     "/api/elections/{election_id}/download_zip_results": {
       "get": {
-        "tags": [
-          "report"
-        ],
         "summary": "Download a zip containing a PDF for the PV and the EML with election results",
         "operationId": "election_download_zip_results",
         "parameters": [
@@ -446,9 +425,6 @@
     },
     "/api/elections/{election_id}/polling_stations": {
       "get": {
-        "tags": [
-          "polling_station"
-        ],
         "summary": "Get a list of all [PollingStation]s for an election",
         "operationId": "polling_station_list",
         "parameters": [
@@ -508,9 +484,6 @@
         }
       },
       "post": {
-        "tags": [
-          "polling_station"
-        ],
         "summary": "Create a new [PollingStation]",
         "operationId": "polling_station_create",
         "parameters": [
@@ -592,9 +565,6 @@
     },
     "/api/elections/{election_id}/polling_stations/{polling_station_id}": {
       "get": {
-        "tags": [
-          "polling_station"
-        ],
         "summary": "Get a [PollingStation]",
         "operationId": "polling_station_get",
         "parameters": [
@@ -665,9 +635,6 @@
         }
       },
       "put": {
-        "tags": [
-          "polling_station"
-        ],
         "summary": "Update a [PollingStation]",
         "operationId": "polling_station_update",
         "parameters": [
@@ -741,9 +708,6 @@
         }
       },
       "delete": {
-        "tags": [
-          "polling_station"
-        ],
         "summary": "Delete a [PollingStation]",
         "operationId": "polling_station_delete",
         "parameters": [
@@ -809,9 +773,6 @@
     },
     "/api/elections/{election_id}/status": {
       "get": {
-        "tags": [
-          "data_entry"
-        ],
         "summary": "Get election polling stations data entry statuses",
         "operationId": "election_status",
         "parameters": [
@@ -873,9 +834,6 @@
     },
     "/api/log": {
       "get": {
-        "tags": [
-          "audit_log"
-        ],
         "summary": "Lists all users",
         "operationId": "audit_log_list",
         "responses": {
@@ -914,9 +872,6 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
-        "tags": [
-          "data_entry"
-        ],
         "summary": "Save a data entry for a polling station",
         "operationId": "polling_station_data_entry_save",
         "parameters": [
@@ -1017,9 +972,6 @@
         }
       },
       "delete": {
-        "tags": [
-          "data_entry"
-        ],
         "summary": "Delete an in-progress (not finalised) data entry for a polling station",
         "operationId": "polling_station_data_entry_delete",
         "parameters": [
@@ -1095,9 +1047,6 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim": {
       "post": {
-        "tags": [
-          "data_entry"
-        ],
         "summary": "Claim a data entry for a polling station, returning any existing progress",
         "operationId": "polling_station_data_entry_claim",
         "parameters": [
@@ -1170,9 +1119,6 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
       "post": {
-        "tags": [
-          "data_entry"
-        ],
         "summary": "Finalise the data entry for a polling station",
         "operationId": "polling_station_data_entry_finalise",
         "parameters": [
@@ -1258,9 +1204,6 @@
     },
     "/api/user": {
       "get": {
-        "tags": [
-          "authentication"
-        ],
         "summary": "Lists all users",
         "operationId": "user_list",
         "responses": {
@@ -1297,9 +1240,6 @@
         }
       },
       "post": {
-        "tags": [
-          "authentication"
-        ],
         "summary": "Create a new user",
         "operationId": "user_create",
         "requestBody": {
@@ -1358,9 +1298,6 @@
     },
     "/api/user/account": {
       "put": {
-        "tags": [
-          "authentication"
-        ],
         "summary": "Update the user's account with a new password and optionally new fullname",
         "operationId": "account_update",
         "requestBody": {
@@ -1399,9 +1336,6 @@
     },
     "/api/user/login": {
       "post": {
-        "tags": [
-          "authentication"
-        ],
         "summary": "Login endpoint, authenticates a user and creates a new session + session cookie",
         "operationId": "login",
         "requestBody": {
@@ -1450,9 +1384,6 @@
     },
     "/api/user/logout": {
       "post": {
-        "tags": [
-          "authentication"
-        ],
         "summary": "Logout endpoint, deletes the session cookie",
         "operationId": "logout",
         "responses": {
@@ -1474,9 +1405,6 @@
     },
     "/api/user/whoami": {
       "get": {
-        "tags": [
-          "authentication"
-        ],
         "summary": "Get current logged-in user endpoint",
         "operationId": "whoami",
         "responses": {
@@ -1515,9 +1443,6 @@
     },
     "/api/user/{user_id}": {
       "get": {
-        "tags": [
-          "authentication"
-        ],
         "summary": "Get a user",
         "operationId": "user_get",
         "parameters": [
@@ -1577,9 +1502,6 @@
         }
       },
       "put": {
-        "tags": [
-          "authentication"
-        ],
         "summary": "Update a user",
         "operationId": "user_update",
         "parameters": [
@@ -1648,9 +1570,6 @@
         }
       },
       "delete": {
-        "tags": [
-          "authentication"
-        ],
         "summary": "Delete a user",
         "operationId": "user_delete",
         "parameters": [
@@ -2020,42 +1939,6 @@
           "Female",
           "X"
         ]
-      },
-      "CandidateNominationResult": {
-        "type": "object",
-        "description": "The result of the candidate nomination procedure.\nThis contains the preference threshold and percentage that was used.\nIt contains a list of all chosen candidates in alphabetical order.\nIt also contains the preferential nomination of candidates, the remaining\nnomination of candidates and the final ranking of candidates for each political group.",
-        "required": [
-          "preference_threshold_percentage",
-          "preference_threshold",
-          "chosen_candidates",
-          "political_group_candidate_nomination"
-        ],
-        "properties": {
-          "chosen_candidates": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Candidate"
-            },
-            "description": "List of chosen candidates in alphabetical order"
-          },
-          "political_group_candidate_nomination": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupCandidateNomination"
-            },
-            "description": "List of chosen candidates and candidate list ranking per political group"
-          },
-          "preference_threshold": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "Preference threshold number of votes"
-          },
-          "preference_threshold_percentage": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Preference threshold percentage",
-            "minimum": 0
-          }
-        }
       },
       "CandidateVotes": {
         "type": "object",
@@ -2695,21 +2578,6 @@
           }
         }
       },
-      "Pagination": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "perPage": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          }
-        }
-      },
       "PoliticalGroup": {
         "type": "object",
         "description": "Political group with its candidates",
@@ -2732,57 +2600,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          }
-        }
-      },
-      "PoliticalGroupCandidateNomination": {
-        "type": "object",
-        "description": "Contains information about the chosen candidates and the candidate list ranking\nfor a specific political group.",
-        "required": [
-          "pg_number",
-          "pg_name",
-          "pg_seats",
-          "preferential_candidate_nomination",
-          "other_candidate_nomination",
-          "updated_candidate_ranking"
-        ],
-        "properties": {
-          "other_candidate_nomination": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CandidateVotes"
-            },
-            "description": "The list of other chosen candidates, can be empty"
-          },
-          "pg_name": {
-            "type": "string",
-            "description": "Political group name for which this nomination applies"
-          },
-          "pg_number": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Political group number for which this nomination applies",
-            "minimum": 0
-          },
-          "pg_seats": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The number of seats assigned to this group",
-            "minimum": 0
-          },
-          "preferential_candidate_nomination": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CandidateVotes"
-            },
-            "description": "The list of chosen candidates via preferential votes, can be empty"
-          },
-          "updated_candidate_ranking": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Candidate"
-            },
-            "description": "The updated ranking of the whole candidate list, can be empty"
           }
         }
       },
@@ -3441,23 +3258,5 @@
         }
       }
     }
-  },
-  "tags": [
-    {
-      "name": "apportionment",
-      "description": "Election apportionment API"
-    },
-    {
-      "name": "authentication",
-      "description": "Authentication and user API"
-    },
-    {
-      "name": "election",
-      "description": "Election API"
-    },
-    {
-      "name": "polling_station",
-      "description": "Polling station API"
-    }
-  ]
+  }
 }

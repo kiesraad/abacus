@@ -1,13 +1,17 @@
+use crate::{APIError, AppState, ErrorResponse, authentication::AdminOrCoordinator};
 use axum::{
     Json,
     extract::{Query, State},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-
-use crate::{APIError, ErrorResponse, authentication::AdminOrCoordinator};
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{AuditLog, AuditLogEvent};
+
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::default().routes(routes!(audit_log_list))
+}
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]

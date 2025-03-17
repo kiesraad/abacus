@@ -6,7 +6,7 @@
   "delete_are_you_sure": "Je kan dit niet ongedaan maken. Weet je zeker dat je deze gebruiker wilt verwijderen?",
   "delete": "Gebruiker verwijderen",
   "details_title": "Details van het account",
-  "expiration_warning_details": "Je bent al even niet meer actief. Je wordt automatisch uitgelogd over <strong>{time}</strong>. Niet opgeslagen wijzigingen gaan verloren.",
+  "expiration_warning_details": "Je bent al even niet meer actief. Je wordt automatisch uitgelogd over <strong>{time}</strong>.\n Niet opgeslagen wijzigingen gaan verloren.",
   "expiration_warning": "Je wordt bijna uitgelogd",
   "fullname_hint": "Deze is terug te zien in de logs",
   "fullname": "Volledige naam",

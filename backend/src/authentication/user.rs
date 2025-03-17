@@ -273,9 +273,8 @@ impl Users {
         username: &str,
         new_password: &str,
     ) -> Result<(), AuthenticationError> {
-        let mut tx = self.0.begin().await?;
         let old_password = sqlx::query!("SELECT password_hash FROM users WHERE id = ?", user_id)
-            .fetch_one(tx.as_mut())
+            .fetch_one(&self.0)
             .await?
             .password_hash
             .into();
@@ -291,10 +290,9 @@ impl Users {
             password_hash,
             user_id
         )
-        .execute(tx.as_mut())
+        .execute(&self.0)
         .await?;
 
-        tx.commit().await?;
         Ok(())
     }
 

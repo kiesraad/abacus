@@ -116,7 +116,7 @@ export function formatTimeToGo(seconds: number) {
 
   if (remainingSeconds === 1) {
     secondsFormatted = t("one_second");
-  } else if (remainingSeconds > 1) {
+  } else if (remainingSeconds > 1 || remainingSeconds === 0) {
     secondsFormatted = t("seconds", { seconds: remainingSeconds });
   }
 

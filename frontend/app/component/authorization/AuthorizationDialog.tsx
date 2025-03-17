@@ -22,6 +22,11 @@ export function AuthorizationDialog() {
         const now = new Date();
         const validFor = (expiration.getTime() - now.getTime()) / 1000;
         setSessionValidFor(validFor);
+
+        // logout after session expiration
+        if (validFor <= 0) {
+          setUser(null);
+        }
       }, 1000);
 
       return () => {

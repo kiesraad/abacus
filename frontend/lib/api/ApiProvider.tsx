@@ -35,10 +35,6 @@ export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderPr
   useEffect(() => {
     const callback = (expiration: Date) => {
       setExpiration(expiration);
-      const now = new Date();
-      if (expiration.getTime() < now.getTime()) {
-        setUser(null);
-      }
     };
 
     return client.subscribeToSessionExpiration(callback);

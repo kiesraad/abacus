@@ -3,26 +3,36 @@ import { expect } from "@playwright/test";
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "./fixtures";
 import { NavBarPgObj } from "./page-objects/NavBarPgObj";
 
+import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
+import { AccountSetupPgObj } from "./page-objects/authentication/AccountSetupPgObj";
+import { LoginPgObj } from "./page-objects/authentication/LoginPgObj";
+import { UserCreateDetailsPgObj } from "./page-objects/users/UserCreateDetailsPgObj";
+import { UserCreateRolePgObj } from "./page-objects/users/UserCreateRolePgObj";
+import { UserCreateTypePgObj } from "./page-objects/users/UserCreateTypePgObj";
+import { UserListPgObj } from "./page-objects/users/UserListPgObj";
+
 test.describe("authentication", () => {
   test("login happy path", async ({ page }) => {
     await page.goto("/account/login");
 
-    await page.getByLabel("Gebruikersnaam").fill("admin");
-    await page.getByLabel("Wachtwoord").fill("AdminPassword01");
-    await page.getByRole("button", { name: "Inloggen" }).click();
+    const loginPgObj = new LoginPgObj(page);
+    await loginPgObj.username.fill("admin");
+    await loginPgObj.password.fill("AdminPassword01");
+    await loginPgObj.loginBtn.click();
 
     await page.waitForURL("/elections");
 
-    // TODO: use new page object when we know which page to render
-    await expect(page.getByText("Sanne Molenaar(Beheerder)")).toBeVisible();
+    await expect(loginPgObj.navbar.username).toHaveText("Sanne Molenaar");
+    await expect(loginPgObj.navbar.role).toHaveText("(Beheerder)");
   });
 
   test("login unhappy path", async ({ page }) => {
     await page.goto("/account/login");
 
-    await page.getByLabel("Gebruikersnaam").fill("admin");
-    await page.getByLabel("Wachtwoord").fill("wrong-password");
-    await page.getByRole("button", { name: "Inloggen" }).click();
+    const loginPgObj = new LoginPgObj(page);
+    await loginPgObj.username.fill("admin");
+    await loginPgObj.password.fill("wrong-password");
+    await loginPgObj.loginBtn.click();
 
     await expect(page.getByRole("alert")).toContainText("De gebruikersnaam of het wachtwoord is onjuist");
   });
@@ -39,6 +49,7 @@ test.describe("authentication", () => {
 
     // Fill out the account setup page
     const password = "Sterk wachtwoord";
+    const accountSetupPgObj = new AccountSetupPgObj(page);
     await expect(page.getByRole("article").getByText(username)).toBeVisible();
     await page.getByRole("textbox", { name: "Jouw naam (roepnaam +" }).fill(fullname);
     await page.getByRole("textbox", { name: "Kies nieuw wachtwoord" }).fill(password);

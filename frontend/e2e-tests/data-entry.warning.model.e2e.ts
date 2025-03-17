@@ -12,7 +12,6 @@ import { createMachine } from "xstate";
 import { VotersCounts, VotesCounts } from "@kiesraad/api";
 
 import { test } from "./fixtures";
-import { NavBarPgObj } from "./page-objects/NavBarPgObj";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
 
 /*
@@ -189,7 +188,6 @@ test.describe("Data entry model test - warnings", () => {
     .forEach((path) => {
       // eslint-disable-next-line playwright/valid-title
       test(path.description, async ({ page, pollingStation, election }) => {
-        const navBarPgObj = new NavBarPgObj(page);
         const pollingStationChoicePage = new PollingStationChoicePage(page);
         const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -391,7 +389,7 @@ test.describe("Data entry model test - warnings", () => {
             await abortModal.saveInput.click();
           },
           NAV_TO_POLLING_STATION_PAGE: async () => {
-            await navBarPgObj.clickElectionInNavBar(election.election.location, election.election.name);
+            await votersAndVotesPage.navBar.clickElectionInNavBar(election.election.location, election.election.name);
           },
           SAVE_UNSUBMITTED_CHANGES: async () => {
             await votersAndVotesPage.unsavedChangesModal.saveInput.click();

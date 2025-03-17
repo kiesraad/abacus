@@ -1,3 +1,5 @@
+import { RouterProvider } from "react-router";
+
 import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -5,7 +7,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { errorWarningMocks } from "app/component/form/data_entry/test-data";
 import { routes } from "app/routes";
 
-import { SaveDataEntryResponse } from "@kiesraad/api";
+import { SaveDataEntryResponse, TestUserProvider } from "@kiesraad/api";
 import {
   ElectionListRequestHandler,
   electionMockData,
@@ -15,20 +17,17 @@ import {
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntrySaveHandler,
 } from "@kiesraad/api-mocks";
-import {
-  overrideOnce,
-  Providers,
-  Router,
-  screen,
-  server,
-  setupTestRouter,
-  userTypeInputs,
-  waitFor,
-} from "@kiesraad/test";
+import { overrideOnce, Router, screen, server, setupTestRouter, userTypeInputs, waitFor } from "@kiesraad/test";
 
 function renderWithRouter() {
   const router = setupTestRouter(routes);
-  rtlRender(<Providers router={router} />);
+
+  rtlRender(
+    <TestUserProvider userRole="typist">
+      <RouterProvider router={router} />
+    </TestUserProvider>,
+  );
+
   return router;
 }
 

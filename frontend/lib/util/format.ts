@@ -130,6 +130,10 @@ export function formatTimeToGo(seconds: number) {
     return secondsFormatted;
   }
 
+  if (minutesFormatted && remainingSeconds === 0) {
+    return minutesFormatted;
+  }
+
   if (minutesFormatted && secondsFormatted) {
     return `${minutesFormatted} ${t("and")} ${secondsFormatted}`;
   }

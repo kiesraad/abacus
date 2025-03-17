@@ -24,7 +24,7 @@ export function AuthorizationDialog() {
         setSessionValidFor(validFor);
 
         // logout after session expiration
-        if (validFor <= 0) {
+        if (validFor <= 0 && user !== null) {
           setUser(null);
         }
       }, 1000);
@@ -33,7 +33,7 @@ export function AuthorizationDialog() {
         clearInterval(interval);
       };
     }
-  }, [expiration, setUser]);
+  }, [expiration, user, setUser]);
 
   // navigate to login page if the user is not authenticated
   if (!loading && !user && !ALLOW_UNAUTHORIZED.includes(path)) {

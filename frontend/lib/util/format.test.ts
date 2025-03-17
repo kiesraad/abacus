@@ -91,7 +91,7 @@ describe("Format util", () => {
   });
 
   test.each([
-    [0, ""],
+    [0, "0 seconden"],
     [0.6, "1 seconde"],
     [1, "1 seconde"],
     [10, "10 seconden"],

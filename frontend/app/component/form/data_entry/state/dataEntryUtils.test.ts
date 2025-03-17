@@ -2,7 +2,7 @@ import { assert, describe, expect, test } from "vitest";
 
 import { ValidationResult } from "@kiesraad/api";
 
-import { defaultDataEntryState, errorWarningMocks, initialValues } from "../test.util";
+import { errorWarningMocks, getDefaultDataEntryState, getInitialValues } from "../test-data";
 import {
   addValidationResultToFormState,
   formSectionComplete,
@@ -17,7 +17,7 @@ import { ClientValidationResult } from "./types";
 
 describe("addValidationResultToFormState", () => {
   test("should add validation result to form state", () => {
-    const formState = structuredClone(defaultDataEntryState.formState);
+    const formState = getDefaultDataEntryState().formState;
     formState.sections.differences_counts.isSaved = true;
     const validationResults: ValidationResult[] = [
       {
@@ -32,7 +32,7 @@ describe("addValidationResultToFormState", () => {
   });
 
   test("addValidationResultToFormState adds result to multiple sections", () => {
-    const formState = structuredClone(defaultDataEntryState.formState);
+    const formState = getDefaultDataEntryState().formState;
 
     formState.sections.voters_votes_counts.isSaved = true;
     if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
@@ -53,7 +53,7 @@ describe("addValidationResultToFormState", () => {
   });
 
   test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {
-    const formState = structuredClone(defaultDataEntryState.formState);
+    const formState = getDefaultDataEntryState().formState;
     formState.sections.differences_counts.isSaved = false;
     const validationResults: ValidationResult[] = [
       {
@@ -143,9 +143,7 @@ describe("hasOnlyGlobalValidationResults", () => {
 
 describe("resetFormSectionState", () => {
   test("should reset form section state", () => {
-    const formState = {
-      ...defaultDataEntryState.formState,
-    };
+    const formState = getDefaultDataEntryState().formState;
     formState.sections.voters_votes_counts.errors = [
       {
         code: "W201",
@@ -161,7 +159,7 @@ describe("resetFormSectionState", () => {
 
 describe("getNextSectionID", () => {
   test("should get next section ID", () => {
-    const formState = structuredClone(defaultDataEntryState.formState);
+    const formState = getDefaultDataEntryState().formState;
     formState.sections.recounted.isSaved = true;
     formState.sections.recounted.isSubmitted = true;
 
@@ -267,8 +265,8 @@ describe("getErrorsAndWarnings", () => {
 
 describe("getPollingStationSummary", () => {
   test("getPollingStationSummary", () => {
-    const state = structuredClone(defaultDataEntryState.formState);
-    const values = structuredClone(initialValues);
+    const state = getDefaultDataEntryState().formState;
+    const values = getInitialValues();
 
     values.voters_counts.poll_card_count = 4;
     values.voters_counts.total_admitted_voters_count = 4;

@@ -871,60 +871,26 @@
         }
       }
     },
-    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
+    "/api/log": {
       "get": {
         "tags": [
-          "data_entry"
+          "audit_log"
         ],
-        "summary": "Get an in-progress (not finalised) data entry for a polling station",
-        "operationId": "polling_station_data_entry_get",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
+        "summary": "Lists all users",
+        "operationId": "audit_log_list",
         "responses": {
           "200": {
-            "description": "Data entry retrieved successfully",
+            "description": "Audit log event list",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetDataEntryResponse"
+                  "$ref": "#/components/schemas/AuditLogListResponse"
                 }
               }
             }
           },
           "401": {
             "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -944,12 +910,14 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
         "tags": [
           "data_entry"
         ],
-        "summary": "Save or update a data entry for a polling station",
+        "summary": "Save a data entry for a polling station",
         "operationId": "polling_station_data_entry_save",
         "parameters": [
           {
@@ -1094,6 +1062,81 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim": {
+      "post": {
+        "tags": [
+          "data_entry"
+        ],
+        "summary": "Claim a data entry for a polling station, returning any existing progress",
+        "operationId": "polling_station_data_entry_claim",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "entry_number",
+            "in": "path",
+            "description": "Data entry number (first or second data entry)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data entry claimed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimDataEntryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -1770,6 +1813,167 @@
         ],
         "description": "Records the political group and specific change for a specific residual seat"
       },
+      "AuditEvent": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserLoggedInDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserLoggedIn"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserLoggedOutDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserLoggedOut"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "eventType"
+            ],
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "enum": [
+                  "UnknownEvent"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "AuditEventLevel": {
+        "type": "string",
+        "enum": [
+          "info",
+          "success",
+          "warning",
+          "error"
+        ]
+      },
+      "AuditLogEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "time",
+          "event",
+          "eventLevel",
+          "userId",
+          "username",
+          "ip"
+        ],
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/AuditEvent"
+          },
+          "eventLevel": {
+            "$ref": "#/components/schemas/AuditEventLevel"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "ip": {
+            "type": "string"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "time": {
+            "type": "string"
+          },
+          "userFullname": {
+            "type": "string",
+            "description": "user defaults"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "userRole": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "workstation": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "AuditLogListResponse": {
+        "type": "object",
+        "required": [
+          "events",
+          "page",
+          "pages",
+          "perPage"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLogEvent"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "perPage": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -1869,6 +2073,26 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "ClaimDataEntryResponse": {
+        "type": "object",
+        "description": "Response structure for getting data entry of polling station results",
+        "required": [
+          "data",
+          "client_state",
+          "validation_results"
+        ],
+        "properties": {
+          "client_state": {
+            "type": "object"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "validation_results": {
+            "$ref": "#/components/schemas/ValidationResults"
           }
         }
       },
@@ -2346,36 +2570,6 @@
           }
         }
       },
-      "GetDataEntryResponse": {
-        "type": "object",
-        "description": "Response structure for getting data entry of polling station results",
-        "required": [
-          "progress",
-          "data",
-          "client_state",
-          "validation_results",
-          "updated_at"
-        ],
-        "properties": {
-          "client_state": {
-            "type": "object"
-          },
-          "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
-          },
-          "progress": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "updated_at": {
-            "type": "string"
-          },
-          "validation_results": {
-            "$ref": "#/components/schemas/ValidationResults"
-          }
-        }
-      },
       "LargestAverageAssignedSeat": {
         "type": "object",
         "description": "Contains the details for an assigned seat, assigned through the largest average method.",
@@ -2484,6 +2678,21 @@
           }
         }
       },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "perPage": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "PoliticalGroup": {
         "type": "object",
         "description": "Political group with its candidates",
@@ -2518,16 +2727,9 @@
           "pg_seats",
           "preferential_candidate_nomination",
           "other_candidate_nomination",
-          "candidate_ranking"
+          "updated_candidate_ranking"
         ],
         "properties": {
-          "candidate_ranking": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CandidateVotes"
-            },
-            "description": "The ranking of the whole candidate list, can be empty"
-          },
           "other_candidate_nomination": {
             "type": "array",
             "items": {
@@ -2557,6 +2759,13 @@
               "$ref": "#/components/schemas/CandidateVotes"
             },
             "description": "The list of chosen candidates via preferential votes, can be empty"
+          },
+          "updated_candidate_ranking": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "description": "The updated ranking of the whole candidate list, can be empty"
           }
         }
       },
@@ -3043,6 +3252,36 @@
             "items": {
               "$ref": "#/components/schemas/User"
             }
+          }
+        }
+      },
+      "UserLoggedInDetails": {
+        "type": "object",
+        "required": [
+          "userAgent",
+          "loggedInUsersCount"
+        ],
+        "properties": {
+          "loggedInUsersCount": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "userAgent": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLoggedOutDetails": {
+        "type": "object",
+        "required": [
+          "sessionDuration"
+        ],
+        "properties": {
+          "sessionDuration": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           }
         }
       },

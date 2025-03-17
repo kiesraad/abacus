@@ -14,8 +14,8 @@ export function deepEqual(obj1: unknown, obj2: unknown, zeroIsEqualToEmptyString
 
   if (isPrimitive(obj1) || isPrimitive(obj2)) return obj1 === obj2;
 
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
+  const keys1 = Object.keys(obj1 as object);
+  const keys2 = Object.keys(obj2 as object);
 
   if (keys1.length !== keys2.length) return false;
 

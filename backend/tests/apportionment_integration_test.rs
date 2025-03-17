@@ -56,7 +56,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     let addr = serve_api(pool).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
     let typist_cookie = shared::typist_login(&addr).await;
-    create_result(&addr, typist_cookie.clone(), 3, 3).await;
+    create_result(&addr, typist_cookie, 3, 3).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
     let response = reqwest::Client::new()

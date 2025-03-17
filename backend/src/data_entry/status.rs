@@ -165,7 +165,13 @@ impl DataEntryStatus {
                 }))
             }
             DataEntryStatus::FirstEntryInProgress(_) => {
-                Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
+                if current_data_entry.user_id
+                    == self.get_first_entry_user_id().expect("user id is present")
+                {
+                    Ok(self)
+                } else {
+                    Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
+                }
             }
             DataEntryStatus::SecondEntryNotStarted(_) => {
                 Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
@@ -196,7 +202,13 @@ impl DataEntryStatus {
                 }))
             }
             DataEntryStatus::SecondEntryInProgress(_) => {
-                Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
+                if current_data_entry.user_id
+                    == self.get_second_entry_user_id().expect("user id is present")
+                {
+                    Ok(self)
+                } else {
+                    Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
+                }
             }
             DataEntryStatus::Definitive(_) => {
                 Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
@@ -483,6 +495,28 @@ impl DataEntryStatus {
         }
     }
 
+    /// Get the user ID of the first entry typist
+    pub fn get_first_entry_user_id(&self) -> Option<u32> {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::SecondEntryNotStarted(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::SecondEntryInProgress(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::EntriesDifferent(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::Definitive(state) => Some(state.first_entry_user_id),
+            _ => None,
+        }
+    }
+
+    /// Get the user ID of the second entry typist
+    pub fn get_second_entry_user_id(&self) -> Option<u32> {
+        match self {
+            DataEntryStatus::SecondEntryInProgress(state) => Some(state.second_entry_user_id),
+            DataEntryStatus::EntriesDifferent(state) => Some(state.second_entry_user_id),
+            DataEntryStatus::Definitive(state) => Some(state.second_entry_user_id),
+            _ => None,
+        }
+    }
+
     /// Get the data for the current entry if there is any
     pub fn get_data(&self) -> Option<&PollingStationResults> {
         match self {
@@ -576,7 +610,11 @@ mod tests {
     fn polling_station_result() -> PollingStationResults {
         PollingStationResults {
             recounted: Some(false),
-            ..Default::default()
+            voters_counts: Default::default(),
+            votes_counts: Default::default(),
+            voters_recounts: None,
+            differences_counts: Default::default(),
+            political_group_votes: vec![],
         }
     }
 
@@ -666,10 +704,24 @@ mod tests {
         assert!(matches!(next, DataEntryStatus::FirstEntryInProgress(_)));
     }
 
+    /// FirstEntryInProgress --> FirstEntryInProgress: claim with same user
     #[test]
-    fn first_entry_in_progress_claim_first_entry_error() {
+    fn first_entry_in_progress_claim_first_entry_ok() {
+        let next = first_entry_in_progress().claim_first_entry(empty_current_data_entry());
+        assert!(matches!(next, Ok(DataEntryStatus::FirstEntryInProgress(_))));
+    }
+
+    /// FirstEntryInProgress --> FirstEntryInProgress: claim with different user returns error
+    #[test]
+    fn first_entry_in_progress_claim_first_entry_other_user_error() {
+        let current_data_entry = CurrentDataEntry {
+            progress: None,
+            user_id: 1,
+            entry: polling_station_result(),
+            client_state: None,
+        };
         assert_eq!(
-            first_entry_in_progress().claim_first_entry(empty_current_data_entry()),
+            first_entry_in_progress().claim_first_entry(current_data_entry),
             Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
         );
     }
@@ -766,7 +818,7 @@ mod tests {
             first_entry_user_id: 0,
             first_entry: PollingStationResults {
                 recounted: Some(true),
-                ..Default::default()
+                ..polling_station_result()
             },
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
         });
@@ -829,10 +881,27 @@ mod tests {
         ));
     }
 
+    /// SecondEntryInProgress --> SecondEntryInProgress: claim with same user
     #[test]
-    fn second_entry_in_progress_claim_second_entry_error() {
+    fn second_entry_in_progress_claim_second_entry_ok() {
+        let next = second_entry_in_progress().claim_second_entry(empty_current_data_entry());
+        assert!(matches!(
+            next,
+            Ok(DataEntryStatus::SecondEntryInProgress(_))
+        ));
+    }
+
+    /// SecondEntryInProgress --> SecondEntryInProgress: claim with different user returns error
+    #[test]
+    fn second_entry_in_progress_claim_second_entry_other_user_error() {
+        let current_data_entry = CurrentDataEntry {
+            progress: None,
+            user_id: 1,
+            entry: polling_station_result(),
+            client_state: None,
+        };
         assert_eq!(
-            second_entry_in_progress().claim_second_entry(empty_current_data_entry()),
+            second_entry_in_progress().claim_second_entry(current_data_entry),
             Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
         );
     }
@@ -914,7 +983,7 @@ mod tests {
             second_entry_user_id: 0,
             second_entry: PollingStationResults {
                 recounted: Some(true),
-                ..Default::default()
+                ..polling_station_result()
             },
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
             first_entry_user_id: 0,
@@ -1038,9 +1107,9 @@ mod tests {
     #[test]
     fn entries_different_to_definitive() {
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
-            second_entry: polling_station_result(),
-            first_entry: PollingStationResults::default(),
+            first_entry: polling_station_result(),
             first_entry_user_id: 0,
+            second_entry: polling_station_result(),
             second_entry_user_id: 0,
         });
         let next = initial.resolve(EntryNumber::SecondEntry).unwrap();

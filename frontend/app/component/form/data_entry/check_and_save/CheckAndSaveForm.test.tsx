@@ -5,8 +5,8 @@ import { ElectionProvider } from "@kiesraad/api";
 import {
   electionMockData,
   ElectionRequestHandler,
+  PollingStationDataEntryClaimHandler,
   PollingStationDataEntryFinaliseHandler,
-  PollingStationDataEntryGetHandler,
   PollingStationDataEntrySaveHandler,
 } from "@kiesraad/api-mocks";
 import { renderReturningRouter, screen, server, spyOnHandler, within } from "@kiesraad/test";
@@ -14,51 +14,39 @@ import { renderReturningRouter, screen, server, spyOnHandler, within } from "@ki
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { DataEntryState } from "../state/types";
 import {
-  defaultFormSection,
-  emptyDataEntryRequest,
   errorWarningMocks,
-  overrideServerGetDataEntryResponse,
-} from "../test.util";
+  getDefaultFormSection,
+  getEmptyDataEntryRequest,
+  overrideServerClaimDataEntryResponse,
+} from "../test-data";
 import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
-const defaultValues = emptyDataEntryRequest.data;
+function getDefaultValues() {
+  return getEmptyDataEntryRequest().data;
+}
 
-const defaultDataEntryState: DataEntryState = {
-  election: electionMockData,
-  pollingStationId: 1,
-  error: null,
-  pollingStationResults: null,
-  entryNumber: 1,
-  formState: {
-    current: "save",
-    furthest: "save",
-    sections: {
-      recounted: {
-        id: "recounted",
-        index: 1,
-        ...defaultFormSection,
-      },
-      voters_votes_counts: {
-        id: "voters_votes_counts",
-        index: 2,
-        ...defaultFormSection,
-      },
-      differences_counts: {
-        id: "differences_counts",
-        index: 3,
-        ...defaultFormSection,
-      },
-      save: {
-        id: "save",
-        index: 4,
-        ...defaultFormSection,
+function getDefaultDataEntryState(): DataEntryState {
+  return {
+    election: electionMockData,
+    pollingStationId: 1,
+    error: null,
+    pollingStationResults: null,
+    entryNumber: 1,
+    formState: {
+      current: "save",
+      furthest: "save",
+      sections: {
+        recounted: getDefaultFormSection("recounted", 1),
+        voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
+        differences_counts: getDefaultFormSection("differences_counts", 3),
+        save: getDefaultFormSection("save", 4),
       },
     },
-  },
-  targetFormSectionId: "recounted",
-  status: "idle",
-  cache: null,
-};
+    targetFormSectionId: "recounted",
+    status: "idle",
+    cache: null,
+  };
+}
 
 function renderForm() {
   return renderReturningRouter(
@@ -74,7 +62,7 @@ describe("Test CheckAndSaveForm", () => {
   beforeEach(() => {
     server.use(
       ElectionRequestHandler,
-      PollingStationDataEntryGetHandler,
+      PollingStationDataEntryClaimHandler,
       PollingStationDataEntrySaveHandler,
       PollingStationDataEntryFinaliseHandler,
     );
@@ -112,9 +100,9 @@ describe("Test CheckAndSaveForm", () => {
   });
 
   test("Data entry does not show finalise button with errors", async () => {
-    overrideServerGetDataEntryResponse({
-      formState: defaultDataEntryState.formState,
-      pollingStationResults: defaultValues,
+    overrideServerClaimDataEntryResponse({
+      formState: getDefaultDataEntryState().formState,
+      pollingStationResults: getDefaultValues(),
       validationResults: {
         errors: [
           {
@@ -140,9 +128,9 @@ describe("Test CheckAndSaveForm", () => {
   });
 
   test("Data entry does not show finalise button with unaccepted warnings", async () => {
-    overrideServerGetDataEntryResponse({
-      formState: defaultDataEntryState.formState,
-      pollingStationResults: defaultValues,
+    overrideServerClaimDataEntryResponse({
+      formState: getDefaultDataEntryState().formState,
+      pollingStationResults: getDefaultValues(),
       validationResults: {
         errors: [],
         warnings: [
@@ -163,12 +151,12 @@ describe("Test CheckAndSaveForm", () => {
   });
 
   test("Data entry shows finalise button with accepted warnings", async () => {
-    const dataEntryState = structuredClone(defaultDataEntryState);
+    const dataEntryState = getDefaultDataEntryState();
     dataEntryState.formState.sections.voters_votes_counts.acceptWarnings = true;
 
-    overrideServerGetDataEntryResponse({
+    overrideServerClaimDataEntryResponse({
       formState: dataEntryState.formState,
-      pollingStationResults: defaultValues,
+      pollingStationResults: getDefaultValues(),
       validationResults: {
         errors: [],
         warnings: [
@@ -188,13 +176,13 @@ describe("Test CheckAndSaveForm", () => {
 
 describe("Test CheckAndSaveForm summary", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+    server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
   test("Blocking", async () => {
-    const values = structuredClone(defaultValues);
+    const values = getDefaultValues();
 
-    overrideServerGetDataEntryResponse({
-      formState: defaultDataEntryState.formState,
+    overrideServerClaimDataEntryResponse({
+      formState: getDefaultDataEntryState().formState,
       pollingStationResults: values,
       validationResults: {
         errors: [errorWarningMocks.F201],
@@ -221,11 +209,11 @@ describe("Test CheckAndSaveForm summary", () => {
   });
 
   test("Accepted with warnings", async () => {
-    const dataEntryState = structuredClone(defaultDataEntryState);
+    const dataEntryState = getDefaultDataEntryState();
     dataEntryState.formState.sections.differences_counts.acceptWarnings = true;
-    overrideServerGetDataEntryResponse({
+    overrideServerClaimDataEntryResponse({
       formState: dataEntryState.formState,
-      pollingStationResults: defaultValues,
+      pollingStationResults: getDefaultValues(),
       validationResults: {
         errors: [],
         warnings: [errorWarningMocks.W301],
@@ -245,9 +233,9 @@ describe("Test CheckAndSaveForm summary", () => {
   });
 
   test("Unaccepted warnings", async () => {
-    overrideServerGetDataEntryResponse({
-      formState: defaultDataEntryState.formState,
-      pollingStationResults: defaultValues,
+    overrideServerClaimDataEntryResponse({
+      formState: getDefaultDataEntryState().formState,
+      pollingStationResults: getDefaultValues(),
       validationResults: {
         errors: [],
         warnings: [errorWarningMocks.W301],

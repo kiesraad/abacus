@@ -1,0 +1,32 @@
+{
+  "no_events": "Geen gebeurtenissen gevonden",
+  "action": {
+    "filter": "Filteren",
+    "details": "Details"
+  },
+  "header": {
+    "workstation": "Werkplek",
+    "time": "Tijdstip",
+    "level": "Type",
+    "event": "Gebeurtenis",
+    "message": "Toelichting",
+    "user": "Gebruiker"
+  },
+  "level": {
+    "error": "Fout",
+    "warning": "Waarschuwing",
+    "info": "Informatie",
+    "success": "Succes"
+  },
+  "event": {
+    "UserLoggedIn": "Gebruiker ingelogd",
+    "UserLoggedOut": "Gebruiker uitgelogd",
+    "UnknownEvent": "Onbekende gebeurtenis"
+  },
+  "field": {
+    "userAgent": "User agent",
+    "ip": "IP-adres",
+    "loggedInUsersCount": "Aantal ingelogde gebruikers",
+    "sessionDuration": "Sessieduur (seconden)"
+  }
+}

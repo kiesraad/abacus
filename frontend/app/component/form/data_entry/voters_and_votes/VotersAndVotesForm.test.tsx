@@ -2,24 +2,15 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { mockElection } from "app/component/election/status/mockData";
-import {
-  defaultFormSection,
-  emptyDataEntryRequest,
-  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
-  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
-  expectFieldsToHaveIconAndToHaveAccessibleName,
-  expectFieldsToNotHaveIcon,
-  overrideServerGetDataEntryResponse,
-} from "app/component/form/data_entry/test.util";
 
 import {
-  GetDataEntryResponse,
+  ClaimDataEntryResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationResults,
 } from "@kiesraad/api";
 import {
   electionMockData,
-  PollingStationDataEntryGetHandler,
+  PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs, waitFor } from "@kiesraad/test";
@@ -27,6 +18,15 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInpu
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { getClientState } from "../state/dataEntryUtils";
 import { DataEntryState } from "../state/types";
+import {
+  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
+  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
+  expectFieldsToHaveIconAndToHaveAccessibleName,
+  expectFieldsToNotHaveIcon,
+  getDefaultFormSection,
+  getEmptyDataEntryRequest,
+  overrideServerClaimDataEntryResponse,
+} from "../test-data";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const initialValues: PollingStationResults = {
@@ -73,26 +73,10 @@ const defaultDataEntryState: DataEntryState = {
     current: "voters_votes_counts",
     furthest: "voters_votes_counts",
     sections: {
-      recounted: {
-        id: "recounted",
-        index: 1,
-        ...defaultFormSection,
-      },
-      voters_votes_counts: {
-        id: "voters_votes_counts",
-        index: 2,
-        ...defaultFormSection,
-      },
-      differences_counts: {
-        id: "differences_counts",
-        index: 3,
-        ...defaultFormSection,
-      },
-      save: {
-        id: "save",
-        index: 4,
-        ...defaultFormSection,
-      },
+      recounted: getDefaultFormSection("recounted", 1),
+      voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
+      differences_counts: getDefaultFormSection("differences_counts", 3),
+      save: getDefaultFormSection("save", 4),
     },
   },
   targetFormSectionId: "recounted",
@@ -131,7 +115,7 @@ const recountFieldIds = {
 
 describe("Test VotersAndVotesForm", () => {
   beforeEach(() => {
-    server.use(PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+    server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 
   describe("VotersAndVotesForm user interactions", () => {
@@ -184,7 +168,7 @@ describe("Test VotersAndVotesForm", () => {
 
     test("Form field entry and keybindings", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
@@ -287,7 +271,7 @@ describe("Test VotersAndVotesForm", () => {
     test("VotersAndVotesForm without recount: request body is equal to the form data", async () => {
       const expectedRequest = {
         data: {
-          ...emptyDataEntryRequest.data,
+          ...getEmptyDataEntryRequest().data,
           recounted: false,
           voters_counts: {
             poll_card_count: 1,
@@ -307,7 +291,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
       //TODO: is this a conceptual change? recounted is now undefined by default.
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -338,7 +322,7 @@ describe("Test VotersAndVotesForm", () => {
     test("VotersAndVotesForm with recount: request body is equal to the form data", async () => {
       const expectedRequest = {
         data: {
-          ...emptyDataEntryRequest.data,
+          ...getEmptyDataEntryRequest().data,
           recounted: true,
           voters_counts: {
             poll_card_count: 1,
@@ -363,7 +347,7 @@ describe("Test VotersAndVotesForm", () => {
       };
 
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
@@ -495,7 +479,7 @@ describe("Test VotersAndVotesForm", () => {
 
     test("F.203 IncorrectTotal Voters recounts", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
@@ -754,7 +738,7 @@ describe("Test VotersAndVotesForm", () => {
 
     test("W.204 votes counts and voters recounts difference above threshold", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
@@ -883,7 +867,7 @@ describe("Test VotersAndVotesForm", () => {
 
     test("W.207 total votes cast and total admitted voters recount should not exceed polling stations number of eligible voters", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
@@ -972,7 +956,7 @@ describe("Test VotersAndVotesForm", () => {
 
     test("W.209 EqualInput voters recounts and votes counts", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
@@ -984,10 +968,8 @@ describe("Test VotersAndVotesForm", () => {
           ...initialValues,
           recounted: true,
         },
-        progress: 1,
-        updated_at: "",
         validation_results: { errors: [], warnings: [] },
-      } satisfies GetDataEntryResponse);
+      } satisfies ClaimDataEntryResponse);
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");

@@ -1,7 +1,7 @@
 import {
+  ClaimDataEntryResponse,
   DataEntry,
   ElectionRequest,
-  GetDataEntryResponse,
   PollingStationRequest,
   PollingStationResults,
   SaveDataEntryResponse,
@@ -61,10 +61,8 @@ export const pollingStationRequests: PollingStationRequest[] = [
   },
 ];
 
-export const emptyDataEntryResponse: GetDataEntryResponse = {
-  progress: 0,
+export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
   data: {
-    recounted: false,
     voters_counts: {
       poll_card_count: 0,
       proxy_certificate_count: 0,
@@ -103,12 +101,7 @@ export const emptyDataEntryResponse: GetDataEntryResponse = {
       },
     ],
   },
-  validation_results: {
-    errors: [],
-    warnings: [],
-  },
-  client_state: {},
-  updated_at: new Date().toISOString(),
+  client_state: null,
 };
 
 export const noRecountNoDifferencesDataEntry: PollingStationResults = {

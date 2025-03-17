@@ -948,6 +948,10 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: None,
+            voters_counts: Default::default(),
+            votes_counts: Default::default(),
+            voters_recounts: None,
+            differences_counts: Default::default(),
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
                 total: 42,
@@ -956,7 +960,6 @@ mod tests {
                     votes: 42,
                 }],
             }],
-            ..Default::default()
         };
         let election = election_fixture(&[1]);
         let polling_station = polling_station_fixture(None);

@@ -15,12 +15,6 @@ import { test } from "./fixtures";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
 
 /*
-Not covered in the model:
-- fill in page with error data, then fix, nav, abort
-- fill in page with warning data, then fix, accept, nav abort
-*/
-
-/*
 The names of the states in the machine keep track of two states:
 1. the current page
 2. the state of the data on the voters and votes page
@@ -177,7 +171,7 @@ test.use({
   storageState: "e2e-tests/state/typist.json",
 });
 
-test.describe("Data entry model test", () => {
+test.describe("Data entry model test - valid data", () => {
   createTestModel(machine)
     .getSimplePaths()
     .forEach((path) => {

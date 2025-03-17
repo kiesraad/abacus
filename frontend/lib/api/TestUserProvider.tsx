@@ -36,7 +36,9 @@ export function TestUserProvider({ userRole, children, overrideExpiration }: Tes
     loading: false,
     expiration,
     extendSession: function (): Promise<void> {
-      throw new Error("Function not implemented.");
+      expiration.setMinutes(expiration.getMinutes() + 30);
+
+      return Promise.resolve();
     },
   };
 

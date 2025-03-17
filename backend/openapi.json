@@ -2744,16 +2744,9 @@
           "pg_seats",
           "preferential_candidate_nomination",
           "other_candidate_nomination",
-          "candidate_ranking"
+          "updated_candidate_ranking"
         ],
         "properties": {
-          "candidate_ranking": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CandidateVotes"
-            },
-            "description": "The ranking of the whole candidate list, can be empty"
-          },
           "other_candidate_nomination": {
             "type": "array",
             "items": {
@@ -2783,6 +2776,13 @@
               "$ref": "#/components/schemas/CandidateVotes"
             },
             "description": "The list of chosen candidates via preferential votes, can be empty"
+          },
+          "updated_candidate_ranking": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "description": "The updated ranking of the whole candidate list, can be empty"
           }
         }
       },

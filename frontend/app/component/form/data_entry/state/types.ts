@@ -2,8 +2,8 @@ import { Dispatch } from "react";
 
 import {
   AnyApiError,
+  ClaimDataEntryResponse,
   Election,
-  GetDataEntryResponse,
   PollingStationResults,
   ValidationResult,
   ValidationResults,
@@ -48,7 +48,7 @@ export type DataEntryDispatch = Dispatch<DataEntryAction>;
 export type DataEntryAction =
   | {
       type: "DATA_ENTRY_LOADED";
-      dataEntry: GetDataEntryResponse;
+      dataEntry: ClaimDataEntryResponse;
     }
   | {
       type: "DATA_ENTRY_LOAD_FAILED";

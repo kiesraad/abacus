@@ -12,14 +12,7 @@ import { createMachine } from "xstate";
 import { VotersCounts, VotesCounts } from "@kiesraad/api";
 
 import { test } from "./fixtures";
-import { NavBarPgObj } from "./page-objects/NavBarPgObj";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
-
-/*
-Not covered in the model:
-- fill in page with error data, then fix, nav, abort
-- fill in page with warning data, then fix, accept, nav abort
-*/
 
 /*
 The names of the states in the machine keep track of two states:
@@ -34,103 +27,104 @@ to the polling stations page.
 const dataEntryMachineDefinition = {
   initial: "voterVotesPageEmpty",
   states: {
+    pollingStationsPageErrorSaved: {
+      on: {
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeError",
+      },
+    },
+    pollingStationsPageChangedToErrorSaved: {
+      on: {
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeErrorChanged",
+      },
+    },
     pollingStationsPageDiscarded: {},
-    pollingStationsPageEmptySaved: {
+    recountedPageErrorSubmitted: {
       on: {
-        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeEmpty",
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageErrorSubmitted",
       },
     },
-    pollingStationsPageFilledSaved: {
-      on: {
-        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeSaved",
-      },
-    },
-    pollingStationsPageChangedSaved: {
-      on: {
-        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChanged",
-      },
-    },
-    recountedPageEmpty: {},
-    recountedPageSaved: {
-      on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageChangedSubmitted",
-      },
-    },
-    recountedPageDiscarded: {
-      on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageSubmitted",
-      },
-    },
-    recountedPageCached: {
-      on: {
-        GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageCached",
-      },
-    },
-    voterVotesPageCached: {
-      on: {
-        SUBMIT: "differencesPage",
-      },
-    },
+    recountedPageChangedToErrorSubmitted: {},
+    recountedPageChangedToErrorDiscarded: {},
+    recountedPageFilledError: {},
     voterVotesPageEmpty: {
       on: {
-        FILL_WITH_VALID_DATA: "votersVotesPageFilled",
-        CLICK_ABORT: "abortInputModalEmpty",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalEmpty",
-        GO_TO_RECOUNTED_PAGE: "recountedPageEmpty",
+        FILL_WITH_VALID_DATA: "votersVotesPageFilledValid",
+        FILL_WITH_ERROR_DATA: "VotersVotesPageFilledError",
       },
     },
-    votersVotesPageFilled: {
+    votersVotesPageFilledValid: {
       on: {
-        SUBMIT: "differencesPage",
-        CLICK_ABORT: "abortInputModalFilled",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalFilled",
-        GO_TO_RECOUNTED_PAGE: "recountedPageCached",
+        SUBMIT: "differencesPageValid",
       },
     },
-    votersVotesPageSubmitted: {
+    votersVotesPageValidSubmitted: {
       on: {
-        CHANGE_VALID_DATA: "votersVotesPageChangedFilled",
+        CHANGE_TO_ERROR_DATA: "votersVotesPageChangedToError",
       },
     },
-    votersVotesPageChangedSubmitted: {},
-    votersVotesPageChangedFilled: {
+    votersVotesPageChangedToError: {
       on: {
-        SUBMIT: "differencesPage",
-        CLICK_ABORT: "abortInputModalChanged",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalChanged",
-        GO_TO_RECOUNTED_PAGE: "unsavedChangesModalChanged",
+        SUBMIT: "votersVotesPageChangedToErrorSubmitted",
+        CLICK_ABORT: "abortInputModalChangedToErrorSubmitted",
+        GO_TO_RECOUNTED_PAGE: "unsavedChangesModalChangedToError",
       },
     },
-    votersVotesPageAfterResumeSaved: {},
-    votersVotesPageAfterResumeChanged: {},
-    votersVotesPageAfterResumeEmpty: {},
-    differencesPage: {
+    VotersVotesPageFilledError: {
       on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageSubmitted",
+        SUBMIT: "votersVotesPageErrorSubmitted",
+        GO_TO_RECOUNTED_PAGE: "recountedPageFilledError",
       },
     },
-    abortInputModalFilled: {
+    votersVotesPageErrorSubmitted: {
       on: {
-        SAVE_INPUT: "pollingStationsPageFilledSaved",
+        CORRECT_ERROR_DATA: "votersVotesPageCorrected",
+        CHANGE_TO_WARNING_AND_SUBMIT: "votersVotesPageWarningSubmitted",
+        CLICK_ABORT: "abortInputModalErrorSubmitted",
+        NAV_TO_POLLING_STATION_PAGE: "abortInputModalErrorSubmitted",
+        GO_TO_RECOUNTED_PAGE: "recountedPageErrorSubmitted",
+        // no GO_TO_DIFFERENCES_PAGE, because unreachable
+      },
+    },
+    votersVotesPageChangedToErrorSubmitted: {
+      on: {
+        CORRECT_ERROR_DATA: "votersVotesPageCorrected",
+        CLICK_ABORT: "abortInputModalChangedToErrorSubmitted",
+        NAV_TO_POLLING_STATION_PAGE: "abortInputModalChangedToErrorSubmitted",
+        // no GO_TO_RECOUNTED_PAGE because too similar to same action on votersVotesPageErrorSubmitted
+        GO_TO_DIFFERENCES_PAGE: "differencesPageError",
+      },
+    },
+    votersVotesPageCorrected: {
+      on: {
+        SUBMIT: "differencesPageCorrected",
+      },
+    },
+    votersVotesPageWarningSubmitted: {},
+    votersVotesPageAfterResumeError: {},
+    votersVotesPageAfterResumeErrorChanged: {},
+    differencesPageValid: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageValidSubmitted",
+      },
+    },
+    differencesPageCorrected: {},
+    differencesPageError: {},
+    abortInputModalErrorSubmitted: {
+      on: {
+        SAVE_INPUT: "pollingStationsPageErrorSaved",
         DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
-    abortInputModalEmpty: {
+    abortInputModalChangedToErrorSubmitted: {
       on: {
-        SAVE_INPUT: "pollingStationsPageEmptySaved",
+        SAVE_INPUT: "pollingStationsPageChangedToErrorSaved",
         DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
-    abortInputModalChanged: {
+    unsavedChangesModalChangedToError: {
       on: {
-        SAVE_INPUT: "pollingStationsPageChangedSaved",
-        DISCARD_INPUT: "pollingStationsPageDiscarded",
-      },
-    },
-    unsavedChangesModalChanged: {
-      on: {
-        SAVE_UNSUBMITTED_CHANGES: "recountedPageSaved",
-        DISCARD_UNSUBMITTED_CHANGES: "recountedPageDiscarded",
+        SAVE_UNSUBMITTED_CHANGES: "recountedPageChangedToErrorSubmitted",
+        DISCARD_UNSUBMITTED_CHANGES: "recountedPageChangedToErrorDiscarded",
       },
     },
   },
@@ -160,9 +154,23 @@ const votersEmpty: VotersCounts = {
   total_admitted_voters_count: 0,
 };
 
+const votersError: VotersCounts = {
+  poll_card_count: 70,
+  proxy_certificate_count: 30,
+  voter_card_count: 0,
+  total_admitted_voters_count: 90, // incorrect total
+};
+
 const votes: VotesCounts = {
   votes_candidates_count: 100,
   blank_votes_count: 0,
+  invalid_votes_count: 0,
+  total_votes_cast_count: 100,
+};
+
+const votesWarning: VotesCounts = {
+  votes_candidates_count: 60,
+  blank_votes_count: 40,
   invalid_votes_count: 0,
   total_votes_cast_count: 100,
 };
@@ -178,13 +186,12 @@ test.use({
   storageState: "e2e-tests/state/typist.json",
 });
 
-test.describe("Data entry model test", () => {
+test.describe("Data entry model test - errors", () => {
   createTestModel(machine)
     .getSimplePaths()
     .forEach((path) => {
       // eslint-disable-next-line playwright/valid-title
       test(path.description, async ({ page, pollingStation, election }) => {
-        const navBarPgObj = new NavBarPgObj(page);
         const pollingStationChoicePage = new PollingStationChoicePage(page);
         const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -192,143 +199,185 @@ test.describe("Data entry model test", () => {
         const abortModal = new AbortInputModal(page);
 
         const pollingStationsPageStates = {
+          pollingStationsPageErrorSaved: async () => {
+            await expect(pollingStationChoicePage.fieldset).toBeVisible();
+            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
+              `${pollingStation.number} - ${pollingStation.name}`,
+            ]);
+          },
+          pollingStationsPageChangedToErrorSaved: async () => {
+            await expect(pollingStationChoicePage.fieldset).toBeVisible();
+            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
+              `${pollingStation.number} - ${pollingStation.name}`,
+            ]);
+          },
           pollingStationsPageDiscarded: async () => {
             await expect(pollingStationChoicePage.fieldset).toBeVisible();
             await expect(pollingStationChoicePage.alertDataEntryInProgress).toBeHidden();
           },
-          pollingStationsPageEmptySaved: async () => {
-            await expect(pollingStationChoicePage.fieldset).toBeVisible();
-            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
-              `${pollingStation.number} - ${pollingStation.name}`,
-            ]);
-          },
-          pollingStationsPageFilledSaved: async () => {
-            await expect(pollingStationChoicePage.fieldset).toBeVisible();
-            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
-              `${pollingStation.number} - ${pollingStation.name}`,
-            ]);
-          },
-          pollingStationsPageChangedSaved: async () => {
-            await expect(pollingStationChoicePage.fieldset).toBeVisible();
-            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
-              `${pollingStation.number} - ${pollingStation.name}`,
-            ]);
-          },
         };
-
         const PollingStationsPageEvents = {
           RESUME_DATA_ENTRY: async () => {
             await pollingStationChoicePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
           },
         };
-
         const recountedPageStates = {
-          recountedPageEmpty: async () => {
+          recountedPageErrorSubmitted: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
           },
-          recountedPageSaved: async () => {
+          recountedPageChangedToErrorSubmitted: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
           },
-          recountedPageDiscarded: async () => {
+          recountedPageFilledError: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("nog niet afgerond");
           },
-          recountedPageCached: async () => {
+          recountedPageChangedToErrorDiscarded: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
-          },
-          unsavedChangesModalChanged: async () => {
-            await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
         };
-
         const recountedPageEvents = {
-          SAVE_UNSUBMITTED_CHANGES: async () => {
-            await recountedPage.unsavedChangesModal.saveInput.click();
-          },
-          DISCARD_UNSUBMITTED_CHANGES: async () => {
-            await recountedPage.unsavedChangesModal.discardInput.click();
+          GO_TO_VOTERS_VOTES_PAGE: async () => {
+            await recountedPage.navPanel.votersAndVotes.click();
           },
         };
-
         const votersVotesPageStates = {
-          voterVotesPageCached: async () => {
-            await expect(votersAndVotesPage.fieldset).toBeVisible();
-            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
-            expect(votersVotesFields).toStrictEqual({ voters, votes });
-          },
           voterVotesPageEmpty: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
           },
-          votersVotesPageFilled: async () => {
+          votersVotesPageFilledValid: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes });
           },
-          votersVotesPageSubmitted: async () => {
+          votersVotesPageValidSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes });
           },
-          votersVotesPageChangedSubmitted: async () => {
+          votersVotesPageChangedToError: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+          },
+          VotersVotesPageFilledError: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+          },
+          votersVotesPageErrorSubmitted: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+            await expect(votersAndVotesPage.error).toContainText(
+              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
+            );
+          },
+          votersVotesPageChangedToErrorSubmitted: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+            await expect(votersAndVotesPage.error).toContainText(
+              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
+            );
+          },
+          votersVotesPageCorrected: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersChanged, votes });
           },
-          votersVotesPageChangedFilled: async () => {
+          votersVotesPageAfterResumeError: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
-            expect(votersVotesFields).toStrictEqual({ voters: votersChanged, votes });
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+            await expect(votersAndVotesPage.error).toBeHidden();
           },
-          votersVotesPageAfterResumeSaved: async () => {
+          votersVotesPageAfterResumeErrorChanged: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
-            expect(votersVotesFields).toStrictEqual({ voters, votes });
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+            await expect(votersAndVotesPage.error).toContainText(
+              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
+            );
           },
-          votersVotesPageAfterResumeChanged: async () => {
+          votersVotesPageWarningSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
-            expect(votersVotesFields).toStrictEqual({ voters: votersChanged, votes });
+            expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
+            await expect(votersAndVotesPage.warning).toContainText(
+              "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.",
+            );
           },
-          votersVotesPageAfterResumeEmpty: async () => {
-            await expect(votersAndVotesPage.fieldset).toBeVisible();
-            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
-            expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
+          unsavedChangesModalChangedToError: async () => {
+            await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
           },
         };
-
         const votersAndVotesPageEvents = {
           FILL_WITH_VALID_DATA: async () => {
             await votersAndVotesPage.inputVotersCounts(voters);
             await votersAndVotesPage.inputVotesCounts(votes);
           },
-          CHANGE_VALID_DATA: async () => {
+          FILL_WITH_ERROR_DATA: async () => {
+            await votersAndVotesPage.inputVotersCounts(votersError);
+            await votersAndVotesPage.inputVotesCounts(votes);
+          },
+          SUBMIT: async () => {
+            await votersAndVotesPage.next.click();
+          },
+          CORRECT_ERROR_DATA: async () => {
             await votersAndVotesPage.inputVotersCounts(votersChanged);
+          },
+          CHANGE_TO_ERROR_DATA: async () => {
+            await votersAndVotesPage.inputVotersCounts(votersError);
+          },
+          CHANGE_TO_WARNING_AND_SUBMIT: async () => {
+            await votersAndVotesPage.inputVotersCounts(voters);
+            await votersAndVotesPage.inputVotesCounts(votesWarning);
+            await votersAndVotesPage.next.click();
           },
           CLICK_ABORT: async () => {
             await votersAndVotesPage.abortInput.click();
           },
           NAV_TO_POLLING_STATION_PAGE: async () => {
-            await navBarPgObj.clickElectionInNavBar(election.election.location, election.election.name);
+            await votersAndVotesPage.clickElectionInNavBar(election.election.location, election.election.name);
           },
           GO_TO_RECOUNTED_PAGE: async () => {
             await votersAndVotesPage.navPanel.recounted.click();
           },
-          SUBMIT: async () => {
-            await votersAndVotesPage.next.click();
+          GO_TO_DIFFERENCES_PAGE: async () => {
+            await votersAndVotesPage.navPanel.differences.click();
+          },
+          SAVE_UNSUBMITTED_CHANGES: async () => {
+            await votersAndVotesPage.unsavedChangesModal.saveInput.click();
+          },
+          DISCARD_UNSUBMITTED_CHANGES: async () => {
+            await votersAndVotesPage.unsavedChangesModal.discardInput.click();
           },
         };
 
         const differencesPageStates = {
-          differencesPage: async () => {
+          differencesPageValid: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+          },
+          differencesPageCorrected: async () => {
+            await expect(differencesPage.fieldset).toBeVisible();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+          },
+          differencesPageError: async () => {
+            await expect(differencesPage.fieldset).toBeVisible();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
           },
         };
-
         const differencesPageEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
             await differencesPage.navPanel.votersAndVotes.click();
@@ -336,13 +385,10 @@ test.describe("Data entry model test", () => {
         };
 
         const abortInputModalStates = {
-          abortInputModalFilled: async () => {
+          abortInputModalErrorSubmitted: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
-          abortInputModalEmpty: async () => {
-            await expect(abortModal.heading).toBeVisible();
-          },
-          abortInputModalChanged: async () => {
+          abortInputModalChangedToErrorSubmitted: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
         };

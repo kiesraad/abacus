@@ -26,12 +26,13 @@ Table.HeaderCell = HeaderCell;
 Table.Body = Body;
 Table.Row = Row;
 Table.LinkRow = LinkRow;
+Table.ClickRow = ClickRow;
 Table.TotalRow = TotalRow;
 Table.Cell = Cell;
 Table.NumberCell = NumberCell;
 Table.DisplayFractionCells = DisplayFractionCells;
 
-function Header({ children, className }: { children: React.ReactNode[]; className?: string }) {
+function Header({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <thead>
       <tr className={className}>{children}</tr>
@@ -62,15 +63,31 @@ function HeaderCell({
   );
 }
 
-function Body({ children, className }: { children: React.ReactNode[]; className?: string }) {
+function Body({ children, className }: { children: React.ReactNode; className?: string }) {
   return <tbody className={className}>{children}</tbody>;
 }
 
-function Row({ children, className }: { children: React.ReactNode[]; className?: string }) {
+function Row({ children, className }: { children: React.ReactNode; className?: string }) {
   return <tr className={className}>{children}</tr>;
 }
 
-function LinkRow({ children, to, className }: { children: React.ReactNode[]; to: To; className?: string }) {
+function ClickRow({
+  children,
+  onClick,
+  className,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <tr className={cn(cls.rowLink, className)} onClick={onClick}>
+      {children}
+    </tr>
+  );
+}
+
+function LinkRow({ children, to, className }: { children: React.ReactNode; to: To; className?: string }) {
   const navigate = useNavigate();
 
   function handleClick() {

@@ -179,7 +179,7 @@
         "tags": [
           "apportionment"
         ],
-        "summary": "Get the seat allocation for an election",
+        "summary": "Get the apportionment for an election",
         "operationId": "election_apportionment",
         "parameters": [
           {
@@ -871,60 +871,26 @@
         }
       }
     },
-    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
+    "/api/log": {
       "get": {
         "tags": [
-          "data_entry"
+          "audit_log"
         ],
-        "summary": "Get an in-progress (not finalised) data entry for a polling station",
-        "operationId": "polling_station_data_entry_get",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
+        "summary": "Lists all users",
+        "operationId": "audit_log_list",
         "responses": {
           "200": {
-            "description": "Data entry retrieved successfully",
+            "description": "Audit log event list",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetDataEntryResponse"
+                  "$ref": "#/components/schemas/AuditLogListResponse"
                 }
               }
             }
           },
           "401": {
             "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -944,12 +910,14 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
         "tags": [
           "data_entry"
         ],
-        "summary": "Save or update a data entry for a polling station",
+        "summary": "Save a data entry for a polling station",
         "operationId": "polling_station_data_entry_save",
         "parameters": [
           {
@@ -1094,6 +1062,81 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim": {
+      "post": {
+        "tags": [
+          "data_entry"
+        ],
+        "summary": "Claim a data entry for a polling station, returning any existing progress",
+        "operationId": "polling_station_data_entry_claim",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "entry_number",
+            "in": "path",
+            "description": "Data entry number (first or second data entry)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data entry claimed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimDataEntryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -1702,75 +1745,6 @@
           }
         }
       },
-      "ApportionmentResult": {
-        "type": "object",
-        "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
-        "required": [
-          "seats",
-          "full_seats",
-          "residual_seats",
-          "quota",
-          "steps",
-          "final_standing"
-        ],
-        "properties": {
-          "final_standing": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupSeatAssignment"
-            }
-          },
-          "full_seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "quota": {
-            "$ref": "#/components/schemas/Fraction"
-          },
-          "residual_seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "steps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ApportionmentStep"
-            }
-          }
-        }
-      },
-      "ApportionmentStep": {
-        "type": "object",
-        "description": "Records the details for a specific residual seat, and how the standing is\nonce that residual seat was assigned",
-        "required": [
-          "residual_seat_number",
-          "change",
-          "standing"
-        ],
-        "properties": {
-          "change": {
-            "$ref": "#/components/schemas/AssignedSeat"
-          },
-          "residual_seat_number": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "standing": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupStanding"
-            }
-          }
-        }
-      },
       "AssignedSeat": {
         "oneOf": [
           {
@@ -1839,6 +1813,167 @@
         ],
         "description": "Records the political group and specific change for a specific residual seat"
       },
+      "AuditEvent": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserLoggedInDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserLoggedIn"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserLoggedOutDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserLoggedOut"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "eventType"
+            ],
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "enum": [
+                  "UnknownEvent"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "AuditEventLevel": {
+        "type": "string",
+        "enum": [
+          "info",
+          "success",
+          "warning",
+          "error"
+        ]
+      },
+      "AuditLogEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "time",
+          "event",
+          "eventLevel",
+          "userId",
+          "username",
+          "ip"
+        ],
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/AuditEvent"
+          },
+          "eventLevel": {
+            "$ref": "#/components/schemas/AuditEventLevel"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "ip": {
+            "type": "string"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "time": {
+            "type": "string"
+          },
+          "userFullname": {
+            "type": "string",
+            "description": "user defaults"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "userRole": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "workstation": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "AuditLogListResponse": {
+        "type": "object",
+        "required": [
+          "events",
+          "page",
+          "pages",
+          "perPage"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLogEvent"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "perPage": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -1886,6 +2021,42 @@
           "X"
         ]
       },
+      "CandidateNominationResult": {
+        "type": "object",
+        "description": "The result of the candidate nomination procedure.\nThis contains the preference threshold and percentage that was used.\nIt contains a list of all chosen candidates in alphabetical order.\nIt also contains the preferential nomination of candidates, the remaining\nnomination of candidates and the final ranking of candidates for each political group.",
+        "required": [
+          "preference_threshold_percentage",
+          "preference_threshold",
+          "chosen_candidates",
+          "political_group_candidate_nomination"
+        ],
+        "properties": {
+          "chosen_candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "description": "List of chosen candidates in alphabetical order"
+          },
+          "political_group_candidate_nomination": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateNomination"
+            },
+            "description": "List of chosen candidates and candidate list ranking per political group"
+          },
+          "preference_threshold": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "Preference threshold number of votes"
+          },
+          "preference_threshold_percentage": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Preference threshold percentage",
+            "minimum": 0
+          }
+        }
+      },
       "CandidateVotes": {
         "type": "object",
         "required": [
@@ -1902,6 +2073,26 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "ClaimDataEntryResponse": {
+        "type": "object",
+        "description": "Response structure for getting data entry of polling station results",
+        "required": [
+          "data",
+          "client_state",
+          "validation_results"
+        ],
+        "properties": {
+          "client_state": {
+            "type": "object"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "validation_results": {
+            "$ref": "#/components/schemas/ValidationResults"
           }
         }
       },
@@ -2096,17 +2287,17 @@
       },
       "ElectionApportionmentResponse": {
         "type": "object",
-        "description": "Election details response, including the election's candidate list (political groups) and its polling stations",
+        "description": "Election apportionment response, including the seat assignment, candidate nomination and election summary",
         "required": [
-          "apportionment",
+          "seat_assignment",
           "election_summary"
         ],
         "properties": {
-          "apportionment": {
-            "$ref": "#/components/schemas/ApportionmentResult"
-          },
           "election_summary": {
             "$ref": "#/components/schemas/ElectionSummary"
+          },
+          "seat_assignment": {
+            "$ref": "#/components/schemas/SeatAssignmentResult"
           }
         }
       },
@@ -2379,36 +2570,6 @@
           }
         }
       },
-      "GetDataEntryResponse": {
-        "type": "object",
-        "description": "Response structure for getting data entry of polling station results",
-        "required": [
-          "progress",
-          "data",
-          "client_state",
-          "validation_results",
-          "updated_at"
-        ],
-        "properties": {
-          "client_state": {
-            "type": "object"
-          },
-          "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
-          },
-          "progress": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "updated_at": {
-            "type": "string"
-          },
-          "validation_results": {
-            "$ref": "#/components/schemas/ValidationResults"
-          }
-        }
-      },
       "LargestAverageAssignedSeat": {
         "type": "object",
         "description": "Contains the details for an assigned seat, assigned through the largest average method.",
@@ -2517,6 +2678,21 @@
           }
         }
       },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "perPage": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "PoliticalGroup": {
         "type": "object",
         "description": "Political group with its candidates",
@@ -2542,6 +2718,57 @@
           }
         }
       },
+      "PoliticalGroupCandidateNomination": {
+        "type": "object",
+        "description": "Contains information about the chosen candidates and the candidate list ranking\nfor a specific political group.",
+        "required": [
+          "pg_number",
+          "pg_name",
+          "pg_seats",
+          "preferential_candidate_nomination",
+          "other_candidate_nomination",
+          "updated_candidate_ranking"
+        ],
+        "properties": {
+          "other_candidate_nomination": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateVotes"
+            },
+            "description": "The list of other chosen candidates, can be empty"
+          },
+          "pg_name": {
+            "type": "string",
+            "description": "Political group name for which this nomination applies"
+          },
+          "pg_number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number for which this nomination applies",
+            "minimum": 0
+          },
+          "pg_seats": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The number of seats assigned to this group",
+            "minimum": 0
+          },
+          "preferential_candidate_nomination": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateVotes"
+            },
+            "description": "The list of chosen candidates via preferential votes, can be empty"
+          },
+          "updated_candidate_ranking": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "description": "The updated ranking of the whole candidate list, can be empty"
+          }
+        }
+      },
       "PoliticalGroupSeatAssignment": {
         "type": "object",
         "description": "Contains information about the final assignment of seats for a specific political group.",
@@ -2557,7 +2784,7 @@
         "properties": {
           "full_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "description": "The number of full seats assigned to this group",
             "minimum": 0
           },
@@ -2577,13 +2804,13 @@
           },
           "residual_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "description": "The number of residual seats assigned to this group",
             "minimum": 0
           },
           "total_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "description": "The total number of seats assigned to this group",
             "minimum": 0
           },
@@ -2610,7 +2837,7 @@
         "properties": {
           "full_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "description": "The number of full seats this political group got assigned",
             "minimum": 0
           },
@@ -2634,7 +2861,7 @@
           },
           "residual_seats": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "description": "The current number of residual seats this political group got assigned",
             "minimum": 0
           },
@@ -2839,6 +3066,75 @@
           }
         }
       },
+      "SeatAssignmentResult": {
+        "type": "object",
+        "description": "The result of the seat assignment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
+        "required": [
+          "seats",
+          "full_seats",
+          "residual_seats",
+          "quota",
+          "steps",
+          "final_standing"
+        ],
+        "properties": {
+          "final_standing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupSeatAssignment"
+            }
+          },
+          "full_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "quota": {
+            "$ref": "#/components/schemas/Fraction"
+          },
+          "residual_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeatAssignmentStep"
+            }
+          }
+        }
+      },
+      "SeatAssignmentStep": {
+        "type": "object",
+        "description": "Records the details for a specific residual seat, and how the standing is\nonce that residual seat was assigned",
+        "required": [
+          "residual_seat_number",
+          "change",
+          "standing"
+        ],
+        "properties": {
+          "change": {
+            "$ref": "#/components/schemas/AssignedSeat"
+          },
+          "residual_seat_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "standing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupStanding"
+            }
+          }
+        }
+      },
       "SumCount": {
         "type": "object",
         "description": "Contains a summary count, containing both the count and a list of polling\nstations that contributed to it.",
@@ -2956,6 +3252,36 @@
             "items": {
               "$ref": "#/components/schemas/User"
             }
+          }
+        }
+      },
+      "UserLoggedInDetails": {
+        "type": "object",
+        "required": [
+          "userAgent",
+          "loggedInUsersCount"
+        ],
+        "properties": {
+          "loggedInUsersCount": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "userAgent": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLoggedOutDetails": {
+        "type": "object",
+        "required": [
+          "sessionDuration"
+        ],
+        "properties": {
+          "sessionDuration": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           }
         }
       },
@@ -3100,6 +3426,10 @@
     }
   },
   "tags": [
+    {
+      "name": "apportionment",
+      "description": "Election apportionment API"
+    },
     {
       "name": "authentication",
       "description": "Authentication and user API"

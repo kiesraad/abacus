@@ -7,10 +7,12 @@ The "save" endpoint, used to for [First/Second]EntryInProgress states is kept ou
 ```mermaid
 stateDiagram
 FirstEntryNotStarted --> FirstEntryInProgress: claim
+#FirstEntryInProgress --> FirstEntryInProgress: claim
 #FirstEntryInProgress --> FirstEntryInProgress: save
 FirstEntryInProgress --> SecondEntryNotStarted: finalise
 FirstEntryInProgress --> FirstEntryNotStarted: delete
 SecondEntryNotStarted --> SecondEntryInProgress: claim
+#SecondEntryInProgress --> SecondEntryInProgress: claim
 #SecondEntryInProgress --> SecondEntryInProgress: save
 state is_equal <<choice>>
 is_equal --> Definitive: equal? yes

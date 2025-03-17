@@ -43,9 +43,12 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let data_entry_routes = Router::new()
         .route(
             "/{entry_number}",
-            get(data_entry::polling_station_data_entry_get)
-                .post(data_entry::polling_station_data_entry_save)
+            post(data_entry::polling_station_data_entry_save)
                 .delete(data_entry::polling_station_data_entry_delete),
+        )
+        .route(
+            "/{entry_number}/claim",
+            post(data_entry::polling_station_data_entry_claim),
         )
         .route(
             "/{entry_number}/finalise",
@@ -89,7 +92,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     #[cfg(feature = "dev-database")]
     let election_routes = election_routes.route("/", post(election::election_create));
 
-    let user_router = Router::new()
+    let user_routes = Router::new()
         .route(
             "/",
             get(authentication::user_list).post(authentication::user_create),
@@ -109,14 +112,11 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             authentication::extend_session,
         ));
 
-    #[cfg(debug_assertions)]
-    let user_router = user_router.route(
-        "/development/create",
-        post(authentication::development_create_user),
-    );
+    let audit_log_routes = Router::new().route("/", get(audit_log::audit_log_list));
 
     let app = Router::new()
-        .nest("/api/user", user_router)
+        .nest("/api/user", user_routes)
+        .nest("/api/log", audit_log_routes)
         .nest("/api/elections", election_routes)
         .nest(
             "/api/elections/{election_id}/polling_stations",
@@ -163,6 +163,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[openapi(
         paths(
             apportionment::election_apportionment,
+            audit_log::audit_log_list,
             authentication::login,
             authentication::logout,
             authentication::whoami,
@@ -179,7 +180,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             report::election_download_pdf_results,
             report::election_download_xml_results,
             data_entry::polling_station_data_entry_save,
-            data_entry::polling_station_data_entry_get,
+            data_entry::polling_station_data_entry_claim,
             data_entry::polling_station_data_entry_delete,
             data_entry::polling_station_data_entry_finalise,
             data_entry::election_status,
@@ -192,13 +193,17 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
-                apportionment::DisplayFraction,
-                apportionment::ApportionmentResult,
-                apportionment::PoliticalGroupStanding,
-                apportionment::ApportionmentStep,
                 apportionment::AssignedSeat,
+                apportionment::CandidateNominationResult,
+                apportionment::DisplayFraction,
                 apportionment::LargestAverageAssignedSeat,
                 apportionment::LargestRemainderAssignedSeat,
+                apportionment::PoliticalGroupCandidateNomination,
+                apportionment::PoliticalGroupStanding,
+                apportionment::SeatAssignmentResult,
+                apportionment::SeatAssignmentStep,
+                audit_log::AuditLogListResponse,
+                audit_log::Pagination,
                 authentication::Credentials,
                 authentication::LoginResponse,
                 authentication::AccountUpdateRequest,
@@ -208,7 +213,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 data_entry::CandidateVotes,
                 data_entry::DataEntry,
                 data_entry::SaveDataEntryResponse,
-                data_entry::GetDataEntryResponse,
+                data_entry::ClaimDataEntryResponse,
                 data_entry::DifferencesCounts,
                 data_entry::PoliticalGroupVotes,
                 data_entry::status::DataEntryStatusName,
@@ -237,6 +242,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             ),
         ),
         tags(
+            (name = "apportionment", description = "Election apportionment API"),
             (name = "authentication", description = "Authentication and user API"),
             (name = "election", description = "Election API"),
             (name = "polling_station", description = "Polling station API"),

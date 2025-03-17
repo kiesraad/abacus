@@ -44,7 +44,7 @@ function render_information(seats: number, residualSeats: number) {
 
 export function ApportionmentResidualSeatsPage() {
   const { election } = useElection();
-  const { apportionment, error } = useApportionmentContext();
+  const { seatAssignment, error } = useApportionmentContext();
 
   if (error) {
     return (
@@ -63,10 +63,10 @@ export function ApportionmentResidualSeatsPage() {
       </>
     );
   }
-  if (apportionment) {
-    const largestRemainderSteps = apportionment.steps.filter((step) => step.change.assigned_by === "LargestRemainder");
-    const largestAverageSteps = apportionment.steps.filter((step) => step.change.assigned_by === "LargestAverage");
-    const absoluteMajorityChange = apportionment.steps
+  if (seatAssignment) {
+    const largestRemainderSteps = seatAssignment.steps.filter((step) => step.change.assigned_by === "LargestRemainder");
+    const largestAverageSteps = seatAssignment.steps.filter((step) => step.change.assigned_by === "LargestAverage");
+    const absoluteMajorityChange = seatAssignment.steps
       .map((step) => step.change)
       .find((change) => change.assigned_by === "AbsoluteMajorityChange") as AbsoluteMajorityChange | undefined;
     return (
@@ -74,16 +74,16 @@ export function ApportionmentResidualSeatsPage() {
         {render_title_and_header()}
         <main>
           <article className={cls.article}>
-            {apportionment.residual_seats > 0 ? (
+            {seatAssignment.residual_seats > 0 ? (
               <>
-                {apportionment.seats >= 19 ? (
+                {seatAssignment.seats >= 19 ? (
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_averages")}</h2>
-                    {render_information(apportionment.seats, apportionment.residual_seats)}
+                    {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
                     {largestAverageSteps.length > 0 && (
                       <LargestAveragesFor19OrMoreSeatsTable
                         largestAverageSteps={largestAverageSteps}
-                        finalStanding={apportionment.final_standing}
+                        finalStanding={seatAssignment.final_standing}
                         politicalGroups={election.political_groups}
                       />
                     )}
@@ -92,11 +92,11 @@ export function ApportionmentResidualSeatsPage() {
                   <>
                     <div>
                       <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_remainders")}</h2>
-                      {render_information(apportionment.seats, apportionment.residual_seats)}
+                      {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
                       {largestRemainderSteps.length > 0 && (
                         <LargestRemaindersTable
                           largestRemainderSteps={largestRemainderSteps}
-                          finalStanding={apportionment.final_standing}
+                          finalStanding={seatAssignment.final_standing}
                           politicalGroups={election.political_groups}
                         />
                       )}
@@ -113,7 +113,7 @@ export function ApportionmentResidualSeatsPage() {
                         {
                           <LargestAveragesForLessThan19SeatsTable
                             largestAverageSteps={largestAverageSteps}
-                            finalStanding={apportionment.final_standing}
+                            finalStanding={seatAssignment.final_standing}
                             politicalGroups={election.political_groups}
                           />
                         }

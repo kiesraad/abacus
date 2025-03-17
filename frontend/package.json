@@ -23,7 +23,7 @@
     "build:ladle": "ladle build",
     "start:msw": "cross-env API_MODE=mock vite",
     "gen:icons": "node scripts/gen_icons.js",
-    "gen:openapi": "vite-node ./scripts/gen_openapi_types.ts",
+    "gen:openapi": "vite-node scripts/gen_openapi.ts",
     "gen:po": "vite-node scripts/gen_po.js",
     "gen:translation-json": "vite-node scripts/gen_translation-json.js",
     "serve": "npm run build:msw && npx serve dist"
@@ -36,7 +36,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^7.2.0",
-    "vite": "^6.2.1"
+    "vite": "^6.2.2"
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.0",
@@ -50,15 +50,15 @@
     "@types/node": "^22.13.10",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@typescript-eslint/eslint-plugin": "^8.26.0",
-    "@typescript-eslint/parser": "^8.26.0",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
+    "@typescript-eslint/parser": "^8.26.1",
     "@vitejs/plugin-react-swc": "^3.8.0",
     "@vitest/coverage-v8": "^3.0.8",
     "@xstate/graph": "^3.0.2",
     "cross-env": "^7.0.3",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",
-    "eslint-import-resolver-typescript": "^3.8.3",
+    "eslint-import-resolver-typescript": "^4.0.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-playwright": "^2.2.0",

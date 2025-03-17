@@ -1,26 +1,25 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import {
-  defaultFormSection,
-  emptyDataEntryRequest,
-  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
-  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
-  expectFieldsToHaveIconAndToHaveAccessibleName,
-  expectFieldsToNotHaveIcon,
-  overrideServerGetDataEntryResponse,
-} from "app/component/form/data_entry/test.util";
-
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@kiesraad/api";
 import {
   electionMockData,
-  PollingStationDataEntryGetHandler,
+  PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs } from "@kiesraad/test";
 
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { DataEntryState } from "../state/types";
+import {
+  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
+  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
+  expectFieldsToHaveIconAndToHaveAccessibleName,
+  expectFieldsToNotHaveIcon,
+  getDefaultFormSection,
+  getEmptyDataEntryRequest,
+  overrideServerClaimDataEntryResponse,
+} from "../test-data";
 import { DifferencesForm } from "./DifferencesForm";
 
 const defaultDataEntryState: DataEntryState = {
@@ -33,26 +32,10 @@ const defaultDataEntryState: DataEntryState = {
     current: "differences_counts",
     furthest: "differences_counts",
     sections: {
-      recounted: {
-        id: "recounted",
-        index: 1,
-        ...defaultFormSection,
-      },
-      voters_votes_counts: {
-        id: "voters_votes_counts",
-        index: 2,
-        ...defaultFormSection,
-      },
-      differences_counts: {
-        id: "differences_counts",
-        index: 3,
-        ...defaultFormSection,
-      },
-      save: {
-        id: "save",
-        index: 4,
-        ...defaultFormSection,
-      },
+      recounted: getDefaultFormSection("recounted", 1),
+      voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
+      differences_counts: getDefaultFormSection("differences_counts", 3),
+      save: getDefaultFormSection("save", 4),
     },
   },
   targetFormSectionId: "recounted",
@@ -80,14 +63,14 @@ const differencesFieldIds = {
 
 describe("Test DifferencesForm", () => {
   beforeEach(() => {
-    server.use(PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+    server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 
   describe("DifferencesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
 
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -108,7 +91,7 @@ describe("Test DifferencesForm", () => {
 
     test("hitting shift+enter does result in api call", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -133,7 +116,7 @@ describe("Test DifferencesForm", () => {
       });
 
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -221,7 +204,7 @@ describe("Test DifferencesForm", () => {
 
       const expectedRequest = {
         data: {
-          ...emptyDataEntryRequest.data,
+          ...getEmptyDataEntryRequest().data,
           ...votersAndVotesValues,
           differences_counts: {
             more_ballots_count: 2,
@@ -237,7 +220,7 @@ describe("Test DifferencesForm", () => {
       };
 
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           ...votersAndVotesValues,
@@ -269,7 +252,7 @@ describe("Test DifferencesForm", () => {
     test("F.301 IncorrectDifference", async () => {
       const user = userEvent.setup();
 
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -309,7 +292,7 @@ describe("Test DifferencesForm", () => {
 
     test("F.302 Should be empty", async () => {
       const user = userEvent.setup();
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
@@ -350,7 +333,7 @@ describe("Test DifferencesForm", () => {
     test("F.303 IncorrectDifference", async () => {
       const user = userEvent.setup();
 
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -392,7 +375,7 @@ describe("Test DifferencesForm", () => {
     test("F.304 Should be empty", async () => {
       const user = userEvent.setup();
 
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
@@ -434,7 +417,7 @@ describe("Test DifferencesForm", () => {
     test("F.305 No difference expected", async () => {
       const user = userEvent.setup();
 
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -490,7 +473,7 @@ describe("Test DifferencesForm", () => {
     test("clicking next without accepting warning results in alert shown and then accept warning", async () => {
       const user = userEvent.setup();
 
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -565,7 +548,7 @@ describe("Test DifferencesForm", () => {
     test("W.301 Incorrect total", async () => {
       const user = userEvent.setup();
 
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
@@ -619,7 +602,7 @@ describe("Test DifferencesForm", () => {
     test("W.302 Incorrect total", async () => {
       const user = userEvent.setup();
 
-      overrideServerGetDataEntryResponse({
+      overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,

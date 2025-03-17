@@ -1,20 +1,35 @@
 import { useState } from "react";
 
+import { AnyApiError, isSuccess, useCrud, User, USER_DELETE_REQUEST_PATH } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconTrash } from "@kiesraad/icon";
 import { Button, Modal } from "@kiesraad/ui";
 
 interface UserDeleteProps {
-  onDelete: () => void;
-  saving: boolean;
+  user: User;
+  onDeleted: () => void;
+  onError: (error: AnyApiError) => void;
 }
 
-export function UserDelete({ onDelete, saving }: UserDeleteProps) {
+export function UserDelete({ user, onDeleted, onError }: UserDeleteProps) {
   const [showModal, setShowModal] = useState(false);
+  const { remove, requestState } = useCrud<User>(`/api/user/${user.id}` satisfies USER_DELETE_REQUEST_PATH);
 
   function toggleModal() {
     setShowModal(!showModal);
   }
+
+  function handleDelete() {
+    void remove().then((result) => {
+      if (!isSuccess(result)) {
+        onError(result);
+      } else {
+        onDeleted();
+      }
+    });
+  }
+
+  const deleting = requestState.status === "loading";
 
   return (
     <>
@@ -26,10 +41,10 @@ export function UserDelete({ onDelete, saving }: UserDeleteProps) {
         <Modal title={t("users.delete")} onClose={toggleModal}>
           <p>{t("users.delete_are_you_sure")}</p>
           <nav>
-            <Button variant="primary-destructive" size="lg" onClick={onDelete} disabled={saving}>
+            <Button variant="primary-destructive" size="lg" onClick={handleDelete} disabled={deleting}>
               {t("delete")}
             </Button>
-            <Button variant="secondary" size="lg" onClick={toggleModal} disabled={saving}>
+            <Button variant="secondary" size="lg" onClick={toggleModal} disabled={deleting}>
               {t("cancel")}
             </Button>
           </nav>

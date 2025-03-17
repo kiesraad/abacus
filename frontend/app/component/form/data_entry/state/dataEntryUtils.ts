@@ -179,21 +179,21 @@ export function isFormSectionEmpty(section: FormSection, values: PollingStationR
   }
 }
 
-export type PollingStationFormSectionStatus = "empty" | "unaccepted-warnings" | "accepted-warnings" | "errors";
-export type PollingStationSummary = {
+export type DataEntryFormSectionStatus = "empty" | "unaccepted-warnings" | "accepted-warnings" | "errors";
+export type DataEntrySummary = {
   countsAddUp: boolean;
   hasBlocks: boolean;
   hasWarnings: boolean;
   hasErrors: boolean;
   notableFormSections: {
-    status: PollingStationFormSectionStatus;
+    status: DataEntryFormSectionStatus;
     title?: string;
     formSection: FormSection;
   }[];
 };
 
-export function getPollingStationSummary(formState: FormState): PollingStationSummary {
-  const result: PollingStationSummary = {
+export function getDataEntrySummary(formState: FormState): DataEntrySummary {
+  const result: DataEntrySummary = {
     countsAddUp: true,
     hasBlocks: false,
     hasWarnings: false,

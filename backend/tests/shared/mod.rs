@@ -1,18 +1,18 @@
 #![cfg(test)]
 
-use axum::http::{HeaderValue, StatusCode};
-use hyper::header::CONTENT_TYPE;
-use reqwest::{Body, Client};
-use serde_json::json;
-use std::net::SocketAddr;
-
 use abacus::data_entry::{
     CandidateVotes, DataEntry, DifferencesCounts, ElectionStatusResponse, PoliticalGroupVotes,
     PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,
     status::{ClientState, DataEntryStatusName},
 };
+use axum::http::{HeaderValue, StatusCode};
+use hyper::header::CONTENT_TYPE;
+use reqwest::{Body, Client};
+use serde_json::json;
+use std::net::SocketAddr;
+use tracing::trace;
 
-// example data entry for an election with two parties with two candidates
+/// Example data entry for an election with two parties with two candidates.
 pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     DataEntry {
         progress: 60,
@@ -75,6 +75,29 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     }
 }
 
+/// Claim a first or second data entry
+pub async fn claim_data_entry(
+    addr: &SocketAddr,
+    cookie: HeaderValue,
+    polling_station_id: u32,
+    entry_number: u32,
+) {
+    let url = format!(
+        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim"
+    );
+    let response = Client::new()
+        .post(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    let status_code = response.status();
+    trace!("Claim data entry response: {:?}", response.text().await);
+    assert_eq!(status_code, StatusCode::OK);
+}
+
 async fn post_data_entry(
     addr: &SocketAddr,
     cookie: HeaderValue,
@@ -100,7 +123,7 @@ async fn post_data_entry(
     assert_eq!(validation_results.validation_results.warnings.len(), 0);
 }
 
-pub async fn create_and_save_data_entry(
+pub async fn save_data_entry(
     addr: &SocketAddr,
     cookie: HeaderValue,
     polling_station_id: u32,
@@ -117,7 +140,7 @@ pub async fn create_and_save_data_entry(
     .await;
 }
 
-pub async fn create_and_save_non_example_data_entry(
+pub async fn save_non_example_data_entry(
     addr: &SocketAddr,
     cookie: HeaderValue,
     polling_station_id: u32,
@@ -154,7 +177,8 @@ pub async fn create_and_finalise_data_entry(
     polling_station_id: u32,
     entry_number: u32,
 ) {
-    create_and_save_data_entry(addr, cookie.clone(), polling_station_id, entry_number, None).await;
+    claim_data_entry(addr, cookie.clone(), polling_station_id, entry_number).await;
+    save_data_entry(addr, cookie.clone(), polling_station_id, entry_number, None).await;
     finalise_data_entry(addr, cookie, polling_station_id, entry_number).await;
 }
 
@@ -165,7 +189,8 @@ pub async fn create_and_finalise_non_example_data_entry(
     entry_number: u32,
     data_entry: DataEntry,
 ) {
-    create_and_save_non_example_data_entry(
+    claim_data_entry(addr, cookie.clone(), polling_station_id, entry_number).await;
+    save_non_example_data_entry(
         addr,
         cookie.clone(),
         polling_station_id,
@@ -178,12 +203,12 @@ pub async fn create_and_finalise_non_example_data_entry(
 
 async fn check_data_entry_status_is_definitive(
     addr: &SocketAddr,
+    cookie: HeaderValue,
     polling_station_id: u32,
     election_id: u32,
 ) {
     // check that data entry status for this polling station is now Definitive
     let url = format!("http://{addr}/api/elections/{election_id}/status");
-    let cookie = typist_login(addr).await;
     let response = Client::new()
         .get(&url)
         .header("cookie", cookie)
@@ -209,8 +234,8 @@ pub async fn create_result(
     election_id: u32,
 ) {
     create_and_finalise_data_entry(addr, cookie.clone(), polling_station_id, 1).await;
-    create_and_finalise_data_entry(addr, cookie, polling_station_id, 2).await;
-    check_data_entry_status_is_definitive(addr, polling_station_id, election_id).await;
+    create_and_finalise_data_entry(addr, cookie.clone(), polling_station_id, 2).await;
+    check_data_entry_status_is_definitive(addr, cookie, polling_station_id, election_id).await;
 }
 
 pub async fn create_result_with_non_example_data_entry(
@@ -230,13 +255,13 @@ pub async fn create_result_with_non_example_data_entry(
     .await;
     create_and_finalise_non_example_data_entry(
         addr,
-        cookie,
+        cookie.clone(),
         polling_station_id,
         2,
         data_entry.clone(),
     )
     .await;
-    check_data_entry_status_is_definitive(addr, polling_station_id, election_id).await;
+    check_data_entry_status_is_definitive(addr, cookie, polling_station_id, election_id).await;
 }
 
 /// Calls the login endpoint for an Admin user and returns the session cookie

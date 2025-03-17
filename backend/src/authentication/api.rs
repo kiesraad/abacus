@@ -94,20 +94,20 @@ pub async fn login(
     sessions.delete_expired_sessions().await?;
     let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
 
+    // Create a new session and cookie
+    let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
+
     // Log the login event
     audit_service
         .with_user(user.clone())
         .log_success(
-            AuditEvent::UserLoggedIn(UserLoggedInDetails {
+            &AuditEvent::UserLoggedIn(UserLoggedInDetails {
                 user_agent,
                 logged_in_users_count: sessions.count().await?,
             }),
             None,
         )
         .await?;
-
-    // Create a new session and cookie
-    let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
 
     // Add the session cookie to the response
     let mut cookie = session.get_cookie();
@@ -208,7 +208,7 @@ pub async fn logout(
             audit_service
                 .with_user(user)
                 .log_success(
-                    AuditEvent::UserLoggedOut(UserLoggedOutDetails {
+                    &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
                         session_duration: session.duration().as_secs(),
                     }),
                     None,
@@ -253,33 +253,6 @@ pub async fn extend_session(State(pool): State<SqlitePool>, req: Request, next: 
     }
 
     res
-}
-
-/// Development endpoint: create a new user (unauthenticated)
-#[cfg(debug_assertions)]
-#[utoipa::path(
-  post,
-  path = "/api/user/development/create",
-  request_body = Credentials,
-  responses(
-      (status = 201, description = "User was successfully created"),
-      (status = 500, description = "Internal server error", body = ErrorResponse),
-  ),
-)]
-pub async fn development_create_user(
-    State(users): State<Users>,
-    Json(credentials): Json<Credentials>,
-) -> Result<impl IntoResponse, APIError> {
-    use super::role::Role;
-
-    let Credentials { username, password } = credentials;
-
-    // Create a new user
-    users
-        .create(&username, None, &password, Role::Typist)
-        .await?;
-
-    Ok(StatusCode::CREATED)
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]

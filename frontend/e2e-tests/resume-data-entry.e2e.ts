@@ -157,7 +157,7 @@ test.describe("resume data entry flow", () => {
       await expect(pollingStationChoicePage.resumeDataEntry).toBeVisible();
 
       await loginAs(request, "typist");
-      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
+      const dataEntryResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
@@ -231,7 +231,7 @@ test.describe("resume data entry flow", () => {
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
       await loginAs(request, "typist");
-      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
+      const dataEntryResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
@@ -384,8 +384,9 @@ test.describe("resume data entry flow", () => {
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
       await loginAs(request, "typist");
-      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
-      expect(dataEntryResponse.status()).toBe(404);
+      const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
+      expect(claimResponse.status()).toBe(200);
+      expect(await claimResponse.json()).toMatchObject(emptyDataEntryResponse);
     });
 
     test("discard input from voters and votes page with warning", async ({ page, request, pollingStation }) => {
@@ -425,8 +426,9 @@ test.describe("resume data entry flow", () => {
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
       await loginAs(request, "typist");
-      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
-      expect(dataEntryResponse.status()).toBe(404);
+      const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
+      expect(claimResponse.status()).toBe(200);
+      expect(await claimResponse.json()).toMatchObject(emptyDataEntryResponse);
     });
   });
 });

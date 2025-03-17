@@ -44,10 +44,10 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionApportionmentResponse = response.json().await.unwrap();
-    assert_eq!(body.apportionment.seats, 15);
-    assert_eq!(body.apportionment.quota, Fraction::new(204, 15));
-    assert_eq!(body.apportionment.steps.len(), 1);
-    let total_seats = get_total_seats_from_apportionment_result(body.apportionment);
+    assert_eq!(body.seat_assignment.seats, 15);
+    assert_eq!(body.seat_assignment.quota, Fraction::new(204, 15));
+    assert_eq!(body.seat_assignment.steps.len(), 1);
+    let total_seats = get_total_seats_from_apportionment_result(body.seat_assignment);
     assert_eq!(total_seats, vec![9, 6]);
 }
 
@@ -56,7 +56,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     let addr = serve_api(pool).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
     let typist_cookie = shared::typist_login(&addr).await;
-    create_result(&addr, typist_cookie.clone(), 3, 3).await;
+    create_result(&addr, typist_cookie, 3, 3).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
     let response = reqwest::Client::new()
@@ -69,10 +69,10 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionApportionmentResponse = response.json().await.unwrap();
-    assert_eq!(body.apportionment.seats, 29);
-    assert_eq!(body.apportionment.quota, Fraction::new(102, 29));
-    assert_eq!(body.apportionment.steps.len(), 1);
-    let total_seats = get_total_seats_from_apportionment_result(body.apportionment);
+    assert_eq!(body.seat_assignment.seats, 29);
+    assert_eq!(body.seat_assignment.quota, Fraction::new(102, 29));
+    assert_eq!(body.seat_assignment.steps.len(), 1);
+    let total_seats = get_total_seats_from_apportionment_result(body.seat_assignment);
     assert_eq!(total_seats, vec![17, 12]);
 }
 

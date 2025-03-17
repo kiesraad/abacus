@@ -117,9 +117,9 @@ describe("User create pages integration test", () => {
 
     test("Showing a unique username error", async () => {
       overrideOnce("post", "/api/user", 409, {
-        error: "Item is not unique",
+        error: "Username already exists",
         fatal: false,
-        reference: "EntryNotUnique",
+        reference: "UsernameNotUnique",
       });
 
       const router = renderWithRouter();

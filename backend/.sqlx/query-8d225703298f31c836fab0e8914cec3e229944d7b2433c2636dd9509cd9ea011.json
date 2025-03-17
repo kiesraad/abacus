@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "INSERT INTO audit_log (event, event_name, event_type, message, workstation, user_id, username, ip)\n            VALUES (?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_type as \"event_type: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                username,\n                ip as \"ip: String\"\n            ",
+  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                audit_log.username,\n                ip as \"ip: String\",\n                users.fullname as \"user_fullname\",\n                users.role as \"user_role?: Role\"\n            FROM audit_log\n            LEFT JOIN users ON audit_log.user_id = users.id\n            ORDER BY time DESC\n            LIMIT ? OFFSET ?\n            ",
   "describe": {
     "columns": [
       {
@@ -19,7 +19,7 @@
         "type_info": "Null"
       },
       {
-        "name": "event_type: _",
+        "name": "event_level: _",
         "ordinal": 3,
         "type_info": "Text"
       },
@@ -47,10 +47,20 @@
         "name": "ip: String",
         "ordinal": 8,
         "type_info": "Text"
+      },
+      {
+        "name": "user_fullname",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_role?: Role",
+        "ordinal": 10,
+        "type_info": "Text"
       }
     ],
     "parameters": {
-      "Right": 8
+      "Right": 2
     },
     "nullable": [
       false,
@@ -61,8 +71,10 @@
       true,
       false,
       false,
+      true,
+      true,
       true
     ]
   },
-  "hash": "8fea7e5c05ac7c228de5665997d0aeb90c32828c1d63803171832a53e2fb0c8c"
+  "hash": "8d225703298f31c836fab0e8914cec3e229944d7b2433c2636dd9509cd9ea011"
 }

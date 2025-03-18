@@ -1,15 +1,10 @@
 import { expect } from "@playwright/test";
 
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "./fixtures";
-import { NavBarPgObj } from "./page-objects/NavBarPgObj";
 
-import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import { AccountSetupPgObj } from "./page-objects/authentication/AccountSetupPgObj";
 import { LoginPgObj } from "./page-objects/authentication/LoginPgObj";
-import { UserCreateDetailsPgObj } from "./page-objects/users/UserCreateDetailsPgObj";
-import { UserCreateRolePgObj } from "./page-objects/users/UserCreateRolePgObj";
-import { UserCreateTypePgObj } from "./page-objects/users/UserCreateTypePgObj";
-import { UserListPgObj } from "./page-objects/users/UserListPgObj";
+import { OverviewPgObj } from "./page-objects/election/OverviewPgObj";
 
 test.describe("authentication", () => {
   test("login happy path", async ({ page }) => {
@@ -34,13 +29,12 @@ test.describe("authentication", () => {
     await loginPgObj.password.fill("wrong-password");
     await loginPgObj.loginBtn.click();
 
-    await expect(page.getByRole("alert")).toContainText("De gebruikersnaam of het wachtwoord is onjuist");
+    await expect(loginPgObj.alert).toContainText("De gebruikersnaam of het wachtwoord is onjuist");
   });
 
   test("first login", async ({ user, page }) => {
     // Login as a newly created user
     const username = user.username;
-    const fullname = "Roep Achternaam";
 
     await page.goto("/account/login");
     await page.getByLabel("Gebruikersnaam").fill(username);
@@ -56,8 +50,8 @@ test.describe("authentication", () => {
     await accountSetupPgObj.nextBtn.click();
     await expect(accountSetupPgObj.navBar.username).toHaveText(user.fullname!);
 
-    const navBarPgObj = new NavBar(page);
-    await expect(navBarPgObj.username).toHaveText(user.fullname!);
-    await expect(page.getByRole("heading", { name: "Je account is ingesteld" })).toBeVisible();
+    const overviewPgObj = new OverviewPgObj(page);
+    await expect(overviewPgObj.navBar.username).toHaveText(user.fullname!);
+    await expect(overviewPgObj.alert).toBeVisible();
   });
 });

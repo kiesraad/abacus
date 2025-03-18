@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
-import { ElectionReport } from "e2e-tests/page-objects/status/ElectionReportPgObj";
-import { ElectionStatus } from "e2e-tests/page-objects/status/ElectionStatusPgObj";
+import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
+import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { stat } from "node:fs/promises";
 
 import { test } from "./fixtures";

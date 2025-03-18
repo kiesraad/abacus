@@ -1,10 +1,10 @@
-import { Election, ElectionSummary, SeatAssignmentResult, SeatAssignmentStep } from "@kiesraad/api";
+import { Election, ElectionSummary, SeatAssignmentResult, SeatChangeStep } from "@kiesraad/api";
 
-export const largest_remainder_steps: SeatAssignmentStep[] = [
+export const largest_remainder_steps: SeatChangeStep[] = [
   {
     residual_seat_number: 1,
     change: {
-      assigned_by: "LargestRemainder",
+      changed_by: "LargestRemainderAssignment",
       selected_pg_number: 2,
       pg_options: [2],
       pg_assigned: [2],
@@ -156,7 +156,7 @@ export const largest_remainder_steps: SeatAssignmentStep[] = [
   {
     residual_seat_number: 2,
     change: {
-      assigned_by: "LargestRemainder",
+      changed_by: "LargestRemainderAssignment",
       selected_pg_number: 1,
       pg_options: [1],
       pg_assigned: [1],
@@ -307,11 +307,11 @@ export const largest_remainder_steps: SeatAssignmentStep[] = [
   },
 ];
 
-export const largest_average_steps: SeatAssignmentStep[] = [
+export const largest_average_steps: SeatChangeStep[] = [
   {
     residual_seat_number: 3,
     change: {
-      assigned_by: "LargestAverage",
+      changed_by: "LargestAverageAssignment",
       selected_pg_number: 1,
       pg_options: [1],
       pg_assigned: [1],
@@ -463,7 +463,7 @@ export const largest_average_steps: SeatAssignmentStep[] = [
   {
     residual_seat_number: 4,
     change: {
-      assigned_by: "LargestAverage",
+      changed_by: "LargestAverageAssignment",
       selected_pg_number: 3,
       pg_options: [3],
       pg_assigned: [3],
@@ -615,7 +615,7 @@ export const largest_average_steps: SeatAssignmentStep[] = [
   {
     residual_seat_number: 5,
     change: {
-      assigned_by: "LargestAverage",
+      changed_by: "LargestAverageAssignment",
       selected_pg_number: 4,
       pg_options: [4],
       pg_assigned: [4],

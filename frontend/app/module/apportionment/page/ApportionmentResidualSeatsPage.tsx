@@ -6,7 +6,7 @@ import {
   LargestRemaindersTable,
 } from "app/component/apportionment";
 
-import { AbsoluteMajorityChange, useApportionmentContext, useElection } from "@kiesraad/api";
+import { AbsoluteMajorityReassignedSeat, useApportionmentContext, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
@@ -64,11 +64,17 @@ export function ApportionmentResidualSeatsPage() {
     );
   }
   if (seatAssignment) {
-    const largestRemainderSteps = seatAssignment.steps.filter((step) => step.change.assigned_by === "LargestRemainder");
-    const largestAverageSteps = seatAssignment.steps.filter((step) => step.change.assigned_by === "LargestAverage");
+    const largestRemainderSteps = seatAssignment.steps.filter(
+      (step) => step.change.changed_by === "LargestRemainderAssignment",
+    );
+    const largestAverageSteps = seatAssignment.steps.filter(
+      (step) => step.change.changed_by === "LargestAverageAssignment",
+    );
     const absoluteMajorityChange = seatAssignment.steps
       .map((step) => step.change)
-      .find((change) => change.assigned_by === "AbsoluteMajorityChange") as AbsoluteMajorityChange | undefined;
+      .find((change) => change.changed_by === "AbsoluteMajorityReassignment") as
+      | AbsoluteMajorityReassignedSeat
+      | undefined;
     return (
       <>
         {render_title_and_header()}

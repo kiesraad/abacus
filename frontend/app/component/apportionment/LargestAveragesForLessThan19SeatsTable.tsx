@@ -2,7 +2,7 @@ import {
   LargestAverageAssignedSeat,
   PoliticalGroup,
   PoliticalGroupSeatAssignment,
-  SeatAssignmentStep,
+  SeatChangeStep,
 } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Table } from "@kiesraad/ui";
@@ -11,7 +11,7 @@ import { cn } from "@kiesraad/util";
 import cls from "./Apportionment.module.css";
 
 interface LargestAveragesForLessThan19SeatsTableProps {
-  largestAverageSteps: SeatAssignmentStep[];
+  largestAverageSteps: SeatChangeStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }

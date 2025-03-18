@@ -26,7 +26,6 @@ import {
 } from "./test-data/request-response-templates";
 
 export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
-export const FIXTURE_TYPIST_TEMP_FULLNAME: string = "Gebruiker met Achternaam";
 
 // Regular fixtures need to be passed into the test's arguments.
 type Fixtures = {
@@ -128,7 +127,7 @@ export const test = base.extend<Fixtures>({
     const data: USER_CREATE_REQUEST_BODY = {
       role: "typist",
       username: createRandomUsername(),
-      fullname: FIXTURE_TYPIST_TEMP_FULLNAME,
+      fullname: "Gebruiker met Achternaam",
       temp_password: FIXTURE_TYPIST_TEMP_PASSWORD,
     };
     const userResponse = await request.post(url, { data });

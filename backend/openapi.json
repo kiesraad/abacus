@@ -1866,7 +1866,7 @@
               "eventType": {
                 "type": "string",
                 "enum": [
-                  "UserUpdateFailed"
+                  "UserAccountUpdateFailed"
                 ]
               }
             }
@@ -1880,7 +1880,7 @@
               "eventType": {
                 "type": "string",
                 "enum": [
-                  "UserUpdateSuccess"
+                  "UserAccountUpdateSuccess"
                 ]
               }
             }

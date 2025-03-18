@@ -1,6 +1,6 @@
 import { useBlocker } from "react-router";
 
-import { PollingStationResults } from "@kiesraad/api";
+import { PollingStationResults, useUser } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
@@ -15,6 +15,7 @@ export interface DataEntryNavigationProps {
 export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNavigationProps) {
   const { status, election, pollingStationId, formState, setCache, entryNumber, onDeleteDataEntry, updateFormSection } =
     useDataEntryContext();
+  const user = useUser();
 
   // path check to see if the current location is part of the data entry flow
   const isPartOfDataEntryFlow = (pathname: string) =>
@@ -22,6 +23,11 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
 
   // block navigation if there are unsaved changes
   const blocker = useBlocker(({ currentLocation, nextLocation }) => {
+    // do not block when user is logged out / the session expired
+    if (user === null) {
+      return false;
+    }
+
     if (
       status === "deleted" ||
       status === "finalised" ||

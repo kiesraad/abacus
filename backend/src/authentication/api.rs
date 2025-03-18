@@ -7,6 +7,7 @@ use super::{
 };
 use axum::{
     extract::{Path, State},
+    http::HeaderValue,
     response::{IntoResponse, Json, Response},
 };
 use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
@@ -14,7 +15,7 @@ use cookie::{Cookie, SameSite};
 use hyper::{StatusCode, header::SET_COOKIE};
 use serde::{Deserialize, Serialize};
 use sqlx::Error;
-use tracing::debug;
+use tracing::{debug, info};
 use utoipa::ToSchema;
 
 use crate::{
@@ -170,7 +171,7 @@ pub async fn account_update(
     if let Err(e) = result {
         audit_service
             .with_user(user.clone())
-            .log_error(&AuditEvent::UserUpdateFailed, None)
+            .log_error(&AuditEvent::UserAccountUpdateFailed, None)
             .await?;
 
         return Err(e.into());
@@ -187,7 +188,7 @@ pub async fn account_update(
 
     audit_service
         .with_user(updated_user.clone())
-        .log_error(&AuditEvent::UserUpdateSuccess, None)
+        .log_error(&AuditEvent::UserAccountUpdateSuccess, None)
         .await?;
 
     Ok(Json(LoginResponse::from(&updated_user)))
@@ -257,10 +258,11 @@ pub async fn extend_session(
     };
 
     let sessions = Sessions::new(state.pool.clone());
+    let mut expires = None;
 
     // extend lifetime of session and set new cookie if the session is still valid and will soon be expired
     if let Ok(Some(session)) = sessions.extend_session(session_cookie.value()).await {
-        debug!("Session extended: {:?}", session_cookie);
+        info!("Session extended for user {}", session.user_id());
 
         let users = Users::new(state.pool);
 
@@ -279,6 +281,16 @@ pub async fn extend_session(
                 response.headers_mut().append(SET_COOKIE, header_value);
             }
         }
+
+        expires = Some(session.expires_at());
+    } else if let Ok(Some(session)) = sessions.get_by_key(session_cookie.value()).await {
+        expires = Some(session.expires_at());
+    }
+
+    if let Some(expires) = expires.and_then(|e| HeaderValue::from_str(&e.to_rfc3339()).ok()) {
+        response
+            .headers_mut()
+            .append("X-Session-Expires-At", expires);
     }
 
     response

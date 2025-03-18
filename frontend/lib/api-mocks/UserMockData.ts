@@ -56,5 +56,5 @@ export const loginResponseMockData: LoginResponse = {
   username: "Sanne",
   role: "administrator",
   fullname: "Sanne Molenaar",
-  needs_password_change: true,
+  needs_password_change: false,
 };

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
-import { AUDIT_LOG_LIST_REQUEST_PATH, AuditLogEvent, AuditLogListResponse, useApiRequest } from "@kiesraad/api";
+import { AUDIT_LOG_LIST_REQUEST_PATH, AuditLogEvent, AuditLogListResponse, useInitialApiGet } from "@kiesraad/api";
 
 interface Pagination {
   page: number;
@@ -13,7 +13,7 @@ export function useAuditLog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [events, setEvents] = useState<AuditLogEvent[]>([]);
-  const { requestState } = useApiRequest<AuditLogListResponse>(`${path}?${searchParams}`);
+  const { requestState } = useInitialApiGet<AuditLogListResponse>(`${path}?${searchParams}`);
 
   useEffect(() => {
     if (requestState.status === "success") {

@@ -3,8 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 import { overrideOnce } from "@kiesraad/test";
 
 import { ApiClient } from "./ApiClient";
-import { FatalApiError } from "./ApiError";
-import { ApiResponseStatus } from "./ApiResponseStatus";
+import { ApiResponseStatus, FatalApiError } from "./ApiResult";
 
 describe("ApiClient", () => {
   test("200 response is parsed as success", async () => {

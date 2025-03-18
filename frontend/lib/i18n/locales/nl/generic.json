@@ -60,5 +60,10 @@
   "version": "Versie",
   "vote_count": "Aantal stemmen",
   "yesterday": "gisteren",
-  "you_are_here": "je bent hier"
+  "you_are_here": "je bent hier",
+  "minutes": "{minutes} minuten",
+  "one_minute": "1 minuut",
+  "seconds": "{seconds} seconden",
+  "one_second": "1 seconde",
+  "and": "en"
 }

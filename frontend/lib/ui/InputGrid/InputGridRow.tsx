@@ -1,7 +1,18 @@
 import * as React from "react";
 
-import { ErrorsAndWarnings } from "@kiesraad/api";
+import { ValidationResultCode } from "@kiesraad/api";
 import { FormField, InputGrid, NumberInput } from "@kiesraad/ui";
+
+export type ResultCode = ValidationResultCode | "REFORMAT_WARNING";
+export type FieldValidationResult = {
+  code: ResultCode;
+  id: string;
+  value?: string;
+};
+export type ErrorsAndWarnings = {
+  errors: FieldValidationResult[];
+  warnings: FieldValidationResult[];
+};
 
 export interface InputGridRowProps {
   id: string;

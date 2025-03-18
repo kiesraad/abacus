@@ -1,9 +1,8 @@
-import { type ErrorResponse } from "@kiesraad/api";
+import { ApiResult, type ErrorResponse } from "@kiesraad/api";
 import { TranslationPath } from "@kiesraad/i18n";
 
-import { ApiResult, RequestMethod, ServerError } from "./api.types";
-import { ApiError, ApiErrorEvent, FatalApiError, NetworkError, NotFoundError } from "./ApiError";
-import { ApiResponseStatus } from "./ApiResponseStatus";
+import { ApiErrorEvent, SessionExpirationEvent } from "./ApiEvents";
+import { ApiError, ApiResponseStatus, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
 
 const MIME_JSON = "application/json";
 const HEADER_ACCEPT = "Accept";
@@ -37,6 +36,22 @@ export class ApiClient extends EventTarget {
     };
   }
 
+  // subscribe to API header value for session expiration timestamps
+  subscribeToSessionExpiration(callback: (expiration: Date) => void): () => void {
+    const listener = (event: Event) => {
+      if (event instanceof SessionExpirationEvent) {
+        callback(event.expiration);
+      }
+    };
+
+    this.addEventListener("sessionExpiration", listener);
+
+    // return unsubscribe function
+    return () => {
+      this.removeEventListener("sessionExpiration", listener);
+    };
+  }
+
   // encode an optional JSON body
   setRequestBodyAndHeaders(requestBody?: object): RequestInit {
     if (requestBody) {
@@ -59,7 +74,7 @@ export class ApiClient extends EventTarget {
   // handle a response with a JSON body, and return an error when there is a non-2xx status or a non-JSON body
   async handleJsonBody<T>(response: Response): Promise<ApiResult<T>> {
     try {
-      const body = (await response.json()) as T | ServerError;
+      const body = (await response.json()) as unknown;
 
       if (response.ok) {
         return {
@@ -148,7 +163,7 @@ export class ApiClient extends EventTarget {
 
   // perform an HTTP request and handle the response
   async request<T>(
-    method: RequestMethod,
+    method: "GET" | "POST" | "PUT" | "DELETE",
     path: string,
     abort?: AbortController,
     requestBody?: object,
@@ -159,6 +174,11 @@ export class ApiClient extends EventTarget {
         signal: abort?.signal,
         ...this.setRequestBodyAndHeaders(requestBody),
       });
+
+      const sessionExpiration = response.headers.get("x-session-expires-at");
+      if (sessionExpiration) {
+        this.dispatchEvent(new SessionExpirationEvent(new Date(sessionExpiration)));
+      }
 
       const isJson = response.headers.get(HEADER_CONTENT_TYPE) === MIME_JSON;
 

@@ -28,8 +28,8 @@ pub struct UserLoggedOutDetails {
 pub enum AuditEvent {
     UserLoggedIn(UserLoggedInDetails),
     UserLoggedOut(UserLoggedOutDetails),
-    UserUpdateFailed,
-    UserUpdateSuccess,
+    UserAccountUpdateFailed,
+    UserAccountUpdateSuccess,
     UserSessionExtended,
     UserCreated(LoginResponse),
     UserUpdated(LoginResponse),
@@ -48,8 +48,8 @@ impl fmt::Display for AuditEvent {
         match self {
             AuditEvent::UserLoggedIn(..) => write!(f, "UserLoggedIn"),
             AuditEvent::UserLoggedOut(..) => write!(f, "UserLoggedOut"),
-            AuditEvent::UserUpdateFailed => write!(f, "UserUpdateFailed"),
-            AuditEvent::UserUpdateSuccess => write!(f, "UserUpdateSuccess"),
+            AuditEvent::UserAccountUpdateFailed => write!(f, "UserAccountUpdateFailed"),
+            AuditEvent::UserAccountUpdateSuccess => write!(f, "UserAccountUpdateSuccess"),
             AuditEvent::UserSessionExtended => write!(f, "UserSessionExtended"),
             AuditEvent::UserCreated(..) => write!(f, "UserCreated"),
             AuditEvent::UserUpdated(..) => write!(f, "UserUpdated"),

@@ -22,16 +22,16 @@ npx playwright install --with-deps --no-shell
 
 ### Running
 
-This runs the client with a (client-side) mock API:
+To run with the backend API server, first [start the API server](../backend/README.md#running) and use:
 
 ```sh
 npm run dev
 ```
 
-To run with the backend API server, first [start the API server](../backend/README.md#running) and use:
+This runs the client with a (client-side) mock API:
 
 ```sh
-npm run dev:server
+npm run dev:mock
 ```
 
 ### Linting

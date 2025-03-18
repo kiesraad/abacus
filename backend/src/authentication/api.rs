@@ -5,6 +5,10 @@ use super::{
     session::Sessions,
     user::{User, Users},
 };
+use crate::{
+    APIError, AppState, ErrorResponse,
+    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
+};
 use axum::{
     extract::{Path, Request, State},
     http::HeaderValue,
@@ -18,11 +22,21 @@ use serde::{Deserialize, Serialize};
 use sqlx::{Error, SqlitePool};
 use tracing::{debug, info};
 use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::{
-    APIError, ErrorResponse,
-    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
-};
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::default()
+        .routes(routes!(login))
+        .routes(routes!(whoami))
+        .routes(routes!(account_update))
+        .routes(routes!(logout))
+        .routes(routes!(user_list))
+        .routes(routes!(user_create))
+        .routes(routes!(user_get))
+        .routes(routes!(user_update))
+        .routes(routes!(user_delete))
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Credentials {
     pub username: String,
@@ -71,7 +85,7 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn login(
+async fn login(
     user_agent: Option<TypedHeader<UserAgent>>,
     State(users): State<Users>,
     State(sessions): State<Sessions>,
@@ -137,7 +151,7 @@ pub struct AccountUpdateRequest {
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
-pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
+async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     let user = user.ok_or(AuthenticationError::UserNotFound)?;
 
     Ok(Json(LoginResponse::from(&user)))
@@ -153,7 +167,7 @@ pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
-pub async fn account_update(
+async fn account_update(
     user: User,
     State(users): State<Users>,
     Json(account): Json<AccountUpdateRequest>,
@@ -188,7 +202,7 @@ pub async fn account_update(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn logout(
+async fn logout(
     State(sessions): State<Sessions>,
     State(users): State<Users>,
     audit_service: AuditService,
@@ -280,7 +294,7 @@ pub struct UserListResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn user_list(
+async fn user_list(
     _user: Admin,
     State(users_repo): State<Users>,
 ) -> Result<Json<UserListResponse>, APIError> {
@@ -322,7 +336,7 @@ pub struct UpdateUserRequest {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn user_create(
+async fn user_create(
     _user: Admin,
     State(users_repo): State<Users>,
     Json(create_user_req): Json<CreateUserRequest>,
@@ -352,7 +366,7 @@ pub async fn user_create(
         ("user_id" = u32, description = "User id"),
     ),
 )]
-pub async fn user_get(
+async fn user_get(
     _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,
@@ -373,7 +387,7 @@ pub async fn user_get(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn user_update(
+async fn user_update(
     _user: Admin,
     State(users_repo): State<Users>,
     State(session_repo): State<Sessions>,
@@ -407,7 +421,7 @@ pub async fn user_update(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn user_delete(
+async fn user_delete(
     _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,

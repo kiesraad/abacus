@@ -1,3 +1,10 @@
+use self::repository::PollingStations;
+pub use self::structs::*;
+use crate::{
+    APIError, AppState, ErrorResponse,
+    authentication::{AdminOrCoordinator, User},
+    election::repository::Elections,
+};
 use axum::{
     Json,
     extract::{Path, State},
@@ -6,17 +13,19 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-
-use self::repository::PollingStations;
-pub use self::structs::*;
-use crate::{
-    APIError, ErrorResponse,
-    authentication::{AdminOrCoordinator, User},
-    election::repository::Elections,
-};
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub mod repository;
 pub mod structs;
+
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::default()
+        .routes(routes!(polling_station_list))
+        .routes(routes!(polling_station_create))
+        .routes(routes!(polling_station_get))
+        .routes(routes!(polling_station_update))
+        .routes(routes!(polling_station_delete))
+}
 
 /// Polling station list response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -44,7 +53,7 @@ impl IntoResponse for PollingStationListResponse {
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn polling_station_list(
+async fn polling_station_list(
     _user: User,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
@@ -74,7 +83,7 @@ pub async fn polling_station_list(
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn polling_station_create(
+async fn polling_station_create(
     _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
@@ -107,7 +116,7 @@ pub async fn polling_station_create(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-pub async fn polling_station_get(
+async fn polling_station_get(
     _user: User,
     State(polling_stations): State<PollingStations>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
@@ -136,7 +145,7 @@ pub async fn polling_station_get(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-pub async fn polling_station_update(
+async fn polling_station_update(
     _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
@@ -167,7 +176,7 @@ pub async fn polling_station_update(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-pub async fn polling_station_delete(
+async fn polling_station_delete(
     _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,

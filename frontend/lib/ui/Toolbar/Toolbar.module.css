@@ -4,9 +4,14 @@
   padding-bottom: var(--space-lg);
 }
 
+.fixed-height {
+  min-height: 5rem;
+}
+
 .toolbar-section {
   display: flex;
   gap: var(--space-md-lg);
+
   &.start {
     /* default aligned at the start */
   }

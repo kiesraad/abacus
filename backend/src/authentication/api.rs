@@ -19,7 +19,7 @@ use tracing::{debug, info};
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, AppState, ErrorResponse,
+    APIError, ErrorResponse,
     audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
 };
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -245,7 +245,8 @@ pub async fn logout(
 
 /// Middleware to extend the session lifetime
 pub async fn extend_session(
-    State(state): State<AppState>,
+    State(users): State<Users>,
+    State(sessions): State<Sessions>,
     jar: CookieJar,
     audit_service: AuditService,
     mut response: Response,
@@ -257,14 +258,11 @@ pub async fn extend_session(
         return response;
     };
 
-    let sessions = Sessions::new(state.pool.clone());
     let mut expires = None;
 
     // extend lifetime of session and set new cookie if the session is still valid and will soon be expired
     if let Ok(Some(session)) = sessions.extend_session(session_cookie.value()).await {
         info!("Session extended for user {}", session.user_id());
-
-        let users = Users::new(state.pool);
 
         if let Some(user) = users.get_by_id(session.user_id()).await.ok().flatten() {
             let _ = audit_service

@@ -1,8 +1,5 @@
-use chrono::TimeDelta;
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-
 pub use self::api::*;
+use chrono::TimeDelta;
 pub use user::{User, Users};
 
 pub use self::role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
@@ -29,27 +26,6 @@ pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
 
 /// Only send cookies over a secure (https) connection
 pub const SECURE_COOKIES: bool = false;
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct Credentials {
-    username: String,
-    password: String,
-}
-
-// #[derive(Debug, Serialize, Clone, Deserialize, PartialEq, Eq, ToSchema)]
-// pub struct LoginResponse {
-//     user_id: u32,
-//     username: String,
-// }
-
-// impl From<&User> for LoginResponse {
-//     fn from(user: &User) -> Self {
-//         Self {
-//             user_id: user.id(),
-//             username: user.username().to_string(),
-//         }
-//     }
-// }
 
 #[cfg(test)]
 mod tests {

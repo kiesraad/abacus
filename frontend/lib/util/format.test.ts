@@ -2,7 +2,14 @@ import { describe, expect, test } from "vitest";
 
 import { t } from "@kiesraad/i18n";
 
-import { deformatNumber, formatDateTime, formatDateTimeFull, formatNumber, validateNumberString } from "./format";
+import {
+  deformatNumber,
+  formatDateTime,
+  formatDateTimeFull,
+  formatNumber,
+  formatTimeToGo,
+  validateNumberString,
+} from "./format";
 
 describe("Format util", () => {
   test.each([
@@ -81,5 +88,20 @@ describe("Format util", () => {
     [new Date("Sat Dec 18 2010 23:27:11 GMT+0100"), "18 december 2010 om 23:27"],
   ])("Format date time %s as %s", (input: Date, expected: string) => {
     expect(formatDateTimeFull(input)).toBe(expected);
+  });
+
+  test.each([
+    [0, "0 seconden"],
+    [0.6, "1 seconde"],
+    [1, "1 seconde"],
+    [10, "10 seconden"],
+    [60, "1 minuut"],
+    [61, "1 minuut en 1 seconde"],
+    [70, "1 minuut en 10 seconden"],
+    [1000, "16 minuten en 40 seconden"],
+    [1337 * 60, "1337 minuten"],
+    [1337 * 60 + 42, "1337 minuten en 42 seconden"],
+  ])("Time to go %s formatted as %s", (input: number, expected: string) => {
+    expect(formatTimeToGo(input)).toBe(expected);
   });
 });

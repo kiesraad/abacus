@@ -7,6 +7,7 @@ use super::{
 };
 use axum::{
     extract::{Path, Request, State},
+    http::HeaderValue,
     middleware::Next,
     response::{IntoResponse, Json, Response},
 };
@@ -15,7 +16,7 @@ use cookie::{Cookie, SameSite};
 use hyper::{StatusCode, header::SET_COOKIE};
 use serde::{Deserialize, Serialize};
 use sqlx::{Error, SqlitePool};
-use tracing::debug;
+use tracing::{debug, info};
 use utoipa::ToSchema;
 
 use crate::{
@@ -237,10 +238,11 @@ pub async fn extend_session(State(pool): State<SqlitePool>, req: Request, next: 
     };
 
     let sessions = Sessions::new(pool);
+    let mut expires = None;
 
     // extend lifetime of session and set new cookie if the session is still valid and will soon be expired
     if let Ok(Some(session)) = sessions.extend_session(session_cookie.value()).await {
-        debug!("Session extended: {:?}", session_cookie);
+        info!("Session extended for user {}", session.user_id());
 
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
@@ -250,6 +252,14 @@ pub async fn extend_session(State(pool): State<SqlitePool>, req: Request, next: 
         if let Ok(header_value) = cookie.encoded().to_string().parse() {
             res.headers_mut().append(SET_COOKIE, header_value);
         }
+
+        expires = Some(session.expires_at());
+    } else if let Ok(Some(session)) = sessions.get_by_key(session_cookie.value()).await {
+        expires = Some(session.expires_at());
+    }
+
+    if let Some(expires) = expires.and_then(|e| HeaderValue::from_str(&e.to_rfc3339()).ok()) {
+        res.headers_mut().append("X-Session-Expires-At", expires);
     }
 
     res

@@ -106,3 +106,37 @@ export function formatDateTime(date: Date, relative = true) {
   const dateString = date.toLocaleDateString(t("date_locale"), { day: "numeric", month: "short" });
   return `${dateString} ${timeString}`;
 }
+
+export function formatTimeToGo(seconds: number) {
+  const secondsRounded = Math.round(seconds);
+  const remainingMinutes = Math.floor(secondsRounded / 60);
+  const remainingSeconds = secondsRounded % 60;
+
+  let secondsFormatted = "";
+
+  if (remainingSeconds === 1) {
+    secondsFormatted = t("one_second");
+  } else if (remainingSeconds > 1 || remainingSeconds === 0) {
+    secondsFormatted = t("seconds", { seconds: remainingSeconds });
+  }
+
+  let minutesFormatted = "";
+
+  if (remainingMinutes === 1) {
+    minutesFormatted = t("one_minute");
+  } else if (remainingMinutes > 1) {
+    minutesFormatted = t("minutes", { minutes: remainingMinutes });
+  } else {
+    return secondsFormatted;
+  }
+
+  if (minutesFormatted && remainingSeconds === 0) {
+    return minutesFormatted;
+  }
+
+  if (minutesFormatted && secondsFormatted) {
+    return `${minutesFormatted} ${t("and")} ${secondsFormatted}`;
+  }
+
+  return minutesFormatted;
+}

@@ -1,7 +1,8 @@
-import { ApiResponseStatus, ApiResult, type ErrorResponse } from "@kiesraad/api";
+import { ApiResult, type ErrorResponse } from "@kiesraad/api";
 import { TranslationPath } from "@kiesraad/i18n";
 
-import { ApiError, ApiErrorEvent, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
+import { ApiErrorEvent, SessionExpirationEvent } from "./ApiEvents";
+import { ApiError, ApiResponseStatus, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
 
 const MIME_JSON = "application/json";
 const HEADER_ACCEPT = "Accept";
@@ -32,6 +33,22 @@ export class ApiClient extends EventTarget {
     // return unsubscribe function
     return () => {
       this.removeEventListener("apiError", listener);
+    };
+  }
+
+  // subscribe to API header value for session expiration timestamps
+  subscribeToSessionExpiration(callback: (expiration: Date) => void): () => void {
+    const listener = (event: Event) => {
+      if (event instanceof SessionExpirationEvent) {
+        callback(event.expiration);
+      }
+    };
+
+    this.addEventListener("sessionExpiration", listener);
+
+    // return unsubscribe function
+    return () => {
+      this.removeEventListener("sessionExpiration", listener);
     };
   }
 
@@ -157,6 +174,11 @@ export class ApiClient extends EventTarget {
         signal: abort?.signal,
         ...this.setRequestBodyAndHeaders(requestBody),
       });
+
+      const sessionExpiration = response.headers.get("x-session-expires-at");
+      if (sessionExpiration) {
+        this.dispatchEvent(new SessionExpirationEvent(new Date(sessionExpiration)));
+      }
 
       const isJson = response.headers.get(HEADER_CONTENT_TYPE) === MIME_JSON;
 

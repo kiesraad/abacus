@@ -106,11 +106,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout))
         .route("/whoami", get(authentication::whoami))
-        .route("/account", put(authentication::account_update))
-        .layer(middleware::from_fn_with_state(
-            pool.clone(),
-            authentication::extend_session,
-        ));
+        .route("/account", put(authentication::account_update));
 
     let audit_log_routes = Router::new().route("/", get(audit_log::audit_log_list));
 
@@ -127,7 +123,12 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             data_entry_routes,
         );
 
-    let app = app.layer(TraceLayer::new_for_http());
+    let app = app
+        .layer(TraceLayer::new_for_http())
+        .layer(middleware::from_fn_with_state(
+            pool.clone(),
+            authentication::extend_session,
+        ));
 
     #[cfg(feature = "memory-serve")]
     let app = {

@@ -18,6 +18,7 @@ mod user;
 mod util;
 
 /// Session lifetime, for both cookie and database
+/// Also change the translation string "users.session_expired" in the frontend if this value is changed
 pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 30); // 30 minutes
 
 /// Minimum session lifetime, refresh if only this much time or less is left before expiration
@@ -562,7 +563,7 @@ mod tests {
             .to_str()
             .unwrap();
 
-        assert!(response_cookie.contains("Max-Age=1800"));
+        assert!(response_cookie.contains(&format!("Max-Age={}", SESSION_LIFE_TIME.num_seconds())));
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

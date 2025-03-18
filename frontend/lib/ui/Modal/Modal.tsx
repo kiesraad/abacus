@@ -8,11 +8,12 @@ import cls from "./Modal.module.css";
 
 export interface ModalProps {
   title: string;
+  noFlex?: boolean;
   onClose?: () => void;
   children?: ReactNode;
 }
 
-export function Modal({ title, onClose, children }: ModalProps): ReactNode {
+export function Modal({ title, noFlex = false, onClose, children }: ModalProps): ReactNode {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const lastActiveElement = useRef<HTMLElement | null>(null);
 
@@ -48,7 +49,7 @@ export function Modal({ title, onClose, children }: ModalProps): ReactNode {
           <h2 id="modal-title" tabIndex={-1}>
             {title}
           </h2>
-          {children}
+          {noFlex ? <div className={cls["no-flex"]}>{children}</div> : children}
         </div>
       </div>
     </dialog>

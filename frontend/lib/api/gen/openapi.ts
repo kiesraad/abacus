@@ -387,10 +387,19 @@ export interface ElectionStatusResponse {
  * Election polling stations data entry statuses response
  */
 export interface ElectionStatusResponseEntry {
+  /** Time when the data entry was finalised */
   finished_at?: string;
-  first_data_entry_progress?: number;
+  /** First entry progress as a percentage (0 to 100) */
+  first_entry_progress?: number;
+  /** First entry user id */
+  first_entry_user_id?: number;
+  /** Polling station id */
   polling_station_id: number;
-  second_data_entry_progress?: number;
+  /** Second entry progress as a percentage (0 to 100) */
+  second_entry_progress?: number;
+  /** Second entry user id */
+  second_entry_user_id?: number;
+  /** Data entry status */
   status: DataEntryStatusName;
 }
 

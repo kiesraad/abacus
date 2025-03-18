@@ -2511,25 +2511,42 @@
         ],
         "properties": {
           "finished_at": {
-            "type": "string"
+            "type": "string",
+            "description": "Time when the data entry was finalised"
           },
-          "first_data_entry_progress": {
+          "first_entry_progress": {
             "type": "integer",
             "format": "int32",
+            "description": "First entry progress as a percentage (0 to 100)",
+            "minimum": 0
+          },
+          "first_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "First entry user id",
             "minimum": 0
           },
           "polling_station_id": {
             "type": "integer",
             "format": "int32",
+            "description": "Polling station id",
             "minimum": 0
           },
-          "second_data_entry_progress": {
+          "second_entry_progress": {
             "type": "integer",
             "format": "int32",
+            "description": "Second entry progress as a percentage (0 to 100)",
+            "minimum": 0
+          },
+          "second_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Second entry user id",
             "minimum": 0
           },
           "status": {
-            "$ref": "#/components/schemas/DataEntryStatusName"
+            "$ref": "#/components/schemas/DataEntryStatusName",
+            "description": "Data entry status"
           }
         }
       },

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { AbsoluteMajorityChange, useElection } from "@/api";
+import { AbsoluteMajorityReassignedSeat, useElection } from "@/api";
 import { Alert, FormLayout, PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
@@ -62,11 +62,17 @@ export function ApportionmentResidualSeatsPage() {
     );
   }
   if (seatAssignment) {
-    const largestRemainderSteps = seatAssignment.steps.filter((step) => step.change.assigned_by === "LargestRemainder");
-    const largestAverageSteps = seatAssignment.steps.filter((step) => step.change.assigned_by === "LargestAverage");
+    const largestRemainderSteps = seatAssignment.steps.filter(
+      (step) => step.change.changed_by === "LargestRemainderAssignment",
+    );
+    const largestAverageSteps = seatAssignment.steps.filter(
+      (step) => step.change.changed_by === "LargestAverageAssignment",
+    );
     const absoluteMajorityChange = seatAssignment.steps
       .map((step) => step.change)
-      .find((change) => change.assigned_by === "AbsoluteMajorityChange") as AbsoluteMajorityChange | undefined;
+      .find((change) => change.changed_by === "AbsoluteMajorityReassignment") as
+      | AbsoluteMajorityReassignedSeat
+      | undefined;
     return (
       <>
         {render_title_and_header()}

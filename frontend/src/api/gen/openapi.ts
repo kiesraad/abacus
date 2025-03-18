@@ -152,7 +152,7 @@ export type USER_DELETE_REQUEST_PATH = `/api/user/${number}`;
 /**
  * Contains information about the enactment of article P 9 of the Kieswet.
  */
-export interface AbsoluteMajorityChange {
+export interface AbsoluteMajorityReassignedSeat {
   /** Political group number which the residual seat is assigned to */
   pg_assigned_seat: number;
   /** Political group number which the residual seat is retracted from */
@@ -164,15 +164,6 @@ export interface AccountUpdateRequest {
   password: string;
   username: string;
 }
-
-/**
- * Records the political group and specific change for a specific residual seat
- */
-export type AssignedSeat =
-  | (LargestAverageAssignedSeat & { assigned_by: "LargestAverage" })
-  | (LargestRemainderAssignedSeat & { assigned_by: "LargestRemainder" })
-  | (AbsoluteMajorityChange & { assigned_by: "AbsoluteMajorityChange" })
-  | (ListExhaustionChange & { assigned_by: "ListExhaustionChange" });
 
 export type AuditEvent =
   | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
@@ -486,8 +477,8 @@ export interface LargestRemainderAssignedSeat {
 /**
  * Contains information about the enactment of article P 10 of the Kieswet.
  */
-export interface ListExhaustionChange {
-  /** Political group number which the residual seat is retracted from */
+export interface ListExhaustionRemovedSeat {
+  /** Political group number which the seat is retracted from */
   pg_retracted_seat: number;
 }
 
@@ -641,16 +632,25 @@ export interface SeatAssignmentResult {
   quota: Fraction;
   residual_seats: number;
   seats: number;
-  steps: SeatAssignmentStep[];
+  steps: SeatChangeStep[];
 }
 
 /**
- * Records the details for a specific residual seat, and how the standing is
- * once that residual seat was assigned
+ * Records the political group and specific change for a specific residual seat
  */
-export interface SeatAssignmentStep {
-  change: AssignedSeat;
-  residual_seat_number?: number | null;
+export type SeatChange =
+  | (LargestAverageAssignedSeat & { changed_by: "LargestAverageAssignment" })
+  | (LargestRemainderAssignedSeat & { changed_by: "LargestRemainderAssignment" })
+  | (AbsoluteMajorityReassignedSeat & { changed_by: "AbsoluteMajorityReassignment" })
+  | (ListExhaustionRemovedSeat & { changed_by: "ListExhaustionRemoval" });
+
+/**
+ * Records the change for a specific seat, and how the standing is once
+ * that seat was assigned or removed
+ */
+export interface SeatChangeStep {
+  change: SeatChange;
+  residual_seat_number?: number;
   standing: PoliticalGroupStanding[];
 }
 

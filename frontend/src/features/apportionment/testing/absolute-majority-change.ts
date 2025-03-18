@@ -13,7 +13,7 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       residual_seat_number: 1,
       change: {
-        assigned_by: "LargestRemainder",
+        changed_by: "LargestRemainderAssignment",
         selected_pg_number: 2,
         pg_options: [2],
         pg_assigned: [2],
@@ -114,7 +114,7 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       residual_seat_number: 2,
       change: {
-        assigned_by: "LargestRemainder",
+        changed_by: "LargestRemainderAssignment",
         selected_pg_number: 3,
         pg_options: [3],
         pg_assigned: [3],
@@ -215,7 +215,7 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       residual_seat_number: 3,
       change: {
-        assigned_by: "LargestRemainder",
+        changed_by: "LargestRemainderAssignment",
         selected_pg_number: 4,
         pg_options: [4],
         pg_assigned: [4],
@@ -314,9 +314,8 @@ export const seat_assignment: SeatAssignmentResult = {
       ],
     },
     {
-      residual_seat_number: 3,
       change: {
-        assigned_by: "AbsoluteMajorityChange",
+        changed_by: "AbsoluteMajorityReassignment",
         pg_retracted_seat: 4,
         pg_assigned_seat: 1,
       },

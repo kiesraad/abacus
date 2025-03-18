@@ -17,7 +17,7 @@ pub struct SeatAssignmentResult {
     pub full_seats: u32,
     pub residual_seats: u32,
     pub quota: Fraction,
-    pub steps: Vec<SeatAssignmentStep>,
+    pub steps: Vec<SeatChangeStep>,
     pub final_standing: Vec<PoliticalGroupSeatAssignment>,
 }
 
@@ -121,80 +121,88 @@ impl PoliticalGroupStanding {
     }
 }
 
-/// Records the details for a specific residual seat, and how the standing is
-/// once that residual seat was assigned
+/// Records the change for a specific seat, and how the standing is once
+/// that seat was assigned or removed
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
-pub struct SeatAssignmentStep {
+pub struct SeatChangeStep {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     residual_seat_number: Option<u32>,
-    change: AssignedSeat,
+    change: SeatChange,
     standing: Vec<PoliticalGroupStanding>,
 }
 
 /// Records the political group and specific change for a specific residual seat
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
-#[serde(tag = "assigned_by")]
-pub enum AssignedSeat {
-    LargestAverage(LargestAverageAssignedSeat),
-    LargestRemainder(LargestRemainderAssignedSeat),
-    AbsoluteMajorityChange(AbsoluteMajorityChange),
-    ListExhaustionChange(ListExhaustionChange),
+#[serde(tag = "changed_by")]
+pub enum SeatChange {
+    LargestAverageAssignment(LargestAverageAssignedSeat),
+    LargestRemainderAssignment(LargestRemainderAssignedSeat),
+    AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat),
+    ListExhaustionRemoval(ListExhaustionRemovedSeat),
 }
 
-impl AssignedSeat {
+impl SeatChange {
     /// Get the political group number for the group this step has assigned a seat to
     fn political_group_number(&self) -> PGNumber {
         match self {
-            AssignedSeat::LargestAverage(largest_average) => largest_average.selected_pg_number,
-            AssignedSeat::LargestRemainder(largest_remainder) => {
+            SeatChange::LargestAverageAssignment(largest_average) => {
+                largest_average.selected_pg_number
+            }
+            SeatChange::LargestRemainderAssignment(largest_remainder) => {
                 largest_remainder.selected_pg_number
             }
-            AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
-            AssignedSeat::ListExhaustionChange(_) => unimplemented!(),
+            SeatChange::AbsoluteMajorityReassignment(_) => unimplemented!(),
+            SeatChange::ListExhaustionRemoval(_) => unimplemented!(),
         }
     }
 
     /// Get the list of political groups with the same average, that have not been assigned a seat
     fn pg_options(&self) -> Vec<PGNumber> {
         match self {
-            AssignedSeat::LargestAverage(largest_average) => largest_average.pg_options.clone(),
-            AssignedSeat::LargestRemainder(largest_remainder) => {
+            SeatChange::LargestAverageAssignment(largest_average) => {
+                largest_average.pg_options.clone()
+            }
+            SeatChange::LargestRemainderAssignment(largest_remainder) => {
                 largest_remainder.pg_options.clone()
             }
-            AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
-            AssignedSeat::ListExhaustionChange(_) => unimplemented!(),
+            SeatChange::AbsoluteMajorityReassignment(_) => unimplemented!(),
+            SeatChange::ListExhaustionRemoval(_) => unimplemented!(),
         }
     }
 
     /// Get the list of political groups with the same average, that have been assigned a seat
     fn pg_assigned(&self) -> Vec<PGNumber> {
         match self {
-            AssignedSeat::LargestAverage(largest_average) => largest_average.pg_assigned.clone(),
-            AssignedSeat::LargestRemainder(largest_remainder) => {
+            SeatChange::LargestAverageAssignment(largest_average) => {
+                largest_average.pg_assigned.clone()
+            }
+            SeatChange::LargestRemainderAssignment(largest_remainder) => {
                 largest_remainder.pg_assigned.clone()
             }
-            AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
-            AssignedSeat::ListExhaustionChange(_) => unimplemented!(),
+            SeatChange::AbsoluteMajorityReassignment(_) => unimplemented!(),
+            SeatChange::ListExhaustionRemoval(_) => unimplemented!(),
         }
     }
 
-    /// Returns true if the seat was assigned through the largest remainder
-    pub fn is_assigned_by_largest_remainder(&self) -> bool {
-        matches!(self, AssignedSeat::LargestRemainder(_))
+    /// Returns true if the seat was changed through the largest remainder assignment
+    pub fn is_changed_by_largest_remainder_assignment(&self) -> bool {
+        matches!(self, SeatChange::LargestRemainderAssignment(_))
     }
 
-    /// Returns true if the seat was assigned through the largest average
-    pub fn is_assigned_by_largest_average(&self) -> bool {
-        matches!(self, AssignedSeat::LargestAverage(_))
+    /// Returns true if the seat was changed through the largest average assignment
+    pub fn is_changed_by_largest_average_assignment(&self) -> bool {
+        matches!(self, SeatChange::LargestAverageAssignment(_))
     }
 
-    /// Returns true if the seat was reassigned through the absolute majority change
-    pub fn is_assigned_by_absolute_majority_change(&self) -> bool {
-        matches!(self, AssignedSeat::AbsoluteMajorityChange(_))
+    /// Returns true if the seat was changed through the absolute majority reassignment
+    pub fn is_changed_by_absolute_majority_reassignment(&self) -> bool {
+        matches!(self, SeatChange::AbsoluteMajorityReassignment(_))
     }
 
-    /// Returns true if the seat was reassigned through the list exhaustion change
-    pub fn is_assigned_by_list_exhaustion_change(&self) -> bool {
-        matches!(self, AssignedSeat::ListExhaustionChange(_))
+    /// Returns true if the seat was changed through the list exhaustion removal
+    pub fn is_changed_by_list_exhaustion_removal(&self) -> bool {
+        matches!(self, SeatChange::ListExhaustionRemoval(_))
     }
 }
 
@@ -232,7 +240,7 @@ pub struct LargestRemainderAssignedSeat {
 
 /// Contains information about the enactment of article P 9 of the Kieswet.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
-pub struct AbsoluteMajorityChange {
+pub struct AbsoluteMajorityReassignedSeat {
     /// Political group number which the residual seat is retracted from
     #[schema(value_type = u32)]
     pg_retracted_seat: PGNumber,
@@ -243,8 +251,8 @@ pub struct AbsoluteMajorityChange {
 
 /// Contains information about the enactment of article P 10 of the Kieswet.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
-pub struct ListExhaustionChange {
-    /// Political group number which the residual seat is retracted from
+pub struct ListExhaustionRemovedSeat {
+    /// Political group number which the seat is retracted from
     #[schema(value_type = u32)]
     pg_retracted_seat: PGNumber,
 }
@@ -379,7 +387,7 @@ fn reassign_residual_seat_for_absolute_majority(
     totals: &ElectionSummary,
     pgs_last_residual_seat: &[PGNumber],
     standing: Vec<PoliticalGroupStanding>,
-) -> Result<(Vec<PoliticalGroupStanding>, Option<AssignedSeat>), ApportionmentError> {
+) -> Result<(Vec<PoliticalGroupStanding>, Option<SeatChange>), ApportionmentError> {
     let half_of_votes_count: Fraction =
         Fraction::from(totals.votes_counts.votes_candidates_count) * Fraction::new(1, 2);
 
@@ -420,8 +428,8 @@ fn reassign_residual_seat_for_absolute_majority(
         );
         Ok((
             standing,
-            Some(AssignedSeat::AbsoluteMajorityChange(
-                AbsoluteMajorityChange {
+            Some(SeatChange::AbsoluteMajorityReassignment(
+                AbsoluteMajorityReassignedSeat {
                     pg_retracted_seat: pgs_last_residual_seat[0],
                     pg_assigned_seat: majority_pg_votes.number,
                 },
@@ -438,24 +446,28 @@ fn reassign_residual_seats_for_exhausted_lists(
     seats: u32,
     assigned_residual_seats: u32,
     exhausted_lists_and_seats: Vec<(&PoliticalGroupStanding, u32)>,
-) -> Result<(Vec<SeatAssignmentStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
+) -> Result<(Vec<SeatChangeStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
     let mut seats_to_reassign = 0;
     let mut exhausted_pgs: Vec<&PoliticalGroupStanding> = vec![];
-    let mut list_exhaustion_steps: Vec<SeatAssignmentStep> = vec![];
+    let mut list_exhaustion_steps: Vec<SeatChangeStep> = vec![];
     let mut standing = current_standing.to_owned();
     for (p, seats) in exhausted_lists_and_seats {
         seats_to_reassign += seats;
         exhausted_pgs.push(p);
         for _ in 1..=seats {
-            standing[p.pg_number as usize - 1].residual_seats -= 1;
+            if standing[p.pg_number as usize - 1].residual_seats > 0 {
+                standing[p.pg_number as usize - 1].residual_seats -= 1;
+            } else {
+                standing[p.pg_number as usize - 1].full_seats -= 1;
+            }
             info!(
-                "Residual seat first assigned to list {} has been re-assigned to another list in accordance with Article P 10 Kieswet",
+                "Residual seat first assigned to list {} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
                 p.pg_number
             );
-            list_exhaustion_steps.push(SeatAssignmentStep {
+            list_exhaustion_steps.push(SeatChangeStep {
                 standing: standing.clone(),
                 residual_seat_number: None,
-                change: AssignedSeat::ListExhaustionChange(ListExhaustionChange {
+                change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
                     pg_retracted_seat: p.pg_number,
                 }),
             });
@@ -530,7 +542,7 @@ pub fn seat_assignment(
     };
     if let Some(assigned_seat) = assigned_seat {
         // add the absolute majority change to the remainder assignment steps
-        steps.push(SeatAssignmentStep {
+        steps.push(SeatChangeStep {
             standing: current_standing.clone(),
             residual_seat_number: None,
             change: assigned_seat,
@@ -574,7 +586,7 @@ fn assign_remainder(
     total_residual_seats: u32,
     current_residual_seat_number: u32,
     exhausted_pgs: Vec<&PoliticalGroupStanding>,
-) -> Result<(Vec<SeatAssignmentStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
+) -> Result<(Vec<SeatChangeStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
     let mut steps = vec![];
     let mut residual_seat_number = current_residual_seat_number;
 
@@ -617,7 +629,7 @@ fn assign_remainder(
             .collect();
 
         // add the update to the remainder assignment steps
-        steps.push(SeatAssignmentStep {
+        steps.push(SeatChangeStep {
             standing,
             residual_seat_number: Some(residual_seat_number),
             change: step,
@@ -633,8 +645,8 @@ fn assign_remainder(
 /// return all political group numbers that had the same remainder/votes per seat.
 fn pg_assigned_from_previous_step(
     selected_pg: &PoliticalGroupStanding,
-    previous: &[SeatAssignmentStep],
-    matcher: fn(&AssignedSeat) -> bool,
+    previous: &[SeatChangeStep],
+    matcher: fn(&SeatChange) -> bool,
 ) -> Vec<PGNumber> {
     let mut pg_assigned = Vec::new();
     if let Some(previous_step) = previous.last() {
@@ -656,25 +668,27 @@ fn pg_assigned_from_previous_step(
 fn step_assign_remainder_using_largest_averages<'a>(
     standing: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
     residual_seats: u32,
-    previous: &[SeatAssignmentStep],
+    previous: &[SeatChangeStep],
     exhausted_pgs: &Vec<&'a PoliticalGroupStanding>,
-) -> Result<AssignedSeat, ApportionmentError> {
+) -> Result<SeatChange, ApportionmentError> {
     let mut qualifying_for_largest_average =
         political_groups_qualifying_for_largest_average(standing, exhausted_pgs).peekable();
     if qualifying_for_largest_average.peek().is_some() {
         let selected_pgs =
             political_groups_with_largest_average(qualifying_for_largest_average, residual_seats)?;
         let selected_pg = selected_pgs[0];
-        Ok(AssignedSeat::LargestAverage(LargestAverageAssignedSeat {
-            selected_pg_number: selected_pg.pg_number,
-            pg_assigned: pg_assigned_from_previous_step(
-                selected_pg,
-                previous,
-                AssignedSeat::is_assigned_by_largest_average,
-            ),
-            pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
-            votes_per_seat: selected_pg.next_votes_per_seat,
-        }))
+        Ok(SeatChange::LargestAverageAssignment(
+            LargestAverageAssignedSeat {
+                selected_pg_number: selected_pg.pg_number,
+                pg_assigned: pg_assigned_from_previous_step(
+                    selected_pg,
+                    previous,
+                    SeatChange::is_changed_by_largest_average_assignment,
+                ),
+                pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
+                votes_per_seat: selected_pg.next_votes_per_seat,
+            },
+        ))
     } else {
         Err(ApportionmentError::AllListsExhausted)
     }
@@ -688,14 +702,14 @@ fn step_assign_remainder_using_largest_averages<'a>(
 /// This also removes groups that do not have more candidates to be assigned seats.
 fn political_groups_qualifying_for_largest_remainder<'a>(
     standing: &'a [PoliticalGroupStanding],
-    previous: &'a [SeatAssignmentStep],
+    previous: &'a [SeatChangeStep],
     exhausted_pgs: &Vec<&'a PoliticalGroupStanding>,
 ) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
     standing.iter().filter(move |p| {
         p.meets_remainder_threshold
             && !exhausted_pgs.contains(p)
             && !previous.iter().any(|prev| {
-                prev.change.is_assigned_by_largest_remainder()
+                prev.change.is_changed_by_largest_remainder_assignment()
                     && prev.change.political_group_number() == p.pg_number
             })
     })
@@ -706,11 +720,11 @@ fn political_groups_qualifying_for_largest_remainder<'a>(
 /// got a residual seat through the largest average procedure does not qualify.
 fn political_groups_qualifying_for_unique_largest_average<'a>(
     assigned_seats: &'a [PoliticalGroupStanding],
-    previous: &'a [SeatAssignmentStep],
+    previous: &'a [SeatChangeStep],
 ) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
     assigned_seats.iter().filter(|p| {
         !previous.iter().any(|prev| {
-            prev.change.is_assigned_by_largest_average()
+            prev.change.is_changed_by_largest_average_assignment()
                 && prev.change.political_group_number() == p.pg_number
         })
     })
@@ -732,9 +746,9 @@ fn political_groups_qualifying_for_largest_average<'a>(
 fn step_assign_remainder_using_largest_remainder(
     assigned_seats: &[PoliticalGroupStanding],
     residual_seats: u32,
-    previous: &[SeatAssignmentStep],
+    previous: &[SeatChangeStep],
     exhausted_pgs: &Vec<&PoliticalGroupStanding>,
-) -> Result<AssignedSeat, ApportionmentError> {
+) -> Result<SeatChange, ApportionmentError> {
     // first we check if there are any political groups that still qualify for a largest remainder assigned seat
     let mut qualifying_for_remainder =
         political_groups_qualifying_for_largest_remainder(assigned_seats, previous, exhausted_pgs)
@@ -745,13 +759,13 @@ fn step_assign_remainder_using_largest_remainder(
         let selected_pgs =
             political_groups_with_largest_remainder(qualifying_for_remainder, residual_seats)?;
         let selected_pg = selected_pgs[0];
-        Ok(AssignedSeat::LargestRemainder(
+        Ok(SeatChange::LargestRemainderAssignment(
             LargestRemainderAssignedSeat {
                 selected_pg_number: selected_pg.pg_number,
                 pg_assigned: pg_assigned_from_previous_step(
                     selected_pg,
                     previous,
-                    AssignedSeat::is_assigned_by_largest_remainder,
+                    SeatChange::is_changed_by_largest_remainder_assignment,
                 ),
                 pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
                 remainder_votes: selected_pg.remainder_votes,
@@ -983,7 +997,7 @@ mod tests {
             assert!(
                 result.steps[3]
                     .change
-                    .is_assigned_by_absolute_majority_change()
+                    .is_changed_by_absolute_majority_reassignment()
             );
             let total_seats = get_total_seats_from_apportionment_result(result);
             assert_eq!(total_seats, vec![8, 3, 2, 1, 1]);
@@ -1116,7 +1130,7 @@ mod tests {
                 assert!(
                     result.steps[6]
                         .change
-                        .is_assigned_by_list_exhaustion_change()
+                        .is_changed_by_list_exhaustion_removal()
                 );
                 assert_eq!(result.steps[7].change.political_group_number(), 3);
                 let total_seats = get_total_seats_from_apportionment_result(result);

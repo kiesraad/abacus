@@ -1,4 +1,9 @@
-import { LargestAverageAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatAssignmentStep } from "@/api";
+import {
+  LargestAverageAssignedSeat,
+  PoliticalGroup,
+  PoliticalGroupSeatAssignment,
+  SeatChangeStep,
+} from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
@@ -6,7 +11,7 @@ import { cn } from "@/lib/util";
 import cls from "../Apportionment.module.css";
 
 interface LargestAveragesForLessThan19SeatsTableProps {
-  largestAverageSteps: SeatAssignmentStep[];
+  largestAverageSteps: SeatChangeStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }

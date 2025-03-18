@@ -226,24 +226,6 @@ export interface Candidate {
  */
 export type CandidateGender = "Male" | "Female" | "X";
 
-/**
- * The result of the candidate nomination procedure.
- * This contains the preference threshold and percentage that was used.
- * It contains a list of all chosen candidates in alphabetical order.
- * It also contains the preferential nomination of candidates, the remaining
- * nomination of candidates and the final ranking of candidates for each political group.
- */
-export interface CandidateNominationResult {
-  /** List of chosen candidates in alphabetical order */
-  chosen_candidates: Candidate[];
-  /** List of chosen candidates and candidate list ranking per political group */
-  political_group_candidate_nomination: PoliticalGroupCandidateNomination[];
-  /** Preference threshold number of votes */
-  preference_threshold: Fraction;
-  /** Preference threshold percentage */
-  preference_threshold_percentage: number;
-}
-
 export interface CandidateVotes {
   number: number;
   votes: number;
@@ -507,11 +489,6 @@ export interface LoginResponse {
   username: string;
 }
 
-export interface Pagination {
-  page?: number;
-  perPage?: number;
-}
-
 /**
  * Political group with its candidates
  */
@@ -519,25 +496,6 @@ export interface PoliticalGroup {
   candidates: Candidate[];
   name: string;
   number: number;
-}
-
-/**
- * Contains information about the chosen candidates and the candidate list ranking
- * for a specific political group.
- */
-export interface PoliticalGroupCandidateNomination {
-  /** The list of other chosen candidates, can be empty */
-  other_candidate_nomination: CandidateVotes[];
-  /** Political group name for which this nomination applies */
-  pg_name: string;
-  /** Political group number for which this nomination applies */
-  pg_number: number;
-  /** The number of seats assigned to this group */
-  pg_seats: number;
-  /** The list of chosen candidates via preferential votes, can be empty */
-  preferential_candidate_nomination: CandidateVotes[];
-  /** The updated ranking of the whole candidate list, can be empty */
-  updated_candidate_ranking: Candidate[];
 }
 
 /**

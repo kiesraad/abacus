@@ -1,13 +1,17 @@
+use crate::{APIError, AppState, ErrorResponse, authentication::AdminOrCoordinator};
 use axum::{
     Json,
     extract::{Query, State},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-
-use crate::{APIError, ErrorResponse, authentication::AdminOrCoordinator};
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{AuditLog, AuditLogEvent};
+
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::default().routes(routes!(audit_log_list))
+}
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -47,7 +51,7 @@ pub struct Pagination {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn audit_log_list(
+async fn audit_log_list(
     _user: AdminOrCoordinator,
     pagination: Query<Pagination>,
     State(audit_log): State<AuditLog>,
@@ -90,7 +94,7 @@ mod tests {
         AppState,
         audit_log::{
             AuditEvent, AuditLog, AuditLogListResponse, AuditService, UserLoggedInDetails,
-            audit_log_list,
+            api::audit_log_list,
         },
         authentication::{Sessions, Users},
     };

@@ -157,7 +157,7 @@ cargo install sqlx-cli
 
 *Let op: voor deze methode moet je de repository klonen of downloaden.*
 
-In plaats van het script kun je ook handmatig `cargo run` vanuit de backend-map en `npm run dev:server` vanuit de frontend-map in twee verschillende terminals starten. Hiervoor gelden dezelfde vereisten als bij het uitvoeren van het pull-and-run-script. Deze optie is bedoeld voor development.
+In plaats van het script kun je ook handmatig `cargo run` vanuit de backend-map en `npm run dev` vanuit de frontend-map in twee verschillende terminals starten. Hiervoor gelden dezelfde vereisten als bij het uitvoeren van het pull-and-run-script. Deze optie is bedoeld voor development.
 
 ### Methode 5: Docker compose (Linux, macOS, Windows)
 

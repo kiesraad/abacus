@@ -2,6 +2,7 @@
   "no_events": "Geen gebeurtenissen gevonden",
   "action": {
     "filter": "Filteren",
+    "close_filter": "Filter sluiten",
     "details": "Details"
   },
   "header": {

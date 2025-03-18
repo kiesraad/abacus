@@ -532,7 +532,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
       const alertText = screen.getByRole("alert");
       expect(alertText).toHaveTextContent(
-        "Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.",
+        "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       );
 
       acceptFeedbackCheckbox.click();

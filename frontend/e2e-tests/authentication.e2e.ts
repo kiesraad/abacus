@@ -1,7 +1,6 @@
 import { expect } from "@playwright/test";
 
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "./fixtures";
-
 import { AccountSetupPgObj } from "./page-objects/authentication/AccountSetupPgObj";
 import { LoginPgObj } from "./page-objects/authentication/LoginPgObj";
 import { OverviewPgObj } from "./page-objects/election/OverviewPgObj";
@@ -36,10 +35,11 @@ test.describe("authentication", () => {
     // Login as a newly created user
     const username = user.username;
 
+    const loginPgObj = new LoginPgObj(page);
     await page.goto("/account/login");
-    await page.getByLabel("Gebruikersnaam").fill(username);
-    await page.getByLabel("Wachtwoord").fill(FIXTURE_TYPIST_TEMP_PASSWORD);
-    await page.getByRole("button", { name: "Inloggen" }).click();
+    await loginPgObj.username.fill(username);
+    await loginPgObj.password.fill(FIXTURE_TYPIST_TEMP_PASSWORD);
+    await loginPgObj.loginBtn.click();
 
     // Fill out the account setup page
     const password = "Sterk wachtwoord";

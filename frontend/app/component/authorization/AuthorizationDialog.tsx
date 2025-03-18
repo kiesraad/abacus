@@ -20,7 +20,7 @@ export function AuthorizationDialog() {
   // update the current time every second when there is a session expiration
   useEffect(() => {
     if (expiration !== null) {
-      const interval = setInterval(() => {
+      const update = () => {
         const now = new Date();
         const validFor = (expiration.getTime() - now.getTime()) / 1000;
         setSessionValidFor(validFor);
@@ -29,13 +29,21 @@ export function AuthorizationDialog() {
         if (validFor <= 0 && user !== null) {
           setUser(null);
         }
-      }, 1000);
+
+        // reset hide dialog state if the session is valid for more than the expiration dialog time
+        if (validFor > EXPIRATION_DIALOG_SECONDS && hideDialog) {
+          setHideDialog(false);
+        }
+      };
+
+      update();
+      const interval = setInterval(update, 1000);
 
       return () => {
         clearInterval(interval);
       };
     }
-  }, [expiration, user, setUser]);
+  }, [expiration, user, setUser, hideDialog]);
 
   // navigate to login page if the user is not authenticated
   if (!loading && !user && !ALLOW_UNAUTHORIZED.includes(path)) {

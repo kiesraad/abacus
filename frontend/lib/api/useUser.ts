@@ -1,7 +1,6 @@
 import { useContext } from "react";
 
-import { ApiState } from "./api.types";
-import { ApiProviderContext } from "./ApiProviderContext";
+import { ApiProviderContext, ApiState } from "./ApiProviderContext";
 import { LoginResponse } from "./gen/openapi";
 
 export function useUser(): LoginResponse | null {

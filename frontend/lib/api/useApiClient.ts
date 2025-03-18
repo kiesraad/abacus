@@ -1,14 +1,13 @@
 import { useContext } from "react";
 
-import { ApiState } from "./api.types";
 import { ApiClient } from "./ApiClient";
-import { ApiProviderContext } from "./ApiProviderContext";
+import { ApiProviderContext, ApiState } from "./ApiProviderContext";
 
-export function useApi(): ApiClient {
+export function useApiClient(): ApiClient {
   const apiState = useContext<ApiState | null>(ApiProviderContext);
 
   if (!apiState?.client) {
-    throw new Error("useApi must be used within an ApiProvider");
+    throw new Error("useApiClient must be used within an ApiProvider");
   }
 
   return apiState.client;

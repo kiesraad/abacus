@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { AnyApiError, ApiResult } from "./api.types";
 import { ApiClient, DEFAULT_CANCEL_REASON } from "./ApiClient";
-import { isSuccess } from "./ApiError";
+import { AnyApiError, ApiResult, isSuccess } from "./ApiResult";
 import {
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PATH,

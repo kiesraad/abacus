@@ -140,7 +140,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
-              <p>{t("candidates_votes.check_paper_report")}</p>
+              <p>{t("data_entry.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>
         )}

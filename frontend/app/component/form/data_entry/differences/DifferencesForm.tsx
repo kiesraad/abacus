@@ -149,7 +149,7 @@ export function DifferencesForm() {
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
-              <p>{t("differences.continue_after_check")}</p>
+              <p>{t("data_entry.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>
         )}

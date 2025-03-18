@@ -222,7 +222,7 @@ mod tests {
         let candidate = first_pg.candidates.first().unwrap();
         assert_eq!(
             candidate.qualifying_address.locality_name(),
-            "Heemdamsebrug"
+            "Heemdamseburg"
         );
         assert_eq!(candidate.qualifying_address.country_name_code(), None);
 

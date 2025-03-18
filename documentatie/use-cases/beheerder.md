@@ -142,12 +142,17 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 __Hoofdscenario:__
 
 1. De beheerder maakt beheerders aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
-2. De beheerder maakt coördinators met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+2. De beheerder maakt coördinatoren aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
 3. De beheerder maakt invoerders aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
-4. De beheerder maakt invoerders aan met een gebruikersnaam en tijdelijk wachtwoord, maar zonder volledige naam.
-5. De beheerder controleert de lijst met gebruikers en stelt vast dat alle gebruikers goed zijn.
+4. De beheerder controleert de lijst met gebruikers en stelt vast dat alle gebruikers goed zijn.
 
 __Uitbreidingen:__
 
-5a. De lijst met gebruikers moet aangepast worden:  
-&emsp; 5a1. De beheerder past de gebruikers aan.
+3a. De beheerder heeft de volledige naam niet voor een toe te voegen invoerder:  
+&emsp; 3a1. De beheerder maakt een invoerder aan met een gebruikersnaam en tijdelijk wachtwoord, 
+  maar zonder volledige naam.  
+
+4a. De lijst met gebruikers moet aangepast worden:  
+&emsp; 4a1. De beheerder past de volledige naam aan van een gebruiker.  
+&emsp; 4a2. De beheerder stelt een nieuw tijdelijk wachtwoord in voor een gebruiker.  
+&emsp; 4a3. De beheerder verwijdert een gebruiker.  

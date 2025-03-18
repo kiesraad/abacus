@@ -50,13 +50,14 @@ test.describe("authentication", () => {
     // Fill out the account setup page
     const password = "Sterk wachtwoord";
     const accountSetupPgObj = new AccountSetupPgObj(page);
-    await expect(page.getByRole("article").getByText(username)).toBeVisible();
-    await page.getByRole("textbox", { name: "Jouw naam (roepnaam +" }).fill(fullname);
-    await page.getByRole("textbox", { name: "Kies nieuw wachtwoord" }).fill(password);
-    await page.getByRole("textbox", { name: "Herhaal wachtwoord" }).fill(password);
-    await page.getByRole("button", { name: "Volgende" }).click();
-    const navBarPgObj = new NavBarPgObj(page);
-    await expect(navBarPgObj.navigation.getByText(fullname)).toBeVisible();
+    await accountSetupPgObj.fullname.fill(user.fullname!);
+    await accountSetupPgObj.password.fill(password);
+    await accountSetupPgObj.passwordRepeat.fill(password);
+    await accountSetupPgObj.nextBtn.click();
+    await expect(accountSetupPgObj.navBar.username).toHaveText(user.fullname!);
+
+    const navBarPgObj = new NavBar(page);
+    await expect(navBarPgObj.username).toHaveText(user.fullname!);
     await expect(page.getByRole("heading", { name: "Je account is ingesteld" })).toBeVisible();
   });
 });

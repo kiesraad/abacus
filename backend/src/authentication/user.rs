@@ -255,45 +255,6 @@ impl Users {
         Ok(user)
     }
 
-    /// Update a user
-    pub async fn update(
-        &self,
-        user_id: u32,
-        fullname: Option<&str>,
-        temp_password: Option<&str>,
-    ) -> Result<User, AuthenticationError> {
-        if let Some(pw) = temp_password {
-            self.set_temporary_password(user_id, pw).await?;
-        }
-
-        let updated_user = sqlx::query_as!(
-            User,
-            r#"
-              UPDATE
-                users
-              SET
-                fullname = ?
-              WHERE id = ?
-            RETURNING
-                id as "id: u32",
-                username,
-                fullname,
-                password_hash,
-                needs_password_change,
-                role,
-                last_activity_at as "last_activity_at: _",
-                updated_at as "updated_at: _",
-                created_at as "created_at: _"
-            "#,
-            fullname,
-            user_id
-        )
-        .fetch_one(&self.0)
-        .await?;
-
-        Ok(updated_user)
-    }
-
     /// Delete a user
     pub async fn delete(&self, user_id: u32) -> Result<bool, AuthenticationError> {
         let rows_affected = sqlx::query_as!(User, r#" DELETE FROM users WHERE id = ?"#, user_id)
@@ -311,9 +272,8 @@ impl Users {
         username: &str,
         new_password: &str,
     ) -> Result<(), AuthenticationError> {
-        let mut tx = self.0.begin().await?;
         let old_password = sqlx::query!("SELECT password_hash FROM users WHERE id = ?", user_id)
-            .fetch_one(tx.as_mut())
+            .fetch_one(&self.0)
             .await?
             .password_hash
             .into();
@@ -329,10 +289,9 @@ impl Users {
             password_hash,
             user_id
         )
-        .execute(tx.as_mut())
+        .execute(&self.0)
         .await?;
 
-        tx.commit().await?;
         Ok(())
     }
 
@@ -682,10 +641,12 @@ mod tests {
         assert!(!user.needs_password_change);
 
         // Set a temporary password via update
-        let user = users
-            .update(user.id(), user.fullname(), Some("temp_password"))
+        users
+            .set_temporary_password(user.id(), "temp_password")
             .await
             .unwrap();
+
+        let user = users.get_by_id(user.id()).await.unwrap().unwrap();
 
         // User needs to change their password again
         assert!(user.needs_password_change);

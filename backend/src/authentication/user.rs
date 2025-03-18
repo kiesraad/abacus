@@ -155,12 +155,11 @@ where
         };
 
         match users.get_by_session_key(session_cookie.value()).await {
-            Ok(user) if !user.needs_password_change => {
+            Ok(user) => {
                 user.update_last_activity_at(&users).await?;
                 Ok(Some(user))
             }
-            Ok(_)
-            | Err(AuthenticationError::UserNotFound)
+            Err(AuthenticationError::UserNotFound)
             | Err(AuthenticationError::SessionKeyNotFound) => Ok(None),
             Err(e) => Err(e.into()),
         }

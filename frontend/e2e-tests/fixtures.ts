@@ -25,6 +25,8 @@ import {
   pollingStationRequests,
 } from "./test-data/request-response-templates";
 
+export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
+
 // Regular fixtures need to be passed into the test's arguments.
 type Fixtures = {
   // Election without polling stations
@@ -126,7 +128,7 @@ export const test = base.extend<Fixtures>({
       role: "typist",
       username: createRandomUsername(),
       fullname: "Gebruiker met Achternaam",
-      temp_password: "temp_password_9876",
+      temp_password: FIXTURE_TYPIST_TEMP_PASSWORD,
     };
     const userResponse = await request.post(url, { data });
     expect(userResponse.ok()).toBeTruthy();

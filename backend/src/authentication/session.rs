@@ -142,6 +142,15 @@ impl Sessions {
         Ok(())
     }
 
+    /// Delete a session for a certain user
+    pub async fn delete_user_session(&self, user_id: u32) -> Result<(), AuthenticationError> {
+        sqlx::query!("DELETE FROM sessions WHERE user_id = ?", user_id)
+            .execute(&self.0)
+            .await?;
+
+        Ok(())
+    }
+
     /// Delete all sessions that have expired
     pub async fn delete_expired_sessions(&self) -> Result<(), AuthenticationError> {
         sqlx::query("DELETE FROM sessions WHERE expires_at <= ?")

@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, AppState,
-    authentication::{Role, User, api::LoginResponse},
+    authentication::{LoginResponse, Role, User},
 };
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]

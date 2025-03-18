@@ -414,17 +414,27 @@ pub async fn user_get(
 pub async fn user_update(
     admin: Admin,
     State(users_repo): State<Users>,
+    State(session_repo): State<Sessions>,
     audit_service: AuditService,
     Path(user_id): Path<u32>,
     Json(update_user_req): Json<UpdateUserRequest>,
 ) -> Result<Json<User>, APIError> {
+    if let Some(fullname) = update_user_req.fullname {
+        users_repo.update_fullname(user_id, &fullname).await?
+    };
+
+    if let Some(temp_password) = update_user_req.temp_password {
+        users_repo
+            .set_temporary_password(user_id, &temp_password)
+            .await?;
+
+        session_repo.delete_user_session(user_id).await?;
+    };
+
     let user = users_repo
-        .update(
-            user_id,
-            update_user_req.fullname.as_deref(),
-            update_user_req.temp_password.as_deref(),
-        )
-        .await?;
+        .get_by_id(user_id)
+        .await?
+        .ok_or(Error::RowNotFound)?;
 
     audit_service
         .with_user(admin.0)

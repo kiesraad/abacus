@@ -36,25 +36,25 @@ pub struct Credentials {
     password: String,
 }
 
-#[derive(Debug, Serialize, Clone, Deserialize, PartialEq, Eq, ToSchema)]
-pub struct LoginResponse {
-    user_id: u32,
-    username: String,
-}
+// #[derive(Debug, Serialize, Clone, Deserialize, PartialEq, Eq, ToSchema)]
+// pub struct LoginResponse {
+//     user_id: u32,
+//     username: String,
+// }
 
-impl From<&User> for LoginResponse {
-    fn from(user: &User) -> Self {
-        Self {
-            user_id: user.id(),
-            username: user.username().to_string(),
-        }
-    }
-}
+// impl From<&User> for LoginResponse {
+//     fn from(user: &User) -> Self {
+//         Self {
+//             user_id: user.id(),
+//             username: user.username().to_string(),
+//         }
+//     }
+// }
 
 #[cfg(test)]
 mod tests {
     use super::role::Role;
-    use api::{AccountUpdateRequest, Credentials, LoginResponse, UserListResponse};
+    use api::{AccountUpdateRequest, Credentials, UserListResponse};
     use axum::{
         Router,
         body::Body,

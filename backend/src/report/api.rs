@@ -13,8 +13,7 @@ use crate::{
 };
 use axum::extract::{Path, State};
 use axum_extra::response::Attachment;
-use utoipa_axum::router::OpenApiRouter;
-use utoipa_axum::routes;
+use utoipa_axum::{router::OpenApiRouter, routes};
 use zip::{result::ZipError, write::SimpleFileOptions};
 
 pub fn router() -> OpenApiRouter<AppState> {

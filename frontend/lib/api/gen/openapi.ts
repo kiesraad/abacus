@@ -171,7 +171,8 @@ export interface AccountUpdateRequest {
 export type AssignedSeat =
   | (LargestAverageAssignedSeat & { assigned_by: "LargestAverage" })
   | (LargestRemainderAssignedSeat & { assigned_by: "LargestRemainder" })
-  | (AbsoluteMajorityChange & { assigned_by: "AbsoluteMajorityChange" });
+  | (AbsoluteMajorityChange & { assigned_by: "AbsoluteMajorityChange" })
+  | (ListExhaustionChange & { assigned_by: "ListExhaustionChange" });
 
 export type AuditEvent =
   | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
@@ -400,6 +401,7 @@ export interface ElectionSummary {
  * Error reference used to show the corresponding error message to the end-user
  */
 export type ErrorReference =
+  | "AllListsExhausted"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "DatabaseError"
   | "DrawingOfLotsRequired"
@@ -474,6 +476,14 @@ export interface LargestRemainderAssignedSeat {
   remainder_votes: Fraction;
   /** The political group that was selected for this seat has this political group number */
   selected_pg_number: number;
+}
+
+/**
+ * Contains information about the enactment of article P 10 of the Kieswet.
+ */
+export interface ListExhaustionChange {
+  /** Political group number which the residual seat is retracted from */
+  pg_retracted_seat: number;
 }
 
 export interface LoginResponse {
@@ -635,7 +645,7 @@ export interface SeatAssignmentResult {
  */
 export interface SeatAssignmentStep {
   change: AssignedSeat;
-  residual_seat_number: number;
+  residual_seat_number?: number | null;
   standing: PoliticalGroupStanding[];
 }
 

@@ -44,7 +44,7 @@ pub struct ElectionApportionmentResponse {
         ("election_id" = u32, description = "Election database id"),
   ),
 )]
-pub async fn election_apportionment(
+async fn election_apportionment(
     _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(data_entry_repo): State<PollingStationDataEntries>,

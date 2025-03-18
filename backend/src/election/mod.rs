@@ -65,7 +65,7 @@ impl IntoResponse for Election {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn election_list(
+async fn election_list(
     _user: User,
     State(elections_repo): State<Elections>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
@@ -87,7 +87,7 @@ pub async fn election_list(
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn election_details(
+async fn election_details(
     _user: User,
     State(elections_repo): State<Elections>,
     State(polling_stations): State<PollingStations>,
@@ -114,7 +114,7 @@ pub async fn election_details(
     ),
 )]
 #[cfg(feature = "dev-database")]
-pub async fn election_create(
+async fn election_create(
     _user: Admin,
     State(elections_repo): State<Elections>,
     Json(new_election): Json<ElectionRequest>,

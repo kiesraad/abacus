@@ -51,7 +51,7 @@ pub struct Pagination {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn audit_log_list(
+async fn audit_log_list(
     _user: AdminOrCoordinator,
     pagination: Query<Pagination>,
     State(audit_log): State<AuditLog>,
@@ -94,7 +94,7 @@ mod tests {
         AppState,
         audit_log::{
             AuditEvent, AuditLog, AuditLogListResponse, AuditService, UserLoggedInDetails,
-            audit_log_list,
+            api::audit_log_list,
         },
         authentication::{Sessions, Users},
     };

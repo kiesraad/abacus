@@ -56,7 +56,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
 )]
-pub async fn polling_station_data_entry_claim(
+async fn polling_station_data_entry_claim(
     user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations): State<PollingStations>,
@@ -153,7 +153,7 @@ impl IntoResponse for SaveDataEntryResponse {
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
 )]
-pub async fn polling_station_data_entry_save(
+async fn polling_station_data_entry_save(
     user: Typist,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
@@ -209,7 +209,7 @@ pub async fn polling_station_data_entry_save(
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
 )]
-pub async fn polling_station_data_entry_delete(
+async fn polling_station_data_entry_delete(
     user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
@@ -242,7 +242,7 @@ pub async fn polling_station_data_entry_delete(
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
 )]
-pub async fn polling_station_data_entry_finalise(
+async fn polling_station_data_entry_finalise(
     user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(elections_repo): State<Elections>,
@@ -333,7 +333,7 @@ pub struct ElectionStatusResponseEntry {
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn election_status(
+async fn election_status(
     _user: User,
     State(data_entry_repo): State<PollingStationDataEntries>,
     Path(id): Path<u32>,

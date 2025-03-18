@@ -60,7 +60,6 @@ mod tests {
         body::Body,
         http::{HeaderValue, Request, StatusCode},
         middleware,
-        routing::{get, post, put},
     };
     use http_body_util::BodyExt;
     use hyper::{Method, header::CONTENT_TYPE};
@@ -75,17 +74,9 @@ mod tests {
 
     fn create_app(pool: SqlitePool) -> Router {
         let state = AppState { pool: pool.clone() };
-
-        let router = Router::new()
-            .route("/api/user", get(api::user_list).post(api::user_create))
-            .route("/api/user/{user_id}", put(api::user_update))
-            .route("/api/user/login", post(api::login))
-            .route("/api/user/logout", post(api::logout))
-            .route("/api/user/whoami", get(api::whoami))
-            .route("/api/user/account", put(api::account_update))
-            .layer(middleware::from_fn_with_state(pool, extend_session));
-
-        router.with_state(state)
+        Router::from(api::router())
+            .layer(middleware::from_fn_with_state(pool, extend_session))
+            .with_state(state)
     }
 
     async fn login(app: Router) -> HeaderValue {

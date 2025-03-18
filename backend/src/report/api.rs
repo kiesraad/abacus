@@ -125,7 +125,7 @@ impl ResultsInput {
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn election_download_zip_results(
+async fn election_download_zip_results(
     _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
@@ -194,7 +194,7 @@ pub async fn election_download_zip_results(
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn election_download_pdf_results(
+async fn election_download_pdf_results(
     _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
@@ -237,7 +237,7 @@ pub async fn election_download_pdf_results(
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn election_download_xml_results(
+async fn election_download_xml_results(
     _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,

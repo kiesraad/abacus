@@ -53,7 +53,7 @@ impl IntoResponse for PollingStationListResponse {
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn polling_station_list(
+async fn polling_station_list(
     _user: User,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
@@ -83,7 +83,7 @@ pub async fn polling_station_list(
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn polling_station_create(
+async fn polling_station_create(
     _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
@@ -116,7 +116,7 @@ pub async fn polling_station_create(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-pub async fn polling_station_get(
+async fn polling_station_get(
     _user: User,
     State(polling_stations): State<PollingStations>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
@@ -145,7 +145,7 @@ pub async fn polling_station_get(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-pub async fn polling_station_update(
+async fn polling_station_update(
     _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
@@ -176,7 +176,7 @@ pub async fn polling_station_update(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-pub async fn polling_station_delete(
+async fn polling_station_delete(
     _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,

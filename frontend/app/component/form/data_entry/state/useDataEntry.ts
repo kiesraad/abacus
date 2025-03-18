@@ -4,7 +4,7 @@ import {
   Election,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
-  useApi,
+  useApiClient,
 } from "@kiesraad/api";
 
 import {
@@ -25,7 +25,7 @@ export default function useDataEntry(
   pollingStationId: number,
   entryNumber: number,
 ): DataEntryStateAndActions {
-  const client = useApi();
+  const client = useApiClient();
   const [state, dispatch] = useReducer(dataEntryReducer, getInitialState(election, pollingStationId, entryNumber));
 
   // initial request to get the current data entry from the backend

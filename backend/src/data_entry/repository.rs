@@ -116,8 +116,10 @@ impl PollingStationDataEntries {
             ElectionStatusResponseEntry {
                 polling_station_id: status.polling_station_id,
                 status: state.status_name(),
-                first_data_entry_progress: state.get_first_entry_progress(),
-                second_data_entry_progress: state.get_second_entry_progress(),
+                first_entry_user_id: state.get_first_entry_user_id(),
+                second_entry_user_id: state.get_second_entry_user_id(),
+                first_entry_progress: state.get_first_entry_progress(),
+                second_entry_progress: state.get_second_entry_progress(),
                 finished_at: state.finished_at().cloned(),
             }
         })

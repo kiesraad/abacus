@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 
-import { ApiResult, ApiState } from "./api.types";
 import { ApiClient } from "./ApiClient";
-import { ApiProviderContext } from "./ApiProviderContext";
+import { ApiProviderContext, ApiState } from "./ApiProviderContext";
+import { ApiResult } from "./ApiResult";
 import { LoginResponse, Role } from "./gen/openapi";
 
 interface TestUserProviderProps {

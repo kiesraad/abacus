@@ -1,4 +1,4 @@
-import { ApiError } from "./ApiError";
+import { ApiError } from "./ApiResult";
 
 export class ApiErrorEvent extends Event {
   constructor(public error: ApiError) {

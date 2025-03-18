@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
 
-import { ApiResult } from "./api.types";
-import { useApi } from "./useApi";
-import { ApiRequestState, fatalRequestState, handleApiResult } from "./useApiRequest";
+import { ApiRequestState, isFatalRequestState } from "./ApiRequestState";
+import { ApiResult } from "./ApiResult";
+import { useApiClient } from "./useApiClient";
+import { handleApiResult } from "./useInitialApiGet";
 
-export type CrudRequestState<T> =
-  | {
-      status: "idle";
-    }
-  | ApiRequestState<T>;
+export type ApiRequestIdleState = {
+  status: "idle";
+};
 
 export interface UseCrudReturn<T> {
   get: (controller?: AbortController) => Promise<ApiResult<T>>;
   create: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
   update: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
   remove: (controller?: AbortController) => Promise<ApiResult<T>>;
-  requestState: CrudRequestState<T>;
+  requestState: ApiRequestIdleState | ApiRequestState<T>;
 }
 
 export type ApiPaths =
@@ -29,13 +28,13 @@ export type ApiPaths =
 
 // Call the api and return the current status of the request, optionally throws an error when the request fails
 export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
-  const client = useApi();
-  const [requestState, setRequestState] = useState<CrudRequestState<T>>({ status: "idle" });
+  const client = useApiClient();
+  const [requestState, setRequestState] = useState<ApiRequestIdleState | ApiRequestState<T>>({ status: "idle" });
   const paths = typeof path === "string" ? { get: path, create: path, update: path, remove: path } : path;
 
   // throw fatal errors
   useEffect(() => {
-    if (fatalRequestState(requestState)) {
+    if ("error" in requestState && isFatalRequestState(requestState)) {
       throw requestState.error;
     }
   }, [requestState]);

@@ -5,14 +5,14 @@ import {
   ELECTION_APPORTIONMENT_REQUEST_PATH,
   ElectionApportionmentResponse,
   isSuccess,
-  useApi,
+  useApiClient,
 } from "../index";
 
 export function useApportionmentRequest(electionId: number) {
   const path: ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${electionId}/apportionment`;
   const [data, setData] = useState<ElectionApportionmentResponse>();
   const [error, setError] = useState<AnyApiError>();
-  const client = useApi();
+  const client = useApiClient();
 
   useEffect(() => {
     void client.postRequest<ElectionApportionmentResponse>(path).then((response) => {

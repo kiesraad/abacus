@@ -212,14 +212,14 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
       <ProgressBar
         id={`${polling_station.id}-progressbar`}
         data={{
-          percentage: polling_station.second_data_entry_progress ?? polling_station.first_data_entry_progress ?? 0,
+          percentage: polling_station.second_entry_progress ?? polling_station.first_entry_progress ?? 0,
           class: "default",
         }}
         showPercentage
       />
     </Table.Cell>
   );
-  // TODO: Needs to be updated when user accounts are implemented
+  // TODO: #1131 add user names
   switch (category) {
     case "in_progress":
       return <CategoryPollingStationRow key={polling_station.id}>{[progressCell]}</CategoryPollingStationRow>;

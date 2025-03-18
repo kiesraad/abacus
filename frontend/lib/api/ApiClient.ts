@@ -1,10 +1,8 @@
-import { type ErrorResponse } from "@kiesraad/api";
+import { ApiResult, type ErrorResponse } from "@kiesraad/api";
 import { TranslationPath } from "@kiesraad/i18n";
 
-import { ApiResult, RequestMethod, ServerError } from "./api.types";
-import { ApiError, FatalApiError, NetworkError, NotFoundError } from "./ApiError";
 import { ApiErrorEvent, SessionExpirationEvent } from "./ApiEvents";
-import { ApiResponseStatus } from "./ApiResponseStatus";
+import { ApiError, ApiResponseStatus, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
 
 const MIME_JSON = "application/json";
 const HEADER_ACCEPT = "Accept";
@@ -76,7 +74,7 @@ export class ApiClient extends EventTarget {
   // handle a response with a JSON body, and return an error when there is a non-2xx status or a non-JSON body
   async handleJsonBody<T>(response: Response): Promise<ApiResult<T>> {
     try {
-      const body = (await response.json()) as T | ServerError;
+      const body = (await response.json()) as unknown;
 
       if (response.ok) {
         return {
@@ -165,7 +163,7 @@ export class ApiClient extends EventTarget {
 
   // perform an HTTP request and handle the response
   async request<T>(
-    method: RequestMethod,
+    method: "GET" | "POST" | "PUT" | "DELETE",
     path: string,
     abort?: AbortController,
     requestBody?: object,

@@ -1,10 +1,14 @@
 import { TranslationPath } from "@kiesraad/i18n";
 
-import { ApiResponse, ApiResult } from "./api.types";
-import { ApiResponseStatus } from "./ApiResponseStatus";
 import { ErrorReference } from "./gen/openapi";
 
 export class FatalError extends Error {}
+
+export enum ApiResponseStatus {
+  Success,
+  ClientError,
+  ServerError,
+}
 
 // Error that should allow the user to retry the request
 export class ApiError extends Error {
@@ -55,6 +59,16 @@ export class NotFoundError extends FatalError {
     return this;
   }
 }
+
+export type AnyApiError = ApiError | FatalApiError | NetworkError | NotFoundError;
+
+export interface ApiResponse<T> {
+  status: ApiResponseStatus.Success;
+  code: number;
+  data: T;
+}
+
+export type ApiResult<T, E = AnyApiError> = ApiResponse<T> | E;
 
 export function isError<T>(result: ApiResult<T>): result is Error {
   return (

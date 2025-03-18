@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, ApiError, useApiRequest, User, USER_GET_REQUEST_PATH } from "@kiesraad/api";
+import { AnyApiError, ApiError, useInitialApiGet, User, USER_GET_REQUEST_PATH } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, FormLayout, Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
@@ -12,7 +12,7 @@ import { UserUpdateForm } from "./UserUpdateForm";
 export function UserUpdatePage() {
   const navigate = useNavigate();
   const userId = useNumericParam("userId");
-  const { requestState: getUser } = useApiRequest<User>(`/api/user/${userId}` satisfies USER_GET_REQUEST_PATH);
+  const { requestState: getUser } = useInitialApiGet<User>(`/api/user/${userId}` satisfies USER_GET_REQUEST_PATH);
   const [error, setError] = useState<AnyApiError>();
 
   if (error && !(error instanceof ApiError)) {

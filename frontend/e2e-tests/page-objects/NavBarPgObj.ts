@@ -13,7 +13,7 @@ export class NavBar {
     this.logout = this.navigation.getByRole("link", { name: "Afmelden" });
   }
 
-  async clickElectionInNavBar(electionLocation: string, electionName: string) {
+  async clickElection(electionLocation: string, electionName: string) {
     const linkText = `${electionLocation} — ${electionName}`;
     await this.navigation.getByRole("link", { name: linkText }).click();
   }

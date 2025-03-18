@@ -389,7 +389,7 @@ test.describe("Data entry model test - warnings", () => {
             await abortModal.saveInput.click();
           },
           NAV_TO_POLLING_STATION_PAGE: async () => {
-            await votersAndVotesPage.navBar.clickElectionInNavBar(election.election.location, election.election.name);
+            await votersAndVotesPage.navBar.clickElection(election.election.location, election.election.name);
           },
           SAVE_UNSUBMITTED_CHANGES: async () => {
             await votersAndVotesPage.unsavedChangesModal.saveInput.click();

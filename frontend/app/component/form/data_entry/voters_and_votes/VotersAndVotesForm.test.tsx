@@ -1024,4 +1024,60 @@ describe("Test VotersAndVotesForm", () => {
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
   });
+
+  describe("VotersAndVotesForm accept warnings", () => {
+    beforeEach(async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
+        },
+      });
+
+      renderForm();
+
+      const user = userEvent.setup();
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+      await screen.findByTestId("feedback-warning");
+    });
+
+    test("checkbox should disappear when filling in any form input", async () => {
+      const acceptWarningsCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      const user = userEvent.setup();
+      const input = await screen.findByLabelText("H Totaal uitgebrachte stemmen");
+      await user.type(input, "1");
+
+      expect(acceptWarningsCheckbox).not.toBeVisible();
+    });
+
+    test("checkbox with error should disappear when filling in any form input", async () => {
+      const acceptWarningsCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      const user = userEvent.setup();
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(acceptWarningsCheckbox).toBeInvalid();
+      const acceptWarningsError = screen.getByRole("alert", {
+        description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+      });
+      expect(acceptWarningsError).toBeVisible();
+
+      const input = await screen.findByLabelText("H Totaal uitgebrachte stemmen");
+      await user.type(input, "1");
+
+      expect(acceptWarningsCheckbox).not.toBeVisible();
+      expect(acceptWarningsError).not.toBeVisible();
+    });
+  });
 });

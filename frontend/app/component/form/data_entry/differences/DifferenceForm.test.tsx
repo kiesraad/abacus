@@ -532,7 +532,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
       const alertText = screen.getByRole("alert");
       expect(alertText).toHaveTextContent(
-        "Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.",
+        "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       );
 
       acceptFeedbackCheckbox.click();
@@ -651,6 +651,74 @@ describe("Test DifferencesForm", () => {
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
+    });
+  });
+
+  describe("DifferencesForm accept warnings", () => {
+    beforeEach(async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: [
+                "data.differences_counts.more_ballots_count",
+                "data.differences_counts.too_many_ballots_handed_out_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.unreturned_ballots_count",
+                "data.differences_counts.other_explanation_count",
+                "data.differences_counts.no_explanation_count",
+              ],
+              code: "W301",
+            },
+          ],
+        },
+      });
+
+      renderForm();
+
+      const user = userEvent.setup();
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+      await screen.findByTestId("feedback-warning");
+    });
+
+    test("checkbox should disappear when filling in any form input", async () => {
+      const acceptWarningsCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      const user = userEvent.setup();
+      const input = screen.getByLabelText("O Geen verklaring voor het verschil");
+      await user.type(input, "1");
+
+      expect(acceptWarningsCheckbox).not.toBeVisible();
+    });
+
+    test("checkbox with error should disappear when filling in any form input", async () => {
+      const acceptWarningsCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      const user = userEvent.setup();
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(acceptWarningsCheckbox).toBeInvalid();
+      const acceptWarningsError = await screen.findByRole("alert", {
+        description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+      });
+      expect(acceptWarningsError).toBeVisible();
+
+      const input = screen.getByLabelText("O Geen verklaring voor het verschil");
+      await user.type(input, "1");
+
+      expect(acceptWarningsCheckbox).not.toBeVisible();
+      expect(acceptWarningsError).not.toBeVisible();
     });
   });
 });

@@ -23,7 +23,7 @@ __Uitbreidingen:__
 
 3-5. Het GSB schorst de zitting, omdat er mogelijk nog een verzoek komt.
 
-6a. Het GSB stelt een probleem vast met het concept-PV:  
+6a. Het GSB stelt een probleem vast met het PV:  
 &emsp; 6a1. Het GSB stelt het bezwaar vast.  
 &emsp; 6a2. Het GSB gaat over tot hertelling.
 

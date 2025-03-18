@@ -31,7 +31,7 @@ __Uitbreidingen:__
 5a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
 
 ### Niet in scope
-- Verschillende fases in de applicatie, zoals inrichten, invoer, voorbereiden concept-PV. Reden hiervoor is dat we de coördinator niet willen beperken in wat deze wanneer kan doen. We zouden fases kunnen implementeren waartussen de coördinator vrij kan bewegen, maar dan is het gebruiksvriendelijker om bij bepaalde acties een waarschuwing te laten zien. De coördinator heeft wel de mogelijkheid om invoer open te zetten en te stoppen. Eventueel ook om invoer te pauzeren.
+- Verschillende fases in de applicatie, zoals inrichten, invoer, voorbereiden PV. Reden hiervoor is dat we de coördinator niet willen beperken in wat deze wanneer kan doen. We zouden fases kunnen implementeren waartussen de coördinator vrij kan bewegen, maar dan is het gebruiksvriendelijker om bij bepaalde acties een waarschuwing te laten zien. De coördinator heeft wel de mogelijkheid om invoer open te zetten en te stoppen. Eventueel ook om invoer te pauzeren.
 
 ### Open punten
 
@@ -144,18 +144,13 @@ __Hoofdscenario:__
 1. De coördinator bekijkt de verschillen tussen de twee invoeren.
 2. De coördinator stelt vast dat één van de twee invoeren correct is.
 3. De coördinator accepteert de correcte invoer en gooit de andere invoer weg.
+4. De applicatie behandelt de geaccepteerde invoer als een eerste invoer. (Dus bij nieuwe invoer: waarschuwingen over verschillen met geaccepteerde invoer.)
 4. De coördinator geeft het PV aan een invoerder om nogmaals in te voeren.
 
 __Uitbreidingen:__  
 2a. Geen van beide invoeren is correct:  
 &emsp; 2a1. De coördinator verwijdert beide invoeren.  
 &emsp; 2a2. De coördinator laat het stembureau opnieuw invoeren door twee invoerders.
-
-3a. De eerste invoer is incorrect:
-&emsp; 3a1. De tweede invoer wordt als eerste invoer behandeld. De andere invoer wordt weggegooid. Dus bij opnieuw invoeren krijg je waarschuwing over verschillen met de eerdere, correcte invoer.
-
-3b. De tweede invoer is incorrect:
-&emsp;3b1. Tweede invoer verwijderen en opnieuw laten doen.
 
 ### Niet in scope
 

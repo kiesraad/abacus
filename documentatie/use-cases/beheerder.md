@@ -10,7 +10,7 @@ _Niveau:_ hoog-over, wolk, ☁️
 2. [De beheerder zet de verkiezingen in de applicatie.](#de-beheerder-zet-de-verkiezingen-in-de-applicatie-zee)
 3. De beheerder leest de kandidatenlijst in.
 4. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
-5. De beheerder maakt de gebruikers aan.
+5. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
 
 __Uitbreidingen:__  
 
@@ -132,3 +132,22 @@ __Hoofdscenario__:
 ### Open punten
 
 - Is dit eigenlijk de use case voor het opschonen van de gebruikte machines?
+
+## De beheerder maakt de gebruikers aan (zee)
+
+__Niveau:__ gebruikersdoel, zee, 🌊
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__
+
+1. De beheerder maakt beheerders aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+2. De beheerder maakt coördinators met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+3. De beheerder maakt invoerders aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+4. De beheerder maakt invoerders aan met een gebruikersnaam en tijdelijk wachtwoord, maar zonder volledige naam.
+5. De beheerder controleert de lijst met gebruikers en stelt vast dat alle gebruikers goed zijn.
+
+__Uitbreidingen:__
+
+5a. De lijst met gebruikers moet aangepast worden:  
+&emsp; 5a1. De beheerder past de gebruikers aan.

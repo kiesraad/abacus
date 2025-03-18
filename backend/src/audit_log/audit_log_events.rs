@@ -10,6 +10,8 @@ use crate::{
     authentication::{Role, User},
 };
 
+use super::LogFilter;
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserLoggedInDetails {
@@ -189,7 +191,12 @@ impl AuditLog {
         Ok(event)
     }
 
-    pub async fn list(&self, offset: u32, limit: u32) -> Result<Vec<AuditLogEvent>, APIError> {
+    pub async fn list(
+        &self,
+        offset: u32,
+        limit: u32,
+        _filter: &LogFilter,
+    ) -> Result<Vec<AuditLogEvent>, APIError> {
         let events = sqlx::query_as!(
             AuditLogEvent,
             r#"SELECT
@@ -210,7 +217,7 @@ impl AuditLog {
             LIMIT ? OFFSET ?
             "#,
             limit,
-            offset
+            offset,
         )
         .fetch_all(&self.0)
         .await?;

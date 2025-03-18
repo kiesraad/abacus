@@ -494,17 +494,19 @@ export interface LargestRemainderAssignedSeat {
   selected_pg_number: number;
 }
 
+export interface LogFilter {
+  event: string[];
+  level: string[];
+  page?: number;
+  perPage?: number;
+}
+
 export interface LoginResponse {
   fullname?: string;
   needs_password_change: boolean;
   role: Role;
   user_id: number;
   username: string;
-}
-
-export interface Pagination {
-  page?: number;
-  perPage?: number;
 }
 
 /**

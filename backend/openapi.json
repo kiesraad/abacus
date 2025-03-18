@@ -2667,6 +2667,37 @@
           }
         }
       },
+      "LogFilter": {
+        "type": "object",
+        "required": [
+          "level",
+          "event"
+        ],
+        "properties": {
+          "event": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "level": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "perPage": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "LoginResponse": {
         "type": "object",
         "required": [
@@ -2692,21 +2723,6 @@
           },
           "username": {
             "type": "string"
-          }
-        }
-      },
-      "Pagination": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "perPage": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
           }
         }
       },

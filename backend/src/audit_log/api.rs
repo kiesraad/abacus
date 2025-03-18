@@ -1,7 +1,5 @@
-use axum::{
-    Json,
-    extract::{Query, State},
-};
+use axum::{Json, extract::State};
+use axum_extra::extract::Query;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -30,11 +28,13 @@ fn default_per_page() -> u32 {
 
 #[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct Pagination {
+pub struct LogFilter {
     #[serde(default = "default_page")]
     page: u32,
     #[serde(default = "default_per_page")]
     per_page: u32,
+    pub level: Vec<String>,
+    pub event: Vec<String>,
 }
 
 /// Lists all users
@@ -49,13 +49,13 @@ pub struct Pagination {
 )]
 pub async fn audit_log_list(
     _user: AdminOrCoordinator,
-    pagination: Query<Pagination>,
+    Query(filter): Query<LogFilter>,
     State(audit_log): State<AuditLog>,
 ) -> Result<Json<AuditLogListResponse>, APIError> {
-    let offset = (pagination.page - 1) * pagination.per_page;
-    let limit = pagination.per_page;
+    let offset = (filter.page - 1) * filter.per_page;
+    let limit = filter.per_page;
 
-    let events = audit_log.list(offset, limit).await?;
+    let events = audit_log.list(offset, limit, &filter).await?;
     let count = audit_log.count().await?;
     let pages = if count > 0 && limit > 0 {
         count.div_ceil(limit)
@@ -66,8 +66,8 @@ pub async fn audit_log_list(
     Ok(Json(AuditLogListResponse {
         events,
         pages,
-        page: pagination.page,
-        per_page: pagination.per_page,
+        page: filter.page,
+        per_page: filter.per_page,
     }))
 }
 

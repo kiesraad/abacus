@@ -10,7 +10,7 @@ use crate::{
     authentication::{Role, User},
 };
 
-use super::LogFilter;
+use super::LogFilterQuery;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -34,6 +34,12 @@ pub enum AuditEvent {
     UnknownEvent,
 }
 
+pub enum AuditEventType {
+    UserLoggedIn,
+    UserLoggedOut,
+    UnknownEvent,
+}
+
 impl From<serde_json::Value> for AuditEvent {
     fn from(value: serde_json::Value) -> Self {
         serde_json::from_value(value).unwrap_or_default()
@@ -50,6 +56,28 @@ impl fmt::Display for AuditEvent {
     }
 }
 
+impl TryFrom<&str> for AuditEventType {
+    type Error = ();
+
+    fn try_from(event: &str) -> Result<Self, ()> {
+        Ok(match event {
+            "UserLoggedIn" => AuditEventType::UserLoggedIn,
+            "UserLoggedOut" => AuditEventType::UserLoggedOut,
+            _ => return Err(()),
+        })
+    }
+}
+
+impl fmt::Display for AuditEventType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            AuditEventType::UserLoggedIn => write!(f, "UserLoggedIn"),
+            AuditEventType::UserLoggedOut => write!(f, "UserLoggedOut"),
+            AuditEventType::UnknownEvent => write!(f, "UnknownEvent"),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, ToSchema, Type)]
 #[serde(rename_all = "lowercase")]
 #[sqlx(rename_all = "snake_case")]
@@ -58,6 +86,20 @@ pub enum AuditEventLevel {
     Success,
     Warning,
     Error,
+}
+
+impl TryFrom<&str> for AuditEventLevel {
+    type Error = ();
+
+    fn try_from(level: &str) -> Result<Self, ()> {
+        Ok(match level {
+            "info" => AuditEventLevel::Info,
+            "success" => AuditEventLevel::Success,
+            "warning" => AuditEventLevel::Warning,
+            "error" => AuditEventLevel::Error,
+            _ => return Err(()),
+        })
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -133,6 +175,39 @@ impl FromRef<AppState> for AuditLog {
     }
 }
 
+pub struct LogFilter {
+    pub limit: u32,
+    pub offset: u32,
+    pub level: Vec<AuditEventLevel>,
+    pub event: Vec<AuditEventType>,
+}
+
+impl From<&LogFilterQuery> for LogFilter {
+    fn from(query: &LogFilterQuery) -> Self {
+        let offset = (query.page - 1) * query.per_page;
+        let limit = query.per_page;
+
+        let level = query
+            .level
+            .iter()
+            .filter_map(|l| AuditEventLevel::try_from(l.as_str()).ok())
+            .collect();
+
+        let event = query
+            .event
+            .iter()
+            .filter_map(|e| AuditEventType::try_from(e.as_str()).ok())
+            .collect();
+
+        Self {
+            limit,
+            offset,
+            level,
+            event,
+        }
+    }
+}
+
 impl AuditLog {
     #[cfg(test)]
     pub fn new(pool: SqlitePool) -> Self {
@@ -191,12 +266,7 @@ impl AuditLog {
         Ok(event)
     }
 
-    pub async fn list(
-        &self,
-        offset: u32,
-        limit: u32,
-        _filter: &LogFilter,
-    ) -> Result<Vec<AuditLogEvent>, APIError> {
+    pub async fn list(&self, filter: &LogFilter) -> Result<Vec<AuditLogEvent>, APIError> {
         let events = sqlx::query_as!(
             AuditLogEvent,
             r#"SELECT
@@ -216,8 +286,8 @@ impl AuditLog {
             ORDER BY time DESC
             LIMIT ? OFFSET ?
             "#,
-            limit,
-            offset,
+            filter.limit,
+            filter.offset,
         )
         .fetch_all(&self.0)
         .await?;

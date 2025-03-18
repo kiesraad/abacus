@@ -2667,7 +2667,7 @@
           }
         }
       },
-      "LogFilter": {
+      "LogFilterQuery": {
         "type": "object",
         "required": [
           "level",

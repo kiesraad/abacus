@@ -28,11 +28,11 @@ fn default_per_page() -> u32 {
 
 #[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct LogFilter {
+pub struct LogFilterQuery {
     #[serde(default = "default_page")]
-    page: u32,
+    pub page: u32,
     #[serde(default = "default_per_page")]
-    per_page: u32,
+    pub per_page: u32,
     pub level: Vec<String>,
     pub event: Vec<String>,
 }
@@ -49,16 +49,15 @@ pub struct LogFilter {
 )]
 pub async fn audit_log_list(
     _user: AdminOrCoordinator,
-    Query(filter): Query<LogFilter>,
+    Query(filter_query): Query<LogFilterQuery>,
     State(audit_log): State<AuditLog>,
 ) -> Result<Json<AuditLogListResponse>, APIError> {
-    let offset = (filter.page - 1) * filter.per_page;
-    let limit = filter.per_page;
+    let filter = (&filter_query).into();
+    let events = audit_log.list(&filter).await?;
 
-    let events = audit_log.list(offset, limit, &filter).await?;
     let count = audit_log.count().await?;
-    let pages = if count > 0 && limit > 0 {
-        count.div_ceil(limit)
+    let pages = if count > 0 && filter.limit > 0 {
+        count.div_ceil(filter.limit)
     } else {
         1
     };
@@ -66,8 +65,8 @@ pub async fn audit_log_list(
     Ok(Json(AuditLogListResponse {
         events,
         pages,
-        page: filter.page,
-        per_page: filter.per_page,
+        page: filter_query.page,
+        per_page: filter_query.per_page,
     }))
 }
 

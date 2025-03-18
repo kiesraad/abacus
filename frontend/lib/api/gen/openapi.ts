@@ -494,7 +494,7 @@ export interface LargestRemainderAssignedSeat {
   selected_pg_number: number;
 }
 
-export interface LogFilter {
+export interface LogFilterQuery {
   event: string[];
   level: string[];
   page?: number;

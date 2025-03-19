@@ -41,11 +41,13 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     showAcceptWarnings,
   } = useCandidateVotes(group.number);
 
+  const totalFieldId = `data.political_group_votes[${group.number - 1}].total`;
+
   React.useEffect(() => {
     if (missingTotalError) {
-      document.getElementById("total")?.focus();
+      document.getElementById(totalFieldId)?.focus();
     }
-  }, [missingTotalError]);
+  }, [missingTotalError, totalFieldId]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -68,11 +70,11 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           ),
         }}
       />
-      {formSection.isSaved && formSection.errors.length > 0 && (
-        <Feedback id="feedback-error" type="error" data={formSection.errors.map((error) => error.code)} />
+      {formSection.isSaved && !formSection.errors.isEmpty() && (
+        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} />
       )}
-      {formSection.isSaved && formSection.warnings.length > 0 && formSection.errors.length === 0 && (
-        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.map((warning) => warning.code)} />
+      {formSection.isSaved && !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && (
+        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} />
       )}
       <InputGrid key={`list${group.number}`} zebra>
         <InputGrid.Header>
@@ -94,7 +96,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 key={`list${group.number}-candidate${index + 1}`}
                 field={`${index + 1}`}
                 name="candidatevotes[]"
-                id={`candidate_votes[${candidate.number - 1}].votes`}
+                id={`data.political_group_votes[${group.number - 1}].candidate_votes[${candidate.number - 1}].votes`}
                 title={candidateFullName}
                 addSeparator={addSeparator}
                 value={defaultValue}
@@ -114,7 +116,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             key={`list${group.number}-total`}
             field={``}
             name="total"
-            id="total"
+            id={totalFieldId}
             title={t("totals_list", { group_number: group.number })}
             value={currentValues.total}
             onChange={(e) => {

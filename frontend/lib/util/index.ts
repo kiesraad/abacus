@@ -4,7 +4,6 @@ export * from "./compare";
 export * from "./data-entry";
 export * from "./domtoren";
 export * from "./env";
-export * from "./fields";
 export * from "./form";
 export * from "./format";
 export * from "./strings";

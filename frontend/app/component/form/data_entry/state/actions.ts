@@ -53,8 +53,8 @@ export function onSubmitForm(
 
     if (
       !aborting &&
-      currentSection.errors.length === 0 &&
-      currentSection.warnings.length > 0 &&
+      currentSection.errors.isEmpty() &&
+      !currentSection.warnings.isEmpty() &&
       showAcceptWarnings &&
       !currentSection.acceptWarnings
     ) {
@@ -92,12 +92,12 @@ export function onSubmitForm(
 
     dispatch({ type: "SET_STATUS", status: aborting ? "aborted" : "idle" });
 
-    // handle validation errors
     if (!isSuccess(response)) {
       dispatch({ type: "FORM_SAVE_FAILED", error: response });
       return false;
     }
 
+    // handle validation errors
     dispatch({
       type: "FORM_SAVED",
       data,

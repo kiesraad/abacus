@@ -2,7 +2,7 @@ import { within } from "@testing-library/dom";
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@kiesraad/test";
-import { ErrorsAndWarnings, FieldValidationResult, InputGrid, InputGridRow, InputGridRowProps } from "@kiesraad/ui";
+import { InputGrid, InputGridRow, InputGridRowProps } from "@kiesraad/ui";
 
 const defaultProps: InputGridRowProps = {
   id: "this-row-id",
@@ -18,9 +18,6 @@ const renderRow = (extraProps: Partial<InputGridRowProps> = {}) =>
       </InputGrid.Body>
     </InputGrid>,
   );
-
-const FIELD_ERROR: FieldValidationResult = { code: "F101", id: "id-f101" };
-const FIELD_WARNING: FieldValidationResult = { code: "W201", id: "id-w201" };
 
 describe("InputGridRow", () => {
   test("InputGridRow renders a table row", async () => {
@@ -57,11 +54,8 @@ describe("InputGridRow", () => {
   });
 
   test("InputGridRow shows errors for this row", async () => {
-    const errorsAndWarnings: Map<string, ErrorsAndWarnings> = new Map();
-    errorsAndWarnings.set("this-row-id", {
-      errors: [FIELD_ERROR],
-      warnings: [],
-    });
+    const errorsAndWarnings: Map<string, "error" | "warning"> = new Map();
+    errorsAndWarnings.set("this-row-id", "error");
 
     renderRow({ errorsAndWarnings });
 
@@ -71,11 +65,8 @@ describe("InputGridRow", () => {
   });
 
   test("InputGridRow does not show errors for another row", async () => {
-    const errorsAndWarnings: Map<string, ErrorsAndWarnings> = new Map();
-    errorsAndWarnings.set("another-row-id", {
-      errors: [FIELD_ERROR],
-      warnings: [],
-    });
+    const errorsAndWarnings: Map<string, "error" | "warning"> = new Map();
+    errorsAndWarnings.set("another-row-id", "error");
 
     renderRow({ errorsAndWarnings });
 
@@ -85,11 +76,8 @@ describe("InputGridRow", () => {
   });
 
   test("InputGridRow shows warnings for this row", async () => {
-    const errorsAndWarnings: Map<string, ErrorsAndWarnings> = new Map();
-    errorsAndWarnings.set("this-row-id", {
-      errors: [],
-      warnings: [FIELD_WARNING],
-    });
+    const errorsAndWarnings: Map<string, "error" | "warning"> = new Map();
+    errorsAndWarnings.set("this-row-id", "warning");
 
     renderRow({ errorsAndWarnings });
 
@@ -99,11 +87,8 @@ describe("InputGridRow", () => {
   });
 
   test("InputGridRow does not show warnings for another row", async () => {
-    const errorsAndWarnings: Map<string, ErrorsAndWarnings> = new Map();
-    errorsAndWarnings.set("another-row-id", {
-      errors: [],
-      warnings: [FIELD_WARNING],
-    });
+    const errorsAndWarnings: Map<string, "error" | "warning"> = new Map();
+    errorsAndWarnings.set("another-row-id", "warning");
 
     renderRow({ errorsAndWarnings });
 
@@ -113,11 +98,8 @@ describe("InputGridRow", () => {
   });
 
   test("InputGridRow does not show warnings if warnings are accepted", async () => {
-    const errorsAndWarnings: Map<string, ErrorsAndWarnings> = new Map();
-    errorsAndWarnings.set("another-row-id", {
-      errors: [],
-      warnings: [FIELD_WARNING],
-    });
+    const errorsAndWarnings: Map<string, "error" | "warning"> = new Map();
+    errorsAndWarnings.set("another-row-id", "warning");
 
     renderRow({ errorsAndWarnings, warningsAccepted: true });
 
@@ -127,11 +109,8 @@ describe("InputGridRow", () => {
   });
 
   test("InputGridRow shows errors and warnings for this row", async () => {
-    const errorsAndWarnings: Map<string, ErrorsAndWarnings> = new Map();
-    errorsAndWarnings.set("this-row-id", {
-      errors: [FIELD_ERROR],
-      warnings: [FIELD_WARNING],
-    });
+    const errorsAndWarnings: Map<string, "error" | "warning"> = new Map();
+    errorsAndWarnings.set("this-row-id", "error");
 
     renderRow({ errorsAndWarnings });
 

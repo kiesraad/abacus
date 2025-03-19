@@ -1,57 +1,8 @@
-import { assert, describe, expect, test } from "vitest";
-
-import { ValidationResult } from "@kiesraad/api";
+import { describe, expect, test } from "vitest";
 
 import { errorWarningMocks, getDefaultDataEntryState, getInitialValues } from "../test-data";
-import {
-  addValidationResultToFormState,
-  formSectionComplete,
-  getDataEntrySummary,
-  getErrorsAndWarnings,
-  getNextSectionID,
-  hasOnlyGlobalValidationResults,
-  isGlobalValidationResult,
-  resetFormSectionState,
-} from "./dataEntryUtils";
-import { ClientValidationResult } from "./types";
-
-describe("addValidationResultToFormState", () => {
-  test("should add validation result to form state", () => {
-    const formState = getDefaultDataEntryState().formState;
-    formState.sections.differences_counts.isSaved = true;
-    const validationResults: ValidationResult[] = [errorWarningMocks.F303];
-
-    addValidationResultToFormState(formState, validationResults, "errors");
-
-    expect(formState.sections.differences_counts.errors.length).toBe(1);
-  });
-
-  test("addValidationResultToFormState adds result to multiple sections", () => {
-    const formState = getDefaultDataEntryState().formState;
-
-    formState.sections.voters_votes_counts.isSaved = true;
-    if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
-
-    const validationResults: ValidationResult[] = [errorWarningMocks.F204];
-
-    addValidationResultToFormState(formState, validationResults, "errors");
-
-    expect(formState.sections.voters_votes_counts.errors.length).toBe(1);
-    const pg1 = formState.sections.political_group_votes_1;
-    assert(pg1);
-    expect(pg1.errors.length).toBe(1);
-  });
-
-  test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {
-    const formState = getDefaultDataEntryState().formState;
-    formState.sections.differences_counts.isSaved = false;
-    const validationResults: ValidationResult[] = [errorWarningMocks.F303];
-
-    addValidationResultToFormState(formState, validationResults, "errors");
-
-    expect(formState.sections.differences_counts.errors.length).toBe(0);
-  });
-});
+import { formSectionComplete, getDataEntrySummary, getNextSectionID, resetFormSectionState } from "./dataEntryUtils";
+import { ValidationResultSet } from "./ValidationResults";
 
 describe("formSectionComplete", () => {
   test("formSectionComplete", () => {
@@ -61,8 +12,8 @@ describe("formSectionComplete", () => {
         id: "recounted",
         isSaved: false,
         acceptWarnings: false,
-        errors: [],
-        warnings: [],
+        errors: new ValidationResultSet(),
+        warnings: new ValidationResultSet(),
         hasChanges: false,
         acceptWarningsError: false,
       }),
@@ -74,8 +25,8 @@ describe("formSectionComplete", () => {
         id: "recounted",
         isSaved: true,
         acceptWarnings: false,
-        errors: [],
-        warnings: [],
+        errors: new ValidationResultSet(),
+        warnings: new ValidationResultSet(),
         hasChanges: false,
         acceptWarningsError: false,
       }),
@@ -83,57 +34,14 @@ describe("formSectionComplete", () => {
   });
 });
 
-describe("hasOnlyGlobalValidationResults", () => {
-  test("should check if array has only global validation results", () => {
-    const onlyGlobalResults: ClientValidationResult[] = [
-      {
-        code: "F204",
-        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
-      },
-    ];
-
-    expect(hasOnlyGlobalValidationResults(onlyGlobalResults)).toBe(true);
-
-    const onlyLocalResults: ClientValidationResult[] = [
-      {
-        code: "W201",
-        fields: ["data.votes_counts.blank_votes_count"],
-        isGlobal: false,
-      },
-      {
-        code: "W202",
-        fields: ["data.votes_counts.invalid_votes_count"],
-        isGlobal: false,
-      },
-    ];
-
-    expect(hasOnlyGlobalValidationResults(onlyLocalResults)).toBe(false);
-
-    const mixedResults: ClientValidationResult[] = [
-      {
-        code: "F204",
-        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
-        isGlobal: true,
-      },
-      {
-        code: "W201",
-        fields: ["data.votes_counts.blank_votes_count"],
-        isGlobal: false,
-      },
-    ];
-
-    expect(hasOnlyGlobalValidationResults(mixedResults)).toBe(false);
-  });
-});
-
 describe("resetFormSectionState", () => {
   test("should reset form section state", () => {
     const formState = getDefaultDataEntryState().formState;
-    formState.sections.voters_votes_counts.errors = [errorWarningMocks.W201];
+    formState.sections.voters_votes_counts.errors = new ValidationResultSet([errorWarningMocks.W201]);
 
     resetFormSectionState(formState);
 
-    expect(formState.sections.voters_votes_counts.errors.length).toBe(0);
+    expect(formState.sections.voters_votes_counts.errors.size()).toBe(0);
   });
 });
 
@@ -146,100 +54,6 @@ describe("getNextSectionID", () => {
     const nextSection = getNextSectionID(formState);
 
     expect(nextSection).toBe("voters_votes_counts");
-  });
-});
-
-describe("isGlobalValidationResult", () => {
-  test("should check if validation result is global", () => {
-    expect(
-      isGlobalValidationResult({
-        code: "F204",
-        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
-      }),
-    ).toBe(true);
-
-    expect(
-      isGlobalValidationResult({
-        code: "F303",
-        fields: ["data.differences_counts.fewer_ballots_count"],
-      }),
-    ).toBe(false);
-
-    expect(
-      isGlobalValidationResult({
-        code: "W301",
-        fields: ["data.votes_counts.blank_votes_count"],
-      }),
-    ).toBe(false);
-  });
-});
-
-describe("getErrorsAndWarnings", () => {
-  test("getErrorsAndWarnings errors", () => {
-    const errors: ValidationResult[] = [
-      {
-        code: "F201",
-        fields: [
-          "data.voters_counts.total_admitted_voters_count",
-          "data.voters_counts.poll_card_count",
-          "data.voters_counts.proxy_certificate_count",
-          "data.voters_counts.voter_card_count",
-        ],
-      },
-      {
-        code: "F202",
-        fields: [
-          "data.votes_counts.total_votes_cast_count",
-          "data.votes_counts.votes_candidates_count",
-          "data.votes_counts.blank_votes_count",
-          "data.votes_counts.invalid_votes_count",
-        ],
-      },
-    ];
-
-    const warnings: ValidationResult[] = [
-      {
-        code: "W201",
-        fields: ["data.votes_counts.blank_votes_count"],
-      },
-    ];
-
-    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
-    expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
-    expect(errorsAndWarnings.get("blank_votes_count")?.errors).toEqual(
-      expect.arrayContaining([
-        {
-          code: "F202",
-          id: "blank_votes_count",
-        },
-      ]),
-    );
-
-    //warnings should not be added if errors
-    expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(0);
-  });
-
-  test("getErrorsAndWarnings warnings", () => {
-    const errors: ValidationResult[] = [];
-
-    const warnings: ValidationResult[] = [
-      {
-        code: "W201",
-        fields: ["data.votes_counts.blank_votes_count"],
-      },
-    ];
-
-    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
-    expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
-    expect(errorsAndWarnings.get("blank_votes_count")?.errors.length).toBe(0);
-    expect(errorsAndWarnings.get("blank_votes_count")?.warnings).toEqual(
-      expect.arrayContaining([
-        {
-          code: "W201",
-          id: "blank_votes_count",
-        },
-      ]),
-    );
   });
 });
 
@@ -271,7 +85,7 @@ describe("getPollingStationSummary", () => {
     expect(summary.notableFormSections.length).toBe(0);
 
     state.sections.differences_counts.acceptWarnings = true;
-    state.sections.differences_counts.warnings = [errorWarningMocks.W301];
+    state.sections.differences_counts.warnings = new ValidationResultSet([errorWarningMocks.W301]);
 
     summary = getDataEntrySummary(state);
     expect(summary.countsAddUp).toBe(true);
@@ -284,7 +98,7 @@ describe("getPollingStationSummary", () => {
       ),
     );
 
-    state.sections.voters_votes_counts.errors = [errorWarningMocks.F201];
+    state.sections.voters_votes_counts.errors = new ValidationResultSet([errorWarningMocks.F201]);
 
     summary = getDataEntrySummary(state);
 

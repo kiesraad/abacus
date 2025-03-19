@@ -53,13 +53,13 @@ function renderForm() {
 }
 
 const differencesFieldIds = {
-  moreBallotsCount: "more_ballots_count",
-  fewerBallotsCount: "fewer_ballots_count",
-  unreturnedBallotsCount: "unreturned_ballots_count",
-  tooFewBallotsHandedOutCount: "too_few_ballots_handed_out_count",
-  tooManyBallotsHandedOutCount: "too_many_ballots_handed_out_count",
-  otherExplanationCount: "other_explanation_count",
-  noExplanationCount: "no_explanation_count",
+  moreBallotsCount: "data.differences_counts.more_ballots_count",
+  fewerBallotsCount: "data.differences_counts.fewer_ballots_count",
+  unreturnedBallotsCount: "data.differences_counts.unreturned_ballots_count",
+  tooFewBallotsHandedOutCount: "data.differences_counts.too_few_ballots_handed_out_count",
+  tooManyBallotsHandedOutCount: "data.differences_counts.too_many_ballots_handed_out_count",
+  otherExplanationCount: "data.differences_counts.other_explanation_count",
+  noExplanationCount: "data.differences_counts.no_explanation_count",
 };
 
 describe("Test DifferencesForm", () => {
@@ -233,9 +233,13 @@ describe("Test DifferencesForm", () => {
       await screen.findByTestId("differences_form");
       const spy = vi.spyOn(global, "fetch");
 
-      await userTypeInputs(user, {
-        ...expectedRequest.data.differences_counts,
-      });
+      await userTypeInputs(
+        user,
+        {
+          ...expectedRequest.data.differences_counts,
+        },
+        "data.differences_counts.",
+      );
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);

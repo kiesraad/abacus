@@ -94,24 +94,24 @@ function renderForm() {
 }
 
 const votersFieldIds = {
-  pollCardCount: "poll_card_count",
-  proxyCertificateCount: "proxy_certificate_count",
-  voterCardCount: "voter_card_count",
-  totalAdmittedVotersCount: "total_admitted_voters_count",
+  pollCardCount: "data.voters_counts.poll_card_count",
+  proxyCertificateCount: "data.voters_counts.proxy_certificate_count",
+  voterCardCount: "data.voters_counts.voter_card_count",
+  totalAdmittedVotersCount: "data.voters_counts.total_admitted_voters_count",
 };
 
 const votesFieldIds = {
-  votesCandidatesCount: "votes_candidates_count",
-  blankVotesCount: "blank_votes_count",
-  invalidVotesCount: "invalid_votes_count",
-  totalVotesCastCount: "total_votes_cast_count",
+  votesCandidatesCount: "data.votes_counts.votes_candidates_count",
+  blankVotesCount: "data.votes_counts.blank_votes_count",
+  invalidVotesCount: "data.votes_counts.invalid_votes_count",
+  totalVotesCastCount: "data.votes_counts.total_votes_cast_count",
 };
 
 const recountFieldIds = {
-  pollCardRecount: "poll_card_recount",
-  proxyCertificateRecount: "proxy_certificate_recount",
-  voterCardRecount: "voter_card_recount",
-  totalAdmittedVotersRecount: "total_admitted_voters_recount",
+  pollCardRecount: "data.voters_recounts.poll_card_count",
+  proxyCertificateRecount: "data.voters_recounts.proxy_certificate_count",
+  voterCardRecount: "data.voters_recounts.voter_card_count",
+  totalAdmittedVotersRecount: "data.voters_recounts.total_admitted_voters_count",
 };
 
 describe("Test VotersAndVotesForm", () => {
@@ -291,7 +291,6 @@ describe("Test VotersAndVotesForm", () => {
       };
 
       const user = userEvent.setup();
-      //TODO: is this a conceptual change? recounted is now undefined by default.
       overrideServerClaimDataEntryResponse({
         formState: defaultDataEntryState.formState,
         pollingStationResults: {
@@ -300,10 +299,8 @@ describe("Test VotersAndVotesForm", () => {
       });
       renderForm();
 
-      await userTypeInputs(user, {
-        ...expectedRequest.data.voters_counts,
-        ...expectedRequest.data.votes_counts,
-      });
+      await userTypeInputs(user, expectedRequest.data.voters_counts, "data.voters_counts.");
+      await userTypeInputs(user, expectedRequest.data.votes_counts, "data.votes_counts.");
 
       const spy = vi.spyOn(global, "fetch");
 
@@ -357,14 +354,9 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await userTypeInputs(user, {
-        ...expectedRequest.data.voters_counts,
-        ...expectedRequest.data.votes_counts,
-        poll_card_recount: expectedRequest.data.voters_recounts.poll_card_count,
-        proxy_certificate_recount: expectedRequest.data.voters_recounts.proxy_certificate_count,
-        voter_card_recount: expectedRequest.data.voters_recounts.voter_card_count,
-        total_admitted_voters_recount: expectedRequest.data.voters_recounts.total_admitted_voters_count,
-      });
+      await userTypeInputs(user, expectedRequest.data.voters_counts, "data.voters_counts.");
+      await userTypeInputs(user, expectedRequest.data.votes_counts, "data.votes_counts.");
+      await userTypeInputs(user, expectedRequest.data.voters_recounts, "data.voters_recounts.");
 
       const spy = vi.spyOn(global, "fetch");
 
@@ -564,18 +556,18 @@ describe("Test VotersAndVotesForm", () => {
       acceptFeedbackCheckbox.click();
       expect(acceptFeedbackCheckbox).toBeChecked();
 
-      await user.clear(screen.getByTestId("blank_votes_count"));
-      await user.type(screen.getByTestId("blank_votes_count"), "100");
+      await user.clear(screen.getByTestId(votesFieldIds.blankVotesCount));
+      await user.type(screen.getByTestId(votesFieldIds.blankVotesCount), "100");
       await user.tab();
-      expect(screen.getByTestId("blank_votes_count"), "100").toHaveValue("100");
-      await user.clear(screen.getByTestId("blank_votes_count"));
+      expect(screen.getByTestId(votesFieldIds.blankVotesCount), "100").toHaveValue("100");
+      await user.clear(screen.getByTestId(votesFieldIds.blankVotesCount));
 
       await waitFor(() => expect(acceptFeedbackCheckbox).not.toBeInTheDocument());
 
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
-          warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
+          warnings: [errorWarningMocks.W201],
         },
       });
 

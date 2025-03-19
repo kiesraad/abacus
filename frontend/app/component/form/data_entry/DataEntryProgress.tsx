@@ -19,10 +19,10 @@ export function DataEntryProgress() {
     (formSection?: FormSection): MenuStatus => {
       if (!formSection) return "idle";
 
-      if (formSection.errors.length > 0) {
+      if (!formSection.errors.isEmpty()) {
         return "error";
       }
-      if (formSection.warnings.length > 0 && !formSection.acceptWarnings) {
+      if (!formSection.warnings.isEmpty() && !formSection.acceptWarnings) {
         return "warning";
       }
 
@@ -39,7 +39,7 @@ export function DataEntryProgress() {
         }
       }
 
-      if (formSection.errors.length === 0 && formSection.isSaved) {
+      if (formSection.errors.isEmpty() && formSection.isSaved) {
         return "accept";
       }
 

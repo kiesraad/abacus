@@ -49,11 +49,11 @@ export function VotersAndVotesForm() {
         currentValues={formValuesToValues(currentValues, pollingStationResults.recounted || false)}
       />
       {error instanceof ApiError && <ErrorModal error={error} />}
-      {formSection.isSaved && formSection.errors.length > 0 && (
-        <Feedback id="feedback-error" type="error" data={formSection.errors.map((error) => error.code)} />
+      {formSection.isSaved && !formSection.errors.isEmpty() && (
+        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} />
       )}
-      {formSection.isSaved && formSection.warnings.length > 0 && formSection.errors.length === 0 && (
-        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.map((warning) => warning.code)} />
+      {formSection.isSaved && !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && (
+        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} />
       )}
       <InputGrid key="voters-and-votes">
         <InputGrid.Header>
@@ -66,7 +66,7 @@ export function VotersAndVotesForm() {
             autoFocusInput
             key="A"
             field="A"
-            id="poll_card_count"
+            id="data.voters_counts.poll_card_count"
             title={t("voters_and_votes.poll_card_count")}
             value={currentValues.poll_card_count || ""}
             onChange={(e) => {
@@ -80,7 +80,7 @@ export function VotersAndVotesForm() {
           <InputGridRow
             key="B"
             field="B"
-            id="proxy_certificate_count"
+            id="data.voters_counts.proxy_certificate_count"
             title={t("voters_and_votes.proxy_certificate_count")}
             value={currentValues.proxy_certificate_count || ""}
             onChange={(e) => {
@@ -94,7 +94,7 @@ export function VotersAndVotesForm() {
           <InputGridRow
             key="C"
             field="C"
-            id="voter_card_count"
+            id="data.voters_counts.voter_card_count"
             title={t("voters_and_votes.voter_card_count")}
             value={currentValues.voter_card_count || ""}
             onChange={(e) => {
@@ -108,7 +108,7 @@ export function VotersAndVotesForm() {
           <InputGridRow
             key="D"
             field="D"
-            id="total_admitted_voters_count"
+            id="data.voters_counts.total_admitted_voters_count"
             title={t("voters_and_votes.total_admitted_voters_count")}
             isTotal
             addSeparator
@@ -124,7 +124,7 @@ export function VotersAndVotesForm() {
           <InputGridRow
             key="E"
             field="E"
-            id="votes_candidates_count"
+            id="data.votes_counts.votes_candidates_count"
             title={t("voters_and_votes.votes_candidates_count")}
             value={currentValues.votes_candidates_count || ""}
             onChange={(e) => {
@@ -138,7 +138,7 @@ export function VotersAndVotesForm() {
           <InputGridRow
             key="F"
             field="F"
-            id="blank_votes_count"
+            id="data.votes_counts.blank_votes_count"
             title={t("voters_and_votes.blank_votes_count")}
             value={currentValues.blank_votes_count || ""}
             onChange={(e) => {
@@ -152,7 +152,7 @@ export function VotersAndVotesForm() {
           <InputGridRow
             key="G"
             field="G"
-            id="invalid_votes_count"
+            id="data.votes_counts.invalid_votes_count"
             title={t("voters_and_votes.invalid_votes_count")}
             value={currentValues.invalid_votes_count || ""}
             onChange={(e) => {
@@ -166,7 +166,7 @@ export function VotersAndVotesForm() {
           <InputGridRow
             key="H"
             field="H"
-            id="total_votes_cast_count"
+            id="data.votes_counts.total_votes_cast_count"
             title={t("voters_and_votes.total_votes_cast_count")}
             value={currentValues.total_votes_cast_count || ""}
             onChange={(e) => {
@@ -191,7 +191,7 @@ export function VotersAndVotesForm() {
               <InputGridRow
                 key="A.2"
                 field="A.2"
-                id="poll_card_recount"
+                id="data.voters_recounts.poll_card_count"
                 title={t("voters_and_votes.poll_card_recount")}
                 value={currentValues.poll_card_recount || ""}
                 onChange={(e) => {
@@ -205,7 +205,7 @@ export function VotersAndVotesForm() {
               <InputGridRow
                 key="B.2"
                 field="B.2"
-                id="proxy_certificate_recount"
+                id="data.voters_recounts.proxy_certificate_count"
                 title={t("voters_and_votes.proxy_certificate_recount")}
                 value={currentValues.proxy_certificate_recount || ""}
                 onChange={(e) => {
@@ -219,7 +219,7 @@ export function VotersAndVotesForm() {
               <InputGridRow
                 key="C.2"
                 field="C.2"
-                id="voter_card_recount"
+                id="data.voters_recounts.voter_card_count"
                 title={t("voters_and_votes.voter_card_recount")}
                 value={currentValues.voter_card_recount || ""}
                 onChange={(e) => {
@@ -233,7 +233,7 @@ export function VotersAndVotesForm() {
               <InputGridRow
                 key="D.2"
                 field="D.2"
-                id="total_admitted_voters_recount"
+                id="data.voters_recounts.total_admitted_voters_count"
                 title={t("voters_and_votes.total_admitted_voters_recount")}
                 value={currentValues.total_admitted_voters_recount || ""}
                 onChange={(e) => {

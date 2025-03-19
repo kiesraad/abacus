@@ -45,7 +45,7 @@ export function CheckAndSaveForm() {
   }, [formState]);
 
   const finalisationAllowed = Object.values(formState.sections).every(
-    (section) => section.errors.length === 0 && (section.warnings.length === 0 || section.acceptWarnings),
+    (section) => section.errors.isEmpty() && (section.warnings.isEmpty() || section.acceptWarnings),
   );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>

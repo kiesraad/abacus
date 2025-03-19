@@ -82,14 +82,14 @@ const total_votes = electionMockData.political_groups.length * 10;
 
 async function fillVotersAndVotesForm(values?: Record<string, number>) {
   const userValues = values ?? {
-    poll_card_count: total_votes,
-    proxy_certificate_count: 0,
-    voter_card_count: 0,
-    total_admitted_voters_count: total_votes,
-    votes_candidates_count: total_votes,
-    blank_votes_count: 0,
-    invalid_votes_count: 0,
-    total_votes_cast_count: total_votes,
+    "data.voters_counts.poll_card_count": total_votes,
+    "data.voters_counts.proxy_certificate_count": 0,
+    "data.voters_counts.voter_card_count": 0,
+    "data.voters_counts.total_admitted_voters_count": total_votes,
+    "data.votes_counts.votes_candidates_count": total_votes,
+    "data.votes_counts.blank_votes_count": 0,
+    "data.votes_counts.invalid_votes_count": 0,
+    "data.votes_counts.total_votes_cast_count": total_votes,
   };
 
   await userTypeInputs(user, userValues);
@@ -108,35 +108,41 @@ async function expectDifferencesForm(inputShouldHaveFocus = true) {
 
 async function fillDifferencesForm(values?: Record<string, number>) {
   const userValues = values ?? {
-    more_ballots_count: 0,
-    fewer_ballots_count: 0,
-    unreturned_ballots_count: 0,
-    too_few_ballots_handed_out_count: 0,
-    too_many_ballots_handed_out_count: 0,
-    other_explanation_count: 0,
-    no_explanation_count: 0,
+    "data.differences_counts.more_ballots_count": 0,
+    "data.differences_counts.fewer_ballots_count": 0,
+    "data.differences_counts.unreturned_ballots_count": 0,
+    "data.differences_counts.too_few_ballots_handed_out_count": 0,
+    "data.differences_counts.too_many_ballots_handed_out_count": 0,
+    "data.differences_counts.other_explanation_count": 0,
+    "data.differences_counts.no_explanation_count": 0,
   };
 
   await userTypeInputs(user, userValues);
 }
 
 async function expectPoliticalGroupCandidatesForm(pgNumber: number, inputShouldHaveFocus = true) {
+  const prefix = `data.political_group_votes[${pgNumber - 1}]`;
   await waitFor(() => {
     expect(screen.getByTestId(`candidates_form_${pgNumber}`)).toBeInTheDocument();
   });
   if (inputShouldHaveFocus) {
     await waitFor(() => {
-      expect(screen.getByTestId(`candidate_votes[0].votes`)).toHaveFocus();
+      expect(screen.getByTestId(`${prefix}.candidate_votes[0].votes`)).toHaveFocus();
     });
   }
 }
 
-async function fillPoliticalGroupCandidatesVotesForm() {
-  await userTypeInputs(user, {
-    "candidate_votes[0].votes": 5,
-    "candidate_votes[1].votes": 5,
-    total: 10,
-  });
+async function fillPoliticalGroupCandidatesVotesForm(pgNumber: number) {
+  const prefix = `data.political_group_votes[${pgNumber - 1}].`;
+  await userTypeInputs(
+    user,
+    {
+      "candidate_votes[0].votes": 5,
+      "candidate_votes[1].votes": 5,
+      total: 10,
+    },
+    prefix,
+  );
 }
 
 async function expectCheckAndSavePage(router: Router, bodyShouldHaveFocus = true) {
@@ -284,14 +290,14 @@ async function executeStepsForPendingChanges(router: Router) {
   await gotoForm("voters_and_votes");
   await expectVotersAndVotesForm();
   await fillVotersAndVotesForm({
-    poll_card_count: 1,
-    proxy_certificate_count: 1,
-    voter_card_count: 1,
-    total_admitted_voters_count: 2,
-    votes_candidates_count: 1,
-    blank_votes_count: 1,
-    invalid_votes_count: 1,
-    total_votes_cast_count: 3,
+    "data.voters_counts.poll_card_count": 1,
+    "data.voters_counts.proxy_certificate_count": 1,
+    "data.voters_counts.voter_card_count": 1,
+    "data.voters_counts.total_admitted_voters_count": 2,
+    "data.votes_counts.votes_candidates_count": 1,
+    "data.votes_counts.blank_votes_count": 1,
+    "data.votes_counts.invalid_votes_count": 1,
+    "data.votes_counts.total_votes_cast_count": 3,
   });
 
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -300,7 +306,7 @@ async function executeStepsForPendingChanges(router: Router) {
   await submit();
   await expectFeedbackError("F.201");
   await fillVotersAndVotesForm({
-    total_admitted_voters_count: 3,
+    "data.voters_counts.total_admitted_voters_count": 3,
   });
 }
 
@@ -330,7 +336,7 @@ describe("Polling Station data entry integration tests", () => {
       await submit();
       for (const pg of electionMockData.political_groups) {
         await expectPoliticalGroupCandidatesForm(pg.number);
-        await fillPoliticalGroupCandidatesVotesForm();
+        await fillPoliticalGroupCandidatesVotesForm(pg.number);
         await submit();
       }
       await expectCheckAndSavePage(router);
@@ -344,15 +350,15 @@ describe("Polling Station data entry integration tests", () => {
       await submit();
       await expectVotersAndVotesForm();
       await fillVotersAndVotesForm({
-        poll_card_count: total_votes,
-        proxy_certificate_count: 1,
-        voter_card_count: 0,
-        total_admitted_voters_count: total_votes + 1,
+        "data.voters_counts.poll_card_count": total_votes,
+        "data.voters_counts.proxy_certificate_count": 1,
+        "data.voters_counts.voter_card_count": 0,
+        "data.voters_counts.total_admitted_voters_count": total_votes + 1,
         // to get the F204 error, votes_candidates_count should not match total_votes
-        votes_candidates_count: total_votes + 1,
-        blank_votes_count: 0,
-        invalid_votes_count: 0,
-        total_votes_cast_count: total_votes + 1,
+        "data.votes_counts.votes_candidates_count": total_votes + 1,
+        "data.votes_counts.blank_votes_count": 0,
+        "data.votes_counts.invalid_votes_count": 0,
+        "data.votes_counts.total_votes_cast_count": total_votes + 1,
       });
       await submit();
       await expectDifferencesForm();
@@ -362,7 +368,7 @@ describe("Polling Station data entry integration tests", () => {
       const lastGroup = electionMockData.political_groups[electionMockData.political_groups.length - 1];
       for (const group of electionMockData.political_groups) {
         await expectPoliticalGroupCandidatesForm(group.number);
-        await fillPoliticalGroupCandidatesVotesForm();
+        await fillPoliticalGroupCandidatesVotesForm(group.number);
 
         if (group === lastGroup) {
           overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -460,14 +466,14 @@ describe("Polling Station data entry integration tests", () => {
       await submit();
       for (const pg of electionMockData.political_groups) {
         await expectPoliticalGroupCandidatesForm(pg.number);
-        await fillPoliticalGroupCandidatesVotesForm();
+        await fillPoliticalGroupCandidatesVotesForm(pg.number);
         await submit();
       }
       await expectCheckAndSavePage(router);
 
       await gotoForm("voters_and_votes");
       await userTypeInputs(user, {
-        total_admitted_voters_count: 1,
+        "data.voters_counts.total_admitted_voters_count": 1,
       });
 
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -477,7 +483,7 @@ describe("Polling Station data entry integration tests", () => {
       await expectFeedbackError("F.201");
 
       await userTypeInputs(user, {
-        total_admitted_voters_count: total_votes,
+        "data.voters_counts.total_admitted_voters_count": total_votes,
       });
 
       await user.click(screen.getByRole("link", { name: "Is er herteld?" }));
@@ -501,7 +507,7 @@ describe("Polling Station data entry integration tests", () => {
       await submit();
       for (const pg of electionMockData.political_groups) {
         await expectPoliticalGroupCandidatesForm(pg.number);
-        await fillPoliticalGroupCandidatesVotesForm();
+        await fillPoliticalGroupCandidatesVotesForm(pg.number);
         await submit();
       }
       await expectCheckAndSavePage(router);
@@ -537,7 +543,7 @@ describe("Polling Station data entry integration tests", () => {
 
       for (const pg of electionMockData.political_groups) {
         await expectPoliticalGroupCandidatesForm(pg.number);
-        await fillPoliticalGroupCandidatesVotesForm();
+        await fillPoliticalGroupCandidatesVotesForm(pg.number);
         await submit();
       }
 
@@ -547,14 +553,17 @@ describe("Polling Station data entry integration tests", () => {
       await gotoForm("voters_and_votes");
       await expectElementContainsIcon("list-item-voters-and-votes", "je bent hier");
       await fillVotersAndVotesForm({
-        poll_card_count: total_votes + 1,
-        total_admitted_voters_count: total_votes + 1,
-        votes_candidates_count: total_votes,
-        total_votes_cast_count: total_votes,
+        "data.voters_counts.poll_card_count": total_votes + 1,
+        "data.voters_counts.total_admitted_voters_count": total_votes + 1,
+        "data.votes_counts.votes_candidates_count": total_votes,
+        "data.votes_counts.total_votes_cast_count": total_votes,
       });
       await submit();
       await expectDifferencesForm(false);
-      await fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 });
+      await fillDifferencesForm({
+        "data.differences_counts.fewer_ballots_count": 1,
+        "data.differences_counts.no_explanation_count": 2,
+      });
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W302] },
       } as SaveDataEntryResponse);
@@ -566,7 +575,7 @@ describe("Polling Station data entry integration tests", () => {
       await expectElementContainsIcon("list-item-differences", "opgeslagen");
       await gotoForm("voters_and_votes");
       await userTypeInputs(user, {
-        total_admitted_voters_count: 1,
+        "data.voters_counts.total_admitted_voters_count": 1,
       });
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [errorWarningMocks.F201], warnings: [] },

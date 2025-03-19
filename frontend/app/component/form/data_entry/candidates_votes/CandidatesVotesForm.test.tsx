@@ -13,6 +13,7 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, within } fro
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { DataEntryState } from "../state/types";
 import {
+  errorWarningMocks,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
@@ -495,10 +496,7 @@ describe("Test CandidatesVotesForm", () => {
 
       await screen.findByTestId("candidates_form_1");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [{ fields: ["data.political_group_votes[0]"], code: "F401" }],
-          warnings: [],
-        },
+        validation_results: { errors: [errorWarningMocks.F401], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });

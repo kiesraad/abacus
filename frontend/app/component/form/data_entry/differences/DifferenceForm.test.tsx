@@ -634,5 +634,28 @@ describe("Test DifferencesForm", () => {
       expect(acceptWarningsCheckbox).not.toBeVisible();
       expect(acceptWarningsError).not.toBeVisible();
     });
+
+    test("error should not immediately disappear when checkbox is checked", async () => {
+      const acceptWarningsCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      const user = userEvent.setup();
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(acceptWarningsCheckbox).toBeInvalid();
+      const acceptWarningsError = screen.getByRole("alert", {
+        description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+      });
+      expect(acceptWarningsError).toBeVisible();
+
+      await user.click(acceptWarningsCheckbox);
+      expect(acceptWarningsCheckbox).toBeChecked();
+      expect(acceptWarningsCheckbox).toBeInvalid();
+      expect(acceptWarningsError).toBeVisible();
+    });
   });
 });

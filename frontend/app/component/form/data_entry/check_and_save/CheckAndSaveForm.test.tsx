@@ -103,20 +103,7 @@ describe("Test CheckAndSaveForm", () => {
     overrideServerClaimDataEntryResponse({
       formState: getDefaultDataEntryState().formState,
       pollingStationResults: getDefaultValues(),
-      validationResults: {
-        errors: [
-          {
-            code: "F201",
-            fields: [
-              "data.voters_counts.poll_card_count",
-              "data.voters_counts.proxy_certificate_count",
-              "data.voters_counts.voter_card_count",
-              "data.voters_counts.total_admitted_voters_count",
-            ],
-          },
-        ],
-        warnings: [],
-      },
+      validationResults: { errors: [errorWarningMocks.F201], warnings: [] },
     });
     renderForm();
 
@@ -131,15 +118,7 @@ describe("Test CheckAndSaveForm", () => {
     overrideServerClaimDataEntryResponse({
       formState: getDefaultDataEntryState().formState,
       pollingStationResults: getDefaultValues(),
-      validationResults: {
-        errors: [],
-        warnings: [
-          {
-            code: "W202",
-            fields: ["data.voters_counts.invalid_votes_count"],
-          },
-        ],
-      },
+      validationResults: { errors: [], warnings: [errorWarningMocks.W202] },
     });
     renderForm();
 
@@ -157,15 +136,7 @@ describe("Test CheckAndSaveForm", () => {
     overrideServerClaimDataEntryResponse({
       formState: dataEntryState.formState,
       pollingStationResults: getDefaultValues(),
-      validationResults: {
-        errors: [],
-        warnings: [
-          {
-            code: "W202",
-            fields: ["data.voters_counts.invalid_votes_count"],
-          },
-        ],
-      },
+      validationResults: { errors: [], warnings: [errorWarningMocks.W202] },
     });
     renderForm();
 
@@ -184,10 +155,7 @@ describe("Test CheckAndSaveForm summary", () => {
     overrideServerClaimDataEntryResponse({
       formState: getDefaultDataEntryState().formState,
       pollingStationResults: values,
-      validationResults: {
-        errors: [errorWarningMocks.F201],
-        warnings: [errorWarningMocks.W301],
-      },
+      validationResults: { errors: [errorWarningMocks.F201], warnings: [errorWarningMocks.W301] },
     });
     renderForm();
 
@@ -214,10 +182,7 @@ describe("Test CheckAndSaveForm summary", () => {
     overrideServerClaimDataEntryResponse({
       formState: dataEntryState.formState,
       pollingStationResults: getDefaultValues(),
-      validationResults: {
-        errors: [],
-        warnings: [errorWarningMocks.W301],
-      },
+      validationResults: { errors: [], warnings: [errorWarningMocks.W301] },
     });
     renderForm();
 
@@ -236,10 +201,7 @@ describe("Test CheckAndSaveForm summary", () => {
     overrideServerClaimDataEntryResponse({
       formState: getDefaultDataEntryState().formState,
       pollingStationResults: getDefaultValues(),
-      validationResults: {
-        errors: [],
-        warnings: [errorWarningMocks.W301],
-      },
+      validationResults: { errors: [], warnings: [errorWarningMocks.W301] },
     });
     renderForm();
 

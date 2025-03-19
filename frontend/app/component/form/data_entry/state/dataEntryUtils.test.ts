@@ -19,12 +19,7 @@ describe("addValidationResultToFormState", () => {
   test("should add validation result to form state", () => {
     const formState = getDefaultDataEntryState().formState;
     formState.sections.differences_counts.isSaved = true;
-    const validationResults: ValidationResult[] = [
-      {
-        fields: ["data.differences_counts.fewer_ballots_count"],
-        code: "F303",
-      },
-    ];
+    const validationResults: ValidationResult[] = [errorWarningMocks.F303];
 
     addValidationResultToFormState(formState, validationResults, "errors");
 
@@ -37,12 +32,7 @@ describe("addValidationResultToFormState", () => {
     formState.sections.voters_votes_counts.isSaved = true;
     if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
 
-    const validationResults: ValidationResult[] = [
-      {
-        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes[0].total"],
-        code: "F204",
-      },
-    ];
+    const validationResults: ValidationResult[] = [errorWarningMocks.F204];
 
     addValidationResultToFormState(formState, validationResults, "errors");
 
@@ -55,12 +45,7 @@ describe("addValidationResultToFormState", () => {
   test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {
     const formState = getDefaultDataEntryState().formState;
     formState.sections.differences_counts.isSaved = false;
-    const validationResults: ValidationResult[] = [
-      {
-        fields: ["data.differences_counts.fewer_ballots_count"],
-        code: "F303",
-      },
-    ];
+    const validationResults: ValidationResult[] = [errorWarningMocks.F303];
 
     addValidationResultToFormState(formState, validationResults, "errors");
 
@@ -144,12 +129,7 @@ describe("hasOnlyGlobalValidationResults", () => {
 describe("resetFormSectionState", () => {
   test("should reset form section state", () => {
     const formState = getDefaultDataEntryState().formState;
-    formState.sections.voters_votes_counts.errors = [
-      {
-        code: "W201",
-        fields: ["data.votes_counts.blank_votes_count"],
-      },
-    ];
+    formState.sections.voters_votes_counts.errors = [errorWarningMocks.W201];
 
     resetFormSectionState(formState);
 

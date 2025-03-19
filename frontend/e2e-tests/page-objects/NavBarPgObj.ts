@@ -7,10 +7,10 @@ export class NavBar {
   readonly role: Locator;
 
   constructor(protected readonly page: Page) {
-    this.username = page.getByLabel("user-name");
-    this.role = page.getByLabel("role");
     this.navigation = page.getByRole("navigation", { name: "primary-navigation" });
     this.logout = this.navigation.getByRole("link", { name: "Afmelden" });
+    this.username = this.navigation.getByTestId("navbar-username");
+    this.role = this.navigation.getByTestId("navbar-role");
   }
 
   async clickElection(electionLocation: string, electionName: string) {

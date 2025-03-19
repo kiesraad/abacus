@@ -19,8 +19,8 @@ export function NavBar({ location }: NavBarProps) {
       <div className={styles.userInfo}>
         {user ? (
           <>
-            <strong aria-label="user-name">{user.fullname || user.username}</strong>
-            <span className={styles.lower} aria-label="role">
+            <strong id="navbar-username">{user.fullname || user.username}</strong>
+            <span className={styles.lower} id="navbar-role">
               ({t(user.role)})
             </span>
             <Link to={`/account/logout`}>{t("account.logout")}</Link>

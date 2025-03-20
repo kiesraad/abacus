@@ -58,59 +58,59 @@ components:
       - ".*/frontend/src/routes.tsx"
   - name: "(Frontend) Components/apportionment"
     include:
-      - ".*/frontend/src/component/apportionment/.*"
+      - ".*/frontend/src/components/apportionment/.*"
   - name: "(Frontend) Components/election"
     include:
-      - ".*/frontend/src/component/election/.*"
+      - ".*/frontend/src/components/election/.*"
   - name: "(Frontend) Components/error"
     include:
-      - ".*/frontend/src/component/error/.*"
+      - ".*/frontend/src/components/error/.*"
   - name: "(Frontend) Components/footer"
     include:
-      - ".*/frontend/src/component/footer/.*"
+      - ".*/frontend/src/components/footer/.*"
   - name: "(Frontend) app/component/form/data_entry"
     include:
-      - ".*/frontend/src/component/form/data_entry/.*"
+      - ".*/frontend/src/components/form/data_entry/.*"
   - name: "(Frontend) app/component/form/polling_station"
     include:
-      - ".*/frontend/src/component/form/polling_station/.*"
+      - ".*/frontend/src/components/form/polling_station/.*"
   - name: "(Frontend) app/component/form/user"
     include:
-      - ".*/frontend/src/component/form/user/.*"
+      - ".*/frontend/src/components/form/user/.*"
   - name: "(Frontend) Components/navbar"
     include:
-      - ".*/frontend/src/component/navbar/.*"
+      - ".*/frontend/src/components/navbar/.*"
 
   - name: "(Frontend) Modules/Root files"
     include:
-      - ".*/frontend/src/module/AdministratorLayout.tsx"
-      - ".*/frontend/src/module/FatalError.tsx"
-      - ".*/frontend/src/module/NotFound.tsx"
-      - ".*/frontend/src/module/RootLayout.tsx"
+      - ".*/frontend/src/features/AdministratorLayout.tsx"
+      - ".*/frontend/src/features/FatalError.tsx"
+      - ".*/frontend/src/features/NotFound.tsx"
+      - ".*/frontend/src/features/RootLayout.tsx"
   - name: "(Frontend) Modules/account"
     include:
-      - ".*/frontend/src/module/account/.*"
+      - ".*/frontend/src/features/account/.*"
   - name: "(Frontend) Modules/apportionment"
     include:
-      - ".*/frontend/src/module/apportionment/.*"
+      - ".*/frontend/src/features/apportionment/.*"
   - name: "(Frontend) Modules/data_entry"
     include:
-      - ".*/frontend/src/module/data_entry/.*"
+      - ".*/frontend/src/features/data_entry/.*"
   - name: "(Frontend) Modules/election"
     include:
-      - ".*/frontend/src/module/election/.*"
+      - ".*/frontend/src/features/election/.*"
   - name: "(Frontend) Modules/logs"
     include:
-      - ".*/frontend/src/module/logs/.*"
+      - ".*/frontend/src/features/logs/.*"
   - name: "(Frontend) Modules/polling_stations"
     include:
-      - ".*/frontend/src/module/polling_stations/.*"
+      - ".*/frontend/src/features/polling_stations/.*"
   - name: "(Frontend) Modules/users"
     include:
-      - ".*/frontend/src/module/users/.*"
+      - ".*/frontend/src/features/users/.*"
   - name: "(Frontend) Modules/workstations"
     include:
-      - ".*/frontend/src/module/workstations/.*"
+      - ".*/frontend/src/features/workstations/.*"
 
   - name: "(Frontend) Lib/API"
     include:
@@ -179,7 +179,7 @@ languages:
 
 exclude:
   - ".*/backend/[.]sqlx/.*"
-  - ".*/frontend/src/component/MockTest[.]tsx"
+  - ".*/frontend/src/components/MockTest[.]tsx"
   - ".*/frontend/lib/icon/.*"
   - ".*/[.]ladle.*"
   - ".*[.]d[.]ts"

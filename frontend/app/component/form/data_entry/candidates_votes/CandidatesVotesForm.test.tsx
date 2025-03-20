@@ -13,6 +13,7 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, within } fro
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { DataEntryState } from "../state/types";
 import {
+  errorWarningMocks,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
@@ -45,7 +46,9 @@ const defaultDataEntryState: DataEntryState = {
   cache: null,
 };
 
-function renderForm({ group, election }: { group?: PoliticalGroup; election?: Required<Election> }) {
+const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
+
+function renderForm({ group, election }: { group?: PoliticalGroup; election?: Required<Election> } = {}) {
   return render(
     <DataEntryProvider election={election || electionMockData} pollingStationId={1} entryNumber={1}>
       <CandidatesVotesForm group={group || politicalGroupMockData} />
@@ -123,9 +126,7 @@ describe("Test CandidatesVotesForm", () => {
         },
       });
 
-      renderForm({});
-
-      const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
+      renderForm();
 
       const candidate1 = await screen.findByRole("textbox", { name: `1 ${candidateNames[0]}` });
       await user.type(candidate1, "12345");
@@ -147,7 +148,7 @@ describe("Test CandidatesVotesForm", () => {
         },
       });
 
-      renderForm({});
+      renderForm();
 
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
@@ -165,7 +166,7 @@ describe("Test CandidatesVotesForm", () => {
         },
       });
 
-      renderForm({});
+      renderForm();
       const spy = vi.spyOn(global, "fetch");
 
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
@@ -194,7 +195,7 @@ describe("Test CandidatesVotesForm", () => {
           recounted: false,
         },
       });
-      renderForm({});
+      renderForm();
 
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
@@ -442,7 +443,7 @@ describe("Test CandidatesVotesForm", () => {
           recounted: false,
         },
       });
-      renderForm({});
+      renderForm();
 
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
@@ -491,14 +492,11 @@ describe("Test CandidatesVotesForm", () => {
           recounted: false,
         },
       });
-      renderForm({});
+      renderForm();
 
       await screen.findByTestId("candidates_form_1");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [{ fields: ["data.political_group_votes[0]"], code: "F401" }],
-          warnings: [],
-        },
+        validation_results: { errors: [errorWarningMocks.F401], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -528,7 +526,7 @@ describe("Test CandidatesVotesForm", () => {
           recounted: false,
         },
       });
-      renderForm({});
+      renderForm();
 
       await screen.findByTestId("candidates_form_1");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -553,6 +551,62 @@ describe("Test CandidatesVotesForm", () => {
       ];
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
+    });
+  });
+
+  describe("CandidatesVotesForm accept warnings", () => {
+    beforeEach(async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [{ fields: ["data.political_group_votes[0]"], code: "F401" }],
+        },
+      });
+
+      renderForm();
+
+      const user = userEvent.setup();
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+      await screen.findByTestId("feedback-warning");
+    });
+
+    test("checkbox should disappear when filling in any form input", async () => {
+      const acceptWarningsCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      const user = userEvent.setup();
+      const input = screen.getByRole("textbox", { name: `2 ${candidateNames[1]}` });
+      await user.type(input, "1");
+
+      expect(acceptWarningsCheckbox).not.toBeVisible();
+    });
+
+    test("checkbox with error should disappear when filling in any form input", async () => {
+      const acceptWarningsCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      const user = userEvent.setup();
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(acceptWarningsCheckbox).toBeInvalid();
+      const acceptWarningsError = await screen.findByRole("alert", {
+        description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+      });
+      expect(acceptWarningsError).toBeVisible();
+
+      const input = screen.getByRole("textbox", { name: `2 ${candidateNames[1]}` });
+      await user.type(input, "1");
+
+      expect(acceptWarningsCheckbox).not.toBeVisible();
+      expect(acceptWarningsError).not.toBeVisible();
     });
   });
 });

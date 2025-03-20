@@ -16,13 +16,15 @@ export interface AlertProps {
 }
 
 export function Alert({ type, onClose, children, margin, variant = "default" }: AlertProps) {
+  const id = React.useId();
+
   return (
-    <div className={`${cn(cls.alert, cls[type], variant)} ${margin}`} role="alert">
+    <div className={cn(cls.alert, cls[type], margin, variant)} role="alert" aria-describedby={id}>
       {onClose && (
         <IconButton icon={<IconCross />} title={t("close_message")} variant="tertiary" size="lg" onClick={onClose} />
       )}
       {variant !== "no-icon" && <aside>{renderIconForType(type)}</aside>}
-      <section>{children}</section>
+      <section id={id}>{children}</section>
     </div>
   );
 }

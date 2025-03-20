@@ -1,29 +1,30 @@
 {
-  "title": "Invoeren",
-  "entry_saved": "Je invoer is opgeslagen",
   "abort": {
     "action": "Invoer afbreken",
-    "title": "Wat wil je doen met je invoer?",
     "description": "<p>Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de invoer die je al hebt gedaan bewaren.</p><p>Twijfel je? Overleg dan met de coördinator.</p>",
+    "discard_input": "Niet bewaren",
     "save_input": "Invoer bewaren",
-    "discard_input": "Niet bewaren"
+    "title": "Wat wil je doen met je invoer?"
+  },
+  "completed": {
+    "all_entries_completed": "Alle stembureaus zijn ingevoerd",
+    "info": "De resultaten van alle stembureaus kunnen nu opgeteld gaan worden om de uitslag van de {electionName} vast te stellen.",
+    "thank_you": "Bedankt voor je hulp!",
+    "wait_for_instructions": "Wacht op instructies van de coördinator."
+  },
+  "continue_after_check": "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+  "definitive": "Definitief",
+  "entries_different": "Verschil invoer 1 en 2",
+  "entry_saved": "Je invoer is opgeslagen",
+  "first_entry": "1e invoer",
+  "list": {
+    "not_found": "Geen lijst gevonden voor {listNumber}"
   },
   "pick_polling_station": "Kies een stembureau",
+  "second_entry": "2e invoer",
   "success": {
     "return_paper": "Geef het papieren proces-verbaal terug aan de coördinator.",
     "second_entry_info": "Een andere invoerder doet straks de tweede invoer."
   },
-  "completed": {
-    "all_entries_completed": "Alle stembureaus zijn ingevoerd",
-    "thank_you": "Bedankt voor je hulp!",
-    "info": "De resultaten van alle stembureaus kunnen nu opgeteld gaan worden om de uitslag van de {electionName} vast te stellen.",
-    "wait_for_instructions": "Wacht op instructies van de coördinator."
-  },
-  "list": {
-    "not_found": "Geen lijst gevonden voor {listNumber}"
-  },
-  "first_entry": "1e invoer",
-  "second_entry": "2e invoer",
-  "entries_different": "Verschil invoer 1 en 2",
-  "definitive": "Definitief"
+  "title": "Invoeren"
 }

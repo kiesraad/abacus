@@ -253,7 +253,7 @@ export function VotersAndVotesForm() {
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
-              <p>{t("voters_and_votes.continue_after_check")}</p>
+              <p>{t("data_entry.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>
         )}

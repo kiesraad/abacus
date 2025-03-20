@@ -101,6 +101,7 @@
   --gray-700: #344054;
   --gray-600: #475467;
   --gray-500: #667085;
+  --gray-450: #8a95a8;
   --gray-400: #98a2b3;
   --gray-300: #d0d5dd;
   --gray-200: #eaecf0;
@@ -218,5 +219,6 @@
   --progress-bar-in-progress: #efc943;
   --progress-bar-first-entry-finished: #66c61c;
   --progress-bar-definitive: var(--color-success);
-  --progress-bar-not-started: var(--gray-300);
+  --progress-bar-not-started: var(--gray-200);
+  --progress-bar-not-started-border: var(--gray-450);
 }

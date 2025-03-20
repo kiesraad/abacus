@@ -52,65 +52,65 @@ components:
   # Frontend components
   - name: "(Frontend) App Root Files"
     include:
-      - ".*/frontend/app/app.test.ts"
-      - ".*/frontend/app/main.tsx"
-      - ".*/frontend/app/routes.test.tsx"
-      - ".*/frontend/app/routes.tsx"
+      - ".*/frontend/src/app.test.ts"
+      - ".*/frontend/src/main.tsx"
+      - ".*/frontend/src/routes.test.tsx"
+      - ".*/frontend/src/routes.tsx"
   - name: "(Frontend) Components/apportionment"
     include:
-      - ".*/frontend/app/component/apportionment/.*"
+      - ".*/frontend/src/component/apportionment/.*"
   - name: "(Frontend) Components/election"
     include:
-      - ".*/frontend/app/component/election/.*"
+      - ".*/frontend/src/component/election/.*"
   - name: "(Frontend) Components/error"
     include:
-      - ".*/frontend/app/component/error/.*"
+      - ".*/frontend/src/component/error/.*"
   - name: "(Frontend) Components/footer"
     include:
-      - ".*/frontend/app/component/footer/.*"
+      - ".*/frontend/src/component/footer/.*"
   - name: "(Frontend) app/component/form/data_entry"
     include:
-      - ".*/frontend/app/component/form/data_entry/.*"
+      - ".*/frontend/src/component/form/data_entry/.*"
   - name: "(Frontend) app/component/form/polling_station"
     include:
-      - ".*/frontend/app/component/form/polling_station/.*"
+      - ".*/frontend/src/component/form/polling_station/.*"
   - name: "(Frontend) app/component/form/user"
     include:
-      - ".*/frontend/app/component/form/user/.*"
+      - ".*/frontend/src/component/form/user/.*"
   - name: "(Frontend) Components/navbar"
     include:
-      - ".*/frontend/app/component/navbar/.*"
+      - ".*/frontend/src/component/navbar/.*"
 
   - name: "(Frontend) Modules/Root files"
     include:
-      - ".*/frontend/app/module/AdministratorLayout.tsx"
-      - ".*/frontend/app/module/FatalError.tsx"
-      - ".*/frontend/app/module/NotFound.tsx"
-      - ".*/frontend/app/module/RootLayout.tsx"
+      - ".*/frontend/src/module/AdministratorLayout.tsx"
+      - ".*/frontend/src/module/FatalError.tsx"
+      - ".*/frontend/src/module/NotFound.tsx"
+      - ".*/frontend/src/module/RootLayout.tsx"
   - name: "(Frontend) Modules/account"
     include:
-      - ".*/frontend/app/module/account/.*"
+      - ".*/frontend/src/module/account/.*"
   - name: "(Frontend) Modules/apportionment"
     include:
-      - ".*/frontend/app/module/apportionment/.*"
+      - ".*/frontend/src/module/apportionment/.*"
   - name: "(Frontend) Modules/data_entry"
     include:
-      - ".*/frontend/app/module/data_entry/.*"
+      - ".*/frontend/src/module/data_entry/.*"
   - name: "(Frontend) Modules/election"
     include:
-      - ".*/frontend/app/module/election/.*"
+      - ".*/frontend/src/module/election/.*"
   - name: "(Frontend) Modules/logs"
     include:
-      - ".*/frontend/app/module/logs/.*"
+      - ".*/frontend/src/module/logs/.*"
   - name: "(Frontend) Modules/polling_stations"
     include:
-      - ".*/frontend/app/module/polling_stations/.*"
+      - ".*/frontend/src/module/polling_stations/.*"
   - name: "(Frontend) Modules/users"
     include:
-      - ".*/frontend/app/module/users/.*"
+      - ".*/frontend/src/module/users/.*"
   - name: "(Frontend) Modules/workstations"
     include:
-      - ".*/frontend/app/module/workstations/.*"
+      - ".*/frontend/src/module/workstations/.*"
 
   - name: "(Frontend) Lib/API"
     include:
@@ -179,7 +179,7 @@ languages:
 
 exclude:
   - ".*/backend/[.]sqlx/.*"
-  - ".*/frontend/app/component/MockTest[.]tsx"
+  - ".*/frontend/src/component/MockTest[.]tsx"
   - ".*/frontend/lib/icon/.*"
   - ".*/[.]ladle.*"
   - ".*[.]d[.]ts"

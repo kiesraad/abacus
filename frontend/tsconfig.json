@@ -20,7 +20,7 @@
     "rootDir": ".",
     "paths": {
       "ladle/*": [".ladle/*"],
-      "@/*": ["app/*"],
+      "@/*": ["src/*"],
       "@kiesraad/api": ["lib/api/index.ts"],
       "@kiesraad/api-mocks": ["lib/api-mocks/index.ts"],
       "@kiesraad/ui": ["lib/ui/index.ts"],
@@ -33,7 +33,7 @@
   },
   "include": [
     ".ladle/**/*",
-    "app/**/*",
+    "src/**/*",
     "lib/**/*",
     "scripts/**/*",
     "playwright.e2e.config.ts",

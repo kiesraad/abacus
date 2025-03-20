@@ -1,13 +1,8 @@
 import { Dispatch } from "react";
 
-import {
-  AnyApiError,
-  ClaimDataEntryResponse,
-  Election,
-  PollingStationResults,
-  ValidationResult,
-  ValidationResults,
-} from "@kiesraad/api";
+import { AnyApiError, ClaimDataEntryResponse, Election, PollingStationResults, ValidationResults } from "@kiesraad/api";
+
+import { ValidationResultSet } from "./ValidationResults";
 
 export interface DataEntryState {
   // state from providers
@@ -146,10 +141,6 @@ export type TemporaryCache = {
 // This is a type instead of an enum because of https://github.com/ArnaudBarre/eslint-plugin-react-refresh/issues/36
 export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" | "finalised" | "aborted";
 
-export interface ClientValidationResult extends ValidationResult {
-  isGlobal?: boolean;
-}
-
 export interface ClientState {
   furthest: FormSectionId;
   current: FormSectionId;
@@ -174,6 +165,6 @@ export type FormSection = {
   isSubmitted?: boolean; //whether this section has been submitted in the latest request
   acceptWarnings: boolean;
   acceptWarningsError: boolean;
-  errors: ValidationResult[];
-  warnings: ValidationResult[];
+  errors: ValidationResultSet;
+  warnings: ValidationResultSet;
 };

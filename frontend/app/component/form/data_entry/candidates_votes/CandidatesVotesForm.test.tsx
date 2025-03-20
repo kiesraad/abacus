@@ -57,9 +57,9 @@ function renderForm({ group, election }: { group?: PoliticalGroup; election?: Re
 }
 
 const candidatesFieldIds = {
-  candidate0: "candidate_votes[0].votes",
-  candidate1: "candidate_votes[1].votes",
-  total: "total",
+  candidate0: "data.political_group_votes[0].candidate_votes[0].votes",
+  candidate1: "data.political_group_votes[0].candidate_votes[1].votes",
+  total: "data.political_group_votes[0].total",
 };
 
 describe("Test CandidatesVotesForm", () => {
@@ -87,7 +87,7 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ group: politicalGroupMock });
 
-      const candidateRow = await screen.findByTestId("row-candidate_votes[0].votes");
+      const candidateRow = await screen.findByTestId(`row-${candidatesFieldIds.candidate0}`);
       const candidateName = within(candidateRow).getAllByRole("cell")[2];
       expect(candidateName).toHaveTextContent(/^Zilverlicht, E\. \(Eldor\)$/);
     });
@@ -110,7 +110,7 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ group: politicalGroupMock });
 
-      const candidateRow = await screen.findByTestId("row-candidate_votes[0].votes");
+      const candidateRow = await screen.findByTestId("row-data.political_group_votes[0].candidate_votes[0].votes");
       const candidateName = within(candidateRow).getAllByRole("cell")[2];
       expect(candidateName).toHaveTextContent(/^Zilverlicht, E\.$/);
     });

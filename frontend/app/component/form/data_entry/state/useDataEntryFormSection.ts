@@ -3,9 +3,9 @@ import * as React from "react";
 import { PollingStationResults } from "@kiesraad/api";
 import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
-import { getErrorsAndWarnings } from "./dataEntryUtils";
 import { FormSectionReference, SubmitCurrentFormOptions, TemporaryCache } from "./types";
 import { useDataEntryContext } from "./useDataEntryContext";
+import { mapValidationResultsToFields } from "./ValidationResults";
 
 export interface UseDataEntryFormSectionParams<FORM_VALUES> {
   getDefaultFormValues: (results: PollingStationResults, cache?: TemporaryCache | null) => FORM_VALUES;
@@ -31,11 +31,11 @@ export function useDataEntryFormSection<FORM_VALUES>({
   }
   const { errors, warnings, isSaved, acceptWarnings, hasChanges } = formSection;
   const defaultProps = {
-    errorsAndWarnings: isSaved ? getErrorsAndWarnings(errors, warnings) : undefined,
+    errorsAndWarnings: isSaved ? mapValidationResultsToFields(errors, warnings) : undefined,
     warningsAccepted: acceptWarnings,
   };
 
-  const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0 && !hasChanges;
+  const showAcceptWarnings = !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && !hasChanges;
 
   // register changes when fields change
   const setValues = (values: FORM_VALUES) => {
@@ -59,8 +59,8 @@ export function useDataEntryFormSection<FORM_VALUES>({
     options?: SubmitCurrentFormOptions,
   ): Promise<boolean> => {
     const result = await onSubmitForm(data, { ...options, showAcceptWarnings });
-    if (formSection.errors.length) {
-      // scroll to top when there are errors, this is mainly necesarry when users click "volgende" a second time without chaning anything
+    if (!formSection.errors.isEmpty()) {
+      // scroll to top when there are errors, this is mainly necessary when users click "volgende" a second time without changing anything
       window.scrollTo(0, 0);
     }
     return result;

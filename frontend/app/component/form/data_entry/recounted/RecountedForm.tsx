@@ -22,8 +22,8 @@ export function RecountedForm() {
     >
       <DataEntryNavigation onSubmit={onSubmit} currentValues={{ recounted }} />
       {error instanceof ApiError && <ErrorModal error={error} />}
-      {formSection.isSaved && formSection.errors.length > 0 && (
-        <Feedback id="feedback-error" type="error" data={formSection.errors.map((error) => error.code)} />
+      {formSection.isSaved && !formSection.errors.isEmpty() && (
+        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} />
       )}
       <p className="form-paragraph md">{t("recounted.message")}</p>
       <div className="radio-form">

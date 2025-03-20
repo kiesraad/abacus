@@ -1,93 +1,23 @@
-import { Election, PollingStationResults, ValidationResult, ValidationResults } from "@kiesraad/api";
-import { ErrorsAndWarnings, ValidationResultType } from "@kiesraad/ui";
-import { fieldNameFromPath, FieldSection, objectHasOnlyEmptyValues, rootFieldSection } from "@kiesraad/util";
+import { Election, PollingStationResults, ValidationResults } from "@kiesraad/api";
+import { objectHasOnlyEmptyValues } from "@kiesraad/util";
 
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
-import { ClientState, ClientValidationResult, FormSection, FormSectionId, FormState } from "./types";
-
-function checkAndAddValidationResult(
-  section: FormSection,
-  target: ValidationResultType,
-  validationResult: ValidationResult,
-) {
-  //don't add errors and warnings to the form state if the section is not saved
-  if (section.isSaved) {
-    //don't add a duplicate validation result to the form state
-    if (!section[target].includes(validationResult)) {
-      section[target].push(validationResult);
-    }
-  }
-}
-
-export function addValidationResultToFormState(
-  formState: FormState,
-  arr: ValidationResult[],
-  target: ValidationResultType,
-) {
-  arr.forEach((validationResult) => {
-    const uniqueRootSections = uniqueFieldSections(validationResult.fields);
-
-    uniqueRootSections.forEach((fieldSection) => {
-      const { name: rootSection, index } = fieldSection;
-      switch (rootSection) {
-        case "recounted":
-          checkAndAddValidationResult(formState.sections.recounted, target, validationResult);
-          break;
-        case "votes_counts":
-        case "voters_counts":
-        case "voters_recounts":
-          checkAndAddValidationResult(formState.sections.voters_votes_counts, target, validationResult);
-          break;
-        case "differences_counts":
-          checkAndAddValidationResult(formState.sections.differences_counts, target, validationResult);
-          break;
-        case "political_group_votes":
-          if (index !== undefined) {
-            const sectionKey = `political_group_votes_${index + 1}` as FormSectionId;
-            const section = formState.sections[sectionKey];
-            if (section) {
-              checkAndAddValidationResult(section, target, validationResult);
-            }
-          }
-          break;
-        default:
-          console.error("Unknown validation result target", target);
-          break;
-      }
-    });
-  });
-}
-
-export function uniqueFieldSections(fields: string[]): FieldSection[] {
-  const result: FieldSection[] = [];
-
-  fields.forEach((field) => {
-    const rootSection = rootFieldSection(field);
-    if (result.findIndex((s) => s.name === rootSection.name && s.index === rootSection.index) === -1) {
-      result.push(rootSection);
-    }
-  });
-
-  return result;
-}
+import { ClientState, FormSection, FormSectionId, FormState } from "./types";
+import { addValidationResultsToFormState, ValidationResultSet } from "./ValidationResults";
 
 export function formSectionComplete(section: FormSection): boolean {
   return (
     section.isSaved &&
-    (section.errors.length === 0 || hasOnlyGlobalValidationResults(section.errors)) &&
-    (section.warnings.length === 0 || section.acceptWarnings)
+    (section.errors.isEmpty() || section.errors.hasOnlyGlobalValidationResults()) &&
+    (section.warnings.isEmpty() || section.acceptWarnings)
   );
-}
-
-export function hasOnlyGlobalValidationResults(arr: ClientValidationResult[]): boolean {
-  return arr.every((result) => isGlobalValidationResult(result));
 }
 
 export function resetFormSectionState(formState: FormState) {
   Object.values(formState.sections).forEach((section) => {
     // the server response contains the validation results for the entire form, so we can clear the old validation results
-    section.errors = [];
-    section.warnings = [];
+    section.errors = new ValidationResultSet();
+    section.warnings = new ValidationResultSet();
     section.isSubmitted = undefined;
     section.acceptWarningsError = false;
   });
@@ -98,57 +28,13 @@ export function getNextSectionID(formState: FormState) {
 
   if (currentSection && currentSection.isSubmitted && formSectionComplete(currentSection)) {
     for (const section of Object.values(formState.sections)) {
-      if ((formState.furthest === "save" && section.errors.length > 0) || section.index === currentSection.index + 1) {
+      if ((formState.furthest === "save" && !section.errors.isEmpty()) || section.index === currentSection.index + 1) {
         return section.id;
       }
     }
   }
 
   return null;
-}
-
-export function isGlobalValidationResult(validationResult: ValidationResult): boolean {
-  switch (validationResult.code) {
-    case "F204":
-      return true;
-    default:
-      return false;
-  }
-}
-
-//transform a form sections errors and warnings into a map of field ids and their errors and warnings
-export function getErrorsAndWarnings(
-  errors: ValidationResult[],
-  warnings: ValidationResult[],
-): Map<string, ErrorsAndWarnings> {
-  const result = new Map<string, ErrorsAndWarnings>();
-
-  const process = (target: keyof ErrorsAndWarnings, arr: ValidationResult[]) => {
-    arr.forEach((v) => {
-      v.fields.forEach((f) => {
-        const fieldName = fieldNameFromPath(f);
-        if (!result.has(fieldName)) {
-          result.set(fieldName, { errors: [], warnings: [] });
-        }
-        const field = result.get(fieldName);
-        if (field) {
-          field[target].push({
-            code: v.code,
-            id: fieldName,
-          });
-        }
-      });
-    });
-  };
-
-  if (errors.length > 0) {
-    process("errors", errors);
-  } else if (warnings.length > 0) {
-    // only process warnings if there are no errors
-    process("warnings", warnings);
-  }
-
-  return result;
 }
 
 export function isFormSectionEmpty(section: FormSection, values: PollingStationResults): boolean {
@@ -203,12 +89,12 @@ export function getDataEntrySummary(formState: FormState): DataEntrySummary {
     .filter((section) => section.id !== "save")
     .sort(sortFormSections)
     .forEach((section) => {
-      if (section.errors.length > 0) {
+      if (!section.errors.isEmpty()) {
         result.notableFormSections.push({ status: "errors", formSection: section });
         result.countsAddUp = false;
         result.hasBlocks = true;
         result.hasErrors = true;
-      } else if (section.warnings.length > 0) {
+      } else if (!section.warnings.isEmpty()) {
         result.hasWarnings = true;
         if (section.acceptWarnings) {
           result.notableFormSections.push({ status: "accepted-warnings", formSection: section });
@@ -268,7 +154,7 @@ export function getInitialValues(
   };
 }
 
-export function getInitialFormState(election: Required<Election>, defaultFormState?: Partial<FormState>): FormState {
+export function getInitialFormState(election: Required<Election>): FormState {
   const result: FormState = {
     current: INITIAL_FORM_SECTION_ID,
     furthest: INITIAL_FORM_SECTION_ID,
@@ -281,8 +167,8 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
         acceptWarnings: false,
         hasChanges: false,
         acceptWarningsError: false,
-        errors: [],
-        warnings: [],
+        errors: new ValidationResultSet(),
+        warnings: new ValidationResultSet(),
       },
       voters_votes_counts: {
         index: 1,
@@ -292,8 +178,8 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
         acceptWarnings: false,
         hasChanges: false,
         acceptWarningsError: false,
-        errors: [],
-        warnings: [],
+        errors: new ValidationResultSet(),
+        warnings: new ValidationResultSet(),
       },
       differences_counts: {
         index: 2,
@@ -303,8 +189,8 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
         acceptWarnings: false,
         hasChanges: false,
         acceptWarningsError: false,
-        errors: [],
-        warnings: [],
+        errors: new ValidationResultSet(),
+        warnings: new ValidationResultSet(),
       },
       save: {
         index: election.political_groups.length + 3,
@@ -314,8 +200,8 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
         acceptWarnings: false,
         hasChanges: false,
         acceptWarningsError: false,
-        errors: [],
-        warnings: [],
+        errors: new ValidationResultSet(),
+        warnings: new ValidationResultSet(),
       },
     },
   };
@@ -329,12 +215,12 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
       acceptWarnings: false,
       hasChanges: false,
       acceptWarningsError: false,
-      errors: [],
-      warnings: [],
+      errors: new ValidationResultSet(),
+      warnings: new ValidationResultSet(),
     };
   });
 
-  return structuredClone({ ...result, ...defaultFormState });
+  return result;
 }
 
 export function getClientState(formState: FormState, acceptWarnings: boolean, continueToNextSection: boolean) {
@@ -431,8 +317,8 @@ export function updateFormStateAfterSubmit(
   }
 
   //distribute errors and warnings to sections
-  addValidationResultToFormState(formState, validationResults.errors, "errors");
-  addValidationResultToFormState(formState, validationResults.warnings, "warnings");
+  addValidationResultsToFormState(validationResults.errors, formState, "errors");
+  addValidationResultsToFormState(validationResults.warnings, formState, "warnings");
 
   //determine the new furthest section, if applicable
   if (continueToNextSection && currentFormSection && formState.furthest === currentFormSection.id) {
@@ -442,14 +328,14 @@ export function updateFormStateAfterSubmit(
   if (formState.furthest !== "save") {
     //if the entire form is not completed yet, filter out global validation results since they don't have meaning yet.
     Object.values(formState.sections).forEach((section) => {
-      section.errors = section.errors.filter((err) => !isGlobalValidationResult(err));
-      section.warnings = section.warnings.filter((err) => !isGlobalValidationResult(err));
+      section.errors.removeGlobalValidationResults();
+      section.warnings.removeGlobalValidationResults();
     });
   }
 
   // Reset acceptWarnings when a page gets an error or has no warnings anymore
   Object.values(formState.sections).forEach((section) => {
-    if (section.acceptWarnings && (section.errors.length > 0 || section.warnings.length === 0)) {
+    if (section.acceptWarnings && (!section.errors.isEmpty() || section.warnings.isEmpty())) {
       section.acceptWarnings = false;
     }
   });

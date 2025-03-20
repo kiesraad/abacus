@@ -48,11 +48,11 @@ export function DifferencesForm() {
         currentValues={{ differences_counts: formValuesToValues(currentValues) }}
       />
       {error instanceof ApiError && <ErrorModal error={error} />}
-      {formSection.isSaved && formSection.errors.length > 0 && (
-        <Feedback id="feedback-error" type="error" data={formSection.errors.map((error) => error.code)} />
+      {formSection.isSaved && !formSection.errors.isEmpty() && (
+        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} />
       )}
-      {formSection.isSaved && formSection.warnings.length > 0 && formSection.errors.length === 0 && (
-        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.map((warning) => warning.code)} />
+      {formSection.isSaved && !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && (
+        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} />
       )}
       <InputGrid key="differences">
         <InputGrid.Header>
@@ -65,7 +65,7 @@ export function DifferencesForm() {
             autoFocusInput
             key="I"
             field="I"
-            id="more_ballots_count"
+            id="data.differences_counts.more_ballots_count"
             title={t("differences.more_ballots_count")}
             value={currentValues.more_ballots_count}
             onChange={(e) => {
@@ -76,7 +76,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="J"
             field="J"
-            id="fewer_ballots_count"
+            id="data.differences_counts.fewer_ballots_count"
             title={t("differences.fewer_ballots_count")}
             value={currentValues.fewer_ballots_count}
             onChange={(e) => {
@@ -89,7 +89,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="K"
             field="K"
-            id="unreturned_ballots_count"
+            id="data.differences_counts.unreturned_ballots_count"
             title={t("differences.unreturned_ballots_count")}
             value={currentValues.unreturned_ballots_count}
             onChange={(e) => {
@@ -100,7 +100,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="L"
             field="L"
-            id="too_few_ballots_handed_out_count"
+            id="data.differences_counts.too_few_ballots_handed_out_count"
             title={t("differences.too_few_ballots_handed_out_count")}
             value={currentValues.too_few_ballots_handed_out_count}
             onChange={(e) => {
@@ -111,7 +111,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="M"
             field="M"
-            id="too_many_ballots_handed_out_count"
+            id="data.differences_counts.too_many_ballots_handed_out_count"
             title={t("differences.too_many_ballots_handed_out_count")}
             value={currentValues.too_many_ballots_handed_out_count}
             onChange={(e) => {
@@ -122,7 +122,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="N"
             field="N"
-            id="other_explanation_count"
+            id="data.differences_counts.other_explanation_count"
             title={t("differences.other_explanation_count")}
             value={currentValues.other_explanation_count}
             onChange={(e) => {
@@ -135,7 +135,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="O"
             field="O"
-            id="no_explanation_count"
+            id="data.differences_counts.no_explanation_count"
             title={t("differences.no_explanation_count")}
             value={currentValues.no_explanation_count}
             onChange={(e) => {

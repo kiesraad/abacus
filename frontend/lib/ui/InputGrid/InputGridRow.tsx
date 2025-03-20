@@ -1,24 +1,12 @@
 import * as React from "react";
 
-import { ValidationResultCode } from "@kiesraad/api";
 import { FormField, InputGrid, NumberInput } from "@kiesraad/ui";
-
-export type ResultCode = ValidationResultCode | "REFORMAT_WARNING";
-export type FieldValidationResult = {
-  code: ResultCode;
-  id: string;
-  value?: string;
-};
-export type ErrorsAndWarnings = {
-  errors: FieldValidationResult[];
-  warnings: FieldValidationResult[];
-};
 
 export interface InputGridRowProps {
   id: string;
   field: string;
   title: string;
-  errorsAndWarnings?: Map<string, ErrorsAndWarnings>;
+  errorsAndWarnings?: Map<string, "error" | "warning">;
   warningsAccepted?: boolean;
   name?: string;
   defaultValue?: string | number;
@@ -47,10 +35,12 @@ export function InputGridRow({
   value,
   onChange,
 }: InputGridRowProps) {
-  const errors = errorsAndWarnings?.get(id)?.errors;
-  const warnings = errorsAndWarnings?.get(id)?.warnings;
-  const hasError = errors && errors.length > 0;
-  const hasWarning = warnings && warnings.length > 0;
+  const hasError = errorsAndWarnings?.get(id) === "error";
+  const hasWarning = errorsAndWarnings?.get(id) === "warning";
+  const hasUnacceptedWarning = hasWarning && !warningsAccepted;
+
+  const errorMessage =
+    errorMessageId || (hasError ? "feedback-error" : hasUnacceptedWarning ? "feedback-warning" : undefined);
 
   const children: [React.ReactElement, React.ReactElement, React.ReactElement] = [
     <td key={`${id}-1`} id={`field-${id}`}>
@@ -67,16 +57,8 @@ export function InputGridRow({
           value={value}
           onChange={onChange}
           aria-labelledby={`field-${id} title-${id}`}
-          aria-invalid={!!errorMessageId || hasError || (hasWarning && !warningsAccepted) ? "true" : "false"}
-          aria-errormessage={
-            errorMessageId
-              ? errorMessageId
-              : hasError
-                ? "feedback-error"
-                : hasWarning && !warningsAccepted
-                  ? "feedback-warning"
-                  : undefined
-          }
+          aria-invalid={errorMessage !== undefined}
+          aria-errormessage={errorMessage}
         />
       </FormField>
     </td>,

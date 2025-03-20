@@ -62,9 +62,9 @@ export function getUrlMethodAndBody(call: [input: string | URL | Request, init?:
   return { url, method, body };
 }
 
-export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: string | number }) {
+export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: string | number }, prefix: string = "") {
   for (const [key, value] of Object.entries(inputs)) {
-    const input = await screen.findByTestId(key);
+    const input = await screen.findByTestId(prefix + key);
     await user.clear(input);
     await user.type(input, value.toString());
     expect(input).toHaveValue(value.toString());

@@ -7,6 +7,7 @@ import {
 import { electionMockData } from "@kiesraad/api-mocks";
 
 import { DataEntryState, FormSection, FormSectionId } from "../state/types";
+import { ValidationResultSet } from "../state/ValidationResults";
 
 export function getInitialValues(): PollingStationResults {
   return {
@@ -53,8 +54,8 @@ export function getDefaultFormSection(id: FormSectionId, index: number): FormSec
     acceptWarnings: false,
     hasChanges: false,
     acceptWarningsError: false,
-    errors: [],
-    warnings: [],
+    errors: new ValidationResultSet(),
+    warnings: new ValidationResultSet(),
   };
 }
 
@@ -182,7 +183,7 @@ export const errorWarningMocks: ErrorWarningsMap<ValidationResultCode> = {
     code: "W203",
   },
   W204: {
-    fields: ["data.votes_counts.total_votes_cast_count", "data.voters_recounts.total_admitted_voters_recount"],
+    fields: ["data.votes_counts.total_votes_cast_count", "data.voters_recounts.total_admitted_voters_count"],
     code: "W204",
   },
   W205: { fields: ["data.votes_counts.total_votes_cast_count"], code: "W205" },

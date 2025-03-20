@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { useUserCreateContext } from "@/module/users/create/useUserCreateContext";
+import { useUserCreateContext } from "@/features/users/create/useUserCreateContext";
 
 import { Role } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

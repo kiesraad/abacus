@@ -1,7 +1,7 @@
 import { Navigate, useRouteError } from "react-router";
 
-import { FatalErrorPage } from "@/module/FatalErrorPage";
-import { NotFoundPage } from "@/module/NotFoundPage";
+import { FatalErrorPage } from "@/features/FatalErrorPage";
+import { NotFoundPage } from "@/features/NotFoundPage";
 
 import { ApiError, FatalApiError, NetworkError, NotFoundError } from "@kiesraad/api";
 

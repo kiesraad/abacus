@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionHomePage } from "@/module/election";
+import { ElectionHomePage } from "@/features/election";
 
 import { ElectionProvider, ElectionStatusProvider, TestUserProvider } from "@kiesraad/api";
 import { ElectionRequestHandler } from "@kiesraad/api-mocks";

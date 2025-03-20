@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { UserCreateTypePage } from "@/module/users";
+import { UserCreateTypePage } from "@/features/users";
 
 import { render } from "@kiesraad/test";
 

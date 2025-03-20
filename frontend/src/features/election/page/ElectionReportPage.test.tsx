@@ -1,7 +1,7 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionReportPage } from "@/module/election";
+import { ElectionReportPage } from "@/features/election";
 import { routes } from "@/routes";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";

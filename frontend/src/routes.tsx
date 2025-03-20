@@ -2,7 +2,24 @@ import { createRoutesFromElements, Navigate, Route } from "react-router";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { CheckAndSaveForm } from "@/components/form/data_entry/check_and_save/CheckAndSaveForm";
-import { AdministratorLayout } from "@/module/AdministratorLayout";
+import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "@/features/account";
+import { Logout } from "@/features/account/Logout";
+import { AdministratorLayout } from "@/features/AdministratorLayout";
+import {
+  ApportionmentFullSeatsPage,
+  ApportionmentLayout,
+  ApportionmentPage,
+  ApportionmentResidualSeatsPage,
+} from "@/features/apportionment";
+import {
+  CandidatesVotesPage,
+  DataEntryHomePage,
+  DifferencesPage,
+  RecountedPage,
+  VotersAndVotesPage,
+} from "@/features/data_entry";
+import { DataEntryLayout } from "@/features/data_entry/DataEntryLayout";
+import { DevHomePage } from "@/features/DevHomePage";
 import {
   ElectionHomePage,
   ElectionLayout,
@@ -10,10 +27,14 @@ import {
   ElectionStatusPage,
   OverviewLayout,
   OverviewPage,
-} from "@/module/election";
-import { LogsHomePage } from "@/module/logs";
-import { NotAvailableInMock } from "@/module/NotAvailableInMock";
-import { PollingStationListPage, PollingStationsLayout } from "@/module/polling_stations";
+} from "@/features/election";
+import { LogsHomePage } from "@/features/logs";
+import { NotAvailableInMock } from "@/features/NotAvailableInMock";
+import { NotFoundPage } from "@/features/NotFoundPage";
+import { PollingStationListPage, PollingStationsLayout } from "@/features/polling_stations";
+import { PollingStationCreatePage } from "@/features/polling_stations/page/PollingStationCreatePage";
+import { PollingStationUpdatePage } from "@/features/polling_stations/page/PollingStationUpdatePage";
+import { RootLayout } from "@/features/RootLayout";
 import {
   UserCreateDetailsPage,
   UserCreateLayout,
@@ -21,32 +42,10 @@ import {
   UserCreateTypePage,
   UserListPage,
   UserUpdatePage,
-} from "@/module/users";
-import { WorkstationsHomePage } from "@/module/workstations";
+} from "@/features/users";
+import { WorkstationsHomePage } from "@/features/workstations";
 
 import { t } from "@kiesraad/i18n";
-
-import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
-import { Logout } from "./module/account/Logout";
-import {
-  ApportionmentFullSeatsPage,
-  ApportionmentLayout,
-  ApportionmentPage,
-  ApportionmentResidualSeatsPage,
-} from "./module/apportionment";
-import {
-  CandidatesVotesPage,
-  DataEntryHomePage,
-  DifferencesPage,
-  RecountedPage,
-  VotersAndVotesPage,
-} from "./module/data_entry";
-import { DataEntryLayout } from "./module/data_entry/DataEntryLayout";
-import { DevHomePage } from "./module/DevHomePage";
-import { NotFoundPage } from "./module/NotFoundPage";
-import { PollingStationCreatePage } from "./module/polling_stations/page/PollingStationCreatePage";
-import { PollingStationUpdatePage } from "./module/polling_stations/page/PollingStationUpdatePage";
-import { RootLayout } from "./module/RootLayout";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />} errorElement={<ErrorBoundary />}>

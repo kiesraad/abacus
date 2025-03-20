@@ -126,7 +126,7 @@ components:
       - ".*/frontend/lib/test/.*"
   - name: "(Frontend) Lib/UI"
     include:
-      - ".*/frontend/lib/ui/.*"
+      - ".*/frontend/src/components/ui/.*"
   - name: "(Frontend) Lib/Util"
     include:
       - ".*/frontend/lib/util/.*"

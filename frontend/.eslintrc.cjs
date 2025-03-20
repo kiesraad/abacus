@@ -59,7 +59,7 @@ module.exports = {
       },
     },
     {
-      files: ["lib/ui/**/*.e2e.ts"],
+      files: ["src/components/ui/**/*.e2e.ts"],
       rules: {
         // Needed for Ladle, page.waitForSelector("[data-storyloaded]")
         "playwright/no-wait-for-selector": "off",

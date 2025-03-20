@@ -2,7 +2,8 @@ import { StaticRouter } from "react-router";
 
 import type { GlobalProvider } from "@ladle/react";
 
-import "../lib/ui/style/index.css";
+import "@/components/ui/style/index.css";
+
 import "./override.css";
 
 export const Provider: GlobalProvider = ({ children }) => (

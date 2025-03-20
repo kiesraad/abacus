@@ -582,7 +582,7 @@ pub fn seat_assignment(
         info!("There are no exhausted lists");
         (steps, cumulative_standings)
     };
-    println!("final_steps[1]: {:#?}", final_steps[1]);
+
     Ok(SeatAssignmentResult {
         seats,
         full_seats,
@@ -1114,7 +1114,7 @@ mod tests {
             };
             use test_log::test;
 
-            /// Apportionment with residual seats assigned with remainder system  
+            /// Apportionment with no residual seats
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 4, 3, 2, 1] - Remainder seats: 0  
@@ -1353,6 +1353,70 @@ mod tests {
                 ]);
                 let result = seat_assignment(23, &totals);
                 assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+            }
+        }
+
+        mod list_exhaustion {
+            use crate::apportionment::{
+                get_total_seats_from_apportionment_result, seat_assignment,
+                test_helpers::election_summary_fixture_with_given_candidate_votes,
+            };
+            use test_log::test;
+
+            /// Apportionment with no residual seats  
+            /// This test triggers Kieswet Article P 10
+            ///
+            /// Full seats: [5, 5, 4, 4, 2] - Remainder seats: 0  
+            /// 1 - Residual seat first assigned to list 1 has been re-assigned to another list in accordance with Article P 10 Kieswet  
+            /// 2 - largest average: [333 2/6, 333 2/6, 320, 320, 266 2/3] seat assigned to list 5
+            #[test]
+            fn test_with_list_exhaustion_during_full_seats_assignment() {
+                let totals = election_summary_fixture_with_given_candidate_votes(vec![
+                    vec![500, 500, 500, 500],
+                    vec![400, 400, 400, 400, 400],
+                    vec![400, 400, 400, 400],
+                    vec![400, 400, 400, 400],
+                    vec![400, 400, 0],
+                ]);
+                let result = seat_assignment(20, &totals).unwrap();
+                assert_eq!(result.steps.len(), 2);
+                assert!(
+                    result.steps[0]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[1].change.political_group_number(), 5);
+                let total_seats = get_total_seats_from_apportionment_result(result);
+                assert_eq!(total_seats, vec![4, 5, 4, 4, 3]);
+            }
+
+            /// Apportionment with residual seats assigned with averages system  
+            /// This test triggers Kieswet Article P 10
+            ///
+            /// Full seats: [4, 4, 4, 4, 2] - Remainder seats: 1  
+            /// 1 - largest average: [319 4/5, 319 3/5, 319 3/5, 319 3/5, 334 2/3] seat assigned to list 5  
+            /// 2 - Residual seat first assigned to list 5 has been re-assigned to another list in accordance with Article P 10 Kieswet  
+            /// 3 - largest average: [319 4/5, 319 3/5, 319 3/5, 319 3/5, 251] seat assigned to list 1
+            #[test]
+            fn test_with_list_exhaustion_during_residual_seats_assignment() {
+                let totals = election_summary_fixture_with_given_candidate_votes(vec![
+                    vec![400, 400, 400, 399, 0],
+                    vec![400, 400, 400, 398, 0],
+                    vec![400, 400, 400, 398, 0],
+                    vec![400, 400, 400, 398, 0],
+                    vec![502, 502],
+                ]);
+                let result = seat_assignment(19, &totals).unwrap();
+                assert_eq!(result.steps[0].change.political_group_number(), 5);
+                assert_eq!(result.steps.len(), 3);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[2].change.political_group_number(), 1);
+                let total_seats = get_total_seats_from_apportionment_result(result);
+                assert_eq!(total_seats, vec![5, 4, 4, 4, 2]);
             }
         }
     }

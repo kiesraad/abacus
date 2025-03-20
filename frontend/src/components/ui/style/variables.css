@@ -1,18 +1,18 @@
 @font-face {
   font-family: "SpaceGrotesk";
-  src: url("../../../static/font/Space_Grotesk/SpaceGrotesk[wght].woff2") format("woff2");
+  src: url("../../../assets/font/Space_Grotesk/SpaceGrotesk[wght].woff2") format("woff2");
   font-weight: 300 700;
 }
 
 @font-face {
   font-family: "DMSans";
-  src: url("../../../static/font/DM_Sans/DMSans[opsz,wght].woff2") format("woff2");
+  src: url("../../../assets/font/DM_Sans/DMSans[opsz,wght].woff2") format("woff2");
   font-weight: 100 1000;
 }
 
 @font-face {
   font-family: "GeistMono";
-  src: url("../../../static/font/Geist_Mono/GeistMono[wght].woff2") format("woff2");
+  src: url("../../../assets/font/Geist_Mono/GeistMono[wght].woff2") format("woff2");
   font-weight: 100 900;
 }
 

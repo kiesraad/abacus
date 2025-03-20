@@ -22,7 +22,7 @@
       "ladle/*": [".ladle/*"],
       "@/*": ["src/*"],
       "@kiesraad/api": ["src/api/index.ts"],
-      "@kiesraad/api-mocks": ["lib/api-mocks/index.ts"],
+      "@kiesraad/api-mocks": ["src/testing/api-mocks/index.ts"],
       "@kiesraad/ui": ["src/components/ui/index.ts"],
       "@kiesraad/icon": ["lib/icon/index.ts"],
       "@kiesraad/test": ["src/testing/index.ts"],

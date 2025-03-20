@@ -117,7 +117,7 @@ components:
       - ".*/frontend/src/api/.*"
   - name: "(Frontend) lib/API-Mocks"
     include:
-      - ".*/frontend/lib/api-mocks/.*"
+      - ".*/frontend/src/testing/api-mocks/.*"
   - name: "(Frontend) Lib/i18n"
     include:
       - ".*/frontend/lib/i18n/.*"
@@ -167,8 +167,8 @@ languages:
       - ".*DevHomePage[.]tsx"
       - ".*NotAvailableInMock[.]tsx"
       - ".*msw-mock-api[.]ts"
-      - ".*/lib/api-mocks/.*[.]ts"
-      - ".*/lib/api-mocks/.*[.]tsx"
+      - ".*/src/testing/api-mocks/.*[.]ts"
+      - ".*/src/testing/api-mocks/.*[.]tsx"
       - ".*[.]e2e[.]ts"
       - ".*.stories[.]tsx"
       - ".*/test-data/.*[.]ts"

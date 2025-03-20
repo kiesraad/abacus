@@ -1,11 +1,11 @@
 import * as React from "react";
 
 import { Story } from "@ladle/react";
-import { electionDetailsMockResponse } from "lib/api-mocks/ElectionMockData";
 
 import { ElectionProviderContext } from "@/api/election/ElectionProviderContext";
 
 import { Election, Role, TestUserProvider } from "@kiesraad/api";
+import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
 
 import { NavBar } from "./NavBar";
 import styles from "./NavBar.module.css";

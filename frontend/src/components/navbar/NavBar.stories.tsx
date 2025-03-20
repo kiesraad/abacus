@@ -2,7 +2,8 @@ import * as React from "react";
 
 import { Story } from "@ladle/react";
 import { electionDetailsMockResponse } from "lib/api-mocks/ElectionMockData";
-import { ElectionProviderContext } from "lib/api/election/ElectionProviderContext";
+
+import { ElectionProviderContext } from "@/api/election/ElectionProviderContext";
 
 import { Election, Role, TestUserProvider } from "@kiesraad/api";
 

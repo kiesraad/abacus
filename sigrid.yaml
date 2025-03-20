@@ -114,7 +114,7 @@ components:
 
   - name: "(Frontend) Lib/API"
     include:
-      - ".*/frontend/lib/api/.*"
+      - ".*/frontend/src/api/.*"
   - name: "(Frontend) lib/API-Mocks"
     include:
       - ".*/frontend/lib/api-mocks/.*"

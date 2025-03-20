@@ -8,7 +8,7 @@ const FRONTEND_ROOT = path.join(__dirname, "../..");
 const BACKEND_ROOT = path.join(FRONTEND_ROOT, "..", "backend");
 
 const OPEN_API_JSON_PATH = `${BACKEND_ROOT}/openapi.json`;
-const CURRENT_SPEC_PATH = `${FRONTEND_ROOT}/lib/api/gen/openapi.ts`;
+const CURRENT_SPEC_PATH = `${FRONTEND_ROOT}/src/api/gen/openapi.ts`;
 
 describe("openapi spec", () => {
   test("openapi spec is up to date", async () => {

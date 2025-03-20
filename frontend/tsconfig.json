@@ -21,7 +21,7 @@
     "paths": {
       "ladle/*": [".ladle/*"],
       "@/*": ["src/*"],
-      "@kiesraad/api": ["lib/api/index.ts"],
+      "@kiesraad/api": ["src/api/index.ts"],
       "@kiesraad/api-mocks": ["lib/api-mocks/index.ts"],
       "@kiesraad/ui": ["lib/ui/index.ts"],
       "@kiesraad/icon": ["lib/icon/index.ts"],

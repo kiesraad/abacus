@@ -120,7 +120,7 @@ components:
       - ".*/frontend/src/testing/api-mocks/.*"
   - name: "(Frontend) Lib/i18n"
     include:
-      - ".*/frontend/lib/i18n/.*"
+      - ".*/frontend/src/lib/i18n/.*"
   - name: "(Frontend) Unit tests"
     include:
       - ".*/frontend/src/testing/.*"
@@ -129,7 +129,7 @@ components:
       - ".*/frontend/src/components/ui/.*"
   - name: "(Frontend) Lib/Util"
     include:
-      - ".*/frontend/lib/util/.*"
+      - ".*/frontend/src/lib/util/.*"
 
   - name: "(Frontend) e2e tests"
     include:
@@ -180,7 +180,7 @@ languages:
 exclude:
   - ".*/backend/[.]sqlx/.*"
   - ".*/frontend/src/components/MockTest[.]tsx"
-  - ".*/frontend/lib/icon/.*"
+  - ".*/frontend/src/lib/icon/.*"
   - ".*/[.]ladle.*"
   - ".*[.]d[.]ts"
   - ".*[.]config[.]ts"

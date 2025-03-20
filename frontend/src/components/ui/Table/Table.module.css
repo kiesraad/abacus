@@ -78,7 +78,7 @@
     /* Cell with the chevron icon */
     td:last-of-type {
       padding-right: 4.5rem;
-      background-image: url("../../icon/svg/chevronRight.svg");
+      background-image: url("../../../lib/icon/svg/chevronRight.svg");
       background-size: 1.25rem;
       background-position: center right 1.5rem;
       background-repeat: no-repeat;

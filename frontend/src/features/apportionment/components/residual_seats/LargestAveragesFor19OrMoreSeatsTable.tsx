@@ -53,7 +53,7 @@ export function LargestAveragesFor19OrMoreSeatsTable({
                 </Table.Cell>
                 {largestAverageSteps.map((step: SeatChangeStep) => {
                   const change = step.change as LargestAverageAssignedSeat;
-                  const average = step.standing[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
+                  const average = step.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
                   if (average) {
                     return (
                       <Table.DisplayFractionCells

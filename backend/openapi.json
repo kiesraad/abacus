@@ -3070,7 +3070,7 @@
         "description": "Records the change for a specific seat, and how the standing is once\nthat seat was assigned or removed",
         "required": [
           "change",
-          "standing"
+          "standings"
         ],
         "properties": {
           "change": {
@@ -3081,7 +3081,7 @@
             "format": "int32",
             "minimum": 0
           },
-          "standing": {
+          "standings": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PoliticalGroupStanding"

@@ -14,7 +14,7 @@ export const largest_remainder_steps: SeatChangeStep[] = [
         denominator: 15,
       },
     },
-    standing: [
+    standings: [
       {
         pg_number: 1,
         votes_cast: 808,
@@ -166,7 +166,7 @@ export const largest_remainder_steps: SeatChangeStep[] = [
         denominator: 15,
       },
     },
-    standing: [
+    standings: [
       {
         pg_number: 1,
         votes_cast: 808,
@@ -321,7 +321,7 @@ export const largest_average_steps: SeatChangeStep[] = [
         denominator: 12,
       },
     },
-    standing: [
+    standings: [
       {
         pg_number: 1,
         votes_cast: 808,
@@ -473,7 +473,7 @@ export const largest_average_steps: SeatChangeStep[] = [
         denominator: 1,
       },
     },
-    standing: [
+    standings: [
       {
         pg_number: 1,
         votes_cast: 808,
@@ -625,7 +625,7 @@ export const largest_average_steps: SeatChangeStep[] = [
         denominator: 1,
       },
     },
-    standing: [
+    standings: [
       {
         pg_number: 1,
         votes_cast: 808,

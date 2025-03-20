@@ -651,7 +651,7 @@ export type SeatChange =
 export interface SeatChangeStep {
   change: SeatChange;
   residual_seat_number?: number;
-  standing: PoliticalGroupStanding[];
+  standings: PoliticalGroupStanding[];
 }
 
 /**

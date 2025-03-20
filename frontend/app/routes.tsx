@@ -1,6 +1,6 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router";
 
-import { AdministratorLayout } from "app/module/AdministratorLayout";
+import { AdministratorLayout } from "@/module/AdministratorLayout";
 import {
   ElectionHomePage,
   ElectionLayout,
@@ -8,10 +8,10 @@ import {
   ElectionStatusPage,
   OverviewLayout,
   OverviewPage,
-} from "app/module/election";
-import { LogsHomePage } from "app/module/logs";
-import { NotAvailableInMock } from "app/module/NotAvailableInMock";
-import { PollingStationListPage, PollingStationsLayout } from "app/module/polling_stations";
+} from "@/module/election";
+import { LogsHomePage } from "@/module/logs";
+import { NotAvailableInMock } from "@/module/NotAvailableInMock";
+import { PollingStationListPage, PollingStationsLayout } from "@/module/polling_stations";
 import {
   UserCreateDetailsPage,
   UserCreateLayout,
@@ -19,8 +19,8 @@ import {
   UserCreateTypePage,
   UserListPage,
   UserUpdatePage,
-} from "app/module/users";
-import { WorkstationsHomePage } from "app/module/workstations";
+} from "@/module/users";
+import { WorkstationsHomePage } from "@/module/workstations";
 
 import { t } from "@kiesraad/i18n";
 

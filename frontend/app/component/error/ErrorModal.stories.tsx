@@ -1,6 +1,6 @@
 import { Story } from "@ladle/react";
 
-import { ErrorModal } from "app/component/error/ErrorModal";
+import { ErrorModal } from "@/component/error/ErrorModal";
 
 import { ApiError, ApiResponseStatus } from "@kiesraad/api";
 

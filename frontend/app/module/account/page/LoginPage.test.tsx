@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { LoginPage } from "app/module/account";
+import { LoginPage } from "@/module/account";
 
 import { render } from "@kiesraad/test";
 

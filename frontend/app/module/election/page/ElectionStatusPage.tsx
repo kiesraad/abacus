@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router";
 
-import { HeaderElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
-import { ElectionStatus } from "app/component/election/status/ElectionStatus";
-import { Footer } from "app/component/footer/Footer";
+import { HeaderElectionStatusWithIcon } from "@/component/election/ElectionStatusWithIcon";
+import { ElectionStatus } from "@/component/election/status/ElectionStatus";
+import { Footer } from "@/component/footer/Footer";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

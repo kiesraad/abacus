@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 
-import { DataEntryProgress } from "app/component/form/data_entry/DataEntryProgress";
-import { DataEntryProvider } from "app/component/form/data_entry/state/DataEntryProvider";
+import { DataEntryProgress } from "@/component/form/data_entry/DataEntryProgress";
+import { DataEntryProvider } from "@/component/form/data_entry/state/DataEntryProvider";
 
 import { NotFoundError, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

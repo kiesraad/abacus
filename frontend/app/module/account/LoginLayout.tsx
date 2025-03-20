@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router";
 
-import { NavBar } from "app/component/navbar/NavBar";
+import { NavBar } from "@/component/navbar/NavBar";
 
 import { AppLayout } from "@kiesraad/ui";
 

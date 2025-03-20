@@ -5,19 +5,19 @@ import {
   election as election_19_or_more_seats,
   election_summary as election_summary_19_or_more_seats,
   seat_assignment as seat_assignment_19_or_more_seats,
-} from "app/component/apportionment/test-data/19-or-more-seats";
+} from "@/component/apportionment/test-data/19-or-more-seats";
 import {
   election as election_absolute_majority_change,
   election_summary as election_summary_absolute_majority_change,
   seat_assignment as seat_assignment_absolute_majority_change,
-} from "app/component/apportionment/test-data/absolute-majority-change";
+} from "@/component/apportionment/test-data/absolute-majority-change";
 import {
   election as election_less_than_19_seats,
   election_summary as election_summary_less_than_19_seats,
   largest_remainder_steps,
   seat_assignment as seat_assignment_less_than_19_seats,
-} from "app/component/apportionment/test-data/less-than-19-seats";
-import { routes } from "app/routes";
+} from "@/component/apportionment/test-data/less-than-19-seats";
+import { routes } from "@/routes";
 
 import { ApportionmentProvider, ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@kiesraad/api";
 import { getElectionMockData } from "@kiesraad/api-mocks";

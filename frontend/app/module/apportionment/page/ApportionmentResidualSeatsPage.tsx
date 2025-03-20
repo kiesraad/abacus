@@ -4,7 +4,7 @@ import {
   LargestAveragesFor19OrMoreSeatsTable,
   LargestAveragesForLessThan19SeatsTable,
   LargestRemaindersTable,
-} from "app/component/apportionment";
+} from "@/component/apportionment";
 
 import { AbsoluteMajorityChange, useApportionmentContext, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";

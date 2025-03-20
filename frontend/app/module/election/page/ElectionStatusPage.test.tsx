@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { ElectionStatusPage } from "app/module/election";
+import { ElectionStatusPage } from "@/module/election";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { getElectionMockData } from "@kiesraad/api-mocks";

@@ -1,4 +1,4 @@
-import { Footer } from "app/component/footer/Footer";
+import { Footer } from "@/component/footer/Footer";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";

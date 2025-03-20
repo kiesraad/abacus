@@ -1,8 +1,8 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionReportPage } from "app/module/election";
-import { routes } from "app/routes";
+import { ElectionReportPage } from "@/module/election";
+import { routes } from "@/routes";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 import { ElectionRequestHandler } from "@kiesraad/api-mocks";

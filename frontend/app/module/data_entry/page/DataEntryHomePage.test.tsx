@@ -3,7 +3,7 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { routes } from "app/routes";
+import { routes } from "@/routes";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 import {

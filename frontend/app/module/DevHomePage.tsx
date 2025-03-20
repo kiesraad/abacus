@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { MockTest } from "app/component/MockTest";
+import { MockTest } from "@/component/MockTest";
 
 import { ElectionListProvider, useApiState, useElectionList, useUserRole } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

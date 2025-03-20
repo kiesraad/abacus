@@ -4,8 +4,8 @@ import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { errorWarningMocks } from "app/component/form/data_entry/test-data";
-import { routes } from "app/routes";
+import { errorWarningMocks } from "@/component/form/data_entry/test-data";
+import { routes } from "@/routes";
 
 import { SaveDataEntryResponse, TestUserProvider } from "@kiesraad/api";
 import {

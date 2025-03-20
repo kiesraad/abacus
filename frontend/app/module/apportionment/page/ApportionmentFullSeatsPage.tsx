@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { FullSeatsTable, ResidualSeatsCalculationTable } from "app/component/apportionment";
+import { FullSeatsTable, ResidualSeatsCalculationTable } from "@/component/apportionment";
 
 import { useApportionmentContext, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";

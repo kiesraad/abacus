@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useNavigate } from "react-router";
 
-import { PollingStationForm } from "app/component/form/polling_station/PollingStationForm";
-import { PollingStationDeleteModal } from "app/module/polling_stations/page/PollingStationDeleteModal";
+import { PollingStationForm } from "@/component/form/polling_station/PollingStationForm";
+import { PollingStationDeleteModal } from "@/module/polling_stations/page/PollingStationDeleteModal";
 
 import { useElection, usePollingStationGet } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

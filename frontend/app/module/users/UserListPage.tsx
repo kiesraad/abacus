@@ -1,4 +1,4 @@
-import { useUserListRequest } from "app/module/users/useUserListRequest";
+import { useUserListRequest } from "@/module/users/useUserListRequest";
 
 import { Role } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

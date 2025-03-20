@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router";
 
-import { UserCreateDetailsForm } from "app/module/users/create/UserCreateDetailsForm";
+import { UserCreateDetailsForm } from "@/module/users/create/UserCreateDetailsForm";
 
 import type { User } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

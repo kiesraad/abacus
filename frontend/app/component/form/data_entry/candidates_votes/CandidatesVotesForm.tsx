@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { ErrorModal } from "app/component/error";
+import { ErrorModal } from "@/component/error";
 
 import { ApiError, PoliticalGroup } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

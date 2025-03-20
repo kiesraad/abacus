@@ -1,8 +1,8 @@
 import { FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-import { UserType } from "app/module/users/create/UserCreateContext";
-import { useUserCreateContext } from "app/module/users/create/useUserCreateContext";
+import { UserType } from "@/module/users/create/UserCreateContext";
+import { useUserCreateContext } from "@/module/users/create/useUserCreateContext";
 
 import { t } from "@kiesraad/i18n";
 import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@kiesraad/ui";

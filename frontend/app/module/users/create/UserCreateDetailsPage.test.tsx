@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { UserCreateDetailsPage } from "app/module/users";
+import { UserCreateDetailsPage } from "@/module/users";
 
 import { User, USER_CREATE_REQUEST_PATH } from "@kiesraad/api";
 import { overrideOnce, render } from "@kiesraad/test";

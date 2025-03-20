@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { mockElection } from "app/component/election/status/mockData";
+import { mockElection } from "@/component/election/status/mockData";
 
 import { ApiResponseStatus } from "@kiesraad/api";
 

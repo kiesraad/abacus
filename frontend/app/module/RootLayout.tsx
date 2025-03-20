@@ -1,6 +1,6 @@
 import { Outlet, ScrollRestoration } from "react-router";
 
-import { AuthorizationDialog } from "app/component/authorization/AuthorizationDialog";
+import { AuthorizationDialog } from "@/component/authorization/AuthorizationDialog";
 
 import { AppFrame } from "@kiesraad/ui";
 

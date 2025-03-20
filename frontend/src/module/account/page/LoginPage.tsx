@@ -1,4 +1,4 @@
-import { LoginForm } from "@/component/form/account/login/LoginForm";
+import { LoginForm } from "@/components/form/account/login/LoginForm";
 
 import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";

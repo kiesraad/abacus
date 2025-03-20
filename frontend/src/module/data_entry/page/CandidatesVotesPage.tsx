@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 
-import { CandidatesVotesForm } from "@/component/form/data_entry/candidates_votes/CandidatesVotesForm";
+import { CandidatesVotesForm } from "@/components/form/data_entry/candidates_votes/CandidatesVotesForm";
 
 import { useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

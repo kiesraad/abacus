@@ -1,10 +1,9 @@
 import { Outlet, useLocation } from "react-router";
 
-import { Footer } from "@/component/footer/Footer";
+import { Footer } from "@/components/footer/Footer";
+import { NavBar } from "@/components/navbar/NavBar";
 
 import { AppLayout } from "@kiesraad/ui";
-
-import { NavBar } from "../component/navbar/NavBar";
 
 export function AdministratorLayout() {
   const location = useLocation();

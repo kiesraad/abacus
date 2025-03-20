@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router";
 
-import { AccountSetupForm } from "@/component/form/account/account_setup/AccountSetupForm";
+import { AccountSetupForm } from "@/components/form/account/account_setup/AccountSetupForm";
 
 import { LoginResponse, useApiState } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

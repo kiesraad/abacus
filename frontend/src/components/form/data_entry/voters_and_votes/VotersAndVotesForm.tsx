@@ -1,4 +1,4 @@
-import { ErrorModal } from "@/component/error";
+import { ErrorModal } from "@/components/error";
 
 import { ApiError } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

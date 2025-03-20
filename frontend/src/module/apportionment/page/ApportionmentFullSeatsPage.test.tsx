@@ -1,7 +1,7 @@
 import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { election, election_summary, seat_assignment } from "@/component/apportionment/test-data/less-than-19-seats";
+import { election, election_summary, seat_assignment } from "@/components/apportionment/test-data/less-than-19-seats";
 import { routes } from "@/routes";
 
 import { ApportionmentProvider, ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@kiesraad/api";

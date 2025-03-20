@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 
-import { PollingStationForm } from "@/component/form/polling_station/PollingStationForm";
+import { PollingStationForm } from "@/components/form/polling_station/PollingStationForm";
 
 import { PollingStation, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

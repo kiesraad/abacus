@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 
-import { ErrorModal } from "@/component/error";
+import { ErrorModal } from "@/components/error";
 
 import { AuditLogEvent, Role, useAuditLog } from "@kiesraad/api";
 import { t, TranslationPath } from "@kiesraad/i18n";

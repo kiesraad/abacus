@@ -2,7 +2,7 @@ import * as React from "react";
 import { ReactElement } from "react";
 import { Link, useNavigate } from "react-router";
 
-import { ErrorModal } from "@/component/error";
+import { ErrorModal } from "@/components/error";
 
 import { ApiError, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";

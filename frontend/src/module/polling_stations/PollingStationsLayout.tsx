@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
 
-import { Footer } from "@/component/footer/Footer";
+import { Footer } from "@/components/footer/Footer";
 
 import { AppLayout } from "@kiesraad/ui";
 

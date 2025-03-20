@@ -1,6 +1,6 @@
-import { Error } from "@/component/error";
-import { Footer } from "@/component/footer/Footer";
-import { NavBar } from "@/component/navbar/NavBar";
+import { Error } from "@/components/error";
+import { Footer } from "@/components/footer/Footer";
+import { NavBar } from "@/components/navbar/NavBar";
 
 import { t, TranslationPath, tx } from "@kiesraad/i18n";
 import { AppLayout } from "@kiesraad/ui";

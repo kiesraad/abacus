@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
-import { ElectionProgress } from "@/component/election/ElectionProgress";
-import { Footer } from "@/component/footer/Footer";
-import { PollingStationChoiceForm } from "@/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
+import { ElectionProgress } from "@/components/election/ElectionProgress";
+import { Footer } from "@/components/footer/Footer";
+import { PollingStationChoiceForm } from "@/components/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 
 import { DEFAULT_CANCEL_REASON, useElection, useElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

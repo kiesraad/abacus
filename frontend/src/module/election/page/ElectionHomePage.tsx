@@ -1,6 +1,6 @@
 import { Link, Navigate } from "react-router";
 
-import { Footer } from "@/component/footer/Footer";
+import { Footer } from "@/components/footer/Footer";
 
 import { useElection, useUserRole } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

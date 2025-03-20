@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { ApportionmentTable, ElectionSummaryTable } from "@/component/apportionment";
+import { ApportionmentTable, ElectionSummaryTable } from "@/components/apportionment";
 
 import { useApportionmentContext, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

@@ -34,7 +34,7 @@ export function LargestAveragesForLessThan19SeatsTable({
       </Table.Header>
       <Table.Body>
         {finalStanding.map((pg_seat_assignment) => {
-          const average = largestAverageSteps[0]?.standing[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
+          const average = largestAverageSteps[0]?.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
           const residual_seats = largestAverageSteps.filter((step) => {
             const change = step.change as LargestAverageAssignedSeat;
             return change.selected_pg_number == pg_seat_assignment.pg_number;

@@ -129,7 +129,7 @@ pub struct SeatChangeStep {
     #[schema(nullable = false)]
     residual_seat_number: Option<u32>,
     change: SeatChange,
-    standing: Vec<PoliticalGroupStanding>,
+    standings: Vec<PoliticalGroupStanding>,
 }
 
 /// Records the political group and specific change for a specific residual seat
@@ -286,22 +286,22 @@ fn initial_full_seats_per_political_group(
 ///
 /// This function will always return at least one group.
 fn political_groups_with_largest_average<'a>(
-    assigned_seats: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
+    standings: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
     residual_seats: u32,
 ) -> Result<Vec<&'a PoliticalGroupStanding>, ApportionmentError> {
     // We are now going to find the political groups that have the largest average
     // votes per seat if we would were to add one additional seat to them
-    let (max_average, political_groups) = assigned_seats.into_iter().fold(
+    let (max_average, political_groups) = standings.into_iter().fold(
         (Fraction::ZERO, vec![]),
-        |(current_max, mut max_groups), pg| {
+        |(current_max, mut max_groups), s| {
             // If this average is higher than any previously seen, we reset the list of groups matching
-            if pg.next_votes_per_seat > current_max {
-                (pg.next_votes_per_seat, vec![pg])
+            if s.next_votes_per_seat > current_max {
+                (s.next_votes_per_seat, vec![s])
             } else {
                 // If the next average seats for this political group is the same as the
                 // max we add it to the list of groups that have that current maximum
-                if pg.next_votes_per_seat == current_max {
-                    max_groups.push(pg);
+                if s.next_votes_per_seat == current_max {
+                    max_groups.push(s);
                 }
                 (current_max, max_groups)
             }
@@ -337,21 +337,23 @@ fn political_groups_with_largest_average<'a>(
 ///
 /// This function will always return at least one group.
 fn political_groups_with_largest_remainder<'a>(
-    assigned_seats: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
+    standings: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
     residual_seats: u32,
 ) -> Result<Vec<&'a PoliticalGroupStanding>, ApportionmentError> {
+    // TODO: WHY ARE EXHAUSTED LISTS STILL INCLUDED...
     // We are now going to find the political groups that have the largest remainder
-    let (max_remainder, political_groups) = assigned_seats.into_iter().fold(
+    let (max_remainder, political_groups) = standings.into_iter().fold(
         (Fraction::ZERO, vec![]),
-        |(current_max, mut max_groups), pg| {
+        |(current_max, mut max_groups), s| {
+            println!("{}", s.pg_number);
             // If this remainder is higher than any previously seen, we reset the list of groups matching
-            if pg.remainder_votes > current_max {
-                (pg.remainder_votes, vec![pg])
+            if s.remainder_votes > current_max {
+                (s.remainder_votes, vec![s])
             } else {
                 // If the remainder for this political group is the same as the
                 // max we add it to the list of groups that have that current maximum
-                if pg.remainder_votes == current_max {
-                    max_groups.push(pg);
+                if s.remainder_votes == current_max {
+                    max_groups.push(s);
                 }
                 (current_max, max_groups)
             }
@@ -386,7 +388,7 @@ fn reassign_residual_seat_for_absolute_majority(
     seats: u32,
     totals: &ElectionSummary,
     pgs_last_residual_seat: &[PGNumber],
-    standing: Vec<PoliticalGroupStanding>,
+    standings: Vec<PoliticalGroupStanding>,
 ) -> Result<(Vec<PoliticalGroupStanding>, Option<SeatChange>), ApportionmentError> {
     let half_of_votes_count: Fraction =
         Fraction::from(totals.votes_counts.votes_candidates_count) * Fraction::new(1, 2);
@@ -397,16 +399,16 @@ fn reassign_residual_seat_for_absolute_majority(
         .iter()
         .find(|pg| Fraction::from(pg.total) > half_of_votes_count)
     else {
-        return Ok((standing, None));
+        return Ok((standings, None));
     };
 
     let half_of_seats_count: Fraction = Fraction::from(seats) * Fraction::new(1, 2);
-    let pg_final_standing_majority_votes = standing
+    let standing_of_pg_with_majority_votes = standings
         .iter()
         .find(|pg_standing| pg_standing.pg_number == majority_pg_votes.number)
-        .expect("PG exists");
+        .expect("Standing exists");
 
-    let pg_seats = Fraction::from(pg_final_standing_majority_votes.total_seats());
+    let pg_seats = Fraction::from(standing_of_pg_with_majority_votes.total_seats());
 
     if pg_seats <= half_of_seats_count {
         if pgs_last_residual_seat.len() > 1 {
@@ -417,13 +419,13 @@ fn reassign_residual_seat_for_absolute_majority(
             return Err(ApportionmentError::DrawingOfLotsNotImplemented);
         }
 
-        // Do the reassignment of the seat
-        let mut standing = standing.clone();
+        // Reassign the seat
+        let mut standing = standings.clone();
         standing[pgs_last_residual_seat[0] as usize - 1].residual_seats -= 1;
         standing[majority_pg_votes.number as usize - 1].residual_seats += 1;
 
         info!(
-            "Residual seat first assigned to list {} has been re-assigned to list {} in accordance with Article P 9 Kieswet",
+            "Residual seat first assigned to list {} has been reassigned to list {} in accordance with Article P 9 Kieswet",
             pgs_last_residual_seat[0], majority_pg_votes.number
         );
         Ok((
@@ -436,68 +438,73 @@ fn reassign_residual_seat_for_absolute_majority(
             )),
         ))
     } else {
-        Ok((standing, None))
+        Ok((standings, None))
     }
 }
 
 /// TODO
 fn reassign_residual_seats_for_exhausted_lists(
-    current_standing: &[PoliticalGroupStanding],
+    current_standings: &[PoliticalGroupStanding],
     seats: u32,
     assigned_residual_seats: u32,
-    exhausted_lists_and_seats: Vec<(&PoliticalGroupStanding, u32)>,
+    previous_steps: &[SeatChangeStep],
+    exhausted_lists_and_seats: Vec<(PoliticalGroupStanding, u32)>,
 ) -> Result<(Vec<SeatChangeStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
+    println!("{:#?}", exhausted_lists_and_seats);
     let mut seats_to_reassign = 0;
-    let mut exhausted_pgs: Vec<&PoliticalGroupStanding> = vec![];
+    let mut exhausted_standings: Vec<PoliticalGroupStanding> = vec![];
     let mut list_exhaustion_steps: Vec<SeatChangeStep> = vec![];
-    let mut standing = current_standing.to_owned();
-    for (p, seats) in exhausted_lists_and_seats {
+    let mut standings = current_standings.to_owned();
+    for (s, seats) in exhausted_lists_and_seats {
         seats_to_reassign += seats;
-        exhausted_pgs.push(p);
+        exhausted_standings.push(s);
         for _ in 1..=seats {
-            if standing[p.pg_number as usize - 1].residual_seats > 0 {
-                standing[p.pg_number as usize - 1].residual_seats -= 1;
+            if standings[s.pg_number as usize - 1].residual_seats > 0 {
+                standings[s.pg_number as usize - 1].residual_seats -= 1;
             } else {
-                standing[p.pg_number as usize - 1].full_seats -= 1;
+                standings[s.pg_number as usize - 1].full_seats -= 1;
             }
             info!(
                 "Residual seat first assigned to list {} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
-                p.pg_number
+                s.pg_number
             );
             list_exhaustion_steps.push(SeatChangeStep {
-                standing: standing.clone(),
+                standings: standings.clone(),
                 residual_seat_number: None,
                 change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
-                    pg_retracted_seat: p.pg_number,
+                    pg_retracted_seat: s.pg_number,
                 }),
             });
         }
     }
-    let (reassignment_steps, final_standing) = assign_remainder(
-        &standing,
+    println!("{:#?}", exhausted_standings);
+    let mut cumulative_steps = previous_steps.to_vec();
+    cumulative_steps.extend(list_exhaustion_steps);
+    let (final_steps, final_standing) = assign_remainder(
+        &standings,
         seats,
         assigned_residual_seats + seats_to_reassign,
         assigned_residual_seats,
-        exhausted_pgs,
+        &cumulative_steps,
+        &exhausted_standings,
     )?;
-    list_exhaustion_steps.extend(reassignment_steps);
-    Ok((list_exhaustion_steps, final_standing))
+    Ok((final_steps, final_standing))
 }
 
 fn exhausted_lists<'a>(
-    standing: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
+    standings: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
     totals: &'a ElectionSummary,
-) -> Vec<(&'a PoliticalGroupStanding, u32)> {
-    let mut exhausted_lists: Vec<(&PoliticalGroupStanding, u32)> = vec![];
-    for p in standing {
+) -> Vec<(PoliticalGroupStanding, u32)> {
+    let mut exhausted_lists: Vec<(PoliticalGroupStanding, u32)> = vec![];
+    for s in standings {
         let number_of_candidates = u32::try_from(
-            totals.political_group_votes[p.pg_number as usize - 1]
+            totals.political_group_votes[s.pg_number as usize - 1]
                 .candidate_votes
                 .len(),
         )
         .expect("Number of candidates fits in u32");
-        if number_of_candidates < p.total_seats() {
-            exhausted_lists.push((p, number_of_candidates.abs_diff(p.total_seats())));
+        if number_of_candidates < s.total_seats() {
+            exhausted_lists.push((*s, number_of_candidates.abs_diff(s.total_seats())));
         }
     }
     exhausted_lists
@@ -522,28 +529,28 @@ pub fn seat_assignment(
     let full_seats = initial_standing.iter().map(|pg| pg.full_seats).sum::<u32>();
     let residual_seats = seats - full_seats;
 
-    let (mut steps, current_standing) = if residual_seats > 0 {
-        assign_remainder(&initial_standing, seats, residual_seats, 0, vec![])?
+    let (mut steps, current_standings) = if residual_seats > 0 {
+        assign_remainder(&initial_standing, seats, residual_seats, 0, &[], &[])?
     } else {
         info!("All seats have been assigned without any residual seats");
         (vec![], initial_standing)
     };
 
     // [Artikel P 9 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_9&z=2025-02-12&g=2025-02-12)
-    let (current_standing, assigned_seat) = if let Some(last_step) = steps.last() {
+    let (cumulative_standings, assigned_seat) = if let Some(last_step) = steps.last() {
         reassign_residual_seat_for_absolute_majority(
             seats,
             totals,
             &last_step.change.pg_assigned(),
-            current_standing,
+            current_standings,
         )?
     } else {
-        (current_standing, None)
+        (current_standings, None)
     };
     if let Some(assigned_seat) = assigned_seat {
         // add the absolute majority change to the remainder assignment steps
         steps.push(SeatChangeStep {
-            standing: current_standing.clone(),
+            standings: cumulative_standings.clone(),
             residual_seat_number: None,
             change: assigned_seat,
         });
@@ -553,26 +560,29 @@ pub fn seat_assignment(
     //  mark deceased candidates
 
     // [Artikel P 10 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_10&z=2025-02-12&g=2025-02-12)
-    let exhausted_lists_and_seats: Vec<(&PoliticalGroupStanding, u32)> =
-        exhausted_lists(&current_standing, totals);
-    let (exhaustion_steps, final_standing) = if !exhausted_lists_and_seats.is_empty() {
+    let exhausted_lists_and_seats: Vec<(PoliticalGroupStanding, u32)> =
+        exhausted_lists(&cumulative_standings, totals);
+    // TODO: WHAT IF SEAT IS ASSIGNED TO A SEAT THAT ALSO DOES NOT HAVE OPEN SEATS?
+    //  SHOULD WE HAVE ANOTHER LIST WITH LISTS THAT ARE FULLY ASSIGNED AS WELL?
+    let (final_steps, final_standing) = if !exhausted_lists_and_seats.is_empty() {
         reassign_residual_seats_for_exhausted_lists(
-            &current_standing,
+            &cumulative_standings,
             seats,
             residual_seats,
+            &steps,
             exhausted_lists_and_seats,
         )?
     } else {
         info!("There are no exhausted lists");
-        (vec![], current_standing)
+        (steps, cumulative_standings)
     };
-    steps.extend(exhaustion_steps);
+    println!("{:#?}", final_steps[0]);
     Ok(SeatAssignmentResult {
         seats,
         full_seats,
         residual_seats,
         quota,
-        steps,
+        steps: final_steps,
         final_standing: final_standing.into_iter().map(Into::into).collect(),
     })
 }
@@ -581,16 +591,17 @@ pub fn seat_assignment(
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
 fn assign_remainder(
-    initial_standing: &[PoliticalGroupStanding],
+    initial_standings: &[PoliticalGroupStanding],
     seats: u32,
     total_residual_seats: u32,
     current_residual_seat_number: u32,
-    exhausted_pgs: Vec<&PoliticalGroupStanding>,
+    previous_steps: &[SeatChangeStep],
+    exhausted_standings: &[PoliticalGroupStanding],
 ) -> Result<(Vec<SeatChangeStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
-    let mut steps = vec![];
+    let mut steps: Vec<SeatChangeStep> = previous_steps.to_vec();
     let mut residual_seat_number = current_residual_seat_number;
 
-    let mut current_standing = initial_standing.to_vec();
+    let mut current_standings = initial_standings.to_vec();
 
     while residual_seat_number != total_residual_seats {
         let residual_seats = total_residual_seats - residual_seat_number;
@@ -598,45 +609,45 @@ fn assign_remainder(
         let step = if seats >= 19 {
             // [Artikel P 7 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_7&z=2025-02-12&g=2025-02-12)
             step_assign_remainder_using_largest_averages(
-                &current_standing,
+                &current_standings,
                 residual_seats,
                 &steps,
-                &exhausted_pgs,
+                exhausted_standings,
             )?
         } else {
             // [Artikel P 8 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_8&z=2025-02-12&g=2025-02-12)
             step_assign_remainder_using_largest_remainder(
-                &current_standing,
+                &current_standings,
                 residual_seats,
                 &steps,
-                &exhausted_pgs,
+                exhausted_standings,
             )?
         };
 
-        let standing = current_standing.clone();
+        let standings = current_standings.clone();
 
         // update the current standing by finding the selected group and
         // adding the residual seat to their tally
-        current_standing = current_standing
+        current_standings = current_standings
             .into_iter()
-            .map(|p| {
-                if p.pg_number == step.political_group_number() {
-                    p.add_residual_seat()
+            .map(|s| {
+                if s.pg_number == step.political_group_number() {
+                    s.add_residual_seat()
                 } else {
-                    p
+                    s
                 }
             })
             .collect();
 
         // add the update to the remainder assignment steps
         steps.push(SeatChangeStep {
-            standing,
+            standings,
             residual_seat_number: Some(residual_seat_number),
             change: step,
         });
     }
 
-    Ok((steps, current_standing))
+    Ok((steps, current_standings))
 }
 
 /// Get a vector with the political group number that was assigned the last residual seat.  
@@ -645,11 +656,11 @@ fn assign_remainder(
 /// return all political group numbers that had the same remainder/votes per seat.
 fn pg_assigned_from_previous_step(
     selected_pg: &PoliticalGroupStanding,
-    previous: &[SeatChangeStep],
+    previous_steps: &[SeatChangeStep],
     matcher: fn(&SeatChange) -> bool,
 ) -> Vec<PGNumber> {
     let mut pg_assigned = Vec::new();
-    if let Some(previous_step) = previous.last() {
+    if let Some(previous_step) = previous_steps.last() {
         if matcher(&previous_step.change)
             && previous_step
                 .change
@@ -663,16 +674,27 @@ fn pg_assigned_from_previous_step(
     pg_assigned
 }
 
+/// Get an iterator that lists all the political group standings without exhausted lists.  
+fn non_exhausted_political_group_standings<'a>(
+    standings: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
+    exhausted_standings: &[PoliticalGroupStanding],
+) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
+    standings
+        .into_iter()
+        .filter(|&s| !exhausted_standings.contains(s))
+}
+
 /// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with 19 seats or more.
 fn step_assign_remainder_using_largest_averages<'a>(
-    standing: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
+    standings: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
     residual_seats: u32,
-    previous: &[SeatChangeStep],
-    exhausted_pgs: &Vec<&'a PoliticalGroupStanding>,
+    previous_steps: &[SeatChangeStep],
+    exhausted_standings: &[PoliticalGroupStanding],
 ) -> Result<SeatChange, ApportionmentError> {
     let mut qualifying_for_largest_average =
-        political_groups_qualifying_for_largest_average(standing, exhausted_pgs).peekable();
+        non_exhausted_political_group_standings(standings, exhausted_standings).peekable();
+
     if qualifying_for_largest_average.peek().is_some() {
         let selected_pgs =
             political_groups_with_largest_average(qualifying_for_largest_average, residual_seats)?;
@@ -682,7 +704,7 @@ fn step_assign_remainder_using_largest_averages<'a>(
                 selected_pg_number: selected_pg.pg_number,
                 pg_assigned: pg_assigned_from_previous_step(
                     selected_pg,
-                    previous,
+                    previous_steps,
                     SeatChange::is_changed_by_largest_average_assignment,
                 ),
                 pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
@@ -695,22 +717,22 @@ fn step_assign_remainder_using_largest_averages<'a>(
 }
 
 /// Get an iterator that lists all the parties that qualify for getting a seat through
-/// the largest remainder process. This checks the previously assigned seats to make sure
-/// that only parties that didn't previously get a seat assigned are allowed to still
-/// get a seat through the remainder process. Additionally only political parties that
-/// met the threshold are considered for this process.
+/// the largest remainder process.  
+/// This checks the previously assigned seats to make sure that only parties that didn't
+/// previously get a seat assigned are allowed to still get a seat through the remainder process.  
+/// Additionally only political parties that met the threshold are considered for this process.  
 /// This also removes groups that do not have more candidates to be assigned seats.
-fn political_groups_qualifying_for_largest_remainder<'a>(
-    standing: &'a [PoliticalGroupStanding],
-    previous: &'a [SeatChangeStep],
-    exhausted_pgs: &Vec<&'a PoliticalGroupStanding>,
+fn political_group_standings_qualifying_for_largest_remainder<'a>(
+    standings: &'a [PoliticalGroupStanding],
+    previous_steps: &'a [SeatChangeStep],
+    exhausted_standings: &[PoliticalGroupStanding],
 ) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
-    standing.iter().filter(move |p| {
-        p.meets_remainder_threshold
-            && !exhausted_pgs.contains(p)
-            && !previous.iter().any(|prev| {
+    standings.iter().filter(|&s| {
+        s.meets_remainder_threshold
+            && !exhausted_standings.contains(s)
+            && !previous_steps.iter().any(|prev| {
                 prev.change.is_changed_by_largest_remainder_assignment()
-                    && prev.change.political_group_number() == p.pg_number
+                    && prev.change.political_group_number() == s.pg_number
             })
     })
 }
@@ -718,41 +740,33 @@ fn political_groups_qualifying_for_largest_remainder<'a>(
 /// Get an iterator that lists all the parties that qualify for unique largest average.  
 /// This checks the previously assigned seats to make sure that every group that already
 /// got a residual seat through the largest average procedure does not qualify.
-fn political_groups_qualifying_for_unique_largest_average<'a>(
-    assigned_seats: &'a [PoliticalGroupStanding],
-    previous: &'a [SeatChangeStep],
+fn political_group_standings_qualifying_for_unique_largest_average<'a>(
+    standings: &'a [PoliticalGroupStanding],
+    previous_steps: &'a [SeatChangeStep],
 ) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
-    assigned_seats.iter().filter(|p| {
-        !previous.iter().any(|prev| {
+    standings.iter().filter(|&s| {
+        !previous_steps.iter().any(|prev| {
             prev.change.is_changed_by_largest_average_assignment()
-                && prev.change.political_group_number() == p.pg_number
+                && prev.change.political_group_number() == s.pg_number
         })
     })
-}
-
-/// Get an iterator that lists all the parties that qualify for largest average.  
-/// This removes groups that do not have more candidates to be assigned seats.
-fn political_groups_qualifying_for_largest_average<'a>(
-    assigned_seats: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
-    exhausted_pgs: &Vec<&'a PoliticalGroupStanding>,
-) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
-    assigned_seats
-        .into_iter()
-        .filter(|p| !exhausted_pgs.contains(p))
 }
 
 /// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with less than 19 seats.
 fn step_assign_remainder_using_largest_remainder(
-    assigned_seats: &[PoliticalGroupStanding],
+    standings: &[PoliticalGroupStanding],
     residual_seats: u32,
-    previous: &[SeatChangeStep],
-    exhausted_pgs: &Vec<&PoliticalGroupStanding>,
+    previous_steps: &[SeatChangeStep],
+    exhausted_standings: &[PoliticalGroupStanding],
 ) -> Result<SeatChange, ApportionmentError> {
     // first we check if there are any political groups that still qualify for a largest remainder assigned seat
-    let mut qualifying_for_remainder =
-        political_groups_qualifying_for_largest_remainder(assigned_seats, previous, exhausted_pgs)
-            .peekable();
+    let mut qualifying_for_remainder = political_group_standings_qualifying_for_largest_remainder(
+        standings,
+        previous_steps,
+        exhausted_standings,
+    )
+    .peekable();
 
     // If there is at least one element in the iterator, we know we can still do a largest remainder assignment
     if qualifying_for_remainder.peek().is_some() {
@@ -764,7 +778,7 @@ fn step_assign_remainder_using_largest_remainder(
                 selected_pg_number: selected_pg.pg_number,
                 pg_assigned: pg_assigned_from_previous_step(
                     selected_pg,
-                    previous,
+                    previous_steps,
                     SeatChange::is_changed_by_largest_remainder_assignment,
                 ),
                 pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
@@ -776,14 +790,17 @@ fn step_assign_remainder_using_largest_remainder(
         // we allow every group to get a seat, not allowing any group to get a second residual seat
         // while there are still parties that did not get a residual seat.
         let mut qualifying_for_unique_largest_average =
-            political_groups_qualifying_for_unique_largest_average(assigned_seats, previous)
-                .peekable();
+            political_group_standings_qualifying_for_unique_largest_average(
+                standings,
+                previous_steps,
+            )
+            .peekable();
         if qualifying_for_unique_largest_average.peek().is_some() {
             step_assign_remainder_using_largest_averages(
                 qualifying_for_unique_largest_average,
                 residual_seats,
-                previous,
-                exhausted_pgs,
+                previous_steps,
+                exhausted_standings,
             )
         } else {
             // We've now even exhausted unique largest average seats: every group that qualified
@@ -791,10 +808,10 @@ fn step_assign_remainder_using_largest_remainder(
             // assigned to them. We now allow any residual seats to be assigned using the largest
             // averages procedure
             step_assign_remainder_using_largest_averages(
-                assigned_seats,
+                standings,
                 residual_seats,
-                previous,
-                exhausted_pgs,
+                previous_steps,
+                exhausted_standings,
             )
         }
     }
@@ -839,9 +856,9 @@ mod tests {
 
         /// Apportionment with residual seats assigned with remainder system
         ///
-        /// Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2
-        /// Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 60, 40]
-        /// 1 - largest remainder: seat assigned to list 1
+        /// Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2  
+        /// Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 60, 40]  
+        /// 1 - largest remainder: seat assigned to list 1  
         /// 2 - largest remainder: seat assigned to list 7
         #[test]
         fn test_with_residual_seats_assigned_with_remainder_system() {
@@ -858,13 +875,13 @@ mod tests {
 
         /// Apportionment with residual seats assigned with remainder and averages system
         ///
-        /// Full seats: [10, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 5
-        /// Remainders: [8, 59, 58, 57, 56, 55, 54, 53], only votes of list 1 meet the threshold of 75% of the quota
-        /// 1 - largest remainder: seat assigned to list 1
-        /// 1st round of largest averages system (assignment to unique political groups):
-        /// 2 - largest average: [67 4/12, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 1
-        /// 3 - largest average: [62 2/13, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 2,
-        /// 4 - largest average: [62 2/13, 29 1/2, 58, 57, 56, 55, 54, 53] seat assigned to list 3
+        /// Full seats: [10, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 5  
+        /// Remainders: [8, 59, 58, 57, 56, 55, 54, 53], only votes of list 1 meet the threshold of 75% of the quota  
+        /// 1 - largest remainder: seat assigned to list 1  
+        /// 1st round of largest averages system (assignment to unique political groups):  
+        /// 2 - largest average: [67 4/12, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 1  
+        /// 3 - largest average: [62 2/13, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 2  
+        /// 4 - largest average: [62 2/13, 29 1/2, 58, 57, 56, 55, 54, 53] seat assigned to list 3  
         /// 5 - largest average: [62 2/13, 29 1/2, 29, 57, 56, 55, 54, 53] seat assigned to list 4
         #[test]
         fn test_with_1_list_that_meets_threshold() {
@@ -884,10 +901,10 @@ mod tests {
 
         /// Apportionment with residual seats assigned with remainder system
         ///
-        /// Full seats: [6, 3, 3, 0, 0, 0, 0] - Remainder seats: 3
-        /// Remainders: [0/15, 0/15, 0/15, 55, 50, 45, 45, 45], only votes of lists [1, 2, 3] meet the threshold of 75% of the quota
-        /// 1 - largest remainder: seat assigned to list 1
-        /// 2 - largest remainder: seat assigned to list 2
+        /// Full seats: [6, 3, 3, 0, 0, 0, 0] - Remainder seats: 3  
+        /// Remainders: [0/15, 0/15, 0/15, 55, 50, 45, 45, 45], only votes of lists [1, 2, 3] meet the threshold of 75% of the quota  
+        /// 1 - largest remainder: seat assigned to list 1  
+        /// 2 - largest remainder: seat assigned to list 2  
         /// 3 - largest remainder: seat assigned to list 3
         #[test]
         fn test_with_3_lists_that_meet_threshold_0_remainders() {
@@ -905,11 +922,11 @@ mod tests {
 
         /// Apportionment with residual seats assigned with averages system
         ///
-        /// Full seats: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 3
-        /// Remainders: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1], no lists meet the threshold of 75% of the quota
-        /// 1st round of largest averages system (assignment to unique political groups):
-        /// 1 - largest average: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 1
-        /// 2 - largest average: [4, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 2
+        /// Full seats: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 3  
+        /// Remainders: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1], no lists meet the threshold of 75% of the quota  
+        /// 1st round of largest averages system (assignment to unique political groups):  
+        /// 1 - largest average: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 1  
+        /// 2 - largest average: [4, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 2  
         /// 3 - largest average: [4, 3 1/2, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 3
         #[test]
         fn test_with_0_lists_that_meet_threshold() {
@@ -927,11 +944,11 @@ mod tests {
 
         /// Apportionment with residual seats assigned with remainder and averages system
         ///
-        /// Full seats: [0, 0, 0, 0, 0, 7] - Remainder seats: 3
-        /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list [6] meets the threshold of 75% of the quota
-        ///  1 - largest remainder: seat assigned to list 6
-        /// 1st round of largest averages system (assignment to unique political groups):
-        ///  2 - largest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6
+        /// Full seats: [0, 0, 0, 0, 0, 7] - Remainder seats: 3  
+        /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list [6] meets the threshold of 75% of the quota  
+        ///  1 - largest remainder: seat assigned to list 6  
+        /// 1st round of largest averages system (assignment to unique political groups):  
+        ///  2 - largest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6  
         ///  3 - largest average: [0/1, 3, 5, 6, 7, 7 9/10] seat assigned to list 5
         #[test]
         fn test_1st_round_unique_largest_averages_system_regression() {
@@ -944,18 +961,18 @@ mod tests {
 
         /// Apportionment with residual seats assigned with remainder and averages system
         ///
-        /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 10
-        /// Remainders: [0/10, 0/10, 0/10, 0/10, 0/10]
-        ///  1 - largest remainder: seat assigned to list 1
-        ///  2 - largest remainder: seat assigned to list 2
-        ///  3 - largest remainder: seat assigned to list 3
-        ///  4 - largest remainder: seat assigned to list 4
-        ///  5 - largest remainder: seat assigned to list 5
-        /// 1st round of largest averages system (assignment to unique political groups):
-        ///  6 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 1
-        ///  7 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 2
-        ///  8 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 3
-        ///  9 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 4
+        /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 10  
+        /// Remainders: [0/10, 0/10, 0/10, 0/10, 0/10]  
+        ///  1 - largest remainder: seat assigned to list 1  
+        ///  2 - largest remainder: seat assigned to list 2  
+        ///  3 - largest remainder: seat assigned to list 3  
+        ///  4 - largest remainder: seat assigned to list 4  
+        ///  5 - largest remainder: seat assigned to list 5  
+        /// 1st round of largest averages system (assignment to unique political groups):  
+        ///  6 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 1  
+        ///  7 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 2  
+        ///  8 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 3  
+        ///  9 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 4  
         /// 10 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 5
         #[test]
         fn test_with_0_votes() {
@@ -978,12 +995,12 @@ mod tests {
 
         /// Apportionment with residual seats assigned with remainder system
         ///
-        /// This test triggers Kieswet Article P 9 (Actual case from GR2022)
-        /// Full seats: [7, 2, 1, 1, 1] - Remainder seats: 3
-        /// Remainders: [189 2/15, 296 7/15, 226 11/15, 195 11/15, 112 11/15]
-        /// 1 - largest remainder: seat assigned to list 2
-        /// 2 - largest remainder: seat assigned to list 3
-        /// 3 - largest remainder: seat assigned to list 4
+        /// This test triggers Kieswet Article P 9 (Actual case from GR2022)  
+        /// Full seats: [7, 2, 1, 1, 1] - Remainder seats: 3  
+        /// Remainders: [189 2/15, 296 7/15, 226 11/15, 195 11/15, 112 11/15]  
+        /// 1 - largest remainder: seat assigned to list 2  
+        /// 2 - largest remainder: seat assigned to list 3  
+        /// 3 - largest remainder: seat assigned to list 4  
         /// 4 - Residual seat first assigned to list 4 has been re-assigned to list 1 in accordance with Article P 9 Kieswet
         #[test]
         fn test_with_absolute_majority_of_votes_but_not_seats() {
@@ -1010,14 +1027,14 @@ mod tests {
             };
             use test_log::test;
 
-            /// Apportionment with residual seats assigned with remainder system
+            /// Apportionment with residual seats assigned with remainder system  
             /// This test triggers Kieswet Article P 9
             ///
-            /// Full seats: [7, 1, 1, 1, 1, 1] - Remainder seats: 3
-            /// Remainders: [170 9/15, 170 12/15, 170 12/15, 170 12/15, 168 12/15, 168 12/15]
-            /// 1 - largest remainder: seat assigned to list 2
-            /// 2 - largest remainder: seat assigned to list 3
-            /// 3 - largest remainder: seat assigned to list 4
+            /// Full seats: [7, 1, 1, 1, 1, 1] - Remainder seats: 3  
+            /// Remainders: [170 9/15, 170 12/15, 170 12/15, 170 12/15, 168 12/15, 168 12/15]  
+            /// 1 - largest remainder: seat assigned to list 2  
+            /// 2 - largest remainder: seat assigned to list 3  
+            /// 3 - largest remainder: seat assigned to list 4  
             /// 4 - Drawing of lots is required for political groups: [2, 3, 4] to pick a political group which the residual seat gets retracted from
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error() {
@@ -1030,21 +1047,21 @@ mod tests {
 
             /// Apportionment with residual seats assigned with remainder and 2 rounds of averages system
             ///
-            /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 15
-            /// Remainders: [0/10, 0/10, 0/10, 0/10, 0/10]
-            ///  1 - largest remainder: seat assigned to list 1
-            ///  2 - largest remainder: seat assigned to list 2
-            ///  3 - largest remainder: seat assigned to list 3
-            ///  4 - largest remainder: seat assigned to list 4
-            ///  5 - largest remainder: seat assigned to list 5
-            /// 1st round of largest averages system (assignment to unique political groups):
-            ///  6 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1
-            ///  7 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 2
-            ///  8 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 3
-            ///  9 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 4
-            /// 10 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 5
-            /// 2nd round of largest averages system (assignment to any political group):
-            /// 11 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1
+            /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 15  
+            /// Remainders: [0/10, 0/10, 0/10, 0/10, 0/10]  
+            ///  1 - largest remainder: seat assigned to list 1  
+            ///  2 - largest remainder: seat assigned to list 2  
+            ///  3 - largest remainder: seat assigned to list 3  
+            ///  4 - largest remainder: seat assigned to list 4  
+            ///  5 - largest remainder: seat assigned to list 5  
+            /// 1st round of largest averages system (assignment to unique political groups):  
+            ///  6 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1  
+            ///  7 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 2  
+            ///  8 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 3  
+            ///  9 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 4  
+            /// 10 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 5  
+            /// 2nd round of largest averages system (assignment to any political group):  
+            /// 11 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1  
             /// 12 - Drawing of lots is required for political groups: [1, 2, 3, 4, 5], only 4 seats available
             #[test]
             fn test_with_0_votes_with_drawing_of_lots_error_in_2nd_round_averages_system() {
@@ -1056,9 +1073,9 @@ mod tests {
 
             /// Apportionment with residual seats assigned with remainder system
             ///
-            /// Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2
-            /// Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 55, 45]
-            /// 1 - largest remainder: seat assigned to list 1
+            /// Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2  
+            /// Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 55, 45]  
+            /// 1 - largest remainder: seat assigned to list 1  
             /// 2 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 1 seat available
             #[test]
             fn test_with_0_remainders_drawing_of_lots_error() {
@@ -1071,8 +1088,8 @@ mod tests {
 
             /// Apportionment with residual seats assigned with remainder system
             ///
-            /// Full seats: [6, 1, 1, 1, 1, 1] - Remainder seats: 4
-            /// Remainders: [20, 60, 60, 60, 60, 60]
+            /// Full seats: [6, 1, 1, 1, 1, 1] - Remainder seats: 4  
+            /// Remainders: [20, 60, 60, 60, 60, 60]  
             /// 1 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 4 seats available
             #[test]
             fn test_with_drawing_of_lots_error() {
@@ -1093,17 +1110,47 @@ mod tests {
 
             /// Apportionment with residual seats assigned with remainder system
             ///
-            /// This test triggers Kieswet Article P 10 (Actual case from GR2022)
-            /// Full seats: [2, 1, 1, 1, 1, 1, 1, 0, 2, 1, 0] - Remainder seats: 6
-            /// Remainders: [227 7/17, 40 12/17, 387 12/17, 213 12/17, 156 12/17, 204 12/17, 161 12/17, 326, 295 7/17, 271 12/17, 380]
-            /// 1 - largest remainder: seat assigned to list 3
-            /// 2 - largest remainder: seat assigned to list 11
-            /// 3 - largest remainder: seat assigned to list 9
-            /// 4 - largest remainder: seat assigned to list 10
-            /// 5 - largest remainder: seat assigned to list 1
-            /// 6 - largest remainder: seat assigned to list 4
-            /// 7 - Residual seat first assigned to list 10 has been re-assigned to another list in accordance with Article P 10 Kieswet
-            /// 8 - largest remainder: seat assigned to list 3
+            /// This test triggers Kieswet Article P 10  
+            /// Full seats: [5, 4, 3, 2, 0] - Remainder seats: 4  
+            /// Remainders: [1, 0/15, 0/15, 0/15, 399]  
+            /// 1 - largest remainder: seat assigned to list 5  
+            /// 2 - Residual seat first assigned to list 1 has been re-assigned to another list in accordance with Article P 10 Kieswet  
+            /// 3 - largest average: seat assigned to list 5
+            #[test]
+            fn test_with_list_exhaustion_during_full_seats_assignment() {
+                let totals = election_summary_fixture_with_given_candidate_votes(vec![
+                    vec![500, 500, 500, 501],
+                    vec![400, 400, 400, 400],
+                    vec![400, 400, 400],
+                    vec![400, 400],
+                    vec![200, 199],
+                ]);
+                let result = seat_assignment(15, &totals).unwrap();
+                assert_eq!(result.steps.len(), 3);
+                assert_eq!(result.steps[0].change.political_group_number(), 5);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[2].change.political_group_number(), 5);
+                let total_seats = get_total_seats_from_apportionment_result(result);
+                assert_eq!(total_seats, vec![4, 4, 3, 2, 2]);
+            }
+
+            /// Apportionment with residual seats assigned with remainder system
+            ///
+            /// This test triggers Kieswet Article P 10 (Actual case from GR2022)  
+            /// Full seats: [2, 1, 1, 1, 1, 1, 1, 0, 2, 1, 0] - Remainder seats: 6  
+            /// Remainders: [227 7/17, 40 12/17, 387 12/17, 213 12/17, 156 12/17, 204 12/17, 161 12/17, 326, 295 7/17, 271 12/17, 380]  
+            /// 1 - largest remainder: seat assigned to list 3  
+            /// 2 - largest remainder: seat assigned to list 11  
+            /// 3 - largest remainder: seat assigned to list 9  
+            /// 4 - largest remainder: seat assigned to list 10  
+            /// 5 - largest remainder: seat assigned to list 1  
+            /// 6 - largest remainder: seat assigned to list 4  
+            /// 7 - Residual seat first assigned to list 10 has been re-assigned to another list in accordance with Article P 10 Kieswet  
+            /// 8 - largest remainder: seat assigned to list 6
             #[test]
             fn test_with_list_exhaustion_during_residual_seats_assignment_with_remainder_system() {
                 let totals = election_summary_fixture_with_given_candidate_votes(vec![
@@ -1132,9 +1179,9 @@ mod tests {
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[7].change.political_group_number(), 3);
+                assert_eq!(result.steps[7].change.political_group_number(), 6);
                 let total_seats = get_total_seats_from_apportionment_result(result);
-                assert_eq!(total_seats, vec![3, 1, 3, 2, 1, 1, 1, 0, 3, 1, 1]);
+                assert_eq!(total_seats, vec![3, 1, 2, 2, 1, 2, 1, 0, 3, 1, 1]);
             }
         }
     }
@@ -1162,10 +1209,10 @@ mod tests {
 
         /// Apportionment with residual seats assigned with averages system
         ///
-        /// Full seats: [11, 5, 1, 1, 1] - Remainder seats: 4
-        /// 1 - largest average: [50, 50 2/6, 49, 49 1/2, 50 1/2] seat assigned to list 5
-        /// 2 - largest average: [50, 50 2/6, 49, 49 1/2, 33 2/3] seat assigned to list 2
-        /// 3 - largest average: [50, 43 1/7, 49, 49 1/2, 33 2/3] seat assigned to list 1
+        /// Full seats: [11, 5, 1, 1, 1] - Remainder seats: 4  
+        /// 1 - largest average: [50, 50 2/6, 49, 49 1/2, 50 1/2] seat assigned to list 5  
+        /// 2 - largest average: [50, 50 2/6, 49, 49 1/2, 33 2/3] seat assigned to list 2  
+        /// 3 - largest average: [50, 43 1/7, 49, 49 1/2, 33 2/3] seat assigned to list 1  
         /// 4 - largest average: [46 2/13, 43 1/7, 49, 49 1/2, 33 2/3] seat assigned to list 4
         #[test]
         fn test_with_remainder_seats() {
@@ -1183,13 +1230,13 @@ mod tests {
 
         /// Apportionment with residual seats assigned with averages system
         ///
-        /// Full seats: [15, 0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 7
-        /// 1 - largest average: [62 2/13, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 1
-        /// 2 - largest average: [57 10/14, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 1
-        /// 3 - largest average: [53 13/15, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 2
-        /// 4 - largest average: [53 13/15, 28 1/2, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 3
-        /// 5 - largest average: [53 13/15, 28 1/2, 28, 55, 54, 53, 52, 51, 14] seat assigned to list 4
-        /// 6 - largest average: [53 13/15, 28 1/2, 28, 27 1/2, 54, 53, 52, 51, 14] seat assigned to list 5
+        /// Full seats: [15, 0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 7  
+        /// 1 - largest average: [62 2/13, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 1  
+        /// 2 - largest average: [57 10/14, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 1  
+        /// 3 - largest average: [53 13/15, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 2  
+        /// 4 - largest average: [53 13/15, 28 1/2, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 3  
+        /// 5 - largest average: [53 13/15, 28 1/2, 28, 55, 54, 53, 52, 51, 14] seat assigned to list 4  
+        /// 6 - largest average: [53 13/15, 28 1/2, 28, 27 1/2, 54, 53, 52, 51, 14] seat assigned to list 5  
         /// 7 - largest average: [53 13/15, 28 1/2, 28, 27 1/2, 27, 53, 52, 51, 14] seat assigned to list 1
         #[test]
         fn test_with_multiple_remainder_seats_assigned_to_one_list() {
@@ -1211,8 +1258,8 @@ mod tests {
 
         /// Apportionment with residual seats assigned with averages system
         ///
-        /// Full seats: [0] - Remainder seats: 19
-        /// 1-19 - largest average: [0/1] seat assigned to list 1
+        /// Full seats: [0] - Remainder seats: 19  
+        /// 1-19 - largest average: [0/1] seat assigned to list 1  
         #[test]
         fn test_with_0_votes() {
             let totals = election_summary_fixture_with_default_50_candidates(vec![0]);
@@ -1222,16 +1269,16 @@ mod tests {
             assert_eq!(total_seats, vec![19]);
         }
 
-        /// Apportionment with residual seats assigned with averages system
+        /// Apportionment with residual seats assigned with averages system  
         /// This test triggers Kieswet Article P 9
         ///
-        /// Full seats: [12, 1, 1, 1, 1, 1, 1, 0] - Remainder seats: 6
-        /// 1 - largest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 2
-        /// 2 - largest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 3
-        /// 3 - largest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 4
-        /// 4 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 7] seat assigned to list 5
-        /// 5 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 7] seat assigned to list 6
-        /// 6 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 7] seat assigned to list 7
+        /// Full seats: [12, 1, 1, 1, 1, 1, 1, 0] - Remainder seats: 6  
+        /// 1 - largest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 2  
+        /// 2 - largest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 3  
+        /// 3 - largest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 4  
+        /// 4 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 7] seat assigned to list 5  
+        /// 5 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 7] seat assigned to list 6  
+        /// 6 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 7] seat assigned to list 7  
         /// 7 - Residual seat first assigned to list 7 has been re-assigned to list 1 in accordance with Article P 9 Kieswet
         #[test]
         fn test_with_absolute_majority_of_votes_but_not_seats() {
@@ -1257,16 +1304,16 @@ mod tests {
             };
             use test_log::test;
 
-            /// Apportionment with residual seats assigned with averages system
+            /// Apportionment with residual seats assigned with averages system  
             /// This test triggers Kieswet Article P 9
             ///
-            /// Full seats: [12, 1, 1, 1, 1, 1, 1, 0] - Remainder seats: 6
-            /// 1 - largest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 2
-            /// 2 - largest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 3
-            /// 3 - largest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 4
-            /// 4 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 624, 8] seat assigned to list 5
-            /// 5 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 624, 8] seat assigned to list 6
-            /// 6 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416, 624, 8] seat assigned to list 7
+            /// Full seats: [12, 1, 1, 1, 1, 1, 1, 0] - Remainder seats: 6  
+            /// 1 - largest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 2  
+            /// 2 - largest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 3  
+            /// 3 - largest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 4  
+            /// 4 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 624, 8] seat assigned to list 5  
+            /// 5 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 624, 8] seat assigned to list 6  
+            /// 6 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416, 624, 8] seat assigned to list 7  
             /// 7 - Drawing of lots is required for political groups: [6, 7] to pick a political group which the residual seat gets retracted from
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error() {
@@ -1279,8 +1326,8 @@ mod tests {
 
             /// Apportionment with residual seats assigned with averages system
             ///
-            /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 19
-            /// 1-15 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1
+            /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 19  
+            /// 1-15 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1  
             /// 16 - Drawing of lots is required for political groups: [1, 2, 3, 4, 5], only 4 seats available
             #[test]
             fn test_with_0_votes_with_drawing_of_lots_error() {
@@ -1292,8 +1339,8 @@ mod tests {
 
             /// Apportionment with residual seats assigned with averages system
             ///
-            /// Full seats: [9, 2, 2, 2, 2, 2] - Remainder seats: 4
-            /// 1 - largest average: [50, 46 2/3, 46 2/3, 46 2/3, 46 2/3, 46 2/3] seat assigned to list 1
+            /// Full seats: [9, 2, 2, 2, 2, 2] - Remainder seats: 4  
+            /// 1 - largest average: [50, 46 2/3, 46 2/3, 46 2/3, 46 2/3, 46 2/3] seat assigned to list 1  
             /// 2 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 3 seats available
             #[test]
             fn test_with_drawing_of_lots_error() {

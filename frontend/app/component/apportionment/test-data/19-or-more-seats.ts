@@ -23,7 +23,7 @@ export const seat_assignment: SeatAssignmentResult = {
           denominator: 2,
         },
       },
-      standing: [
+      standings: [
         {
           pg_number: 1,
           votes_cast: 600,
@@ -124,7 +124,7 @@ export const seat_assignment: SeatAssignmentResult = {
           denominator: 6,
         },
       },
-      standing: [
+      standings: [
         {
           pg_number: 1,
           votes_cast: 600,
@@ -225,7 +225,7 @@ export const seat_assignment: SeatAssignmentResult = {
           denominator: 12,
         },
       },
-      standing: [
+      standings: [
         {
           pg_number: 1,
           votes_cast: 600,
@@ -326,7 +326,7 @@ export const seat_assignment: SeatAssignmentResult = {
           denominator: 2,
         },
       },
-      standing: [
+      standings: [
         {
           pg_number: 1,
           votes_cast: 600,

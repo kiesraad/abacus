@@ -233,13 +233,7 @@ describe("Test DifferencesForm", () => {
       await screen.findByTestId("differences_form");
       const spy = vi.spyOn(global, "fetch");
 
-      await userTypeInputs(
-        user,
-        {
-          ...expectedRequest.data.differences_counts,
-        },
-        "data.differences_counts.",
-      );
+      await userTypeInputs(user, expectedRequest.data.differences_counts, "data.differences_counts.");
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);

@@ -58,7 +58,7 @@ function renderForm({ group, election }: { group?: PoliticalGroup; election?: Re
 
 const candidatesFieldIds = {
   candidate0: "data.political_group_votes[0].candidate_votes[0].votes",
-  candidate1: "data.political_group_votes[0].candidate_votes[0].votes",
+  candidate1: "data.political_group_votes[0].candidate_votes[1].votes",
   total: "data.political_group_votes[0].total",
 };
 

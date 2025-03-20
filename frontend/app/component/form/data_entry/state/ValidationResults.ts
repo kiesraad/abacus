@@ -54,11 +54,13 @@ export function isGlobalValidationResult(validationResult: ValidationResult): bo
 }
 
 /*
- * Maps a field name as used in a ValidationResult to a field section as used in the data entry state.
+ * Maps a field name as used in a ValidationResult to a form section as used in the data entry state.
  */
-export function mapFieldNameToFieldSection(fieldName: string): FormSectionId | null {
+export function mapFieldNameToFormSection(fieldName: string): FormSectionId {
   const parts = fieldName.split(".");
-  if (parts[1] === undefined) return null;
+  if (parts[1] === undefined) {
+    throw new Error(`Field "${fieldName}" could not be mapped to a form section (no second part).`);
+  }
   const section = parts[1].split("[")[0];
   switch (section) {
     case "recounted":
@@ -74,15 +76,15 @@ export function mapFieldNameToFieldSection(fieldName: string): FormSectionId | n
       return `political_group_votes_${index}`;
     }
     default:
-      return null;
+      throw new Error(`Field "${fieldName}" could not be mapped to a form section (unknown second part).`);
   }
 }
 
 /*
- * Returns the set of field sections for a given validation result.
+ * Returns the set of form sections for a given validation result.
  */
-export function getFieldSectionsForValidationResult(validationResult: ValidationResult): Set<FormSectionId> {
-  return new Set(validationResult.fields.map(mapFieldNameToFieldSection).filter((v) => v !== null));
+export function getFormSectionsForValidationResult(validationResult: ValidationResult): Set<FormSectionId> {
+  return new Set(validationResult.fields.map(mapFieldNameToFormSection));
 }
 
 /*
@@ -94,10 +96,10 @@ export function addValidationResultsToFormState(
   errorsOrWarnings: "errors" | "warnings",
 ) {
   for (const validationResult of validationResults) {
-    const fieldSections = getFieldSectionsForValidationResult(validationResult);
-    for (const fieldSection of fieldSections) {
-      if (formState.sections[fieldSection] && formState.sections[fieldSection].isSaved) {
-        formState.sections[fieldSection][errorsOrWarnings].add(validationResult);
+    const formSections = getFormSectionsForValidationResult(validationResult);
+    for (const formSection of formSections) {
+      if (formState.sections[formSection] && formState.sections[formSection].isSaved) {
+        formState.sections[formSection][errorsOrWarnings].add(validationResult);
       }
     }
   }

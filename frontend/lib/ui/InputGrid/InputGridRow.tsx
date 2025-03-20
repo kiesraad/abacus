@@ -35,11 +35,10 @@ export function InputGridRow({
   value,
   onChange,
 }: InputGridRowProps) {
-  const hasError = errorsAndWarnings && errorsAndWarnings.get(id) == "error";
-  const hasWarning = errorsAndWarnings && errorsAndWarnings.get(id) == "warning";
+  const hasError = errorsAndWarnings?.get(id) === "error";
+  const hasWarning = errorsAndWarnings?.get(id) === "warning";
   const hasUnacceptedWarning = hasWarning && !warningsAccepted;
 
-  const isInvalid = !!errorMessageId || hasError || hasUnacceptedWarning;
   const errorMessage =
     errorMessageId || (hasError ? "feedback-error" : hasUnacceptedWarning ? "feedback-warning" : undefined);
 
@@ -58,7 +57,7 @@ export function InputGridRow({
           value={value}
           onChange={onChange}
           aria-labelledby={`field-${id} title-${id}`}
-          aria-invalid={isInvalid}
+          aria-invalid={errorMessage !== undefined}
           aria-errormessage={errorMessage}
         />
       </FormField>

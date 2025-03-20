@@ -1,4 +1,4 @@
-import { assert, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { ValidationResult } from "@kiesraad/api";
 
@@ -6,7 +6,7 @@ import { errorWarningMocks, getDefaultDataEntryState } from "../test-data";
 import {
   addValidationResultsToFormState,
   isGlobalValidationResult,
-  mapFieldNameToFieldSection,
+  mapFieldNameToFormSection,
   mapValidationResultsToFields,
   ValidationResultSet,
 } from "./ValidationResults";
@@ -38,7 +38,7 @@ describe("isGlobalValidationResult", () => {
   });
 });
 
-describe("mapFieldNameToFieldSection", () => {
+describe("mapFieldNameToFormSection", () => {
   test.each([
     ["data.recounted", "recounted"],
     ["data.voters_counts.poll_card_count", "voters_votes_counts"],
@@ -48,9 +48,12 @@ describe("mapFieldNameToFieldSection", () => {
     ["data.political_group_votes[8].candidate_votes[1].votes", "political_group_votes_9"],
     ["data.political_group_votes[11].candidate_votes[1].votes", "political_group_votes_12"],
     ["data.political_group_votes[20].candidate_votes[5].votes", "political_group_votes_21"],
-    ["data.unknown", null],
-  ])("map field name %s to field section %s", (fieldName: string, fieldSection: string | null) => {
-    expect(mapFieldNameToFieldSection(fieldName)).equals(fieldSection);
+  ])("map field name %s to field section %s", (fieldName: string, formSection: string) => {
+    expect(mapFieldNameToFormSection(fieldName)).equals(formSection);
+  });
+
+  test("should throw error for unknown field name", () => {
+    expect(() => mapFieldNameToFormSection("data.unknown")).toThrowError();
   });
 });
 
@@ -77,8 +80,7 @@ describe("addValidationResultToFormState", () => {
 
     expect(formState.sections.voters_votes_counts.errors.size()).toBe(1);
     const pg1 = formState.sections.political_group_votes_1;
-    assert(pg1);
-    expect(pg1.errors.size()).toBe(1);
+    expect(pg1?.errors.size()).toBe(1);
   });
 
   test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {

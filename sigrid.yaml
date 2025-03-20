@@ -123,7 +123,7 @@ components:
       - ".*/frontend/lib/i18n/.*"
   - name: "(Frontend) Unit tests"
     include:
-      - ".*/frontend/lib/test/.*"
+      - ".*/frontend/src/testing/.*"
   - name: "(Frontend) Lib/UI"
     include:
       - ".*/frontend/src/components/ui/.*"

@@ -53,7 +53,7 @@ module.exports = {
       },
     },
     {
-      files: ["*.test.tsx", "lib/api-mocks/**/*.ts", "lib/test/**/*.ts"],
+      files: ["*.test.tsx", "lib/api-mocks/**/*.ts", "src/testing/**/*.ts"],
       rules: {
         "@typescript-eslint/no-non-null-assertion": "off",
       },

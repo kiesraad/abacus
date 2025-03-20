@@ -12,6 +12,12 @@ import {
 } from "./ValidationResults";
 
 describe("ValidationResultSet", () => {
+  test("includes", () => {
+    const validationResults = new ValidationResultSet([errorWarningMocks.F201, errorWarningMocks.F202]);
+    expect(validationResults.includes("F201")).toBe(true);
+    expect(validationResults.includes("F204")).toBe(false);
+  });
+
   test("hasOnlyGlobalValidationResults", () => {
     const onlyGlobalResults = new ValidationResultSet([errorWarningMocks.F204]);
     expect(onlyGlobalResults.hasOnlyGlobalValidationResults()).toBe(true);

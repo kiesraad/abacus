@@ -21,12 +21,12 @@ export function useInitialDataEntryState(
         const dataEntry = result.data;
 
         dispatch({
-          type: "DATA_ENTRY_LOADED",
+          type: "DATA_ENTRY_CLAIMED",
           dataEntry,
         });
       } else {
         dispatch({
-          type: "DATA_ENTRY_LOAD_FAILED",
+          type: "DATA_ENTRY_CLAIM_FAILED",
           error: result,
         });
       }

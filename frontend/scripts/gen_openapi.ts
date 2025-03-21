@@ -2,7 +2,7 @@ import fs from "fs";
 
 import { generate } from "./openapi/generator";
 
-const TARGET_PATH = "lib/api/gen/openapi.ts";
+const TARGET_PATH = "src/api/gen/openapi.ts";
 
 async function run() {
   const fileString = fs.readFileSync("../backend/openapi.json", "utf8");

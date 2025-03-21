@@ -9,8 +9,8 @@ export default defineConfig((configEnv) =>
       test: {
         environment: "jsdom",
         restoreMocks: true,
-        setupFiles: ["lib/test/setup.ts"],
-        includeSource: ["app/**/*.ts", "lib/**/*.ts"],
+        setupFiles: ["src/testing/setup.ts"],
+        includeSource: ["src/**/*.ts"],
         testTimeout: 30_000,
         coverage: {
           provider: "v8",

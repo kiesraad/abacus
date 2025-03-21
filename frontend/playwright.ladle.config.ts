@@ -6,7 +6,7 @@ const config: PlaywrightTestConfig = defineConfig({
   ...commonConfig,
   // Use the list reporter even on CI, to get immediate feedback
   reporter: process.env.CI ? [["list"], ["github"], ["junit", { outputFile: "playwright.ladle.junit.xml" }]] : "list",
-  testDir: "./lib/ui",
+  testDir: "./src/components/ui",
   outputDir: "./test-results/ladle",
   testMatch: /\.e2e\.ts/,
   use: {

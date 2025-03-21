@@ -14,11 +14,11 @@ __Hoofdscenario:__
 4. [Het CSB voert de tellingen van het GSB in.](#het-csb-voert-de-tellingen-van-het-gsb-in-vlieger)
 5. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
 6. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)
-7. De applicatie genereert de benodigde bestanden: concept-PV, digitaal bestand(en). Locatie en datum, namen stembureauleden, opmerkelijkheden, ...?
+7. De applicatie genereert de benodigde bestanden: PV, digitaal bestand(en). Locatie en datum, namen stembureauleden, opmerkelijkheden, ...?
 8. De voorzitter CSB (burgemeester) tekent de brieven.
 9. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)
 10. Het CSB opent de zitting.
-11. Het CSB stelt de uitslag vast obv het concept-PV: controleren op compleetheid, voorlezen, er zijn geen bezwaren, ondertekenen. En sluit daarmee de zitting.
+11. Het CSB stelt de uitslag vast obv het PV: controleren op compleetheid, voorlezen, er zijn geen bezwaren, ondertekenen. En sluit daarmee de zitting.
 12. Het CSB publiceert het digitaal bestand en het PV op de website van de gemeente.
 13. Het CSB stuurt alle PVs naar de gemeenteraad.
 14. Het CSB deelt het digitale bestand met de Kiesraad.
@@ -29,6 +29,9 @@ __Uitbreidingen:__
 &emsp;3a1. Het CSB verwijst terug naar het GSB.  
 &emsp;3a2. Het GSB doet onderzoek en gaat eventueel over tot hertelling.  
 &emsp;3a3. Het GSB deelt de resultaten van de terugverwijzing met het CSB.
+
+4-11a. Het CSB moet nieuwe aantallen invoeren ter correctie van de eerder ingevoerde tellingen:  
+&emsp; 4-11a1. Het CSB corrigeert de eerder ingevoerde aantallen in de applicatie. Er is dus geen tweede zitting.
 
 11a. Er zijn bezwaren (kan alleen tijdens zitting):
 
@@ -65,6 +68,8 @@ __Uitbreidingen:__
 &emsp;1a1. Het CSB lost in overleg met het GSB het probleem op en importeert alsnog het bestand.  
 &emsp;1a1a. Het CSB slaagt er niet in het probleem op te lossen:  
 &emsp;&emsp;1a1a1. Het CSB doet de eerste invoer handmatig.
+
+TODO: hier ook bij 3a uitwerken over waarschuwingen zoals bij GSB
 
 3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 3a1. De coördinator vergelijkt de eerste en tweede invoer met het papieren PV.  

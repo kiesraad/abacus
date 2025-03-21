@@ -446,53 +446,6 @@ fn reassign_residual_seat_for_absolute_majority(
     }
 }
 
-/// TODO
-fn reassign_residual_seats_for_exhausted_lists(
-    current_standings: &[PoliticalGroupStanding],
-    seats: u32,
-    assigned_residual_seats: u32,
-    previous_steps: &[SeatChangeStep],
-    exhausted_lists: ExhaustedLists,
-) -> Result<(Vec<SeatChangeStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
-    let mut seats_to_reassign = 0;
-    let mut exhausted_pg_numbers: Vec<PGNumber> = exhausted_lists.no_empty_seats_left;
-    let mut list_exhaustion_steps: Vec<SeatChangeStep> = vec![];
-    let mut standings = current_standings.to_owned();
-    for (pg_number, seats) in exhausted_lists.too_many_seats_assigned {
-        seats_to_reassign += seats;
-        exhausted_pg_numbers.push(pg_number);
-        for _ in 1..=seats {
-            if standings[pg_number as usize - 1].residual_seats > 0 {
-                standings[pg_number as usize - 1].residual_seats -= 1;
-            } else {
-                standings[pg_number as usize - 1].full_seats -= 1;
-            }
-            info!(
-                "Residual seat first assigned to list {} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
-                pg_number
-            );
-            list_exhaustion_steps.push(SeatChangeStep {
-                standings: standings.clone(),
-                residual_seat_number: None,
-                change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
-                    pg_retracted_seat: pg_number,
-                }),
-            });
-        }
-    }
-    let mut cumulative_steps = previous_steps.to_vec();
-    cumulative_steps.extend(list_exhaustion_steps);
-    let (final_steps, final_standing) = assign_remainder(
-        &standings,
-        seats,
-        assigned_residual_seats + seats_to_reassign,
-        assigned_residual_seats,
-        &cumulative_steps,
-        &exhausted_pg_numbers,
-    )?;
-    Ok((final_steps, final_standing))
-}
-
 fn exhausted_lists<'a>(
     standings: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
     totals: &'a ElectionSummary,
@@ -516,6 +469,79 @@ fn exhausted_lists<'a>(
     ExhaustedLists {
         too_many_seats_assigned,
         no_empty_seats_left,
+    }
+}
+
+fn update_exhausted_pg_numbers(
+    standings: Vec<PoliticalGroupStanding>,
+    totals: &ElectionSummary,
+) -> Vec<PGNumber> {
+    let exhausted_lists: ExhaustedLists = exhausted_lists(&standings, totals);
+    let mut exhausted_pg_numbers: Vec<PGNumber> = exhausted_lists.no_empty_seats_left;
+    for (pg_number, _) in exhausted_lists.too_many_seats_assigned {
+        exhausted_pg_numbers.push(pg_number);
+    }
+    exhausted_pg_numbers
+}
+
+/// If political groups got more seats than candidates on their lists,
+/// re-assign those excess seats to other political groups without exhausted lists.  
+/// This re-assignment is done according to article P 10 of the Kieswet.
+fn reassign_residual_seats_for_exhausted_lists(
+    previous_standings: Vec<PoliticalGroupStanding>,
+    seats: u32,
+    assigned_residual_seats: u32,
+    previous_steps: Vec<SeatChangeStep>,
+    totals: &ElectionSummary,
+) -> Result<(Vec<SeatChangeStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
+    let exhausted_lists: ExhaustedLists = exhausted_lists(&previous_standings, totals);
+    if !exhausted_lists.too_many_seats_assigned.is_empty() {
+        let mut current_standings = previous_standings.to_owned();
+        let mut exhausted_pg_numbers: Vec<PGNumber> = exhausted_lists.no_empty_seats_left;
+        let mut seats_to_reassign = 0;
+        let mut list_exhaustion_steps: Vec<SeatChangeStep> = vec![];
+
+        // Remove excess seats from exhausted lists
+        for (pg_number, seats) in exhausted_lists.too_many_seats_assigned {
+            seats_to_reassign += seats;
+            exhausted_pg_numbers.push(pg_number);
+            for _ in 1..=seats {
+                if current_standings[pg_number as usize - 1].residual_seats > 0 {
+                    current_standings[pg_number as usize - 1].residual_seats -= 1;
+                } else {
+                    current_standings[pg_number as usize - 1].full_seats -= 1;
+                }
+                info!(
+                    "Residual seat first assigned to list {} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
+                    pg_number
+                );
+                list_exhaustion_steps.push(SeatChangeStep {
+                    standings: current_standings.clone(),
+                    residual_seat_number: None,
+                    change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
+                        pg_retracted_seat: pg_number,
+                    }),
+                });
+            }
+        }
+        let mut current_steps = previous_steps.to_owned();
+        current_steps.extend(list_exhaustion_steps);
+
+        // Reassign removed seats to non-exhausted lists
+        for seat in 0..seats_to_reassign {
+            (current_steps, current_standings) = assign_remainder(
+                &current_standings,
+                seats,
+                assigned_residual_seats + seats_to_reassign,
+                assigned_residual_seats + seat,
+                &current_steps,
+                &exhausted_pg_numbers,
+            )?;
+            exhausted_pg_numbers = update_exhausted_pg_numbers(current_standings.to_owned(), totals)
+        }
+        Ok((current_steps, current_standings))
+    } else {
+        Ok((previous_steps, previous_standings))
     }
 }
 
@@ -569,19 +595,13 @@ pub fn seat_assignment(
     //  mark deceased candidates
 
     // [Artikel P 10 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_10&z=2025-02-12&g=2025-02-12)
-    let exhausted_lists: ExhaustedLists = exhausted_lists(&cumulative_standings, totals);
-    let (final_steps, final_standing) = if !exhausted_lists.too_many_seats_assigned.is_empty() {
-        reassign_residual_seats_for_exhausted_lists(
-            &cumulative_standings,
-            seats,
-            residual_seats,
-            &steps,
-            exhausted_lists,
-        )?
-    } else {
-        info!("There are no exhausted lists");
-        (steps, cumulative_standings)
-    };
+    let (final_steps, final_standing) = reassign_residual_seats_for_exhausted_lists(
+        cumulative_standings,
+        seats,
+        residual_seats,
+        steps,
+        totals,
+    )?;
 
     Ok(SeatAssignmentResult {
         seats,

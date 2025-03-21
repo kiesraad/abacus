@@ -81,14 +81,14 @@ function importPoFiles() {
         generic[key] = translations[locale][key];
       } else {
         fs.writeFileSync(
-          `./lib/i18n/locales/${locale}/${key}.json`,
+          `./src/lib/i18n/locales/${locale}/${key}.json`,
           JSON.stringify(translations[locale][key], null, 2) + "\n",
         );
         console.log(`Wrote ${translations[locale][key].length} entries to ${locale}/${key}.json`);
       }
     }
 
-    fs.writeFileSync(`./lib/i18n/locales/${locale}/generic.json`, JSON.stringify(generic, null, 2) + "\n");
+    fs.writeFileSync(`./src/lib/i18n/locales/${locale}/generic.json`, JSON.stringify(generic, null, 2) + "\n");
     console.log(`Wrote ${generic.length} entries to ${locale}/generic.json`);
   }
 }

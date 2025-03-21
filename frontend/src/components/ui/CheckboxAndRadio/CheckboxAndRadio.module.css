@@ -1,0 +1,159 @@
+/* Fieldset styling */
+.choice-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  border: none;
+  margin: 0;
+  padding: 0;
+
+  legend {
+    display: contents;
+    font-size: var(--font-size-md);
+    font-style: normal;
+    line-height: 1.5rem;
+    color: var(--text-color-header);
+    font-weight: bold;
+  }
+
+  .error {
+    padding: 0;
+    margin: -0.75rem 0 0 0;
+    font-size: var(--font-size-md);
+    color: var(--color-error-darker);
+    font-weight: normal;
+  }
+}
+
+/* Checkbox and radio input styling */
+.checkbox-and-radio {
+  display: inline-flex;
+
+  /* General checkbox and radio styling */
+  input {
+    appearance: none;
+    width: var(--checkbox-radio-size);
+    height: var(--checkbox-radio-size);
+    background-color: var(--checkbox-radio-color-bg-default);
+    border: 1px solid var(--checkbox-radio-color-border);
+    display: inline-block;
+    position: relative;
+    margin: 0.125rem 0 0 0;
+    flex-shrink: 0; /* do not remove, this keeps the input from misshaping */
+    cursor: pointer;
+
+    /* Radio styling */
+    &[type="radio"] {
+      border-radius: 1rem;
+    }
+    /* Checkbox styling */
+    &[type="checkbox"] {
+      border-radius: 0.375rem;
+    }
+
+    /* Checked input styling */
+    &:checked {
+      background-color: var(--checkbox-radio-color-bg-default-checked);
+      &:active {
+        background-color: var(--checkbox-radio-color-bg-active-checked);
+      }
+      &:hover {
+        background-color: var(--checkbox-radio-color-bg-hover-checked);
+      }
+      &:focus,
+      &:focus-visible {
+        background-color: var(--checkbox-radio-color-bg-focus-checked);
+        &::before {
+          background-color: var(--base-dark-blue); /* change icon color as well */
+        }
+      }
+    }
+
+    /* Checked icon styling */
+    &:checked::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: var(--base-white);
+      mask-size: var(--checkbox-radio-svg-size);
+      mask-repeat: no-repeat;
+      mask-position: center;
+    }
+
+    /* Set radio icon */
+    &[type="radio"]:checked::before {
+      mask-image: url("../../../lib/icon/svg/dot.svg");
+    }
+
+    /* Set checkbox icon */
+    &[type="checkbox"]:checked::before {
+      mask-image: url("../../../lib/icon/svg/checkmarkSmall.svg");
+    }
+
+    /* Set checkbox indeterminate icon */
+    &[type="checkbox"]:global(.indeterminate):checked::before {
+      mask-image: url("../../../lib/icon/svg/minus.svg");
+    }
+
+    /* Disabled input styling */
+    &:disabled {
+      background-color: var(--checkbox-radio-color-bg-disabled);
+      &:hover {
+        border-width: 1px;
+        background-color: var(--checkbox-radio-color-bg-disabled);
+      }
+      &:checked {
+        background-color: var(--checkbox-radio-color-bg-disabled-checked);
+        &:hover {
+          background-color: var(--checkbox-radio-color-bg-disabled-checked);
+        }
+      }
+    }
+
+    /* Active input styling */
+    &:active {
+      border-width: 2px;
+      background: var(--checkbox-radio-color-bg-active);
+    }
+
+    /* Hover input styling */
+    &:hover {
+      border-width: 2px;
+      background: var(--checkbox-radio-color-bg-hover);
+    }
+
+    /* Focus input styling */
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      background: var(--checkbox-radio-color-bg-default);
+      border: 2px solid var(--border-color-focus);
+      box-shadow: 0 0 0 3px var(--shadow-color-focus);
+    }
+
+    /* Has error styling */
+    &[aria-invalid="true"] {
+      border: 2px solid var(--color-error-darker);
+    }
+  }
+
+  /* Label and description styling */
+  > div:global(.labels) {
+    display: flex;
+    flex-direction: column;
+    color: var(--base-black);
+
+    > * {
+      padding-left: 0.5rem;
+    }
+
+    label {
+      cursor: pointer;
+    }
+
+    div:global(.description) {
+      color: var(--color-help-text);
+    }
+  }
+}

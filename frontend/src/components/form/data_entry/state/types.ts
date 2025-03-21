@@ -54,9 +54,6 @@ export type DataEntryAction =
       error: AnyApiError;
     }
   | {
-      type: "DATA_ENTRY_NOT_FOUND";
-    }
-  | {
       type: "FORM_SAVE_FAILED";
       error: AnyApiError;
     }

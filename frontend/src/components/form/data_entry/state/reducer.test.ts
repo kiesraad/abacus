@@ -55,9 +55,9 @@ function getInitialValues() {
   return _getInitialValues(mockElection);
 }
 
-test("should handle DATA_ENTRY_LOADED with client_state", () => {
+test("should handle DATA_ENTRY_CLAIMED with client_state", () => {
   const action: DataEntryAction = {
-    type: "DATA_ENTRY_LOADED",
+    type: "DATA_ENTRY_CLAIMED",
     dataEntry: {
       client_state: null,
       data: getInitialValues(),
@@ -74,9 +74,9 @@ test("should handle DATA_ENTRY_LOADED with client_state", () => {
   expect(state.error).toBeNull();
 });
 
-test("should handle DATA_ENTRY_LOAD_FAILED", () => {
+test("should handle DATA_ENTRY_CLAIM_FAILED", () => {
   const action: DataEntryAction = {
-    type: "DATA_ENTRY_LOAD_FAILED",
+    type: "DATA_ENTRY_CLAIM_FAILED",
     error: {
       message: "error",
       code: 1,

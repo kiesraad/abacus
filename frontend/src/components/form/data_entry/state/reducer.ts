@@ -33,7 +33,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
   // console.log("ACTION", action);
 
   switch (action.type) {
-    case "DATA_ENTRY_LOADED":
+    case "DATA_ENTRY_CLAIMED":
       if (action.dataEntry.client_state) {
         const { formState, targetFormSectionId } = buildFormState(
           action.dataEntry.client_state as ClientState,
@@ -56,7 +56,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         pollingStationResults: action.dataEntry.data,
         error: null,
       };
-    case "DATA_ENTRY_LOAD_FAILED":
+    case "DATA_ENTRY_CLAIM_FAILED":
       return {
         ...state,
         error: action.error,

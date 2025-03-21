@@ -1,0 +1,224 @@
+@font-face {
+  font-family: "SpaceGrotesk";
+  src: url("../../../assets/font/Space_Grotesk/SpaceGrotesk[wght].woff2") format("woff2");
+  font-weight: 300 700;
+}
+
+@font-face {
+  font-family: "DMSans";
+  src: url("../../../assets/font/DM_Sans/DMSans[opsz,wght].woff2") format("woff2");
+  font-weight: 100 1000;
+}
+
+@font-face {
+  font-family: "GeistMono";
+  src: url("../../../assets/font/Geist_Mono/GeistMono[wght].woff2") format("woff2");
+  font-weight: 100 900;
+}
+
+:root {
+  /* FONTS */
+  --font-header: "SpaceGrotesk";
+  --font-header-body: "DMSans";
+  --font-text: "DMSans";
+  --font-number: "GeistMono", monospace, monospace;
+
+  --font-size-body: 1.125rem;
+  /* TODO: pick a better font size scale */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.875rem;
+  --font-size-xl: 3rem;
+
+  /* SPACING */
+  --space-md: 1rem;
+  --space-md-lg: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+
+  /* CORNERS */
+  --rounded-default: 0.5rem;
+
+  /* COLORS */
+  --blue-900: #1b3764;
+  --blue-800: #254b89;
+  --blue-700: #2e5eaa;
+  --blue-600: #366fca;
+  --blue-500: #5c8bd6;
+  --blue-400: #82a6e0;
+  --blue-300: #a4bee8;
+  --blue-200: #c5d6f1;
+  --blue-100: #e7eef9;
+  --blue-50: #f8fafd;
+
+  --green-900: #113b26;
+  --green-800: #195738;
+  --green-700: #206c46;
+  --green-600: #248052;
+  --green-500: #329d68;
+  --green-400: #64b58c;
+  --green-300: #8fc9ac;
+  --green-200: #b8ddca;
+  --green-100: #e7f3ee;
+  --green-50: #f6fbf9;
+
+  --yellow-900: #402d0d;
+  --yellow-800: #644714;
+  --yellow-700: #7c5919;
+  --yellow-600: #926a1c;
+  --yellow-500: #b18322;
+  --yellow-400: #d19c26;
+  --yellow-300: #efc943;
+  --yellow-200: #f5de89;
+  --yellow-100: #fff4d6;
+  --yellow-50: #fdfaf2;
+
+  --orange-900: #521f09;
+  --orange-800: #7a2e0e;
+  --orange-700: #b54708;
+  --orange-600: #d4690b;
+  --orange-500: #f79009;
+  --orange-400: #fdb022;
+  --orange-300: #fec84b;
+  --orange-200: #fedf89;
+  --orange-100: #fef4d7;
+  --orange-50: #fdfaf2;
+
+  --red-900: #661a27;
+  --red-800: #8e2437;
+  --red-700: #b02d45;
+  --red-600: #d03651;
+  --red-500: #e35f77;
+  --red-400: #ea889a;
+  --red-300: #f0aab7;
+  --red-200: #f6cad2;
+  --red-100: #fbe9ed;
+  --red-50: #fef9fa;
+
+  --gray-900: #101828;
+  --gray-800: #1d2939;
+  --gray-700: #344054;
+  --gray-600: #475467;
+  --gray-500: #667085;
+  --gray-450: #8a95a8;
+  --gray-400: #98a2b3;
+  --gray-300: #d0d5dd;
+  --gray-200: #eaecf0;
+  --gray-100: #f2f4f7;
+  --gray-50: #f9fafb;
+  --gray-25: #fcfcfd;
+
+  --text-color-header: var(--gray-900);
+  --text-color-body: var(--gray-700);
+
+  --button-color-primary: var(--base-dark-blue);
+  --button-color-primary-hover: #00447a;
+  --button-color-primary-focus: var(--base-dark-blue);
+  --button-color-primary-active: #00254e;
+  --button-color-secondary: var(--base-white);
+  --button-color-secondary-hover: var(--bg-gray);
+  --button-color-secondary-focus: var(--base-white);
+  --button-color-secondary-active: var(--color-hover);
+  --button-color-disabled: #b3b3b3;
+  --button-color-bg-disabled: #f2f2f2;
+
+  --checkbox-radio-color-border: var(--gray-400);
+  --checkbox-radio-color-bg-default: var(--base-white);
+  --checkbox-radio-color-bg-active: var(--bg-gray);
+  --checkbox-radio-color-bg-hover: var(--bg-gray-darker);
+  --checkbox-radio-color-bg-disabled: var(--checkbox-radio-color-bg-hover);
+  --checkbox-radio-color-bg-default-checked: var(--button-color-primary);
+  --checkbox-radio-color-bg-active-checked: var(--button-color-primary-active);
+  --checkbox-radio-color-bg-hover-checked: var(--button-color-primary-hover);
+  --checkbox-radio-color-bg-focus-checked: var(--checkbox-radio-color-bg-default);
+  --checkbox-radio-color-bg-disabled-checked: var(--checkbox-radio-color-border);
+  --checkbox-radio-size: 1.25rem;
+  --checkbox-radio-svg-size: 0.875rem;
+
+  --button-icon-modal-close-color-svg: var(--menu-empty);
+  --button-icon-tertiary-color-svg: var(--base-black);
+  --button-icon-tertiary-color-border-focus: var(--checkbox-radio-color-border);
+  --button-icon-tertiary-color-bg-focus: var(--bg-gray-darker);
+  --button-icon-tertiary-color-bg-hover: var(--bg-gray-darker);
+
+  --shadow-color-focus: #d1e0ff;
+  --border-color-default: var(--bg-gray-darkest);
+  --border-color-focus: #155eef;
+
+  --color-error: #e35f77;
+  --color-error-darker: #d03651;
+  --color-error-darkest: #b02d45;
+  --color-error-bg: #fbe9ed;
+  --color-error-hover: #f6cad2;
+
+  --color-warning: #f79009;
+  --color-warning-darker: #d4690b;
+  --color-warning-bg: #fef4d7;
+  --color-warning-hover: #fedf89;
+
+  --color-notify: #366fca;
+  --color-notify-bg: #e7eef9;
+  --color-notify-hover: #c5d6f1;
+
+  --color-success: #248052;
+  --color-success-bg: #e7f3ee;
+  --color-success-hover: #b8ddca;
+
+  --color-help-text: var(--gray-600);
+  --color-hover: var(--gray-200);
+
+  --bg-gray: #f9fafb;
+  --bg-gray-darker: var(--gray-100);
+  --bg-gray-darkest: var(--gray-300);
+  --bg-highlight: #eff4ff;
+
+  --base-black: #000000;
+  --base-brand-blue: #113051;
+  --base-dark-blue: #00305b;
+  --base-white: #ffffff;
+
+  --accent-orange: #ef8050;
+
+  --link-default: var(--border-color-focus);
+  --link-hover: #004eeb;
+  --link-active: #0040c1;
+  --link-visited: #6927da;
+
+  --menu-empty: var(--gray-500);
+  --menu-unsaved: var(--color-notify);
+  --menu-active: var(--text-color-header);
+  --menu-accept: var(--color-success);
+  --menu-warning: var(--color-warning);
+  --menu-error: var(--color-error-darker);
+
+  --badge-polling-station: var(--base-white);
+  --badge-polling-station-bg: #4a75ba;
+  --badge-workstation: var(--base-brand-blue);
+  --badge-workstation-bg: var(--bg-gray-darker);
+  --badge-first-entry: #93370d;
+  --badge-first-entry-bg: #fef0c7;
+  --badge-second-entry: #095c37;
+  --badge-second-entry-bg: #d3f8df;
+  --badge-extra-entry: var(--badge-second-entry);
+  --badge-extra-entry-bg: var(--badge-second-entry-bg);
+  --badge-correction: #065986;
+  --badge-correction-bg: var(--color-notify-bg);
+  --badge-objections: #4a1fb8;
+  --badge-objections-bg: #ebe9fe;
+  --badge-difference: var(--base-white);
+  --badge-difference-bg: var(--red-600);
+  --badge-typist-busy: var(--link-active);
+  --badge-typist-busy-bg: var(--shadow-color-focus);
+  --badge-definitive: var(--base-white);
+  --badge-definitive-bg: var(--base-dark-blue);
+
+  --progress-bar-default: #366fca;
+  --progress-bar-errors-and-warnings: var(--color-error-darker);
+  --progress-bar-unfinished: var(--color-warning);
+  --progress-bar-in-progress: #efc943;
+  --progress-bar-first-entry-finished: #66c61c;
+  --progress-bar-definitive: var(--color-success);
+  --progress-bar-not-started: var(--gray-200);
+  --progress-bar-not-started-border: var(--gray-450);
+}

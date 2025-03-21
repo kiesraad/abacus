@@ -1,4 +1,4 @@
-import { userEvent } from "@testing-library/user-event";
+import { userEvent, UserEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { mockElection } from "@/components/election/status/mockData";
@@ -930,6 +930,10 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   describe("VotersAndVotesForm accept warnings", () => {
+    let user: UserEvent;
+    let submitButton: HTMLButtonElement;
+    let acceptWarningsCheckbox: HTMLInputElement;
+
     beforeEach(async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
@@ -940,20 +944,19 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      const user = userEvent.setup();
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      user = userEvent.setup();
+      submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
-      await screen.findByTestId("feedback-warning");
+
+      acceptWarningsCheckbox = await screen.findByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
     });
 
     test("checkbox should disappear when filling in any form input", async () => {
-      const acceptWarningsCheckbox = screen.getByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
-      });
       expect(acceptWarningsCheckbox).toBeVisible();
       expect(acceptWarningsCheckbox).not.toBeInvalid();
 
-      const user = userEvent.setup();
       const input = await screen.findByLabelText("H Totaal uitgebrachte stemmen");
       await user.type(input, "1");
 
@@ -961,14 +964,9 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("checkbox with error should disappear when filling in any form input", async () => {
-      const acceptWarningsCheckbox = screen.getByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
-      });
       expect(acceptWarningsCheckbox).toBeVisible();
       expect(acceptWarningsCheckbox).not.toBeInvalid();
 
-      const user = userEvent.setup();
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       expect(acceptWarningsCheckbox).toBeInvalid();
@@ -982,6 +980,24 @@ describe("Test VotersAndVotesForm", () => {
 
       expect(acceptWarningsCheckbox).not.toBeVisible();
       expect(acceptWarningsError).not.toBeVisible();
+    });
+
+    test("error should not immediately disappear when checkbox is checked", async () => {
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      await user.click(submitButton);
+
+      expect(acceptWarningsCheckbox).toBeInvalid();
+      const acceptWarningsError = screen.getByRole("alert", {
+        description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+      });
+      expect(acceptWarningsError).toBeVisible();
+
+      await user.click(acceptWarningsCheckbox);
+      expect(acceptWarningsCheckbox).toBeChecked();
+      expect(acceptWarningsCheckbox).toBeInvalid();
+      expect(acceptWarningsError).toBeVisible();
     });
   });
 });

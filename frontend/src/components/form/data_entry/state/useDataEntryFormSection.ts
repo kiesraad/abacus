@@ -46,7 +46,7 @@ export function useDataEntryFormSection<FORM_VALUES>({
   };
 
   const setAcceptWarnings = (acceptWarnings: boolean) => {
-    updateFormSection({ acceptWarningsError: false, acceptWarnings });
+    updateFormSection({ acceptWarnings });
   };
 
   // form keyboard navigation

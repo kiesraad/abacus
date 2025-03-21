@@ -53,13 +53,13 @@ module.exports = {
       },
     },
     {
-      files: ["*.test.tsx", "lib/api-mocks/**/*.ts", "lib/test/**/*.ts"],
+      files: ["*.test.tsx", "src/testing/**/*.ts"],
       rules: {
         "@typescript-eslint/no-non-null-assertion": "off",
       },
     },
     {
-      files: ["lib/ui/**/*.e2e.ts"],
+      files: ["src/components/ui/**/*.e2e.ts"],
       rules: {
         // Needed for Ladle, page.waitForSelector("[data-storyloaded]")
         "playwright/no-wait-for-selector": "off",

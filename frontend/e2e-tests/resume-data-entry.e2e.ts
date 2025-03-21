@@ -119,7 +119,7 @@ test.describe("resume data entry flow", () => {
       await expect(differencesPage.fieldset).toBeVisible();
       await differencesPage.next.click();
 
-      const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
       await expect(candidatesListPage_1.fieldset).toBeVisible();
       await candidatesListPage_1.navPanel.votersAndVotes.click();
 

@@ -21,6 +21,11 @@
   "event": {
     "UserLoggedIn": "Gebruiker ingelogd",
     "UserLoggedOut": "Gebruiker uitgelogd",
+    "UserAccountUpdateFailed": "Gebruikersaccount bijwerken mislukt",
+    "UserAccountUpdateSuccess": "Gebruikersaccount bijgewerkt",
+    "UserSessionExtended": "Gebruikerssessie verlengd",
+    "UserCreated": "Gebruiker aangemaakt",
+    "UserUpdated": "Gebruiker bijgewerkt",
     "UnknownEvent": "Onbekende gebeurtenis"
   },
   "field": {

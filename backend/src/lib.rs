@@ -50,6 +50,8 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
 
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
+    let state = AppState { pool };
+
     // Serve the OpenAPI documentation at /api-docs (if the openapi feature is enabled)
     #[cfg(feature = "openapi")]
     let router = {
@@ -62,12 +64,13 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let router = Router::from(openapi_router());
 
     // Add middleware to trace all HTTP requests and extend the user's session lifetime if needed
-    let router = router
-        .layer(TraceLayer::new_for_http())
-        .layer(middleware::from_fn_with_state(
-            pool.clone(),
-            authentication::extend_session,
-        ));
+    let router =
+        router
+            .layer(TraceLayer::new_for_http())
+            .layer(middleware::map_response_with_state(
+                state.clone(),
+                authentication::extend_session,
+            ));
 
     // Add the memory-serve router to serve the frontend (if the memory-serve feature is enabled)
     #[cfg(feature = "memory-serve")]
@@ -80,7 +83,6 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     );
 
     // Add the state to the app
-    let state = AppState { pool };
     let router = router.with_state(state);
 
     Ok(router)

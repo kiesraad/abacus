@@ -25,6 +25,7 @@ use abacus::{
 pub mod shared;
 pub mod utils;
 
+// TODO: I need elections with enough candidates...
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;

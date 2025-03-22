@@ -23,6 +23,7 @@ use zip::result::ZipError;
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub enum ErrorReference {
+    AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DatabaseError,
     DrawingOfLotsRequired,
@@ -261,6 +262,14 @@ impl IntoResponse for APIError {
                 error!("Apportionment error: {:?}", err);
 
                 match err {
+                    ApportionmentError::AllListsExhausted => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "All lists are exhausted, not enough candidates to fill all seats",
+                            ErrorReference::AllListsExhausted,
+                            false,
+                        ),
+                    ),
                     ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised => (
                         StatusCode::PRECONDITION_FAILED,
                         to_error(

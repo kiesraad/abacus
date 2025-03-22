@@ -34,9 +34,9 @@ pub struct PoliticalGroupCandidateNomination {
 /// nomination of candidates and the final ranking of candidates for each political group.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct CandidateNominationResult {
-    /// Preference threshold percentage
+    /// Preference threshold as a percentage (0 to 100)
     pub preference_threshold_percentage: u64,
-    /// Preference threshold number of votes
+    /// Preference threshold as a number of votes
     pub preference_threshold: Fraction,
     /// List of chosen candidates in alphabetical order
     pub chosen_candidates: Vec<Candidate>,

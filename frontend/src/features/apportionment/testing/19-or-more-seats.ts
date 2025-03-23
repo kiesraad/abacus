@@ -493,8 +493,8 @@ export const election_summary: ElectionSummary = {
   },
   votes_counts: {
     votes_candidates_count: 1200,
-    blank_votes_count: 2,
-    invalid_votes_count: 3,
+    blank_votes_count: 3,
+    invalid_votes_count: 2,
     total_votes_cast_count: 1205,
   },
   differences_counts: {

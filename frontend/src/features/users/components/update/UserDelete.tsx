@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import { AnyApiError, isSuccess, useCrud, User, USER_DELETE_REQUEST_PATH } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { IconTrash } from "@kiesraad/icon";
-import { Button, Modal } from "@kiesraad/ui";
+import { AnyApiError, isSuccess, useCrud, User, USER_DELETE_REQUEST_PATH } from "@/api";
+import { Button, Modal } from "@/components/ui";
+import { t } from "@/lib/i18n";
+import { IconTrash } from "@/lib/icon";
 
 interface UserDeleteProps {
   user: User;

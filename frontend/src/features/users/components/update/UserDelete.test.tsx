@@ -2,9 +2,9 @@ import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { User, USER_DELETE_REQUEST_PATH } from "@kiesraad/api";
-import { UserDeleteRequestHandler } from "@kiesraad/api-mocks";
-import { overrideOnce, render, server, spyOnHandler } from "@kiesraad/test";
+import { User, USER_DELETE_REQUEST_PATH } from "@/api";
+import { overrideOnce, render, server, spyOnHandler } from "@/testing";
+import { UserDeleteRequestHandler } from "@/testing/api-mocks";
 
 import { UserDelete } from "./UserDelete";
 

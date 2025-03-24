@@ -1,11 +1,11 @@
 import { FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-import { UserType } from "@/features/users/create/UserCreateContext";
-import { useUserCreateContext } from "@/features/users/create/useUserCreateContext";
+import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
-import { t } from "@kiesraad/i18n";
-import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@kiesraad/ui";
+import { UserType } from "../../hooks/UserCreateContext";
+import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
 export function UserCreateTypePage() {
   const navigate = useNavigate();

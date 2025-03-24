@@ -2,11 +2,10 @@ import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { UserCreateTypePage } from "@/features/users";
+import { render } from "@/testing";
 
-import { render } from "@kiesraad/test";
-
-import { IUserCreateContext, UserCreateContext } from "./UserCreateContext";
+import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
+import { UserCreateTypePage } from "./UserCreateTypePage";
 
 const navigate = vi.fn();
 

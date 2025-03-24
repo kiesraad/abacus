@@ -29,14 +29,12 @@ import { PollingStationListPage, PollingStationsLayout } from "@/features/pollin
 import { PollingStationCreatePage } from "@/features/polling_stations/page/PollingStationCreatePage";
 import { PollingStationUpdatePage } from "@/features/polling_stations/page/PollingStationUpdatePage";
 import { RootLayout } from "@/features/RootLayout";
-import {
-  UserCreateDetailsPage,
-  UserCreateLayout,
-  UserCreateRolePage,
-  UserCreateTypePage,
-  UserListPage,
-  UserUpdatePage,
-} from "@/features/users";
+import { UserCreateDetailsPage } from "@/features/users/components/create/UserCreateDetailsPage";
+import { UserCreateLayout } from "@/features/users/components/create/UserCreateLayout";
+import { UserCreateRolePage } from "@/features/users/components/create/UserCreateRolePage";
+import { UserCreateTypePage } from "@/features/users/components/create/UserCreateTypePage";
+import { UserUpdatePage } from "@/features/users/components/update/UserUpdatePage";
+import { UserListPage } from "@/features/users/components/UserListPage";
 import { WorkstationsHomePage } from "@/features/workstations";
 
 import { t } from "@kiesraad/i18n";

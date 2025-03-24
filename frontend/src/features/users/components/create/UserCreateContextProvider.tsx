@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useState } from "react";
 
-import type { Role } from "@kiesraad/api";
+import type { Role } from "@/api";
 
-import { IUserCreateContext, UserCreateContext, UserType } from "./UserCreateContext";
+import { IUserCreateContext, UserCreateContext, UserType } from "../../hooks/UserCreateContext";
 
 export function UserCreateContextProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<Role | undefined>(undefined);

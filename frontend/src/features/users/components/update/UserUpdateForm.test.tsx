@@ -2,9 +2,9 @@ import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { User, USER_UPDATE_REQUEST_PATH } from "@kiesraad/api";
-import { userMockData, UserUpdateRequestHandler } from "@kiesraad/api-mocks";
-import { overrideOnce, render, server, spyOnHandler } from "@kiesraad/test";
+import { User, USER_UPDATE_REQUEST_PATH } from "@/api";
+import { overrideOnce, render, server, spyOnHandler } from "@/testing";
+import { userMockData, UserUpdateRequestHandler } from "@/testing/api-mocks";
 
 import { UserUpdateForm } from "./UserUpdateForm";
 

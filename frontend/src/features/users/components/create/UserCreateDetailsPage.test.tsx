@@ -2,12 +2,11 @@ import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { UserCreateDetailsPage } from "@/features/users";
+import { User, USER_CREATE_REQUEST_PATH } from "@/api";
+import { overrideOnce, render } from "@/testing";
 
-import { User, USER_CREATE_REQUEST_PATH } from "@kiesraad/api";
-import { overrideOnce, render } from "@kiesraad/test";
-
-import { IUserCreateContext, UserCreateContext } from "./UserCreateContext";
+import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
+import { UserCreateDetailsPage } from "./UserCreateDetailsPage";
 
 const navigate = vi.fn();
 

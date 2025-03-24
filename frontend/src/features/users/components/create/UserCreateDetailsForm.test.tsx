@@ -3,9 +3,9 @@ import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { Role, USER_CREATE_REQUEST_PATH } from "@kiesraad/api";
-import { UserCreateRequestHandler, userMockData } from "@kiesraad/api-mocks";
-import { overrideOnce, render, server, spyOnHandler } from "@kiesraad/test";
+import { Role, USER_CREATE_REQUEST_PATH } from "@/api";
+import { overrideOnce, render, server, spyOnHandler } from "@/testing";
+import { UserCreateRequestHandler, userMockData } from "@/testing/api-mocks";
 
 import { UserCreateDetailsForm } from "./UserCreateDetailsForm";
 

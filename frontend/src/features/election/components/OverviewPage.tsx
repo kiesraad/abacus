@@ -3,10 +3,11 @@ import { To, useLocation, useNavigate } from "react-router";
 import { ElectionStatusWithIcon } from "@/components/election/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
+import { IconPlus } from "@/lib/icon";
 
 import { Election, useElectionList, useUserRole } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { Alert, PageTitle, Table } from "@kiesraad/ui";
+import { Alert, Button, PageTitle, Table, Toolbar } from "@kiesraad/ui";
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -46,6 +47,11 @@ export function OverviewPage() {
       )}
       <main>
         <article>
+          <Toolbar>
+            <Button.Link variant="secondary" size="sm" to={"./create"}>
+              <IconPlus /> {t("election.add")}
+            </Button.Link>
+          </Toolbar>
           {!electionList.length ? (
             !isAdminOrCoordinator ? (
               <>

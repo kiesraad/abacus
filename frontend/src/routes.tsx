@@ -56,6 +56,7 @@ export const routes = createRoutesFromElements(
     </Route>
     <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />
+      <Route path="create" element={<ElectionCreatePage />} />
       <Route path=":electionId" element={<ElectionLayout />}>
         <Route index element={<ElectionHomePage />} />
         <Route path="apportionment" element={<ApportionmentLayout />}>

@@ -27,4 +27,4 @@ services:
       TZ: "Europe/Amsterdam"
       API_HOST: http://backend:8080
       VITE_HOST: "0.0.0.0"
-    command: ["npm", "run", "dev:server", "--", "--host"]
+    command: ["npx", "vite", "--host"]

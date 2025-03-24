@@ -9,6 +9,16 @@ use utils::serve_api;
 
 pub mod shared;
 pub mod utils;
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_user_login(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    shared::admin_login(&addr).await;
+    shared::coordinator_login(&addr).await;
+    shared::typist_login(&addr).await;
+    shared::typist2_login(&addr).await;
+}
+
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     // Assert the user has no last activity timestamp yet
@@ -72,7 +82,7 @@ async fn test_user_listing(pool: SqlitePool) {
         "Unexpected response status"
     );
     let body: UserListResponse = response.json().await.unwrap();
-    assert_eq!(body.users.len(), 3);
+    assert_eq!(body.users.len(), 4);
     assert!(body.users.iter().any(|ps| {
         ["admin", "coordinator", "typist"]
             .iter()

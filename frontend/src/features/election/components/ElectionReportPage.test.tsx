@@ -1,12 +1,13 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionReportPage } from "@/features/election";
 import { routes } from "@/routes";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 import { ElectionRequestHandler } from "@kiesraad/api-mocks";
 import { expectErrorPage, overrideOnce, Providers, render, screen, server, setupTestRouter } from "@kiesraad/test";
+
+import { ElectionReportPage } from "./ElectionReportPage";
 
 describe("ElectionReportPage", () => {
   beforeEach(() => {

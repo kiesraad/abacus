@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionHomePage } from "@/features/election";
-
 import { ElectionProvider, ElectionStatusProvider, TestUserProvider } from "@kiesraad/api";
 import { ElectionRequestHandler } from "@kiesraad/api-mocks";
 import { overrideOnce, render, screen, server } from "@kiesraad/test";
+
+import { ElectionHomePage } from "./ElectionHomePage";
 
 describe("ElectionHomePage", () => {
   beforeEach(() => {

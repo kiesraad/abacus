@@ -1,12 +1,12 @@
 import { Fragment, useState } from "react";
 
+import { AuditLogEvent, Role, useAuditLog } from "@/api";
 import { ErrorModal } from "@/components/error";
+import { t, TranslationPath } from "@/lib/i18n";
+import { IconFilter } from "@/lib/icon";
+import { formatDateTime, formatDateTimeFull } from "@/lib/util";
 
-import { AuditLogEvent, Role, useAuditLog } from "@kiesraad/api";
-import { t, TranslationPath } from "@kiesraad/i18n";
-import { IconFilter } from "@kiesraad/icon";
 import { Button, Loader, Modal, PageTitle, Pagination, Table, Toolbar, ToolbarSection } from "@kiesraad/ui";
-import { formatDateTime, formatDateTimeFull } from "@kiesraad/util";
 
 import cls from "./LogsHomePage.module.css";
 

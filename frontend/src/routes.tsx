@@ -2,32 +2,32 @@ import { createRoutesFromElements, Navigate, Route } from "react-router";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { CheckAndSaveForm } from "@/components/form/data_entry/check_and_save/CheckAndSaveForm";
-import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "@/features/account";
-import { Logout } from "@/features/account/Logout";
+import { AccountSetupPage } from "@/features/account/components/AccountSetupPage";
+import { LoginLayout } from "@/features/account/components/LoginLayout";
+import { LoginPage } from "@/features/account/components/LoginPage";
+import { Logout } from "@/features/account/components/Logout";
+import { UserHomePage } from "@/features/account/components/UserHomePage";
 import { AdministratorLayout } from "@/features/AdministratorLayout";
-import {
-  CandidatesVotesPage,
-  DataEntryHomePage,
-  DifferencesPage,
-  RecountedPage,
-  VotersAndVotesPage,
-} from "@/features/data_entry";
-import { DataEntryLayout } from "@/features/data_entry/DataEntryLayout";
+import { CandidatesVotesPage } from "@/features/data_entry/components/CandidatesVotesPage";
+import { DataEntryHomePage } from "@/features/data_entry/components/DataEntryHomePage";
+import { DataEntryLayout } from "@/features/data_entry/components/DataEntryLayout";
+import { DifferencesPage } from "@/features/data_entry/components/DifferencesPage";
+import { RecountedPage } from "@/features/data_entry/components/RecountedPage";
+import { VotersAndVotesPage } from "@/features/data_entry/components/VotersAndVotesPage";
 import { DevHomePage } from "@/features/DevHomePage";
-import {
-  ElectionHomePage,
-  ElectionLayout,
-  ElectionReportPage,
-  ElectionStatusPage,
-  OverviewLayout,
-  OverviewPage,
-} from "@/features/election";
-import { LogsHomePage } from "@/features/logs";
+import { ElectionHomePage } from "@/features/election/components/ElectionHomePage";
+import { ElectionLayout } from "@/features/election/components/ElectionLayout";
+import { ElectionReportPage } from "@/features/election/components/ElectionReportPage";
+import { ElectionStatusPage } from "@/features/election/components/ElectionStatusPage";
+import { OverviewLayout } from "@/features/election/components/OverviewLayout";
+import { OverviewPage } from "@/features/election/components/OverviewPage";
+import { LogsHomePage } from "@/features/logs/components/LogsHomePage";
 import { NotAvailableInMock } from "@/features/NotAvailableInMock";
 import { NotFoundPage } from "@/features/NotFoundPage";
-import { PollingStationListPage, PollingStationsLayout } from "@/features/polling_stations";
-import { PollingStationCreatePage } from "@/features/polling_stations/page/PollingStationCreatePage";
-import { PollingStationUpdatePage } from "@/features/polling_stations/page/PollingStationUpdatePage";
+import { PollingStationCreatePage } from "@/features/polling_stations/components/PollingStationCreatePage";
+import { PollingStationListPage } from "@/features/polling_stations/components/PollingStationListPage";
+import { PollingStationsLayout } from "@/features/polling_stations/components/PollingStationsLayout";
+import { PollingStationUpdatePage } from "@/features/polling_stations/components/PollingStationUpdatePage";
 import { RootLayout } from "@/features/RootLayout";
 import { UserCreateDetailsPage } from "@/features/users/components/create/UserCreateDetailsPage";
 import { UserCreateLayout } from "@/features/users/components/create/UserCreateLayout";
@@ -35,7 +35,7 @@ import { UserCreateRolePage } from "@/features/users/components/create/UserCreat
 import { UserCreateTypePage } from "@/features/users/components/create/UserCreateTypePage";
 import { UserUpdatePage } from "@/features/users/components/update/UserUpdatePage";
 import { UserListPage } from "@/features/users/components/UserListPage";
-import { WorkstationsHomePage } from "@/features/workstations";
+import { WorkstationsHomePage } from "@/features/workstations/components/WorkstationsHomePage";
 
 import { t } from "@kiesraad/i18n";
 

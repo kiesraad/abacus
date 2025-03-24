@@ -2,8 +2,8 @@ import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { LogRequestHandler } from "@kiesraad/api-mocks";
-import { render, server } from "@kiesraad/test";
+import { render, server } from "@/testing";
+import { LogRequestHandler } from "@/testing/api-mocks";
 
 import { LogsHomePage } from "./LogsHomePage";
 

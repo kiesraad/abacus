@@ -265,9 +265,6 @@ pub async fn extend_session(
     audit_service: AuditService,
     mut response: Response,
 ) -> Response {
-    // let jar = CookieJar::from_headers(req.headers());
-    // let mut res = next.run(req).await;
-
     let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
         return response;
     };

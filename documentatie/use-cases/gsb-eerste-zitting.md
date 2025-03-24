@@ -16,22 +16,19 @@ __Hoofdscenario:__
 5. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 1 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
 6. (parallel aan invoer stembureaus) [De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-gsb-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
 7. De coördinator GSB sluit de invoer.
-8. De coördinator GSB genereert het [PV](./input-output-bestanden.md#output-voor-csb) en het [digitale bestand](./input-output-bestanden.md#output-voor-csb). En voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
-9. De coördinator GSB voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
-10. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
-11. Het GSB stelt de gemeentelijke totalen vast o.b.v. het PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
-12. De coördinator GSB sluit de zitting in de applicatie.
-13. Het GSB stelt de benodigde EML_NL bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
-14. Het GSB stelt het PV GSB (inc. bijlagen) beschikbaar aan de burgemeester.
-15. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
+8. [De coördinator GSB maakt het PV en het digitale bestand aan.](#de-coördinator-gsb-maakt-het-pv-en-het-digitale-bestand-aan-zee)
+9. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
+10. Het GSB stelt de gemeentelijke totalen vast o.b.v. het PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
+11. De coördinator GSB sluit de zitting in de applicatie.
+12. Het GSB stelt de benodigde EML_NL bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+13. Het GSB stelt het PV GSB (inc. bijlagen) beschikbaar aan de burgemeester.
+14. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
 
 __Uitbreidingen:__  
 TODO:  
 - verwijderen van een zitting in de applicatie (alleen als geen latere zitting met invoer)
 - zelfde aanpassingen in DSO use case
-- stap 7-8: Geen PV maken totdat alle stembureaus definitieve invoer hebben en invoer is afgesloten.
 - De coördinator GSB kan een latere zitting openen. (als geen andere open zitting)
-- overal expliciet maken: coördinator GSB vs coördinator CSB
 
 5a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
 
@@ -76,6 +73,7 @@ TODO:
 
 ### Open punten
 
+- Is het toegestaan de zitting te sluiten als nog niet alle stembureaus definitieve invoer hebben? Dit wordt nu een stap later gecontroleerd, nl. vlak voor het genereren van het PV.
 - Hoe ziet de overdracht van het EML_NL bestand van GSB naar CSB binnen de applicatie er precies uit?
   - De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
   - Proces via uitwisselplatform loopt parallel.
@@ -187,3 +185,20 @@ __Uitbreidingen:__
   - De SB PVs verschillen hierin tussen DSO en CSO.
   - Als de applicatie dit moet doen, moeten de invoerders dit over kunnen nemen van het SB PV.
   - De applicatie gaat nog uit van de oude modellen, met alleen de vraag "Is er herteld?"
+
+
+## De coördinator GSB maakt het PV en het digitale bestand aan (zee)
+
+__Niveau:__ gebruikersdoel, zee, 🌊
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__  
+1. De applicatie stelt vast dat alle stembureaus definitieve invoer hebben en dat invoer is afgesloten.
+2. De coördinator GSB genereert het [PV](./input-output-bestanden.md#output-voor-csb) en het [digitale bestand](./input-output-bestanden.md#output-voor-csb).
+3. De coördinator GSB voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
+
+__Uitbreidingen:__  
+1a. Niet alle stembureaus hebben definitieve invoer:  
+
+1b. De invoer is niet afgesloten:  

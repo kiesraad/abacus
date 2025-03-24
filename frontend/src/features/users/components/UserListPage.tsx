@@ -1,5 +1,4 @@
 import { Role } from "@/api";
-import { useUserListRequest } from "@/features/users/hooks/useUserListRequest";
 import { t } from "@/lib/i18n";
 import { IconPlus } from "@/lib/icon";
 import { formatDateTime } from "@/lib/util";
@@ -7,6 +6,7 @@ import { formatDateTime } from "@/lib/util";
 import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
 
 import { useQueryParam } from "../hooks/useQueryParam";
+import { useUserListRequest } from "../hooks/useUserListRequest";
 
 export function UserListPage() {
   const { requestState } = useUserListRequest();

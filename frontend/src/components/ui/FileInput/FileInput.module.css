@@ -6,7 +6,7 @@ input.file-input {
   position: absolute;
 }
 
-span.selected-file {
+label.selected-file {
   padding-left: 1rem;
   color: var(--gray-600);
 }

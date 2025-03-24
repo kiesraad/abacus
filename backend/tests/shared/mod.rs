@@ -279,6 +279,11 @@ pub async fn typist_login(addr: &SocketAddr) -> HeaderValue {
     login(addr, "typist", "TypistPassword01").await
 }
 
+/// Calls the login endpoint for a Typist user and returns the session cookie
+pub async fn typist2_login(addr: &SocketAddr) -> HeaderValue {
+    login(addr, "typist2", "Typist2Password01").await
+}
+
 /// Calls the login endpoint with a username and password
 pub async fn login(addr: &SocketAddr, username: &str, password: &str) -> HeaderValue {
     let url = format!("http://{addr}/api/user/login");

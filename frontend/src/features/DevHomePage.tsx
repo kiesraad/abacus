@@ -116,6 +116,16 @@ function DevLinks() {
             {t("typist")}
           </Link>
         </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("typist2", "Typist2Password01");
+            }}
+          >
+            {t("typist")} 2
+          </Link>
+        </li>
         {user && (
           <li>
             <Link

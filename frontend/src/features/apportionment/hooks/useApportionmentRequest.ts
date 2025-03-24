@@ -6,7 +6,7 @@ import {
   ElectionApportionmentResponse,
   isSuccess,
   useApiClient,
-} from "@kiesraad/api";
+} from "@/api";
 
 export function useApportionmentRequest(electionId: number) {
   const path: ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${electionId}/apportionment`;

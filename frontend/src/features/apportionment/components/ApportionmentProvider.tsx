@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { isFatalError } from "@kiesraad/api";
+import { isFatalError } from "@/api";
 
 import { ApportionmentProviderContext } from "../hooks/ApportionmentProviderContext";
 import { useApportionmentRequest } from "../hooks/useApportionmentRequest";

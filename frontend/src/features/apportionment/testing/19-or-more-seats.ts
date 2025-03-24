@@ -1,4 +1,4 @@
-import { Election, ElectionSummary, SeatAssignmentResult } from "@kiesraad/api";
+import { Election, ElectionSummary, SeatAssignmentResult } from "@/api";
 
 export const seat_assignment: SeatAssignmentResult = {
   seats: 23,

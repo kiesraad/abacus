@@ -1,8 +1,8 @@
 import { Link } from "react-router";
 
-import { AbsoluteMajorityChange, useElection } from "@kiesraad/api";
-import { t, tx } from "@kiesraad/i18n";
-import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
+import { AbsoluteMajorityChange, useElection } from "@/api";
+import { Alert, FormLayout, PageTitle } from "@/components/ui";
+import { t, tx } from "@/lib/i18n";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import cls from "../Apportionment.module.css";

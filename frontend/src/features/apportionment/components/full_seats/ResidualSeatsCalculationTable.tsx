@@ -1,6 +1,6 @@
-import { t } from "@kiesraad/i18n";
-import { Table } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
+import { Table } from "@/components/ui";
+import { t } from "@/lib/i18n";
+import { cn } from "@/lib/util";
 
 import cls from "../Apportionment.module.css";
 

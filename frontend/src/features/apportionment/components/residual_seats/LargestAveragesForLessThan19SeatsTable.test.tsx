@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
-import { PoliticalGroup } from "@kiesraad/api";
-import { render, screen } from "@kiesraad/test";
+import { PoliticalGroup } from "@/api";
+import { render, screen } from "@/testing";
 
 import { election, largest_average_steps, seat_assignment } from "../../testing/less-than-19-seats";
 import { LargestAveragesForLessThan19SeatsTable } from "./LargestAveragesForLessThan19SeatsTable";

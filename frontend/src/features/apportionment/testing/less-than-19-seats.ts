@@ -1,4 +1,4 @@
-import { Election, ElectionSummary, SeatAssignmentResult, SeatAssignmentStep } from "@kiesraad/api";
+import { Election, ElectionSummary, SeatAssignmentResult, SeatAssignmentStep } from "@/api";
 
 export const largest_remainder_steps: SeatAssignmentStep[] = [
   {

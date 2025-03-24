@@ -1,11 +1,10 @@
 import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
+import { ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@/api";
 import { routes } from "@/routes";
-
-import { ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@kiesraad/api";
-import { getElectionMockData } from "@kiesraad/api-mocks";
-import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@kiesraad/test";
+import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@/testing";
+import { getElectionMockData } from "@/testing/api-mocks";
 
 import {
   election as election_19_or_more_seats,

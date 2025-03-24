@@ -1,7 +1,7 @@
-import { Fraction, VotesCounts } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { DisplayFraction, Table } from "@kiesraad/ui";
-import { cn, formatNumber } from "@kiesraad/util";
+import { Fraction, VotesCounts } from "@/api";
+import { DisplayFraction, Table } from "@/components/ui";
+import { t } from "@/lib/i18n";
+import { cn, formatNumber } from "@/lib/util";
 
 import cls from "./Apportionment.module.css";
 

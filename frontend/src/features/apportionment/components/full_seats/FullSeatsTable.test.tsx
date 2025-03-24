@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { render, screen } from "@kiesraad/test";
+import { render, screen } from "@/testing";
 
 import { election, seat_assignment } from "../../testing/19-or-more-seats";
 import { FullSeatsTable } from "./FullSeatsTable";

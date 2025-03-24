@@ -770,12 +770,14 @@ fn political_group_standings_qualifying_for_largest_remainder<'a>(
 fn political_group_standings_qualifying_for_unique_largest_average<'a>(
     standings: &'a [PoliticalGroupStanding],
     previous_steps: &'a [SeatChangeStep],
+    exhausted_pg_numbers: &[PGNumber],
 ) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
     standings.iter().filter(|&s| {
-        !previous_steps.iter().any(|prev| {
-            prev.change.is_changed_by_largest_average_assignment()
-                && prev.change.political_group_number() == s.pg_number
-        })
+        !exhausted_pg_numbers.contains(&s.pg_number)
+            && !previous_steps.iter().any(|prev| {
+                prev.change.is_changed_by_largest_average_assignment()
+                    && prev.change.political_group_number() == s.pg_number
+            })
     })
 }
 
@@ -820,6 +822,7 @@ fn step_assign_remainder_using_largest_remainder(
             political_group_standings_qualifying_for_unique_largest_average(
                 standings,
                 previous_steps,
+                exhausted_pg_numbers,
             )
             .peekable();
         if qualifying_for_unique_largest_average.peek().is_some() {
@@ -972,7 +975,7 @@ mod tests {
         /// Apportionment with residual seats assigned with remainder and averages system
         ///
         /// Full seats: [0, 0, 0, 0, 0, 7] - Remainder seats: 3  
-        /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list [6] meets the threshold of 75% of the quota  
+        /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list 6 meet the threshold of 75% of the quota  
         ///  1 - largest remainder: seat assigned to list 6  
         /// 1st round of largest averages system (assignment to unique political groups):  
         ///  2 - largest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6  
@@ -1216,7 +1219,7 @@ mod tests {
             /// Apportionment with residual seats assigned with remainder and averages system
             ///
             /// Full seats: [0, 0, 0, 0, 0, 7] - Remainder seats: 3  
-            /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list [6] meets the threshold of 75% of the quota  
+            /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list 6 meet the threshold of 75% of the quota  
             ///  1 - largest remainder: seat assigned to list 6  
             /// 1st round of largest averages system (assignment to unique political groups):  
             ///  2 - largest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6  
@@ -1247,6 +1250,114 @@ mod tests {
                 assert_eq!(result.steps[4].change.political_group_number(), 4);
                 let total_seats = get_total_seats_from_apportionment_result(result);
                 assert_eq!(total_seats, [0, 0, 0, 1, 1, 8]);
+            }
+
+            /// Apportionment with residual seats assigned with remainder and averages system
+            ///
+            /// Full seats: [0, 0, 5] - Remainder seats: 1  
+            /// Remainders: [5, 5, 0/6], only votes of list 3 meet the threshold of 75% of the quota  
+            ///  1 - largest remainder: seat assigned to list 3  
+            ///  2 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  3 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  4 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  5 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1st round of largest averages system (assignment to unique political groups):  
+            ///  6 - largest average: [5, 5, 7 1/7] seat assigned to list 1  
+            ///  7 - largest average: [2 1/2, 5, 7 1/7] seat assigned to list 2  
+            /// 2nd round of largest averages system (assignment to any political group):  
+            ///  8 - largest average: [2 1/2, 2 1/2, 7 1/7] seat assigned to list 1  
+            ///  9 - largest average: [1 2/3, 2 1/2, 7 1/7] seat assigned to list 2
+            #[test]
+            fn test_with_list_exhaustion_triggering_2nd_round_largest_average_assignment_with_same_averages()
+             {
+                let totals = election_summary_fixture_with_given_candidate_votes(vec![
+                    vec![3, 2],
+                    vec![3, 2],
+                    vec![25, 25],
+                ]);
+                let result = seat_assignment(6, &totals).unwrap();
+                assert_eq!(result.steps.len(), 9);
+                assert_eq!(result.steps[0].change.political_group_number(), 3);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert!(
+                    result.steps[2]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert!(
+                    result.steps[3]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert!(
+                    result.steps[4]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[5].change.political_group_number(), 1);
+                assert_eq!(result.steps[6].change.political_group_number(), 2);
+                assert_eq!(result.steps[7].change.political_group_number(), 1);
+                assert_eq!(result.steps[8].change.political_group_number(), 2);
+                let total_seats = get_total_seats_from_apportionment_result(result);
+                assert_eq!(total_seats, [2, 2, 2]);
+            }
+
+            /// Apportionment with residual seats assigned with remainder and averages system
+            ///
+            /// Full seats: [0, 0, 5] - Remainder seats: 1  
+            /// Remainders: [6, 4, 0/6], only votes of list 3 meet the threshold of 75% of the quota  
+            ///  1 - largest remainder: seat assigned to list 3  
+            ///  2 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  3 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  4 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  5 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1st round of largest averages system (assignment to unique political groups):  
+            ///  6 - largest average: [6, 4, 7 1/7] seat assigned to list 1  
+            ///  7 - largest average: [3, 4, 7 1/7] seat assigned to list 2  
+            /// 2nd round of largest averages system (assignment to any political group):  
+            ///  8 - largest average: [3, 2, 7 1/7] seat assigned to list 1  
+            ///  9 - largest average: [2, 2, 7 1/7] seat assigned to list 2
+            #[test]
+            fn test_with_list_exhaustion_triggering_2nd_round_largest_average_assignment_with_different_averages()
+             {
+                let totals = election_summary_fixture_with_given_candidate_votes(vec![
+                    vec![3, 3],
+                    vec![2, 2],
+                    vec![25, 25],
+                ]);
+                let result = seat_assignment(6, &totals).unwrap();
+                assert_eq!(result.steps.len(), 9);
+                assert_eq!(result.steps[0].change.political_group_number(), 3);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert!(
+                    result.steps[2]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert!(
+                    result.steps[3]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert!(
+                    result.steps[4]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[5].change.political_group_number(), 1);
+                assert_eq!(result.steps[6].change.political_group_number(), 2);
+                assert_eq!(result.steps[7].change.political_group_number(), 1);
+                assert_eq!(result.steps[8].change.political_group_number(), 2);
+                let total_seats = get_total_seats_from_apportionment_result(result);
+                assert_eq!(total_seats, [2, 2, 2]);
             }
 
             /// Apportionment with residual seats assigned with remainder system  

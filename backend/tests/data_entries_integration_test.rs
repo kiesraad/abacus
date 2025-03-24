@@ -363,7 +363,7 @@ async fn get_statuses(
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn ntest_election_details_status(pool: SqlitePool) {
+async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;

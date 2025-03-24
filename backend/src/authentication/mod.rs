@@ -1,15 +1,12 @@
-use chrono::TimeDelta;
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-
 pub use self::api::*;
+use chrono::TimeDelta;
 pub use user::{User, Users};
 
 pub use self::role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
 #[cfg(test)]
 pub use self::session::Sessions;
 
-mod api;
+pub mod api;
 pub mod error;
 mod password;
 mod role;
@@ -30,31 +27,10 @@ pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
 /// Only send cookies over a secure (https) connection
 pub const SECURE_COOKIES: bool = false;
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct Credentials {
-    username: String,
-    password: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct LoginResponse {
-    user_id: u32,
-    username: String,
-}
-
-impl From<&User> for LoginResponse {
-    fn from(user: &User) -> Self {
-        Self {
-            user_id: user.id(),
-            username: user.username().to_string(),
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::role::Role;
-    use api::{AccountUpdateRequest, Credentials, LoginResponse, UserListResponse};
+    use api::{AccountUpdateRequest, Credentials, UserListResponse};
     use axum::{
         Router,
         body::Body,
@@ -74,8 +50,12 @@ mod tests {
 
     fn create_app(pool: SqlitePool) -> Router {
         let state = AppState { pool: pool.clone() };
+
         Router::from(api::router())
-            .layer(middleware::from_fn_with_state(pool, extend_session))
+            .layer(middleware::map_response_with_state(
+                state.clone(),
+                extend_session,
+            ))
             .with_state(state)
     }
 
@@ -499,7 +479,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: UserListResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.users.len(), 3);
+        assert_eq!(result.users.len(), 4);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

@@ -114,46 +114,6 @@ function sortFormSections(a: FormSection, b: FormSection): number {
   return 0;
 }
 
-export function getInitialValues(
-  election: Required<Election>,
-  defaultValues?: Partial<PollingStationResults>,
-): PollingStationResults {
-  return {
-    recounted: undefined,
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      votes_candidates_count: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-    voters_recounts: undefined,
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
-    political_group_votes: election.political_groups.map((pg) => ({
-      number: pg.number,
-      total: 0,
-      candidate_votes: pg.candidates.map((c) => ({
-        number: c.number,
-        votes: 0,
-      })),
-    })),
-    ...defaultValues,
-  };
-}
-
 export function getInitialFormState(election: Required<Election>): FormState {
   const result: FormState = {
     current: INITIAL_FORM_SECTION_ID,

@@ -30,7 +30,7 @@ function TypistLinks() {
 
 function AdministratorCoordinatorLinks() {
   const { electionList } = useElectionList();
-  const { isAdministrator } = useUserRole();
+  const { isAdministrator, isCoordinator } = useUserRole();
 
   return (
     <>
@@ -49,9 +49,11 @@ function AdministratorCoordinatorLinks() {
                 <li>
                   <Link to={`/elections/${election.id}/status`}>{t("election_status.main_title")}</Link>
                 </li>
-                <li>
-                  <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
-                </li>
+                {isCoordinator && (
+                  <li>
+                    <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
+                  </li>
+                )}
                 <li>
                   <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
                 </li>
@@ -114,6 +116,16 @@ function DevLinks() {
             }}
           >
             {t("typist")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("typist2", "Typist2Password01");
+            }}
+          >
+            {t("typist")} 2
           </Link>
         </li>
         {user && (

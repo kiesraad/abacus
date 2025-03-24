@@ -49,7 +49,7 @@ export function OverviewPage() {
         <article>
           <Toolbar>
             <Button.Link variant="secondary" size="sm" to={"./create"}>
-              <IconPlus /> {t("election.add")}
+              <IconPlus /> {t("election.create")}
             </Button.Link>
           </Toolbar>
           {!electionList.length ? (

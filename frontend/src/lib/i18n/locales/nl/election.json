@@ -5,10 +5,9 @@
     "plural": "Verkiezingen",
     "details": "Details verkiezing",
     "overview": "Overzicht verkiezingen",
-    "create": "Verkiezing toevoegen",
     "finish_data_entry": "Invoerfase afronden"
   },
-  "add": "Verkiezing toevoegen",
+  "create": "Verkiezing toevoegen",
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",
   "no_elections_added": "Nog geen verkiezingen ingesteld",

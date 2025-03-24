@@ -14,7 +14,7 @@ __Hoofdscenario:__
 4. [Het CSB voert de tellingen van het GSB in.](#het-csb-voert-de-tellingen-van-het-gsb-in-vlieger)
 5. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
 6. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)
-7. De applicatie genereert de benodigde bestanden: PV, digitaal bestand(en). Locatie en datum, namen stembureauleden, opmerkelijkheden, ...?
+7. De applicatie genereert de benodigde bestanden: PV, digitaal bestand(en).
 8. De voorzitter CSB (burgemeester) tekent de brieven.
 9. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)
 10. Het CSB opent de zitting.
@@ -43,6 +43,7 @@ __Uitbreidingen:__
 
 ### Open punten
 
+- In welke stap worden de volgende zaken in het PV opgenomen: locatie en datum, namen stembureauleden, opmerkelijkheden, ...?
 - Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier?
     - Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
     - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijst importeren.
@@ -72,14 +73,14 @@ __Uitbreidingen:__
 TODO: hier ook bij 3a uitwerken over waarschuwingen zoals bij GSB
 
 3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
-&emsp; 3a1. De coördinator vergelijkt de eerste en tweede invoer met het papieren PV.  
-&emsp; 3a2. De coördinator stelt vast dat de tweede (handmatige) invoer correct is.  
-&emsp;&emsp;3a2a. De coördinator stelt vast dat de tweede (handmatige) invoer niet correct is en het digitale bestand correct is:  
-&emsp;&emsp;&emsp;3a2a1. De coördinator gooit de tweede (handmatige) invoer weg en laat die opnieuw invoeren.  
-&emsp;&emsp;3a2b. De coördinator stelt vast dat zowel de tweede (handmatige) invoer als het digitale bestand niet correct zijn:  
-&emsp;&emsp;&emsp;3a2b1. De coördinator gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
-&emsp; 3a3. De coördinator markeert de tweede (handmatige) invoer als correct en gooit de andere invoer weg.
-&emsp; 3a4. De coördinator geeft het PV aan een invoerder om nogmaals in te voeren.
+&emsp; 3a1. De coördinator CSB vergelijkt de eerste en tweede invoer met het papieren PV.  
+&emsp; 3a2. De coördinator CSB stelt vast dat de tweede (handmatige) invoer correct is.  
+&emsp;&emsp;3a2a. De coördinator CSB stelt vast dat de tweede (handmatige) invoer niet correct is en het digitale bestand correct is:  
+&emsp;&emsp;&emsp;3a2a1. De coördinator CSB gooit de tweede (handmatige) invoer weg en laat die opnieuw invoeren.  
+&emsp;&emsp;3a2b. De coördinator CSB stelt vast dat zowel de tweede (handmatige) invoer als het digitale bestand niet correct zijn:  
+&emsp;&emsp;&emsp;3a2b1. De coördinator CSB gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
+&emsp; 3a3. De coördinator CSB markeert de tweede (handmatige) invoer als correct en gooit de andere invoer weg.
+&emsp; 3a4. De coördinator CSB geeft het PV aan een invoerder om nogmaals in te voeren.
 
 ## Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan (vlieger)
 

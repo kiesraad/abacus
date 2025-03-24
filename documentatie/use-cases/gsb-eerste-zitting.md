@@ -14,20 +14,20 @@ __Hoofdscenario:__
 3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na 31-2 Bijlage 1 in.
 4. De coördinator GSB opent de zitting in de applicatie en stelt de invoer open.
 5. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 1 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
-6. (parallel aan invoer stembureaus) [De coördinator voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
-7. De coördinator sluit de invoer.
-8. De coördinator genereert het [PV](./input-output-bestanden.md#output-voor-csb) en het [digitale bestand](./input-output-bestanden.md#output-voor-csb). En voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
-9. De coördinator voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
+6. (parallel aan invoer stembureaus) [De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-gsb-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
+7. De coördinator GSB sluit de invoer.
+8. De coördinator GSB genereert het [PV](./input-output-bestanden.md#output-voor-csb) en het [digitale bestand](./input-output-bestanden.md#output-voor-csb). En voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
+9. De coördinator GSB voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
 10. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 11. Het GSB stelt de gemeentelijke totalen vast o.b.v. het PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
-12. De coördinator sluit de zitting in de applicatie.
+12. De coördinator GSB sluit de zitting in de applicatie.
 13. Het GSB stelt de benodigde EML_NL bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 14. Het GSB stelt het PV GSB (inc. bijlagen) beschikbaar aan de burgemeester.
 15. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
 
 __Uitbreidingen:__  
 TODO:  
-- verwijderen zitting (alleen als geen latere zitting met invoer)
+- verwijderen van een zitting in de applicatie (alleen als geen latere zitting met invoer)
 - zelfde aanpassingen in DSO use case
 - stap 7-8: Geen PV maken totdat alle stembureaus definitieve invoer hebben en invoer is afgesloten.
 - De coördinator GSB kan een latere zitting openen. (als geen andere open zitting)
@@ -60,15 +60,15 @@ TODO:
 12a. De coördinator GSB sluit de zitting niet:
 &emsp; 12a1. (nadat de zitting meer dan een dag open staat) De applicatie toont een melding over het sluiten van de zitting en het openen van een nieuwe zitting.
 
-12b. De coördinator sluit per ongeluk de zitting:
-&emsp; 12b1. De coördinator heropent de zitting.
+12b. De coördinator GSB sluit per ongeluk de zitting:
+&emsp; 12b1. De coördinator GSB heropent de zitting.
 &emsp;&emsp; 12b1a. De applicatie stelt vast dat er een latere zitting met invoer is:
 &emsp;&emsp;&emsp; 12b1a1. De applicatie toont een foutmelding en heropent de zitting niet.
 
 ### Niet in scope
 
 - Elektronische handtekening van documenten.
-- CSO: Invullen van "Bijlage 2: Bezwaren van aanwezigen op stembureaus" in de applicatie. Wordt wel handmatig toegevoegd aan het geprinte PV door coördinator.
+- CSO: Invullen van "Bijlage 2: Bezwaren van aanwezigen op stembureaus" in de applicatie. Wordt wel handmatig toegevoegd aan het geprinte PV door coördinator GSB.
 - Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Dit gaan we niet faciliteren in de applicatie.
 - Invoeren van het resultaat controleprotocol (handmatige controle optellingen software). N.B. Als het controleprotocol verschillen oplevert, dan is er een probleem met het PV uit de applicatie en kan dat PV dus niet gebruikt worden.
 - Het GSB faciliteren in het berekenen van een voorlopige zetelverdeling. (nooit in scope)
@@ -80,7 +80,7 @@ TODO:
   - De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
   - Proces via uitwisselplatform loopt parallel.
 - Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het PV?
-- Moet de applicatie een preview van het te genereren PV tonen, zodat de coördinator die kan controleren en eventuele fouten kan herstellen?
+- Moet de applicatie een preview van het te genereren PV tonen, zodat de coördinator GSB die kan controleren en eventuele fouten kan herstellen?
   - Preview: bestand genereren met "concept" in watermerk en in bestandsnaam.
 
 
@@ -98,8 +98,8 @@ __Hoofdscenario:__
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. (voor elk stembureau) Het GSB stelt met de hand vast dat de tellingen die het stembureau heeft vastgesteld in N 10-1, kloppen.
 4. (voor elk stembureau) [Het GSB voert de tellingen uit N 10-1 en evt. Na 14-1 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
-5. (parallel aan invoer stembureaus) [De coördinator voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
-6. De coördinator genereert het PV en het EML_NL bestand.
+5. (parallel aan invoer stembureaus) [De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-gsb-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
+6. De coördinator GSB genereert het PV en het EML_NL bestand.
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
 9. Het GSB stelt de benodigde EML_NL bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
@@ -136,7 +136,7 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 __Hoofdscenario 1:__
 
 1. De coördinator GSB verneemt dat een stembureau niet open is gegaan.
-2. De coördinator stelt vast dat het stembureau op de gepubliceerde lijst staat en in de applicatie staat.
+2. De coördinator GSB stelt vast dat het stembureau op de gepubliceerde lijst staat en in de applicatie staat.
 3. De coördinator GSB verwijdert het stembureau.
 4. De applicatie toont een waarschuwing dat elke aanpassing op een stembureau, waardoor die afwijkt van de gepubliceerde lijst, opgenomen moet worden in het PV.
 
@@ -157,32 +157,32 @@ __Hoofdscenario 2:__
 
 
 
-## De coördinator voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in. (zee)
+## De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in. (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Precondities:__
 
-- De coördinator is ingelogd in de applicatie.
+- De coördinator GSB is ingelogd in de applicatie.
 
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
 
-1. De coördinator voert de datum, tijd en locatie van de zitting in.
-2. De coördinator voert de aanwezige leden van het GSB in.
-3. De coördinator voert de bezwaren van kiezers/belangstellenden tijdens de zitting in.
-4. De coördinator voert onregelmatigheden of bijzonderheden tijdens de zitting in.
+1. De coördinator GSB voert de datum, tijd en locatie van de zitting in.
+2. De coördinator GSB voert de aanwezige leden van het GSB in.
+3. De coördinator GSB voert de bezwaren van kiezers/belangstellenden tijdens de zitting in.
+4. De coördinator GSB voert onregelmatigheden of bijzonderheden tijdens de zitting in.
 
 __Uitbreidingen:__
 
-3a. De coördinator vult in: "zie bijlage".
+3a. De coördinator GSB vult in: "zie bijlage".
 
-4a. De coördinator vult in: "zie bijlage".
+4a. De coördinator GSB vult in: "zie bijlage".
 
 ### Open punten
 
-- Voert de coördinator de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de applicatie dat?
+- Voert de coördinator GSB de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de applicatie dat?
   - Nieuw model GSB PV heeft drie vinkjes: toegelaten kiezers opnieuw vastgesteld, onderzocht vanwege andere redenen, stembiljetten (deels) herteld.
   - De SB PVs verschillen hierin tussen DSO en CSO.
   - Als de applicatie dit moet doen, moeten de invoerders dit over kunnen nemen van het SB PV.

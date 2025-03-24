@@ -526,16 +526,14 @@ fn reassign_residual_seats_for_exhausted_lists(
         current_steps.extend(list_exhaustion_steps);
 
         // Reassign removed seats to non-exhausted lists
-        for seat in 0..seats_to_reassign {
-            (current_steps, current_standings) = assign_remainder(
-                &current_standings,
-                seats,
-                assigned_residual_seats + seats_to_reassign,
-                assigned_residual_seats + seat,
-                &current_steps,
-                Some(totals),
-            )?;
-        }
+        (current_steps, current_standings) = assign_remainder(
+            &current_standings,
+            seats,
+            assigned_residual_seats + seats_to_reassign,
+            assigned_residual_seats,
+            &current_steps,
+            Some(totals),
+        )?;
         Ok((current_steps, current_standings))
     } else {
         Ok((previous_steps, previous_standings))

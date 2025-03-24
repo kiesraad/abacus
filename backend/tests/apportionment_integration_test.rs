@@ -1,7 +1,9 @@
 #![cfg(test)]
 
 use crate::{
-    shared::{create_and_finalise_data_entry, create_result_with_non_example_data_entry},
+    shared::{
+        create_and_finalise_data_entry, create_result, create_result_with_non_example_data_entry,
+    },
     utils::serve_api,
 };
 use abacus::{
@@ -519,6 +521,30 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     assert_eq!(body.seat_assignment.steps.len(), 4);
     let total_seats = get_total_seats_from_apportionment_result(body.seat_assignment);
     assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
+async fn test_election_apportionment_error_all_lists_exhausted(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    create_result(&addr, typist_cookie, 3, 3).await;
+
+    let url = format!("http://{addr}/api/elections/3/apportionment");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    let body: ErrorResponse = response.json().await.unwrap();
+    assert_eq!(
+        body.error,
+        "All lists are exhausted, not enough candidates to fill all seats"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]

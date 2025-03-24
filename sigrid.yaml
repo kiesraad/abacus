@@ -134,9 +134,6 @@ components:
   - name: "(Frontend) e2e tests"
     include:
       - ".*/frontend/e2e-tests/.*"
-  - name: "(Frontend) Scripts"
-    include:
-      - ".*/frontend/scripts/.*"
 
 languages:
   - name: "css"
@@ -179,6 +176,7 @@ languages:
 
 exclude:
   - ".*/backend/[.]sqlx/.*"
+  - ".*/frontend/scripts/.*"
   - ".*/frontend/src/components/MockTest[.]tsx"
   - ".*/frontend/src/lib/icon/.*"
   - ".*/[.]ladle.*"

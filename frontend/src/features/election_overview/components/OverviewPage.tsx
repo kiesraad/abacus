@@ -4,10 +4,13 @@ import { Election, useUserRole } from "@/api";
 import { ElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
-import { Alert, PageTitle, Table } from "@/components/ui";
+import { Alert, Button, PageTitle, Table, Toolbar } from "@/components/ui";
 import { t } from "@/lib/i18n";
 
+import { IconPlus } from "@/lib/icon";
+
 import { useElectionList } from "../hooks/useElectionList";
+
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -47,6 +50,11 @@ export function OverviewPage() {
       )}
       <main>
         <article>
+          <Toolbar>
+            <Button.Link variant="secondary" size="sm" to={"./create"}>
+              <IconPlus /> {t("election.add")}
+            </Button.Link>
+          </Toolbar>
           {!electionList.length ? (
             !isAdminOrCoordinator ? (
               <>

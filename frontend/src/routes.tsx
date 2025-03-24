@@ -25,6 +25,7 @@ import { ElectionReportPage } from "@/features/election_management/components/El
 import { OverviewLayout } from "@/features/election_overview/components/OverviewLayout";
 import { OverviewPage } from "@/features/election_overview/components/OverviewPage";
 import { ElectionStatusPage } from "@/features/election_status/components/ElectionStatusPage";
+import { ElectionCreatePage } from "@/features/election_management/components";
 import { LogsHomePage } from "@/features/logs/components/LogsHomePage";
 import { NotAvailableInMock } from "@/features/NotAvailableInMock";
 import { NotFoundPage } from "@/features/NotFoundPage";
@@ -54,6 +55,7 @@ export const routes = createRoutesFromElements(
     </Route>
     <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />
+      <Route path="create" element={<ElectionCreatePage />} />
       <Route path=":electionId" element={<ElectionLayout />}>
         <Route index element={<ElectionHomePage />} />
         <Route path="apportionment" element={<ApportionmentLayout />}>

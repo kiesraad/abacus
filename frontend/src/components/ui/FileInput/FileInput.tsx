@@ -25,7 +25,9 @@ export function FileInput({ id, children, ...props }: FileInputProps) {
           setFile(e.target.files ? e.target.files[0] : undefined);
         }}
       />
-      <span className={cls["selected-file"]}>{file?.name || t("no_file_chosen")}</span>
+      <label htmlFor={id} className={cls["selected-file"]}>
+        {file?.name || t("no_file_chosen")}
+      </label>
     </>
   );
 }

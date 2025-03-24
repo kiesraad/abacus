@@ -42,19 +42,16 @@ export type DataEntryDispatch = Dispatch<DataEntryAction>;
 
 export type DataEntryAction =
   | {
-      type: "DATA_ENTRY_LOADED";
+      type: "DATA_ENTRY_CLAIMED";
       dataEntry: ClaimDataEntryResponse;
     }
   | {
-      type: "DATA_ENTRY_LOAD_FAILED";
+      type: "DATA_ENTRY_CLAIM_FAILED";
       error: AnyApiError;
     }
   | {
       type: "DATA_ENTRY_SAVE_FAILED";
       error: AnyApiError;
-    }
-  | {
-      type: "DATA_ENTRY_NOT_FOUND";
     }
   | {
       type: "FORM_SAVE_FAILED";

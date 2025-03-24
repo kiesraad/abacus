@@ -1,12 +1,6 @@
 import { Election } from "@kiesraad/api";
 
-import {
-  buildFormState,
-  getInitialFormState,
-  getInitialValues,
-  getNextSectionID,
-  updateFormStateAfterSubmit,
-} from "./dataEntryUtils";
+import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
 import { ClientState, DataEntryAction, DataEntryState, FormSectionId, FormSectionReference } from "./types";
 
 export const INITIAL_FORM_SECTION_ID: FormSectionId = "recounted";
@@ -39,7 +33,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
   // console.log("ACTION", action);
 
   switch (action.type) {
-    case "DATA_ENTRY_LOADED":
+    case "DATA_ENTRY_CLAIMED":
       if (action.dataEntry.client_state) {
         const { formState, targetFormSectionId } = buildFormState(
           action.dataEntry.client_state as ClientState,
@@ -62,14 +56,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         pollingStationResults: action.dataEntry.data,
         error: null,
       };
-    case "DATA_ENTRY_NOT_FOUND":
-      return {
-        ...state,
-        pollingStationResults: getInitialValues(state.election),
-        formState: getInitialFormState(state.election),
-        targetFormSectionId: INITIAL_FORM_SECTION_ID,
-      };
-    case "DATA_ENTRY_LOAD_FAILED":
+    case "DATA_ENTRY_CLAIM_FAILED":
       return {
         ...state,
         error: action.error,

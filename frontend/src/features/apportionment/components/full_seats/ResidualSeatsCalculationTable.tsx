@@ -2,7 +2,7 @@ import { t } from "@kiesraad/i18n";
 import { Table } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
-import cls from "./Apportionment.module.css";
+import cls from "../Apportionment.module.css";
 
 interface ResidualSeatsCalculationTableProps {
   seats: number;

@@ -1,14 +1,15 @@
 import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { election, election_summary, seat_assignment } from "@/components/apportionment/test-data/less-than-19-seats";
 import { routes } from "@/routes";
 
-import { ApportionmentProvider, ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@kiesraad/api";
+import { ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@kiesraad/api";
 import { getElectionMockData } from "@kiesraad/api-mocks";
 import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter, within } from "@kiesraad/test";
 
+import { election, election_summary, seat_assignment } from "../testing/less-than-19-seats";
 import { ApportionmentPage } from "./ApportionmentPage";
+import { ApportionmentProvider } from "./ApportionmentProvider";
 
 const renderApportionmentPage = () =>
   render(

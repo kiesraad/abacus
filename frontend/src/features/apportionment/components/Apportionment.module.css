@@ -1,3 +1,26 @@
+/* Styling for the apportionment pages */
+.article {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.table-title {
+  margin-bottom: 2rem;
+}
+
+.table-information {
+  display: block;
+  width: 39rem;
+  margin-bottom: 2rem;
+}
+
+.absolute-majority-change-information {
+  width: 53rem;
+}
+
+/* Styling for the apportionment tables */
 .table {
   max-width: 52rem;
   color: var(--gray-900);

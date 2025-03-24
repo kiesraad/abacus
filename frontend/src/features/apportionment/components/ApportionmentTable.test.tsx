@@ -3,8 +3,8 @@ import { describe, expect, test } from "vitest";
 import { PoliticalGroup } from "@kiesraad/api";
 import { render, screen } from "@kiesraad/test";
 
+import { election, seat_assignment } from "../testing/19-or-more-seats";
 import { ApportionmentTable } from "./ApportionmentTable";
-import { election, seat_assignment } from "./test-data/19-or-more-seats";
 
 describe("ApportionmentTable", () => {
   test("renders a table with the apportionment", async () => {

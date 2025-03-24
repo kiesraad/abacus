@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import { ApiError, ElectionSummary, SeatAssignmentResult } from "../index";
+import { ApiError, ElectionSummary, SeatAssignmentResult } from "@kiesraad/api";
 
 export interface iElectionApportionmentProviderContext {
   seatAssignment?: SeatAssignmentResult;

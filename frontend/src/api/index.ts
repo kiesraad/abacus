@@ -1,4 +1,3 @@
-export * from "./apportionment";
 export * from "./election";
 export * from "./gen/openapi";
 export * from "./polling_station";

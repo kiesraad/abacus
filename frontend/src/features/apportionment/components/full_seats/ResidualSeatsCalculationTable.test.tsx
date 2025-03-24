@@ -2,8 +2,8 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@kiesraad/test";
 
+import { seat_assignment } from "../../testing/19-or-more-seats";
 import { ResidualSeatsCalculationTable } from "./ResidualSeatsCalculationTable";
-import { seat_assignment } from "./test-data/19-or-more-seats";
 
 describe("ResidualSeatsCalculationTable", () => {
   test("renders a table with the residual seats calculation", async () => {

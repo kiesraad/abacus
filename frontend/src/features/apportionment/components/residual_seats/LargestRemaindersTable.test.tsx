@@ -3,8 +3,8 @@ import { describe, expect, test } from "vitest";
 import { PoliticalGroup } from "@kiesraad/api";
 import { render, screen } from "@kiesraad/test";
 
+import { election, largest_remainder_steps, seat_assignment } from "../../testing/less-than-19-seats";
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
-import { election, largest_remainder_steps, seat_assignment } from "./test-data/less-than-19-seats";
 
 describe("LargestRemaindersTable", () => {
   test("renders a table with the residual seat assignment with largest remainders system", async () => {

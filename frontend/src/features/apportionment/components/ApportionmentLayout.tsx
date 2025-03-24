@@ -2,8 +2,9 @@ import { Outlet } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
 
-import { ApportionmentProvider } from "@kiesraad/api";
 import { useNumericParam } from "@kiesraad/util";
+
+import { ApportionmentProvider } from "./ApportionmentProvider";
 
 export function ApportionmentLayout() {
   const electionId = useNumericParam("electionId");

@@ -3,8 +3,8 @@ import { describe, expect, test } from "vitest";
 import { PoliticalGroup } from "@kiesraad/api";
 import { render, screen } from "@kiesraad/test";
 
+import { election, seat_assignment } from "../../testing/19-or-more-seats";
 import { LargestAveragesFor19OrMoreSeatsTable } from "./LargestAveragesFor19OrMoreSeatsTable";
-import { election, seat_assignment } from "./test-data/19-or-more-seats";
 
 describe("LargestAveragesFor19OrMoreSeatsTable", () => {
   test("renders a table with the residual seat assignment with largest averages system for 19 or more seats", async () => {

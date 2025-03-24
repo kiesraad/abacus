@@ -1,16 +1,14 @@
 import { Link } from "react-router";
 
-import {
-  LargestAveragesFor19OrMoreSeatsTable,
-  LargestAveragesForLessThan19SeatsTable,
-  LargestRemaindersTable,
-} from "@/components/apportionment";
-
-import { AbsoluteMajorityChange, useApportionmentContext, useElection } from "@kiesraad/api";
+import { AbsoluteMajorityChange, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
-import cls from "./Apportionment.module.css";
+import { useApportionmentContext } from "../../hooks/useApportionmentContext";
+import cls from "../Apportionment.module.css";
+import { LargestAveragesFor19OrMoreSeatsTable } from "./LargestAveragesFor19OrMoreSeatsTable";
+import { LargestAveragesForLessThan19SeatsTable } from "./LargestAveragesForLessThan19SeatsTable";
+import { LargestRemaindersTable } from "./LargestRemaindersTable";
 
 function render_title_and_header() {
   return (

@@ -1,8 +1,9 @@
 import * as React from "react";
 
-import { isFatalError } from "../ApiResult";
-import { ApportionmentProviderContext } from "./ApportionmentProviderContext";
-import { useApportionmentRequest } from "./useApportionmentRequest";
+import { isFatalError } from "@kiesraad/api";
+
+import { ApportionmentProviderContext } from "../hooks/ApportionmentProviderContext";
+import { useApportionmentRequest } from "../hooks/useApportionmentRequest";
 
 export interface ElectionApportionmentProviderProps {
   children: React.ReactNode;

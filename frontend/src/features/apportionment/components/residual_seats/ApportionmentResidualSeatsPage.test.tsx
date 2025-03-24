@@ -1,28 +1,29 @@
 import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
+import { routes } from "@/routes";
+
+import { ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@kiesraad/api";
+import { getElectionMockData } from "@kiesraad/api-mocks";
+import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@kiesraad/test";
+
 import {
   election as election_19_or_more_seats,
   election_summary as election_summary_19_or_more_seats,
   seat_assignment as seat_assignment_19_or_more_seats,
-} from "@/components/apportionment/test-data/19-or-more-seats";
+} from "../../testing/19-or-more-seats";
 import {
   election as election_absolute_majority_change,
   election_summary as election_summary_absolute_majority_change,
   seat_assignment as seat_assignment_absolute_majority_change,
-} from "@/components/apportionment/test-data/absolute-majority-change";
+} from "../../testing/absolute-majority-change";
 import {
   election as election_less_than_19_seats,
   election_summary as election_summary_less_than_19_seats,
   largest_remainder_steps,
   seat_assignment as seat_assignment_less_than_19_seats,
-} from "@/components/apportionment/test-data/less-than-19-seats";
-import { routes } from "@/routes";
-
-import { ApportionmentProvider, ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@kiesraad/api";
-import { getElectionMockData } from "@kiesraad/api-mocks";
-import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@kiesraad/test";
-
+} from "../../testing/less-than-19-seats";
+import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentResidualSeatsPage } from "./ApportionmentResidualSeatsPage";
 
 const renderApportionmentResidualSeatsPage = () =>

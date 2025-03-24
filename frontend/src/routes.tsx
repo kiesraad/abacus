@@ -6,12 +6,6 @@ import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "@/featur
 import { Logout } from "@/features/account/Logout";
 import { AdministratorLayout } from "@/features/AdministratorLayout";
 import {
-  ApportionmentFullSeatsPage,
-  ApportionmentLayout,
-  ApportionmentPage,
-  ApportionmentResidualSeatsPage,
-} from "@/features/apportionment";
-import {
   CandidatesVotesPage,
   DataEntryHomePage,
   DifferencesPage,
@@ -46,6 +40,11 @@ import {
 import { WorkstationsHomePage } from "@/features/workstations";
 
 import { t } from "@kiesraad/i18n";
+
+import { ApportionmentLayout } from "./features/apportionment/components/ApportionmentLayout";
+import { ApportionmentPage } from "./features/apportionment/components/ApportionmentPage";
+import { ApportionmentFullSeatsPage } from "./features/apportionment/components/full_seats/ApportionmentFullSeatsPage";
+import { ApportionmentResidualSeatsPage } from "./features/apportionment/components/residual_seats/ApportionmentResidualSeatsPage";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />} errorElement={<ErrorBoundary />}>

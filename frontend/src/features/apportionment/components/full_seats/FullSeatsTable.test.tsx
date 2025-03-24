@@ -2,8 +2,8 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@kiesraad/test";
 
+import { election, seat_assignment } from "../../testing/19-or-more-seats";
 import { FullSeatsTable } from "./FullSeatsTable";
-import { election, seat_assignment } from "./test-data/19-or-more-seats";
 
 describe("FullSeatsTable", () => {
   test("renders a table with the full seats assignment", async () => {

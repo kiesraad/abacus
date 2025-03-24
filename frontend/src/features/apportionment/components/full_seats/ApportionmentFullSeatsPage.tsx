@@ -1,12 +1,13 @@
 import { Link } from "react-router";
 
-import { FullSeatsTable, ResidualSeatsCalculationTable } from "@/components/apportionment";
-
-import { useApportionmentContext, useElection } from "@kiesraad/api";
+import { useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
-import cls from "./Apportionment.module.css";
+import { useApportionmentContext } from "../../hooks/useApportionmentContext";
+import cls from "../Apportionment.module.css";
+import { FullSeatsTable } from "./FullSeatsTable";
+import { ResidualSeatsCalculationTable } from "./ResidualSeatsCalculationTable";
 
 export function ApportionmentFullSeatsPage() {
   const { election } = useElection();

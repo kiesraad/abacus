@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, ApiError, useInitialApiGet, User, USER_GET_REQUEST_PATH } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
+import { AnyApiError, ApiError, useInitialApiGet, User, USER_GET_REQUEST_PATH } from "@/api";
+import { t } from "@/lib/i18n";
+import { useNumericParam } from "@/lib/util";
+
 import { Alert, FormLayout, Loader, PageTitle } from "@kiesraad/ui";
-import { useNumericParam } from "@kiesraad/util";
 
 import { UserDelete } from "./UserDelete";
 import { UserUpdateForm } from "./UserUpdateForm";

@@ -4,9 +4,8 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { routes } from "@/routes";
-
-import { ElectionListRequestHandler, UserListRequestHandler } from "@kiesraad/api-mocks";
-import { overrideOnce, Providers, server, setupTestRouter } from "@kiesraad/test";
+import { overrideOnce, Providers, server, setupTestRouter } from "@/testing";
+import { ElectionListRequestHandler, UserListRequestHandler } from "@/testing/api-mocks";
 
 function renderWithRouter() {
   const router = setupTestRouter(routes);

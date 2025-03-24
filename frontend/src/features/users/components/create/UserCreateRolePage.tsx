@@ -1,11 +1,12 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { useUserCreateContext } from "@/features/users/create/useUserCreateContext";
+import { Role } from "@/api";
+import { t } from "@/lib/i18n";
 
-import { Role } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
 import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@kiesraad/ui";
+
+import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
 export function UserCreateRolePage() {
   const navigate = useNavigate();

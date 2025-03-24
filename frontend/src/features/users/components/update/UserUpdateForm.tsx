@@ -1,16 +1,9 @@
 import { FormEvent, useState } from "react";
 
-import {
-  AnyApiError,
-  ApiError,
-  isSuccess,
-  UpdateUserRequest,
-  useCrud,
-  User,
-  USER_UPDATE_REQUEST_PATH,
-} from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { IconPencil } from "@kiesraad/icon";
+import { AnyApiError, ApiError, isSuccess, UpdateUserRequest, useCrud, User, USER_UPDATE_REQUEST_PATH } from "@/api";
+import { t } from "@/lib/i18n";
+import { IconPencil } from "@/lib/icon";
+
 import { Alert, Button, Form, FormLayout, InputField } from "@kiesraad/ui";
 
 export interface UserUpdateFormProps {

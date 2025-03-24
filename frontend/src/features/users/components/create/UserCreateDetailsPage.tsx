@@ -1,12 +1,12 @@
 import { Navigate, useNavigate } from "react-router";
 
-import { UserCreateDetailsForm } from "@/features/users/create/UserCreateDetailsForm";
+import type { User } from "@/api";
+import { t } from "@/lib/i18n";
 
-import type { User } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
-import { useUserCreateContext } from "./useUserCreateContext";
+import { useUserCreateContext } from "../../hooks/useUserCreateContext";
+import { UserCreateDetailsForm } from "./UserCreateDetailsForm";
 
 export function UserCreateDetailsPage() {
   const navigate = useNavigate();

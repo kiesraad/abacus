@@ -9,8 +9,9 @@ import {
   useCrud,
   User,
   USER_CREATE_REQUEST_PATH,
-} from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
+} from "@/api";
+import { t } from "@/lib/i18n";
+
 import { Alert, Button, Form, FormLayout, InputField } from "@kiesraad/ui";
 
 export interface UserCreateDetailsFormProps {

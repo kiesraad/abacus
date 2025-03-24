@@ -331,7 +331,7 @@ async fn test_can_delete_logged_in_user(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_1", "users"))))]
 async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/user/2");
+    let url = format!("http://{addr}/api/user/3");
     let admin_cookie = shared::admin_login(&addr).await;
     let typist_cookie = shared::typist_login(&addr).await;
 

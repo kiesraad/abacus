@@ -363,10 +363,11 @@ async fn get_statuses(
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_election_details_status(pool: SqlitePool) {
+async fn ntest_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let typist_user_id = 3;
 
     // Ensure the statuses are "NotStarted"
     let statuses = get_statuses(&addr, coordinator_cookie.clone()).await;
@@ -401,13 +402,13 @@ async fn test_election_details_status(pool: SqlitePool) {
     let statuses = get_statuses(&addr, coordinator_cookie.clone()).await;
 
     assert_eq!(statuses[&1].status, SecondEntryNotStarted);
-    assert_eq!(statuses[&1].first_entry_user_id, Some(2));
+    assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&1].second_entry_user_id, None);
     assert_eq!(statuses[&1].first_entry_progress, Some(100));
     assert_eq!(statuses[&1].second_entry_progress, None);
 
     assert_eq!(statuses[&2].status, FirstEntryInProgress);
-    assert_eq!(statuses[&2].first_entry_user_id, Some(2));
+    assert_eq!(statuses[&2].first_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&2].second_entry_user_id, None);
     assert_eq!(statuses[&2].first_entry_progress, Some(60));
     assert_eq!(statuses[&2].second_entry_progress, None);
@@ -435,13 +436,13 @@ async fn test_election_details_status(pool: SqlitePool) {
     let statuses = get_statuses(&addr, coordinator_cookie.clone()).await;
 
     assert_eq!(statuses[&1].status, SecondEntryInProgress);
-    assert_eq!(statuses[&1].first_entry_user_id, Some(2));
-    assert_eq!(statuses[&1].second_entry_user_id, Some(2));
+    assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
+    assert_eq!(statuses[&1].second_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&1].first_entry_progress, Some(100));
     assert_eq!(statuses[&1].second_entry_progress, Some(60));
 
     assert_eq!(statuses[&2].status, FirstEntryInProgress);
-    assert_eq!(statuses[&2].first_entry_user_id, Some(2));
+    assert_eq!(statuses[&2].first_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&2].second_entry_user_id, None);
     assert_eq!(statuses[&2].first_entry_progress, Some(60));
     assert_eq!(statuses[&2].second_entry_progress, None);
@@ -453,13 +454,13 @@ async fn test_election_details_status(pool: SqlitePool) {
     let statuses = get_statuses(&addr, coordinator_cookie).await;
 
     assert_eq!(statuses[&1].status, Definitive);
-    assert_eq!(statuses[&1].first_entry_user_id, Some(2));
-    assert_eq!(statuses[&1].second_entry_user_id, Some(2));
+    assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
+    assert_eq!(statuses[&1].second_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&1].first_entry_progress, Some(100));
     assert_eq!(statuses[&1].second_entry_progress, Some(100));
 
     assert_eq!(statuses[&2].status, FirstEntryInProgress);
-    assert_eq!(statuses[&2].first_entry_user_id, Some(2));
+    assert_eq!(statuses[&2].first_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&2].second_entry_user_id, None);
     assert_eq!(statuses[&2].first_entry_progress, Some(60));
     assert_eq!(statuses[&2].second_entry_progress, None);

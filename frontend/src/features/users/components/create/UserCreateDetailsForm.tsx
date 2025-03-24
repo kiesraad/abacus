@@ -10,9 +10,8 @@ import {
   User,
   USER_CREATE_REQUEST_PATH,
 } from "@/api";
+import { Alert, Button, Form, FormLayout, InputField } from "@/components/ui";
 import { t } from "@/lib/i18n";
-
-import { Alert, Button, Form, FormLayout, InputField } from "@kiesraad/ui";
 
 export interface UserCreateDetailsFormProps {
   role: Role;

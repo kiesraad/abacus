@@ -469,7 +469,7 @@ describe("Test PollingStationChoiceForm", () => {
     });
   });
 
-  test.only("Show unfiinished data entries for current user", async () => {
+  test("Show unfiinished data entries for current user", async () => {
     server.use(ElectionRequestHandler);
     const testPollingStation = pollingStationMockData[0]!;
     // Have the server return an in progress polling station that is owned by a logged in user.

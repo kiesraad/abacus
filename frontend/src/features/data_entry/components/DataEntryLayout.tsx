@@ -1,12 +1,12 @@
 import { Outlet } from "react-router";
 
+import { NotFoundError, useElection } from "@/api";
 import { DataEntryProgress } from "@/components/form/data_entry/DataEntryProgress";
 import { DataEntryProvider } from "@/components/form/data_entry/state/DataEntryProvider";
+import { t } from "@/lib/i18n";
+import { useNumericParam, usePollingStationStatus } from "@/lib/util";
 
-import { NotFoundError, useElection } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
 import { Badge, PageTitle, PollingStationNumber, StickyNav } from "@kiesraad/ui";
-import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
 
 import { AbortDataEntryControl } from "./AbortDataEntryControl";
 

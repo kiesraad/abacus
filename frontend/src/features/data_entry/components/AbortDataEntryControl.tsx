@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router";
 
-import { useElection } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
+import { useElection } from "@/api";
+import { t } from "@/lib/i18n";
+
 import { Button } from "@kiesraad/ui";
 
 export function AbortDataEntryControl() {

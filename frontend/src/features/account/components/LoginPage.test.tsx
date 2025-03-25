@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 
-import { LoginPage } from "@/features/account";
-
 import { render } from "@kiesraad/test";
+
+import { LoginPage } from "./LoginPage";
 
 describe("LoginPage", () => {
   test("Enter form field values", () => {

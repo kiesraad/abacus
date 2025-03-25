@@ -1,11 +1,11 @@
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { PollingStationListPage } from "@/features/polling_stations";
-
 import { ElectionProvider, PollingStationListResponse } from "@kiesraad/api";
 import { ElectionRequestHandler, PollingStationListRequestHandler } from "@kiesraad/api-mocks";
 import { overrideOnce, render, server } from "@kiesraad/test";
+
+import { PollingStationListPage } from "./PollingStationListPage";
 
 describe("PollingStationListPage", () => {
   beforeEach(() => {

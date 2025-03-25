@@ -12,7 +12,7 @@ export function FileInput({ id, children, ...props }: FileInputProps) {
 
   return (
     <>
-      <label htmlFor={id} className={btnCls["button"]}>
+      <label htmlFor={id} className={btnCls.button}>
         {children}
       </label>
       <input
@@ -20,12 +20,12 @@ export function FileInput({ id, children, ...props }: FileInputProps) {
         id={id}
         type="file"
         name={props.name || id}
-        className={cls["file-input"]}
+        className={cls.fileInput}
         onChange={(e) => {
           setFile(e.target.files ? e.target.files[0] : undefined);
         }}
       />
-      <label htmlFor={id} className={cls["selected-file"]}>
+      <label htmlFor={id} className={cls.selectedFile}>
         {file?.name || t("no_file_chosen")}
       </label>
     </>

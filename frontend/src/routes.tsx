@@ -43,6 +43,7 @@ import { ApportionmentLayout } from "./features/apportionment/components/Apporti
 import { ApportionmentPage } from "./features/apportionment/components/ApportionmentPage";
 import { ApportionmentFullSeatsPage } from "./features/apportionment/components/full_seats/ApportionmentFullSeatsPage";
 import { ApportionmentResidualSeatsPage } from "./features/apportionment/components/residual_seats/ApportionmentResidualSeatsPage";
+import { ElectionCreatePage } from "./features/election/components";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />} errorElement={<ErrorBoundary />}>

@@ -3,6 +3,7 @@
 use crate::{
     shared::{
         create_and_finalise_data_entry, create_result, create_result_with_non_example_data_entry,
+        differences_counts_zero, political_group_votes_from_test_data_auto,
     },
     utils::serve_api,
 };
@@ -12,8 +13,7 @@ use abacus::{
         ElectionApportionmentResponse, Fraction, get_total_seats_from_apportionment_result,
     },
     data_entry::{
-        CandidateVotes, DataEntry, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-        VotersCounts, VotesCounts, status::ClientState,
+        DataEntry, PollingStationResults, VotersCounts, VotesCounts, status::ClientState,
     },
     election::Election,
 };
@@ -46,240 +46,19 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
                 total_votes_cast_count: 1205,
             },
             voters_recounts: None,
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
-            },
+            differences_counts: differences_counts_zero(),
             political_group_votes: vec![
-                PoliticalGroupVotes {
-                    number: 1,
-                    total: 808,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 138,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 55,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 45,
-                        },
-                        CandidateVotes {
-                            number: 5,
-                            votes: 50,
-                        },
-                        CandidateVotes {
-                            number: 6,
-                            votes: 100,
-                        },
-                        CandidateVotes {
-                            number: 7,
-                            votes: 60,
-                        },
-                        CandidateVotes {
-                            number: 8,
-                            votes: 40,
-                        },
-                        CandidateVotes {
-                            number: 9,
-                            votes: 30,
-                        },
-                        CandidateVotes {
-                            number: 10,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 11,
-                            votes: 50,
-                        },
-                        CandidateVotes {
-                            number: 12,
-                            votes: 200,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 2,
-                    total: 60,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 15,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 5,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 3,
-                        },
-                        CandidateVotes {
-                            number: 5,
-                            votes: 2,
-                        },
-                        CandidateVotes {
-                            number: 6,
-                            votes: 15,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 3,
-                    total: 58,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 15,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 5,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 3,
-                        },
-                        CandidateVotes {
-                            number: 5,
-                            votes: 2,
-                        },
-                        CandidateVotes {
-                            number: 6,
-                            votes: 13,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 4,
-                    total: 57,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 15,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 5,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 3,
-                        },
-                        CandidateVotes {
-                            number: 5,
-                            votes: 14,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 5,
-                    total: 56,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 15,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 5,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 16,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 6,
-                    total: 55,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 15,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 5,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 15,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 7,
-                    total: 54,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 15,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 5,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 14,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 8,
-                    total: 52,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 32,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 15,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 5,
-                        },
-                    ],
-                },
+                political_group_votes_from_test_data_auto(
+                    1,
+                    &[138, 20, 55, 45, 50, 100, 60, 40, 30, 20, 50, 200],
+                ),
+                political_group_votes_from_test_data_auto(2, &[20, 15, 5, 3, 2, 15]),
+                political_group_votes_from_test_data_auto(3, &[20, 15, 5, 3, 2, 13]),
+                political_group_votes_from_test_data_auto(4, &[20, 15, 5, 3, 14]),
+                political_group_votes_from_test_data_auto(5, &[20, 15, 5, 16]),
+                political_group_votes_from_test_data_auto(6, &[20, 15, 5, 15]),
+                political_group_votes_from_test_data_auto(7, &[20, 15, 5, 14]),
+                political_group_votes_from_test_data_auto(8, &[32, 15, 5]),
             ],
         },
         client_state: ClientState::new_from_str(None).unwrap(),
@@ -326,178 +105,16 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
                 total_votes_cast_count: 1205,
             },
             voters_recounts: None,
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
-            },
+            differences_counts: differences_counts_zero(),
             political_group_votes: vec![
-                PoliticalGroupVotes {
-                    number: 1,
-                    total: 600,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 78,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 55,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 45,
-                        },
-                        CandidateVotes {
-                            number: 5,
-                            votes: 50,
-                        },
-                        CandidateVotes {
-                            number: 6,
-                            votes: 0,
-                        },
-                        CandidateVotes {
-                            number: 7,
-                            votes: 60,
-                        },
-                        CandidateVotes {
-                            number: 8,
-                            votes: 40,
-                        },
-                        CandidateVotes {
-                            number: 9,
-                            votes: 30,
-                        },
-                        CandidateVotes {
-                            number: 10,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 11,
-                            votes: 50,
-                        },
-                        CandidateVotes {
-                            number: 12,
-                            votes: 152,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 2,
-                    total: 302,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 150,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 50,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 22,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 10,
-                        },
-                        CandidateVotes {
-                            number: 5,
-                            votes: 30,
-                        },
-                        CandidateVotes {
-                            number: 6,
-                            votes: 40,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 3,
-                    total: 98,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 15,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 25,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 3,
-                        },
-                        CandidateVotes {
-                            number: 5,
-                            votes: 2,
-                        },
-                        CandidateVotes {
-                            number: 6,
-                            votes: 33,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 4,
-                    total: 99,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 15,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 25,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 24,
-                        },
-                        CandidateVotes {
-                            number: 5,
-                            votes: 15,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 5,
-                    total: 101,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 20,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 31,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 10,
-                        },
-                        CandidateVotes {
-                            number: 4,
-                            votes: 40,
-                        },
-                    ],
-                },
+                political_group_votes_from_test_data_auto(
+                    1,
+                    &[78, 20, 55, 45, 50, 0, 60, 40, 30, 20, 50, 152],
+                ),
+                political_group_votes_from_test_data_auto(2, &[150, 50, 22, 10, 30, 40]),
+                political_group_votes_from_test_data_auto(3, &[20, 15, 25, 3, 2, 33]),
+                political_group_votes_from_test_data_auto(4, &[20, 15, 25, 24, 15]),
+                political_group_votes_from_test_data_auto(5, &[20, 31, 10, 40]),
             ],
         },
         client_state: ClientState::new_from_str(None).unwrap(),
@@ -569,44 +186,10 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
                 total_votes_cast_count: 104,
             },
             voters_recounts: None,
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
-            },
+            differences_counts: differences_counts_zero(),
             political_group_votes: vec![
-                PoliticalGroupVotes {
-                    number: 1,
-                    total: 51,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 30,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 21,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 2,
-                    total: 51,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 30,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 21,
-                        },
-                    ],
-                },
+                political_group_votes_from_test_data_auto(1, &[30, 21]),
+                political_group_votes_from_test_data_auto(2, &[30, 21]),
             ],
         },
         client_state: ClientState::new_from_str(None).unwrap(),

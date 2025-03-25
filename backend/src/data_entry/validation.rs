@@ -952,14 +952,7 @@ mod tests {
             votes_counts: Default::default(),
             voters_recounts: None,
             differences_counts: Default::default(),
-            political_group_votes: vec![PoliticalGroupVotes {
-                number: 1,
-                total: 42,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 42,
-                }],
-            }],
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[42])],
         };
         let election = election_fixture(&[1]);
         let polling_station = polling_station_fixture(None);
@@ -1015,14 +1008,7 @@ mod tests {
                 other_explanation_count: 0,
                 no_explanation_count: 0,
             },
-            political_group_votes: vec![PoliticalGroupVotes {
-                number: 1,
-                total: 44,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 44,
-                }],
-            }],
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[44])],
         };
         let election = election_fixture(&[1]);
         let polling_station = polling_station_fixture(None);
@@ -1108,14 +1094,7 @@ mod tests {
                 other_explanation_count: 0,
                 no_explanation_count: 2,
             },
-            political_group_votes: vec![PoliticalGroupVotes {
-                number: 1,
-                total: 100,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 100,
-                }],
-            }],
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
         };
         polling_station_results
             .validate(
@@ -1175,14 +1154,7 @@ mod tests {
                 other_explanation_count: 2,
                 no_explanation_count: 0,
             },
-            political_group_votes: vec![PoliticalGroupVotes {
-                number: 1,
-                total: 3,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 3,
-                }],
-            }],
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[3])],
         };
         polling_station_results
             .validate(
@@ -1279,14 +1251,7 @@ mod tests {
                 other_explanation_count: 8,
                 no_explanation_count: 7,
             },
-            political_group_votes: vec![PoliticalGroupVotes {
-                number: 1,
-                total: 101,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 101,
-                }],
-            }],
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[101])],
         };
         polling_station_results
             .validate(
@@ -1355,14 +1320,7 @@ mod tests {
                 other_explanation_count: 2,
                 no_explanation_count: 2,
             },
-            political_group_votes: vec![PoliticalGroupVotes {
-                number: 1,
-                total: 50,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 50,
-                }],
-            }],
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[50])],
         };
         let election = election_fixture(&[1]);
         let polling_station = polling_station_fixture(None);
@@ -1422,14 +1380,7 @@ mod tests {
                 other_explanation_count: 2, // F.305 no difference expected
                 no_explanation_count: 2,    // F.305 no difference expected
             },
-            political_group_votes: vec![PoliticalGroupVotes {
-                number: 1,
-                total: 50,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 50,
-                }],
-            }],
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[50])],
         };
         polling_station_results
             .validate(
@@ -1550,23 +1501,8 @@ mod tests {
                 total_votes_cast_count: 51, // W.206 should not exceed polling stations eligible voters
             },
             voters_recounts: None,
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
-            },
-            political_group_votes: vec![PoliticalGroupVotes {
-                number: 1,
-                total: 51,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 51,
-                }],
-            }],
+            differences_counts: DifferencesCounts::zero(),
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[51])],
         };
         let election = election_fixture(&[1]);
         let polling_station = polling_station_fixture(Some(i64::from(50)));
@@ -1645,23 +1581,8 @@ mod tests {
                 total_votes_cast_count: 1002,
             },
             voters_recounts: None,
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
-            },
-            political_group_votes: vec![PoliticalGroupVotes {
-                number: 1,
-                total: 1000,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 1000,
-                }],
-            }],
+            differences_counts: DifferencesCounts::zero(),
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[1000])],
         };
         let election = election_fixture(&[1]);
         let polling_station = polling_station_fixture(None);

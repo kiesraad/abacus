@@ -350,9 +350,7 @@ pub mod tests {
 
     use crate::{
         authentication::Role,
-        data_entry::{
-            CandidateVotes, DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts,
-        },
+        data_entry::{DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts},
     };
 
     use super::*;
@@ -375,44 +373,10 @@ pub mod tests {
                     total_votes_cast_count: 100,
                 },
                 voters_recounts: None,
-                differences_counts: DifferencesCounts {
-                    more_ballots_count: 0,
-                    fewer_ballots_count: 0,
-                    unreturned_ballots_count: 0,
-                    too_few_ballots_handed_out_count: 0,
-                    too_many_ballots_handed_out_count: 0,
-                    other_explanation_count: 0,
-                    no_explanation_count: 0,
-                },
+                differences_counts: DifferencesCounts::zero(),
                 political_group_votes: vec![
-                    PoliticalGroupVotes {
-                        number: 1,
-                        total: 56,
-                        candidate_votes: vec![
-                            CandidateVotes {
-                                number: 1,
-                                votes: 36,
-                            },
-                            CandidateVotes {
-                                number: 2,
-                                votes: 20,
-                            },
-                        ],
-                    },
-                    PoliticalGroupVotes {
-                        number: 2,
-                        total: 40,
-                        candidate_votes: vec![
-                            CandidateVotes {
-                                number: 1,
-                                votes: 30,
-                            },
-                            CandidateVotes {
-                                number: 2,
-                                votes: 10,
-                            },
-                        ],
-                    },
+                    PoliticalGroupVotes::from_test_data_auto(1, &[36, 20]),
+                    PoliticalGroupVotes::from_test_data_auto(2, &[30, 10]),
                 ],
             },
             client_state: ClientState(None),

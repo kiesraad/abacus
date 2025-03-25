@@ -6,9 +6,9 @@ import { routes } from "@/routes";
 import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@/testing";
 import { getElectionMockData } from "@/testing/api-mocks";
 
-import * as equalOrMore from "../../testing/19-or-more-seats";
+import * as gte19Seats from "../../testing/19-or-more-seats";
 import * as absoluteMajorityChange from "../../testing/absolute-majority-change";
-import * as lessThan from "../../testing/less-than-19-seats";
+import * as lt19Seats from "../../testing/less-than-19-seats";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentResidualSeatsPage } from "./ApportionmentResidualSeatsPage";
 
@@ -23,11 +23,11 @@ const renderApportionmentResidualSeatsPage = () =>
 
 describe("ApportionmentResidualSeatsPage", () => {
   test("Residual seats assignment table for 19 or more seats visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(equalOrMore.election));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(gte19Seats.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      seat_assignment: equalOrMore.seat_assignment,
-      candidate_nomination: equalOrMore.candidate_nomination,
-      election_summary: equalOrMore.election_summary,
+      seat_assignment: gte19Seats.seat_assignment,
+      candidate_nomination: gte19Seats.candidate_nomination,
+      election_summary: gte19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
 
     renderApportionmentResidualSeatsPage();
@@ -59,12 +59,12 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats assignment tables for less than 19 seats with both systems visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lessThan.election));
+  test("Residual seats assignment tables for less than 19 seats with both methods visible", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      seat_assignment: lessThan.seat_assignment,
-      candidate_nomination: lessThan.candidate_nomination,
-      election_summary: lessThan.election_summary,
+      seat_assignment: lt19Seats.seat_assignment,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
 
     renderApportionmentResidualSeatsPage();
@@ -106,15 +106,15 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats assignment tables for less than 19 seats with only remainder system visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lessThan.election));
+  test("Residual seats assignment tables for less than 19 seats with only largest remainders method visible", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: {
-        ...lessThan.seat_assignment,
-        steps: lessThan.largest_remainder_steps,
+        ...lt19Seats.seat_assignment,
+        steps: lt19Seats.largest_remainder_steps,
       },
-      candidate_nomination: lessThan.candidate_nomination,
-      election_summary: lessThan.election_summary,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
 
     renderApportionmentResidualSeatsPage();
@@ -179,7 +179,7 @@ describe("ApportionmentResidualSeatsPage", () => {
 
   describe("Apportionment not yet available", () => {
     test("Not available until data entry is finalised", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lessThan.election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 412, {
         error: "Election data entry first needs to be finalised",
         fatal: false,
@@ -203,7 +203,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lessThan.election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
@@ -227,7 +227,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     });
 
     test("Not possible because all lists are exhausted", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lessThan.election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "All lists are exhausted, not enough candidates to fill all seats",
         fatal: false,
@@ -246,9 +246,9 @@ describe("ApportionmentResidualSeatsPage", () => {
         ),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("largest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest_remainders_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
     });
 
@@ -259,7 +259,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       });
       const router = setupTestRouter(routes);
 
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lessThan.election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 500, {
         error: "Internal Server Error",
         fatal: true,

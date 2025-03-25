@@ -308,6 +308,15 @@ de telling is onjuist.
           #election_candidate.last_name,
           #election_candidate.initials
           #if "first_name" in election_candidate [ (#election_candidate.first_name) ]
+          #if "gender" in election_candidate [
+            #if election_candidate.gender == "Male" [
+              (m)
+            ] else if election_candidate.gender == "Female" [
+              (v)
+            ] else if election_candidate.gender == "X" [
+              (x)
+            ]
+          ]
         ],
         align(right, mono[#candidate.votes]),
       )

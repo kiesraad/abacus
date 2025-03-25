@@ -51,7 +51,6 @@ impl Session {
     }
 
     /// Get the session expiration time
-    #[cfg(test)]
     pub(super) fn expires_at(&self) -> DateTime<Utc> {
         self.expires_at
     }
@@ -137,6 +136,15 @@ impl Sessions {
     /// Delete a session by its key
     pub async fn delete(&self, session_key: &str) -> Result<(), AuthenticationError> {
         sqlx::query!("DELETE FROM sessions WHERE session_key = ?", session_key)
+            .execute(&self.0)
+            .await?;
+
+        Ok(())
+    }
+
+    /// Delete a session for a certain user
+    pub async fn delete_user_session(&self, user_id: u32) -> Result<(), AuthenticationError> {
+        sqlx::query!("DELETE FROM sessions WHERE user_id = ?", user_id)
             .execute(&self.0)
             .await?;
 
@@ -261,6 +269,7 @@ mod test {
     async fn test_extend_session(pool: SqlitePool) {
         let sessions = Sessions::new(pool);
 
+        // do not extend sessions that have a long life time
         let session: crate::authentication::session::Session = sessions
             .create(1, TimeDelta::seconds(60 * 60 * 60))
             .await
@@ -271,7 +280,8 @@ mod test {
             .unwrap();
         assert_eq!(session_from_db, None);
 
-        let session = sessions.create(1, TimeDelta::seconds(60)).await.unwrap();
+        // extend sessions that have a short life time
+        let session = sessions.create(1, TimeDelta::seconds(10)).await.unwrap();
         let session_from_db = sessions
             .extend_session(session.session_key())
             .await

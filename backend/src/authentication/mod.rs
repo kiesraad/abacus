@@ -1,15 +1,12 @@
-use chrono::TimeDelta;
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-
 pub use self::api::*;
+use chrono::TimeDelta;
 pub use user::{User, Users};
 
 pub use self::role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
 #[cfg(test)]
 pub use self::session::Sessions;
 
-mod api;
+pub mod api;
 pub mod error;
 mod password;
 mod role;
@@ -18,6 +15,7 @@ mod user;
 mod util;
 
 /// Session lifetime, for both cookie and database
+/// Also change the translation string "users.session_expired" in the frontend if this value is changed
 pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 30); // 30 minutes
 
 /// Minimum session lifetime, refresh if only this much time or less is left before expiration
@@ -29,37 +27,15 @@ pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
 /// Only send cookies over a secure (https) connection
 pub const SECURE_COOKIES: bool = false;
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct Credentials {
-    username: String,
-    password: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct LoginResponse {
-    user_id: u32,
-    username: String,
-}
-
-impl From<&User> for LoginResponse {
-    fn from(user: &User) -> Self {
-        Self {
-            user_id: user.id(),
-            username: user.username().to_string(),
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::role::Role;
-    use api::{AccountUpdateRequest, Credentials, LoginResponse, UserListResponse};
+    use api::{AccountUpdateRequest, Credentials, UserListResponse};
     use axum::{
         Router,
         body::Body,
         http::{HeaderValue, Request, StatusCode},
         middleware,
-        routing::{get, post, put},
     };
     use http_body_util::BodyExt;
     use hyper::{Method, header::CONTENT_TYPE};
@@ -75,16 +51,12 @@ mod tests {
     fn create_app(pool: SqlitePool) -> Router {
         let state = AppState { pool: pool.clone() };
 
-        let router = Router::new()
-            .route("/api/user", get(api::user_list).post(api::user_create))
-            .route("/api/user/{user_id}", put(api::user_update))
-            .route("/api/user/login", post(api::login))
-            .route("/api/user/logout", post(api::logout))
-            .route("/api/user/whoami", get(api::whoami))
-            .route("/api/user/account", put(api::account_update))
-            .layer(middleware::from_fn_with_state(pool, extend_session));
-
-        router.with_state(state)
+        Router::from(api::router())
+            .layer(middleware::map_response_with_state(
+                state.clone(),
+                extend_session,
+            ))
+            .with_state(state)
     }
 
     async fn login(app: Router) -> HeaderValue {
@@ -507,7 +479,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: UserListResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.users.len(), 3);
+        assert_eq!(result.users.len(), 4);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -562,7 +534,7 @@ mod tests {
             .to_str()
             .unwrap();
 
-        assert!(response_cookie.contains("Max-Age=1800"));
+        assert!(response_cookie.contains(&format!("Max-Age={}", SESSION_LIFE_TIME.num_seconds())));
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

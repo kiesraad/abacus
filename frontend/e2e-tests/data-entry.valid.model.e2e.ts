@@ -305,7 +305,7 @@ test.describe("Data entry model test - valid data", () => {
             await votersAndVotesPage.abortInput.click();
           },
           NAV_TO_POLLING_STATION_PAGE: async () => {
-            await votersAndVotesPage.clickElectionInNavBar(election.election.location, election.election.name);
+            await votersAndVotesPage.navBar.clickElection(election.election.location, election.election.name);
           },
           GO_TO_RECOUNTED_PAGE: async () => {
             await votersAndVotesPage.navPanel.recounted.click();

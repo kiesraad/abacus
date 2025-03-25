@@ -1,6 +1,6 @@
 use std::fs;
 
-use abacus::create_openapi;
+use abacus::openapi_router;
 
 /// Write OpenAPI JSON documentation to `openapi.json`.
 fn main() {
@@ -10,8 +10,8 @@ fn main() {
 }
 
 fn get_openapi_json() -> String {
-    let openapi = create_openapi();
-    openapi
+    openapi_router()
+        .into_openapi()
         .to_pretty_json()
         .expect("Could not generate OpenAPI JSON")
 }

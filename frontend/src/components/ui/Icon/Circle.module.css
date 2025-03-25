@@ -1,0 +1,75 @@
+.circle {
+  display: inline-block;
+  border-radius: 50%;
+
+  &.warning {
+    background-color: var(--color-warning);
+  }
+
+  &.default {
+    background-color: var(--progress-bar-default);
+  }
+
+  &.error {
+    background-color: var(--color-error-darker);
+  }
+
+  &.accept {
+    background-color: var(--color-success);
+  }
+
+  &.errors-and-warnings {
+    background-color: var(--progress-bar-errors-and-warnings);
+  }
+
+  &.unfinished {
+    background-color: var(--progress-bar-unfinished);
+  }
+
+  &.in-progress {
+    background-color: var(--progress-bar-in-progress);
+  }
+
+  &.first-entry-finished {
+    background-color: var(--progress-bar-first-entry-finished);
+  }
+
+  &.definitive {
+    background-color: var(--progress-bar-definitive);
+  }
+
+  &.not-started {
+    background-color: var(--progress-bar-not-started);
+    border: solid 2px var(--progress-bar-not-started-border);
+  }
+
+  &.xxs {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  &.xs {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &.sm {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  &.md {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &.lg {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  &.xl {
+    width: 3rem;
+    height: 3rem;
+  }
+}

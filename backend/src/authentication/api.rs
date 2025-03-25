@@ -5,30 +5,44 @@ use super::{
     session::Sessions,
     user::{User, Users},
 };
+use crate::{
+    APIError, AppState, ErrorResponse,
+    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
+};
 use axum::{
-    extract::{Path, Request, State},
-    middleware::Next,
+    extract::{Path, State},
+    http::HeaderValue,
     response::{IntoResponse, Json, Response},
 };
 use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
 use cookie::{Cookie, SameSite};
 use hyper::{StatusCode, header::SET_COOKIE};
 use serde::{Deserialize, Serialize};
-use sqlx::{Error, SqlitePool};
-use tracing::debug;
+use sqlx::Error;
+use tracing::{debug, info};
 use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::{
-    APIError, ErrorResponse,
-    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
-};
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::default()
+        .routes(routes!(login))
+        .routes(routes!(whoami))
+        .routes(routes!(account_update))
+        .routes(routes!(logout))
+        .routes(routes!(user_list))
+        .routes(routes!(user_create))
+        .routes(routes!(user_get))
+        .routes(routes!(user_update))
+        .routes(routes!(user_delete))
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Credentials {
     pub username: String,
     pub password: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, ToSchema)]
 pub struct LoginResponse {
     pub user_id: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -70,7 +84,7 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn login(
+async fn login(
     user_agent: Option<TypedHeader<UserAgent>>,
     State(users): State<Users>,
     State(sessions): State<Sessions>,
@@ -136,7 +150,7 @@ pub struct AccountUpdateRequest {
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
-pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
+async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     let user = user.ok_or(AuthenticationError::UserNotFound)?;
 
     Ok(Json(LoginResponse::from(&user)))
@@ -152,9 +166,10 @@ pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
-pub async fn account_update(
+async fn account_update(
     user: User,
     State(users): State<Users>,
+    audit_service: AuditService,
     Json(account): Json<AccountUpdateRequest>,
 ) -> Result<impl IntoResponse, APIError> {
     if user.username() != account.username {
@@ -162,9 +177,19 @@ pub async fn account_update(
     }
 
     // Update the password
-    users
+    let result = users
         .update_password(user.id(), &account.username, &account.password)
-        .await?;
+        .await;
+
+    // Register audit event if the password update failed
+    if let Err(e) = result {
+        audit_service
+            .with_user(user.clone())
+            .log_error(&AuditEvent::UserAccountUpdateFailed, None)
+            .await?;
+
+        return Err(e.into());
+    }
 
     // Update the fullname
     if let Some(fullname) = account.fullname {
@@ -174,6 +199,11 @@ pub async fn account_update(
     let Some(updated_user) = users.get_by_username(user.username()).await? else {
         return Err(AuthenticationError::UserNotFound.into());
     };
+
+    audit_service
+        .with_user(updated_user.clone())
+        .log_error(&AuditEvent::UserAccountUpdateSuccess, None)
+        .await?;
 
     Ok(Json(LoginResponse::from(&updated_user)))
 }
@@ -187,7 +217,7 @@ pub async fn account_update(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn logout(
+async fn logout(
     State(sessions): State<Sessions>,
     State(users): State<Users>,
     audit_service: AuditService,
@@ -228,31 +258,51 @@ pub async fn logout(
 }
 
 /// Middleware to extend the session lifetime
-pub async fn extend_session(State(pool): State<SqlitePool>, req: Request, next: Next) -> Response {
-    let jar = CookieJar::from_headers(req.headers());
-    let mut res = next.run(req).await;
-
+pub async fn extend_session(
+    State(users): State<Users>,
+    State(sessions): State<Sessions>,
+    jar: CookieJar,
+    audit_service: AuditService,
+    mut response: Response,
+) -> Response {
     let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
-        return res;
+        return response;
     };
 
-    let sessions = Sessions::new(pool);
+    let mut expires = None;
 
     // extend lifetime of session and set new cookie if the session is still valid and will soon be expired
     if let Ok(Some(session)) = sessions.extend_session(session_cookie.value()).await {
-        debug!("Session extended: {:?}", session_cookie);
+        info!("Session extended for user {}", session.user_id());
 
-        let mut cookie = session.get_cookie();
-        set_default_cookie_properties(&mut cookie);
+        if let Some(user) = users.get_by_id(session.user_id()).await.ok().flatten() {
+            let _ = audit_service
+                .with_user(user)
+                .log_success(&AuditEvent::UserSessionExtended, None)
+                .await;
 
-        debug!("Setting cookie: {:?}", cookie);
+            let mut cookie = session.get_cookie();
+            set_default_cookie_properties(&mut cookie);
 
-        if let Ok(header_value) = cookie.encoded().to_string().parse() {
-            res.headers_mut().append(SET_COOKIE, header_value);
+            debug!("Setting cookie: {:?}", cookie);
+
+            if let Ok(header_value) = cookie.encoded().to_string().parse() {
+                response.headers_mut().append(SET_COOKIE, header_value);
+            }
         }
+
+        expires = Some(session.expires_at());
+    } else if let Ok(Some(session)) = sessions.get_by_key(session_cookie.value()).await {
+        expires = Some(session.expires_at());
     }
 
-    res
+    if let Some(expires) = expires.and_then(|e| HeaderValue::from_str(&e.to_rfc3339()).ok()) {
+        response
+            .headers_mut()
+            .append("X-Session-Expires-At", expires);
+    }
+
+    response
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
@@ -270,7 +320,7 @@ pub struct UserListResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn user_list(
+async fn user_list(
     _user: Admin,
     State(users_repo): State<Users>,
 ) -> Result<Json<UserListResponse>, APIError> {
@@ -313,8 +363,9 @@ pub struct UpdateUserRequest {
     ),
 )]
 pub async fn user_create(
-    _user: Admin,
+    admin: Admin,
     State(users_repo): State<Users>,
+    audit_service: AuditService,
     Json(create_user_req): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
     let user = users_repo
@@ -325,6 +376,12 @@ pub async fn user_create(
             create_user_req.role,
         )
         .await?;
+
+    audit_service
+        .with_user(admin.0)
+        .log_success(&AuditEvent::UserCreated(LoginResponse::from(&user)), None)
+        .await?;
+
     Ok((StatusCode::CREATED, Json(user)))
 }
 
@@ -342,7 +399,7 @@ pub async fn user_create(
         ("user_id" = u32, description = "User id"),
     ),
 )]
-pub async fn user_get(
+async fn user_get(
     _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,
@@ -364,18 +421,35 @@ pub async fn user_get(
     ),
 )]
 pub async fn user_update(
-    _user: Admin,
+    admin: Admin,
     State(users_repo): State<Users>,
+    State(session_repo): State<Sessions>,
+    audit_service: AuditService,
     Path(user_id): Path<u32>,
     Json(update_user_req): Json<UpdateUserRequest>,
 ) -> Result<Json<User>, APIError> {
+    if let Some(fullname) = update_user_req.fullname {
+        users_repo.update_fullname(user_id, &fullname).await?
+    };
+
+    if let Some(temp_password) = update_user_req.temp_password {
+        users_repo
+            .set_temporary_password(user_id, &temp_password)
+            .await?;
+
+        session_repo.delete_user_session(user_id).await?;
+    };
+
     let user = users_repo
-        .update(
-            user_id,
-            update_user_req.fullname.as_deref(),
-            update_user_req.temp_password.as_deref(),
-        )
+        .get_by_id(user_id)
+        .await?
+        .ok_or(Error::RowNotFound)?;
+
+    audit_service
+        .with_user(admin.0)
+        .log_success(&AuditEvent::UserUpdated(LoginResponse::from(&user)), None)
         .await?;
+
     Ok(Json(user))
 }
 
@@ -390,7 +464,7 @@ pub async fn user_update(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn user_delete(
+async fn user_delete(
     _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,

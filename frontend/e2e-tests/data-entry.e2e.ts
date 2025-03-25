@@ -64,7 +64,7 @@ test.describe("full data entry flow", () => {
     await expect(differencesPage.moreBallotsCount).toBeFocused();
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     await expect(candidatesListPage_1.getCandidate(0)).toBeFocused();
 
     await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
@@ -155,7 +155,7 @@ test.describe("full data entry flow", () => {
     await expect(differencesPage.fieldset).toBeVisible();
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
 
     await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
@@ -220,7 +220,7 @@ test.describe("full data entry flow", () => {
     await differencesPage.fillMoreBallotsFields(moreBallotsFields);
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
 
     await candidatesListPage_1.fillCandidatesAndTotal([902, 233], 1135);
@@ -296,7 +296,7 @@ test.describe("full data entry flow", () => {
     await differencesPage.fillFewerBallotsFields(fewerBallotsFields);
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
 
     await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
@@ -348,7 +348,7 @@ test.describe("full data entry flow", () => {
 
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
     await candidatesListPage_1.fillCandidatesAndTotal([99, 1], 100);
     await candidatesListPage_1.next.click();
@@ -494,7 +494,7 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.fieldset).toBeVisible();
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     // fill counts of List 1 with data that does not match the total votes on candidates
     await candidatesListPage_1.fillCandidatesAndTotal([2, 1], 3);
     await candidatesListPage_1.next.click();
@@ -783,7 +783,7 @@ test.describe("navigation", () => {
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
       await differencesPage.next.click();
 
-      const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
       await expect(candidatesListPage_1.fieldset).toBeVisible();
       await expect(candidatesListPage_1.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
       await expect(candidatesListPage_1.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");

@@ -5,7 +5,7 @@ module.exports = {
     "^react.*$", // anything react
     "<THIRD_PARTY_MODULES>", // node_modules
     "^ladle/.*$", // ladle
-    "^app/.*$", // app
+    "^@/.*$", // app
     "^@kiesraad/.*$", // lib
     "^(\\.||\\.\\.)/.*$", // local imports
   ],

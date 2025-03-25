@@ -32,6 +32,7 @@ dependencies = [
  "typst",
  "typst-pdf",
  "utoipa",
+ "utoipa-axum",
  "utoipa-swagger-ui",
  "zip",
 ]
@@ -1859,9 +1860,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve"
-version = "1.0.1"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d99b66275a38f88989bc90fb2717bd1e9833637d54015f5442c68b396b175f2"
+checksum = "0cfc92aa7fd45743d406a4e8ab0ecc3262d35851525c85903ca296db0cf10f3c"
 dependencies = [
  "axum",
  "brotli",
@@ -1874,9 +1875,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-core"
-version = "1.0.1"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93fe505bfe7730dcb8faa7013d50c2fe0ae8a88987ec4e8eaa51c7d044bc678c"
+checksum = "e08a56e08967b27df85eed2b90d3fbe92300481188d8f2f6bb377f09c8e35d03"
 dependencies = [
  "brotli",
  "mime_guess",
@@ -1887,9 +1888,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-macros"
-version = "1.0.1"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae30b9847788c65bf65d701272882b19ceccc3d488f6b55ad38786c1ea1e7653"
+checksum = "cfd1d3e59fb7742ad32e357cf504fd0fe36c9f35aa5b2797321eb13cf52603af"
 dependencies = [
  "memory-serve-core",
 ]
@@ -2489,9 +2490,9 @@ checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 
 [[package]]
 name = "reqwest"
-version = "0.12.14"
+version = "0.12.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "989e327e510263980e231de548a33e63d34962d29ae61b467389a1a09627a254"
+checksum = "d19c46a6fdd48bc4dab94b6103fccc55d34c67cc0ad04653aad4ea2a07cd7bbb"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -4116,6 +4117,19 @@ dependencies = [
  "serde",
  "serde_json",
  "utoipa-gen",
+]
+
+[[package]]
+name = "utoipa-axum"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c25bae5bccc842449ec0c5ddc5cbb6a3a1eaeac4503895dc105a1138f8234a0"
+dependencies = [
+ "axum",
+ "paste",
+ "tower-layer",
+ "tower-service",
+ "utoipa",
 ]
 
 [[package]]

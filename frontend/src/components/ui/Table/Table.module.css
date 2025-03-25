@@ -1,0 +1,99 @@
+.table {
+  width: 100%;
+  line-height: 1.5rem;
+  border-spacing: unset;
+  color: var(--color-help-text);
+  font-size: var(--font-size-body);
+
+  thead {
+    font-size: var(--font-size-xs);
+  }
+
+  th:not(:global(.bb-none)),
+  td:not(:global(.bb-none)) {
+    border-bottom: 1px solid var(--bg-gray-darkest);
+  }
+
+  th:not(:global(.text-align-r)) {
+    text-align: left;
+  }
+
+  th[scope="col"] {
+    height: 2.75rem;
+    line-height: 1.125rem;
+    padding: 0.75rem 1.5rem;
+    &:global(.link-cell-padding) {
+      padding-right: 4.5rem;
+    }
+  }
+
+  th[scope="row"],
+  td {
+    height: 3.5rem;
+    line-height: 1.25rem;
+    padding: 1rem 1.5rem;
+    &:global(.link-cell-padding) {
+      padding-right: 4.5rem;
+    }
+  }
+
+  /* Vertical center child inline-blocks */
+  td > * {
+    vertical-align: middle;
+  }
+
+  /* Gap between children */
+  td > * + * {
+    margin-left: 0.5rem;
+  }
+
+  td.number-cell {
+    text-align: right;
+    width: 6.5rem;
+    line-height: 1.75rem;
+  }
+
+  td.integer-cell {
+    padding-right: 0;
+    text-align: right;
+  }
+
+  td.fraction-cell {
+    padding-left: 0.5rem;
+    text-align: left;
+    font-size: var(--font-size-xs);
+  }
+  td.fraction-cell:empty {
+    width: 0;
+    padding-left: 0;
+  }
+
+  tr.row-link {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-hover);
+    }
+
+    /* Cell with the chevron icon */
+    td:last-of-type {
+      padding-right: 4.5rem;
+      background-image: url("../../../lib/icon/svg/chevronRight.svg");
+      background-size: 1.25rem;
+      background-position: center right 1.5rem;
+      background-repeat: no-repeat;
+    }
+  }
+
+  tr.row-total {
+    td {
+      font-weight: bold;
+      border-bottom: none;
+    }
+  }
+}
+
+:where(.number-cell) {
+  font-weight: bold;
+  font-size: var(--font-size-body);
+}

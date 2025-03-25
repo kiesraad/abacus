@@ -1,12 +1,5 @@
-use axum::{
-    Json,
-    extract::{Path, State},
-};
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-
 use crate::{
-    APIError, ErrorResponse,
+    APIError, AppState, ErrorResponse,
     apportionment::{ApportionmentError, SeatAssignmentResult, seat_assignment},
     authentication::Coordinator,
     data_entry::{
@@ -17,6 +10,17 @@ use crate::{
     polling_station::repository::PollingStations,
     summary::ElectionSummary,
 };
+use axum::{
+    Json,
+    extract::{Path, State},
+};
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
+
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::default().routes(routes!(election_apportionment))
+}
 
 /// Election apportionment response, including the seat assignment, candidate nomination and election summary
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -40,7 +44,7 @@ pub struct ElectionApportionmentResponse {
         ("election_id" = u32, description = "Election database id"),
   ),
 )]
-pub async fn election_apportionment(
+async fn election_apportionment(
     _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(data_entry_repo): State<PollingStationDataEntries>,

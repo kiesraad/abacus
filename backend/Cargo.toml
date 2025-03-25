@@ -25,8 +25,9 @@ chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
 clap = { version = "4.5", default-features = false, features = ["derive", "std", "help"] }
 hyper = { version = "1", features = ["full"] }
 tokio = { version = "1", features = ["full"] }
-memory-serve = { version = "1.0.1", features = ["force-embed"], optional = true }
+memory-serve = { version = "1.1.0", features = ["force-embed"], optional = true }
 utoipa = { version = "5.3.1", features = ["axum_extras"] }
+utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.0", features = ["axum"], optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

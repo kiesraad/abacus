@@ -13,8 +13,8 @@ export function ChosenCandidatesTable({ chosenCandidates }: ChosenCandidatesTabl
   return (
     <Table id="chosen_candidates_table" className={cn(cls.table, cls.chosenCandidatesTable)}>
       <Table.Header>
-        <Table.HeaderCell>{t("candidate")}</Table.HeaderCell>
-        <Table.HeaderCell>{t("apportionment.locality")}</Table.HeaderCell>
+        <Table.HeaderCell>{t("candidate.title")}</Table.HeaderCell>
+        <Table.HeaderCell>{t("candidate.locality")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
         {chosenCandidates.map((candidate) => {

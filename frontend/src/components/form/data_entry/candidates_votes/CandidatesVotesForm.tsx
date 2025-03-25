@@ -81,7 +81,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         <InputGrid.Header>
           <th>{t("number")}</th>
           <th>{t("vote_count")}</th>
-          <th>{t("candidate")}</th>
+          <th>{t("candidate.title")}</th>
         </InputGrid.Header>
         <InputGrid.Body>
           {group.candidates.map((candidate, index) => {

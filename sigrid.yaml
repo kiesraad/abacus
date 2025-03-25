@@ -59,6 +59,9 @@ components:
   - name: "(Frontend) Components/apportionment"
     include:
       - ".*/frontend/src/components/apportionment/.*"
+  - name: "(Frontend) Components/authorization"
+    include:
+      - ".*/frontend/src/components/authorization/.*"
   - name: "(Frontend) Components/election"
     include:
       - ".*/frontend/src/components/election/.*"
@@ -68,6 +71,9 @@ components:
   - name: "(Frontend) Components/footer"
     include:
       - ".*/frontend/src/components/footer/.*"
+  - name: "(Frontend) app/component/form/account"
+    include:
+      - ".*/frontend/src/components/form/account/.*"
   - name: "(Frontend) app/component/form/data_entry"
     include:
       - ".*/frontend/src/components/form/data_entry/.*"
@@ -156,6 +162,7 @@ languages:
     generated:
       include:
         - ".*/gen/.*[.]rs"
+        - ".*/.sqlx/.*[.]json"
 
   - name: "typescript"
     production:
@@ -164,10 +171,9 @@ languages:
       - ".*DevHomePage[.]tsx"
       - ".*NotAvailableInMock[.]tsx"
       - ".*msw-mock-api[.]ts"
-      - ".*/src/testing/api-mocks/.*[.]ts"
-      - ".*/src/testing/api-mocks/.*[.]tsx"
       - ".*[.]e2e[.]ts"
       - ".*.stories[.]tsx"
+      - ".*/testing/.*"
       - ".*/test-data/.*[.]ts"
       - ".*/test[.]utils[.]ts"
     generated:

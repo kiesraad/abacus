@@ -1,5 +1,5 @@
 use axum::extract::FromRef;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{SqlitePool, Type, prelude::FromRow};
@@ -10,21 +10,62 @@ use utoipa::ToSchema;
 use crate::{
     APIError, AppState,
     authentication::{LoginResponse, Role, User},
+    election::{ElectionCategory, ElectionStatus},
+    polling_station::PollingStationType,
 };
 
 use super::LogFilterQuery;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserLoggedInDetails {
     pub user_agent: String,
     pub logged_in_users_count: u32,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserLoggedOutDetails {
     pub session_duration: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct ElectionDetails {
+    pub election_id: u32,
+    pub election_name: String,
+    pub election_location: String,
+    pub election_number_of_voters: u32,
+    pub election_category: ElectionCategory,
+    pub election_number_of_seats: u32,
+    #[schema(value_type = String, format = "date")]
+    pub election_election_date: NaiveDate,
+    #[schema(value_type = String, format = "date")]
+    pub election_nomination_date: NaiveDate,
+    pub election_status: ElectionStatus,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct PollingStationDetails {
+    pub polling_statiob_id: u32,
+    pub polling_statiob_election_id: u32,
+    pub polling_statiob_name: String,
+    pub polling_statiob_number: i64,
+    pub polling_statiob_number_of_voters: Option<i64>,
+    pub polling_statiob_type: Option<PollingStationType>,
+    pub polling_statiob_address: String,
+    pub polling_statiob_postal_code: String,
+    pub polling_statiob_locality: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DataEntryDetails {
+    pub polling_station_id: u32,
+    pub data_entry_progress: u8,
+    pub data_entry_recounted: Option<bool>,
+    pub first_entry_user_id: u32,
 }
 
 #[derive(
@@ -32,7 +73,6 @@ pub struct UserLoggedOutDetails {
     Deserialize,
     strum::Display,
     VariantNames,
-    Clone,
     Debug,
     PartialEq,
     Eq,
@@ -41,13 +81,30 @@ pub struct UserLoggedOutDetails {
 )]
 #[serde(rename_all = "PascalCase", tag = "eventType")]
 pub enum AuditEvent {
+    // authentication and accoutn events
     UserLoggedIn(UserLoggedInDetails),
     UserLoggedOut(UserLoggedOutDetails),
     UserAccountUpdateFailed,
-    UserAccountUpdateSuccess,
+    UserAccountUpdateSuccess(LoginResponse),
     UserSessionExtended,
+    // user managament events
     UserCreated(LoginResponse),
     UserUpdated(LoginResponse),
+    UserDeleted(LoginResponse),
+    // election events
+    ElectionCreated(ElectionDetails),
+    // apportionment
+    ApportionmentCreated(ElectionDetails),
+    // polling station events
+    PollingStationCreated(PollingStationDetails),
+    PollingStationUpdated(PollingStationDetails),
+    PollingStationDeleted(PollingStationDetails),
+    // data entry events
+    DataEntryCreated(DataEntryDetails),
+    DataEntryUpdated(DataEntryDetails),
+    DataEntryDeleted(DataEntryDetails),
+    DataEntryClaimed(DataEntryDetails),
+    DataEntryFinalized(DataEntryDetails),
     #[default]
     UnknownEvent,
 }
@@ -59,7 +116,7 @@ impl From<serde_json::Value> for AuditEvent {
 }
 
 #[derive(
-    Serialize, Deserialize, VariantNames, Clone, Debug, PartialEq, Eq, Hash, ToSchema, Type,
+    Serialize, Deserialize, VariantNames, Debug, PartialEq, Eq, Hash, ToSchema, Type,
 )]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "snake_case")]
@@ -71,7 +128,7 @@ pub enum AuditEventLevel {
     Error,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(transparent)]
 pub struct Ip(Option<IpAddr>);
 

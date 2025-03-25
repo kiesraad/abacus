@@ -7,16 +7,19 @@ import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRout
 import { getElectionMockData } from "@/testing/api-mocks";
 
 import {
+  candidate_nomination as candidate_nomination_19_or_more_seats,
   election as election_19_or_more_seats,
   election_summary as election_summary_19_or_more_seats,
   seat_assignment as seat_assignment_19_or_more_seats,
 } from "../../testing/19-or-more-seats";
 import {
+  candidate_nomination as candidate_nomination_absolute_majority_change,
   election as election_absolute_majority_change,
   election_summary as election_summary_absolute_majority_change,
   seat_assignment as seat_assignment_absolute_majority_change,
 } from "../../testing/absolute-majority-change";
 import {
+  candidate_nomination as candidate_nomination_less_than_19_seats,
   election as election_less_than_19_seats,
   election_summary as election_summary_less_than_19_seats,
   largest_remainder_steps,
@@ -39,6 +42,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_19_or_more_seats));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment_19_or_more_seats,
+      candidate_nomination: candidate_nomination_19_or_more_seats,
       election_summary: election_summary_19_or_more_seats,
     } satisfies ElectionApportionmentResponse);
 
@@ -75,6 +79,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment_less_than_19_seats,
+      candidate_nomination: candidate_nomination_less_than_19_seats,
       election_summary: election_summary_less_than_19_seats,
     } satisfies ElectionApportionmentResponse);
 
@@ -124,6 +129,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         ...seat_assignment_less_than_19_seats,
         steps: largest_remainder_steps,
       },
+      candidate_nomination: candidate_nomination_less_than_19_seats,
       election_summary: election_summary_less_than_19_seats,
     } satisfies ElectionApportionmentResponse);
 
@@ -154,6 +160,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_absolute_majority_change));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment_absolute_majority_change,
+      candidate_nomination: candidate_nomination_absolute_majority_change,
       election_summary: election_summary_absolute_majority_change,
     } satisfies ElectionApportionmentResponse);
 

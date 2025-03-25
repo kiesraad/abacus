@@ -18,7 +18,7 @@ function get_number_of_seats_assigned_sentence(seats: number, type: "residual_se
 
 export function ApportionmentPage() {
   const { election } = useElection();
-  const { seatAssignment, electionSummary, error } = useApportionmentContext();
+  const { seatAssignment, candidateNomination, electionSummary, error } = useApportionmentContext();
 
   return (
     <>
@@ -39,6 +39,7 @@ export function ApportionmentPage() {
             </FormLayout.Alert>
           ) : (
             seatAssignment &&
+            candidateNomination &&
             electionSummary && (
               <>
                 <div>
@@ -48,6 +49,7 @@ export function ApportionmentPage() {
                     seats={seatAssignment.seats}
                     quota={seatAssignment.quota}
                     numberOfVoters={election.number_of_voters}
+                    preferenceThreshold={candidateNomination.preference_threshold}
                   />
                 </div>
                 <div>

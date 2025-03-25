@@ -4,7 +4,13 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { PollingStationChoiceForm } from "@/components/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 
-import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse, LoginResponse } from "@kiesraad/api";
+import {
+  ElectionProvider,
+  ElectionStatusProvider,
+  ElectionStatusResponse,
+  LoginResponse,
+  useUser,
+} from "@kiesraad/api";
 import {
   electionDetailsMockResponse,
   ElectionRequestHandler,
@@ -13,8 +19,6 @@ import {
   pollingStationMockData,
 } from "@kiesraad/api-mocks";
 import { overrideOnce, render, renderReturningRouter, screen, server, within } from "@kiesraad/test";
-
-import { useUser } from "../../../../api/useUser";
 
 vi.mock("../../../../api/useUser");
 
@@ -441,7 +445,7 @@ describe("Test PollingStationChoiceForm", () => {
 
       server.use(ElectionRequestHandler);
 
-      // Have the server return an in progress polling station that is owned by a logged in user.
+      // Have the server return an in progress polling station that is owned by a logged-in user.
       overrideOnce("get", "api/elections/1/status", 200, {
         statuses: [
           {
@@ -469,10 +473,10 @@ describe("Test PollingStationChoiceForm", () => {
     });
   });
 
-  test("Show unfiinished data entries for current user", async () => {
+  test("Show unfinished data entries for current user", async () => {
     server.use(ElectionRequestHandler);
     const testPollingStation = pollingStationMockData[0]!;
-    // Have the server return an in progress polling station that is owned by a logged in user.
+    // Have the server return an in progress polling station that is owned by a logged-in user.
     overrideOnce("get", "api/elections/1/status", 200, {
       statuses: [
         {

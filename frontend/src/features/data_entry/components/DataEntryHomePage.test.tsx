@@ -5,7 +5,13 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { routes } from "@/routes";
 
-import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse, LoginResponse } from "@kiesraad/api";
+import {
+  ElectionProvider,
+  ElectionStatusProvider,
+  ElectionStatusResponse,
+  LoginResponse,
+  useUser,
+} from "@kiesraad/api";
 import {
   electionDetailsMockResponse,
   ElectionListRequestHandler,
@@ -14,7 +20,6 @@ import {
 } from "@kiesraad/api-mocks";
 import { overrideOnce, Providers, render, screen, server, setupTestRouter, within } from "@kiesraad/test";
 
-import { useUser } from "../../../api/useUser";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
 vi.mock("../../../api/useUser");

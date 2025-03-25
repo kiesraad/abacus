@@ -31,6 +31,7 @@
   }
   th {
     text-wrap: nowrap;
+    color: var(--gray-600);
   }
   th[scope="row"] {
     font-size: var(--font-size-md);

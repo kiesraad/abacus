@@ -303,7 +303,7 @@ de telling is onjuist.
       let election_candidate = election_pg.candidates.find(c => c.number == candidate.number)
       (
         align(right)[#candidate.number],
-        [#election_candidate.initials #election_candidate.last_name (#election_candidate.first_name)],
+        [#election_candidate.last_name_prefix #election_candidate.last_name, #election_candidate.initials (#election_candidate.first_name)],
         align(right, mono[#candidate.votes]),
       )
     },

@@ -7,7 +7,7 @@ import { election, largest_remainder_steps, seat_assignment } from "../../testin
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
 
 describe("LargestRemaindersTable", () => {
-  test("renders a table with the residual seat assignment with largest remainders system", async () => {
+  test("renders a table with the residual seat assignment with largest remainders method", async () => {
     render(
       <LargestRemaindersTable
         largestRemainderSteps={largest_remainder_steps}

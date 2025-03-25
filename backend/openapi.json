@@ -2487,9 +2487,9 @@
           }
         }
       },
-      "LargestAverageAssignedSeat": {
+      "HighestAverageAssignedSeat": {
         "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the largest average method.",
+        "description": "Contains the details for an assigned seat, assigned through the highest average method.",
         "required": [
           "selected_pg_number",
           "pg_options",
@@ -2981,7 +2981,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/LargestAverageAssignedSeat"
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
               },
               {
                 "type": "object",
@@ -2992,7 +2992,7 @@
                   "changed_by": {
                     "type": "string",
                     "enum": [
-                      "LargestAverageAssignment"
+                      "HighestAverageAssignment"
                     ]
                   }
                 }

@@ -3,14 +3,14 @@ import { describe, expect, test } from "vitest";
 import { PoliticalGroup } from "@/api";
 import { render, screen } from "@/testing";
 
-import { election, largest_average_steps, seat_assignment } from "../../testing/less-than-19-seats";
-import { LargestAveragesForLessThan19SeatsTable } from "./LargestAveragesForLessThan19SeatsTable";
+import { election, highest_average_steps, seat_assignment } from "../../testing/less-than-19-seats";
+import { HighestAveragesForLessThan19SeatsTable } from "./HighestAveragesForLessThan19SeatsTable";
 
-describe("LargestAveragesForLessThan19SeatsTable", () => {
-  test("renders a table with the residual seat assignment with largest averages system for less than 19 seats", async () => {
+describe("HighestAveragesForLessThan19SeatsTable", () => {
+  test("renders a table with the residual seat assignment with highest averages method for less than 19 seats", async () => {
     render(
-      <LargestAveragesForLessThan19SeatsTable
-        largestAverageSteps={largest_average_steps}
+      <HighestAveragesForLessThan19SeatsTable
+        highestAverageSteps={highest_average_steps}
         finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
       />,

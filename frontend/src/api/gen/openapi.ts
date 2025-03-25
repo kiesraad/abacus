@@ -447,9 +447,9 @@ export interface Fraction {
 }
 
 /**
- * Contains the details for an assigned seat, assigned through the largest average method.
+ * Contains the details for an assigned seat, assigned through the highest average method.
  */
-export interface LargestAverageAssignedSeat {
+export interface HighestAverageAssignedSeat {
   /** The list of political groups with the same average, that have been assigned a seat */
   pg_assigned: number[];
   /** The list of political groups with the same average, that have not been assigned a seat */
@@ -639,7 +639,7 @@ export interface SeatAssignmentResult {
  * Records the political group and specific change for a specific residual seat
  */
 export type SeatChange =
-  | (LargestAverageAssignedSeat & { changed_by: "LargestAverageAssignment" })
+  | (HighestAverageAssignedSeat & { changed_by: "HighestAverageAssignment" })
   | (LargestRemainderAssignedSeat & { changed_by: "LargestRemainderAssignment" })
   | (AbsoluteMajorityReassignedSeat & { changed_by: "AbsoluteMajorityReassignment" })
   | (ListExhaustionRemovedSeat & { changed_by: "ListExhaustionRemoval" });

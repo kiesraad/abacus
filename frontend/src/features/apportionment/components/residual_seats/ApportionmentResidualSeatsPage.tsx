@@ -6,8 +6,8 @@ import { t, tx } from "@/lib/i18n";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import cls from "../Apportionment.module.css";
-import { LargestAveragesFor19OrMoreSeatsTable } from "./LargestAveragesFor19OrMoreSeatsTable";
-import { LargestAveragesForLessThan19SeatsTable } from "./LargestAveragesForLessThan19SeatsTable";
+import { HighestAveragesFor19OrMoreSeatsTable } from "./HighestAveragesFor19OrMoreSeatsTable";
+import { HighestAveragesForLessThan19SeatsTable } from "./HighestAveragesForLessThan19SeatsTable";
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
 
 function render_title_and_header() {
@@ -35,7 +35,7 @@ function render_information(seats: number, residualSeats: number) {
       )}
       <br />
       <br />
-      {tx(`apportionment.information_largest_${seats >= 19 ? "averages" : "remainders"}`)}
+      {tx(`apportionment.information_${seats >= 19 ? "highest_averages" : "largest_remainders"}`)}
     </span>
   );
 }
@@ -65,8 +65,8 @@ export function ApportionmentResidualSeatsPage() {
     const largestRemainderSteps = seatAssignment.steps.filter(
       (step) => step.change.changed_by === "LargestRemainderAssignment",
     );
-    const largestAverageSteps = seatAssignment.steps.filter(
-      (step) => step.change.changed_by === "LargestAverageAssignment",
+    const highestAverageSteps = seatAssignment.steps.filter(
+      (step) => step.change.changed_by === "HighestAverageAssignment",
     );
     const absoluteMajorityChange = seatAssignment.steps
       .map((step) => step.change)
@@ -82,11 +82,11 @@ export function ApportionmentResidualSeatsPage() {
               <>
                 {seatAssignment.seats >= 19 ? (
                   <div>
-                    <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_averages")}</h2>
+                    <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
                     {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
-                    {largestAverageSteps.length > 0 && (
-                      <LargestAveragesFor19OrMoreSeatsTable
-                        largestAverageSteps={largestAverageSteps}
+                    {highestAverageSteps.length > 0 && (
+                      <HighestAveragesFor19OrMoreSeatsTable
+                        highestAverageSteps={highestAverageSteps}
                         finalStanding={seatAssignment.final_standing}
                         politicalGroups={election.political_groups}
                       />
@@ -105,18 +105,18 @@ export function ApportionmentResidualSeatsPage() {
                         />
                       )}
                     </div>
-                    {largestAverageSteps.length > 0 && (
+                    {highestAverageSteps.length > 0 && (
                       <div>
                         <h2 className={cls.tableTitle}>{t("apportionment.remaining_residual_seats_assignment")}</h2>
                         <span className={cls.tableInformation}>
                           {t(
-                            `apportionment.remaining_residual_seats_amount_and_information.${largestAverageSteps.length > 1 ? "plural" : "singular"}`,
-                            { num_seats: largestAverageSteps.length },
+                            `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length > 1 ? "plural" : "singular"}`,
+                            { num_seats: highestAverageSteps.length },
                           )}
                         </span>
                         {
-                          <LargestAveragesForLessThan19SeatsTable
-                            largestAverageSteps={largestAverageSteps}
+                          <HighestAveragesForLessThan19SeatsTable
+                            highestAverageSteps={highestAverageSteps}
                             finalStanding={seatAssignment.final_standing}
                             politicalGroups={election.political_groups}
                           />

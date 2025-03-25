@@ -6,20 +6,18 @@ The "save" endpoint, used to for [First/Second]EntryInProgress states is kept ou
 
 ```mermaid
 stateDiagram
-FirstEntryNotStarted --> FirstEntryInProgress: claim
-#FirstEntryInProgress --> FirstEntryInProgress: claim
-#FirstEntryInProgress --> FirstEntryInProgress: save
-FirstEntryInProgress --> SecondEntryNotStarted: finalise
-FirstEntryInProgress --> FirstEntryNotStarted: delete
-SecondEntryNotStarted --> SecondEntryInProgress: claim
-#SecondEntryInProgress --> SecondEntryInProgress: claim
-#SecondEntryInProgress --> SecondEntryInProgress: save
-state is_equal <<choice>>
-is_equal --> Definitive: equal? yes
-is_equal --> EntriesDifferent: equal? no
-SecondEntryInProgress --> is_equal: finalise
-SecondEntryInProgress --> SecondEntryNotStarted: delete
-#EntriesDifferent --> EntriesDifferent: save
-# Will be Implemented in #130: EntriesDifferent --> NotStarted: delete
-EntriesDifferent --> Definitive: resolve
+  direction LR
+  state is_equal <<choice>>
+  FirstEntryNotStarted --> FirstEntryInProgress:claim
+  #FirstEntryInProgress --> FirstEntryInProgress:save
+  FirstEntryInProgress --> SecondEntryNotStarted:finalise
+  FirstEntryInProgress --> FirstEntryNotStarted:delete
+  SecondEntryNotStarted --> SecondEntryInProgress:claim
+  is_equal --> Definitive:equal? yes
+  is_equal --> EntriesDifferent:equal? no
+  #SecondEntryInProgress --> SecondEntryInProgress:save
+  SecondEntryInProgress --> is_equal:finalise
+  SecondEntryInProgress --> SecondEntryNotStarted:delete
+  EntriesDifferent --> FirstEntryInProgress: discard both entries
+  EntriesDifferent --> SecondEntryInProgress:keep one entry
 ```

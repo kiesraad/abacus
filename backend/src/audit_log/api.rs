@@ -45,7 +45,7 @@ pub struct LogFilterQuery {
     #[serde(default)]
     pub user: Vec<u32>,
     #[serde(default)]
-    pub since: Option<String>,
+    pub since: Option<i64>,
 }
 
 /// Lists all users

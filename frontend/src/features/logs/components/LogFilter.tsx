@@ -1,7 +1,6 @@
 import { t } from "@kiesraad/i18n";
 import { IconCross } from "@kiesraad/icon";
 import { Button, Checkbox, InputField } from "@kiesraad/ui";
-import { localDateToUtc, utcToLocalDate } from "@kiesraad/util";
 
 import { LogFilterState } from "../hooks/useAuditLog";
 import { LogFilterName, useLogFilterOptions } from "../hooks/useLogFilterOptions";
@@ -12,6 +11,29 @@ interface LogFilterProps {
   filterState: LogFilterState;
   setSince: (since: string) => void;
   toggleFilter: (filterName: LogFilterName, value: string, checked: boolean) => void;
+}
+
+// timestamp to local date string
+function timestamopToDateString(timestamp: string | undefined): string {
+  if (!timestamp) {
+    return "";
+  }
+
+  const d = new Date();
+  const time = new Date(parseInt(timestamp) * 1000 - d.getTimezoneOffset() * 60000);
+
+  return time.toISOString().slice(0, 16);
+}
+
+// local date string to timestamp
+function dateToTimestampString(date: string): string {
+  if (!date) {
+    return "";
+  }
+
+  const time = new Date(date);
+
+  return Math.round(time.getTime() / 1000).toString();
 }
 
 export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogFilterProps) {
@@ -47,9 +69,9 @@ export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogF
             type="datetime-local"
             name="since"
             fieldWidth="parent"
-            value={filterState.since ? utcToLocalDate(filterState.since).slice(0, 16) : ""}
+            value={timestamopToDateString(filterState.since)}
             onChange={(e) => {
-              setSince(e.target.value ? localDateToUtc(e.target.value) : "");
+              setSince(dateToTimestampString(e.target.value));
             }}
             label={t("log.header.since")}
           />

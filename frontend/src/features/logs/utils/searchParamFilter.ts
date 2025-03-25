@@ -1,12 +1,12 @@
 import { LogFilterState } from "../hooks/useAuditLog";
 import { LogFilterNames } from "../hooks/useLogFilterOptions";
 
-export function getLogFilterOptionsFromSearchParams(searchPareams: URLSearchParams): LogFilterState {
+export function getLogFilterOptionsFromSearchParams(searchParams: URLSearchParams): LogFilterState {
   return {
-    event: searchPareams.getAll("event"),
-    level: searchPareams.getAll("level"),
-    user: searchPareams.getAll("user"),
-    since: searchPareams.get("since") ?? undefined,
+    event: searchParams.getAll("event"),
+    level: searchParams.getAll("level"),
+    user: searchParams.getAll("user"),
+    since: searchParams.get("since") ?? undefined,
   };
 }
 

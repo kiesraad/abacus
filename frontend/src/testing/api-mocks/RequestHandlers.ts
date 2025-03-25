@@ -41,8 +41,7 @@ import {
 
 import { claimDataEntryResponse, saveDataEntryResponse } from "./DataEntryMockData";
 import { electionDetailsMockResponse, electionListMockResponse, electionStatusMockResponse } from "./ElectionMockData";
-import logMockResponse1 from "./LogMockData1.json";
-import logMockResponse2 from "./LogMockData2.json";
+import { logMockResponse } from "./LogMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
 import { loginResponseMockData, userMockData } from "./UserMockData";
 
@@ -77,27 +76,7 @@ export const AccountUpdateRequestHandler = http.put<
 >("/api/user/account", () => HttpResponse.json(loginResponseMockData, { status: 200 }));
 
 // simulate some audit log filtering
-export const LogRequestHandler = http.get("/api/log", ({ request }) => {
-  const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page")?.toString() || "1");
-
-  const data = { ...(page === 2 ? logMockResponse2 : logMockResponse1) };
-  const event = url.searchParams.getAll("event");
-  const level = url.searchParams.getAll("level");
-  const user = url.searchParams.getAll("user");
-
-  if (event.length > 0) {
-    data.events = data.events.filter((e) => event.includes(e.event.eventType));
-  }
-  if (level.length > 0) {
-    data.events = data.events.filter((e) => level.includes(e.eventLevel));
-  }
-  if (user.length > 0) {
-    data.events = data.events.filter((e) => user.includes(e.userId.toString()));
-  }
-
-  return HttpResponse.json(data, { status: 200 });
-});
+export const LogRequestHandler = http.get("/api/log", () => HttpResponse.json(logMockResponse, { status: 200 }));
 
 // get election list handler
 export const ElectionListRequestHandler = http.get("/api/elections", () =>

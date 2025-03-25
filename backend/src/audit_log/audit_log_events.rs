@@ -177,7 +177,7 @@ impl LogFilter {
         let since = query
             .since
             .as_ref()
-            .and_then(|since| DateTime::parse_from_rfc3339(since).ok())
+            .and_then(|since| DateTime::from_timestamp(*since, 0))
             .map(|dt| dt.to_utc());
 
         Self {

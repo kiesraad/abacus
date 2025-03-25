@@ -80,7 +80,7 @@ describe("ApportionmentFullSeatsPage", () => {
       expect(screen.queryByTestId("residual_seats_calculation_table")).not.toBeInTheDocument();
     });
 
-    test("Not available because drawing of lots is not implemented yet", async () => {
+    test("Not possible because drawing of lots is not implemented yet", async () => {
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
@@ -96,6 +96,30 @@ describe("ApportionmentFullSeatsPage", () => {
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
+      ).toBeVisible();
+
+      expect(screen.queryByTestId("full_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("residual_seats_calculation_table")).not.toBeInTheDocument();
+    });
+
+    test("Not possible because all lists are exhausted", async () => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+        error: "All lists are exhausted, not enough candidates to fill all seats",
+        fatal: false,
+        reference: "AllListsExhausted",
+      } satisfies ErrorResponse);
+
+      renderApportionmentFullSeatsPage();
+
+      // Wait for the page to be loaded
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
+
+      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
+      expect(
+        await screen.findByText(
+          "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
+        ),
       ).toBeVisible();
 
       expect(screen.queryByTestId("full_seats_table")).not.toBeInTheDocument();

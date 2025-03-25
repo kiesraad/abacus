@@ -21,10 +21,19 @@ test("getCandidateFullName util", () => {
     last_name_prefix: "de",
     number: 3,
   };
+  const candidateWithFirstNameAndLastNamePrefixAndGender: Candidate = {
+    ...candidateWithFirstNameAndLastNamePrefix,
+    gender: "Female",
+    number: 4,
+  };
   const fullNameWithoutFirstName = getCandidateFullName(candidateWithoutFirstName);
   const fullNameWithFirstName = getCandidateFullName(candidateWithFirstName);
   const fullNameWithFirstNameAndLastNamePrefix = getCandidateFullName(candidateWithFirstNameAndLastNamePrefix);
+  const fullNameWithFirstNameAndLastNamePrefixAndGender = getCandidateFullName(
+    candidateWithFirstNameAndLastNamePrefixAndGender,
+  );
   expect(fullNameWithoutFirstName).toBe("Boer, A.B.");
   expect(fullNameWithFirstName).toBe("Boer, A.B. (Anne)");
   expect(fullNameWithFirstNameAndLastNamePrefix).toBe("de Boer, A.B. (Anne)");
+  expect(fullNameWithFirstNameAndLastNamePrefixAndGender).toBe("de Boer, A.B. (Anne) (v)");
 });

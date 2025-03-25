@@ -1,5 +1,6 @@
 import account from "./account.json";
 import apportionment from "./apportionment.json";
+import candidate from "./candidate.json";
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
 import data_entry from "./data_entry.json";
@@ -25,6 +26,7 @@ const nl = {
   ...generic,
   account,
   apportionment,
+  candidate,
   candidates_votes,
   check_and_save,
   data_entry,

@@ -192,10 +192,9 @@ export interface AuditLogEvent {
   ip: string;
   message?: string | null;
   time: string;
-  /** user defaults */
-  userFullname?: string;
+  userFullname: string;
   userId: number;
-  userRole?: string;
+  userRole: Role;
   username: string;
   workstation?: number | null;
 }

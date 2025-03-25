@@ -21,14 +21,14 @@ describe("LogsHomePage", () => {
     await waitFor(() => {
       expect(table).toHaveTableContent([
         ["Nummer", "Tijdstip", "Werkplek", "Type", "Gebeurtenis", "Gebruiker"],
-        ["24", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "Sanne Molenaar (Beheerder)"],
-        ["23", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "Sanne Molenaar (Beheerder)"],
-        ["22", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "Sanne Molenaar (Beheerder)"],
-        ["21", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "Sam Kuijpers (Invoerder)"],
-        ["20", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "Sam Kuijpers (Invoerder)"],
-        ["19", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "Mohammed van der Velden (Coördinator)"],
-        ["18", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "Mohammed van der Velden (Coördinator)"],
-        ["17", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "Mohammed van der Velden (Coördinator)"],
+        ["24", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#1 Sanne Molenaar (Beheerder)"],
+        ["23", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#1 Sanne Molenaar (Beheerder)"],
+        ["22", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#1 Sanne Molenaar (Beheerder)"],
+        ["21", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#2 Sam Kuijpers (Invoerder)"],
+        ["20", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#2 Sam Kuijpers (Invoerder)"],
+        ["19", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#3 Mohammed van der Velden (Coördinator)"],
+        ["18", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#3 Mohammed van der Velden (Coördinator)"],
+        ["17", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#3 Mohammed van der Velden (Coördinator)"],
       ]);
     });
 
@@ -58,7 +58,8 @@ describe("LogsHomePage", () => {
       [
         "Tijdstip",
         "11 maart 2025 om 10:02",
-        "GebruikerSanne Molenaar (Beheerder)",
+        "Gebruiker",
+        "#1 Sanne Molenaar (Beheerder)",
         "Toelichting",
         "-",
         "IP-adres",
@@ -84,14 +85,14 @@ describe("LogsHomePage", () => {
 
     expect(table).toHaveTableContent([
       ["Nummer", "Tijdstip", "Werkplek", "Type", "Gebeurtenis", "Gebruiker"],
-      ["24", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "Sanne Molenaar (Beheerder)"],
-      ["23", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "Sanne Molenaar (Beheerder)"],
-      ["22", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "Sanne Molenaar (Beheerder)"],
-      ["21", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "Sam Kuijpers (Invoerder)"],
-      ["20", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "Sam Kuijpers (Invoerder)"],
-      ["19", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "Mohammed van der Velden (Coördinator)"],
-      ["18", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "Mohammed van der Velden (Coördinator)"],
-      ["17", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "Mohammed van der Velden (Coördinator)"],
+      ["24", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#1 Sanne Molenaar (Beheerder)"],
+      ["23", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#1 Sanne Molenaar (Beheerder)"],
+      ["22", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#1 Sanne Molenaar (Beheerder)"],
+      ["21", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#2 Sam Kuijpers (Invoerder)"],
+      ["20", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#2 Sam Kuijpers (Invoerder)"],
+      ["19", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#3 Mohammed van der Velden (Coördinator)"],
+      ["18", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#3 Mohammed van der Velden (Coördinator)"],
+      ["17", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#3 Mohammed van der Velden (Coördinator)"],
     ]);
 
     const filterButton = await screen.findByRole("button", { name: "Filteren" });
@@ -139,7 +140,7 @@ describe("LogsHomePage", () => {
     const since = await screen.findByLabelText("Sinds");
     await userEvent.type(since, "2025-03-11T10:00");
 
-    params.append("since", "2025-03-11T09:00:00.000Z");
+    params.append("since", "1741683600");
 
     expect(filterLog).toHaveBeenCalledExactlyOnceWith(null, params);
     filterLog.mockClear();

@@ -93,19 +93,10 @@ pub struct AuditLogEvent {
     workstation: Option<u32>,
     user_id: u32,
     username: String,
+    user_fullname: String,
+    user_role: Role,
     #[schema(value_type = String)]
     ip: Ip,
-
-    /// user defaults
-    #[sqlx(skip)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
-    user_fullname: Option<String>,
-
-    #[sqlx(skip)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
-    user_role: Option<Role>,
 }
 
 #[cfg(test)]
@@ -222,14 +213,14 @@ impl AuditLog {
         let event = serde_json::to_value(event)?;
         let user_id = user.id();
         let username = user.username();
-        let fullname = user.fullname();
+        let fullname = user.fullname().unwrap_or_default();
         let role = user.role();
         let ip = ip.map(|ip| ip.to_string());
 
         let event = sqlx::query_as!(
             AuditLogEvent,
-            r#"INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, ip)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            r#"INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, user_fullname, user_role, ip)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
                 id as "id: u32",
                 time as "time: _",
@@ -239,9 +230,9 @@ impl AuditLog {
                 workstation as "workstation: _",
                 user_id as "user_id: u32",
                 username,
-                ip as "ip: String",
-                ? as "user_fullname?: String",
-                ? as "user_role?: Role"
+                ip,
+                user_fullname,
+                user_role
             "#,
             event,
             event_name,
@@ -250,9 +241,9 @@ impl AuditLog {
             workstation,
             user_id,
             username,
-            ip,
             fullname,
-            role
+            role,
+            ip
         )
         .fetch_one(&self.0)
         .await?;
@@ -276,14 +267,13 @@ impl AuditLog {
                 user_id as "user_id: u32",
                 audit_log.username,
                 ip as "ip: String",
-                users.fullname as "user_fullname",
-                users.role as "user_role?: Role"
+                user_fullname,
+                user_role as "user_role: Role"
             FROM audit_log
-            LEFT JOIN users ON audit_log.user_id = users.id
             WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))
-            AND (json_array_length($2) = 0 OR event ->> 'eventType' IN (SELECT value FROM json_each($2)))
-            AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))
-            AND ($4 IS NULL OR unixepoch(time) >= $4)
+                AND (json_array_length($2) = 0 OR event ->> 'eventType' IN (SELECT value FROM json_each($2)))
+                AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))
+                AND ($4 IS NULL OR unixepoch(time) >= $4)
             ORDER BY
                 CASE WHEN $4 IS NULL THEN time ELSE 1 END DESC,
                 CASE WHEN $4 IS NULL THEN 1 ELSE time END ASC

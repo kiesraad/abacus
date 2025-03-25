@@ -1,4 +1,4 @@
-import { AuditLogEvent, Role } from "@kiesraad/api";
+import { AuditLogEvent } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Table } from "@kiesraad/ui";
 import { formatDateTime } from "@kiesraad/util";
@@ -37,10 +37,7 @@ export function LogsTable({ events, setDetails }: LogsTableProps) {
             <Table.Cell>{event.workstation || "-"}</Table.Cell>
             <Table.Cell>{t(`log.level.${event.eventLevel}`)}</Table.Cell>
             <Table.Cell>{t(`log.event.${event.event.eventType}`)}</Table.Cell>
-            <Table.Cell>
-              {event.userFullname || event.username}
-              {event.userRole && ` (${t(event.userRole as Role)})`}
-            </Table.Cell>
+            <Table.Cell>{`#${event.userId} ${event.userFullname || event.username} (${t(event.userRole)})`}</Table.Cell>
           </Table.ClickRow>
         ))}
       </Table.Body>

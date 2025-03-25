@@ -1894,6 +1894,8 @@
           "eventLevel",
           "userId",
           "username",
+          "userFullname",
+          "userRole",
           "ip"
         ],
         "properties": {
@@ -1921,8 +1923,7 @@
             "type": "string"
           },
           "userFullname": {
-            "type": "string",
-            "description": "user defaults"
+            "type": "string"
           },
           "userId": {
             "type": "integer",
@@ -1930,7 +1931,7 @@
             "minimum": 0
           },
           "userRole": {
-            "type": "string"
+            "$ref": "#/components/schemas/Role"
           },
           "username": {
             "type": "string"

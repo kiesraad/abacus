@@ -202,7 +202,7 @@ async fn account_update(
 
     audit_service
         .with_user(updated_user.clone())
-        .log_error(&AuditEvent::UserAccountUpdateSuccess, None)
+        .log_success(&AuditEvent::UserAccountUpdateSuccess, None)
         .await?;
 
     Ok(Json(LoginResponse::from(&updated_user)))

@@ -1,6 +1,6 @@
 import { useUserListRequest } from "@/features/users/hooks/useUserListRequest";
 
-import { locale, translations } from "@kiesraad/i18n";
+import { locale, t, translations } from "@kiesraad/i18n";
 
 export const LogFilterNames = ["event", "level", "user"] as const;
 export type LogFilterName = (typeof LogFilterNames)[number];
@@ -29,7 +29,7 @@ export function useLogFilterOptions(): LogFilterOptions {
       if (users.requestState.status === "success") {
         values = users.requestState.data.users.map(({ id, fullname, username, role }) => ({
           value: id.toString(),
-          label: `${fullname || username} (${role})`,
+          label: `${fullname || username} (${t(role)})`,
         }));
       }
     } else {

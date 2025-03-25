@@ -14,7 +14,7 @@ interface LogFilterProps {
 }
 
 // timestamp to local date string
-function timestamopToDateString(timestamp: string | undefined): string {
+function timestampToDateString(timestamp: string | undefined): string {
   if (!timestamp) {
     return "";
   }
@@ -69,7 +69,7 @@ export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogF
             type="datetime-local"
             name="since"
             fieldWidth="parent"
-            value={timestamopToDateString(filterState.since)}
+            value={timestampToDateString(filterState.since)}
             onChange={(e) => {
               setSince(dateToTimestampString(e.target.value));
             }}

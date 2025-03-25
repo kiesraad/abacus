@@ -1,6 +1,6 @@
 import { Fragment } from "react/jsx-runtime";
 
-import { AuditLogEvent, Role } from "@kiesraad/api";
+import { AuditLogEvent } from "@kiesraad/api";
 import { t, TranslationPath } from "@kiesraad/i18n";
 import { Modal } from "@kiesraad/ui";
 import { formatDateTimeFull } from "@kiesraad/util";
@@ -25,10 +25,7 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
           <dt>{t("log.header.time")}</dt>
           <dd>{formatDateTimeFull(new Date(details.time))}</dd>
           <dt>{t("log.header.user")}</dt>
-          <dd>
-            {details.userFullname || details.username}
-            {details.userRole && ` (${t(details.userRole as Role)})`}
-          </dd>
+          <dd>{`#${details.userId} ${details.userFullname || details.username} (${t(details.userRole)})`}</dd>
           <dt>{t("log.header.message")}</dt>
           <dd>{details.message || "-"}</dd>
           <dt>{t("log.field.ip")}</dt>

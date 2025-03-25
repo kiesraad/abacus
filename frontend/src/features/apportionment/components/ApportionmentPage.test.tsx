@@ -6,7 +6,7 @@ import { routes } from "@/routes";
 import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter, within } from "@/testing";
 import { getElectionMockData } from "@/testing/api-mocks";
 
-import { election, election_summary, seat_assignment } from "../testing/less-than-19-seats";
+import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/less-than-19-seats";
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 
@@ -24,6 +24,7 @@ describe("ApportionmentPage", () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment,
+      candidate_nomination: candidate_nomination,
       election_summary: election_summary,
     } satisfies ElectionApportionmentResponse);
 
@@ -42,6 +43,7 @@ describe("ApportionmentPage", () => {
       ["Stemmen op kandidaten", "1.200", ""],
       ["Aantal raadszetels", "15", ""],
       ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
+      ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" }));

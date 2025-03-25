@@ -27,6 +27,14 @@ pub struct PoliticalGroupCandidateNomination {
     pub updated_candidate_ranking: Vec<Candidate>,
 }
 
+#[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+pub struct PreferenceThreshold {
+    /// Preference threshold as a percentage (0 to 100)
+    pub percentage: u64,
+    /// Preference threshold as a number of votes
+    pub number_of_votes: Fraction,
+}
+
 /// The result of the candidate nomination procedure.  
 /// This contains the preference threshold and percentage that was used.  
 /// It contains a list of all chosen candidates in alphabetical order.  
@@ -34,10 +42,8 @@ pub struct PoliticalGroupCandidateNomination {
 /// nomination of candidates and the final ranking of candidates for each political group.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct CandidateNominationResult {
-    /// Preference threshold as a percentage (0 to 100)
-    pub preference_threshold_percentage: u64,
-    /// Preference threshold as a number of votes
-    pub preference_threshold: Fraction,
+    /// Preference threshold percentage and number of votes
+    pub preference_threshold: PreferenceThreshold,
     /// List of chosen candidates in alphabetical order
     pub chosen_candidates: Vec<Candidate>,
     /// List of chosen candidates and candidate list ranking per political group
@@ -281,8 +287,10 @@ pub fn candidate_nomination(
     );
 
     Ok(CandidateNominationResult {
-        preference_threshold_percentage,
-        preference_threshold,
+        preference_threshold: PreferenceThreshold {
+            percentage: preference_threshold_percentage,
+            number_of_votes: preference_threshold,
+        },
         chosen_candidates,
         political_group_candidate_nomination,
     })
@@ -401,10 +409,10 @@ mod tests {
             vec![266, 36, 39, 36, 38, 38],
         ]);
         let result = candidate_nomination(&election, quota, &totals, vec![8, 3, 2, 1, 1]).unwrap();
-        assert_eq!(result.preference_threshold_percentage, 50);
+        assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
-            result.preference_threshold,
-            quota * Fraction::new(result.preference_threshold_percentage, 100)
+            result.preference_threshold.number_of_votes,
+            quota * Fraction::new(result.preference_threshold.percentage, 100)
         );
         check_political_group_candidate_nomination(
             &result.political_group_candidate_nomination[0],
@@ -485,10 +493,10 @@ mod tests {
             vec![4, 4, 4, 4, 5],
         ]);
         let result = candidate_nomination(&election, quota, &totals, vec![1, 1, 1, 1, 1]).unwrap();
-        assert_eq!(result.preference_threshold_percentage, 50);
+        assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
-            result.preference_threshold,
-            quota * Fraction::new(result.preference_threshold_percentage, 100)
+            result.preference_threshold.number_of_votes,
+            quota * Fraction::new(result.preference_threshold.percentage, 100)
         );
         check_political_group_candidate_nomination(
             &result.political_group_candidate_nomination[0],
@@ -573,10 +581,10 @@ mod tests {
             vec![200, 200, 199, 198, 198, 0, 119],
         ]);
         let result = candidate_nomination(&election, quota, &totals, vec![6, 5, 4, 2, 2]).unwrap();
-        assert_eq!(result.preference_threshold_percentage, 25);
+        assert_eq!(result.preference_threshold.percentage, 25);
         assert_eq!(
-            result.preference_threshold,
-            quota * Fraction::new(result.preference_threshold_percentage, 100)
+            result.preference_threshold.number_of_votes,
+            quota * Fraction::new(result.preference_threshold.percentage, 100)
         );
         let pg_0_preferential_nominated_candidate_numbers = &[1, 3, 4, 5, 6, 7];
         let pg_0_other_nominated_candidate_numbers = &[];

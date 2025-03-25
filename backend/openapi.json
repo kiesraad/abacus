@@ -1956,6 +1956,35 @@
           "X"
         ]
       },
+      "CandidateNominationResult": {
+        "type": "object",
+        "description": "The result of the candidate nomination procedure.\nThis contains the preference threshold and percentage that was used.\nIt contains a list of all chosen candidates in alphabetical order.\nIt also contains the preferential nomination of candidates, the remaining\nnomination of candidates and the final ranking of candidates for each political group.",
+        "required": [
+          "preference_threshold",
+          "chosen_candidates",
+          "political_group_candidate_nomination"
+        ],
+        "properties": {
+          "chosen_candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "description": "List of chosen candidates in alphabetical order"
+          },
+          "political_group_candidate_nomination": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateNomination"
+            },
+            "description": "List of chosen candidates and candidate list ranking per political group"
+          },
+          "preference_threshold": {
+            "$ref": "#/components/schemas/PreferenceThreshold",
+            "description": "Preference threshold percentage and number of votes"
+          }
+        }
+      },
       "CandidateVotes": {
         "type": "object",
         "required": [
@@ -2189,9 +2218,13 @@
         "description": "Election apportionment response, including the seat assignment, candidate nomination and election summary",
         "required": [
           "seat_assignment",
+          "candidate_nomination",
           "election_summary"
         ],
         "properties": {
+          "candidate_nomination": {
+            "$ref": "#/components/schemas/CandidateNominationResult"
+          },
           "election_summary": {
             "$ref": "#/components/schemas/ElectionSummary"
           },
@@ -2635,6 +2668,57 @@
           }
         }
       },
+      "PoliticalGroupCandidateNomination": {
+        "type": "object",
+        "description": "Contains information about the chosen candidates and the candidate list ranking\nfor a specific political group.",
+        "required": [
+          "pg_number",
+          "pg_name",
+          "pg_seats",
+          "preferential_candidate_nomination",
+          "other_candidate_nomination",
+          "updated_candidate_ranking"
+        ],
+        "properties": {
+          "other_candidate_nomination": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateVotes"
+            },
+            "description": "The list of other chosen candidates, can be empty"
+          },
+          "pg_name": {
+            "type": "string",
+            "description": "Political group name for which this nomination applies"
+          },
+          "pg_number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number for which this nomination applies",
+            "minimum": 0
+          },
+          "pg_seats": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The number of seats assigned to this group",
+            "minimum": 0
+          },
+          "preferential_candidate_nomination": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateVotes"
+            },
+            "description": "The list of chosen candidates via preferential votes, can be empty"
+          },
+          "updated_candidate_ranking": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "description": "The updated ranking of the whole candidate list, can be empty"
+          }
+        }
+      },
       "PoliticalGroupSeatAssignment": {
         "type": "object",
         "description": "Contains information about the final assignment of seats for a specific political group.",
@@ -2911,6 +2995,25 @@
           "Special",
           "Mobile"
         ]
+      },
+      "PreferenceThreshold": {
+        "type": "object",
+        "required": [
+          "percentage",
+          "number_of_votes"
+        ],
+        "properties": {
+          "number_of_votes": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "Preference threshold as a number of votes"
+          },
+          "percentage": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Preference threshold as a percentage (0 to 100)",
+            "minimum": 0
+          }
+        }
       },
       "Role": {
         "type": "string",

@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing";
 
-import { election, election_summary, seat_assignment } from "../testing/19-or-more-seats";
+import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/19-or-more-seats";
 import { ElectionSummaryTable } from "./ElectionSummaryTable";
 
 describe("ElectionSummaryTable", () => {
@@ -13,6 +13,7 @@ describe("ElectionSummaryTable", () => {
         seats={seat_assignment.seats}
         quota={seat_assignment.quota}
         numberOfVoters={election.number_of_voters}
+        preferenceThreshold={candidate_nomination.preference_threshold}
       />,
     );
 
@@ -26,6 +27,7 @@ describe("ElectionSummaryTable", () => {
       ["Stemmen op kandidaten", "1.200", ""],
       ["Aantal raadszetels", "23", ""],
       ["Kiesdeler", "52 4/23", "Benodigde stemmen per volle zetel"],
+      ["Voorkeursdrempel", "13 100/2300", "25% van de kiesdeler"],
     ]);
   });
 
@@ -36,6 +38,7 @@ describe("ElectionSummaryTable", () => {
         seats={seat_assignment.seats}
         quota={seat_assignment.quota}
         numberOfVoters={undefined}
+        preferenceThreshold={candidate_nomination.preference_threshold}
       />,
     );
 
@@ -49,6 +52,7 @@ describe("ElectionSummaryTable", () => {
       ["Stemmen op kandidaten", "1.200", ""],
       ["Aantal raadszetels", "23", ""],
       ["Kiesdeler", "52 4/23", "Benodigde stemmen per volle zetel"],
+      ["Voorkeursdrempel", "13 100/2300", "25% van de kiesdeler"],
     ]);
   });
 });

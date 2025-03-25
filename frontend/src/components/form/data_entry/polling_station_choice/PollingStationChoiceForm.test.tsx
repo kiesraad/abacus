@@ -14,9 +14,9 @@ import {
 } from "@kiesraad/api-mocks";
 import { overrideOnce, render, renderReturningRouter, screen, server, within } from "@kiesraad/test";
 
-import { useUser } from "../../../../../lib/api/useUser";
+import { useUser } from "../../../../api/useUser";
 
-vi.mock("../../../../../lib/api/useUser");
+vi.mock("../../../../api/useUser");
 
 function renderPollingStationChoicePage() {
   return renderReturningRouter(

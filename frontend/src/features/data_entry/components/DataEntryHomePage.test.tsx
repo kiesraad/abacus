@@ -14,10 +14,10 @@ import {
 } from "@kiesraad/api-mocks";
 import { overrideOnce, Providers, render, screen, server, setupTestRouter, within } from "@kiesraad/test";
 
-import { useUser } from "../../../../lib/api/useUser";
+import { useUser } from "../../../api/useUser";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
-vi.mock("../../../../lib/api/useUser");
+vi.mock("../../../api/useUser");
 
 const testUser: LoginResponse = {
   username: "test-user-1",

@@ -11,3 +11,16 @@
     color: var(--gray-600);
   }
 }
+
+.filters {
+  margin-top: 1rem;
+
+  & > div {
+    margin: 1rem 0;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+}

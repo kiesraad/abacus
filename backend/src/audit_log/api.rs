@@ -1,13 +1,12 @@
-use crate::{APIError, AppState, ErrorResponse, authentication::AdminOrCoordinator};
-use axum::{
-    Json,
-    extract::{Query, State},
-};
+use axum::{Json, extract::State};
+use axum_extra::extract::Query;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{AuditLog, AuditLogEvent};
+use crate::{APIError, AppState, ErrorResponse, authentication::AdminOrCoordinator};
+
+use super::{AuditLog, AuditLogEvent, LogFilter};
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default().routes(routes!(audit_log_list))
@@ -34,11 +33,19 @@ fn default_per_page() -> u32 {
 
 #[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct Pagination {
+pub struct LogFilterQuery {
     #[serde(default = "default_page")]
-    page: u32,
+    pub page: u32,
     #[serde(default = "default_per_page")]
-    per_page: u32,
+    pub per_page: u32,
+    #[serde(default)]
+    pub level: Vec<String>,
+    #[serde(default)]
+    pub event: Vec<String>,
+    #[serde(default)]
+    pub user: Vec<u32>,
+    #[serde(default)]
+    pub since: Option<String>,
 }
 
 /// Lists all users
@@ -53,16 +60,15 @@ pub struct Pagination {
 )]
 async fn audit_log_list(
     _user: AdminOrCoordinator,
-    pagination: Query<Pagination>,
+    Query(filter_query): Query<LogFilterQuery>,
     State(audit_log): State<AuditLog>,
 ) -> Result<Json<AuditLogListResponse>, APIError> {
-    let offset = (pagination.page - 1) * pagination.per_page;
-    let limit = pagination.per_page;
+    let filter = LogFilter::from_query(&filter_query);
+    let events = audit_log.list(&filter).await?;
 
-    let events = audit_log.list(offset, limit).await?;
-    let count = audit_log.count().await?;
-    let pages = if count > 0 && limit > 0 {
-        count.div_ceil(limit)
+    let count = audit_log.count(&filter).await?;
+    let pages = if count > 0 && filter.limit > 0 {
+        count.div_ceil(filter.limit)
     } else {
         1
     };
@@ -70,8 +76,8 @@ async fn audit_log_list(
     Ok(Json(AuditLogListResponse {
         events,
         pages,
-        page: pagination.page,
-        per_page: pagination.per_page,
+        page: filter_query.page,
+        per_page: filter_query.per_page,
     }))
 }
 

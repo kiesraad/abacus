@@ -74,6 +74,28 @@ describe("ApportionmentPage", () => {
       "href",
       "/details-residual-seats",
     );
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Gekozen kandidaten" }));
+    const chosen_candidates_table = await screen.findByTestId("chosen_candidates_table");
+    expect(chosen_candidates_table).toBeVisible();
+    expect(chosen_candidates_table).toHaveTableContent([
+      ["Kandidaat", "Woonplaats"],
+      ["Bakker, S. (Sophie)", "Test Location"],
+      ["Bakker, T. (Tinus)", "Test Location"],
+      ["Bogaert, G. (Gerard)", "Test Location"],
+      ["De Jong, R. (Rolf)", "Test Location"],
+      ["De Vries, J. (Johan)", "Test Location"],
+      ["Jansen, A. (Arie)", "Test Location"],
+      ["Kok, K. (Karin)", "Test Location"],
+      ["Oud, L. (Lidewij)", "Test Location"],
+      ["Oud, J. (Johan)", "Test Location"],
+      ["Oud, M. (Marijke)", "Test Location"],
+      ["Oud, K. (Klaas)", "Test Location"],
+      ["Van Doorn, A. (Adelbert)", "Test Location"],
+      ["Van den Berg, M. (Marijke)", "Test Location"],
+      ["Van der Weijden, H. (Henk)", "Test Location"],
+      ["Van der Weijden, B. (Berta)", "Test Location"],
+    ]);
   });
 
   describe("Apportionment not yet available", () => {
@@ -112,7 +134,7 @@ describe("ApportionmentPage", () => {
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
 
-      expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
+      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
       ).toBeVisible();

@@ -1,11 +1,12 @@
 import { Link } from "react-router";
 
 import { AbsoluteMajorityReassignedSeat, useElection } from "@/api";
-import { Alert, FormLayout, PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import cls from "../Apportionment.module.css";
+import { ApportionmentError } from "../ApportionmentError";
 import { HighestAveragesFor19OrMoreSeatsTable } from "./HighestAveragesFor19OrMoreSeatsTable";
 import { HighestAveragesForLessThan19SeatsTable } from "./HighestAveragesForLessThan19SeatsTable";
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
@@ -50,12 +51,7 @@ export function ApportionmentResidualSeatsPage() {
         {render_title_and_header()}
         <main>
           <article>
-            <FormLayout.Alert>
-              <Alert type="error">
-                <h2>{t("apportionment.not_available")}</h2>
-                <p>{t(`error.api_error.${error.reference}`)}</p>
-              </Alert>
-            </FormLayout.Alert>
+            <ApportionmentError error={error} />
           </article>
         </main>
       </>

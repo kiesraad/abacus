@@ -231,7 +231,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
 
-      expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
+      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
       ).toBeVisible();

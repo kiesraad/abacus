@@ -1,11 +1,12 @@
 import { Link } from "react-router";
 
 import { useElection } from "@/api";
-import { Alert, FormLayout, PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import cls from "../Apportionment.module.css";
+import { ApportionmentError } from "../ApportionmentError";
 import { FullSeatsTable } from "./FullSeatsTable";
 import { ResidualSeatsCalculationTable } from "./ResidualSeatsCalculationTable";
 
@@ -24,12 +25,7 @@ export function ApportionmentFullSeatsPage() {
       <main>
         <article className={cls.article}>
           {error ? (
-            <FormLayout.Alert>
-              <Alert type="error">
-                <h2>{t("apportionment.not_available")}</h2>
-                <p>{t(`error.api_error.${error.reference}`)}</p>
-              </Alert>
-            </FormLayout.Alert>
+            <ApportionmentError error={error} />
           ) : (
             seatAssignment && (
               <>

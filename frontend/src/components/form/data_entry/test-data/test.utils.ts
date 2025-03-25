@@ -1,5 +1,7 @@
 import { expect } from "vitest";
 
+import { getCandidateFullName } from "@/lib/util";
+
 import {
   ClaimDataEntryResponse,
   PoliticalGroup,
@@ -74,10 +76,7 @@ export function expectFieldsToNotHaveIcon(fields: Array<string>) {
 }
 
 export function getCandidateFullNamesFromMockData(politicalGroupMockData: PoliticalGroup): string[] {
-  const candidateNames = politicalGroupMockData.candidates.map((candidate) => {
-    return candidate.first_name
-      ? `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`
-      : `${candidate.last_name}, ${candidate.initials}`;
+  return politicalGroupMockData.candidates.map((candidate) => {
+    return getCandidateFullName(candidate);
   });
-  return candidateNames;
 }

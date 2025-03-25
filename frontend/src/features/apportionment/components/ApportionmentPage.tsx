@@ -1,12 +1,14 @@
 import { Link } from "react-router";
 
 import { useElection } from "@/api";
-import { Alert, FormLayout, PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/ui";
 import { t } from "@/lib/i18n";
 
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
 import cls from "./Apportionment.module.css";
+import { ApportionmentError } from "./ApportionmentError";
 import { ApportionmentTable } from "./ApportionmentTable";
+import { ChosenCandidatesTable } from "./ChosenCandidatesTable";
 import { ElectionSummaryTable } from "./ElectionSummaryTable";
 
 function get_number_of_seats_assigned_sentence(seats: number, type: "residual_seat" | "full_seat"): string {
@@ -31,12 +33,7 @@ export function ApportionmentPage() {
       <main>
         <article className={cls.article}>
           {error ? (
-            <FormLayout.Alert>
-              <Alert type="error">
-                <h2>{t("apportionment.not_available")}</h2>
-                <p>{t(`error.api_error.${error.reference}`)}</p>
-              </Alert>
-            </FormLayout.Alert>
+            <ApportionmentError error={error} />
           ) : (
             seatAssignment &&
             candidateNomination &&
@@ -71,6 +68,11 @@ export function ApportionmentPage() {
                       <Link to="./details-residual-seats">{t("apportionment.view_details")}</Link>)
                     </li>
                   </ul>
+                </div>
+                <div>
+                  <h2 className={cls.tableTitle}>{t("apportionment.chosen_candidates")}</h2>
+                  <span className={cls.tableInformation}>{t("apportionment.in_alphabetical_order")}</span>
+                  <ChosenCandidatesTable chosenCandidates={candidateNomination.chosen_candidates} />
                 </div>
               </>
             )

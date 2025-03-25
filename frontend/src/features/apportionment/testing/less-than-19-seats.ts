@@ -307,11 +307,11 @@ export const largest_remainder_steps: SeatChangeStep[] = [
   },
 ];
 
-export const largest_average_steps: SeatChangeStep[] = [
+export const highest_average_steps: SeatChangeStep[] = [
   {
     residual_seat_number: 3,
     change: {
-      changed_by: "LargestAverageAssignment",
+      changed_by: "HighestAverageAssignment",
       selected_pg_number: 1,
       pg_options: [1],
       pg_assigned: [1],
@@ -463,7 +463,7 @@ export const largest_average_steps: SeatChangeStep[] = [
   {
     residual_seat_number: 4,
     change: {
-      changed_by: "LargestAverageAssignment",
+      changed_by: "HighestAverageAssignment",
       selected_pg_number: 3,
       pg_options: [3],
       pg_assigned: [3],
@@ -615,7 +615,7 @@ export const largest_average_steps: SeatChangeStep[] = [
   {
     residual_seat_number: 5,
     change: {
-      changed_by: "LargestAverageAssignment",
+      changed_by: "HighestAverageAssignment",
       selected_pg_number: 4,
       pg_options: [4],
       pg_assigned: [4],
@@ -775,7 +775,7 @@ export const seat_assignment: SeatAssignmentResult = {
     numerator: 0,
     denominator: 15,
   },
-  steps: largest_remainder_steps.concat(largest_average_steps),
+  steps: largest_remainder_steps.concat(highest_average_steps),
   final_standing: [
     {
       pg_number: 1,

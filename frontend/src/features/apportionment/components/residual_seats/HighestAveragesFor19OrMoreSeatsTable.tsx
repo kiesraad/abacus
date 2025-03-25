@@ -1,31 +1,31 @@
-import { LargestAverageAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatChangeStep } from "@/api";
+import { HighestAverageAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatChangeStep } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
 
 import cls from "../Apportionment.module.css";
 
-interface LargestAveragesFor19OrMoreSeatsTableProps {
-  largestAverageSteps: SeatChangeStep[];
+interface HighestAveragesFor19OrMoreSeatsTableProps {
+  highestAverageSteps: SeatChangeStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
-export function LargestAveragesFor19OrMoreSeatsTable({
-  largestAverageSteps,
+export function HighestAveragesFor19OrMoreSeatsTable({
+  highestAverageSteps,
   finalStanding,
   politicalGroups,
-}: LargestAveragesFor19OrMoreSeatsTableProps) {
+}: HighestAveragesFor19OrMoreSeatsTableProps) {
   return (
     <div className={cls.scrollable}>
       <Table
-        id="largest_averages_for_19_or_more_seats_table"
+        id="highest_averages_for_19_or_more_seats_table"
         className={cn(cls.table, cls.residualSeats19OrMoreSeatsTable)}
       >
         <Table.Header>
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>{t("list")}</Table.HeaderCell>
           <Table.HeaderCell className={cls.sticky}>{t("list_name")}</Table.HeaderCell>
-          {largestAverageSteps.map((step: SeatChangeStep) => {
+          {highestAverageSteps.map((step: SeatChangeStep) => {
             return (
               <Table.HeaderCell key={step.residual_seat_number} className="text-align-r" span={2}>
                 {t("apportionment.residual_seat.singular")} {step.residual_seat_number}
@@ -46,8 +46,8 @@ export function LargestAveragesFor19OrMoreSeatsTable({
                 <Table.Cell className={cls.sticky}>
                   {politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}
                 </Table.Cell>
-                {largestAverageSteps.map((step: SeatChangeStep) => {
-                  const change = step.change as LargestAverageAssignedSeat;
+                {highestAverageSteps.map((step: SeatChangeStep) => {
+                  const change = step.change as HighestAverageAssignedSeat;
                   const average = step.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
                   if (average) {
                     return (
@@ -73,8 +73,8 @@ export function LargestAveragesFor19OrMoreSeatsTable({
             <Table.Cell className={cn(cls.sticky, "text-align-r", "nowrap", "bold")}>
               {t("apportionment.residual_seat_assigned_to_list")}
             </Table.Cell>
-            {largestAverageSteps.map((step: SeatChangeStep) => {
-              const change = step.change as LargestAverageAssignedSeat;
+            {highestAverageSteps.map((step: SeatChangeStep) => {
+              const change = step.change as HighestAverageAssignedSeat;
               return (
                 <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
                   {change.selected_pg_number}

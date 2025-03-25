@@ -73,7 +73,7 @@ pub struct DataEntryDetails {
 )]
 #[serde(rename_all = "PascalCase", tag = "eventType")]
 pub enum AuditEvent {
-    // authentication and accoutn events
+    // authentication and account events
     UserLoggedIn(UserLoggedInDetails),
     UserLoggedOut(UserLoggedOutDetails),
     UserAccountUpdateFailed,

@@ -69,15 +69,7 @@ pub struct DataEntryDetails {
 }
 
 #[derive(
-    Serialize,
-    Deserialize,
-    strum::Display,
-    VariantNames,
-    Debug,
-    PartialEq,
-    Eq,
-    ToSchema,
-    Default,
+    Serialize, Deserialize, strum::Display, VariantNames, Debug, PartialEq, Eq, ToSchema, Default,
 )]
 #[serde(rename_all = "PascalCase", tag = "eventType")]
 pub enum AuditEvent {
@@ -115,9 +107,7 @@ impl From<serde_json::Value> for AuditEvent {
     }
 }
 
-#[derive(
-    Serialize, Deserialize, VariantNames, Debug, PartialEq, Eq, Hash, ToSchema, Type,
-)]
+#[derive(Serialize, Deserialize, VariantNames, Debug, PartialEq, Eq, Hash, ToSchema, Type)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "snake_case")]
 #[sqlx(rename_all = "snake_case")]

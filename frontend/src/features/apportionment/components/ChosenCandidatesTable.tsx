@@ -20,7 +20,7 @@ export function ChosenCandidatesTable({ chosenCandidates }: ChosenCandidatesTabl
         {chosenCandidates.map((candidate) => {
           return (
             <Table.Row key={`${candidate.number}-${candidate.last_name}`}>
-              <Table.Cell>{getCandidateFullName(candidate)}</Table.Cell>
+              <Table.Cell>{getCandidateFullName(candidate, true)}</Table.Cell>
               <Table.Cell>{candidate.locality}</Table.Cell>
             </Table.Row>
           );

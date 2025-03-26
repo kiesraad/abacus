@@ -6,12 +6,12 @@ export class PollingStationChoicePage {
   readonly pollingStationNumber: Locator;
   readonly pollingStationFeedback: Locator;
   readonly pollingStationSubmitFeedback: Locator;
-  protected readonly start: Locator; // use clickStart() instead
   readonly alertInputSaved: Locator;
   readonly dataEntrySuccess: Locator;
   readonly resumeDataEntry: Locator;
   readonly alertDataEntryInProgress: Locator;
   readonly allDataEntriesInProgress: Locator;
+  protected readonly start: Locator; // use clickStart() instead
 
   constructor(protected readonly page: Page) {
     this.fieldset = page.getByRole("group", {
@@ -48,7 +48,7 @@ export class PollingStationChoicePage {
   }
 
   async selectPollingStationAndClickStart(pollingStationNumber: number) {
-    await this.pollingStationNumber.fill(pollingStationNumber.toString());
+    await this.pollingStationNumber.pressSequentially(pollingStationNumber.toString(), { delay: 50 });
     await this.clickStart();
   }
 

@@ -10,12 +10,12 @@ stateDiagram-v2
   FirstEntryNotStarted --> FirstEntryInProgress: claim
   #FirstEntryInProgress --> FirstEntryInProgress: save
   FirstEntryInProgress --> SecondEntryNotStarted: finalise
-  FirstEntryInProgress --> FirstEntryNotStarted: delete
+  FirstEntryInProgress --> FirstEntryNotStarted: discard
   SecondEntryNotStarted --> SecondEntryInProgress: claim
   #SecondEntryInProgress --> SecondEntryInProgress: save
   state is_equal <<choice>>
   SecondEntryInProgress --> is_equal: finalise
-  SecondEntryInProgress --> SecondEntryNotStarted: delete
+  SecondEntryInProgress --> SecondEntryNotStarted: discard
   state resolve <<choice>>
   EntriesDifferent --> resolve: resolve
   resolve --> SecondEntryNotStarted: keep one entry
@@ -26,5 +26,5 @@ stateDiagram-v2
 ```
 
 When resolving differences between the first and second entry (`EntriesDifferent` state), the coordinator can choose to
-keep one of the entries or discard both. If one of the entries is kept, the other entry is deleted. The remaining entry
+keep one of the entries or discard both. If one of the entries is kept, the other entry is discarded. The remaining entry
 will from then on be the first entry, and the data entry is open for a new second entry.

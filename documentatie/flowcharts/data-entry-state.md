@@ -24,3 +24,7 @@ stateDiagram-v2
   is_equal --> EntriesDifferent: equal? no
   Definitive --> [*]
 ```
+
+When resolving differences between the first and second entry (`EntriesDifferent` state), the coordinator can choose to
+keep one of the entries or discard both. If one of the entries is kept, the other entry is deleted. The remaining entry
+will from then on be the first entry, and the data entry is open for a new second entry.

@@ -38,6 +38,31 @@ interface PollingStationWithStatusAndTypist extends PollingStation, Partial<Elec
   typist?: string;
 }
 
+function getTypistName(users: User[], status: ElectionStatusResponseEntry | undefined) {
+  if (status === undefined || users.length === 0) {
+    return "";
+  }
+
+  let typistId: number | undefined;
+  switch (status.status) {
+    case "first_entry_in_progress":
+    case "second_entry_not_started":
+      typistId = status.first_entry_user_id;
+      break;
+    case "second_entry_in_progress":
+      typistId = status.second_entry_user_id;
+      break;
+    default:
+      break;
+  }
+  if (typistId === undefined) {
+    return "";
+  }
+
+  const user = users.find((user) => user.id === typistId);
+  return user?.fullname ?? user?.username ?? "";
+}
+
 export function ElectionStatus({ statuses, election, pollingStations, navigate, users }: ElectionStatusProps) {
   const categoryCounts: Record<StatusCategory, number> = React.useMemo(
     () =>
@@ -63,37 +88,12 @@ export function ElectionStatus({ statuses, election, pollingStations, navigate, 
     return data;
   }, [statuses, categoryCounts]);
 
-  function getTypistName(status: ElectionStatusResponseEntry | undefined) {
-    if (status === undefined || users.length === 0) {
-      return "";
-    }
-
-    let typistId: number | undefined;
-    switch (status.status) {
-      case "first_entry_in_progress":
-      case "second_entry_not_started":
-        typistId = status.first_entry_user_id;
-        break;
-      case "second_entry_in_progress":
-        typistId = status.second_entry_user_id;
-        break;
-      default:
-        break;
-    }
-    if (typistId === undefined) {
-      return "";
-    }
-
-    const user = users.find((user) => user.id === typistId);
-    return user?.fullname ?? user?.username ?? "";
-  }
-
   const pollingStationWithStatusAndTypist = pollingStations.map((ps) => {
     const status = statuses.find((element) => element.polling_station_id === ps.id);
     return {
       ...ps,
       ...status,
-      typist: getTypistName(status),
+      typist: getTypistName(users, status),
     } satisfies PollingStationWithStatusAndTypist;
   });
 

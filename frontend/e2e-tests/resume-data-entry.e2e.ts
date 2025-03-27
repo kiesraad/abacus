@@ -190,7 +190,7 @@ test.describe("resume data entry flow", () => {
         },
       });
 
-      await pollingStationChoicePage.selectPollingStationAndClickStart(33);
+      await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
     });
 
@@ -265,7 +265,7 @@ test.describe("resume data entry flow", () => {
         },
       });
 
-      await pollingStationChoicePage.selectPollingStationAndClickStart(33);
+      await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
     });
 
@@ -293,7 +293,7 @@ test.describe("resume data entry flow", () => {
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
-      await pollingStationChoicePage.selectPollingStationAndClickStart(33);
+      await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation);
 
       await expect(recountedPage.fieldset).toBeVisible();
       await recountedPage.navPanel.votersAndVotes.click();

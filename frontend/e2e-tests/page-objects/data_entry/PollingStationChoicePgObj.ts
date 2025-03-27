@@ -1,4 +1,6 @@
-import { type Locator, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
+
+import { PollingStation } from "@/api";
 
 export class PollingStationChoicePage {
   readonly fieldset: Locator;
@@ -47,8 +49,9 @@ export class PollingStationChoicePage {
     await button.click({ timeout: 2000 });
   }
 
-  async selectPollingStationAndClickStart(pollingStationNumber: number) {
-    await this.pollingStationNumber.pressSequentially(pollingStationNumber.toString(), { delay: 50 });
+  async selectPollingStationAndClickStart(pollingStation: PollingStation) {
+    await this.pollingStationNumber.pressSequentially(pollingStation.number.toString(), { delay: 50 });
+    await expect(this.pollingStationFeedback).toContainText(pollingStation.name);
     await this.clickStart();
   }
 

@@ -147,63 +147,57 @@ impl SeatChange {
     /// Get the political group number for the group this step has assigned a seat to
     fn political_group_number(&self) -> PGNumber {
         match self {
-            SeatChange::HighestAverageAssignment(highest_average) => {
-                highest_average.selected_pg_number
-            }
-            SeatChange::LargestRemainderAssignment(largest_remainder) => {
+            Self::HighestAverageAssignment(highest_average) => highest_average.selected_pg_number,
+            Self::LargestRemainderAssignment(largest_remainder) => {
                 largest_remainder.selected_pg_number
             }
-            SeatChange::AbsoluteMajorityReassignment(_) => unimplemented!(),
-            SeatChange::ListExhaustionRemoval(_) => unimplemented!(),
+            Self::AbsoluteMajorityReassignment(_) => unimplemented!(),
+            Self::ListExhaustionRemoval(_) => unimplemented!(),
         }
     }
 
     /// Get the list of political groups with the same average, that have not been assigned a seat
     fn pg_options(&self) -> Vec<PGNumber> {
         match self {
-            SeatChange::HighestAverageAssignment(highest_average) => {
-                highest_average.pg_options.clone()
-            }
-            SeatChange::LargestRemainderAssignment(largest_remainder) => {
+            Self::HighestAverageAssignment(highest_average) => highest_average.pg_options.clone(),
+            Self::LargestRemainderAssignment(largest_remainder) => {
                 largest_remainder.pg_options.clone()
             }
-            SeatChange::AbsoluteMajorityReassignment(_) => unimplemented!(),
-            SeatChange::ListExhaustionRemoval(_) => unimplemented!(),
+            Self::AbsoluteMajorityReassignment(_) => unimplemented!(),
+            Self::ListExhaustionRemoval(_) => unimplemented!(),
         }
     }
 
     /// Get the list of political groups with the same average, that have been assigned a seat
     fn pg_assigned(&self) -> Vec<PGNumber> {
         match self {
-            SeatChange::HighestAverageAssignment(highest_average) => {
-                highest_average.pg_assigned.clone()
-            }
-            SeatChange::LargestRemainderAssignment(largest_remainder) => {
+            Self::HighestAverageAssignment(highest_average) => highest_average.pg_assigned.clone(),
+            Self::LargestRemainderAssignment(largest_remainder) => {
                 largest_remainder.pg_assigned.clone()
             }
-            SeatChange::AbsoluteMajorityReassignment(_) => unimplemented!(),
-            SeatChange::ListExhaustionRemoval(_) => unimplemented!(),
+            Self::AbsoluteMajorityReassignment(_) => unimplemented!(),
+            Self::ListExhaustionRemoval(_) => unimplemented!(),
         }
     }
 
     /// Returns true if the seat was changed through the largest remainder assignment
     pub fn is_changed_by_largest_remainder_assignment(&self) -> bool {
-        matches!(self, SeatChange::LargestRemainderAssignment(_))
+        matches!(self, Self::LargestRemainderAssignment(_))
     }
 
     /// Returns true if the seat was changed through the highest average assignment
     pub fn is_changed_by_highest_average_assignment(&self) -> bool {
-        matches!(self, SeatChange::HighestAverageAssignment(_))
+        matches!(self, Self::HighestAverageAssignment(_))
     }
 
     /// Returns true if the seat was changed through the absolute majority reassignment
     pub fn is_changed_by_absolute_majority_reassignment(&self) -> bool {
-        matches!(self, SeatChange::AbsoluteMajorityReassignment(_))
+        matches!(self, Self::AbsoluteMajorityReassignment(_))
     }
 
     /// Returns true if the seat was changed through the list exhaustion removal
     pub fn is_changed_by_list_exhaustion_removal(&self) -> bool {
-        matches!(self, SeatChange::ListExhaustionRemoval(_))
+        matches!(self, Self::ListExhaustionRemoval(_))
     }
 }
 
@@ -264,12 +258,6 @@ pub enum ApportionmentError {
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DrawingOfLotsNotImplemented,
-}
-
-#[derive(Debug, Default)]
-struct ExhaustedLists {
-    too_many_seats_assigned: Vec<(PGNumber, u32)>,
-    no_empty_seats_left: Vec<PGNumber>,
 }
 
 /// Initial construction of the data required per political group
@@ -447,11 +435,11 @@ fn reassign_residual_seat_for_absolute_majority(
     }
 }
 
-fn exhausted_lists<'a>(
+fn pg_numbers_with_exhausted_seats<'a>(
     standings: impl Iterator<Item = &'a PoliticalGroupStanding>,
     totals: &'a ElectionSummary,
-) -> ExhaustedLists {
-    standings.fold(ExhaustedLists::default(), |mut exhausted_lists, s| {
+) -> Vec<(PGNumber, u32)> {
+    standings.fold(vec![], |mut exhausted_pg_numbers_and_seats, s| {
         let number_of_candidates = u32::try_from(
             totals.political_group_votes[s.pg_number as usize - 1]
                 .candidate_votes
@@ -459,33 +447,31 @@ fn exhausted_lists<'a>(
         )
         .expect("Number of candidates fits in u32");
 
-        match number_of_candidates.cmp(&s.total_seats()) {
-            Ordering::Less => exhausted_lists
-                .too_many_seats_assigned
-                .push((s.pg_number, number_of_candidates.abs_diff(s.total_seats()))),
-            Ordering::Equal => exhausted_lists.no_empty_seats_left.push(s.pg_number),
-            _ => {}
+        if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
+            exhausted_pg_numbers_and_seats
+                .push((s.pg_number, number_of_candidates.abs_diff(s.total_seats())))
         }
-
-        exhausted_lists
+        exhausted_pg_numbers_and_seats
     })
 }
 
-fn update_exhausted_pg_numbers(
-    standings: Vec<PoliticalGroupStanding>,
-    totals: &ElectionSummary,
+fn pg_numbers_without_empty_seats<'a>(
+    standings: impl Iterator<Item = &'a PoliticalGroupStanding>,
+    totals: &'a ElectionSummary,
 ) -> Vec<PGNumber> {
-    let ExhaustedLists {
-        too_many_seats_assigned,
-        mut no_empty_seats_left,
-    } = exhausted_lists(standings.iter(), totals);
-    no_empty_seats_left.append(
-        &mut too_many_seats_assigned
-            .iter()
-            .map(|(pg_number, _)| *pg_number)
-            .collect(),
-    );
-    no_empty_seats_left
+    standings.fold(vec![], |mut pg_numbers_without_empty_seats, s| {
+        let number_of_candidates = u32::try_from(
+            totals.political_group_votes[s.pg_number as usize - 1]
+                .candidate_votes
+                .len(),
+        )
+        .expect("Number of candidates fits in u32");
+
+        if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
+            pg_numbers_without_empty_seats.push(s.pg_number)
+        }
+        pg_numbers_without_empty_seats
+    })
 }
 
 /// If political groups got more seats than candidates on their lists,
@@ -498,14 +484,14 @@ fn reassign_residual_seats_for_exhausted_lists(
     previous_steps: Vec<SeatChangeStep>,
     totals: &ElectionSummary,
 ) -> Result<(Vec<SeatChangeStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
-    let exhausted_lists = exhausted_lists(previous_standings.iter(), totals);
-    if !exhausted_lists.too_many_seats_assigned.is_empty() {
+    let exhausted_lists = pg_numbers_with_exhausted_seats(previous_standings.iter(), totals);
+    if !exhausted_lists.is_empty() {
         let mut current_standings = previous_standings.clone();
         let mut seats_to_reassign = 0;
         let mut list_exhaustion_steps: Vec<SeatChangeStep> = vec![];
 
         // Remove excess seats from exhausted lists
-        for (pg_number, seats) in exhausted_lists.too_many_seats_assigned {
+        for (pg_number, seats) in exhausted_lists {
             seats_to_reassign += seats;
             for _ in 1..=seats {
                 if current_standings[pg_number as usize - 1].residual_seats > 0 {
@@ -632,7 +618,7 @@ fn assign_remainder(
         residual_seat_number += 1;
         let exhausted_pg_numbers: Vec<PGNumber> = exclude_exhausted_lists
             .map_or_else(Vec::new, |totals| {
-                update_exhausted_pg_numbers(current_standings.to_owned(), totals)
+                pg_numbers_without_empty_seats(current_standings.iter(), totals)
             });
 
         let change = if seats >= 19 {

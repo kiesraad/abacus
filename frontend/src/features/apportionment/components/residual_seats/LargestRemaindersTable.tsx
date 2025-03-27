@@ -1,9 +1,4 @@
-import {
-  LargestRemainderAssignedSeat,
-  PoliticalGroup,
-  PoliticalGroupSeatAssignment,
-  SeatChangeStep,
-} from "@/api";
+import { LargestRemainderAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatChangeStep } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";

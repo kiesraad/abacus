@@ -71,13 +71,11 @@ export function ElectionStatus({ statuses, election, pollingStations, navigate, 
     let typistId: number | undefined;
     switch (status.status) {
       case "first_entry_in_progress":
+      case "second_entry_not_started":
         typistId = status.first_entry_user_id;
         break;
       case "second_entry_in_progress":
         typistId = status.second_entry_user_id;
-        break;
-      case "second_entry_not_started":
-        typistId = status.first_entry_user_id;
         break;
       default:
         break;

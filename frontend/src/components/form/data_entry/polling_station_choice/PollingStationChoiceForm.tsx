@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { DataEntryStatusName, PollingStation, useElection, useElectionStatus, useUser } from "@kiesraad/api";
+import { PollingStation, useElection, useElectionStatus, useUser } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
@@ -11,6 +11,7 @@ import cls from "./PollingStationChoiceForm.module.css";
 import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationSelector } from "./PollingStationSelector";
 import { PollingStationsList } from "./PollingStationsList";
+import { getPollingStationStatus, PollingStationUserStatus } from "./util";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
 
@@ -51,29 +52,26 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
     const parsedStationNumber = parseIntUserInput(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const statusEntry = electionStatus.statuses.find((status) => status.polling_station_id === pollingStation?.id);
-    const pollingStationStatus = statusEntry?.status;
-    const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
+    const { statusEntry, userStatus } = getPollingStationStatus({
+      user,
+      pollingStation,
+      statuses: electionStatus.statuses,
+    });
 
-    if (pollingStationStatus && firstAndSecondEntryFinished.includes(pollingStationStatus)) {
+    if (userStatus === PollingStationUserStatus.FINISHED) {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
       setLoading(false);
       return;
     }
 
-    if (pollingStationStatus) {
-      if (
-        (pollingStationStatus === "first_entry_in_progress" && statusEntry.first_entry_user_id !== user?.user_id) ||
-        (pollingStationStatus === "second_entry_in_progress" && statusEntry.second_entry_user_id !== user?.user_id)
-      ) {
-        setAlert(DEFINITIVE_POLLING_STATION_ALERT);
-        setLoading(false);
-        return;
-      }
+    if (userStatus === PollingStationUserStatus.IN_PROGRESS_OTHER_USER) {
+      setAlert(DEFINITIVE_POLLING_STATION_ALERT);
+      setLoading(false);
+      return;
     }
 
     if (pollingStation) {
-      void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
+      void navigate(getUrlForDataEntry(election.id, pollingStation.id, statusEntry?.status));
     } else {
       setAlert(INVALID_POLLING_STATION_ALERT);
       setLoading(false);
@@ -125,6 +123,11 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         <PollingStationSelector
           pollingStationNumber={pollingStationNumber}
           setPollingStationNumber={setPollingStationNumber}
+          pollingStationStatus={getPollingStationStatus({
+            user,
+            pollingStation: currentPollingStation,
+            statuses: electionStatus.statuses,
+          })}
           loading={loading}
           setLoading={setLoading}
           currentPollingStation={currentPollingStation}

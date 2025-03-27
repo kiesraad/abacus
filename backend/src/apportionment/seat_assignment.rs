@@ -908,10 +908,10 @@ mod tests {
         /// Full seats: [10, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 5  
         /// Remainders: [8, 59, 58, 57, 56, 55, 54, 53], only votes of list 1 meet the threshold of 75% of the quota  
         /// 1 - largest remainder: seat assigned to list 1  
-        /// 1st round of highest averages method (assignment to unique political groups):
-        /// 2 - highest average: [67 4/12, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 1
-        /// 3 - highest average: [62 2/13, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 2
-        /// 4 - highest average: [62 2/13, 29 1/2, 58, 57, 56, 55, 54, 53] seat assigned to list 3
+        /// 1st round of highest averages method (assignment to unique political groups):  
+        /// 2 - highest average: [67 4/12, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 1  
+        /// 3 - highest average: [62 2/13, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 2  
+        /// 4 - highest average: [62 2/13, 29 1/2, 58, 57, 56, 55, 54, 53] seat assigned to list 3  
         /// 5 - highest average: [62 2/13, 29 1/2, 29, 57, 56, 55, 54, 53] seat assigned to list 4
         #[test]
         fn test_with_1_list_that_meets_threshold() {
@@ -954,9 +954,9 @@ mod tests {
         ///
         /// Full seats: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 3  
         /// Remainders: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1], no lists meet the threshold of 75% of the quota  
-        /// 1st round of highest averages method (assignment to unique political groups):
-        /// 1 - highest average: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 1
-        /// 2 - highest average: [4, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 2
+        /// 1st round of highest averages method (assignment to unique political groups):  
+        /// 1 - highest average: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 1  
+        /// 2 - highest average: [4, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 2  
         /// 3 - highest average: [4, 3 1/2, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 3
         #[test]
         fn test_with_0_lists_that_meet_threshold() {
@@ -977,8 +977,8 @@ mod tests {
         /// Full seats: [0, 0, 0, 0, 0, 7] - Remainder seats: 3  
         /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list 6 meet the threshold of 75% of the quota  
         ///  1 - largest remainder: seat assigned to list 6  
-        /// 1st round of highest averages method (assignment to unique political groups):
-        ///  2 - highest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6
+        /// 1st round of highest averages method (assignment to unique political groups):  
+        ///  2 - highest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6  
         ///  3 - highest average: [0/1, 3, 5, 6, 7, 7 9/10] seat assigned to list 5
         #[test]
         fn test_1st_round_unique_highest_averages_method_regression() {
@@ -1002,11 +1002,11 @@ mod tests {
         ///  3 - largest remainder: seat assigned to list 3  
         ///  4 - largest remainder: seat assigned to list 4  
         ///  5 - largest remainder: seat assigned to list 5  
-        /// 1st round of highest averages method (assignment to unique political groups):
-        ///  6 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 1
-        ///  7 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 2
-        ///  8 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 3
-        ///  9 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 4
+        /// 1st round of highest averages method (assignment to unique political groups):  
+        ///  6 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 1  
+        ///  7 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 2  
+        ///  8 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 3  
+        ///  9 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 4  
         /// 10 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 5
         #[test]
         fn test_with_0_votes() {
@@ -1027,7 +1027,7 @@ mod tests {
             assert_eq!(total_seats, vec![2, 2, 2, 2, 2]);
         }
 
-        /// Apportionment with residual seats assigned with largest remainders method
+        /// Apportionment with residual seats assigned with largest remainders method  
         /// This test triggers Kieswet Article P 9 (Actual case from GR2022)
         ///
         /// Full seats: [7, 2, 1, 1, 1] - Remainder seats: 3  
@@ -1061,7 +1061,7 @@ mod tests {
             };
             use test_log::test;
 
-            /// Apportionment with residual seats assigned with largest remainders method
+            /// Apportionment with residual seats assigned with largest remainders method  
             /// This test triggers Kieswet Article P 9
             ///
             /// Full seats: [7, 1, 1, 1, 1, 1] - Remainder seats: 3  
@@ -1088,14 +1088,14 @@ mod tests {
             ///  3 - largest remainder: seat assigned to list 3  
             ///  4 - largest remainder: seat assigned to list 4  
             ///  5 - largest remainder: seat assigned to list 5  
-            /// 1st round of highest averages method (assignment to unique political groups):
-            ///  6 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1
-            ///  7 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 2
-            ///  8 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 3
-            ///  9 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 4
-            /// 10 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 5
-            /// 2nd round of highest averages method (assignment to any political group):
-            /// 11 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1
+            /// 1st round of highest averages method (assignment to unique political groups):  
+            ///  6 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1  
+            ///  7 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 2  
+            ///  8 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 3  
+            ///  9 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 4  
+            /// 10 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 5  
+            /// 2nd round of highest averages method (assignment to any political group):  
+            /// 11 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1  
             /// 12 - Drawing of lots is required for political groups: [1, 2, 3, 4, 5], only 4 seats available
             #[test]
             fn test_with_0_votes_with_drawing_of_lots_error_in_2nd_round_highest_averages_method() {
@@ -1142,11 +1142,12 @@ mod tests {
             };
             use test_log::test;
 
-            /// Apportionment with no residual seats
+            /// Apportionment with no residual seats  
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 4, 3, 2, 1] - Remainder seats: 0  
-            /// 1 - Seat first assigned to list 1 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// Remainders: [0/15, 0/15, 0/15, 0/15, 0/15]  
             /// 2 - largest remainder: seat assigned to list 5
             #[test]
@@ -1170,7 +1171,7 @@ mod tests {
                 assert_eq!(total_seats, vec![4, 4, 3, 2, 2]);
             }
 
-            /// Apportionment with residual seats assigned with largest remainders method
+            /// Apportionment with residual seats assigned with largest remainders method  
             /// This test triggers Kieswet Article P 10 (Actual case from GR2022)
             ///
             /// Full seats: [2, 1, 1, 1, 1, 1, 1, 0, 2, 1, 0] - Remainder seats: 6  
@@ -1181,10 +1182,12 @@ mod tests {
             /// 4 - largest remainder: seat assigned to list 10  
             /// 5 - largest remainder: seat assigned to list 1  
             /// 6 - largest remainder: seat assigned to list 4  
-            /// 7 - Seat first assigned to list 10 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 7 - Seat first assigned to list 10 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet    
             /// 8 - largest remainder: seat assigned to list 6
             #[test]
-            fn test_with_list_exhaustion_during_residual_seats_assignment_with_remainder_system() {
+            fn test_with_list_exhaustion_during_residual_seats_assignment_with_largest_remainders_method()
+             {
                 let totals = election_summary_fixture_with_given_candidate_votes(vec![
                     vec![754, 85, 84, 40, 31, 15, 2, 38, 3, 4, 8, 8, 4, 17, 5, 3, 15],
                     vec![274, 48, 11, 76, 10, 66],
@@ -1216,18 +1219,19 @@ mod tests {
                 assert_eq!(total_seats, vec![3, 1, 2, 2, 1, 2, 1, 0, 3, 1, 1]);
             }
 
-            /// Apportionment with residual seats assigned with remainder and averages system
+            /// Apportionment with residual seats assigned with largest remainders and highest averages method
             ///
             /// Full seats: [0, 0, 0, 0, 0, 7] - Remainder seats: 3  
             /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list 6 meet the threshold of 75% of the quota  
             ///  1 - largest remainder: seat assigned to list 6  
-            /// 1st round of highest averages system (assignment to unique political groups):
-            ///  2 - highest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6
-            ///  3 - highest average: [0/1, 3, 5, 6, 7, 7 9/10] seat assigned to list 5
-            ///  4 - Seat first assigned to list 6 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1st round of highest averages method (assignment to unique political groups):  
+            ///  2 - highest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6  
+            ///  3 - highest average: [0/1, 3, 5, 6, 7, 7 9/10] seat assigned to list 5  
+            ///  4 - Seat first assigned to list 6 has been removed and
+            ///      will be assigned to another list in accordance with Article P 10 Kieswet  
             ///  5 - highest average: [0/1, 3, 5, 6, 3 1/2, 7 9/10] seat assigned to list 4
             #[test]
-            fn test_with_list_exhaustion_during_residual_seats_assignment_with_unique_highest_average_system()
+            fn test_with_list_exhaustion_during_residual_seats_assignment_with_unique_highest_averages_method()
              {
                 let totals = election_summary_fixture_with_given_candidate_votes(vec![
                     vec![0],
@@ -1252,20 +1256,24 @@ mod tests {
                 assert_eq!(total_seats, [0, 0, 0, 1, 1, 8]);
             }
 
-            /// Apportionment with residual seats assigned with remainder and averages system
+            /// Apportionment with residual seats assigned with largest remainders and highest averages method
             ///
             /// Full seats: [0, 0, 5] - Remainder seats: 1  
             /// Remainders: [5, 5, 0/6], only votes of list 3 meet the threshold of 75% of the quota  
             ///  1 - largest remainder: seat assigned to list 3  
-            ///  2 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            ///  3 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            ///  4 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            ///  5 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            /// 1st round of highest averages system (assignment to unique political groups):
-            ///  6 - highest average: [5, 5, 7 1/7] seat assigned to list 1
-            ///  7 - highest average: [2 1/2, 5, 7 1/7] seat assigned to list 2
-            /// 2nd round of highest averages system (assignment to any political group):
-            ///  8 - highest average: [2 1/2, 2 1/2, 7 1/7] seat assigned to list 1
+            ///  2 - Seat first assigned to list 3 has been removed and
+            ///      will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  3 - Seat first assigned to list 3 has been removed and
+            ///      will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  4 - Seat first assigned to list 3 has been removed and
+            ///      will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  5 - Seat first assigned to list 3 has been removed and
+            ///      will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1st round of highest averages method (assignment to unique political groups):  
+            ///  6 - highest average: [5, 5, 7 1/7] seat assigned to list 1  
+            ///  7 - highest average: [2 1/2, 5, 7 1/7] seat assigned to list 2  
+            /// 2nd round of highest averages method (assignment to any political group):  
+            ///  8 - highest average: [2 1/2, 2 1/2, 7 1/7] seat assigned to list 1  
             ///  9 - highest average: [1 2/3, 2 1/2, 7 1/7] seat assigned to list 2
             #[test]
             fn test_with_list_exhaustion_triggering_2nd_round_highest_average_assignment_with_same_averages()
@@ -1306,20 +1314,24 @@ mod tests {
                 assert_eq!(total_seats, [2, 2, 2]);
             }
 
-            /// Apportionment with residual seats assigned with remainder and averages system
+            /// Apportionment with residual seats assigned with largest remainders and highest averages method
             ///
             /// Full seats: [0, 0, 5] - Remainder seats: 1  
             /// Remainders: [6, 4, 0/6], only votes of list 3 meet the threshold of 75% of the quota  
             ///  1 - largest remainder: seat assigned to list 3  
-            ///  2 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            ///  3 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            ///  4 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            ///  5 - Seat first assigned to list 3 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            /// 1st round of highest averages system (assignment to unique political groups):
-            ///  6 - highest average: [6, 4, 7 1/7] seat assigned to list 1
-            ///  7 - highest average: [3, 4, 7 1/7] seat assigned to list 2
-            /// 2nd round of highest averages system (assignment to any political group):
-            ///  8 - highest average: [3, 2, 7 1/7] seat assigned to list 1
+            ///  2 - Seat first assigned to list 3 has been removed and
+            ///      will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  3 - Seat first assigned to list 3 has been removed and
+            ///      will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  4 - Seat first assigned to list 3 has been removed and
+            ///      will be assigned to another list in accordance with Article P 10 Kieswet  
+            ///  5 - Seat first assigned to list 3 has been removed and
+            ///      will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1st round of highest averages method (assignment to unique political groups):  
+            ///  6 - highest average: [6, 4, 7 1/7] seat assigned to list 1  
+            ///  7 - highest average: [3, 4, 7 1/7] seat assigned to list 2  
+            /// 2nd round of highest averages method (assignment to any political group):  
+            ///  8 - highest average: [3, 2, 7 1/7] seat assigned to list 1  
             ///  9 - highest average: [2, 2, 7 1/7] seat assigned to list 2
             #[test]
             fn test_with_list_exhaustion_triggering_2nd_round_highest_average_assignment_with_different_averages()
@@ -1360,7 +1372,7 @@ mod tests {
                 assert_eq!(total_seats, [2, 2, 2]);
             }
 
-            /// Apportionment with residual seats assigned with remainder system  
+            /// Apportionment with residual seats assigned with largest remainders method  
             /// This test triggers Kieswet Article P 9 and P 10
             ///
             /// Full seats: [7, 2, 1, 1, 1] - Remainder seats: 3  
@@ -1369,7 +1381,8 @@ mod tests {
             /// 2 - largest remainder: seat assigned to list 3  
             /// 3 - largest remainder: seat assigned to list 4  
             /// 4 - Seat first assigned to list 4 has been re-assigned to list 1 in accordance with Article P 9 Kieswet  
-            /// 5 - Seat first assigned to list 1 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 5 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 6 - largest remainder: seat assigned to list 5
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion() {
@@ -1404,7 +1417,8 @@ mod tests {
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 4, 3, 2, 1] - Remainder seats: 0  
-            /// 1 - Seat first assigned to list 1 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// Remainders: [0/15, 0/15, 0/15, 0/15, 0/15]  
             /// 2 - Seat cannot be (re)assigned because all lists are exhausted
             #[test]
@@ -1424,8 +1438,10 @@ mod tests {
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 5, 3, 1, 1] - Remainder seats: 0  
-            /// 1 - Seat first assigned to list 1 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            /// 2 - Seat first assigned to list 2 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 2 - Seat first assigned to list 2 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// Remainders: [0/15, 0/15, 0/15, 0/15, 0/15]  
             /// 3 - largest remainder: seat assigned to list 4  
             /// 4 - Seat cannot be (re)assigned because all lists are exhausted
@@ -1465,12 +1481,12 @@ mod tests {
             assert_eq!(total_seats, vec![12, 6, 2, 2, 2, 1]);
         }
 
-        /// Apportionment with residual seats assigned with averages system
+        /// Apportionment with residual seats assigned with highest averages method
         ///
         /// Full seats: [11, 5, 1, 1, 1] - Remainder seats: 4  
-        /// 1 - highest average: [50, 50 2/6, 49, 49 1/2, 50 1/2] seat assigned to list 5
-        /// 2 - highest average: [50, 50 2/6, 49, 49 1/2, 33 2/3] seat assigned to list 2
-        /// 3 - highest average: [50, 43 1/7, 49, 49 1/2, 33 2/3] seat assigned to list 1
+        /// 1 - highest average: [50, 50 2/6, 49, 49 1/2, 50 1/2] seat assigned to list 5  
+        /// 2 - highest average: [50, 50 2/6, 49, 49 1/2, 33 2/3] seat assigned to list 2  
+        /// 3 - highest average: [50, 43 1/7, 49, 49 1/2, 33 2/3] seat assigned to list 1  
         /// 4 - highest average: [46 2/13, 43 1/7, 49, 49 1/2, 33 2/3] seat assigned to list 4
         #[test]
         fn test_with_remainder_seats() {
@@ -1486,15 +1502,15 @@ mod tests {
             assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
         }
 
-        /// Apportionment with residual seats assigned with averages system
+        /// Apportionment with residual seats assigned with highest averages method
         ///
         /// Full seats: [15, 0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 7  
-        /// 1 - highest average: [62 2/13, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 1
-        /// 2 - highest average: [57 10/14, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 1
-        /// 3 - highest average: [53 13/15, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 2
-        /// 4 - highest average: [53 13/15, 28 1/2, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 3
-        /// 5 - highest average: [53 13/15, 28 1/2, 28, 55, 54, 53, 52, 51, 14] seat assigned to list 4
-        /// 6 - highest average: [53 13/15, 28 1/2, 28, 27 1/2, 54, 53, 52, 51, 14] seat assigned to list 5
+        /// 1 - highest average: [62 2/13, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 1  
+        /// 2 - highest average: [57 10/14, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 1  
+        /// 3 - highest average: [53 13/15, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 2  
+        /// 4 - highest average: [53 13/15, 28 1/2, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 3  
+        /// 5 - highest average: [53 13/15, 28 1/2, 28, 55, 54, 53, 52, 51, 14] seat assigned to list 4  
+        /// 6 - highest average: [53 13/15, 28 1/2, 28, 27 1/2, 54, 53, 52, 51, 14] seat assigned to list 5  
         /// 7 - highest average: [53 13/15, 28 1/2, 28, 27 1/2, 27, 53, 52, 51, 14] seat assigned to list 1
         #[test]
         fn test_with_multiple_remainder_seats_assigned_to_one_list() {
@@ -1514,7 +1530,7 @@ mod tests {
             assert_eq!(total_seats, vec![15, 1, 1, 1, 1, 0, 0, 0, 0]);
         }
 
-        /// Apportionment with residual seats assigned with averages system
+        /// Apportionment with residual seats assigned with highest averages method
         ///
         /// Full seats: [0] - Remainder seats: 19  
         /// 1-19 - highest average: [0/1] seat assigned to list 1
@@ -1527,16 +1543,16 @@ mod tests {
             assert_eq!(total_seats, vec![19]);
         }
 
-        /// Apportionment with residual seats assigned with averages system  
+        /// Apportionment with residual seats assigned with highest averages method  
         /// This test triggers Kieswet Article P 9
         ///
         /// Full seats: [12, 1, 1, 1, 1, 1, 1, 0] - Remainder seats: 6  
-        /// 1 - highest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 2
-        /// 2 - highest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 3
-        /// 3 - highest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 4
-        /// 4 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 7] seat assigned to list 5
-        /// 5 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 7] seat assigned to list 6
-        /// 6 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 7] seat assigned to list 7
+        /// 1 - highest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 2  
+        /// 2 - highest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 3  
+        /// 3 - highest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 4  
+        /// 4 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 7] seat assigned to list 5  
+        /// 5 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 7] seat assigned to list 6  
+        /// 6 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 7] seat assigned to list 7  
         /// 7 - Seat first assigned to list 7 has been re-assigned to list 1 in accordance with Article P 9 Kieswet
         #[test]
         fn test_with_absolute_majority_of_votes_but_not_seats() {
@@ -1567,16 +1583,16 @@ mod tests {
             };
             use test_log::test;
 
-            /// Apportionment with residual seats assigned with averages system  
+            /// Apportionment with residual seats assigned with highest averages method  
             /// This test triggers Kieswet Article P 9
             ///
             /// Full seats: [12, 1, 1, 1, 1, 1, 1, 0] - Remainder seats: 6  
-            /// 1 - highest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 2
-            /// 2 - highest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 3
-            /// 3 - highest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 4
-            /// 4 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 624, 8] seat assigned to list 5
-            /// 5 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 624, 8] seat assigned to list 6
-            /// 6 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416, 624, 8] seat assigned to list 7
+            /// 1 - highest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 2  
+            /// 2 - highest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 3  
+            /// 3 - highest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 4  
+            /// 4 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 624, 8] seat assigned to list 5  
+            /// 5 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 624, 8] seat assigned to list 6  
+            /// 6 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416, 624, 8] seat assigned to list 7  
             /// 7 - Drawing of lots is required for political groups: [6, 7] to pick a political group which the residual seat gets retracted from
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error() {
@@ -1587,10 +1603,10 @@ mod tests {
                 assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
             }
 
-            /// Apportionment with residual seats assigned with averages system
+            /// Apportionment with residual seats assigned with highest averages method
             ///
             /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 19  
-            /// 1-15 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1
+            /// 1-15 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1  
             /// 16 - Drawing of lots is required for political groups: [1, 2, 3, 4, 5], only 4 seats available
             #[test]
             fn test_with_0_votes_with_drawing_of_lots_error() {
@@ -1600,10 +1616,10 @@ mod tests {
                 assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
             }
 
-            /// Apportionment with residual seats assigned with averages system
+            /// Apportionment with residual seats assigned with highest averages method
             ///
             /// Full seats: [9, 2, 2, 2, 2, 2] - Remainder seats: 4  
-            /// 1 - highest average: [50, 46 2/3, 46 2/3, 46 2/3, 46 2/3, 46 2/3] seat assigned to list 1
+            /// 1 - highest average: [50, 46 2/3, 46 2/3, 46 2/3, 46 2/3, 46 2/3] seat assigned to list 1  
             /// 2 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 3 seats available
             #[test]
             fn test_with_drawing_of_lots_error() {
@@ -1626,7 +1642,8 @@ mod tests {
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 5, 4, 4, 2] - Remainder seats: 0  
-            /// 1 - Seat first assigned to list 1 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 2 - highest average: [333 2/6, 333 2/6, 320, 320, 266 2/3] seat assigned to list 5
             #[test]
             fn test_with_list_exhaustion_during_full_seats_assignment() {
@@ -1649,12 +1666,13 @@ mod tests {
                 assert_eq!(total_seats, vec![4, 5, 4, 4, 3]);
             }
 
-            /// Apportionment with residual seats assigned with averages system  
+            /// Apportionment with residual seats assigned with highest averages method  
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [4, 4, 4, 4, 2] - Remainder seats: 1  
-            /// 1 - highest average: [319 4/5, 319 3/5, 319 3/5, 319 3/5, 334 2/3] seat assigned to list 5
-            /// 2 - Seat first assigned to list 5 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1 - highest average: [319 4/5, 319 3/5, 319 3/5, 319 3/5, 334 2/3] seat assigned to list 5  
+            /// 2 - Seat first assigned to list 5 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 3 - highest average: [319 4/5, 319 3/5, 319 3/5, 319 3/5, 251] seat assigned to list 1
             #[test]
             fn test_with_list_exhaustion_during_residual_seats_assignment() {
@@ -1678,18 +1696,19 @@ mod tests {
                 assert_eq!(total_seats, vec![5, 4, 4, 4, 2]);
             }
 
-            /// Apportionment with residual seats assigned with averages system  
+            /// Apportionment with residual seats assigned with highest averages method  
             /// This test triggers Kieswet Article P 9 and P 10
             ///
             /// Full seats: [12, 1, 1, 1, 1, 1, 1, 0] - Remainder seats: 6  
-            /// 1 - highest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 2
-            /// 2 - highest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 3
-            /// 3 - highest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 4
-            /// 4 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 7] seat assigned to list 5
-            /// 5 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 7] seat assigned to list 6
-            /// 6 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 7] seat assigned to list 7
+            /// 1 - highest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 2  
+            /// 2 - highest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 3  
+            /// 3 - highest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 4  
+            /// 4 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 7] seat assigned to list 5  
+            /// 5 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 7] seat assigned to list 6  
+            /// 6 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 7] seat assigned to list 7  
             /// 7 - Seat first assigned to list 7 has been re-assigned to list 1 in accordance with Article P 9 Kieswet  
-            /// 8 - Seat first assigned to list 1 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 8 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 9 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 7] seat assigned to list 7
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion() {
@@ -1730,7 +1749,8 @@ mod tests {
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 5, 4, 4, 2] - Remainder seats: 0  
-            /// 1 - Seat first assigned to list 1 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 1 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 2 - Seat cannot be (re)assigned because all lists are exhausted
             #[test]
             fn test_with_all_lists_exhausted_error() {
@@ -1749,9 +1769,11 @@ mod tests {
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 5, 4, 4, 2] - Remainder seats: 0  
-            /// 1 - Seat first assigned to list 1 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            /// 2 - Seat first assigned to list 2 has been removed and will be assigned to another list in accordance with Article P 10 Kieswet  
-            /// 3 - highest average: [333 2/6, 333 2/6, 320, 320, 266 2/3] seat assigned to list 5
+            /// 1 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 2 - Seat first assigned to list 2 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 3 - highest average: [333 2/6, 333 2/6, 320, 320, 266 2/3] seat assigned to list 5  
             /// 4 - Seat cannot be (re)assigned because all lists are exhausted
             #[test]
             fn test_with_2_exhausted_lists_and_all_lists_exhausted_error() {

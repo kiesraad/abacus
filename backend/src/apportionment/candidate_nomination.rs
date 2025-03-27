@@ -560,7 +560,7 @@ mod tests {
     /// PG 4: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations  
     ///       Candidates 3, 4, 6 and 7 also meet the preferential threshold but do not get seats  
     /// PG 5: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations  
-    ///       Candidates 4, 5 and 7 also meet the preferential threshold but do not get seats  
+    ///       Candidates 4, 5 and 7 also meet the preferential threshold but do not get seats
     #[test]
     fn test_with_ge_19_seats_and_more_candidates_eligible_for_preferential_nomination_than_seats() {
         let election = election_fixture_with_given_number_of_seats(&[7, 7, 7, 7, 7], 19);

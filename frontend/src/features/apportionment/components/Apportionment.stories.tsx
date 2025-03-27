@@ -33,6 +33,7 @@ export const DefaultElectionSummaryTable: Story = () => (
     seats={gte19Seats.seat_assignment.seats}
     quota={gte19Seats.seat_assignment.quota}
     numberOfVoters={gte19Seats.election.number_of_voters}
+    preferenceThreshold={gte19Seats.candidate_nomination.preference_threshold}
   />
 );
 DefaultElectionSummaryTable.storyName = "ElectionSummaryTable";

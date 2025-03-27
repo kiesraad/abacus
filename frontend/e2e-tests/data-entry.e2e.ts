@@ -791,6 +791,7 @@ test.describe("navigation", () => {
 
       await candidatesListPage_1.fillCandidatesAndTotal([1, 1], 100);
       await candidatesListPage_1.next.click();
+      await expect(candidatesListPage_1.error).toBeVisible();
       await candidatesListPage_1.navPanel.differences.click();
 
       await expect(differencesPage.fieldset).toBeVisible();

@@ -282,11 +282,11 @@ fn initial_full_seats_per_political_group(
         .collect()
 }
 
-/// Compute the political groups with the highest average votes per seats.
+/// Compute the political groups with the highest average votes per seats.  
 /// This is determined based on seeing what would happen to the average votes
 /// per seat if one additional seat would be assigned to each political group.
 ///
-/// It then returns all the political groups for which this fraction is the largest.
+/// It then returns all the political groups for which this fraction is the largest.  
 /// If there are more political groups than there are residual seats to be assigned,
 /// a drawing of lots is required.
 ///
@@ -764,7 +764,7 @@ fn political_group_standings_qualifying_for_largest_remainder<'a>(
     })
 }
 
-/// Get an iterator that lists all the parties that qualify for unique highest average.
+/// Get an iterator that lists all the parties that qualify for unique highest average.  
 /// This checks the previously assigned seats to make sure that every group that already
 /// got a residual seat through the highest average procedure does not qualify.
 fn political_group_standings_qualifying_for_unique_highest_average<'a>(

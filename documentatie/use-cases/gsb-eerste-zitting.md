@@ -13,7 +13,7 @@ __Hoofdscenario:__
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na 31-2 Bijlage 1 in.
 4. De coördinator GSB opent de zitting in de applicatie.
-5. [De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in](./gsb-invoer-eerste-zitting.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger)
+5. [De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in.](./gsb-invoer-eerste-zitting.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger)
 6. [De coördinator GSB maakt het PV en het digitale bestand aan.](#de-coördinator-gsb-maakt-het-pv-en-het-digitale-bestand-aan-zee)
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
@@ -24,7 +24,6 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__  
 TODO:  
-- zelfde aanpassingen in DSO use case (stap 4-8) -> wordt andere use case voor invoeren gegevens
 - verwijderen van een zitting in de applicatie (alleen als geen latere zitting met invoer)
   - wanneer wordt zitting aangemaakt? bij start use case tweede zitting?
 - De coördinator GSB kan een latere zitting openen. (als geen andere open zitting)

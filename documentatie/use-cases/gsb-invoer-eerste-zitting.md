@@ -2,7 +2,7 @@
 
 ## De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in (vlieger)
 
-__Niveau:__ hoog-over, vlieger, 🪁 of wolk?
+__Niveau:__ hoog-over, vlieger, 🪁
 
 ### Hoofdscenario en uitbreidingen
 

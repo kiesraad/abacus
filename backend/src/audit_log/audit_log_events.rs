@@ -12,7 +12,7 @@ use crate::{
     authentication::{LoginResponse, Role, User},
 };
 
-use super::LogFilterQuery;
+use super::{AuditLogUser, LogFilterQuery};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -312,5 +312,23 @@ impl AuditLog {
             .await?;
 
         Ok(row_count.count)
+    }
+
+    pub async fn list_users(&self) -> Result<Vec<AuditLogUser>, APIError> {
+        let users = sqlx::query_as!(
+            AuditLogUser,
+            r#"SELECT
+                user_id as "id: u32",
+                user_fullname as fullname,
+                username,
+                user_role as "role: Role"
+            FROM audit_log
+            GROUP BY user_id
+            ORDER BY username"#
+        )
+        .fetch_all(&self.0)
+        .await?;
+
+        Ok(users)
     }
 }

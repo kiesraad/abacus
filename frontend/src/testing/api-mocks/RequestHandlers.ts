@@ -78,6 +78,11 @@ export const AccountUpdateRequestHandler = http.put<
 // simulate some audit log filtering
 export const LogRequestHandler = http.get("/api/log", () => HttpResponse.json(logMockResponse, { status: 200 }));
 
+// simulate audit log user list
+export const LogUsersRequestHandler = http.get("/api/log-users", () =>
+  HttpResponse.json(userMockData, { status: 200 }),
+);
+
 // get election list handler
 export const ElectionListRequestHandler = http.get("/api/elections", () =>
   HttpResponse.json(electionListMockResponse, { status: 200 }),

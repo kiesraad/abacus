@@ -4,12 +4,17 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::{APIError, AppState, ErrorResponse, authentication::AdminOrCoordinator};
+use crate::{
+    APIError, AppState, ErrorResponse,
+    authentication::{AdminOrCoordinator, Role},
+};
 
 use super::{AuditLog, AuditLogEvent, LogFilter};
 
 pub fn router() -> OpenApiRouter<AppState> {
-    OpenApiRouter::default().routes(routes!(audit_log_list))
+    OpenApiRouter::default()
+        .routes(routes!(audit_log_list))
+        .routes(routes!(audit_log_list_users))
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -81,6 +86,33 @@ async fn audit_log_list(
     }))
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+pub struct AuditLogUser {
+    pub id: u32,
+    pub username: String,
+    pub fullname: String,
+    pub role: Role,
+}
+
+/// Lists all users
+#[utoipa::path(
+    get,
+    path = "/api/log-users",
+    responses(
+        (status = 200, description = "Audit log list of all users", body = Vec<AuditLogUser>),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+async fn audit_log_list_users(
+    _user: AdminOrCoordinator,
+    State(audit_log): State<AuditLog>,
+) -> Result<Json<Vec<AuditLogUser>>, APIError> {
+    let users = audit_log.list_users().await?;
+
+    Ok(Json(users))
+}
+
 #[cfg(test)]
 mod tests {
     use axum::{
@@ -99,26 +131,14 @@ mod tests {
     use crate::{
         AppState,
         audit_log::{
-            AuditEvent, AuditLog, AuditLogListResponse, AuditService, UserLoggedInDetails,
-            api::audit_log_list,
+            AuditEvent, AuditLog, AuditLogListResponse, AuditLogUser, AuditService,
+            UserLoggedInDetails,
+            api::{audit_log_list, audit_log_list_users},
         },
         authentication::{Sessions, Users},
     };
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
-    async fn test_list(pool: SqlitePool) {
-        let state = AppState { pool: pool.clone() };
-
-        let session = Sessions::new(pool.clone())
-            .create(1, TimeDelta::seconds(60 * 30))
-            .await
-            .unwrap();
-
-        let app = Router::new()
-            .route("/api/log", get(audit_log_list))
-            .with_state(state);
-
-        // create some log entries
+    async fn create_log_entries(pool: SqlitePool) {
         let service = AuditService::new(
             AuditLog::new(pool.clone()),
             Ipv4Addr::new(203, 0, 113, 0).into(),
@@ -135,6 +155,22 @@ mod tests {
         service.log_success(&audit_event, None).await.unwrap();
         service.log_success(&audit_event, None).await.unwrap();
         service.log_success(&audit_event, None).await.unwrap();
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_list(pool: SqlitePool) {
+        let state = AppState { pool: pool.clone() };
+
+        let session = Sessions::new(pool.clone())
+            .create(1, TimeDelta::seconds(60 * 30))
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .route("/api/log", get(audit_log_list))
+            .with_state(state);
+
+        create_log_entries(pool).await;
 
         let response = app
             .clone()
@@ -174,5 +210,40 @@ mod tests {
         assert_eq!(result.events.len(), 1);
         assert_eq!(result.page, 2);
         assert_eq!(result.pages, 2);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_list_users(pool: SqlitePool) {
+        let state = AppState { pool: pool.clone() };
+
+        let session = Sessions::new(pool.clone())
+            .create(1, TimeDelta::seconds(60 * 30))
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .route("/api/log-users", get(audit_log_list_users))
+            .with_state(state);
+
+        create_log_entries(pool).await;
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .header("cookie", session.get_cookie().encoded().to_string())
+                    .uri("/api/log-users")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: Vec<AuditLogUser> = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0].username, "admin");
     }
 }

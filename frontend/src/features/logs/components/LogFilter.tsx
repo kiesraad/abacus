@@ -47,7 +47,7 @@ export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogF
       <div className={cls.filters}>
         {options.map(([filterName, options]) => (
           <div key={filterName}>
-            <h3>{t(`log.header.${filterName}`)}</h3>
+            <h3>{t(`log.filter.${filterName}`)}</h3>
             <ul>
               {options.map(({ value, label }) => (
                 <li key={value}>
@@ -73,7 +73,7 @@ export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogF
             onChange={(e) => {
               setSince(dateToTimestampString(e.target.value));
             }}
-            label={t("log.header.since")}
+            label={t("log.filter.show_events_since")}
           />
         </div>
       </div>

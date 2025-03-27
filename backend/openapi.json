@@ -870,6 +870,47 @@
         }
       }
     },
+    "/api/log-users": {
+      "get": {
+        "summary": "Lists all users",
+        "operationId": "audit_log_list_users",
+        "responses": {
+          "200": {
+            "description": "Audit log list of all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditLogUser"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
         "summary": "Save a data entry for a polling station",
@@ -1975,6 +2016,31 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "AuditLogUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "username",
+          "fullname",
+          "role"
+        ],
+        "properties": {
+          "fullname": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "username": {
+            "type": "string"
           }
         }
       },

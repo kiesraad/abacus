@@ -14,7 +14,7 @@ export function LogsTable({ events, setDetails }: LogsTableProps) {
       <Table.Header>
         <Table.HeaderCell>{t("number")}</Table.HeaderCell>
         <Table.HeaderCell>{t("log.header.time")}</Table.HeaderCell>
-        <Table.HeaderCell>{t("log.header.workstation")}</Table.HeaderCell>
+        {/* <Table.HeaderCell>{t("log.header.workstation")}</Table.HeaderCell> */}
         <Table.HeaderCell>{t("log.header.level")}</Table.HeaderCell>
         <Table.HeaderCell>{t("log.header.event")}</Table.HeaderCell>
         <Table.HeaderCell>{t("log.header.user")}</Table.HeaderCell>
@@ -34,10 +34,10 @@ export function LogsTable({ events, setDetails }: LogsTableProps) {
           >
             <Table.Cell>{event.id}</Table.Cell>
             <Table.Cell>{formatDateTime(new Date(event.time), false)}</Table.Cell>
-            <Table.Cell>{event.workstation || "-"}</Table.Cell>
+            {/* <Table.Cell>{event.workstation || "-"}</Table.Cell> */}
             <Table.Cell>{t(`log.level.${event.eventLevel}`)}</Table.Cell>
             <Table.Cell>{t(`log.event.${event.event.eventType}`)}</Table.Cell>
-            <Table.Cell>{`#${event.userId} ${event.userFullname || event.username} (${t(event.userRole)})`}</Table.Cell>
+            <Table.Cell>{`${event.userId}, ${event.username} (${t(event.userRole)})`}</Table.Cell>
           </Table.ClickRow>
         ))}
       </Table.Body>

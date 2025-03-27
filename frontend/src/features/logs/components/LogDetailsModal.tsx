@@ -24,8 +24,14 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
         <dl className={cls.details} role="list">
           <dt>{t("log.header.time")}</dt>
           <dd>{formatDateTimeFull(new Date(details.time))}</dd>
-          <dt>{t("log.header.user")}</dt>
-          <dd>{`#${details.userId} ${details.userFullname || details.username} (${t(details.userRole)})`}</dd>
+          <dt>{t("users.username")}</dt>
+          <dd>{details.username}</dd>
+          <dt>{t("users.fullname")}</dt>
+          <dd>{details.userFullname}</dd>
+          <dt>{t("role")}</dt>
+          <dd>{t(details.userRole)}</dd>
+          <dt>{t("users.id")}</dt>
+          <dd>{details.userId}</dd>
           <dt>{t("log.header.message")}</dt>
           <dd>{details.message || "-"}</dd>
           <dt>{t("log.field.ip")}</dt>

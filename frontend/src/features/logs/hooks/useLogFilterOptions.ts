@@ -1,6 +1,6 @@
-import { useUserListRequest } from "@/features/users/hooks/useUserListRequest";
+import { AUDIT_LOG_LIST_USERS_REQUEST_PATH, AuditLogUser, useInitialApiGet } from "@/api";
 
-import { locale, t, translations } from "@kiesraad/i18n";
+import { locale, translations } from "@kiesraad/i18n";
 
 export const LogFilterNames = ["event", "level", "user"] as const;
 export type LogFilterName = (typeof LogFilterNames)[number];
@@ -16,7 +16,8 @@ export type LogFilterOptions = Array<
 >;
 
 export function useLogFilterOptions(): LogFilterOptions {
-  const users = useUserListRequest();
+  const path: AUDIT_LOG_LIST_USERS_REQUEST_PATH = `/api/log-users`;
+  const { requestState: usersRequestState } = useInitialApiGet<AuditLogUser[]>(path);
   const source = translations[locale].log;
 
   return LogFilterNames.map((filterName) => {
@@ -26,10 +27,10 @@ export function useLogFilterOptions(): LogFilterOptions {
     }> = [];
 
     if (filterName === "user") {
-      if (users.requestState.status === "success") {
-        values = users.requestState.data.users.map(({ id, fullname, username, role }) => ({
+      if (usersRequestState.status === "success") {
+        values = usersRequestState.data.map(({ id, username }) => ({
           value: id.toString(),
-          label: `${fullname || username} (${t(role)})`,
+          label: `${id}, ${username}`,
         }));
       }
     } else {

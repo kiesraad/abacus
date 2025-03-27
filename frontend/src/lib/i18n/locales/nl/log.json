@@ -11,8 +11,14 @@
     "level": "Type",
     "event": "Gebeurtenis",
     "message": "Toelichting",
-    "user": "Gebruiker",
+    "user": "Gebruiker: id, gebruikersnaam (rol)",
     "since": "Sinds"
+  },
+  "filter": {
+    "level": "Type",
+    "event": "Gebeurtenis",
+    "user": "Gebruiker",
+    "show_events_since": "Sinds"
   },
   "level": {
     "error": "Fout",

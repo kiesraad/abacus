@@ -3,13 +3,13 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { render, server, spyOnHandler } from "@/testing";
-import { LogRequestHandler, UserListRequestHandler } from "@/testing/api-mocks";
+import { LogRequestHandler, LogUsersRequestHandler } from "@/testing/api-mocks";
 
 import { LogsHomePage } from "./LogsHomePage";
 
 describe("LogsHomePage", () => {
   beforeEach(() => {
-    server.use(LogRequestHandler, UserListRequestHandler);
+    server.use(LogRequestHandler, LogUsersRequestHandler);
   });
 
   test("Show audit log events", async () => {
@@ -20,15 +20,15 @@ describe("LogsHomePage", () => {
 
     await waitFor(() => {
       expect(table).toHaveTableContent([
-        ["Nummer", "Tijdstip", "Werkplek", "Type", "Gebeurtenis", "Gebruiker"],
-        ["24", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#1 Sanne Molenaar (Beheerder)"],
-        ["23", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#1 Sanne Molenaar (Beheerder)"],
-        ["22", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#1 Sanne Molenaar (Beheerder)"],
-        ["21", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#2 Sam Kuijpers (Invoerder)"],
-        ["20", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#2 Sam Kuijpers (Invoerder)"],
-        ["19", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#3 Mohammed van der Velden (Coördinator)"],
-        ["18", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#3 Mohammed van der Velden (Coördinator)"],
-        ["17", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#3 Mohammed van der Velden (Coördinator)"],
+        ["Nummer", "Tijdstip", "Type", "Gebeurtenis", "Gebruiker: id, gebruikersnaam (rol)"],
+        ["24", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
+        ["23", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "1, admin (Beheerder)"],
+        ["22", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
+        ["21", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "2, typist (Invoerder)"],
+        ["20", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "2, typist (Invoerder)"],
+        ["19", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
+        ["18", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "3, coordinator (Coördinator)"],
+        ["17", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
       ]);
     });
 
@@ -58,8 +58,14 @@ describe("LogsHomePage", () => {
       [
         "Tijdstip",
         "11 maart 2025 om 10:02",
-        "Gebruiker",
-        "#1 Sanne Molenaar (Beheerder)",
+        "Gebruikersnaam",
+        "admin",
+        "Volledige naam",
+        "Sanne Molenaar",
+        "Rol",
+        "Beheerder",
+        "Gebruikers ID",
+        "1",
         "Toelichting",
         "-",
         "IP-adres",
@@ -84,15 +90,15 @@ describe("LogsHomePage", () => {
     expect(table).toBeVisible();
 
     expect(table).toHaveTableContent([
-      ["Nummer", "Tijdstip", "Werkplek", "Type", "Gebeurtenis", "Gebruiker"],
-      ["24", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#1 Sanne Molenaar (Beheerder)"],
-      ["23", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#1 Sanne Molenaar (Beheerder)"],
-      ["22", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#1 Sanne Molenaar (Beheerder)"],
-      ["21", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#2 Sam Kuijpers (Invoerder)"],
-      ["20", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#2 Sam Kuijpers (Invoerder)"],
-      ["19", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#3 Mohammed van der Velden (Coördinator)"],
-      ["18", "11 mrt 10:02", "-", "Succes", "Gebruiker ingelogd", "#3 Mohammed van der Velden (Coördinator)"],
-      ["17", "11 mrt 10:02", "-", "Succes", "Gebruiker uitgelogd", "#3 Mohammed van der Velden (Coördinator)"],
+      ["Nummer", "Tijdstip", "Type", "Gebeurtenis", "Gebruiker: id, gebruikersnaam (rol)"],
+      ["24", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
+      ["23", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "1, admin (Beheerder)"],
+      ["22", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
+      ["21", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "2, typist (Invoerder)"],
+      ["20", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "2, typist (Invoerder)"],
+      ["19", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
+      ["18", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "3, coordinator (Coördinator)"],
+      ["17", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
     ]);
 
     const filterButton = await screen.findByRole("button", { name: "Filteren" });

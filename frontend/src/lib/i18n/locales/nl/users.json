@@ -44,5 +44,6 @@
   "username_not_unique_error": "Er bestaat al een gebruiker met gebruikersnaam {username}",
   "username_unique": "De gebruikersnaam moet uniek zijn",
   "username": "Gebruikersnaam",
-  "users": "Gebruikers"
+  "users": "Gebruikers",
+  "id": "Gebruikers ID"
 }

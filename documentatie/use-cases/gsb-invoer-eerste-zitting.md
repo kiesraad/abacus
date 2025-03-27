@@ -1,34 +1,35 @@
 # GSB: Invoer eerste zitting
 
-## Het GSB voert de tellingen in de applicatie in (vlieger)
+## De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in (vlieger)
 
-__Niveau:__ hoog-over, vlieger, 🪁
-
-__Precondities:__
-
-- [De beheerder richt de applicatie in](./beheerder.md#de-beheerder-richt-de-applicatie-in-wolk)
+__Niveau:__ hoog-over, vlieger, 🪁 of wolk?
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ Het geplande tijdstip om invoer te starten breekt aan.
-
-__Hoofdscenario:__  
-
-1. De coördinator GSB stelt invoer open.
-2. (voor elk SB PV evt. met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in-vlieger)
-3. De coördinator GSB sluit de invoer af.
-4. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
-5. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
+__Hoofdscenario:__ 
+1. De coördinator GSB stelt de invoer open.
+2. (voor elk stembureau) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in-vlieger)
+3. (parallel aan invoer stembureaus) [De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-gsb-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
+4. De coördinator GSB sluit de invoer.
+5. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
+6. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
 
 __Uitbreidingen:__  
+2a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
 
-2a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
-&emsp; 2a1. De coördinator GSB pauzeert de invoer.  
-&emsp; 2a2. De applicatie blokkeert verdere invoer.
+2b. (CSO) Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
+&emsp; 2b1. Het GSB voert de hertelling uit.  
+&emsp; 2b2. Het GSB corrigeert de Bijlage 1 of vult een nieuwe Bijlage 1 in.  
+&emsp; 2b3. Het GSB voert de nieuwe Bijlage 1 in de applicatie in.  
+&emsp; 2b4. Het GSB vermeldt het stembureau bij "extra onderzoeken van het GSB" in het PV.
 
-4a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
+2-3a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
+&emsp; 2-3a1. De coördinator GSB pauzeert de invoer.  
+&emsp; 2-3a2. De applicatie blokkeert verdere invoer.
 
-5a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
+5a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
+
+6a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
 
 ### Niet in scope
 - Verschillende fases in de applicatie, zoals inrichten, invoer, voorbereiden PV. Reden hiervoor is dat we de coördinator GSB niet willen beperken in wat deze wanneer kan doen. We zouden fases kunnen implementeren waartussen de coördinator GSB vrij kan bewegen, maar dan is het gebruiksvriendelijker om bij bepaalde acties een waarschuwing te laten zien. De coördinator GSB heeft wel de mogelijkheid om invoer open te zetten en te stoppen. Eventueel ook om invoer te pauzeren.
@@ -37,6 +38,39 @@ __Uitbreidingen:__
 
 - Welke controles willen we nog nadat de invoer is afgesloten? Of zijn die controles onderdeel van het afsluiten?
 - Hoe ziet het stoppen/blokkeren van invoer er precies uit?
+- CSO: invoerders vullen gegevens van Bijlage 1 in. DSO: invoerders vullen gegevens van N 10-1 en evt. Na 14-1 in. => input-/output-bestanden?
+
+
+## De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in. (zee)
+
+__Niveau:__ gebruikersdoel, zee, 🌊
+
+__Precondities:__
+
+- De coördinator GSB is ingelogd in de applicatie.
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__
+
+1. De coördinator GSB voert de datum, tijd en locatie van de zitting in.
+2. De coördinator GSB voert de aanwezige leden van het GSB in.
+3. De coördinator GSB voert de bezwaren van kiezers/belangstellenden tijdens de zitting in.
+4. De coördinator GSB voert onregelmatigheden of bijzonderheden tijdens de zitting in.
+
+__Uitbreidingen:__
+
+3a. De coördinator GSB vult in: "zie bijlage".
+
+4a. De coördinator GSB vult in: "zie bijlage".
+
+### Open punten
+
+- Voert de coördinator GSB de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de applicatie dat?
+  - Nieuw model GSB PV heeft drie vinkjes: toegelaten kiezers opnieuw vastgesteld, onderzocht vanwege andere redenen, stembiljetten (deels) herteld.
+  - De SB PVs verschillen hierin tussen DSO en CSO.
+  - Als de applicatie dit moet doen, moeten de invoerders dit over kunnen nemen van het SB PV.
+  - De applicatie gaat nog uit van de oude modellen, met alleen de vraag "Is er herteld?"
 
 
 ## De invoerders vullen de resultaten van de tellingen in (vlieger)

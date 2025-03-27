@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::models::PdfModel;
+use super::super::models::PdfModel;
 use typst::{
     Library, World,
     diag::{FileError, FileResult},
@@ -59,7 +59,8 @@ impl PdfWorld {
             .cloned()
             .expect("could not find input model");
         let input_path = input.as_input_path();
-        let input_data = input.get_input().expect("unable to parse JSON into model");
+        let input_data =
+            Bytes::from_string(input.get_input().expect("unable to parse JSON into model"));
         self.main_source = main_source;
         self.input_data = (FileId::new(None, VirtualPath::new(input_path)), input_data);
     }
@@ -127,21 +128,21 @@ impl World for PdfWorld {
 /// In a debug build, this is done at runtime, for a release build this is
 /// done at compile time.
 macro_rules! include_filedata {
-    ($path:literal) => {{ include_bytes!(concat!("../../templates/", $path)) as &'static [u8] }};
+    ($path:expr) => {{ include_bytes!(concat!("../../../templates/", $path)) as &'static [u8] }};
 }
 
 /// Macro that loads data as a string from a file
 /// In a debug build, this is done at runtime, for a release build this is
 /// done at compile time.
 macro_rules! include_strdata {
-    ($path:literal) => {{ include_str!(concat!("../../templates/", $path)) as &'static str }};
+    ($path:expr) => {{ include_str!(concat!("../../../templates/", $path)) as &'static str }};
 }
 
 /// Load all sources available from the `templates/` directory (i.e. all typst
 /// files).
 fn load_sources() -> Vec<Source> {
     macro_rules! include_source {
-        ($path:literal) => {
+        ($path:expr) => {
             Source::new(
                 FileId::new(None, VirtualPath::new($path)),
                 include_strdata!($path).to_string(),
@@ -167,7 +168,7 @@ fn load_fonts() -> (Vec<Font>, FontBook) {
 
     macro_rules! include_font {
         ($path:literal) => {
-            let fontdata = include_filedata!($path);
+            let fontdata = include_filedata!(concat!("fonts/", $path));
             let font = Font::new(Bytes::new(fontdata), 0).expect("Error reading font file");
             fontbook.push(font.info().clone());
             fonts.push(font);
@@ -178,13 +179,13 @@ fn load_fonts() -> (Vec<Font>, FontBook) {
     // Note that these font files are only read at font index 0 (i.e. font files with multiple
     // fonts are not supported, split them up in separate files instead)
     // Typst also doesn't support variable fonts at this time, so we cannot use those either.
-    include_font!("fonts/DM_Sans/DMSans-Bold.ttf");
-    include_font!("fonts/DM_Sans/DMSans-BoldItalic.ttf");
-    include_font!("fonts/DM_Sans/DMSans-ExtraBold.ttf");
-    include_font!("fonts/DM_Sans/DMSans-ExtraBoldItalic.ttf");
-    include_font!("fonts/DM_Sans/DMSans-Italic.ttf");
-    include_font!("fonts/DM_Sans/DMSans-Regular.ttf");
-    include_font!("fonts/Geist_Mono/GeistMono-Regular.otf");
+    include_font!("DM_Sans/DMSans-Bold.ttf");
+    include_font!("DM_Sans/DMSans-BoldItalic.ttf");
+    include_font!("DM_Sans/DMSans-ExtraBold.ttf");
+    include_font!("DM_Sans/DMSans-ExtraBoldItalic.ttf");
+    include_font!("DM_Sans/DMSans-Italic.ttf");
+    include_font!("DM_Sans/DMSans-Regular.ttf");
+    include_font!("Geist_Mono/GeistMono-Regular.otf");
 
     (fonts, fontbook)
 }

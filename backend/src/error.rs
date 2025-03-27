@@ -4,6 +4,7 @@ use crate::{
     apportionment::ApportionmentError,
     authentication::error::AuthenticationError,
     data_entry::{DataError, status::DataEntryTransitionError},
+    pdf_gen::PdfGenError,
 };
 use axum::{
     Json,
@@ -16,7 +17,6 @@ use quick_xml::SeError;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use tracing::error;
-use typst::diag::SourceDiagnostic;
 use utoipa::ToSchema;
 use zip::result::ZipError;
 
@@ -80,7 +80,7 @@ pub enum APIError {
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
     InvalidHeaderValue,
-    PdfGenError(Vec<SourceDiagnostic>),
+    PdfGenError(PdfGenError),
     StdError(Box<dyn Error>),
     AddError(String, ErrorReference),
     XmlError(SeError),

@@ -81,7 +81,7 @@ jobs:
       - name: Check Clippy without default features
         run: cargo --verbose --locked clippy --target=${{ matrix.target.name }} --all-targets --no-default-features -- -D warnings
       - name: Run tests
-        run: cargo --verbose --locked test --target=${{ matrix.target.name }} -- --nocapture
+        run: cargo --verbose --locked test --target=${{ matrix.target.name }} --features embed-typst -- --nocapture
       - name: Build
         run: cargo --verbose --locked build --features memory-serve,embed-typst --target=${{ matrix.target.name }}
       - uses: actions/upload-artifact@v4

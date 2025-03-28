@@ -11,7 +11,7 @@ interface ChosenCandidatesTableProps {
 
 export function ChosenCandidatesTable({ chosenCandidates }: ChosenCandidatesTableProps) {
   return (
-    <Table id="chosen_candidates_table" className={cn(cls.table)}>
+    <Table id="chosen-candidates-table" className={cn(cls.table)}>
       <Table.Header>
         <Table.HeaderCell>{t("candidate.title")}</Table.HeaderCell>
         <Table.HeaderCell>{t("candidate.locality")}</Table.HeaderCell>

@@ -1,4 +1,13 @@
-import { CandidateNominationResult, Election, ElectionSummary, SeatAssignmentResult, SeatChangeStep } from "@/api";
+import {
+  CandidateNominationResult,
+  Election,
+  ElectionSummary,
+  PoliticalGroup,
+  PoliticalGroupCandidateNomination,
+  PoliticalGroupVotes,
+  SeatAssignmentResult,
+  SeatChangeStep,
+} from "@/api";
 
 export const largest_remainder_steps: SeatChangeStep[] = [
   {
@@ -884,6 +893,171 @@ export const seat_assignment: SeatAssignmentResult = {
   ],
 };
 
+export const political_group_1_candidate_nomination: PoliticalGroupCandidateNomination = {
+  pg_number: 1,
+  pg_name: "Political Group A",
+  pg_seats: 12,
+  preferential_candidate_nomination: [
+    {
+      number: 12,
+      votes: 200,
+    },
+    {
+      number: 1,
+      votes: 138,
+    },
+    {
+      number: 6,
+      votes: 100,
+    },
+    {
+      number: 7,
+      votes: 60,
+    },
+    {
+      number: 3,
+      votes: 55,
+    },
+    {
+      number: 5,
+      votes: 50,
+    },
+    {
+      number: 11,
+      votes: 50,
+    },
+    {
+      number: 4,
+      votes: 45,
+    },
+    {
+      number: 8,
+      votes: 40,
+    },
+  ],
+  other_candidate_nomination: [
+    {
+      number: 2,
+      votes: 20,
+    },
+    {
+      number: 9,
+      votes: 30,
+    },
+    {
+      number: 10,
+      votes: 20,
+    },
+  ],
+  updated_candidate_ranking: [
+    {
+      number: 12,
+      initials: "K.",
+      first_name: "Karin",
+      last_name: "Kok",
+      locality: "Test Location",
+      gender: "Female",
+    },
+    {
+      number: 1,
+      initials: "L.",
+      first_name: "Lidewij",
+      last_name: "Oud",
+      locality: "Test Location",
+      gender: "Female",
+    },
+    {
+      number: 6,
+      initials: "B.",
+      first_name: "Berta",
+      last_name: "Van der Weijden",
+      locality: "Test Location",
+      gender: "Female",
+    },
+    {
+      number: 7,
+      initials: "K.",
+      first_name: "Klaas",
+      last_name: "Oud",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 3,
+      initials: "M.",
+      first_name: "Marijke",
+      last_name: "Oud",
+      locality: "Test Location",
+      gender: "Female",
+    },
+    {
+      number: 5,
+      initials: "H.",
+      first_name: "Henk",
+      last_name: "Van der Weijden",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 11,
+      initials: "R.",
+      first_name: "Rolf",
+      last_name: "De Jong",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 4,
+      initials: "A.",
+      first_name: "Arie",
+      last_name: "Jansen",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 8,
+      initials: "S.",
+      first_name: "Sophie",
+      last_name: "Bakker",
+      locality: "Test Location",
+      gender: "Female",
+    },
+    {
+      number: 2,
+      initials: "J.",
+      first_name: "Johan",
+      last_name: "Oud",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 9,
+      initials: "J.",
+      first_name: "Johan",
+      last_name: "De Vries",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 10,
+      initials: "M.",
+      first_name: "Marijke",
+      last_name: "Van den Berg",
+      locality: "Test Location",
+      gender: "Female",
+    },
+  ],
+};
+
+export const political_group_5_candidate_nomination: PoliticalGroupCandidateNomination = {
+  pg_number: 5,
+  pg_name: "Political Group E",
+  pg_seats: 0,
+  preferential_candidate_nomination: [],
+  other_candidate_nomination: [],
+  updated_candidate_ranking: [],
+};
+
 export const candidate_nomination: CandidateNominationResult = {
   preference_threshold: {
     percentage: 50,
@@ -1016,161 +1190,7 @@ export const candidate_nomination: CandidateNominationResult = {
     },
   ],
   political_group_candidate_nomination: [
-    {
-      pg_number: 1,
-      pg_name: "Political Group A",
-      pg_seats: 12,
-      preferential_candidate_nomination: [
-        {
-          number: 12,
-          votes: 200,
-        },
-        {
-          number: 1,
-          votes: 138,
-        },
-        {
-          number: 6,
-          votes: 100,
-        },
-        {
-          number: 7,
-          votes: 60,
-        },
-        {
-          number: 3,
-          votes: 55,
-        },
-        {
-          number: 5,
-          votes: 50,
-        },
-        {
-          number: 11,
-          votes: 50,
-        },
-        {
-          number: 4,
-          votes: 45,
-        },
-        {
-          number: 8,
-          votes: 40,
-        },
-      ],
-      other_candidate_nomination: [
-        {
-          number: 2,
-          votes: 20,
-        },
-        {
-          number: 9,
-          votes: 30,
-        },
-        {
-          number: 10,
-          votes: 20,
-        },
-      ],
-      updated_candidate_ranking: [
-        {
-          number: 12,
-          initials: "K.",
-          first_name: "Karin",
-          last_name: "Kok",
-          locality: "Test Location",
-          gender: "Female",
-        },
-        {
-          number: 1,
-          initials: "L.",
-          first_name: "Lidewij",
-          last_name: "Oud",
-          locality: "Test Location",
-          gender: "Female",
-        },
-        {
-          number: 6,
-          initials: "B.",
-          first_name: "Berta",
-          last_name: "Van der Weijden",
-          locality: "Test Location",
-          gender: "Female",
-        },
-        {
-          number: 7,
-          initials: "K.",
-          first_name: "Klaas",
-          last_name: "Oud",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 3,
-          initials: "M.",
-          first_name: "Marijke",
-          last_name: "Oud",
-          locality: "Test Location",
-          gender: "Female",
-        },
-        {
-          number: 5,
-          initials: "H.",
-          first_name: "Henk",
-          last_name: "Van der Weijden",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 11,
-          initials: "R.",
-          first_name: "Rolf",
-          last_name: "De Jong",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 4,
-          initials: "A.",
-          first_name: "Arie",
-          last_name: "Jansen",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 8,
-          initials: "S.",
-          first_name: "Sophie",
-          last_name: "Bakker",
-          locality: "Test Location",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "J.",
-          first_name: "Johan",
-          last_name: "Oud",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 9,
-          initials: "J.",
-          first_name: "Johan",
-          last_name: "De Vries",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 10,
-          initials: "M.",
-          first_name: "Marijke",
-          last_name: "Van den Berg",
-          locality: "Test Location",
-          gender: "Female",
-        },
-      ],
-    },
+    political_group_1_candidate_nomination,
     {
       pg_number: 2,
       pg_name: "Political Group B",
@@ -1210,14 +1230,7 @@ export const candidate_nomination: CandidateNominationResult = {
       ],
       updated_candidate_ranking: [],
     },
-    {
-      pg_number: 5,
-      pg_name: "Political Group E",
-      pg_seats: 0,
-      preferential_candidate_nomination: [],
-      other_candidate_nomination: [],
-      updated_candidate_ranking: [],
-    },
+    political_group_5_candidate_nomination,
     {
       pg_number: 6,
       pg_name: "Political Group F",
@@ -1241,6 +1254,61 @@ export const candidate_nomination: CandidateNominationResult = {
       preferential_candidate_nomination: [],
       other_candidate_nomination: [],
       updated_candidate_ranking: [],
+    },
+  ],
+};
+
+export const political_group_1_votes: PoliticalGroupVotes = {
+  number: 1,
+  total: 808,
+  candidate_votes: [
+    {
+      number: 1,
+      votes: 138,
+    },
+    {
+      number: 2,
+      votes: 20,
+    },
+    {
+      number: 3,
+      votes: 55,
+    },
+    {
+      number: 4,
+      votes: 45,
+    },
+    {
+      number: 5,
+      votes: 50,
+    },
+    {
+      number: 6,
+      votes: 100,
+    },
+    {
+      number: 7,
+      votes: 60,
+    },
+    {
+      number: 8,
+      votes: 40,
+    },
+    {
+      number: 9,
+      votes: 30,
+    },
+    {
+      number: 10,
+      votes: 20,
+    },
+    {
+      number: 11,
+      votes: 50,
+    },
+    {
+      number: 12,
+      votes: 200,
     },
   ],
 };
@@ -1290,60 +1358,7 @@ export const election_summary: ElectionSummary = {
   },
   recounted_polling_stations: [],
   political_group_votes: [
-    {
-      number: 1,
-      total: 808,
-      candidate_votes: [
-        {
-          number: 1,
-          votes: 138,
-        },
-        {
-          number: 2,
-          votes: 20,
-        },
-        {
-          number: 3,
-          votes: 55,
-        },
-        {
-          number: 4,
-          votes: 45,
-        },
-        {
-          number: 5,
-          votes: 50,
-        },
-        {
-          number: 6,
-          votes: 100,
-        },
-        {
-          number: 7,
-          votes: 60,
-        },
-        {
-          number: 8,
-          votes: 40,
-        },
-        {
-          number: 9,
-          votes: 30,
-        },
-        {
-          number: 10,
-          votes: 20,
-        },
-        {
-          number: 11,
-          votes: 50,
-        },
-        {
-          number: 12,
-          votes: 200,
-        },
-      ],
-    },
+    political_group_1_votes,
     {
       number: 2,
       total: 60,
@@ -1517,6 +1532,109 @@ export const election_summary: ElectionSummary = {
   ],
 };
 
+export const political_group_1: PoliticalGroup = {
+  number: 1,
+  name: "Political Group A",
+  candidates: [
+    {
+      number: 1,
+      initials: "L.",
+      first_name: "Lidewij",
+      last_name: "Oud",
+      locality: "Test Location",
+      gender: "Female",
+    },
+    {
+      number: 2,
+      initials: "J.",
+      first_name: "Johan",
+      last_name: "Oud",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 3,
+      initials: "M.",
+      first_name: "Marijke",
+      last_name: "Oud",
+      locality: "Test Location",
+      gender: "Female",
+    },
+    {
+      number: 4,
+      initials: "A.",
+      first_name: "Arie",
+      last_name: "Jansen",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 5,
+      initials: "H.",
+      first_name: "Henk",
+      last_name: "Van der Weijden",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 6,
+      initials: "B.",
+      first_name: "Berta",
+      last_name: "Van der Weijden",
+      locality: "Test Location",
+      gender: "Female",
+    },
+    {
+      number: 7,
+      initials: "K.",
+      first_name: "Klaas",
+      last_name: "Oud",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 8,
+      initials: "S.",
+      first_name: "Sophie",
+      last_name: "Bakker",
+      locality: "Test Location",
+      gender: "Female",
+    },
+    {
+      number: 9,
+      initials: "J.",
+      first_name: "Johan",
+      last_name: "De Vries",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 10,
+      initials: "M.",
+      first_name: "Marijke",
+      last_name: "Van den Berg",
+      locality: "Test Location",
+      gender: "Female",
+    },
+    {
+      number: 11,
+      initials: "R.",
+      first_name: "Rolf",
+      last_name: "De Jong",
+      locality: "Test Location",
+      gender: "Male",
+    },
+    {
+      number: 12,
+      initials: "K.",
+      first_name: "Karin",
+      last_name: "Kok",
+      locality: "Test Location",
+      gender: "Female",
+    },
+  ],
+};
+
 export const election: Election = {
   id: 3,
   name: "Test Election < 19 seats",
@@ -1528,108 +1646,7 @@ export const election: Election = {
   nomination_date: "2026-02-02",
   status: "DataEntryFinished",
   political_groups: [
-    {
-      number: 1,
-      name: "Political Group A",
-      candidates: [
-        {
-          number: 1,
-          initials: "L.",
-          first_name: "Lidewij",
-          last_name: "Oud",
-          locality: "Test Location",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "J.",
-          first_name: "Johan",
-          last_name: "Oud",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 3,
-          initials: "M.",
-          first_name: "Marijke",
-          last_name: "Oud",
-          locality: "Test Location",
-          gender: "Female",
-        },
-        {
-          number: 4,
-          initials: "A.",
-          first_name: "Arie",
-          last_name: "Jansen",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 5,
-          initials: "H.",
-          first_name: "Henk",
-          last_name: "Van der Weijden",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 6,
-          initials: "B.",
-          first_name: "Berta",
-          last_name: "Van der Weijden",
-          locality: "Test Location",
-          gender: "Female",
-        },
-        {
-          number: 7,
-          initials: "K.",
-          first_name: "Klaas",
-          last_name: "Oud",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 8,
-          initials: "S.",
-          first_name: "Sophie",
-          last_name: "Bakker",
-          locality: "Test Location",
-          gender: "Female",
-        },
-        {
-          number: 9,
-          initials: "J.",
-          first_name: "Johan",
-          last_name: "De Vries",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 10,
-          initials: "M.",
-          first_name: "Marijke",
-          last_name: "Van den Berg",
-          locality: "Test Location",
-          gender: "Female",
-        },
-        {
-          number: 11,
-          initials: "R.",
-          first_name: "Rolf",
-          last_name: "De Jong",
-          locality: "Test Location",
-          gender: "Male",
-        },
-        {
-          number: 12,
-          initials: "K.",
-          first_name: "Karin",
-          last_name: "Kok",
-          locality: "Test Location",
-          gender: "Female",
-        },
-      ],
-    },
+    political_group_1,
     {
       number: 2,
       name: "Political Group B",

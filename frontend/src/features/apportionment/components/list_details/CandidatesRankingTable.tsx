@@ -11,7 +11,7 @@ interface CandidatesRankingTableProps {
 
 export function CandidatesRankingTable({ candidateRanking }: CandidatesRankingTableProps) {
   return (
-    <Table id="candidates_ranking_table" className={cn(cls.table)}>
+    <Table id="candidates-ranking-table" className={cn(cls.table)}>
       <Table.Header>
         <Table.HeaderCell>{t("candidate.title")}</Table.HeaderCell>
         <Table.HeaderCell>{t("candidate.locality")}</Table.HeaderCell>

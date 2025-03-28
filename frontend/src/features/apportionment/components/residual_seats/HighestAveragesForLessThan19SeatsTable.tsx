@@ -17,7 +17,7 @@ export function HighestAveragesForLessThan19SeatsTable({
   politicalGroups,
 }: HighestAveragesForLessThan19SeatsTableProps) {
   return (
-    <Table id="highest_averages_for_less_than_19_seats_table" className={cls.table}>
+    <Table id="highest-averages-for-less-than-19-seats-table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>

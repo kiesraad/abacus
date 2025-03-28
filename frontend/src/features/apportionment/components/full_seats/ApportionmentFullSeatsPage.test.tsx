@@ -33,7 +33,7 @@ describe("ApportionmentFullSeatsPage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
 
     expect(await screen.findByRole("heading", { level: 2, name: "Hoe vaak haalde elke partij de kiesdeler?" }));
-    const full_seats_table = await screen.findByTestId("full_seats_table");
+    const full_seats_table = await screen.findByTestId("full-seats-table");
     expect(full_seats_table).toBeVisible();
     expect(full_seats_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal stemmen", ":", "Kiesdeler", "=", "Aantal volle zetels"],
@@ -48,7 +48,7 @@ describe("ApportionmentFullSeatsPage", () => {
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Hoeveel restzetels zijn er te verdelen?" }));
-    const residual_seats_calculation_table = await screen.findByTestId("residual_seats_calculation_table");
+    const residual_seats_calculation_table = await screen.findByTestId("residual-seats-calculation-table");
     expect(residual_seats_calculation_table).toBeVisible();
     expect(residual_seats_calculation_table).toHaveTableContent([
       ["Totaal aantal zetels", "15", ""],
@@ -76,8 +76,8 @@ describe("ApportionmentFullSeatsPage", () => {
         await screen.findByText("De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd"),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("full_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("residual_seats_calculation_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("full-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("residual-seats-calculation-table")).not.toBeInTheDocument();
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
@@ -98,8 +98,8 @@ describe("ApportionmentFullSeatsPage", () => {
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("full_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("residual_seats_calculation_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("full-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("residual-seats-calculation-table")).not.toBeInTheDocument();
     });
 
     test("Not possible because all lists are exhausted", async () => {
@@ -122,8 +122,8 @@ describe("ApportionmentFullSeatsPage", () => {
         ),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("full_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("residual_seats_calculation_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("full-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("residual-seats-calculation-table")).not.toBeInTheDocument();
     });
 
     test("Internal Server Error renders error page", async () => {

@@ -122,7 +122,7 @@ export function ApportionmentResidualSeatsPage() {
                   </>
                 )}
                 {absoluteMajorityChange && (
-                  <span id="absolute_majority_change_information" className={cls.absoluteMajorityChangeInformation}>
+                  <span id="absolute-majority-change-information" className={cls.absoluteMajorityChangeInformation}>
                     {t("apportionment.absolute_majority_change", {
                       pg_assigned_seat: absoluteMajorityChange.pg_assigned_seat,
                       pg_retracted_seat: absoluteMajorityChange.pg_retracted_seat,

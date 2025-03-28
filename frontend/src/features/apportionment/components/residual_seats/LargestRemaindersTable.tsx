@@ -20,7 +20,7 @@ export function LargestRemaindersTable({
     (pg_seat_assignment) => pg_seat_assignment.meets_remainder_threshold,
   );
   return (
-    <Table id="largest_remainders_table" className={cls.table}>
+    <Table id="largest-remainders-table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>

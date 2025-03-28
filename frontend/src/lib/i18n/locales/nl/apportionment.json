@@ -27,7 +27,7 @@
   "no_residual_seats_to_assign": "Er zijn geen restzetels te verdelen.",
   "number_of_seats": "Aantal raadszetels",
   "other_chosen_candidates": "Overige gekozen kandidaten",
-  "other_chosen_candidates_empty": "Er zijn geen overige aan de lijst toegewezen zetels.",
+  "other_chosen_candidates_empty": "Er zijn geen andere kandidaten gekozen.",
   "other_chosen_candidates_info": "De overige aan de lijst toegewezen zetels gaan naar de volgende kandidaten.",
   "political_group_assigned_nr_seats": {
     "singular": "{pg_name} heeft <strong>{num_seats} zetel</strong> toegewezen gekregen.",
@@ -36,7 +36,7 @@
   "preference_threshold": "Voorkeursdrempel",
   "preference_threshold_description": "{percentage}% van de kiesdeler",
   "preferentially_chosen_candidates": "Met voorkeur gekozen kandidaten",
-  "preferentially_chosen_candidates_empty": "Er zijn geen kandidaten met voorkeursstemmen gekozen. Geen kandidaat heeft meer dan {percentage}% van de kiesdeler gehaald.",
+  "preferentially_chosen_candidates_empty": "Geen van de kandidaten heeft meer dan {percentage}% van de kiesdeler gehaald. Niemand is met voorkeursstemmen gekozen.",
   "preferentially_chosen_candidates_info": "De volgende kandidaten zijn met voorkeursstemmen gekozen. Deze kandidaten hebben meer dan {percentage}% van de kiesdeler gehaald.",
   "quota": "Kiesdeler",
   "quota_description": "Benodigde stemmen per volle zetel",

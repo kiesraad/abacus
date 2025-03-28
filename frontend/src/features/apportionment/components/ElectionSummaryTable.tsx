@@ -21,7 +21,7 @@ export function ElectionSummaryTable({
   preferenceThreshold,
 }: ElectionSummaryTableProps) {
   return (
-    <Table id="election_summary_table" className={cn(cls.table, cls.electionSummaryTable)}>
+    <Table id="election-summary-table" className={cn(cls.table, cls.electionSummaryTable)}>
       <Table.Body>
         <Table.Row>
           <Table.HeaderCell scope="row" className={cn(cls.bt1Gray, "normal")}>

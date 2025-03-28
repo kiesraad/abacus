@@ -17,7 +17,7 @@ export function HighestAveragesForLessThan19SeatsTable({
   politicalGroups,
 }: HighestAveragesForLessThan19SeatsTableProps) {
   return (
-    <Table id="highest_averages_for_less_than_19_seats_table" className={cls.table}>
+    <Table id="highest-averages-for-less-than-19-seats-table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>
@@ -32,7 +32,7 @@ export function HighestAveragesForLessThan19SeatsTable({
           const average = highestAverageSteps[0]?.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
           const residual_seats = highestAverageSteps.filter((step) => {
             const change = step.change as HighestAverageAssignedSeat;
-            return change.selected_pg_number == pg_seat_assignment.pg_number;
+            return change.selected_pg_number === pg_seat_assignment.pg_number;
           }).length;
           return (
             <Table.Row key={pg_seat_assignment.pg_number}>

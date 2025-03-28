@@ -42,6 +42,7 @@ import { t } from "@kiesraad/i18n";
 import { ApportionmentLayout } from "./features/apportionment/components/ApportionmentLayout";
 import { ApportionmentPage } from "./features/apportionment/components/ApportionmentPage";
 import { ApportionmentFullSeatsPage } from "./features/apportionment/components/full_seats/ApportionmentFullSeatsPage";
+import { ApportionmentListDetailsPage } from "./features/apportionment/components/list_details/ApportionmentListDetailsPage";
 import { ApportionmentResidualSeatsPage } from "./features/apportionment/components/residual_seats/ApportionmentResidualSeatsPage";
 
 export const routes = createRoutesFromElements(
@@ -60,6 +61,7 @@ export const routes = createRoutesFromElements(
         <Route index element={<ElectionHomePage />} />
         <Route path="apportionment" element={<ApportionmentLayout />}>
           <Route index element={<ApportionmentPage />} />
+          <Route path=":pgNumber" element={<ApportionmentListDetailsPage />} />
           <Route path="details-residual-seats" element={<ApportionmentResidualSeatsPage />} />
           <Route path="details-full-seats" element={<ApportionmentFullSeatsPage />} />
         </Route>

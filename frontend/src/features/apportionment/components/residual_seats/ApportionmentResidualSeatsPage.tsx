@@ -1,11 +1,12 @@
 import { Link } from "react-router";
 
 import { AbsoluteMajorityReassignedSeat, useElection } from "@/api";
-import { Alert, FormLayout, PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import cls from "../Apportionment.module.css";
+import { ApportionmentError } from "../ApportionmentError";
 import { HighestAveragesFor19OrMoreSeatsTable } from "./HighestAveragesFor19OrMoreSeatsTable";
 import { HighestAveragesForLessThan19SeatsTable } from "./HighestAveragesForLessThan19SeatsTable";
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
@@ -27,7 +28,7 @@ function render_information(seats: number, residualSeats: number) {
   return (
     <span className={cls.tableInformation}>
       {tx(
-        `apportionment.full_seats_information_link.${residualSeats > 1 ? "plural" : "singular"}`,
+        `apportionment.full_seats_information_link.${residualSeats === 1 ? "singular" : "plural"}`,
         {
           link: (title) => <Link to="../details-full-seats">{title}</Link>,
         },
@@ -50,12 +51,7 @@ export function ApportionmentResidualSeatsPage() {
         {render_title_and_header()}
         <main>
           <article>
-            <FormLayout.Alert>
-              <Alert type="error">
-                <h2>{t("apportionment.not_available")}</h2>
-                <p>{t(`error.api_error.${error.reference}`)}</p>
-              </Alert>
-            </FormLayout.Alert>
+            <ApportionmentError error={error} />
           </article>
         </main>
       </>
@@ -110,7 +106,7 @@ export function ApportionmentResidualSeatsPage() {
                         <h2 className={cls.tableTitle}>{t("apportionment.remaining_residual_seats_assignment")}</h2>
                         <span className={cls.tableInformation}>
                           {t(
-                            `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length > 1 ? "plural" : "singular"}`,
+                            `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length === 1 ? "singular" : "plural"}`,
                             { num_seats: highestAverageSteps.length },
                           )}
                         </span>
@@ -126,7 +122,7 @@ export function ApportionmentResidualSeatsPage() {
                   </>
                 )}
                 {absoluteMajorityChange && (
-                  <span id="absolute_majority_change_information" className={cls.absoluteMajorityChangeInformation}>
+                  <span id="absolute-majority-change-information" className={cls.absoluteMajorityChangeInformation}>
                     {t("apportionment.absolute_majority_change", {
                       pg_assigned_seat: absoluteMajorityChange.pg_assigned_seat,
                       pg_retracted_seat: absoluteMajorityChange.pg_retracted_seat,

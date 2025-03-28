@@ -19,7 +19,7 @@ export function HighestAveragesFor19OrMoreSeatsTable({
   return (
     <div className={cls.scrollable}>
       <Table
-        id="highest_averages_for_19_or_more_seats_table"
+        id="highest-averages-for-19-or-more-seats-table"
         className={cn(cls.table, cls.residualSeats19OrMoreSeatsTable)}
       >
         <Table.Header>

@@ -6,22 +6,9 @@ import { routes } from "@/routes";
 import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@/testing";
 import { getElectionMockData } from "@/testing/api-mocks";
 
-import {
-  election as election_19_or_more_seats,
-  election_summary as election_summary_19_or_more_seats,
-  seat_assignment as seat_assignment_19_or_more_seats,
-} from "../../testing/19-or-more-seats";
-import {
-  election as election_absolute_majority_change,
-  election_summary as election_summary_absolute_majority_change,
-  seat_assignment as seat_assignment_absolute_majority_change,
-} from "../../testing/absolute-majority-change";
-import {
-  election as election_less_than_19_seats,
-  election_summary as election_summary_less_than_19_seats,
-  largest_remainder_steps,
-  seat_assignment as seat_assignment_less_than_19_seats,
-} from "../../testing/less-than-19-seats";
+import * as gte19Seats from "../../testing/19-or-more-seats";
+import * as absoluteMajorityChange from "../../testing/absolute-majority-change";
+import * as lt19Seats from "../../testing/less-than-19-seats";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentResidualSeatsPage } from "./ApportionmentResidualSeatsPage";
 
@@ -36,10 +23,11 @@ const renderApportionmentResidualSeatsPage = () =>
 
 describe("ApportionmentResidualSeatsPage", () => {
   test("Residual seats assignment table for 19 or more seats visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_19_or_more_seats));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(gte19Seats.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      seat_assignment: seat_assignment_19_or_more_seats,
-      election_summary: election_summary_19_or_more_seats,
+      seat_assignment: gte19Seats.seat_assignment,
+      candidate_nomination: gte19Seats.candidate_nomination,
+      election_summary: gte19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
 
     renderApportionmentResidualSeatsPage();
@@ -53,7 +41,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       }),
     );
     const highest_averages_for_19_or_more_seats_table = await screen.findByTestId(
-      "highest_averages_for_19_or_more_seats_table",
+      "highest-averages-for-19-or-more-seats-table",
     );
     expect(highest_averages_for_19_or_more_seats_table).toBeVisible();
     expect(highest_averages_for_19_or_more_seats_table).toHaveTableContent([
@@ -66,16 +54,17 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["", "Restzetel toegekend aan lijst", "5", "2", "1", "4", ""],
     ]);
 
-    expect(screen.queryByTestId("largest_remainders_table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest-averages-for-less-than-19-seats-table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats assignment tables for less than 19 seats with both systems visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
+  test("Residual seats assignment tables for less than 19 seats with both methods visible", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      seat_assignment: seat_assignment_less_than_19_seats,
-      election_summary: election_summary_less_than_19_seats,
+      seat_assignment: lt19Seats.seat_assignment,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
 
     renderApportionmentResidualSeatsPage();
@@ -88,7 +77,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         name: "De restzetels gaan naar de partijen met de grootste overschotten",
       }),
     );
-    const largest_remainders_table = await screen.findByTestId("largest_remainders_table");
+    const largest_remainders_table = await screen.findByTestId("largest-remainders-table");
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
@@ -98,7 +87,7 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     expect(await screen.findByRole("heading", { level: 2, name: "Verdeling overige restzetels" }));
     const highest_averages_for_less_than_19_seats_table = await screen.findByTestId(
-      "highest_averages_for_less_than_19_seats_table",
+      "highest-averages-for-less-than-19-seats-table",
     );
     expect(highest_averages_for_less_than_19_seats_table).toBeVisible();
     expect(highest_averages_for_less_than_19_seats_table).toHaveTableContent([
@@ -117,14 +106,15 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats assignment tables for less than 19 seats with only remainder system visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
+  test("Residual seats assignment tables for less than 19 seats with only largest remainders method visible", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: {
-        ...seat_assignment_less_than_19_seats,
-        steps: largest_remainder_steps,
+        ...lt19Seats.seat_assignment,
+        steps: lt19Seats.largest_remainder_steps,
       },
-      election_summary: election_summary_less_than_19_seats,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
 
     renderApportionmentResidualSeatsPage();
@@ -137,7 +127,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         name: "De restzetels gaan naar de partijen met de grootste overschotten",
       }),
     );
-    const largest_remainders_table = await screen.findByTestId("largest_remainders_table");
+    const largest_remainders_table = await screen.findByTestId("largest-remainders-table");
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
@@ -145,16 +135,17 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["2", "Political Group B", "0", "60", "", "1"],
     ]);
 
-    expect(screen.queryByTestId("highest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest-averages-for-19-or-more-seats-table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest-averages-for-less-than-19-seats-table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
   });
 
   test("Residual seats assignment table for less than 19 seats and absolute majority change information visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_absolute_majority_change));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(absoluteMajorityChange.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      seat_assignment: seat_assignment_absolute_majority_change,
-      election_summary: election_summary_absolute_majority_change,
+      seat_assignment: absoluteMajorityChange.seat_assignment,
+      candidate_nomination: absoluteMajorityChange.candidate_nomination,
+      election_summary: absoluteMajorityChange.election_summary,
     } satisfies ElectionApportionmentResponse);
 
     renderApportionmentResidualSeatsPage();
@@ -167,7 +158,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         name: "De restzetels gaan naar de partijen met de grootste overschotten",
       }),
     );
-    const largest_remainders_table = await screen.findByTestId("largest_remainders_table");
+    const largest_remainders_table = await screen.findByTestId("largest-remainders-table");
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
@@ -178,17 +169,17 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["5", "Political Group E", "1", "112", "11/15", "0"],
     ]);
 
-    expect(await screen.findByTestId("absolute_majority_change_information")).toHaveTextContent(
+    expect(await screen.findByTestId("absolute-majority-change-information")).toHaveTextContent(
       "Overeenkomstig artikel P 9 van de Kieswet (volstrekte meerderheid) wordt aan lijst 1 alsnog één zetel toegewezen en vervalt daartegenover één zetel, die eerder was toegewezen aan lijst 4.",
     );
 
-    expect(screen.queryByTestId("highest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest-averages-for-19-or-more-seats-table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest-averages-for-less-than-19-seats-table")).not.toBeInTheDocument();
   });
 
   describe("Apportionment not yet available", () => {
     test("Not available until data entry is finalised", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 412, {
         error: "Election data entry first needs to be finalised",
         fatal: false,
@@ -205,14 +196,14 @@ describe("ApportionmentResidualSeatsPage", () => {
         await screen.findByText("De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd"),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("highest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest_remainders_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest-averages-for-19-or-more-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest-averages-for-less-than-19-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
     });
 
-    test("Not available because drawing of lots is not implemented yet", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
+    test("Not possible because drawing of lots is not implemented yet", async () => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
@@ -224,15 +215,41 @@ describe("ApportionmentResidualSeatsPage", () => {
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
 
-      expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
+      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("highest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest_remainders_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest-averages-for-19-or-more-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest-averages-for-less-than-19-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
+    });
+
+    test("Not possible because all lists are exhausted", async () => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
+      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+        error: "All lists are exhausted, not enough candidates to fill all seats",
+        fatal: false,
+        reference: "AllListsExhausted",
+      } satisfies ErrorResponse);
+
+      renderApportionmentResidualSeatsPage();
+
+      // Wait for the page to be loaded
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+
+      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
+      expect(
+        await screen.findByText(
+          "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
+        ),
+      ).toBeVisible();
+
+      expect(screen.queryByTestId("highest-averages-for-19-or-more-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest-averages-for-less-than-19-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
     });
 
     test("Internal Server Error renders error page", async () => {
@@ -242,7 +259,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       });
       const router = setupTestRouter(routes);
 
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 500, {
         error: "Internal Server Error",
         fatal: true,

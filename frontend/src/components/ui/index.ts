@@ -9,6 +9,7 @@ export * from "./Button/Button";
 export * from "./CheckboxAndRadio";
 export * from "./DisplayFraction/DisplayFraction";
 export * from "./Feedback";
+export * from "./FileInput/FileInput";
 export * from "./Form";
 export * from "./FormField/FormField";
 export * from "./Icon";

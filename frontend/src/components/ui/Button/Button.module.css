@@ -1,5 +1,6 @@
 button.button,
-a.button {
+a.button,
+label.button {
   --button-border-width: 1px;
 
   color: var(--base-white);

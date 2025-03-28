@@ -47,9 +47,9 @@ describe("ElectionStatus", () => {
 
     expect(headings[0]).toHaveTextContent("Invoer bezig (2)");
     expect(tables[0]).toHaveTableContent([
-      ["Nummer", "Stembureau", "Voortgang"],
-      ["35", "Testschool 1e invoer", "60%"],
-      ["36", "Testbuurthuis 2e invoer", "20%"],
+      ["Nummer", "Stembureau", "Invoerder", "Voortgang"],
+      ["35", "Testschool 1e invoer", "Sanne Molenaar", "60%"],
+      ["36", "Testbuurthuis 2e invoer", "Jayden Ahmen", "20%"],
     ]);
 
     const inProgressRows = within(tables[0]!).getAllByRole("row");
@@ -58,8 +58,8 @@ describe("ElectionStatus", () => {
 
     expect(headings[1]).toHaveTextContent("Eerste invoer klaar (1)");
     expect(tables[1]).toHaveTableContent([
-      ["Nummer", "Stembureau", "Afgerond op"],
-      ["34", "Testplek", "vandaag 10:20"],
+      ["Nummer", "Stembureau", "Invoerder", "Afgerond op"],
+      ["34", "Testplek", "Sanne Molenaar", "vandaag 10:20"],
     ]);
 
     expect(headings[2]).toHaveTextContent("Werkvoorraad (1)");

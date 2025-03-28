@@ -21,7 +21,8 @@
   th[scope="col"] {
     height: 2.75rem;
     line-height: 1.125rem;
-    padding: 0.75rem 1.5rem;
+    padding: 0 1.5rem;
+
     &:global(.link-cell-padding) {
       padding-right: 4.5rem;
     }
@@ -31,7 +32,8 @@
   td {
     height: 3.5rem;
     line-height: 1.25rem;
-    padding: 1rem 1.5rem;
+    padding: 0 1.5rem;
+
     &:global(.link-cell-padding) {
       padding-right: 4.5rem;
     }

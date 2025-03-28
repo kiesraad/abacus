@@ -1,54 +1,19 @@
-use std::time::Instant;
-
-use models::PdfModel;
-use tracing::{debug, info, warn};
-
-use crate::APIError;
-use typst_pdf::{PdfOptions, PdfStandard, PdfStandards};
-
-use self::world::PdfWorld;
-
 pub mod models;
-mod world;
+
+#[cfg(feature = "embed-typst")]
+mod embedded;
+
+#[cfg(not(feature = "embed-typst"))]
+mod external;
+
+#[cfg(feature = "embed-typst")]
+pub use embedded::{PdfGenError, generate_pdf};
+
+#[cfg(not(feature = "embed-typst"))]
+pub use external::{PdfGenError, generate_pdf};
 
 pub struct PdfGenResult {
     pub buffer: Vec<u8>,
-}
-
-pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
-    let start = Instant::now();
-    let mut world = PdfWorld::new();
-    world.set_input_model(model);
-
-    let compile_start = Instant::now();
-    let result = typst::compile(&world);
-    let document = result
-        .output
-        .map_err(|err| APIError::PdfGenError(err.to_vec()))?;
-    info!("Compile took {} ms", compile_start.elapsed().as_millis());
-
-    info!("{} warnings", result.warnings.len());
-    result.warnings.iter().for_each(|warning| {
-        warn!("Warning: {:?}", warning);
-    });
-
-    debug!("Generating PDF...");
-    let pdf_gen_start = Instant::now();
-    let pdf_standards =
-        PdfStandards::new(&[PdfStandard::A_2b]).expect("PDF standards should be valid");
-    let pdf_options = PdfOptions {
-        standards: pdf_standards,
-        ..Default::default()
-    };
-    let buffer = typst_pdf::pdf(&document, &pdf_options)
-        .map_err(|err| APIError::PdfGenError(err.to_vec()))?;
-    debug!(
-        "PDF generation took {} ms",
-        pdf_gen_start.elapsed().as_millis()
-    );
-
-    info!("Finished in {} ms", start.elapsed().as_millis());
-    Ok(PdfGenResult { buffer })
 }
 
 #[cfg(test)]
@@ -60,6 +25,7 @@ pub(crate) mod tests {
     use super::*;
     use crate::{
         election::{Election, ElectionCategory, ElectionStatus, tests::election_fixture},
+        pdf_gen::models::PdfModel,
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
     };

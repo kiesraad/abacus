@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionProvider, ElectionStatusProvider, TestUserProvider } from "@kiesraad/api";
-import { ElectionRequestHandler } from "@kiesraad/api-mocks";
-import { overrideOnce, render, screen, server } from "@kiesraad/test";
+import { ElectionProvider, ElectionStatusProvider, TestUserProvider } from "@/api";
+import { overrideOnce, render, screen, server } from "@/testing";
+import { ElectionRequestHandler } from "@/testing/api-mocks";
 
 import { ElectionHomePage } from "./ElectionHomePage";
 

@@ -1,15 +1,11 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import {
-  ElectionListRequestHandler,
-  ElectionRequestHandler,
-  electionStatusMockResponse,
-  ElectionStatusRequestHandler,
-} from "@kiesraad/api-mocks";
+import { ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler } from "@kiesraad/api-mocks";
 import { expectErrorPage, expectNotFound, overrideOnce, Providers, server, setupTestRouter } from "@kiesraad/test";
 
 import { routes } from "./routes";
+import { statusResponseMock } from "./testing/api-mocks/ElectionStatusMockData";
 
 const renderWithRouter = () => {
   const router = setupTestRouter(routes);
@@ -64,7 +60,7 @@ describe("routes", () => {
   });
 
   test("Error page when polling station is finalised", async () => {
-    overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
+    overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
     const router = renderWithRouter();
     await router.navigate("/elections/1/data-entry/2/1");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/2/1");

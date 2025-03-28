@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 
-import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
-import { getElectionMockData } from "@kiesraad/api-mocks";
-import { overrideOnce, render, screen } from "@kiesraad/test";
+import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@/api";
+import { overrideOnce, render, screen } from "@/testing";
+import { getElectionMockData } from "@/testing/api-mocks";
 
 import { ElectionStatusPage } from "./ElectionStatusPage";
 

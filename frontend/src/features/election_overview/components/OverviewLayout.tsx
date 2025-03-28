@@ -1,8 +1,8 @@
 import { Outlet } from "react-router";
 
-import { ElectionListProvider } from "@/api";
+import { AppLayout } from "@/components/ui";
 
-import { AppLayout } from "@kiesraad/ui";
+import { ElectionListProvider } from "../hooks/ElectionListProvider";
 
 export function OverviewLayout() {
   return (

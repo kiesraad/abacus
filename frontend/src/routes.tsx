@@ -1,5 +1,7 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router";
 
+import { DevHomePage } from "@/app/DevHomePage";
+import { ElectionLayout } from "@/app/ElectionLayout";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { CheckAndSaveForm } from "@/components/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AccountSetupPage } from "@/features/account/components/AccountSetupPage";
@@ -8,19 +10,21 @@ import { LoginPage } from "@/features/account/components/LoginPage";
 import { Logout } from "@/features/account/components/Logout";
 import { UserHomePage } from "@/features/account/components/UserHomePage";
 import { AdministratorLayout } from "@/features/AdministratorLayout";
+import { ApportionmentLayout } from "@/features/apportionment/components/ApportionmentLayout";
+import { ApportionmentPage } from "@/features/apportionment/components/ApportionmentPage";
+import { ApportionmentFullSeatsPage } from "@/features/apportionment/components/full_seats/ApportionmentFullSeatsPage";
+import { ApportionmentResidualSeatsPage } from "@/features/apportionment/components/residual_seats/ApportionmentResidualSeatsPage";
 import { CandidatesVotesPage } from "@/features/data_entry/components/CandidatesVotesPage";
 import { DataEntryHomePage } from "@/features/data_entry/components/DataEntryHomePage";
 import { DataEntryLayout } from "@/features/data_entry/components/DataEntryLayout";
 import { DifferencesPage } from "@/features/data_entry/components/DifferencesPage";
 import { RecountedPage } from "@/features/data_entry/components/RecountedPage";
 import { VotersAndVotesPage } from "@/features/data_entry/components/VotersAndVotesPage";
-import { DevHomePage } from "@/features/DevHomePage";
-import { ElectionHomePage } from "@/features/election/components/ElectionHomePage";
-import { ElectionLayout } from "@/features/election/components/ElectionLayout";
-import { ElectionReportPage } from "@/features/election/components/ElectionReportPage";
-import { ElectionStatusPage } from "@/features/election/components/ElectionStatusPage";
-import { OverviewLayout } from "@/features/election/components/OverviewLayout";
-import { OverviewPage } from "@/features/election/components/OverviewPage";
+import { ElectionHomePage } from "@/features/election_management/components/ElectionHomePage";
+import { ElectionReportPage } from "@/features/election_management/components/ElectionReportPage";
+import { OverviewLayout } from "@/features/election_overview/components/OverviewLayout";
+import { OverviewPage } from "@/features/election_overview/components/OverviewPage";
+import { ElectionStatusPage } from "@/features/election_status/components/ElectionStatusPage";
 import { LogsHomePage } from "@/features/logs/components/LogsHomePage";
 import { NotAvailableInMock } from "@/features/NotAvailableInMock";
 import { NotFoundPage } from "@/features/NotFoundPage";
@@ -36,13 +40,7 @@ import { UserCreateTypePage } from "@/features/users/components/create/UserCreat
 import { UserUpdatePage } from "@/features/users/components/update/UserUpdatePage";
 import { UserListPage } from "@/features/users/components/UserListPage";
 import { WorkstationsHomePage } from "@/features/workstations/components/WorkstationsHomePage";
-
-import { t } from "@kiesraad/i18n";
-
-import { ApportionmentLayout } from "./features/apportionment/components/ApportionmentLayout";
-import { ApportionmentPage } from "./features/apportionment/components/ApportionmentPage";
-import { ApportionmentFullSeatsPage } from "./features/apportionment/components/full_seats/ApportionmentFullSeatsPage";
-import { ApportionmentResidualSeatsPage } from "./features/apportionment/components/residual_seats/ApportionmentResidualSeatsPage";
+import { t } from "@/lib/i18n";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />} errorElement={<ErrorBoundary />}>

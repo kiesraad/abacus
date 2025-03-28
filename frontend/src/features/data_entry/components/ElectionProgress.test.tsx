@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, Mock, test, vi } from "vitest";
 
-import { useElectionStatus } from "@kiesraad/api";
+import { useElectionStatus } from "@/api";
 
 import { ElectionProgress } from "./ElectionProgress";
 

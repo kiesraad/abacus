@@ -1,8 +1,6 @@
 import * as React from "react";
 
-import { DataEntryStatusName, Election, ElectionStatusResponseEntry, PollingStation } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { IconPlus } from "@kiesraad/icon";
+import { DataEntryStatusName, Election, ElectionStatusResponseEntry, PollingStation } from "@/api";
 import {
   Badge,
   Button,
@@ -12,8 +10,10 @@ import {
   ProgressBar,
   ProgressBarColorClass,
   Table,
-} from "@kiesraad/ui";
-import { formatDateTime } from "@kiesraad/util";
+} from "@/components/ui";
+import { t } from "@/lib/i18n";
+import { IconPlus } from "@/lib/icon";
+import { formatDateTime } from "@/lib/util";
 
 import cls from "./ElectionStatus.module.css";
 

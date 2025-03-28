@@ -1,10 +1,11 @@
 import { Link } from "react-router";
 
+import { useApiState, useUserRole } from "@/api";
 import { MockTest } from "@/components/MockTest";
-
-import { ElectionListProvider, useApiState, useElectionList, useUserRole } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { AppLayout, PageTitle } from "@kiesraad/ui";
+import { AppLayout, PageTitle } from "@/components/ui";
+import { ElectionListProvider } from "@/features/election_overview/hooks/ElectionListProvider";
+import { useElectionList } from "@/features/election_overview/hooks/useElectionList";
+import { t } from "@/lib/i18n";
 
 function TypistLinks() {
   const { electionList } = useElectionList();

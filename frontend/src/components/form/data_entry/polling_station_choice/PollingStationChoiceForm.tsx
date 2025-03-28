@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { DataEntryStatusName, PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
+import { DataEntryStatusName, PollingStation, useElection, useElectionStatus, useUser } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
@@ -23,6 +23,7 @@ const DEFINITIVE_POLLING_STATION_ALERT: string = t("polling_station_choice.polli
 
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
+  const user = useUser();
 
   const { election, pollingStations } = useElection();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
@@ -50,15 +51,25 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
     const parsedStationNumber = parseIntUserInput(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const pollingStationStatus = electionStatus.statuses.find(
-      (status) => status.polling_station_id === pollingStation?.id,
-    )?.status;
+    const statusEntry = electionStatus.statuses.find((status) => status.polling_station_id === pollingStation?.id);
+    const pollingStationStatus = statusEntry?.status;
     const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
 
     if (pollingStationStatus && firstAndSecondEntryFinished.includes(pollingStationStatus)) {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
       setLoading(false);
       return;
+    }
+
+    if (pollingStationStatus) {
+      if (
+        (pollingStationStatus === "first_entry_in_progress" && statusEntry.first_entry_user_id !== user?.user_id) ||
+        (pollingStationStatus === "second_entry_in_progress" && statusEntry.second_entry_user_id !== user?.user_id)
+      ) {
+        setAlert(DEFINITIVE_POLLING_STATION_ALERT);
+        setLoading(false);
+        return;
+      }
     }
 
     if (pollingStation) {
@@ -72,6 +83,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
   const unfinished = electionStatus.statuses
     .filter((status) => ["first_entry_in_progress", "second_entry_in_progress"].includes(status.status))
+    .filter((status) => status.first_entry_user_id === user?.user_id || status.second_entry_user_id === user?.user_id)
     .map((status) => ({
       pollingStation: pollingStations.find((ps) => ps.id === status.polling_station_id),
       status: status.status,
@@ -82,6 +94,10 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     return status !== "definitive" && status !== "entries_different";
   });
 
+  if (!user) {
+    return <div>Unauthenticated</div>;
+  }
+
   return (
     <form
       onSubmit={(e) => {
@@ -90,7 +106,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       }}
     >
       {unfinished.length > 0 && (
-        <div className="mb-lg">
+        <div className="mb-lg" id="unfinished-list">
           <Alert type="notify" variant="no-icon">
             <h2>{t("polling_station_choice.unfinished_input_title")}</h2>
             <p>{t("polling_station_choice.unfinished_input_content")}</p>

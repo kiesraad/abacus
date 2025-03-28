@@ -1,11 +1,17 @@
 import { waitForElementToBeRemoved } from "@testing-library/dom";
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { routes } from "@/routes";
 
-import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
+import {
+  ElectionProvider,
+  ElectionStatusProvider,
+  ElectionStatusResponse,
+  LoginResponse,
+  useUser,
+} from "@kiesraad/api";
 import {
   electionDetailsMockResponse,
   ElectionListRequestHandler,
@@ -15,6 +21,15 @@ import {
 import { overrideOnce, Providers, render, screen, server, setupTestRouter, within } from "@kiesraad/test";
 
 import { DataEntryHomePage } from "./DataEntryHomePage";
+
+vi.mock("../../../api/useUser");
+
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
+};
 
 const renderDataEntryHomePage = () =>
   render(
@@ -27,6 +42,7 @@ const renderDataEntryHomePage = () =>
 
 describe("DataEntryHomePage", () => {
   beforeEach(() => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   });
@@ -73,10 +89,10 @@ describe("DataEntryHomePage", () => {
   test("Resume input visible when some are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { polling_station_id: 1, status: "first_entry_in_progress" },
+        { polling_station_id: 1, status: "first_entry_in_progress", first_entry_user_id: testUser.user_id },
         { polling_station_id: 2, status: "first_entry_not_started" },
       ],
-    });
+    } satisfies ElectionStatusResponse);
     renderDataEntryHomePage();
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText("Je hebt nog een openstaande invoer")).toBeVisible();

@@ -20,7 +20,7 @@ export function DataEntryLayout() {
     throw new NotFoundError("error.polling_station_not_found");
   }
 
-  if (pollingStationStatus === "definitive") {
+  if (pollingStationStatus.status === "definitive") {
     throw new Error("error.polling_station_already_definitive");
   }
 
@@ -31,7 +31,7 @@ export function DataEntryLayout() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          {pollingStationStatus && <Badge type={pollingStationStatus} />}
+          {pollingStationStatus.status && <Badge type={pollingStationStatus.status} />}
         </section>
         <section>
           <AbortDataEntryControl />

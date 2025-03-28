@@ -27,7 +27,9 @@ export function PollingStationSelector({
   setAlert,
   handleSubmit,
 }: PollingStationSelectorProps) {
-  const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id);
+  const { status: currentPollingStationStatus, assignedToDifferentUser } = usePollingStationStatus(
+    currentPollingStation?.id,
+  );
   const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
 
   return (
@@ -73,6 +75,19 @@ export function PollingStationSelector({
                     {tx("polling_station_choice.has_already_been_filled_twice", undefined, {
                       nr: currentPollingStation.number,
                       name: currentPollingStation.name,
+                    })}
+                  </span>
+                </div>
+              );
+            } else if (assignedToDifferentUser) {
+              return (
+                <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.warning)}>
+                  <span className={cls.icon}>
+                    <Icon icon={<IconWarning aria-label={t("contains_warning")} />} color="warning" />
+                  </span>
+                  <span>
+                    {tx("polling_station_choice.assigned_to_different_user", undefined, {
+                      nr: currentPollingStation.number,
                     })}
                   </span>
                 </div>

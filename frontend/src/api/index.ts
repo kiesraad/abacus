@@ -16,4 +16,3 @@ export * from "./useElectionStatusRequest";
 export * from "./useInitialApiGet";
 export * from "./useUser";
 export * from "./useUserRole";
-export * from "./log";

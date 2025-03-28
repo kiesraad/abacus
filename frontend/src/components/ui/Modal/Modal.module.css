@@ -16,6 +16,10 @@
     max-width: 90%;
     width: 32.5rem;
 
+    /* Show scrollbar if the modal is higher than the viewport */
+    max-height: calc(100% - 2rem);
+    overflow-y: auto;
+
     > button {
       position: absolute;
       top: 1.5rem;

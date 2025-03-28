@@ -78,6 +78,10 @@ export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 export type AUDIT_LOG_LIST_REQUEST_PARAMS = Record<string, never>;
 export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 
+// /api/log-users
+export type AUDIT_LOG_LIST_USERS_REQUEST_PARAMS = Record<string, never>;
+export type AUDIT_LOG_LIST_USERS_REQUEST_PATH = `/api/log-users`;
+
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;
@@ -184,10 +188,9 @@ export interface AuditLogEvent {
   ip: string;
   message?: string | null;
   time: string;
-  /** user defaults */
-  userFullname?: string;
+  userFullname: string;
   userId: number;
-  userRole?: string;
+  userRole: Role;
   username: string;
   workstation?: number | null;
 }
@@ -197,6 +200,13 @@ export interface AuditLogListResponse {
   page: number;
   pages: number;
   perPage: number;
+}
+
+export interface AuditLogUser {
+  fullname: string;
+  id: number;
+  role: Role;
+  username: string;
 }
 
 /**

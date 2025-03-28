@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 
-import { render, screen, within } from "@kiesraad/test";
+import { render, screen, within } from "@/testing";
 
 import { Empty, PollingStationStatus } from "./ElectionStatus.stories";
 

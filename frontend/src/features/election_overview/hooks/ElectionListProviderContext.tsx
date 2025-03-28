@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import { Election } from "@kiesraad/api";
+import { Election } from "@/api";
 
 export interface iElectionListProviderContext {
   electionList: Election[];

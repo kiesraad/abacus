@@ -1,7 +1,7 @@
-import { ElectionStatus } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { IconCheckHeart, IconCheckVerified } from "@kiesraad/icon";
-import { Icon } from "@kiesraad/ui";
+import { ElectionStatus } from "@/api";
+import { Icon } from "@/components/ui";
+import { t } from "@/lib/i18n";
+import { IconCheckHeart, IconCheckVerified } from "@/lib/icon";
 
 function statusIcon(status: ElectionStatus) {
   switch (status) {

@@ -1,7 +1,9 @@
 import type { Story } from "@ladle/react";
 
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
+
 import { ElectionStatus } from "./ElectionStatus";
-import { mockElection, mockPollingStations } from "./mockData";
 
 interface StoryProps {
   navigate: (path: string) => void;
@@ -38,19 +40,19 @@ export const PollingStationStatus: Story<StoryProps> = ({ navigate }) => {
           second_entry_progress: 20,
         },
       ]}
-      election={mockElection}
-      pollingStations={mockPollingStations}
+      election={electionMockData}
+      pollingStations={pollingStationMockData}
       navigate={navigate}
     />
   );
 };
 
 export const Empty: Story<StoryProps> = ({ navigate }) => (
-  <ElectionStatus statuses={[]} election={mockElection} pollingStations={[]} navigate={navigate} />
+  <ElectionStatus statuses={[]} election={electionMockData} pollingStations={[]} navigate={navigate} />
 );
 
 export default {
-  title: "App / ElectionStatus",
+  title: "Features / Election status",
   argTypes: {
     background: {
       control: { type: "background" },

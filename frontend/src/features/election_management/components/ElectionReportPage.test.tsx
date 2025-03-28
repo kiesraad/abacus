@@ -1,11 +1,10 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { ElectionProvider, ElectionStatusProvider } from "@/api";
 import { routes } from "@/routes";
-
-import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
-import { ElectionRequestHandler } from "@kiesraad/api-mocks";
-import { expectErrorPage, overrideOnce, Providers, render, screen, server, setupTestRouter } from "@kiesraad/test";
+import { expectErrorPage, overrideOnce, Providers, render, screen, server, setupTestRouter } from "@/testing";
+import { ElectionRequestHandler } from "@/testing/api-mocks";
 
 import { ElectionReportPage } from "./ElectionReportPage";
 

@@ -3,14 +3,10 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { PollingStationChoiceForm } from "@/components/form/data_entry/polling_station_choice/PollingStationChoiceForm";
+import { electionDetailsMockResponse, ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks";
+import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
-import {
-  electionDetailsMockResponse,
-  ElectionRequestHandler,
-  electionStatusMockResponse,
-  ElectionStatusRequestHandler,
-} from "@kiesraad/api-mocks";
 import { overrideOnce, render, renderReturningRouter, screen, server, within } from "@kiesraad/test";
 
 function renderPollingStationChoicePage() {
@@ -138,7 +134,7 @@ describe("Test PollingStationChoiceForm", () => {
 
     test("Selecting a valid, but finalised polling station shows alert", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
       const user = userEvent.setup();
       render(
         <ElectionProvider electionId={1}>
@@ -173,7 +169,7 @@ describe("Test PollingStationChoiceForm", () => {
 
     test("Selecting a valid, but with different entries polling station shows alert", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
       const user = userEvent.setup();
       render(
         <ElectionProvider electionId={1}>
@@ -247,7 +243,7 @@ describe("Test PollingStationChoiceForm", () => {
   describe("Polling station list", () => {
     test("Polling station list is displayed", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
 
       const user = userEvent.setup();
       renderPollingStationChoicePage();

@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
-import { DataEntryStatusName, useElectionStatus } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { Progress, ProgressBar } from "@kiesraad/ui";
+import { DataEntryStatusName, useElectionStatus } from "@/api";
+import { Progress, ProgressBar } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
 type Stat = {
   title: string;

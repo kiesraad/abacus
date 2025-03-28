@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { ElectionStatus } from "@kiesraad/api";
+import { ElectionStatus } from "@/api";
 
 import { ElectionStatusWithIcon, HeaderElectionStatusWithIcon } from "./ElectionStatusWithIcon";
 

@@ -1,8 +1,6 @@
 import { userEvent, UserEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { mockElection } from "@/components/election/status/mockData";
-
 import {
   ClaimDataEntryResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
@@ -54,7 +52,7 @@ const initialValues: PollingStationResults = {
     other_explanation_count: 0,
     no_explanation_count: 0,
   },
-  political_group_votes: mockElection.political_groups.map((pg) => ({
+  political_group_votes: electionMockData.political_groups.map((pg) => ({
     number: pg.number,
     total: 0,
     candidate_votes: pg.candidates.map((c) => ({

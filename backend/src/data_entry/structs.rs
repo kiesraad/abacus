@@ -222,42 +222,21 @@ impl PoliticalGroupVotes {
         Ok(())
     }
 
-    /// Create `PoliticalGroupVotes` from test data.
+    /// Create `PoliticalGroupVotes` from test data with candidate numbers automatically generated starting from 1.
     #[cfg(test)]
-    pub fn from_test_data(
-        number: PGNumber,
-        total_count: Count,
-        candidate_votes: &[(CandidateNumber, Count)],
-    ) -> Self {
+    pub fn from_test_data_auto(number: PGNumber, candidate_votes: &[Count]) -> Self {
         PoliticalGroupVotes {
             number,
-            total: total_count,
+            total: candidate_votes.iter().sum(),
             candidate_votes: candidate_votes
                 .iter()
-                .map(|(number, votes)| CandidateVotes {
-                    number: *number,
+                .enumerate()
+                .map(|(i, votes)| CandidateVotes {
+                    number: CandidateNumber::try_from(i + 1).unwrap(),
                     votes: *votes,
                 })
                 .collect(),
         }
-    }
-
-    /// Create `PoliticalGroupVotes` from test data with candidate numbers automatically generated starting from 1.
-    #[cfg(test)]
-    pub fn from_test_data_auto(
-        number: PGNumber,
-        total_count: Count,
-        candidate_votes: &[Count],
-    ) -> Self {
-        Self::from_test_data(
-            number,
-            total_count,
-            &candidate_votes
-                .iter()
-                .enumerate()
-                .map(|(i, votes)| (CandidateNumber::try_from(i + 1).unwrap(), *votes))
-                .collect::<Vec<_>>(),
-        )
     }
 }
 

@@ -16,7 +16,7 @@
   },
   "how_many_residual_seats": "Hoeveel restzetels zijn er te verdelen?",
   "how_often_is_quota_met": "Hoe vaak haalde elke partij de kiesdeler?",
-  "information_largest_averages": "Er zijn 19 of meer zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste gemiddelden</strong>. De partij die na toewijzing van een restzetel het hoogste aantal stemmen per zetel heeft, krijgt de restzetel.\nIn de tabel is het gemiddeld aantal stemmen per zetel te vinden dat elke lijst zou krijgen als een restzetel zou worden toegekend.",
+  "information_highest_averages": "Er zijn 19 of meer zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste gemiddelden</strong>. De partij die na toewijzing van een restzetel het hoogste aantal stemmen per zetel heeft, krijgt de restzetel.\nIn de tabel is het gemiddeld aantal stemmen per zetel te vinden dat elke lijst zou krijgen als een restzetel zou worden toegekend.",
   "information_largest_remainders": "Er zijn minder dan 19 zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste overschotten</strong>. De restzetels zijn één voor één toegewezen aan de lijsten die na verdeling van de zetels het grootste overschot aan stemmen hebben. Lijsten die minder dan 75% van de kiesdeler hebben gehaald, komen niet in aanmerking voor een restzetel.",
   "minus": "min",
   "not_available": "Zetelverdeling is nog niet beschikbaar",
@@ -42,9 +42,9 @@
     "singular": "Er is <link>{num_residual_seats} restzetel te verdelen</link>.",
     "plural": "Er zijn <link>{num_residual_seats} restzetels te verdelen</link>."
   },
-  "residual_seats_information_largest_averages": "Omdat het totaal aantal zetels groter of gelijk is aan 19, gebeurt dat via het systeem van de grootste gemiddelden.",
+  "residual_seats_information_highest_averages": "Omdat het totaal aantal zetels groter of gelijk is aan 19, gebeurt dat via het systeem van de grootste gemiddelden.",
   "residual_seats_information_largest_remainders": "Omdat het totaal aantal zetels kleiner is dan 19, gebeurt dat via het systeem van de grootste overschotten.",
-  "residual_seats_largest_averages": "De restzetels gaan naar de partijen met de grootste gemiddelden",
+  "residual_seats_highest_averages": "De restzetels gaan naar de partijen met de grootste gemiddelden",
   "residual_seats_largest_remainders": "De restzetels gaan naar de partijen met de grootste overschotten",
   "seats_assigned": {
     "singular": "{num_seat} zetel werd als {type_seat} toegewezen",

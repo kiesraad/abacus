@@ -8,8 +8,8 @@ import { ApportionmentTable } from "./ApportionmentTable";
 import { ElectionSummaryTable } from "./ElectionSummaryTable";
 import { FullSeatsTable } from "./full_seats/FullSeatsTable";
 import { ResidualSeatsCalculationTable } from "./full_seats/ResidualSeatsCalculationTable";
-import { LargestAveragesFor19OrMoreSeatsTable } from "./residual_seats/LargestAveragesFor19OrMoreSeatsTable";
-import { LargestAveragesForLessThan19SeatsTable } from "./residual_seats/LargestAveragesForLessThan19SeatsTable";
+import { HighestAveragesFor19OrMoreSeatsTable } from "./residual_seats/HighestAveragesFor19OrMoreSeatsTable";
+import { HighestAveragesForLessThan19SeatsTable } from "./residual_seats/HighestAveragesForLessThan19SeatsTable";
 import { LargestRemaindersTable } from "./residual_seats/LargestRemaindersTable";
 
 export default {
@@ -47,8 +47,8 @@ export const DefaultLargestRemaindersTable: Story = () => (
 DefaultLargestRemaindersTable.storyName = "LargestRemaindersTable";
 
 export const DefaultLargestAveragesForLessThan19SeatsTable: Story = () => (
-  <LargestAveragesForLessThan19SeatsTable
-    largestAverageSteps={lt19Seats.largest_average_steps}
+  <HighestAveragesForLessThan19SeatsTable
+    highestAverageSteps={lt19Seats.highest_average_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
     politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
   />
@@ -56,8 +56,8 @@ export const DefaultLargestAveragesForLessThan19SeatsTable: Story = () => (
 DefaultLargestAveragesForLessThan19SeatsTable.storyName = "Largest averages for less than 19 seats table";
 
 export const DefaultLargestAveragesFor19OrMoreSeatsTable: Story = () => (
-  <LargestAveragesFor19OrMoreSeatsTable
-    largestAverageSteps={gte19Seats.seat_assignment.steps}
+  <HighestAveragesFor19OrMoreSeatsTable
+    highestAverageSteps={gte19Seats.seat_assignment.steps}
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups as PoliticalGroup[]}
   />

@@ -1,9 +1,13 @@
 #![cfg(test)]
 
-use abacus::data_entry::{
-    CandidateVotes, DataEntry, DifferencesCounts, ElectionStatusResponse, PoliticalGroupVotes,
-    PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,
-    status::{ClientState, DataEntryStatusName},
+use abacus::{
+    data_entry::{
+        CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
+        PoliticalGroupVotes, PollingStationResults, SaveDataEntryResponse, VotersCounts,
+        VotesCounts,
+        status::{ClientState, DataEntryStatusName},
+    },
+    election::{CandidateNumber, PGNumber},
 };
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
@@ -11,6 +15,36 @@ use reqwest::{Body, Client};
 use serde_json::json;
 use std::net::SocketAddr;
 use tracing::trace;
+
+pub fn differences_counts_zero() -> DifferencesCounts {
+    DifferencesCounts {
+        more_ballots_count: 0,
+        fewer_ballots_count: 0,
+        unreturned_ballots_count: 0,
+        too_few_ballots_handed_out_count: 0,
+        too_many_ballots_handed_out_count: 0,
+        other_explanation_count: 0,
+        no_explanation_count: 0,
+    }
+}
+
+pub fn political_group_votes_from_test_data_auto(
+    number: PGNumber,
+    candidate_votes: &[Count],
+) -> PoliticalGroupVotes {
+    PoliticalGroupVotes {
+        number,
+        total: candidate_votes.iter().sum(),
+        candidate_votes: candidate_votes
+            .iter()
+            .enumerate()
+            .map(|(i, votes)| CandidateVotes {
+                number: CandidateNumber::try_from(i + 1).unwrap(),
+                votes: *votes,
+            })
+            .collect(),
+    }
+}
 
 /// Example data entry for an election with two parties with two candidates.
 pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
@@ -31,44 +65,10 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
                 total_votes_cast_count: 104,
             },
             voters_recounts: None,
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
-            },
+            differences_counts: differences_counts_zero(),
             political_group_votes: vec![
-                PoliticalGroupVotes {
-                    number: 1,
-                    total: 60,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 40,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 20,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 2,
-                    total: 42,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 30,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 12,
-                        },
-                    ],
-                },
+                political_group_votes_from_test_data_auto(1, &[40, 20]),
+                political_group_votes_from_test_data_auto(2, &[30, 12]),
             ],
         },
         client_state: ClientState::new_from_str(client_state).unwrap(),

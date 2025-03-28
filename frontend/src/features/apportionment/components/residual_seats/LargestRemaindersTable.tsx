@@ -1,4 +1,4 @@
-import { LargestRemainderAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatAssignmentStep } from "@/api";
+import { LargestRemainderAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatChangeStep } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
@@ -6,7 +6,7 @@ import { cn } from "@/lib/util";
 import cls from "../Apportionment.module.css";
 
 interface LargestRemaindersTableProps {
-  largestRemainderSteps: SeatAssignmentStep[];
+  largestRemainderSteps: SeatChangeStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }

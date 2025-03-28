@@ -136,7 +136,7 @@ describe("ApportionmentListDetailsPage", () => {
 
     expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" }));
     expect(await screen.findByTestId("text-political-group-assigned-nr-seats")).toHaveTextContent(
-      "Lijst 5 - Political Group E heeft 0 zetel toegewezen gekregen.",
+      "Lijst 5 - Political Group E heeft 0 zetels toegewezen gekregen.",
     );
 
     expect(await screen.findByRole("heading", { level: 2, name: "Met voorkeur gekozen kandidaten" }));

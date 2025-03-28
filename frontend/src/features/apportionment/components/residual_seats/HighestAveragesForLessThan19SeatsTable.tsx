@@ -32,7 +32,7 @@ export function HighestAveragesForLessThan19SeatsTable({
           const average = highestAverageSteps[0]?.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
           const residual_seats = highestAverageSteps.filter((step) => {
             const change = step.change as HighestAverageAssignedSeat;
-            return change.selected_pg_number == pg_seat_assignment.pg_number;
+            return change.selected_pg_number === pg_seat_assignment.pg_number;
           }).length;
           return (
             <Table.Row key={pg_seat_assignment.pg_number}>

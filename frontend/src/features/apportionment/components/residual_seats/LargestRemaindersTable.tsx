@@ -35,7 +35,7 @@ export function LargestRemaindersTable({
           const residual_seats =
             largestRemainderSteps.filter((step) => {
               const change = step.change as LargestRemainderAssignedSeat;
-              return change.selected_pg_number == pg_seat_assignment.pg_number;
+              return change.selected_pg_number === pg_seat_assignment.pg_number;
             }).length || 0;
           return (
             <Table.Row key={pg_seat_assignment.pg_number}>

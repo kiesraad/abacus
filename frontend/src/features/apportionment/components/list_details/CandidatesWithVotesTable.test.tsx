@@ -13,7 +13,7 @@ describe("CandidatesWithVotesTable", () => {
   test("renders a table with the candidates, localities and number of votes", async () => {
     render(
       <CandidatesWithVotesTable
-        id="test_table"
+        id="test-table"
         showNumber={false}
         showLocality={true}
         candidateList={political_group_1.candidates}
@@ -40,7 +40,7 @@ describe("CandidatesWithVotesTable", () => {
   test("renders a table with the candidates, localities and number of votes", async () => {
     render(
       <CandidatesWithVotesTable
-        id="test_table"
+        id="test-table"
         showNumber={true}
         showLocality={false}
         candidateList={political_group_1.candidates}

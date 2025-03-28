@@ -43,7 +43,7 @@ export function ApportionmentFullSeatsPage() {
                   <h2 className={cls.tableTitle}>{t("apportionment.how_many_residual_seats")}</h2>
                   <span className={cls.tableInformation}>
                     {tx(
-                      `apportionment.residual_seats_information_amount_and_link.${seatAssignment.residual_seats > 1 ? "plural" : "singular"}`,
+                      `apportionment.residual_seats_information_amount_and_link.${seatAssignment.residual_seats === 1 ? "singular" : "plural"}`,
                       {
                         link: (title) => <Link to="../details-residual-seats">{title}</Link>,
                       },

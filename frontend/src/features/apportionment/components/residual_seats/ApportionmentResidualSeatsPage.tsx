@@ -28,7 +28,7 @@ function render_information(seats: number, residualSeats: number) {
   return (
     <span className={cls.tableInformation}>
       {tx(
-        `apportionment.full_seats_information_link.${residualSeats > 1 ? "plural" : "singular"}`,
+        `apportionment.full_seats_information_link.${residualSeats === 1 ? "singular" : "plural"}`,
         {
           link: (title) => <Link to="../details-full-seats">{title}</Link>,
         },
@@ -106,7 +106,7 @@ export function ApportionmentResidualSeatsPage() {
                         <h2 className={cls.tableTitle}>{t("apportionment.remaining_residual_seats_assignment")}</h2>
                         <span className={cls.tableInformation}>
                           {t(
-                            `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length > 1 ? "plural" : "singular"}`,
+                            `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length === 1 ? "singular" : "plural"}`,
                             { num_seats: highestAverageSteps.length },
                           )}
                         </span>

@@ -71,7 +71,7 @@ export function ApportionmentListDetailsPage() {
                   <h2 className={cls.tableTitle}>{t("apportionment.assigned_number_of_seats")}</h2>
                   <span id="text-political-group-assigned-nr-seats">
                     {tx(
-                      `apportionment.political_group_assigned_nr_seats.${pgTotalSeats > 1 ? "plural" : "singular"}`,
+                      `apportionment.political_group_assigned_nr_seats.${pgTotalSeats === 1 ? "singular" : "plural"}`,
                       {},
                       {
                         pg_name: pgName,

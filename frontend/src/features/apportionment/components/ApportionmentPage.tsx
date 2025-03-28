@@ -12,7 +12,7 @@ import { ChosenCandidatesTable } from "./ChosenCandidatesTable";
 import { ElectionSummaryTable } from "./ElectionSummaryTable";
 
 function get_number_of_seats_assigned_sentence(seats: number, type: "residual_seat" | "full_seat"): string {
-  return t(`apportionment.seats_assigned.${seats > 1 ? "plural" : "singular"}`, {
+  return t(`apportionment.seats_assigned.${seats === 1 ? "singular" : "plural"}`, {
     num_seat: seats,
     type_seat: t(`apportionment.${type}.singular`).toLowerCase(),
   });

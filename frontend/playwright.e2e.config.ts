@@ -20,6 +20,8 @@ function returnWebserverCommand(): string {
 
 const config: PlaywrightTestConfig = defineConfig({
   ...commonConfig,
+  // Increase the test timeout on CI, which is usually slower
+  timeout: process.env.CI ? 30_000 : 20_000,
   reporter: process.env.CI
     ? [["list"], ["github"], ["junit", { outputFile: "playwright.ladle.junit.xml" }], ["html", { open: "never" }]]
     : "list",

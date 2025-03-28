@@ -423,7 +423,7 @@ test.describe("Data entry model test - errors", () => {
         expect(new Set(events)).toEqual(new Set(machineEvents));
 
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
-        await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+        await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation);
         await recountedPage.checkNoAndClickNext();
 
         type MachineStates = typeof dataEntryMachineDefinition.states;

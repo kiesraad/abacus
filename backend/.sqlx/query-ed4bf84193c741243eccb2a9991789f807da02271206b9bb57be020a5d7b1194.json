@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                audit_log.username,\n                ip as \"ip: String\",\n                users.fullname as \"user_fullname\",\n                users.role as \"user_role?: Role\"\n            FROM audit_log\n            LEFT JOIN users ON audit_log.user_id = users.id\n            ORDER BY time DESC\n            LIMIT ? OFFSET ?\n            ",
+  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                audit_log.username,\n                ip as \"ip: String\",\n                users.fullname as \"user_fullname\",\n                users.role as \"user_role?: Role\"\n            FROM audit_log\n            LEFT JOIN users ON audit_log.user_id = users.id\n            WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))\n            AND (json_array_length($2) = 0 OR event ->> 'eventType' IN (SELECT value FROM json_each($2)))\n            AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))\n            AND ($4 IS NULL OR unixepoch(time) >= $4)\n            ORDER BY\n                CASE WHEN $4 IS NULL THEN time ELSE 1 END DESC,\n                CASE WHEN $4 IS NULL THEN 1 ELSE time END ASC\n            LIMIT $5 OFFSET $6\n            ",
   "describe": {
     "columns": [
       {
@@ -60,7 +60,7 @@
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 6
     },
     "nullable": [
       false,
@@ -76,5 +76,5 @@
       true
     ]
   },
-  "hash": "8d225703298f31c836fab0e8914cec3e229944d7b2433c2636dd9509cd9ea011"
+  "hash": "ed4bf84193c741243eccb2a9991789f807da02271206b9bb57be020a5d7b1194"
 }

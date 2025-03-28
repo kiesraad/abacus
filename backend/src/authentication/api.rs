@@ -1,5 +1,5 @@
 use super::{
-    Admin, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+    Admin, AdminOrCoordinator, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
     error::AuthenticationError,
     role::Role,
     session::Sessions,
@@ -42,7 +42,7 @@ pub struct Credentials {
     pub password: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 pub struct LoginResponse {
     pub user_id: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -200,12 +200,17 @@ async fn account_update(
         return Err(AuthenticationError::UserNotFound.into());
     };
 
+    let response = LoginResponse::from(&updated_user);
+
     audit_service
         .with_user(updated_user.clone())
-        .log_error(&AuditEvent::UserAccountUpdateSuccess, None)
+        .log_error(
+            &AuditEvent::UserAccountUpdateSuccess(response.clone()),
+            None,
+        )
         .await?;
 
-    Ok(Json(LoginResponse::from(&updated_user)))
+    Ok(Json(response))
 }
 
 /// Logout endpoint, deletes the session cookie
@@ -321,7 +326,7 @@ pub struct UserListResponse {
     ),
 )]
 async fn user_list(
-    _user: Admin,
+    _user: AdminOrCoordinator,
     State(users_repo): State<Users>,
 ) -> Result<Json<UserListResponse>, APIError> {
     Ok(Json(UserListResponse {

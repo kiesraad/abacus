@@ -76,11 +76,27 @@ export const AccountUpdateRequestHandler = http.put<
   ACCOUNT_UPDATE_REQUEST_PATH
 >("/api/user/account", () => HttpResponse.json(loginResponseMockData, { status: 200 }));
 
+// simulate some audit log filtering
 export const LogRequestHandler = http.get("/api/log", ({ request }) => {
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get("page")?.toString() || "1");
 
-  return HttpResponse.json(page === 2 ? logMockResponse2 : logMockResponse1, { status: 200 });
+  const data = { ...(page === 2 ? logMockResponse2 : logMockResponse1) };
+  const event = url.searchParams.getAll("event");
+  const level = url.searchParams.getAll("level");
+  const user = url.searchParams.getAll("user");
+
+  if (event.length > 0) {
+    data.events = data.events.filter((e) => event.includes(e.event.eventType));
+  }
+  if (level.length > 0) {
+    data.events = data.events.filter((e) => level.includes(e.eventLevel));
+  }
+  if (user.length > 0) {
+    data.events = data.events.filter((e) => user.includes(e.userId.toString()));
+  }
+
+  return HttpResponse.json(data, { status: 200 });
 });
 
 // get election list handler

@@ -2,6 +2,7 @@
   "no_events": "Geen gebeurtenissen gevonden",
   "action": {
     "filter": "Filteren",
+    "close_filter": "Filter sluiten",
     "details": "Details"
   },
   "header": {
@@ -10,7 +11,8 @@
     "level": "Type",
     "event": "Gebeurtenis",
     "message": "Toelichting",
-    "user": "Gebruiker"
+    "user": "Gebruiker",
+    "since": "Sinds"
   },
   "level": {
     "error": "Fout",

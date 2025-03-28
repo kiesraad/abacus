@@ -5,6 +5,11 @@
     align-items: flex-start;
     gap: 0.5rem;
 
+    &:global(.parent),
+    &:global(.parent) ~ span {
+      width: 100%;
+    }
+
     &:global(.narrowest),
     &:global(.narrowest) ~ span {
       width: 8rem;

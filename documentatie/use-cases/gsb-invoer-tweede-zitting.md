@@ -15,9 +15,9 @@ __Trigger:__ Er is een corrigendum PV opgesteld.
 
 __Hoofdscenario:__  
 
-1. (voor elk corrigendum) De coördinator stelt invoer open voor het stembureau met corrigendum.
+1. (voor elk corrigendum) De coördinator GSB stelt invoer open voor het stembureau met corrigendum.
 2. (voor elk corrigendum) De invoerders vullen de resultaten van de gecorrigeerde tellingen in.
-3. De coördinator genereert de PV's en EML's etc.
+3. De coördinator GSB genereert de PV's en EML's etc.
 
 __Uitbreidingen:__  
 ...

@@ -23,11 +23,11 @@
 
 ### Output voor CSB
 
-- Concept-PV
+- PV
   - ... (nog aan te vullen)
   - Bijlage voor ondertekenen PV
 - Digitaal bestand (`.zip`-bestand)
-  - EML_NL (enige verplichte onderdeel), concept-PV als pdf
+  - EML_NL (enige verplichte onderdeel), PV als pdf
 
 ### Niet in scope
 

@@ -13,17 +13,27 @@ export interface ModalProps {
   children?: ReactNode;
 }
 
+/**
+ * Modal component
+ *
+ * @param {string} title - The title of the modal.
+ * @param {boolean} noFlex - If true, the modal will not use flexbox for is contents layout.
+ * @param {function} onClose - Callback function to be called when the modal is closed.
+ * @param {ReactNode} children - The content of the modal.
+ * @returns {ReactNode} The rendered modal component.
+ */
 export function Modal({ title, noFlex = false, onClose, children }: ModalProps): ReactNode {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const lastActiveElement = useRef<HTMLElement | null>(null);
 
+  // show the dialog as a modal and focus on the title
   useEffect(() => {
     if (dialogRef.current && !dialogRef.current.open) {
-      lastActiveElement.current = document.activeElement as HTMLElement;
       dialogRef.current.showModal();
-      document.getElementById("modal-title")?.focus();
     }
-  }, []);
+    lastActiveElement.current = document.activeElement as HTMLElement;
+    document.getElementById("modal-title")?.focus();
+  }, [dialogRef]);
 
   return (
     <dialog id="modal-dialog" className={cls.modal} ref={dialogRef}>
@@ -31,11 +41,7 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
         {onClose && (
           <IconButton
             onClick={() => {
-              if (dialogRef.current) {
-                dialogRef.current.close();
-                dialogRef.current = null;
-                lastActiveElement.current?.focus();
-              }
+              lastActiveElement.current?.focus();
               onClose();
             }}
             icon={<IconCross />}

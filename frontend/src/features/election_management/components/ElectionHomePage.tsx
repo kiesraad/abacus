@@ -1,10 +1,9 @@
 import { Link, Navigate } from "react-router";
 
+import { useElection, useUserRole } from "@/api";
 import { Footer } from "@/components/footer/Footer";
-
-import { useElection, useUserRole } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { PageTitle } from "@kiesraad/ui";
+import { PageTitle } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
 export function ElectionHomePage() {
   const { isTypist } = useUserRole();

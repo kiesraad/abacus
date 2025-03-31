@@ -56,12 +56,18 @@ components:
       - ".*/frontend/src/main.tsx"
       - ".*/frontend/src/routes.test.tsx"
       - ".*/frontend/src/routes.tsx"
+  - name: "(Frontend) App"
+    include:
+      - ".*/frontend/src/app/.*"
   - name: "(Frontend) Components/apportionment"
     include:
       - ".*/frontend/src/components/apportionment/.*"
   - name: "(Frontend) Components/authorization"
     include:
       - ".*/frontend/src/components/authorization/.*"
+  - name: "(Frontend) Components/election_status_with_icon"
+    include:
+      - ".*/frontend/src/components/election_status_with_icon/.*"
   - name: "(Frontend) Components/election"
     include:
       - ".*/frontend/src/components/election/.*"
@@ -102,9 +108,15 @@ components:
   - name: "(Frontend) Modules/data_entry"
     include:
       - ".*/frontend/src/features/data_entry/.*"
-  - name: "(Frontend) Modules/election"
+  - name: "(Frontend) Modules/election_management"
     include:
-      - ".*/frontend/src/features/election/.*"
+      - ".*/frontend/src/features/election_management/.*"
+  - name: "(Frontend) Modules/election_overview"
+    include:
+      - ".*/frontend/src/features/election_overview/.*"
+  - name: "(Frontend) Modules/election_status"
+    include:
+      - ".*/frontend/src/features/election_status/.*"
   - name: "(Frontend) Modules/logs"
     include:
       - ".*/frontend/src/features/logs/.*"
@@ -168,17 +180,17 @@ languages:
     production:
     test:
       include:
-      - ".*DevHomePage[.]tsx"
-      - ".*NotAvailableInMock[.]tsx"
-      - ".*msw-mock-api[.]ts"
-      - ".*[.]e2e[.]ts"
-      - ".*.stories[.]tsx"
-      - ".*/testing/.*"
-      - ".*/test-data/.*[.]ts"
-      - ".*/test[.]utils[.]ts"
+        - ".*DevHomePage[.]tsx"
+        - ".*NotAvailableInMock[.]tsx"
+        - ".*msw-mock-api[.]ts"
+        - ".*[.]e2e[.]ts"
+        - ".*.stories[.]tsx"
+        - ".*/testing/.*"
+        - ".*/test-data/.*[.]ts"
+        - ".*/test[.]utils[.]ts"
     generated:
       include:
-      - ".*/gen/.*[.]ts"
+        - ".*/gen/.*[.]ts"
 
 exclude:
   - ".*/backend/[.]sqlx/.*"
@@ -191,7 +203,7 @@ exclude:
 
 dependencychecker:
   blocklist:
-  - "backend"
+    - "backend"
   transitive: true
 
 architecture:

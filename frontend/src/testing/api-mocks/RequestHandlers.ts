@@ -40,7 +40,8 @@ import {
 } from "@kiesraad/api";
 
 import { claimDataEntryResponse, saveDataEntryResponse } from "./DataEntryMockData";
-import { electionDetailsMockResponse, electionListMockResponse, electionStatusMockResponse } from "./ElectionMockData";
+import { electionDetailsMockResponse, electionListMockResponse } from "./ElectionMockData";
+import { statusResponseMock } from "./ElectionStatusMockData";
 import logMockResponse1 from "./LogMockData1.json";
 import logMockResponse2 from "./LogMockData2.json";
 import { pollingStationMockData } from "./PollingStationMockData";
@@ -97,7 +98,7 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
 // get election status handler
 export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id/status",
-  () => HttpResponse.json(electionStatusMockResponse, { status: 200 }),
+  () => HttpResponse.json(statusResponseMock, { status: 200 }),
 );
 
 export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse, LOGIN_REQUEST_PATH>(

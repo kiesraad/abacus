@@ -1,12 +1,13 @@
 import { To, useLocation, useNavigate } from "react-router";
 
-import { ElectionStatusWithIcon } from "@/components/election/ElectionStatusWithIcon";
+import { Election, useUserRole } from "@/api";
+import { ElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
+import { Alert, PageTitle, Table } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
-import { Election, useElectionList, useUserRole } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { Alert, PageTitle, Table } from "@kiesraad/ui";
+import { useElectionList } from "../hooks/useElectionList";
 
 export function OverviewPage() {
   const navigate = useNavigate();

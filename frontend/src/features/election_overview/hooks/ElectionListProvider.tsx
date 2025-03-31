@@ -1,9 +1,9 @@
 import * as React from "react";
 
-import { useElectionListRequest } from "@kiesraad/api";
+import RequestStateHandler from "@/api/RequestStateHandler";
 
-import RequestStateHandler from "../RequestStateHandler";
 import { ElectionListProviderContext } from "./ElectionListProviderContext";
+import { useElectionListRequest } from "./useElectionListRequest";
 
 export interface ElectionListProviderProps {
   children: React.ReactNode;

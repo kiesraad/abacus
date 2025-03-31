@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router";
 
-import { HeaderElectionStatusWithIcon } from "@/components/election/ElectionStatusWithIcon";
-import { ElectionStatus } from "@/components/election/status/ElectionStatus";
+import { HeaderElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
+import { Alert, Button, PageTitle } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
 import {
   useElection,
@@ -11,8 +12,8 @@ import {
   USER_LIST_REQUEST_PATH,
   UserListResponse,
 } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { Alert, Button, PageTitle } from "@kiesraad/ui";
+
+import { ElectionStatus } from "./ElectionStatus";
 
 export function ElectionStatusPage() {
   const navigate = useNavigate();

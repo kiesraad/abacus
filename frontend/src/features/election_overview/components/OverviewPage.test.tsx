@@ -1,10 +1,11 @@
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionListProvider, ElectionListResponse } from "@kiesraad/api";
-import { ElectionListRequestHandler } from "@kiesraad/api-mocks";
-import { overrideOnce, render, server } from "@kiesraad/test";
+import { ElectionListResponse } from "@/api";
+import { overrideOnce, render, server } from "@/testing";
+import { ElectionListRequestHandler } from "@/testing/api-mocks";
 
+import { ElectionListProvider } from "../hooks/ElectionListProvider";
 import { OverviewPage } from "./OverviewPage";
 
 describe("OverviewPage", () => {

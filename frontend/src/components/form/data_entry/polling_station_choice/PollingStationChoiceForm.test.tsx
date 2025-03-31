@@ -455,7 +455,7 @@ describe("Test PollingStationChoiceForm", () => {
       // Test if the warning message is shown correctly
       await waitFor(() => {
         expect(screen.getByTestId("pollingStationSubmitFeedback").textContent).toBe(
-          "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
+          `Een andere invoerder is bezig met stembureau ${testPollingStation.number} (${testPollingStation.name})`,
         );
       });
     });

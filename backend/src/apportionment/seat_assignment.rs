@@ -145,23 +145,43 @@ pub enum SeatChange {
 
 impl SeatChange {
     /// Get the political group number for the group this step has assigned a seat to
-    fn political_group_number(&self) -> PGNumber {
+    fn political_group_number_assigned(&self) -> PGNumber {
         match self {
-            Self::HighestAverageAssignment(highest_average) => highest_average.selected_pg_number,
-            Self::LargestRemainderAssignment(largest_remainder) => {
-                largest_remainder.selected_pg_number
+            Self::HighestAverageAssignment(highest_average_assigned_seat) => {
+                highest_average_assigned_seat.selected_pg_number
             }
-            Self::AbsoluteMajorityReassignment(_) => unimplemented!(),
+            Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
+                largest_remainder_assigned_seat.selected_pg_number
+            }
+            Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
+                absolute_majority_reassigned_seat.pg_assigned_seat
+            }
             Self::ListExhaustionRemoval(_) => unimplemented!(),
+        }
+    }
+
+    /// Get the political group number for the group this step has retracted a seat from
+    fn political_group_number_retracted(&self) -> PGNumber {
+        match self {
+            Self::HighestAverageAssignment(_) => unimplemented!(),
+            Self::LargestRemainderAssignment(_) => unimplemented!(),
+            Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
+                absolute_majority_reassigned_seat.pg_retracted_seat
+            }
+            Self::ListExhaustionRemoval(list_exhaustion_removed_seat) => {
+                list_exhaustion_removed_seat.pg_retracted_seat
+            }
         }
     }
 
     /// Get the list of political groups with the same average, that have not been assigned a seat
     fn pg_options(&self) -> Vec<PGNumber> {
         match self {
-            Self::HighestAverageAssignment(highest_average) => highest_average.pg_options.clone(),
-            Self::LargestRemainderAssignment(largest_remainder) => {
-                largest_remainder.pg_options.clone()
+            Self::HighestAverageAssignment(highest_average_assigned_seat) => {
+                highest_average_assigned_seat.pg_options.clone()
+            }
+            Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
+                largest_remainder_assigned_seat.pg_options.clone()
             }
             Self::AbsoluteMajorityReassignment(_) => unimplemented!(),
             Self::ListExhaustionRemoval(_) => unimplemented!(),
@@ -171,9 +191,11 @@ impl SeatChange {
     /// Get the list of political groups with the same average, that have been assigned a seat
     fn pg_assigned(&self) -> Vec<PGNumber> {
         match self {
-            Self::HighestAverageAssignment(highest_average) => highest_average.pg_assigned.clone(),
-            Self::LargestRemainderAssignment(largest_remainder) => {
-                largest_remainder.pg_assigned.clone()
+            Self::HighestAverageAssignment(highest_average_assigned_seat) => {
+                highest_average_assigned_seat.pg_assigned.clone()
+            }
+            Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
+                largest_remainder_assigned_seat.pg_assigned.clone()
             }
             Self::AbsoluteMajorityReassignment(_) => unimplemented!(),
             Self::ListExhaustionRemoval(_) => unimplemented!(),
@@ -646,7 +668,7 @@ fn assign_remainder(
         current_standings = current_standings
             .into_iter()
             .map(|s| {
-                if s.pg_number == change.political_group_number() {
+                if s.pg_number == change.political_group_number_assigned() {
                     s.add_residual_seat()
                 } else {
                     s
@@ -748,7 +770,11 @@ fn political_group_standings_qualifying_for_largest_remainder<'a>(
             && !exhausted_pg_numbers.contains(&s.pg_number)
             && !previous_steps.iter().any(|prev| {
                 prev.change.is_changed_by_largest_remainder_assignment()
-                    && prev.change.political_group_number() == s.pg_number
+                    && prev.change.political_group_number_assigned() == s.pg_number
+                    && !previous_steps.iter().any(|prev| {
+                        prev.change.is_changed_by_absolute_majority_reassignment()
+                            && prev.change.political_group_number_retracted() == s.pg_number
+                    })
             })
     })
 }
@@ -765,7 +791,11 @@ fn political_group_standings_qualifying_for_unique_highest_average<'a>(
         !exhausted_pg_numbers.contains(&s.pg_number)
             && !previous_steps.iter().any(|prev| {
                 prev.change.is_changed_by_highest_average_assignment()
-                    && prev.change.political_group_number() == s.pg_number
+                    && prev.change.political_group_number_assigned() == s.pg_number
+                    && !previous_steps.iter().any(|prev| {
+                        prev.change.is_changed_by_absolute_majority_reassignment()
+                            && prev.change.political_group_number_retracted() == s.pg_number
+                    })
             })
     })
 }
@@ -886,8 +916,8 @@ mod tests {
             ]);
             let result = seat_assignment(15, &totals).unwrap();
             assert_eq!(result.steps.len(), 2);
-            assert_eq!(result.steps[0].change.political_group_number(), 1);
-            assert_eq!(result.steps[1].change.political_group_number(), 7);
+            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.political_group_number_assigned(), 7);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
         }
@@ -909,11 +939,11 @@ mod tests {
             ]);
             let result = seat_assignment(15, &totals).unwrap();
             assert_eq!(result.steps.len(), 5);
-            assert_eq!(result.steps[0].change.political_group_number(), 1);
-            assert_eq!(result.steps[1].change.political_group_number(), 1);
-            assert_eq!(result.steps[2].change.political_group_number(), 2);
-            assert_eq!(result.steps[3].change.political_group_number(), 3);
-            assert_eq!(result.steps[4].change.political_group_number(), 4);
+            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[2].change.political_group_number_assigned(), 2);
+            assert_eq!(result.steps[3].change.political_group_number_assigned(), 3);
+            assert_eq!(result.steps[4].change.political_group_number_assigned(), 4);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
         }
@@ -932,9 +962,9 @@ mod tests {
             ]);
             let result = seat_assignment(15, &totals).unwrap();
             assert_eq!(result.steps.len(), 3);
-            assert_eq!(result.steps[0].change.political_group_number(), 1);
-            assert_eq!(result.steps[1].change.political_group_number(), 2);
-            assert_eq!(result.steps[2].change.political_group_number(), 3);
+            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
+            assert_eq!(result.steps[2].change.political_group_number_assigned(), 3);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![7, 4, 4, 0, 0, 0, 0, 0]);
         }
@@ -954,9 +984,9 @@ mod tests {
             ]);
             let result = seat_assignment(3, &totals).unwrap();
             assert_eq!(result.steps.len(), 3);
-            assert_eq!(result.steps[0].change.political_group_number(), 1);
-            assert_eq!(result.steps[1].change.political_group_number(), 2);
-            assert_eq!(result.steps[2].change.political_group_number(), 3);
+            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
+            assert_eq!(result.steps[2].change.political_group_number_assigned(), 3);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![1, 1, 1, 0, 0, 0, 0, 0, 0, 0]);
         }
@@ -975,9 +1005,9 @@ mod tests {
                 election_summary_fixture_with_default_50_candidates(vec![0, 3, 5, 6, 7, 79]);
             let result = seat_assignment(10, &totals).unwrap();
             assert_eq!(result.steps.len(), 3);
-            assert_eq!(result.steps[0].change.political_group_number(), 6);
-            assert_eq!(result.steps[1].change.political_group_number(), 6);
-            assert_eq!(result.steps[2].change.political_group_number(), 5);
+            assert_eq!(result.steps[0].change.political_group_number_assigned(), 6);
+            assert_eq!(result.steps[1].change.political_group_number_assigned(), 6);
+            assert_eq!(result.steps[2].change.political_group_number_assigned(), 5);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, [0, 0, 0, 0, 1, 9]);
         }
@@ -1002,16 +1032,16 @@ mod tests {
             let totals = election_summary_fixture_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
             let result = seat_assignment(10, &totals).unwrap();
             assert_eq!(result.steps.len(), 10);
-            assert_eq!(result.steps[0].change.political_group_number(), 1);
-            assert_eq!(result.steps[1].change.political_group_number(), 2);
-            assert_eq!(result.steps[2].change.political_group_number(), 3);
-            assert_eq!(result.steps[3].change.political_group_number(), 4);
-            assert_eq!(result.steps[4].change.political_group_number(), 5);
-            assert_eq!(result.steps[5].change.political_group_number(), 1);
-            assert_eq!(result.steps[6].change.political_group_number(), 2);
-            assert_eq!(result.steps[7].change.political_group_number(), 3);
-            assert_eq!(result.steps[8].change.political_group_number(), 4);
-            assert_eq!(result.steps[9].change.political_group_number(), 5);
+            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
+            assert_eq!(result.steps[2].change.political_group_number_assigned(), 3);
+            assert_eq!(result.steps[3].change.political_group_number_assigned(), 4);
+            assert_eq!(result.steps[4].change.political_group_number_assigned(), 5);
+            assert_eq!(result.steps[5].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[6].change.political_group_number_assigned(), 2);
+            assert_eq!(result.steps[7].change.political_group_number_assigned(), 3);
+            assert_eq!(result.steps[8].change.political_group_number_assigned(), 4);
+            assert_eq!(result.steps[9].change.political_group_number_assigned(), 5);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![2, 2, 2, 2, 2]);
         }
@@ -1031,14 +1061,16 @@ mod tests {
                 election_summary_fixture_with_default_50_candidates(vec![2571, 977, 567, 536, 453]);
             let result = seat_assignment(15, &totals).unwrap();
             assert_eq!(result.steps.len(), 4);
-            assert_eq!(result.steps[0].change.political_group_number(), 2);
-            assert_eq!(result.steps[1].change.political_group_number(), 3);
-            assert_eq!(result.steps[2].change.political_group_number(), 4);
+            assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
+            assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
+            assert_eq!(result.steps[2].change.political_group_number_assigned(), 4);
             assert!(
                 result.steps[3]
                     .change
                     .is_changed_by_absolute_majority_reassignment()
             );
+            assert_eq!(result.steps[3].change.political_group_number_retracted(), 4);
+            assert_eq!(result.steps[3].change.political_group_number_assigned(), 1);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![8, 3, 2, 1, 1]);
         }
@@ -1155,7 +1187,8 @@ mod tests {
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[1].change.political_group_number(), 5);
+                assert_eq!(result.steps[0].change.political_group_number_retracted(), 1);
+                assert_eq!(result.steps[1].change.political_group_number_assigned(), 5);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![4, 4, 3, 2, 2]);
             }
@@ -1192,18 +1225,22 @@ mod tests {
                 ]);
                 let result = seat_assignment(17, &totals).unwrap();
                 assert_eq!(result.steps.len(), 8);
-                assert_eq!(result.steps[0].change.political_group_number(), 3);
-                assert_eq!(result.steps[1].change.political_group_number(), 11);
-                assert_eq!(result.steps[2].change.political_group_number(), 9);
-                assert_eq!(result.steps[3].change.political_group_number(), 10);
-                assert_eq!(result.steps[4].change.political_group_number(), 1);
-                assert_eq!(result.steps[5].change.political_group_number(), 4);
+                assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
+                assert_eq!(result.steps[1].change.political_group_number_assigned(), 11);
+                assert_eq!(result.steps[2].change.political_group_number_assigned(), 9);
+                assert_eq!(result.steps[3].change.political_group_number_assigned(), 10);
+                assert_eq!(result.steps[4].change.political_group_number_assigned(), 1);
+                assert_eq!(result.steps[5].change.political_group_number_assigned(), 4);
                 assert!(
                     result.steps[6]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[7].change.political_group_number(), 6);
+                assert_eq!(
+                    result.steps[6].change.political_group_number_retracted(),
+                    10
+                );
+                assert_eq!(result.steps[7].change.political_group_number_assigned(), 6);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![3, 1, 2, 2, 1, 2, 1, 0, 3, 1, 1]);
             }
@@ -1232,15 +1269,16 @@ mod tests {
                 ]);
                 let result = seat_assignment(10, &totals).unwrap();
                 assert_eq!(result.steps.len(), 5);
-                assert_eq!(result.steps[0].change.political_group_number(), 6);
-                assert_eq!(result.steps[1].change.political_group_number(), 6);
-                assert_eq!(result.steps[2].change.political_group_number(), 5);
+                assert_eq!(result.steps[0].change.political_group_number_assigned(), 6);
+                assert_eq!(result.steps[1].change.political_group_number_assigned(), 6);
+                assert_eq!(result.steps[2].change.political_group_number_assigned(), 5);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[4].change.political_group_number(), 4);
+                assert_eq!(result.steps[3].change.political_group_number_retracted(), 6);
+                assert_eq!(result.steps[4].change.political_group_number_assigned(), 4);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [0, 0, 0, 1, 1, 8]);
             }
@@ -1274,31 +1312,35 @@ mod tests {
                 ]);
                 let result = seat_assignment(6, &totals).unwrap();
                 assert_eq!(result.steps.len(), 9);
-                assert_eq!(result.steps[0].change.political_group_number(), 3);
+                assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
+                assert_eq!(result.steps[1].change.political_group_number_retracted(), 3);
                 assert!(
                     result.steps[2]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
+                assert_eq!(result.steps[2].change.political_group_number_retracted(), 3);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
+                assert_eq!(result.steps[3].change.political_group_number_retracted(), 3);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[5].change.political_group_number(), 1);
-                assert_eq!(result.steps[6].change.political_group_number(), 2);
-                assert_eq!(result.steps[7].change.political_group_number(), 1);
-                assert_eq!(result.steps[8].change.political_group_number(), 2);
+                assert_eq!(result.steps[4].change.political_group_number_retracted(), 3);
+                assert_eq!(result.steps[5].change.political_group_number_assigned(), 1);
+                assert_eq!(result.steps[6].change.political_group_number_assigned(), 2);
+                assert_eq!(result.steps[7].change.political_group_number_assigned(), 1);
+                assert_eq!(result.steps[8].change.political_group_number_assigned(), 2);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [2, 2, 2]);
             }
@@ -1332,31 +1374,35 @@ mod tests {
                 ]);
                 let result = seat_assignment(6, &totals).unwrap();
                 assert_eq!(result.steps.len(), 9);
-                assert_eq!(result.steps[0].change.political_group_number(), 3);
+                assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
+                assert_eq!(result.steps[1].change.political_group_number_retracted(), 3);
                 assert!(
                     result.steps[2]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
+                assert_eq!(result.steps[2].change.political_group_number_retracted(), 3);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
+                assert_eq!(result.steps[3].change.political_group_number_retracted(), 3);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[5].change.political_group_number(), 1);
-                assert_eq!(result.steps[6].change.political_group_number(), 2);
-                assert_eq!(result.steps[7].change.political_group_number(), 1);
-                assert_eq!(result.steps[8].change.political_group_number(), 2);
+                assert_eq!(result.steps[4].change.political_group_number_retracted(), 3);
+                assert_eq!(result.steps[5].change.political_group_number_assigned(), 1);
+                assert_eq!(result.steps[6].change.political_group_number_assigned(), 2);
+                assert_eq!(result.steps[7].change.political_group_number_assigned(), 1);
+                assert_eq!(result.steps[8].change.political_group_number_assigned(), 2);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [2, 2, 2]);
             }
@@ -1372,7 +1418,7 @@ mod tests {
             /// 4 - Seat first assigned to list 4 has been re-assigned to list 1 in accordance with Article P 9 Kieswet  
             /// 5 - Seat first assigned to list 1 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
-            /// 6 - largest remainder: seat assigned to list 5
+            /// 6 - largest remainder: seat assigned to list 4
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion() {
                 let totals = election_summary_fixture_with_given_candidate_votes(vec![
@@ -1384,22 +1430,25 @@ mod tests {
                 ]);
                 let result = seat_assignment(15, &totals).unwrap();
                 assert_eq!(result.steps.len(), 6);
-                assert_eq!(result.steps[0].change.political_group_number(), 2);
-                assert_eq!(result.steps[1].change.political_group_number(), 3);
-                assert_eq!(result.steps[2].change.political_group_number(), 4);
+                assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
+                assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
+                assert_eq!(result.steps[2].change.political_group_number_assigned(), 4);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_absolute_majority_reassignment()
                 );
+                assert_eq!(result.steps[3].change.political_group_number_retracted(), 4);
+                assert_eq!(result.steps[3].change.political_group_number_assigned(), 1);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[5].change.political_group_number(), 5);
+                assert_eq!(result.steps[4].change.political_group_number_retracted(), 1);
+                assert_eq!(result.steps[5].change.political_group_number_assigned(), 4);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, vec![7, 3, 2, 1, 2]);
+                assert_eq!(total_seats, vec![7, 3, 2, 2, 1]);
             }
 
             /// Apportionment with no residual seats  
@@ -1483,10 +1532,10 @@ mod tests {
                 election_summary_fixture_with_default_50_candidates(vec![600, 302, 98, 99, 101]);
             let result = seat_assignment(23, &totals).unwrap();
             assert_eq!(result.steps.len(), 4);
-            assert_eq!(result.steps[0].change.political_group_number(), 5);
-            assert_eq!(result.steps[1].change.political_group_number(), 2);
-            assert_eq!(result.steps[2].change.political_group_number(), 1);
-            assert_eq!(result.steps[3].change.political_group_number(), 4);
+            assert_eq!(result.steps[0].change.political_group_number_assigned(), 5);
+            assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
+            assert_eq!(result.steps[2].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[3].change.political_group_number_assigned(), 4);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
         }
@@ -1508,13 +1557,13 @@ mod tests {
             ]);
             let result = seat_assignment(19, &totals).unwrap();
             assert_eq!(result.steps.len(), 7);
-            assert_eq!(result.steps[0].change.political_group_number(), 1);
-            assert_eq!(result.steps[1].change.political_group_number(), 1);
-            assert_eq!(result.steps[2].change.political_group_number(), 2);
-            assert_eq!(result.steps[3].change.political_group_number(), 3);
-            assert_eq!(result.steps[4].change.political_group_number(), 4);
-            assert_eq!(result.steps[5].change.political_group_number(), 5);
-            assert_eq!(result.steps[6].change.political_group_number(), 1);
+            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[2].change.political_group_number_assigned(), 2);
+            assert_eq!(result.steps[3].change.political_group_number_assigned(), 3);
+            assert_eq!(result.steps[4].change.political_group_number_assigned(), 4);
+            assert_eq!(result.steps[5].change.political_group_number_assigned(), 5);
+            assert_eq!(result.steps[6].change.political_group_number_assigned(), 1);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![15, 1, 1, 1, 1, 0, 0, 0, 0]);
         }
@@ -1550,17 +1599,19 @@ mod tests {
             ]);
             let result = seat_assignment(24, &totals).unwrap();
             assert_eq!(result.steps.len(), 7);
-            assert_eq!(result.steps[0].change.political_group_number(), 2);
-            assert_eq!(result.steps[1].change.political_group_number(), 3);
-            assert_eq!(result.steps[2].change.political_group_number(), 4);
-            assert_eq!(result.steps[3].change.political_group_number(), 5);
-            assert_eq!(result.steps[4].change.political_group_number(), 6);
-            assert_eq!(result.steps[5].change.political_group_number(), 7);
+            assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
+            assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
+            assert_eq!(result.steps[2].change.political_group_number_assigned(), 4);
+            assert_eq!(result.steps[3].change.political_group_number_assigned(), 5);
+            assert_eq!(result.steps[4].change.political_group_number_assigned(), 6);
+            assert_eq!(result.steps[5].change.political_group_number_assigned(), 7);
             assert!(
                 result.steps[6]
                     .change
                     .is_changed_by_absolute_majority_reassignment()
             );
+            assert_eq!(result.steps[6].change.political_group_number_retracted(), 7);
+            assert_eq!(result.steps[6].change.political_group_number_assigned(), 1);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![13, 2, 2, 2, 2, 2, 1, 0]);
         }
@@ -1650,7 +1701,8 @@ mod tests {
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[1].change.political_group_number(), 5);
+                assert_eq!(result.steps[0].change.political_group_number_retracted(), 1);
+                assert_eq!(result.steps[1].change.political_group_number_assigned(), 5);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![4, 5, 4, 4, 3]);
             }
@@ -1673,14 +1725,15 @@ mod tests {
                     vec![502, 502],
                 ]);
                 let result = seat_assignment(19, &totals).unwrap();
-                assert_eq!(result.steps[0].change.political_group_number(), 5);
+                assert_eq!(result.steps[0].change.political_group_number_assigned(), 5);
                 assert_eq!(result.steps.len(), 3);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[2].change.political_group_number(), 1);
+                assert_eq!(result.steps[1].change.political_group_number_retracted(), 5);
+                assert_eq!(result.steps[2].change.political_group_number_assigned(), 1);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![5, 4, 4, 4, 2]);
             }
@@ -1713,23 +1766,26 @@ mod tests {
                 ]);
                 let result = seat_assignment(24, &totals).unwrap();
                 assert_eq!(result.steps.len(), 9);
-                assert_eq!(result.steps[0].change.political_group_number(), 2);
-                assert_eq!(result.steps[1].change.political_group_number(), 3);
-                assert_eq!(result.steps[2].change.political_group_number(), 4);
-                assert_eq!(result.steps[3].change.political_group_number(), 5);
-                assert_eq!(result.steps[4].change.political_group_number(), 6);
-                assert_eq!(result.steps[5].change.political_group_number(), 7);
+                assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
+                assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
+                assert_eq!(result.steps[2].change.political_group_number_assigned(), 4);
+                assert_eq!(result.steps[3].change.political_group_number_assigned(), 5);
+                assert_eq!(result.steps[4].change.political_group_number_assigned(), 6);
+                assert_eq!(result.steps[5].change.political_group_number_assigned(), 7);
                 assert!(
                     result.steps[6]
                         .change
                         .is_changed_by_absolute_majority_reassignment()
                 );
+                assert_eq!(result.steps[6].change.political_group_number_retracted(), 7);
+                assert_eq!(result.steps[6].change.political_group_number_assigned(), 1);
                 assert!(
                     result.steps[7]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[8].change.political_group_number(), 7);
+                assert_eq!(result.steps[7].change.political_group_number_retracted(), 1);
+                assert_eq!(result.steps[8].change.political_group_number_assigned(), 7);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![12, 2, 2, 2, 2, 2, 2, 0]);
             }

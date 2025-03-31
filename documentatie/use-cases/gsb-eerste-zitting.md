@@ -36,12 +36,12 @@ __Uitbreidingen:__
 8b. Er zijn bezwaren en/of bijzonderheden tijdens het voorlezen van het PV:  
 &emsp; 8b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren PV.
 
-9a. De coördinator GSB sluit de zitting niet in de applicatie:
+9a. De coördinator GSB sluit de zitting niet in de applicatie:  
 &emsp; 9a1. (nadat de zitting meer dan een dag open staat) De applicatie toont een melding over het sluiten van de zitting en het openen van een nieuwe zitting.
 
-9b. De coördinator GSB sluit per ongeluk de zitting:
-&emsp; 9b1. De coördinator GSB heropent de zitting.
-&emsp;&emsp; 9b1a. De applicatie stelt vast dat er een latere zitting met invoer is:
+9b. De coördinator GSB sluit per ongeluk de zitting:  
+&emsp; 9b1. De coördinator GSB heropent de zitting.  
+&emsp;&emsp; 9b1a. De applicatie stelt vast dat er een latere zitting met invoer is:  
 &emsp;&emsp;&emsp; 9b1a1. De applicatie toont een foutmelding en heropent de zitting niet.
 
 ### Niet in scope

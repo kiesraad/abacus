@@ -63,12 +63,12 @@ __Hoofdscenario:__
 9.[Het GSB voert de hertelling in de applicatie in.](./gsb-invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)
 
 __Uitbreidingen:__
-6a. Het GSB besluit dat er geen hertelling nodig is:
-&emsp; 6a1. Het GSB zorgt ervoor dat de bevindingen in het PV P 2a worden opgenomen.
+6a. Het GSB besluit dat er geen hertelling nodig is:  
+&emsp; 6a1. Het GSB zorgt ervoor dat de bevindingen in het PV P 2a worden opgenomen.  
 &emsp; 6a2. Het GSB gooit het eerste blad van het 'lege' corrigendum weg.
 
-8a. Het GSB bevestigt het oorspronkelijke resultaat in de hertelling:
-&emsp; 8a1. Het GSB zorgt ervoor dat de bevindingen in het PV P 2a worden opgenomen.
+8a. Het GSB bevestigt het oorspronkelijke resultaat in de hertelling:  
+&emsp; 8a1. Het GSB zorgt ervoor dat de bevindingen in het PV P 2a worden opgenomen.  
 &emsp; 8a2. Het GSB gooit het corrigendum met de hertelling weg.
 
 

@@ -39,9 +39,9 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__  
 2a. De coördinator CSB stelt vast dat de digitale invoer incorrect is, maar de handmatige wel correct is:  
-&emsp; 2a1. De coördinator CSB gooit de digitale invoer weg.
+&emsp; 2a1. De coördinator CSB gooit de digitale invoer weg.  
 &emsp; 2a2. De coördinator CSB laat opnieuw handmatig invoeren.
 
-2b. De coördinator CSB stelt vast dat zowel de digitale als de handmatige invoer niet correct zijn:
-&emsp; 2b1. De coördinator CSB gooit beide invoeren weg.
+2b. De coördinator CSB stelt vast dat zowel de digitale als de handmatige invoer niet correct zijn:  
+&emsp; 2b1. De coördinator CSB gooit beide invoeren weg.  
 &emsp; 2b2. De coördinator CSB laat twee keer opnieuw handmatig invoeren.

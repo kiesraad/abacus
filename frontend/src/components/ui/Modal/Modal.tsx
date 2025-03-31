@@ -28,7 +28,7 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
 
   // show the dialog as a modal and focus on the title
   useEffect(() => {
-    if (dialogRef.current && !dialogRef.current.open) {
+    if (dialogRef.current) {
       dialogRef.current.showModal();
     }
     lastActiveElement.current = document.activeElement as HTMLElement;

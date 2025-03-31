@@ -28,10 +28,11 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
 
   // show the dialog as a modal and focus on the title
   useEffect(() => {
-    if (dialogRef.current) {
-      dialogRef.current.showModal();
-    }
+    // open the modal
+    dialogRef.current?.showModal();
+    // set the previous active element
     lastActiveElement.current = document.activeElement as HTMLElement;
+    // focus on the modal
     document.getElementById("modal-title")?.focus();
   }, [dialogRef]);
 
@@ -41,6 +42,7 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
         {onClose && (
           <IconButton
             onClick={() => {
+              // focus on the last active element
               lastActiveElement.current?.focus();
               onClose();
             }}

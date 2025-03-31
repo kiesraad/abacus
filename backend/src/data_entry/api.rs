@@ -1,5 +1,6 @@
 use crate::{
     APIError, AppState,
+    audit_log::{AuditEvent, AuditService},
     authentication::{Typist, User},
     data_entry::{
         PollingStationResults, ValidationResults,
@@ -61,6 +62,7 @@ async fn polling_station_data_entry_claim(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
+    audit_service: AuditService,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<Json<ClaimDataEntryResponse>, APIError> {
     let polling_station = polling_stations.get(id).await?;
@@ -88,8 +90,8 @@ async fn polling_station_data_entry_claim(
 
     // Transition to the new state
     let new_state = match entry_number {
-        EntryNumber::FirstEntry => state.claim_first_entry(new_data_entry)?,
-        EntryNumber::SecondEntry => state.claim_second_entry(new_data_entry)?,
+        EntryNumber::FirstEntry => state.claim_first_entry(new_data_entry.clone())?,
+        EntryNumber::SecondEntry => state.claim_second_entry(new_data_entry.clone())?,
     };
 
     // Validate the results
@@ -100,6 +102,12 @@ async fn polling_station_data_entry_claim(
 
     // Save the new data entry state
     polling_station_data_entries.upsert(id, &new_state).await?;
+    let data_entry = polling_station_data_entries.get_row(id).await?;
+
+    audit_service
+        .with_user(user.0)
+        .log_success(&AuditEvent::DataEntryClaimed(data_entry.into()), None)
+        .await?;
 
     let client_state = new_state.get_client_state().map(|v| v.to_owned());
     Ok(Json(ClaimDataEntryResponse {
@@ -349,6 +357,7 @@ pub mod tests {
     use test_log::test;
 
     use crate::{
+        audit_log::AuditLog,
         authentication::Role,
         data_entry::{DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts},
     };
@@ -391,11 +400,13 @@ pub mod tests {
     }
 
     async fn claim(pool: SqlitePool, entry_number: EntryNumber) -> Response {
+        let user = User::test_user(Role::Typist);
         polling_station_data_entry_claim(
-            Typist(User::test_user(Role::Typist)),
+            Typist(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
             State(Elections::new(pool.clone())),
+            AuditService::new(AuditLog(pool), user, None),
             Path((1, entry_number)),
         )
         .await

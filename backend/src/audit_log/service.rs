@@ -4,16 +4,17 @@ use axum::{
 };
 use std::net::{IpAddr, SocketAddr};
 
-use super::audit_log_events::{AuditEvent, AuditEventLevel, AuditLog, AuditLogEvent};
 use crate::{
     APIError,
     authentication::{User, Users, error::AuthenticationError},
 };
 
+use super::{AuditEvent, AuditEventLevel, AuditLog, AuditLogEvent};
+
 pub struct AuditService {
     log: AuditLog,
-    ip: Option<IpAddr>,
     user: Option<User>,
+    ip: Option<IpAddr>,
 }
 
 impl<S> FromRequestParts<S> for AuditService
@@ -38,11 +39,11 @@ where
 
 impl AuditService {
     #[cfg(test)]
-    pub fn new(log: AuditLog, ip: IpAddr, user: User) -> Self {
+    pub fn new(log: AuditLog, user: User, ip: Option<IpAddr>) -> Self {
         Self {
             log,
-            ip: Some(ip),
             user: Some(user),
+            ip,
         }
     }
 

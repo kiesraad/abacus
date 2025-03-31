@@ -173,10 +173,21 @@ export type AuditEvent =
   | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
   | (UserLoggedOutDetails & { eventType: "UserLoggedOut" })
   | { eventType: "UserAccountUpdateFailed" }
-  | { eventType: "UserAccountUpdateSuccess" }
+  | (LoginResponse & { eventType: "UserAccountUpdateSuccess" })
   | { eventType: "UserSessionExtended" }
   | (LoginResponse & { eventType: "UserCreated" })
   | (LoginResponse & { eventType: "UserUpdated" })
+  | (LoginResponse & { eventType: "UserDeleted" })
+  | (ElectionDetails & { eventType: "ElectionCreated" })
+  | (ElectionDetails & { eventType: "ApportionmentCreated" })
+  | (PollingStationDetails & { eventType: "PollingStationCreated" })
+  | (PollingStationDetails & { eventType: "PollingStationUpdated" })
+  | (PollingStationDetails & { eventType: "PollingStationDeleted" })
+  | (DataEntryDetails & { eventType: "DataEntryCreated" })
+  | (DataEntryDetails & { eventType: "DataEntryUpdated" })
+  | (DataEntryDetails & { eventType: "DataEntryDeleted" })
+  | (DataEntryDetails & { eventType: "DataEntryClaimed" })
+  | (DataEntryDetails & { eventType: "DataEntryFinalized" })
   | { eventType: "UnknownEvent" };
 
 export type AuditEventLevel = "info" | "success" | "warning" | "error";
@@ -266,6 +277,13 @@ export interface DataEntry {
   progress: number;
 }
 
+export interface DataEntryDetails {
+  dataEntryProgress: number;
+  finishedAt?: string | null;
+  firstEntryUserId?: number | null;
+  pollingStationId: number;
+}
+
 export type DataEntryStatusName =
   | "first_entry_not_started"
   | "first_entry_in_progress"
@@ -322,6 +340,18 @@ export interface ElectionApportionmentResponse {
  * Election category (limited for now)
  */
 export type ElectionCategory = "Municipal";
+
+export interface ElectionDetails {
+  electionCategory: ElectionCategory;
+  electionElectionDate: string;
+  electionId: number;
+  electionLocation: string;
+  electionName: string;
+  electionNominationDate: string;
+  electionNumberOfSeats: number;
+  electionNumberOfVoters: number;
+  electionStatus: ElectionStatus;
+}
 
 /**
  * Election details response, including the election's candidate list (political groups) and its polling stations
@@ -569,6 +599,18 @@ export interface PollingStation {
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
+}
+
+export interface PollingStationDetails {
+  pollingStationAddress: string;
+  pollingStationElectionId: number;
+  pollingStationId: number;
+  pollingStationLocality: string;
+  pollingStationName: string;
+  pollingStationNumber: number;
+  pollingStationNumberOfVoters?: number | null;
+  pollingStationPostalCode: string;
+  pollingStationType?: PollingStationType;
 }
 
 /**

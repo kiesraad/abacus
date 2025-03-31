@@ -200,12 +200,17 @@ async fn account_update(
         return Err(AuthenticationError::UserNotFound.into());
     };
 
+    let response = LoginResponse::from(&updated_user);
+
     audit_service
         .with_user(updated_user.clone())
-        .log_success(&AuditEvent::UserAccountUpdateSuccess, None)
+        .log_success(
+            &AuditEvent::UserAccountUpdateSuccess(response.clone()),
+            None,
+        )
         .await?;
 
-    Ok(Json(LoginResponse::from(&updated_user)))
+    Ok(Json(response))
 }
 
 /// Logout endpoint, deletes the session cookie

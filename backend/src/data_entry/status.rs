@@ -141,7 +141,7 @@ pub struct Definitive {
 }
 
 /// Current data entry, used for function parameters only
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CurrentDataEntry {
     pub progress: Option<u8>,
     pub user_id: u32,

@@ -1764,18 +1764,25 @@
             }
           },
           {
-            "type": "object",
-            "required": [
-              "eventType"
-            ],
-            "properties": {
-              "eventType": {
-                "type": "string",
-                "enum": [
-                  "UserAccountUpdateSuccess"
-                ]
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LoginResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserAccountUpdateSuccess"
+                    ]
+                  }
+                }
               }
-            }
+            ]
           },
           {
             "type": "object",
@@ -1827,6 +1834,237 @@
                     "type": "string",
                     "enum": [
                       "UserUpdated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LoginResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserDeleted"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ElectionDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "ElectionCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ElectionDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "ApportionmentCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PollingStationDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "PollingStationCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PollingStationDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "PollingStationUpdated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PollingStationDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "PollingStationDeleted"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataEntryDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "DataEntryCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataEntryDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "DataEntryUpdated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataEntryDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "DataEntryDeleted"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataEntryDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "DataEntryClaimed"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataEntryDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "DataEntryFinalized"
                     ]
                   }
                 }
@@ -2125,6 +2363,39 @@
           }
         }
       },
+      "DataEntryDetails": {
+        "type": "object",
+        "required": [
+          "pollingStationId",
+          "dataEntryProgress"
+        ],
+        "properties": {
+          "dataEntryProgress": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "finishedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "firstEntryUserId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "pollingStationId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "DataEntryStatusName": {
         "type": "string",
         "enum": [
@@ -2273,6 +2544,57 @@
         "enum": [
           "Municipal"
         ]
+      },
+      "ElectionDetails": {
+        "type": "object",
+        "required": [
+          "electionId",
+          "electionName",
+          "electionLocation",
+          "electionNumberOfVoters",
+          "electionCategory",
+          "electionNumberOfSeats",
+          "electionElectionDate",
+          "electionNominationDate",
+          "electionStatus"
+        ],
+        "properties": {
+          "electionCategory": {
+            "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "electionElectionDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "electionId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "electionLocation": {
+            "type": "string"
+          },
+          "electionName": {
+            "type": "string"
+          },
+          "electionNominationDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "electionNumberOfSeats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "electionNumberOfVoters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "electionStatus": {
+            "$ref": "#/components/schemas/ElectionStatus"
+          }
+        }
       },
       "ElectionDetailsResponse": {
         "type": "object",
@@ -2877,6 +3199,56 @@
           },
           "postal_code": {
             "type": "string"
+          }
+        }
+      },
+      "PollingStationDetails": {
+        "type": "object",
+        "required": [
+          "pollingStationId",
+          "pollingStationElectionId",
+          "pollingStationName",
+          "pollingStationNumber",
+          "pollingStationAddress",
+          "pollingStationPostalCode",
+          "pollingStationLocality"
+        ],
+        "properties": {
+          "pollingStationAddress": {
+            "type": "string"
+          },
+          "pollingStationElectionId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "pollingStationId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "pollingStationLocality": {
+            "type": "string"
+          },
+          "pollingStationName": {
+            "type": "string"
+          },
+          "pollingStationNumber": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pollingStationNumberOfVoters": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "pollingStationPostalCode": {
+            "type": "string"
+          },
+          "pollingStationType": {
+            "$ref": "#/components/schemas/PollingStationType"
           }
         }
       },

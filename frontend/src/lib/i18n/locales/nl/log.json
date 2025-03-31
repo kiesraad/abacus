@@ -35,7 +35,18 @@
     "UserSessionExtended": "Gebruikerssessie verlengd",
     "UserCreated": "Gebruiker aangemaakt",
     "UserUpdated": "Gebruiker bijgewerkt",
-    "UnknownEvent": "Onbekende gebeurtenis"
+    "UserDeleted": "Gebruiker verwijderd",
+    "UnknownEvent": "Onbekende gebeurtenis",
+    "ElectionCreated": "Verkiezing aangemaakt",
+    "ApportionmentCreated": "Zetelverdeling gemaakt",
+    "PollingStationCreated": "Stembureau aangemaakt",
+    "PollingStationUpdated": "Stembureau bijgewerkt",
+    "PollingStationDeleted": "Stembureau verwijderd",
+    "DataEntryCreated": "Invoer aangemaakt",
+    "DataEntryUpdated": "Invoer bijgewerkt",
+    "DataEntryDeleted": "Invoer verwijderd",
+    "DataEntryClaimed": "Invoer geclaimd",
+    "DataEntryFinalized": "Invoer afgerond"
   },
   "field": {
     "userAgent": "User agent",

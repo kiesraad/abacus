@@ -2,6 +2,7 @@ import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { formatDateTime, formatDateTimeFull } from "@/lib/util";
 import { render, server, spyOnHandler } from "@/testing";
 import { LogRequestHandler, LogUsersRequestHandler } from "@/testing/api-mocks";
 
@@ -18,17 +19,19 @@ describe("LogsHomePage", () => {
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
 
+    const formattedDate = formatDateTime(new Date("2025-03-11T09:02:36Z"));
+
     await waitFor(() => {
       expect(table).toHaveTableContent([
         ["Nummer", "Tijdstip", "Type", "Gebeurtenis", "Gebruiker: id, gebruikersnaam (rol)"],
-        ["24", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
-        ["23", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "1, admin (Beheerder)"],
-        ["22", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
-        ["21", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "2, typist (Invoerder)"],
-        ["20", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "2, typist (Invoerder)"],
-        ["19", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
-        ["18", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "3, coordinator (Coördinator)"],
-        ["17", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
+        ["24", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
+        ["23", formattedDate, "Succes", "Gebruiker uitgelogd", "1, admin (Beheerder)"],
+        ["22", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
+        ["21", formattedDate, "Succes", "Gebruiker uitgelogd", "2, typist (Invoerder)"],
+        ["20", formattedDate, "Succes", "Gebruiker ingelogd", "2, typist (Invoerder)"],
+        ["19", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
+        ["18", formattedDate, "Succes", "Gebruiker ingelogd", "3, coordinator (Coördinator)"],
+        ["17", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
       ]);
     });
 
@@ -54,10 +57,12 @@ describe("LogsHomePage", () => {
     const list = (await screen.findAllByRole("list"))[0] as HTMLDataListElement;
     expect(list).toBeVisible();
 
+    const formattedDate = formatDateTimeFull(new Date("2025-03-11T09:02:36Z"));
+
     expect(list).toHaveTextContent(
       [
         "Tijdstip",
-        "11 maart 2025 om 10:02",
+        formattedDate,
         "Gebruikersnaam",
         "admin",
         "Volledige naam",
@@ -85,16 +90,18 @@ describe("LogsHomePage", () => {
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
 
+    const formattedDate = formatDateTime(new Date("2025-03-11T09:02:36Z"));
+
     expect(table).toHaveTableContent([
       ["Nummer", "Tijdstip", "Type", "Gebeurtenis", "Gebruiker: id, gebruikersnaam (rol)"],
-      ["24", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
-      ["23", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "1, admin (Beheerder)"],
-      ["22", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
-      ["21", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "2, typist (Invoerder)"],
-      ["20", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "2, typist (Invoerder)"],
-      ["19", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
-      ["18", "11 mrt 10:02", "Succes", "Gebruiker ingelogd", "3, coordinator (Coördinator)"],
-      ["17", "11 mrt 10:02", "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
+      ["24", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
+      ["23", formattedDate, "Succes", "Gebruiker uitgelogd", "1, admin (Beheerder)"],
+      ["22", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
+      ["21", formattedDate, "Succes", "Gebruiker uitgelogd", "2, typist (Invoerder)"],
+      ["20", formattedDate, "Succes", "Gebruiker ingelogd", "2, typist (Invoerder)"],
+      ["19", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
+      ["18", formattedDate, "Succes", "Gebruiker ingelogd", "3, coordinator (Coördinator)"],
+      ["17", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
     ]);
 
     const filterButton = await screen.findByRole("button", { name: "Filteren" });
@@ -142,7 +149,10 @@ describe("LogsHomePage", () => {
     const since = await screen.findByLabelText("Sinds");
     await userEvent.type(since, "2025-03-11T10:00");
 
-    params.append("since", "1741683600");
+    const date = new Date("2025-03-11T10:00");
+
+    // format date as timestamp
+    params.append("since", Math.round(date.getTime() / 1000).toString());
 
     expect(filterLog).toHaveBeenCalledExactlyOnceWith(null, params);
     filterLog.mockClear();

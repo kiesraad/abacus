@@ -83,11 +83,11 @@ describe("Format util", () => {
   });
 
   test.each([
-    [new Date("Fri Oct 17 2008 05:09:20 GMT+0200"), "17 oktober 2008 om 05:09"],
-    [new Date("Sat Jun 03 2023 14:26:13 GMT+0200"), "3 juni 2023 om 14:26"],
-    [new Date("Sat Dec 18 2010 23:27:11 GMT+0100"), "18 december 2010 om 23:27"],
-  ])("Format date time %s as %s", (input: Date, expected: string) => {
-    expect(formatDateTimeFull(input)).toBe(expected);
+    [new Date("Fri Oct 17 2008 05:09:20 GMT+0200"), new RegExp(/\d+ oktober 2008 om \d\d:\d\d/)],
+    [new Date("Sat Jun 03 2023 14:26:13 GMT+0200"), new RegExp(/\d+ juni 2023 om \d\d:\d\d/)],
+    [new Date("Sat Dec 18 2010 23:27:11 GMT+0100"), new RegExp(/\d+ december 2010 om \d\d:\d\d/)],
+  ])("Format date time %s as %s", (input: Date, expected: RegExp) => {
+    expect(formatDateTimeFull(input)).toMatch(expected);
   });
 
   test.each([

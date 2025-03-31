@@ -10,6 +10,7 @@
   "no_polling_station_found_with_number": "Geen stembureau gevonden met nummer {nr}",
   "no_polling_stations_found": "Geen stembureaus gevonden",
   "polling_station_entry_not_possible": "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
+  "polling_station_in_progress_different_user": "Een andere invoerder is bezig met stembureau {nr} <strong>({name})</strong>",
   "assigned_to_different_user": "Een andere invoerder is bezig met stembureau {nr}",
   "searching": "aan het zoeken",
   "unfinished_input_title": "Je hebt nog een openstaande invoer",

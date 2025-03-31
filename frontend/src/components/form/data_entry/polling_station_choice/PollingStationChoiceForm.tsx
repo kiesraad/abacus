@@ -81,7 +81,12 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     }
 
     if (pollingStation.userStatus === PollingStationUserStatus.IN_PROGRESS_OTHER_USER) {
-      setAlert(DEFINITIVE_POLLING_STATION_ALERT);
+      setAlert(
+        t("polling_station_choice.polling_station_in_progress_different_user", {
+          nr: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      );
       setLoading(false);
       return;
     }

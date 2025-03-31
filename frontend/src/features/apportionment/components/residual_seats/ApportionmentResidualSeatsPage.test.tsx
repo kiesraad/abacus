@@ -140,7 +140,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats assignment table for less than 19 seats and absolute majority change information visible", async () => {
+  test("Residual seats assignment table for less than 19 seats and absolute majority change and list exhaustion information visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(absoluteMajorityChangeAndListExhaustion.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: absoluteMajorityChangeAndListExhaustion.seat_assignment,

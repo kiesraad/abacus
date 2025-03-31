@@ -138,8 +138,8 @@ export function ApportionmentResidualSeatsPage() {
                   {listExhaustionSteps.map((pg_seat_removal, index) => {
                     const change = pg_seat_removal.change as ListExhaustionRemovedSeat;
                     return (
-                      <div className="mb-md" key={`step-${index}`}>
-                        <span id={`list-exhaustion-step-${index}-information`}>
+                      <div className="mb-md" key={`step-${index + 1}`}>
+                        <span id={`list-exhaustion-step-${index + 1}-information`}>
                           {t("apportionment.list_exhaustion_removal", {
                             pg_retracted_seat: change.pg_retracted_seat,
                           })}

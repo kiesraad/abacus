@@ -10,7 +10,7 @@ export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElem
   subtext?: string;
   hint?: string;
   fieldSize?: "small" | "medium" | "large" | "text-area";
-  fieldWidth?: "narrowest" | "narrow" | "wide" | "full" | "full-field-with-narrowest-input";
+  fieldWidth?: "narrowest" | "narrow" | "wide" | "full" | "full-field-with-narrowest-input" | "parent";
   error?: string;
   margin?: "mb-md" | "mb-md-lg" | "mb-lg";
   numberInput?: boolean;

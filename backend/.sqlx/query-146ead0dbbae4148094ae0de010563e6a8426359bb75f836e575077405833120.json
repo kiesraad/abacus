@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                audit_log.username,\n                ip as \"ip: String\",\n                users.fullname as \"user_fullname\",\n                users.role as \"user_role?: Role\"\n            FROM audit_log\n            LEFT JOIN users ON audit_log.user_id = users.id\n            ORDER BY time DESC\n            LIMIT ? OFFSET ?\n            ",
+  "query": "INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, user_fullname, user_role, ip)\n            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                username,\n                ip,\n                user_fullname,\n                user_role\n            ",
   "describe": {
     "columns": [
       {
@@ -44,7 +44,7 @@
         "type_info": "Text"
       },
       {
-        "name": "ip: String",
+        "name": "ip",
         "ordinal": 8,
         "type_info": "Text"
       },
@@ -54,13 +54,13 @@
         "type_info": "Text"
       },
       {
-        "name": "user_role?: Role",
+        "name": "user_role",
         "ordinal": 10,
         "type_info": "Text"
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 10
     },
     "nullable": [
       false,
@@ -72,9 +72,9 @@
       false,
       false,
       true,
-      true,
-      true
+      false,
+      false
     ]
   },
-  "hash": "8d225703298f31c836fab0e8914cec3e229944d7b2433c2636dd9509cd9ea011"
+  "hash": "146ead0dbbae4148094ae0de010563e6a8426359bb75f836e575077405833120"
 }

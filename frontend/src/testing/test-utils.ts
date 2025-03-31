@@ -84,7 +84,11 @@ export function spyOnHandler(handler: HttpHandler) {
         .clone()
         .text()
         .then((body) => {
-          spy(body.length ? JSON.parse(body) : null);
+          if (url.searchParams.size > 0) {
+            spy(body.length ? JSON.parse(body) : null, url.searchParams);
+          } else {
+            spy(body.length ? JSON.parse(body) : null);
+          }
         });
     }
   });

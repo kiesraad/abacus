@@ -2,7 +2,8 @@ import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider, ElectionStatusProvider } from "@/api";
-import { routes } from "@/routes";
+// eslint-disable-next-line import/no-restricted-paths -- #1283
+import { routes } from "@/app/routes";
 import { expectErrorPage, overrideOnce, Providers, render, screen, server, setupTestRouter } from "@/testing";
 import { ElectionRequestHandler } from "@/testing/api-mocks";
 

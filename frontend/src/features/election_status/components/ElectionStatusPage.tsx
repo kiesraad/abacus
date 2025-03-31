@@ -1,10 +1,17 @@
 import { useNavigate } from "react-router";
 
-import { useElection, useElectionStatus } from "@/api";
 import { HeaderElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { Alert, Button, PageTitle } from "@/components/ui";
 import { t } from "@/lib/i18n";
+
+import {
+  useElection,
+  useElectionStatus,
+  useInitialApiGet,
+  USER_LIST_REQUEST_PATH,
+  UserListResponse,
+} from "@kiesraad/api";
 
 import { ElectionStatus } from "./ElectionStatus";
 
@@ -12,6 +19,9 @@ export function ElectionStatusPage() {
   const navigate = useNavigate();
   const { election, pollingStations } = useElection();
   const { statuses } = useElectionStatus();
+  const { requestState } = useInitialApiGet<UserListResponse>("/api/user" satisfies USER_LIST_REQUEST_PATH);
+
+  const users = requestState.status === "success" ? requestState.data.users : [];
 
   function finishInput() {
     void navigate("../report");
@@ -46,6 +56,7 @@ export function ElectionStatusPage() {
           election={election}
           pollingStations={pollingStations}
           statuses={statuses}
+          users={users}
           navigate={(path) => void navigate(path)}
         />
       </main>

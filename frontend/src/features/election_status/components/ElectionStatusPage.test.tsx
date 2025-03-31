@@ -1,8 +1,8 @@
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@/api";
-import { overrideOnce, render, screen } from "@/testing";
-import { getElectionMockData } from "@/testing/api-mocks";
+import { overrideOnce, render, screen, server } from "@/testing";
+import { getElectionMockData, UserListRequestHandler } from "@/testing/api-mocks";
 
 import { ElectionStatusPage } from "./ElectionStatusPage";
 
@@ -16,6 +16,10 @@ const renderElectionStatusPage = () =>
   );
 
 describe("ElectionStatusPage", () => {
+  beforeEach(() => {
+    server.use(UserListRequestHandler);
+  });
+
   test("Finish input not visible when data entry is in progress", () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData());
 

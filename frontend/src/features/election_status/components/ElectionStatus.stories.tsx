@@ -1,5 +1,6 @@
 import type { Story } from "@ladle/react";
 
+import { userMockData } from "@/testing/api-mocks";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 
@@ -23,6 +24,7 @@ export const PollingStationStatus: Story<StoryProps> = ({ navigate }) => {
         {
           polling_station_id: 2,
           status: "second_entry_not_started",
+          first_entry_user_id: 1,
           finished_at: today.toISOString(),
         },
         {
@@ -42,13 +44,20 @@ export const PollingStationStatus: Story<StoryProps> = ({ navigate }) => {
       ]}
       election={electionMockData}
       pollingStations={pollingStationMockData}
+      users={userMockData}
       navigate={navigate}
     />
   );
 };
 
 export const Empty: Story<StoryProps> = ({ navigate }) => (
-  <ElectionStatus statuses={[]} election={electionMockData} pollingStations={[]} navigate={navigate} />
+  <ElectionStatus
+    statuses={[]}
+    election={electionMockData}
+    pollingStations={[]}
+    users={userMockData}
+    navigate={navigate}
+  />
 );
 
 export default {

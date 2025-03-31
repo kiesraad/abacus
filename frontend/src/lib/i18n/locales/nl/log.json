@@ -12,7 +12,8 @@
     "event": "Gebeurtenis",
     "message": "Toelichting",
     "user": "Gebruiker: id, gebruikersnaam (rol)",
-    "since": "Sinds"
+    "since": "Sinds",
+    "details": "Details"
   },
   "filter": {
     "level": "Type",
@@ -40,6 +41,10 @@
     "userAgent": "User agent",
     "ip": "IP-adres",
     "loggedInUsersCount": "Aantal ingelogde gebruikers",
-    "sessionDuration": "Sessieduur (seconden)"
+    "sessionDuration": "Sessieduur (seconden)",
+    "user_id": "Gebruikers ID",
+    "username": "Gebruikersnaam",
+    "role": "Rol",
+    "fullname": "Volledige naam"
   }
 }

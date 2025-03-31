@@ -27,11 +27,14 @@ export function useAuditLog() {
   const [showFilter, setShowFilter] = useState(hasLogFilters(searchParams));
   const [filterState, setFilterState] = useState<LogFilterState>(getLogFilterOptionsFromSearchParams(searchParams));
 
+  // Set the filter state based on the search params
+  useEffect(() => {
+    setFilterState(getLogFilterOptionsFromSearchParams(searchParams));
+  }, [searchParams]);
+
   // Set the since date time filter
   const setSince = (since: string) => {
-    const newFilterState = clearEmptySince({ ...filterState, since });
-    setFilterState(newFilterState);
-    setSearchParams({ ...newFilterState });
+    setSearchParams({ ...clearEmptySince({ ...filterState, since }) });
   };
 
   // Toggle a value in the filter state
@@ -41,7 +44,6 @@ export function useAuditLog() {
       ...filterState,
       [filterName]: checked ? [...currentOptions, value] : currentOptions.filter((v) => v !== value),
     });
-    setFilterState(newFilterState);
     setSearchParams({ ...newFilterState });
   };
 

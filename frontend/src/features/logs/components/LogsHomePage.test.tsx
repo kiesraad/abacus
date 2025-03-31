@@ -108,7 +108,6 @@ describe("LogsHomePage", () => {
     await userEvent.click(filterButton);
 
     await waitFor(() => {
-      // a event option
       expect(screen.getByTestId("event-UserLoggedIn")).toBeInTheDocument();
     });
 

@@ -76,10 +76,8 @@ export const AccountUpdateRequestHandler = http.put<
   ACCOUNT_UPDATE_REQUEST_PATH
 >("/api/user/account", () => HttpResponse.json(loginResponseMockData, { status: 200 }));
 
-// simulate some audit log filtering
 export const LogRequestHandler = http.get("/api/log", () => HttpResponse.json(logMockResponse, { status: 200 }));
 
-// simulate audit log user list
 export const LogUsersRequestHandler = http.get("/api/log-users", () =>
   HttpResponse.json(userMockData, { status: 200 }),
 );

@@ -41,7 +41,7 @@ export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogF
 
   return (
     <nav>
-      <Button variant="secondary" onClick={onClose}>
+      <Button variant="secondary" size="sm" onClick={onClose}>
         <IconCross /> {t("log.action.close_filter")}
       </Button>
       <div className={cls.filters}>

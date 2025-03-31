@@ -53,11 +53,12 @@ export function LogsHomePage() {
           />
         )}
         <article>
-          <Toolbar fixedHeight>
+          <Toolbar>
             {!showFilter && (
               <ToolbarSection>
                 <Button
                   variant="secondary"
+                  size="sm"
                   onClick={() => {
                     setShowFilter(true);
                   }}

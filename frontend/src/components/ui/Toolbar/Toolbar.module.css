@@ -2,10 +2,7 @@
   display: flex;
   align-items: center;
   padding-bottom: var(--space-lg);
-}
-
-.fixed-height {
-  min-height: 5rem;
+  min-height: 4.5rem;
 }
 
 .toolbar-section {

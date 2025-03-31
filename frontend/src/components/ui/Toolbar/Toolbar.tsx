@@ -6,12 +6,10 @@ import cls from "./Toolbar.module.css";
 
 export interface ToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  fixedHeight?: boolean;
 }
-export function Toolbar({ children, fixedHeight = false, ...htmlProps }: ToolbarProps) {
-  const fixedHeightClass = fixedHeight ? cls.fixedHeight : "";
+export function Toolbar({ children, ...htmlProps }: ToolbarProps) {
   return (
-    <nav className={cn(cls.toolbar, fixedHeightClass)} {...htmlProps}>
+    <nav className={cn(cls.toolbar)} {...htmlProps}>
       {children}
     </nav>
   );

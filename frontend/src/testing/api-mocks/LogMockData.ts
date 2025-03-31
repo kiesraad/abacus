@@ -1,4 +1,6 @@
-export const logMockResponse = {
+import { AuditLogListResponse } from "@/api";
+
+export const logMockResponse: AuditLogListResponse = {
   events: [
     {
       id: 24,

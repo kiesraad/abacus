@@ -443,6 +443,7 @@ export type ErrorReference =
   | "InvalidUsernameOrPassword"
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
+  | "PasswordRejection"
   | "PdfGenerationError"
   | "PollingStationDataValidation"
   | "PollingStationFirstEntryAlreadyFinalised"
@@ -454,7 +455,7 @@ export type ErrorReference =
   | "UserNotFound"
   | "UsernameNotUnique"
   | "Unauthorized"
-  | "PasswordRejection";
+  | "ZeroVotesCast";
 
 /**
  * Response structure for errors

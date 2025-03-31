@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { AbsoluteMajorityReassignedSeat, useElection } from "@/api";
+import { AbsoluteMajorityReassignedSeat, ListExhaustionRemovedSeat, useElection } from "@/api";
 import { PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
@@ -64,11 +64,14 @@ export function ApportionmentResidualSeatsPage() {
     const highestAverageSteps = seatAssignment.steps.filter(
       (step) => step.change.changed_by === "HighestAverageAssignment",
     );
-    const absoluteMajorityChange = seatAssignment.steps
+    const absoluteMajorityReassignment = seatAssignment.steps
       .map((step) => step.change)
       .find((change) => change.changed_by === "AbsoluteMajorityReassignment") as
       | AbsoluteMajorityReassignedSeat
       | undefined;
+    const listExhaustionSteps = seatAssignment.steps.filter(
+      (step) => step.change.changed_by === "ListExhaustionRemoval",
+    );
     return (
       <>
         {render_title_and_header()}
@@ -121,14 +124,30 @@ export function ApportionmentResidualSeatsPage() {
                     )}
                   </>
                 )}
-                {absoluteMajorityChange && (
-                  <span id="absolute-majority-change-information" className={cls.absoluteMajorityChangeInformation}>
-                    {t("apportionment.absolute_majority_change", {
-                      pg_assigned_seat: absoluteMajorityChange.pg_assigned_seat,
-                      pg_retracted_seat: absoluteMajorityChange.pg_retracted_seat,
-                    })}
-                  </span>
-                )}
+                <div>
+                  {absoluteMajorityReassignment && (
+                    <div className="mb-md">
+                      <span id="absolute-majority-reassignment-information">
+                        {t("apportionment.absolute_majority_reassignment", {
+                          pg_assigned_seat: absoluteMajorityReassignment.pg_assigned_seat,
+                          pg_retracted_seat: absoluteMajorityReassignment.pg_retracted_seat,
+                        })}
+                      </span>
+                    </div>
+                  )}
+                  {listExhaustionSteps.map((pg_seat_removal, index) => {
+                    const change = pg_seat_removal.change as ListExhaustionRemovedSeat;
+                    return (
+                      <div className="mb-md" key={`step-${index}`}>
+                        <span id={`list-exhaustion-step-${index}-information`}>
+                          {t("apportionment.list_exhaustion_removal", {
+                            pg_retracted_seat: change.pg_retracted_seat,
+                          })}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </>
             ) : (
               <span>{t("apportionment.no_residual_seats_to_assign")}</span>

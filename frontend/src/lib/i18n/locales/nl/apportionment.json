@@ -1,5 +1,5 @@
 {
-  "absolute_majority_change": "Overeenkomstig artikel P 9 van de Kieswet (volstrekte meerderheid) wordt aan lijst {pg_assigned_seat} alsnog één zetel toegewezen en vervalt daartegenover één zetel, die eerder was toegewezen aan lijst {pg_retracted_seat}.",
+  "absolute_majority_reassignment": "Overeenkomstig artikel P 9 van de Kieswet (volstrekte meerderheid) wordt aan lijst {pg_assigned_seat} alsnog één zetel toegewezen en vervalt daartegenover één zetel, die eerder was toegewezen aan lijst {pg_retracted_seat}.",
   "assigned_number_of_seats": "Toegewezen aantal zetels",
   "average": "Gemiddelde",
   "chosen_candidates": "Gekozen kandidaten",
@@ -21,6 +21,7 @@
   "in_alphabetical_order": "In alfabetische volgorde",
   "information_highest_averages": "Er zijn 19 of meer zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste gemiddelden</strong>. De partij die na toewijzing van een restzetel het hoogste aantal stemmen per zetel heeft, krijgt de restzetel.\nIn de tabel is het gemiddeld aantal stemmen per zetel te vinden dat elke lijst zou krijgen als een restzetel zou worden toegekend.",
   "information_largest_remainders": "Er zijn minder dan 19 zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste overschotten</strong>. De restzetels zijn één voor één toegewezen aan de lijsten die na verdeling van de zetels het grootste overschot aan stemmen hebben. Lijsten die minder dan 75% van de kiesdeler hebben gehaald, komen niet in aanmerking voor een restzetel.",
+  "list_exhaustion_removal": "Overeenkomstig artikel P 10 of artikel P 13, eerste lid, van de Kieswet (lijstuitputting) vindt er een overgang plaats van een zetel van lijst {pg_retracted_seat} naar een andere lijst.",
   "minus": "min",
   "not_possible": "Zetelverdeling is niet mogelijk",
   "not_yet_available": "Zetelverdeling is nog niet beschikbaar",

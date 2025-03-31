@@ -7,7 +7,7 @@ import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRout
 import { getElectionMockData } from "@/testing/api-mocks";
 
 import * as gte19Seats from "../../testing/19-or-more-seats";
-import * as absoluteMajorityChange from "../../testing/absolute-majority-change";
+import * as absoluteMajorityChangeAndListExhaustion from "../../testing/absolute-majority-change-and-list-exhaustion";
 import * as lt19Seats from "../../testing/less-than-19-seats";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentResidualSeatsPage } from "./ApportionmentResidualSeatsPage";
@@ -141,11 +141,11 @@ describe("ApportionmentResidualSeatsPage", () => {
   });
 
   test("Residual seats assignment table for less than 19 seats and absolute majority change information visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(absoluteMajorityChange.election));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(absoluteMajorityChangeAndListExhaustion.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      seat_assignment: absoluteMajorityChange.seat_assignment,
-      candidate_nomination: absoluteMajorityChange.candidate_nomination,
-      election_summary: absoluteMajorityChange.election_summary,
+      seat_assignment: absoluteMajorityChangeAndListExhaustion.seat_assignment,
+      candidate_nomination: absoluteMajorityChangeAndListExhaustion.candidate_nomination,
+      election_summary: absoluteMajorityChangeAndListExhaustion.election_summary,
     } satisfies ElectionApportionmentResponse);
 
     renderApportionmentResidualSeatsPage();
@@ -165,12 +165,15 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["1", "Political Group A", "7", "189", "2/15", "0"],
       ["2", "Political Group B", "2", "296", "7/15", "1"],
       ["3", "Political Group C", "1", "226", "11/15", "1"],
-      ["4", "Political Group D", "1", "195", "11/15", "1"],
+      ["4", "Political Group D", "1", "195", "11/15", "2"],
       ["5", "Political Group E", "1", "112", "11/15", "0"],
     ]);
 
-    expect(await screen.findByTestId("absolute-majority-change-information")).toHaveTextContent(
+    expect(await screen.findByTestId("absolute-majority-reassignment-information")).toHaveTextContent(
       "Overeenkomstig artikel P 9 van de Kieswet (volstrekte meerderheid) wordt aan lijst 1 alsnog één zetel toegewezen en vervalt daartegenover één zetel, die eerder was toegewezen aan lijst 4.",
+    );
+    expect(await screen.findByTestId("list-exhaustion-step-1-information")).toHaveTextContent(
+      "Overeenkomstig artikel P 10 of artikel P 13, eerste lid, van de Kieswet (lijstuitputting) vindt er een overgang plaats van een zetel van lijst 1 naar een andere lijst.",
     );
 
     expect(screen.queryByTestId("highest-averages-for-19-or-more-seats-table")).not.toBeInTheDocument();

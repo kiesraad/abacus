@@ -1,0 +1,47 @@
+# CSB: Invoer zitting
+
+## Het CSB voert de tellingen van het GSB in (vlieger)
+
+__Niveau:__ hoog-over, vlieger, 🪁
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__  
+
+1. Het CSB leest het digitale bestand in als eerste invoer. (controle hash-code en importeren)
+2. Het CSB voert de resultaten handmatig in als tweede invoer.
+3. De applicatie stelt vast dat beide invoeren gelijk zijn.
+4. De applicatie slaat het definitieve resultaat op.
+
+__Uitbreidingen:__
+
+1a. Het is niet mogelijk het digitale bestand te importeren:  
+&emsp; 1a1. Het CSB lost in overleg met het GSB het probleem op en importeert alsnog het bestand.  
+&emsp; 1a1a. Het CSB slaagt er niet in het probleem op te lossen:  
+&emsp;&emsp; 1a1a1. Het CSB doet de eerste invoer handmatig.
+
+3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
+&emsp; 3a1. [De coördinator CSB beoordeelt de verschillen tussen de twee invoeren op (zee)](#de-coördinator-csb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-op-zee)
+
+
+
+## De coördinator CSB beoordeelt de verschillen tussen de twee invoeren op (zee)
+
+__Niveau:__ gebruikersdoel, zee, 🌊
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__
+1. De coördinator CSB vergelijkt de eerste en tweede invoer met het papieren PV.  
+2. De coördinator CSB stelt vast dat de digitale invoer correct is, maar de handmatige invoer niet.
+3. De coördinator CSB gooit de handmatige invoer weg.
+4. De coördinator CSB laat opnieuw handmatig invoeren.
+
+__Uitbreidingen:__  
+2a. De coördinator CSB stelt vast dat de digitale invoer incorrect is, maar de handmatige wel correct is:  
+&emsp; 2a1. De coördinator CSB gooit de digitale invoer weg.
+&emsp; 2a2. De coördinator CSB laat opnieuw handmatig invoeren.
+
+2b. De coördinator CSB stelt vast dat zowel de digitale als de handmatige invoer niet correct zijn:
+&emsp; 2b1. De coördinator CSB gooit beide invoeren weg.
+&emsp; 2b2. De coördinator CSB laat twee keer opnieuw handmatig invoeren.

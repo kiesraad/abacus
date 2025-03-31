@@ -97,7 +97,7 @@ __Uitbreidingen:__
 &emsp; 6a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
 
 7a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
-&emsp; 7a1. [De coördinator GSB lost de verschillen tussen de twee invoeren op.](#de-coördinator-gsb-lost-de-verschillen-tussen-de-twee-invoeren-op-zee)
+&emsp; 7a1. [De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.](#de-coördinator-gsb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-op-zee)
 
 ### Open punten
 - Waar in het scenario kan de coördinator GSB verklaringen maken over de waarschuwingen, zodat het CSB deze beter kan beoordelen? Na de eerste of tweede invoer? Of pas nadat het resultaat van een stembureau definitief is?
@@ -163,9 +163,7 @@ __Uitbreidingen:__
 - De use case beschrijft de oude modellen, met daarin alleen de vraag "Is er herteld?" In de nieuwe modellen zijn er drie vragen.
 
 
-## De coördinator GSB lost de verschillen tussen de twee invoeren op (zee)
-
-TODO: betere titel, want wordt niets opgelost
+## De coördinator GSB beoordeelt de verschillen tussen de twee invoeren op (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
@@ -188,7 +186,7 @@ __Uitbreidingen:__
 
 ### Niet in scope
 
-- Als gebruiksvriendelijker alternatief op de uitbreiding waar geen van beide invoeren correct zijn: "De coördinator GSB laat alleen de afwijkende lijsten opnieuw twee keer invoeren."
+- Gebruiksvriendelijker alternatief is om afhankelijk van het aantal verschillen drie opties te geven: (1) coördinator GSB kiest één invoer en voegt een verklaring toe aan "Bijzonderheden"; (2) coördinator GSB laat alleen de afwijkende lijst(en) opnieuw invoeren; (3) coördinator GSB laat de volledige invoer opnieuw doen.
 
 
 

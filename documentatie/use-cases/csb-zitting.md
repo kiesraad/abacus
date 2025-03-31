@@ -11,7 +11,7 @@ __Hoofdscenario:__
 1. Het CSB ontvangt het GSB PV (incl. bijlagen) van de burgemeester.
 2. Het CSB ontvangt de benodigde digitale bestanden (PV, onderliggende PVs, digitale bestanden, corrigenda) van het GSB en controleert ze op volledigheid.
 3. Het CSB stelt vast dat het PV geen aanleiding geeft tot een terugverwijzing. (controleprotocol deel A)
-4. [Het CSB voert de tellingen van het GSB in.](#het-csb-voert-de-tellingen-van-het-gsb-in-vlieger)
+4. [Het CSB voert de tellingen van het GSB in.](./csb-invoer-zitting.md#het-csb-voert-de-tellingen-van-het-gsb-in-vlieger)
 5. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
 6. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)
 7. De applicatie genereert de benodigde bestanden: PV, digitaal bestand(en).
@@ -26,9 +26,9 @@ __Hoofdscenario:__
 __Uitbreidingen:__
 
 3a. Het PV geeft aanleiding tot een terugverwijzing:  
-&emsp;3a1. Het CSB verwijst terug naar het GSB.  
-&emsp;3a2. Het GSB doet onderzoek en gaat eventueel over tot hertelling.  
-&emsp;3a3. Het GSB deelt de resultaten van de terugverwijzing met het CSB.
+&emsp; 3a1. Het CSB verwijst terug naar het GSB.  
+&emsp; 3a2. Het GSB doet onderzoek en gaat eventueel over tot hertelling.  
+&emsp; 3a3. Het GSB deelt de resultaten van de terugverwijzing met het CSB.
 
 4-11a. Het CSB moet nieuwe aantallen invoeren ter correctie van de eerder ingevoerde tellingen:  
 &emsp; 4-11a1. Het CSB corrigeert de eerder ingevoerde aantallen in de applicatie. Er is dus geen tweede zitting.
@@ -49,38 +49,6 @@ __Uitbreidingen:__
     - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijst importeren.
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
 
-
-## Het CSB voert de tellingen van het GSB in (vlieger)
-
-__Niveau:__ hoog-over, vlieger, 🪁
-
-### Hoofdscenario en uitbreidingen
-
-__Hoofdscenario:__  
-
-1. Het CSB leest het digitale bestand in als eerste invoer. (controle hash-code en importeren)
-2. Het CSB voert de resultaten handmatig in als tweede invoer.
-3. De applicatie stelt vast dat beide invoeren gelijk zijn.
-4. De applicatie slaat het definitieve resultaat op.
-
-__Uitbreidingen:__
-
-1a. Het is niet mogelijk het digitale bestand te importeren:  
-&emsp;1a1. Het CSB lost in overleg met het GSB het probleem op en importeert alsnog het bestand.  
-&emsp;1a1a. Het CSB slaagt er niet in het probleem op te lossen:  
-&emsp;&emsp;1a1a1. Het CSB doet de eerste invoer handmatig.
-
-TODO: hier ook bij 3a uitwerken over waarschuwingen zoals bij GSB
-
-3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
-&emsp; 3a1. De coördinator CSB vergelijkt de eerste en tweede invoer met het papieren PV.  
-&emsp; 3a2. De coördinator CSB stelt vast dat de tweede (handmatige) invoer correct is.  
-&emsp;&emsp;3a2a. De coördinator CSB stelt vast dat de tweede (handmatige) invoer niet correct is en het digitale bestand correct is:  
-&emsp;&emsp;&emsp;3a2a1. De coördinator CSB gooit de tweede (handmatige) invoer weg en laat die opnieuw invoeren.  
-&emsp;&emsp;3a2b. De coördinator CSB stelt vast dat zowel de tweede (handmatige) invoer als het digitale bestand niet correct zijn:  
-&emsp;&emsp;&emsp;3a2b1. De coördinator CSB gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
-&emsp; 3a3. De coördinator CSB markeert de tweede (handmatige) invoer als correct en gooit de andere invoer weg.
-&emsp; 3a4. De coördinator CSB geeft het PV aan een invoerder om nogmaals in te voeren.
 
 ## Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan (vlieger)
 

@@ -33,7 +33,6 @@ jobs:
         working-directory: ./backend
     env:
       CARGO_TERM_COLOR: always
-      ASSET_DIR: ${{ github.workspace }}/frontend/dist
       SQLX_OFFLINE: "true"
       NODE_ENV: production
     steps:

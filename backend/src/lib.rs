@@ -1,8 +1,6 @@
 #[cfg(feature = "memory-serve")]
 use axum::http::StatusCode;
 use axum::{Router, extract::FromRef, middleware, serve::ListenerExt};
-#[cfg(feature = "memory-serve")]
-use memory_serve::MemoryServe;
 use sqlx::SqlitePool;
 use std::{error::Error, net::SocketAddr};
 use tokio::{net::TcpListener, signal};
@@ -75,7 +73,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     // Add the memory-serve router to serve the frontend (if the memory-serve feature is enabled)
     #[cfg(feature = "memory-serve")]
     let router = router.merge(
-        MemoryServe::from_env()
+        memory_serve::from_local_build!()
             .index_file(Some("/index.html"))
             .fallback(Some("/index.html"))
             .fallback_status(StatusCode::OK)

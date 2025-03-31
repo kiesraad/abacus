@@ -3,7 +3,6 @@ mod model_na_31_2;
 use std::{error::Error, path::PathBuf};
 
 pub use model_na_31_2::*;
-use typst::foundations::Bytes;
 
 /// Defines the available models and what their input parameters are.
 pub enum PdfModel {
@@ -35,12 +34,12 @@ impl PdfModel {
     }
 
     /// Get the input, serialized as json
-    pub fn get_input(&self) -> serde_json::Result<Bytes> {
+    pub fn get_input(&self) -> serde_json::Result<String> {
         let data = match self {
             Self::ModelNa31_2(input) => serde_json::to_string(input),
         }?;
 
-        Ok(Bytes::from_string(data))
+        Ok(data)
     }
 
     pub fn from_name_with_input(name: &str, input: &str) -> Result<PdfModel, Box<dyn Error>> {

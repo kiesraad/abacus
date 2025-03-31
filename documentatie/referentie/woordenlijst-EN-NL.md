@@ -180,27 +180,27 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 
 ## Zetelverdeling
 
-| Nederlands                           | Afkorting | Engels                       | Opmerkingen                                             |
-|--------------------------------------|-----------|------------------------------|---------------------------------------------------------|
-| zetel                                |           | seat                         |                                                         |
-| volle zetel                          |           | full seat                    |                                                         |
-| restzetel                            |           | residual seat                | via https://english.kiesraad.nl/  - NIET 'rest seat'    |
-| raadszetel                           |           | council seat                 |                                                         |
-| zetelverdeling                       |           | apportionment                |                                                         |
-| zeteltoewijzing                      |           | seat assignment              | toewijzing van een zetel aan een politieke groepering   |
-| aanwijzing van de gekozen kandidaat  |           | candidate nomination         | aanwijzing van de gekozen kandidaat aan een zetel       |
-| lijstuitputting                      |           | list exhaustion              | nog op zoek naar een betere term                        |
-| kandidatenlijst                      |           | list of candidates           |                                                         |
-| kandidaat                            |           | candidate                    |                                                         |
-| partijloos                           |           | non-party                    | *non-party candidate*                                   |
-| onafhankelijk                        |           | independent                  | *independent candidate*                                 |
-| overleden                            |           | deceased                     | *deceased candidate*                                    |
-| kiesdeler                            |           | electoral quota              | via <https://en.wikipedia.org/wiki/Electoral_quota>     |
-| voorkeursdrempel                     |           | preference threshold         | via EML_NL-standaard                                    |
-| voorkeursstem                        |           | preferential vote            | via <https://en.wikipedia.org/wiki/Preferential_voting> |
-| loting                               |           | draw                         |                                                         |
-| systeem van de grootste gemiddelden  |           | system of largest averages   |                                                         |
-| systeem van de grootste overschotten |           | system of largest remainders | via <https://en.wikipedia.org/wiki/Quota_method>        |
+| Nederlands                           | Afkorting | Engels                    | Opmerkingen                                                 |
+|--------------------------------------|-----------|---------------------------|-------------------------------------------------------------|
+| zetel                                |           | seat                      |                                                             |
+| volle zetel                          |           | full seat                 |                                                             |
+| restzetel                            |           | residual seat             | via https://english.kiesraad.nl/  - NIET 'rest seat'        |
+| raadszetel                           |           | council seat              |                                                             |
+| zetelverdeling                       |           | apportionment             |                                                             |
+| zeteltoewijzing                      |           | seat assignment           | toewijzing van een zetel aan een politieke groepering       |
+| aanwijzing van de gekozen kandidaat  |           | candidate nomination      | aanwijzing van de gekozen kandidaat aan een zetel           |
+| lijstuitputting                      |           | list exhaustion           | nog op zoek naar een betere term                            |
+| kandidatenlijst                      |           | list of candidates        |                                                             |
+| kandidaat                            |           | candidate                 |                                                             |
+| partijloos                           |           | non-party                 | *non-party candidate*                                       |
+| onafhankelijk                        |           | independent               | *independent candidate*                                     |
+| overleden                            |           | deceased                  | *deceased candidate*                                        |
+| kiesdeler                            |           | electoral quota           | via <https://en.wikipedia.org/wiki/Electoral_quota>         |
+| voorkeursdrempel                     |           | preference threshold      | via EML_NL-standaard                                        |
+| voorkeursstem                        |           | preferential vote         | via <https://en.wikipedia.org/wiki/Preferential_voting>     |
+| loting                               |           | drawing lots              |                                                             |
+| systeem van de grootste gemiddelden  |           | highest averages method   | via <https://en.wikipedia.org/wiki/Highest_averages_method> |
+| systeem van de grootste overschotten |           | largest remainders method | via <https://en.wikipedia.org/wiki/Quota_method>            |
 
 ## Technisch / software
 

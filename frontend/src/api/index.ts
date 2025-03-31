@@ -11,7 +11,6 @@ export * from "./useApiClient";
 export * from "./useApiState";
 export * from "./useCrud";
 export * from "./useElectionDataRequest";
-export * from "./useElectionListRequest";
 export * from "./useElectionStatusRequest";
 export * from "./useInitialApiGet";
 export * from "./useUser";

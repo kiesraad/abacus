@@ -51,7 +51,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-
       - name: Run tests with coverage
-        run: cargo llvm-cov --branch nextest --profile ci
+        run: cargo llvm-cov --branch nextest --profile ci --features embed-typst
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1

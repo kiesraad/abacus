@@ -1665,7 +1665,7 @@
   },
   "components": {
     "schemas": {
-      "AbsoluteMajorityChange": {
+      "AbsoluteMajorityReassignedSeat": {
         "type": "object",
         "description": "Contains information about the enactment of article P 9 of the Kieswet.",
         "required": [
@@ -1704,74 +1704,6 @@
             "type": "string"
           }
         }
-      },
-      "AssignedSeat": {
-        "oneOf": [
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LargestAverageAssignedSeat"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "assigned_by"
-                ],
-                "properties": {
-                  "assigned_by": {
-                    "type": "string",
-                    "enum": [
-                      "LargestAverage"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LargestRemainderAssignedSeat"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "assigned_by"
-                ],
-                "properties": {
-                  "assigned_by": {
-                    "type": "string",
-                    "enum": [
-                      "LargestRemainder"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AbsoluteMajorityChange"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "assigned_by"
-                ],
-                "properties": {
-                  "assigned_by": {
-                    "type": "string",
-                    "enum": [
-                      "AbsoluteMajorityChange"
-                    ]
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        "description": "Records the political group and specific change for a specific residual seat"
       },
       "AuditEvent": {
         "oneOf": [
@@ -2544,6 +2476,7 @@
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
+          "AllListsExhausted",
           "ApportionmentNotAvailableUntilDataEntryFinalised",
           "DatabaseError",
           "DrawingOfLotsRequired",
@@ -2621,9 +2554,9 @@
           }
         }
       },
-      "LargestAverageAssignedSeat": {
+      "HighestAverageAssignedSeat": {
         "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the largest average method.",
+        "description": "Contains the details for an assigned seat, assigned through the highest average method.",
         "required": [
           "selected_pg_number",
           "pg_options",
@@ -2697,6 +2630,21 @@
             "type": "integer",
             "format": "int32",
             "description": "The political group that was selected for this seat has this political group number",
+            "minimum": 0
+          }
+        }
+      },
+      "ListExhaustionRemovedSeat": {
+        "type": "object",
+        "description": "Contains information about the enactment of article P 10 of the Kieswet.",
+        "required": [
+          "pg_retracted_seat"
+        ],
+        "properties": {
+          "pg_retracted_seat": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number which the seat is retracted from",
             "minimum": 0
           }
         }
@@ -3090,29 +3038,117 @@
           "steps": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SeatAssignmentStep"
+              "$ref": "#/components/schemas/SeatChangeStep"
             }
           }
         }
       },
-      "SeatAssignmentStep": {
+      "SeatChange": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "HighestAverageAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LargestRemainderAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "LargestRemainderAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AbsoluteMajorityReassignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "AbsoluteMajorityReassignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ListExhaustionRemovedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "ListExhaustionRemoval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "description": "Records the political group and specific change for a specific residual seat"
+      },
+      "SeatChangeStep": {
         "type": "object",
-        "description": "Records the details for a specific residual seat, and how the standing is\nonce that residual seat was assigned",
+        "description": "Records the change for a specific seat, and how the standing is once\nthat seat was assigned or removed",
         "required": [
-          "residual_seat_number",
           "change",
-          "standing"
+          "standings"
         ],
         "properties": {
           "change": {
-            "$ref": "#/components/schemas/AssignedSeat"
+            "$ref": "#/components/schemas/SeatChange"
           },
           "residual_seat_number": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "standing": {
+          "standings": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PoliticalGroupStanding"

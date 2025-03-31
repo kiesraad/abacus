@@ -156,7 +156,7 @@ export type USER_DELETE_REQUEST_PATH = `/api/user/${number}`;
 /**
  * Contains information about the enactment of article P 9 of the Kieswet.
  */
-export interface AbsoluteMajorityChange {
+export interface AbsoluteMajorityReassignedSeat {
   /** Political group number which the residual seat is assigned to */
   pg_assigned_seat: number;
   /** Political group number which the residual seat is retracted from */
@@ -168,14 +168,6 @@ export interface AccountUpdateRequest {
   password: string;
   username: string;
 }
-
-/**
- * Records the political group and specific change for a specific residual seat
- */
-export type AssignedSeat =
-  | (LargestAverageAssignedSeat & { assigned_by: "LargestAverage" })
-  | (LargestRemainderAssignedSeat & { assigned_by: "LargestRemainder" })
-  | (AbsoluteMajorityChange & { assigned_by: "AbsoluteMajorityChange" });
 
 export type AuditEvent =
   | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
@@ -415,6 +407,7 @@ export interface ElectionSummary {
  * Error reference used to show the corresponding error message to the end-user
  */
 export type ErrorReference =
+  | "AllListsExhausted"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "DatabaseError"
   | "DrawingOfLotsRequired"
@@ -464,9 +457,9 @@ export interface Fraction {
 }
 
 /**
- * Contains the details for an assigned seat, assigned through the largest average method.
+ * Contains the details for an assigned seat, assigned through the highest average method.
  */
-export interface LargestAverageAssignedSeat {
+export interface HighestAverageAssignedSeat {
   /** The list of political groups with the same average, that have been assigned a seat */
   pg_assigned: number[];
   /** The list of political groups with the same average, that have not been assigned a seat */
@@ -489,6 +482,14 @@ export interface LargestRemainderAssignedSeat {
   remainder_votes: Fraction;
   /** The political group that was selected for this seat has this political group number */
   selected_pg_number: number;
+}
+
+/**
+ * Contains information about the enactment of article P 10 of the Kieswet.
+ */
+export interface ListExhaustionRemovedSeat {
+  /** Political group number which the seat is retracted from */
+  pg_retracted_seat: number;
 }
 
 export interface LoginResponse {
@@ -641,17 +642,26 @@ export interface SeatAssignmentResult {
   quota: Fraction;
   residual_seats: number;
   seats: number;
-  steps: SeatAssignmentStep[];
+  steps: SeatChangeStep[];
 }
 
 /**
- * Records the details for a specific residual seat, and how the standing is
- * once that residual seat was assigned
+ * Records the political group and specific change for a specific residual seat
  */
-export interface SeatAssignmentStep {
-  change: AssignedSeat;
-  residual_seat_number: number;
-  standing: PoliticalGroupStanding[];
+export type SeatChange =
+  | (HighestAverageAssignedSeat & { changed_by: "HighestAverageAssignment" })
+  | (LargestRemainderAssignedSeat & { changed_by: "LargestRemainderAssignment" })
+  | (AbsoluteMajorityReassignedSeat & { changed_by: "AbsoluteMajorityReassignment" })
+  | (ListExhaustionRemovedSeat & { changed_by: "ListExhaustionRemoval" });
+
+/**
+ * Records the change for a specific seat, and how the standing is once
+ * that seat was assigned or removed
+ */
+export interface SeatChangeStep {
+  change: SeatChange;
+  residual_seat_number?: number;
+  standings: PoliticalGroupStanding[];
 }
 
 /**

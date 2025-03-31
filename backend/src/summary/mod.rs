@@ -251,8 +251,8 @@ mod tests {
                 tmp
             },
             political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, 21, &[18, 3]),
-                PoliticalGroupVotes::from_test_data_auto(2, 10, &[4, 4, 2]),
+                PoliticalGroupVotes::from_test_data_auto(1, &[18, 3]),
+                PoliticalGroupVotes::from_test_data_auto(2, &[4, 4, 2]),
             ],
         }
     }
@@ -279,8 +279,8 @@ mod tests {
                 tmp
             },
             political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, 16, &[10, 6]),
-                PoliticalGroupVotes::from_test_data_auto(2, 30, &[12, 10, 8]),
+                PoliticalGroupVotes::from_test_data_auto(1, &[10, 6]),
+                PoliticalGroupVotes::from_test_data_auto(2, &[12, 10, 8]),
             ],
         }
     }
@@ -538,7 +538,7 @@ mod tests {
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result
             .political_group_votes
-            .push(PoliticalGroupVotes::from_test_data_auto(3, 0, &[0]));
+            .push(PoliticalGroupVotes::from_test_data_auto(3, &[0]));
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
@@ -553,7 +553,7 @@ mod tests {
         let ps = polling_stations_fixture(&election, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
-        ps2_result.political_group_votes[1] = PoliticalGroupVotes::from_test_data_auto(3, 0, &[0]);
+        ps2_result.political_group_votes[1] = PoliticalGroupVotes::from_test_data_auto(3, &[0]);
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],

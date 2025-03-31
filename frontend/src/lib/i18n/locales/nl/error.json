@@ -13,6 +13,7 @@
     "content": "Neem contact op met de ontwikkelaars of rapporteer een bug via <link>https://github.com/kiesraad/abacus</link>"
   },
   "api_error": {
+    "AllListsExhausted": "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
     "ApportionmentNotAvailableUntilDataEntryFinalised": "De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd",
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
     "DrawingOfLotsRequired": "Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus",

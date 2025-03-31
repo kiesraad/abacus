@@ -8,21 +8,23 @@ __Niveau:__ hoog-over, vlieger, 🪁
 
 __Hoofdscenario:__  
 
-1. Het CSB leest het digitale bestand in als eerste invoer. (controle hash-code en importeren)
+1. Het CSB leest het digitale bestand uit de database in als eerste invoer. (controle hash-code en importeren)
 2. Het CSB voert de resultaten handmatig in als tweede invoer.
 3. De applicatie stelt vast dat beide invoeren gelijk zijn.
 4. De applicatie slaat het definitieve resultaat op.
 
 __Uitbreidingen:__
 
-1a. Het is niet mogelijk het digitale bestand te importeren:  
-&emsp; 1a1. Het CSB lost in overleg met het GSB het probleem op en importeert alsnog het bestand.  
-&emsp; 1a1a. Het CSB slaagt er niet in het probleem op te lossen:  
-&emsp;&emsp; 1a1a1. Het CSB doet de eerste invoer handmatig.
+1a. De CSB-applicatie draait op een andere machine dan de GSB-applicatie:
+&emsp; 1a1. Het CSB importeert het digitale bestand.
+
+1b. Het is niet mogelijk het digitale bestand te importeren:  
+&emsp; 1b1. Het CSB lost in overleg met het GSB het probleem op en importeert alsnog het bestand.  
+&emsp; 1b1a. Het CSB slaagt er niet in het probleem op te lossen:  
+&emsp;&emsp; 1b1a1. Het CSB doet de eerste invoer handmatig.
 
 3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 3a1. [De coördinator CSB beoordeelt de verschillen tussen de twee invoeren op (zee)](#de-coördinator-csb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-op-zee)
-
 
 
 ## De coördinator CSB beoordeelt de verschillen tussen de twee invoeren op (zee)

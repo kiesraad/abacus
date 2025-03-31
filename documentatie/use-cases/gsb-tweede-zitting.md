@@ -29,6 +29,9 @@ __Uitbreidingen:__
 &emsp;&emsp; 3b1a. Er is al invoer voor de geopende zitting:  
 &emsp;&emsp;&emsp; 3b1a1. De applicatie toont een foutmelding en verwijdert de geopende zitting niet.
 
+3c. Er is geen eerste zitting in de applicatie:  
+&emsp; 3c1. De coördinator importeert het EML_NL bestand van de eerste zitting.
+
 4-6a. Het GSB schorst de zitting, omdat er mogelijk nog een verzoek komt:
 
 6a. Het GSB stelt een probleem vast met het PV:  
@@ -37,7 +40,7 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- Waar komt het lege corrigendum dat moet worden ingevuld, vandaan?
+- Is er een verschil tussen hoe een derde/vierde/.. zitting loopt en de tweede zitting?
 - Maakt het voor de tweede zitting uit of een gemeente DSO of CSO doet?
 - Hoe ziet de trigger voor hertelling er precies uit voor gemeenteraadsverkiezingen? Het GSB (dus de gemeente) stelt de telling op gemeente-niveau vast, het CSB (ook de gemeente) controleert die telling en verzoekt als nodig om onderzoek en/of hertelling?
 - Verschil CSO/DSO: modellen. Dus hopelijk mogelijk zelfde use case.
@@ -60,9 +63,9 @@ __Hoofdscenario:__
 6. Het GSB besluit dat er een hertelling nodig is.
 7. De coördinator GSB drukt de overige bladzijdes van het 'leeg' corrigendum af.
 8. Het GSB stelt een ander resultaat vast in de hertelling.
-9.[Het GSB voert de hertelling in de applicatie in.](./gsb-invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)
+9. [Het GSB voert de hertelling in de applicatie in.](./gsb-invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)
 
-__Uitbreidingen:__
+__Uitbreidingen:__  
 6a. Het GSB besluit dat er geen hertelling nodig is:  
 &emsp; 6a1. Het GSB zorgt ervoor dat de bevindingen in het PV P 2a worden opgenomen.  
 &emsp; 6a2. Het GSB gooit het eerste blad van het 'lege' corrigendum weg.
@@ -78,3 +81,4 @@ __Uitbreidingen:__
 - 'leeg' corrigendum is geen heel goede term
     - Moet je kunnen selecteren welke lijsten er opgenomen moeten worden in het 'lege' corrigendum? Nee, want nieuwe modellen: corrigendum bevat aantallen modellen vorige zitting (niet: eerste zitting tenzij dat de vorige zitting is), dus handig om alle lijsten in corrigendum te hebben.
 - Hoe zorgt het GSB ervoor dat de bevindingen in het PV P 2a worden opgenomen?
+- Is het mogelijk dat er een hertelling wordt uitgevoerd voor een stembureau waar geen verzoek voor is ingediend? Heeft mogelijk gevolgen voor welke stembureaus we toestaan dat er een corrigendum wordt ingevoerd.

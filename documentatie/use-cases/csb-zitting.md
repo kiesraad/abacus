@@ -27,8 +27,7 @@ __Uitbreidingen:__
 
 3a. Het PV geeft aanleiding tot een terugverwijzing:  
 &emsp; 3a1. Het CSB verwijst terug naar het GSB.  
-&emsp; 3a2. Het GSB doet onderzoek en gaat eventueel over tot hertelling.  
-&emsp; 3a3. Het GSB deelt de resultaten van de terugverwijzing met het CSB.
+&emsp; 3a2. [Gemeentelijk stembureau (GSB) stelt uitslag vast in tweede zitting (corrigenda) (wolk)](./gsb-tweede-zitting.md#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-tweede-zitting-corrigenda-wolk)  
 
 4-11a. Het CSB moet nieuwe aantallen invoeren ter correctie van de eerder ingevoerde tellingen:  
 &emsp; 4-11a1. Het CSB corrigeert de eerder ingevoerde aantallen in de applicatie. Er is dus geen tweede zitting.
@@ -37,7 +36,7 @@ __Uitbreidingen:__
 
 ### Niet in scope
 
-- Tellingsbestand in `csv`-formaat. Dit zal door het uitwisselplatform gedaan worden.
+- Tellingsbestand in csv-formaat. Dit zal door het uitwisselplatform gedaan worden.
 - Elektronische handtekening van documenten.
 - CSB besluit tijdens de zitting tot spontane hertelling. Resulteert in samenvoegen van oud en nieuw P22. Vereist wel aanmaken van nieuwe verkiezingen (GR GSB en GR CSB) in Abacus.
 

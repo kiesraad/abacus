@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { DataEntryStatusName, Election, ElectionStatusResponseEntry, PollingStation } from "@kiesraad/api";
+import { DataEntryStatusName, Election, ElectionStatusResponseEntry, PollingStation, User } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconPlus } from "@kiesraad/icon";
 import {
@@ -31,9 +31,39 @@ export interface ElectionStatusProps {
   election: Required<Election>;
   pollingStations: PollingStation[];
   navigate: (path: string) => void;
+  users: User[];
 }
 
-export function ElectionStatus({ statuses, election, pollingStations, navigate }: ElectionStatusProps) {
+interface PollingStationWithStatusAndTypist extends PollingStation, Partial<ElectionStatusResponseEntry> {
+  typist?: string;
+}
+
+function getTypistName(users: User[], status: ElectionStatusResponseEntry | undefined) {
+  if (status === undefined || users.length === 0) {
+    return "";
+  }
+
+  let typistId: number | undefined;
+  switch (status.status) {
+    case "first_entry_in_progress":
+    case "second_entry_not_started":
+      typistId = status.first_entry_user_id;
+      break;
+    case "second_entry_in_progress":
+      typistId = status.second_entry_user_id;
+      break;
+    default:
+      break;
+  }
+  if (typistId === undefined) {
+    return "";
+  }
+
+  const user = users.find((user) => user.id === typistId);
+  return user?.fullname ?? user?.username ?? "";
+}
+
+export function ElectionStatus({ statuses, election, pollingStations, navigate, users }: ElectionStatusProps) {
   const categoryCounts: Record<StatusCategory, number> = React.useMemo(
     () =>
       Object.fromEntries(statusCategories.map((cat) => [cat, statusCount(statuses, cat)])) as Record<
@@ -58,9 +88,13 @@ export function ElectionStatus({ statuses, election, pollingStations, navigate }
     return data;
   }, [statuses, categoryCounts]);
 
-  const pollingStationsWithStatuses = pollingStations.map((ps) => {
+  const pollingStationWithStatusAndTypist = pollingStations.map((ps) => {
     const status = statuses.find((element) => element.polling_station_id === ps.id);
-    return { ...ps, ...status } as PollingStationWithStatus;
+    return {
+      ...ps,
+      ...status,
+      typist: getTypistName(users, status),
+    } satisfies PollingStationWithStatusAndTypist;
   });
 
   const tableCategories = statusCategories.filter((cat) => categoryCounts[cat] !== 0);
@@ -121,8 +155,8 @@ export function ElectionStatus({ statuses, election, pollingStations, navigate }
                     <Table id={cat} key={cat}>
                       {getTableHeaderForCategory(cat)}
                       <Table.Body key={cat} className="fs-sm">
-                        {pollingStationsWithStatuses
-                          .filter((ps) => statusesForCategory[cat].includes(ps.status))
+                        {pollingStationWithStatusAndTypist
+                          .filter((ps) => ps.status !== undefined && statusesForCategory[cat].includes(ps.status))
                           .map((ps) => getTableRowForCategory(cat, ps))}
                       </Table.Body>
                     </Table>
@@ -136,8 +170,6 @@ export function ElectionStatus({ statuses, election, pollingStations, navigate }
     </>
   );
 }
-
-interface PollingStationWithStatus extends PollingStation, ElectionStatusResponseEntry {}
 
 const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
   errors_and_warnings: "errors-and-warnings",
@@ -168,17 +200,29 @@ function getTableHeaderForCategory(category: StatusCategory): React.ReactNode {
     );
   }
 
-  const finishedAtColumn = <Table.HeaderCell key={`${category}-time`}>{t("finished_at")}</Table.HeaderCell>;
+  const finishedAtColumn = (
+    <Table.HeaderCell key={`${category}-time`} className="w-14">
+      {t("finished_at")}
+    </Table.HeaderCell>
+  );
+
   const progressColumn = (
-    <Table.HeaderCell key={`${category}-progress`} className="w-13">
+    <Table.HeaderCell key={`${category}-progress`} className="w-14">
       {t("progress")}
+    </Table.HeaderCell>
+  );
+
+  const typistColumn = (
+    <Table.HeaderCell key={`${category}-typist`} className="w-14">
+      {t("typist")}
     </Table.HeaderCell>
   );
 
   switch (category) {
     case "in_progress":
-      return <CategoryHeader>{[progressColumn]}</CategoryHeader>;
+      return <CategoryHeader>{[typistColumn, progressColumn]}</CategoryHeader>;
     case "first_entry_finished":
+      return <CategoryHeader>{[typistColumn, finishedAtColumn]}</CategoryHeader>;
     case "definitive":
       return <CategoryHeader>{[finishedAtColumn]}</CategoryHeader>;
     default:
@@ -186,7 +230,10 @@ function getTableHeaderForCategory(category: StatusCategory): React.ReactNode {
   }
 }
 
-function getTableRowForCategory(category: StatusCategory, polling_station: PollingStationWithStatus): React.ReactNode {
+function getTableRowForCategory(
+  category: StatusCategory,
+  polling_station: PollingStationWithStatusAndTypist,
+): React.ReactNode {
   const showBadge: DataEntryStatusName[] = ["first_entry_in_progress", "second_entry_in_progress", "entries_different"];
 
   function CategoryPollingStationRow({ children }: { children?: React.ReactNode[] }) {
@@ -195,13 +242,16 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
         <Table.NumberCell key={`${polling_station.id}-number`}>{polling_station.number}</Table.NumberCell>
         <Table.Cell key={`${polling_station.id}-name`}>
           <span>{polling_station.name}</span>
-          {showBadge.includes(polling_station.status) && <Badge type={polling_station.status} />}
+          {polling_station.status && showBadge.includes(polling_station.status) && (
+            <Badge type={polling_station.status} />
+          )}
         </Table.Cell>
         {children}
       </Table.Row>
     );
   }
 
+  const typistCell = <Table.Cell key={`${polling_station.id}-typist`}>{polling_station.typist}</Table.Cell>;
   const finishedAtCell = (
     <Table.Cell key={`${polling_station.id}-time`}>
       {polling_station.finished_at ? formatDateTime(new Date(polling_station.finished_at)) : ""}
@@ -219,11 +269,15 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
       />
     </Table.Cell>
   );
-  // TODO: #1131 add user names
   switch (category) {
     case "in_progress":
-      return <CategoryPollingStationRow key={polling_station.id}>{[progressCell]}</CategoryPollingStationRow>;
+      return (
+        <CategoryPollingStationRow key={polling_station.id}>{[typistCell, progressCell]}</CategoryPollingStationRow>
+      );
     case "first_entry_finished":
+      return (
+        <CategoryPollingStationRow key={polling_station.id}>{[typistCell, finishedAtCell]}</CategoryPollingStationRow>
+      );
     case "definitive":
       return <CategoryPollingStationRow key={polling_station.id}>{[finishedAtCell]}</CategoryPollingStationRow>;
     default:

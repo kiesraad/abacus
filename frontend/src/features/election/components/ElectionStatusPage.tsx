@@ -4,7 +4,13 @@ import { HeaderElectionStatusWithIcon } from "@/components/election/ElectionStat
 import { ElectionStatus } from "@/components/election/status/ElectionStatus";
 import { Footer } from "@/components/footer/Footer";
 
-import { useElection, useElectionStatus } from "@kiesraad/api";
+import {
+  useElection,
+  useElectionStatus,
+  useInitialApiGet,
+  USER_LIST_REQUEST_PATH,
+  UserListResponse,
+} from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, Button, PageTitle } from "@kiesraad/ui";
 
@@ -12,6 +18,9 @@ export function ElectionStatusPage() {
   const navigate = useNavigate();
   const { election, pollingStations } = useElection();
   const { statuses } = useElectionStatus();
+  const { requestState } = useInitialApiGet<UserListResponse>("/api/user" satisfies USER_LIST_REQUEST_PATH);
+
+  const users = requestState.status === "success" ? requestState.data.users : [];
 
   function finishInput() {
     void navigate("../report");
@@ -46,6 +55,7 @@ export function ElectionStatusPage() {
           election={election}
           pollingStations={pollingStations}
           statuses={statuses}
+          users={users}
           navigate={(path) => void navigate(path)}
         />
       </main>

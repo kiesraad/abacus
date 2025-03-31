@@ -16,7 +16,7 @@ export const BasicTable: Story = () => (
   <Table id="basic_table">
     <Table.Header>
       <Table.HeaderCell>Number</Table.HeaderCell>
-      <Table.HeaderCell className="w-13">Fixed width</Table.HeaderCell>
+      <Table.HeaderCell className="w-14">Fixed width</Table.HeaderCell>
       <Table.HeaderCell>Some value</Table.HeaderCell>
     </Table.Header>
     <Table.Body>

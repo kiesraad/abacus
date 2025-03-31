@@ -299,6 +299,26 @@ describe("Test PollingStationChoiceForm", () => {
       expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
     });
 
+    test("Show polling station list for current user only", async () => {
+      server.use(ElectionRequestHandler);
+      const testPollingStation = pollingStationMockData[0]!;
+      overrideOnce("get", "api/elections/1/status", 200, {
+        statuses: [
+          {
+            polling_station_id: testPollingStation.id,
+            status: "first_entry_in_progress",
+            first_entry_user_id: testUser.user_id + 1,
+            first_entry_progress: 42,
+          },
+        ],
+      } satisfies ElectionStatusResponse);
+
+      renderPollingStationChoicePage();
+
+      const pollingStationList = await screen.findByTestId("polling_station_list");
+      expect(pollingStationList).not.toHaveTextContent(testPollingStation.name);
+    });
+
     test("All data entries of polling stations are finished, polling station list shows message", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       overrideOnce("get", "/api/elections/1/status", 200, {

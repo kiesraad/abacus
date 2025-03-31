@@ -8,53 +8,49 @@ export enum PollingStationUserStatus {
   UNKNOWN = "UNKNOWN",
 }
 
-export type PollingStationStatus = {
+export type PollingStationWithStatus = PollingStation & {
   statusEntry?: ElectionStatusResponseEntry;
   userStatus: PollingStationUserStatus;
 };
 
-const dataEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
+export const dataEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
 
-export function getPollingStationStatus({
-  pollingStation,
+export function getPollingStationWithStatusList({
+  pollingStations,
   statuses,
   user,
 }: {
-  pollingStation: PollingStation | undefined;
+  pollingStations: PollingStation[];
   statuses: ElectionStatusResponseEntry[];
   user: LoginResponse | null;
-}): PollingStationStatus {
-  const result: PollingStationStatus = {
-    statusEntry: undefined,
-    userStatus: PollingStationUserStatus.UNKNOWN,
-  };
+}): PollingStationWithStatus[] {
+  return pollingStations.map((pollingStation: PollingStation) => {
+    const result: PollingStationWithStatus = {
+      ...pollingStation,
+      userStatus: PollingStationUserStatus.UNKNOWN,
+    };
+    const statusEntry = statuses.find((status) => status.polling_station_id === pollingStation.id);
 
-  const statusEntry = statuses.find((status) => status.polling_station_id === pollingStation?.id);
+    if (!statusEntry) return result;
 
-  if (!statusEntry) {
+    result.statusEntry = statusEntry;
+
+    if (dataEntryFinished.includes(statusEntry.status)) {
+      result.userStatus = PollingStationUserStatus.FINISHED;
+    } else if (statusEntry.status === "first_entry_in_progress") {
+      if (statusEntry.first_entry_user_id === user?.user_id) {
+        result.userStatus = PollingStationUserStatus.IN_PROGRESS_CURRENT_USER;
+      } else {
+        result.userStatus = PollingStationUserStatus.IN_PROGRESS_OTHER_USER;
+      }
+    } else if (statusEntry.status === "second_entry_in_progress") {
+      if (statusEntry.second_entry_user_id === user?.user_id) {
+        result.userStatus = PollingStationUserStatus.IN_PROGRESS_CURRENT_USER;
+      } else {
+        result.userStatus = PollingStationUserStatus.IN_PROGRESS_OTHER_USER;
+      }
+    }
+
     return result;
-  }
-  result.statusEntry = statusEntry;
-
-  if (dataEntryFinished.includes(statusEntry.status)) {
-    result.userStatus = PollingStationUserStatus.FINISHED;
-  }
-
-  if (statusEntry.status === "first_entry_in_progress") {
-    if (statusEntry.first_entry_user_id === user?.user_id) {
-      result.userStatus = PollingStationUserStatus.IN_PROGRESS_CURRENT_USER;
-    } else {
-      result.userStatus = PollingStationUserStatus.IN_PROGRESS_OTHER_USER;
-    }
-  }
-
-  if (statusEntry.status === "second_entry_in_progress") {
-    if (statusEntry.second_entry_user_id === user?.user_id) {
-      result.userStatus = PollingStationUserStatus.IN_PROGRESS_CURRENT_USER;
-    } else {
-      result.userStatus = PollingStationUserStatus.IN_PROGRESS_OTHER_USER;
-    }
-  }
-
-  return result;
+  });
 }

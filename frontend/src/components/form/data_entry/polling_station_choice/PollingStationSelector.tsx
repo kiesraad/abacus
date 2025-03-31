@@ -1,29 +1,25 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { PollingStation } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError, IconWarning } from "@kiesraad/icon";
 import { Badge, Icon, InputField, Spinner } from "@kiesraad/ui";
 import { cn, removeLeadingZeros } from "@kiesraad/util";
 
 import cls from "./PollingStationSelector.module.css";
-import { PollingStationStatus, PollingStationUserStatus } from "./util";
+import { PollingStationUserStatus, PollingStationWithStatus } from "./util";
 
 export interface PollingStationSelectorProps {
   pollingStationNumber: string;
   setPollingStationNumber: Dispatch<SetStateAction<string>>;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
-  currentPollingStation: PollingStation | undefined;
-  setCurrentPollingStation: Dispatch<SetStateAction<PollingStation | undefined>>;
+  currentPollingStation: PollingStationWithStatus | undefined;
   setAlert: Dispatch<SetStateAction<string | undefined>>;
   handleSubmit: () => void;
-  pollingStationStatus: PollingStationStatus;
 }
 
 export function PollingStationSelector({
   pollingStationNumber,
-  pollingStationStatus,
   setPollingStationNumber,
   loading,
   currentPollingStation,
@@ -64,7 +60,7 @@ export function PollingStationSelector({
               </div>
             );
           } else if (currentPollingStation) {
-            switch (pollingStationStatus.userStatus) {
+            switch (currentPollingStation.userStatus) {
               case PollingStationUserStatus.FINISHED:
                 return (
                   <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.warning)}>
@@ -96,8 +92,8 @@ export function PollingStationSelector({
                 return (
                   <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.success)}>
                     <span className="bold">{currentPollingStation.name}</span>
-                    {pollingStationStatus.statusEntry && (
-                      <Badge type={pollingStationStatus.statusEntry.status} showIcon />
+                    {currentPollingStation.statusEntry && (
+                      <Badge type={currentPollingStation.statusEntry.status} showIcon />
                     )}
                   </div>
                 );

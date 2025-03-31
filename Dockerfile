@@ -10,7 +10,6 @@ WORKDIR /build
 COPY ./backend ./backend
 COPY --from=frontend-builder /build/frontend/dist ./frontend/dist
 WORKDIR /build/backend
-ENV ASSET_DIR=/build/frontend/dist
 RUN cargo build --release --features memory-serve
 
 FROM debian:bookworm-slim

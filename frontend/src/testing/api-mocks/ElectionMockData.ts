@@ -1,10 +1,4 @@
-import {
-  Election,
-  ElectionDetailsResponse,
-  ElectionListResponse,
-  ElectionStatusResponse,
-  PoliticalGroup,
-} from "@kiesraad/api";
+import { Election, ElectionDetailsResponse, ElectionListResponse, PoliticalGroup } from "@/api";
 
 import { pollingStationMockData } from "./PollingStationMockData";
 
@@ -272,20 +266,3 @@ export const getElectionMockData = (election: Partial<Election> = {}): Required<
 
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election as Required<Election>;
-
-export const electionStatusMockResponse: ElectionStatusResponse = {
-  statuses: [
-    {
-      polling_station_id: 1,
-      status: "first_entry_not_started",
-    },
-    {
-      polling_station_id: 2,
-      status: "definitive",
-    },
-    {
-      polling_station_id: 3,
-      status: "entries_different",
-    },
-  ],
-};

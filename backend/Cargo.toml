@@ -10,6 +10,7 @@ default-run = "abacus"
 default = ["openapi", "dev-database"]
 openapi = ["dep:utoipa-swagger-ui"]
 memory-serve = ["dep:memory-serve"]
+embed-typst = ["dep:typst", "dep:typst-pdf"]
 dev-database = []
 
 [[bin]]
@@ -25,7 +26,7 @@ chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
 clap = { version = "4.5", default-features = false, features = ["derive", "std", "help"] }
 hyper = { version = "1", features = ["full"] }
 tokio = { version = "1", features = ["full"] }
-memory-serve = { version = "1.1.0", features = ["force-embed"], optional = true }
+memory-serve = { version = "1.2.1", features = ["force-embed"], optional = true }
 utoipa = { version = "5.3.1", features = ["axum_extras"] }
 utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.0", features = ["axum"], optional = true }
@@ -36,9 +37,9 @@ tower = "0.5"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 tracing = "0.1.41"
 tower-http = { version = "0.6.2", features = ["trace"] }
-typst = "0.13.1"
-typst-pdf = "0.13.1"
-quick-xml = { version = "0.37.2", features = ["serialize"] }
+typst = { version = "0.13.1", optional = true }
+typst-pdf = { version = "0.13.1", optional = true }
+quick-xml = { version = "0.37.3", features = ["serialize"] }
 sha2 = "0.10.8"
 argon2 = "0.5.3"
 password-hash = { version = "0.5.0", features = ["getrandom"] }
@@ -50,6 +51,9 @@ zip = { version = "2.3.0", default-features = false, features = ["deflate", "chr
 test-log = "0.2.17"
 http-body-util = "0.1.3"
 reqwest = { version = "0.12", default-features = false, features = ["json"] }
+
+[build-dependencies]
+memory-serve = { version = "1.2.1", optional = true }
 
 [lints.rust]
 unsafe_code = "forbid"

@@ -22,7 +22,6 @@
   color: var(--gray-900);
   td {
     line-height: 1.5rem;
-    padding: 0 1.5rem;
     font-size: var(--font-size-md);
   }
   th {

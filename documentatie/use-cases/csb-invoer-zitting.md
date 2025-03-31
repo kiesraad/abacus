@@ -24,10 +24,10 @@ __Uitbreidingen:__
 &emsp;&emsp; 1b1a1. Het CSB doet de eerste invoer handmatig.
 
 3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
-&emsp; 3a1. [De coördinator CSB beoordeelt de verschillen tussen de twee invoeren op (zee)](#de-coördinator-csb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-op-zee)
+&emsp; 3a1. [De coördinator CSB beoordeelt de verschillen tussen de twee invoeren(zee)](#de-coördinator-csb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-zee)
 
 
-## De coördinator CSB beoordeelt de verschillen tussen de twee invoeren op (zee)
+## De coördinator CSB beoordeelt de verschillen tussen de twee invoeren (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

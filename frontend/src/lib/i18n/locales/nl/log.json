@@ -42,7 +42,7 @@
     "ip": "IP-adres",
     "loggedInUsersCount": "Aantal ingelogde gebruikers",
     "sessionDuration": "Sessieduur (seconden)",
-    "user_id": "Gebruikers ID",
+    "user_id": "Gebruikers-ID",
     "username": "Gebruikersnaam",
     "role": "Rol",
     "fullname": "Volledige naam"

@@ -64,7 +64,7 @@ describe("LogsHomePage", () => {
         "Sanne Molenaar",
         "Rol",
         "Beheerder",
-        "Gebruikers ID",
+        "Gebruikers-ID",
         "1",
         "Toelichting",
         "-",

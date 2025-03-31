@@ -2877,6 +2877,7 @@
           "InvalidUsernameOrPassword",
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
+          "PasswordRejection",
           "PdfGenerationError",
           "PollingStationDataValidation",
           "PollingStationFirstEntryAlreadyFinalised",
@@ -2888,7 +2889,7 @@
           "UserNotFound",
           "UsernameNotUnique",
           "Unauthorized",
-          "PasswordRejection"
+          "ZeroVotesCast"
         ]
       },
       "ErrorResponse": {

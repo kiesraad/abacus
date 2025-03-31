@@ -281,6 +281,7 @@ pub enum ApportionmentError {
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DrawingOfLotsNotImplemented,
+    ZeroVotesCast,
 }
 
 /// Initial construction of the data required per political group
@@ -560,6 +561,11 @@ pub fn seat_assignment(
 ) -> Result<SeatAssignmentResult, ApportionmentError> {
     info!("Seat assignment");
     info!("Seats: {}", seats);
+
+    if totals.votes_counts.votes_candidates_count == 0 {
+        info!("Zero votes cast");
+        return Err(ApportionmentError::ZeroVotesCast);
+    }
 
     // [Artikel P 5 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_5&z=2025-02-12&g=2025-02-12)
     // Calculate electoral quota (kiesdeler) as a proper fraction
@@ -877,7 +883,7 @@ mod tests {
     /// Tests apportionment for councils with less than 19 seats
     mod lt_19_seats {
         use crate::apportionment::{
-            get_total_seats_from_apportionment_result, seat_assignment,
+            ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
             test_helpers::election_summary_fixture_with_default_50_candidates,
         };
         use test_log::test;
@@ -1005,38 +1011,14 @@ mod tests {
             assert_eq!(total_seats, [0, 0, 0, 0, 1, 9]);
         }
 
-        /// Apportionment with residual seats assigned with largest remainders and highest averages methods
+        /// Apportionment with 0 votes
         ///
-        /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 10  
-        /// Remainders: [0/10, 0/10, 0/10, 0/10, 0/10]  
-        ///  1 - largest remainder: seat assigned to list 1  
-        ///  2 - largest remainder: seat assigned to list 2  
-        ///  3 - largest remainder: seat assigned to list 3  
-        ///  4 - largest remainder: seat assigned to list 4  
-        ///  5 - largest remainder: seat assigned to list 5  
-        /// 1st round of highest averages method (assignment to unique political groups):  
-        ///  6 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 1  
-        ///  7 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 2  
-        ///  8 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 3  
-        ///  9 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 4  
-        /// 10 - highest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 5
+        /// Zero votes cast
         #[test]
         fn test_with_0_votes() {
             let totals = election_summary_fixture_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
-            let result = seat_assignment(10, &totals).unwrap();
-            assert_eq!(result.steps.len(), 10);
-            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
-            assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
-            assert_eq!(result.steps[2].change.political_group_number_assigned(), 3);
-            assert_eq!(result.steps[3].change.political_group_number_assigned(), 4);
-            assert_eq!(result.steps[4].change.political_group_number_assigned(), 5);
-            assert_eq!(result.steps[5].change.political_group_number_assigned(), 1);
-            assert_eq!(result.steps[6].change.political_group_number_assigned(), 2);
-            assert_eq!(result.steps[7].change.political_group_number_assigned(), 3);
-            assert_eq!(result.steps[8].change.political_group_number_assigned(), 4);
-            assert_eq!(result.steps[9].change.political_group_number_assigned(), 5);
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![2, 2, 2, 2, 2]);
+            let result = seat_assignment(10, &totals);
+            assert_eq!(result, Err(ApportionmentError::ZeroVotesCast));
         }
 
         /// Apportionment with residual seats assigned with largest remainders method  
@@ -1089,32 +1071,6 @@ mod tests {
                 let totals = election_summary_fixture_with_default_50_candidates(vec![
                     2552, 511, 511, 511, 509, 509,
                 ]);
-                let result = seat_assignment(15, &totals);
-                assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
-            }
-
-            /// Apportionment with residual seats assigned with largest remainders and 2 rounds of highest averages methods
-            ///
-            /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 15  
-            /// Remainders: [0/10, 0/10, 0/10, 0/10, 0/10]  
-            ///  1 - largest remainder: seat assigned to list 1  
-            ///  2 - largest remainder: seat assigned to list 2  
-            ///  3 - largest remainder: seat assigned to list 3  
-            ///  4 - largest remainder: seat assigned to list 4  
-            ///  5 - largest remainder: seat assigned to list 5  
-            /// 1st round of highest averages method (assignment to unique political groups):  
-            ///  6 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1  
-            ///  7 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 2  
-            ///  8 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 3  
-            ///  9 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 4  
-            /// 10 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 5  
-            /// 2nd round of highest averages method (assignment to any political group):  
-            /// 11 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1  
-            /// 12 - Drawing of lots is required for political groups: [1, 2, 3, 4, 5], only 4 seats available
-            #[test]
-            fn test_with_0_votes_with_drawing_of_lots_error_in_2nd_round_highest_averages_method() {
-                let totals =
-                    election_summary_fixture_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
                 let result = seat_assignment(15, &totals);
                 assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
             }
@@ -1544,7 +1500,7 @@ mod tests {
     /// Tests apportionment for councils with 19 or more seats
     mod gte_19_seats {
         use crate::apportionment::{
-            get_total_seats_from_apportionment_result, seat_assignment,
+            ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
             test_helpers::election_summary_fixture_with_default_50_candidates,
         };
         use test_log::test;
@@ -1611,17 +1567,14 @@ mod tests {
             assert_eq!(total_seats, vec![15, 1, 1, 1, 1, 0, 0, 0, 0]);
         }
 
-        /// Apportionment with residual seats assigned with highest averages method
+        /// Apportionment with 0 votes
         ///
-        /// Full seats: [0] - Remainder seats: 19  
-        /// 1-19 - highest average: [0/1] seat assigned to list 1
+        /// Zero votes cast
         #[test]
         fn test_with_0_votes() {
             let totals = election_summary_fixture_with_default_50_candidates(vec![0]);
-            let result = seat_assignment(19, &totals).unwrap();
-            assert_eq!(result.steps.len(), 19);
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![19]);
+            let result = seat_assignment(19, &totals);
+            assert_eq!(result, Err(ApportionmentError::ZeroVotesCast));
         }
 
         /// Apportionment with residual seats assigned with highest averages method  
@@ -1683,19 +1636,6 @@ mod tests {
                     7501, 1249, 1249, 1249, 1249, 1248, 1248, 8,
                 ]);
                 let result = seat_assignment(24, &totals);
-                assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
-            }
-
-            /// Apportionment with residual seats assigned with highest averages method
-            ///
-            /// Full seats: [0, 0, 0, 0, 0] - Remainder seats: 19  
-            /// 1-15 - highest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1  
-            /// 16 - Drawing of lots is required for political groups: [1, 2, 3, 4, 5], only 4 seats available
-            #[test]
-            fn test_with_0_votes_with_drawing_of_lots_error() {
-                let totals =
-                    election_summary_fixture_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
-                let result = seat_assignment(19, &totals);
                 assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
             }
 

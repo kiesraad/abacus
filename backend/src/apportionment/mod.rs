@@ -52,7 +52,6 @@ pub(crate) mod test_helpers {
             candidate_votes[0] = *votes;
             political_group_votes.push(PoliticalGroupVotes::from_test_data_auto(
                 PGNumber::try_from(index + 1).unwrap(),
-                *votes,
                 &candidate_votes,
             ))
         }
@@ -70,7 +69,6 @@ pub(crate) mod test_helpers {
         for (pg_index, pg_candidate_votes) in candidate_votes.iter().enumerate() {
             political_group_votes.push(PoliticalGroupVotes::from_test_data_auto(
                 PGNumber::try_from(pg_index + 1).unwrap(),
-                pg_candidate_votes.iter().sum(),
                 pg_candidate_votes,
             ))
         }

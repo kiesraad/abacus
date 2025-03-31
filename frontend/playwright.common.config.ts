@@ -10,8 +10,6 @@ const commonConfig: PlaywrightTestConfig = defineConfig({
   retries: process.env.CI ? 2 : 0,
   // Use all available cores on GitHub Actions. Default is 50%, use that locally.
   workers: process.env.CI ? "100%" : undefined,
-  // Increase the test timeout on CI, which is usually slower
-  timeout: process.env.CI ? 30_000 : 10_000,
   fullyParallel: true,
   globalSetup: "./e2e-tests/setup.ts",
   use: {

@@ -4,6 +4,7 @@ use crate::{
     apportionment::ApportionmentError,
     authentication::error::AuthenticationError,
     data_entry::{DataError, status::DataEntryTransitionError},
+    pdf_gen::PdfGenError,
 };
 use axum::{
     Json,
@@ -16,13 +17,13 @@ use quick_xml::SeError;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use tracing::error;
-use typst::diag::SourceDiagnostic;
 use utoipa::ToSchema;
 use zip::result::ZipError;
 
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub enum ErrorReference {
+    AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DatabaseError,
     DrawingOfLotsRequired,
@@ -80,7 +81,7 @@ pub enum APIError {
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
     InvalidHeaderValue,
-    PdfGenError(Vec<SourceDiagnostic>),
+    PdfGenError(PdfGenError),
     StdError(Box<dyn Error>),
     AddError(String, ErrorReference),
     XmlError(SeError),
@@ -261,6 +262,14 @@ impl IntoResponse for APIError {
                 error!("Apportionment error: {:?}", err);
 
                 match err {
+                    ApportionmentError::AllListsExhausted => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "All lists are exhausted, not enough candidates to fill all seats",
+                            ErrorReference::AllListsExhausted,
+                            false,
+                        ),
+                    ),
                     ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised => (
                         StatusCode::PRECONDITION_FAILED,
                         to_error(

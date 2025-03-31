@@ -52,11 +52,11 @@ describe("ApportionmentResidualSeatsPage", () => {
         name: "De restzetels gaan naar de partijen met de grootste gemiddelden",
       }),
     );
-    const largest_averages_for_19_or_more_seats_table = await screen.findByTestId(
-      "largest_averages_for_19_or_more_seats_table",
+    const highest_averages_for_19_or_more_seats_table = await screen.findByTestId(
+      "highest_averages_for_19_or_more_seats_table",
     );
-    expect(largest_averages_for_19_or_more_seats_table).toBeVisible();
-    expect(largest_averages_for_19_or_more_seats_table).toHaveTableContent([
+    expect(highest_averages_for_19_or_more_seats_table).toBeVisible();
+    expect(highest_averages_for_19_or_more_seats_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Restzetel 1", "Restzetel 2", "Restzetel 3", "Restzetel 4", "Aantal restzetels"],
       ["1", "Political Group A", "50", "", "50", "", "50", "", "46", "2/13", "1"],
       ["2", "Political Group B", "50", "2/6", "50", "2/6", "43", "1/7", "43", "1/7", "1"],
@@ -67,7 +67,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     ]);
 
     expect(screen.queryByTestId("largest_remainders_table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("largest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
@@ -97,11 +97,11 @@ describe("ApportionmentResidualSeatsPage", () => {
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Verdeling overige restzetels" }));
-    const largest_averages_for_less_than_19_seats_table = await screen.findByTestId(
-      "largest_averages_for_less_than_19_seats_table",
+    const highest_averages_for_less_than_19_seats_table = await screen.findByTestId(
+      "highest_averages_for_less_than_19_seats_table",
     );
-    expect(largest_averages_for_less_than_19_seats_table).toBeVisible();
-    expect(largest_averages_for_less_than_19_seats_table).toHaveTableContent([
+    expect(highest_averages_for_less_than_19_seats_table).toBeVisible();
+    expect(highest_averages_for_less_than_19_seats_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Gemiddelde", "Aantal restzetels"],
       ["1", "Political Group A", "10", "67", "4/12", "1"],
       ["2", "Political Group B", "0", "30", "", "0"],
@@ -113,7 +113,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["8", "Political Group H", "0", "52", "", "0"],
     ]);
 
-    expect(screen.queryByTestId("largest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
@@ -145,8 +145,8 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["2", "Political Group B", "0", "60", "", "1"],
     ]);
 
-    expect(screen.queryByTestId("largest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("largest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
@@ -182,8 +182,8 @@ describe("ApportionmentResidualSeatsPage", () => {
       "Overeenkomstig artikel P 9 van de Kieswet (volstrekte meerderheid) wordt aan lijst 1 alsnog één zetel toegewezen en vervalt daartegenover één zetel, die eerder was toegewezen aan lijst 4.",
     );
 
-    expect(screen.queryByTestId("largest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("largest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
   });
 
   describe("Apportionment not yet available", () => {
@@ -205,9 +205,9 @@ describe("ApportionmentResidualSeatsPage", () => {
         await screen.findByText("De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd"),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("largest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest_remainders_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
     });
 
@@ -229,9 +229,9 @@ describe("ApportionmentResidualSeatsPage", () => {
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("largest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest_remainders_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
     });
 

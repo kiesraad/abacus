@@ -117,7 +117,7 @@ test.describe("full data entry flow", () => {
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.fieldset).toBeVisible();
@@ -174,7 +174,7 @@ test.describe("full data entry flow", () => {
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.fieldset).toBeVisible();
@@ -239,7 +239,7 @@ test.describe("full data entry flow", () => {
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.fieldset).toBeVisible();
@@ -791,6 +791,7 @@ test.describe("navigation", () => {
 
       await candidatesListPage_1.fillCandidatesAndTotal([1, 1], 100);
       await candidatesListPage_1.next.click();
+      await expect(candidatesListPage_1.error).toBeVisible();
       await candidatesListPage_1.navPanel.differences.click();
 
       await expect(differencesPage.fieldset).toBeVisible();

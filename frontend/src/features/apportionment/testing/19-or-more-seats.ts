@@ -13,7 +13,7 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       residual_seat_number: 1,
       change: {
-        assigned_by: "LargestAverage",
+        changed_by: "HighestAverageAssignment",
         selected_pg_number: 5,
         pg_options: [5],
         pg_assigned: [5],
@@ -23,7 +23,7 @@ export const seat_assignment: SeatAssignmentResult = {
           denominator: 2,
         },
       },
-      standing: [
+      standings: [
         {
           pg_number: 1,
           votes_cast: 600,
@@ -114,7 +114,7 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       residual_seat_number: 2,
       change: {
-        assigned_by: "LargestAverage",
+        changed_by: "HighestAverageAssignment",
         selected_pg_number: 2,
         pg_options: [2],
         pg_assigned: [2],
@@ -124,7 +124,7 @@ export const seat_assignment: SeatAssignmentResult = {
           denominator: 6,
         },
       },
-      standing: [
+      standings: [
         {
           pg_number: 1,
           votes_cast: 600,
@@ -215,7 +215,7 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       residual_seat_number: 3,
       change: {
-        assigned_by: "LargestAverage",
+        changed_by: "HighestAverageAssignment",
         selected_pg_number: 1,
         pg_options: [1],
         pg_assigned: [1],
@@ -225,7 +225,7 @@ export const seat_assignment: SeatAssignmentResult = {
           denominator: 12,
         },
       },
-      standing: [
+      standings: [
         {
           pg_number: 1,
           votes_cast: 600,
@@ -316,7 +316,7 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       residual_seat_number: 4,
       change: {
-        assigned_by: "LargestAverage",
+        changed_by: "HighestAverageAssignment",
         selected_pg_number: 4,
         pg_options: [4],
         pg_assigned: [4],
@@ -326,7 +326,7 @@ export const seat_assignment: SeatAssignmentResult = {
           denominator: 2,
         },
       },
-      standing: [
+      standings: [
         {
           pg_number: 1,
           votes_cast: 600,
@@ -535,11 +535,51 @@ export const election_summary: ElectionSummary = {
       candidate_votes: [
         {
           number: 1,
-          votes: 400,
+          votes: 78,
         },
         {
           number: 2,
-          votes: 200,
+          votes: 20,
+        },
+        {
+          number: 3,
+          votes: 55,
+        },
+        {
+          number: 4,
+          votes: 45,
+        },
+        {
+          number: 5,
+          votes: 50,
+        },
+        {
+          number: 6,
+          votes: 0,
+        },
+        {
+          number: 7,
+          votes: 60,
+        },
+        {
+          number: 8,
+          votes: 40,
+        },
+        {
+          number: 9,
+          votes: 30,
+        },
+        {
+          number: 10,
+          votes: 20,
+        },
+        {
+          number: 11,
+          votes: 50,
+        },
+        {
+          number: 12,
+          votes: 152,
         },
       ],
     },
@@ -549,11 +589,27 @@ export const election_summary: ElectionSummary = {
       candidate_votes: [
         {
           number: 1,
-          votes: 200,
+          votes: 150,
         },
         {
           number: 2,
-          votes: 102,
+          votes: 50,
+        },
+        {
+          number: 3,
+          votes: 22,
+        },
+        {
+          number: 4,
+          votes: 10,
+        },
+        {
+          number: 5,
+          votes: 30,
+        },
+        {
+          number: 6,
+          votes: 40,
         },
       ],
     },
@@ -563,11 +619,27 @@ export const election_summary: ElectionSummary = {
       candidate_votes: [
         {
           number: 1,
-          votes: 50,
+          votes: 20,
         },
         {
           number: 2,
-          votes: 48,
+          votes: 15,
+        },
+        {
+          number: 3,
+          votes: 25,
+        },
+        {
+          number: 4,
+          votes: 3,
+        },
+        {
+          number: 5,
+          votes: 2,
+        },
+        {
+          number: 6,
+          votes: 33,
         },
       ],
     },
@@ -577,11 +649,23 @@ export const election_summary: ElectionSummary = {
       candidate_votes: [
         {
           number: 1,
-          votes: 60,
+          votes: 20,
         },
         {
           number: 2,
-          votes: 39,
+          votes: 15,
+        },
+        {
+          number: 3,
+          votes: 25,
+        },
+        {
+          number: 4,
+          votes: 24,
+        },
+        {
+          number: 5,
+          votes: 15,
         },
       ],
     },
@@ -591,11 +675,19 @@ export const election_summary: ElectionSummary = {
       candidate_votes: [
         {
           number: 1,
-          votes: 70,
+          votes: 20,
         },
         {
           number: 2,
           votes: 31,
+        },
+        {
+          number: 3,
+          votes: 10,
+        },
+        {
+          number: 4,
+          votes: 40,
         },
       ],
     },
@@ -603,15 +695,15 @@ export const election_summary: ElectionSummary = {
 };
 
 export const election: Election = {
-  id: 1,
+  id: 2,
   name: "Test Election >= 19 seats",
   location: "Test Location",
   number_of_voters: 2000,
   category: "Municipal",
   number_of_seats: 23,
-  election_date: "2026-01-01",
-  nomination_date: "2026-01-01",
-  status: "DataEntryInProgress",
+  election_date: "2026-03-18",
+  nomination_date: "2026-02-02",
+  status: "DataEntryFinished",
   political_groups: [
     {
       number: 1,
@@ -619,18 +711,99 @@ export const election: Election = {
       candidates: [
         {
           number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
+          initials: "L.",
+          first_name: "Lidewij",
+          last_name: "Oud",
+          locality: "Test Location",
           gender: "Female",
         },
         {
           number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
+          initials: "J.",
+          first_name: "Johan",
+          last_name: "Oud",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 3,
+          initials: "M.",
+          first_name: "Marijke",
+          last_name: "Oud",
+          locality: "Test Location",
+          gender: "Female",
+        },
+        {
+          number: 4,
+          initials: "A.",
+          first_name: "Arie",
+          last_name: "Jansen",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 5,
+          initials: "H.",
+          first_name: "Henk",
+          last_name: "Van der Weijden",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 6,
+          initials: "B.",
+          first_name: "Berta",
+          last_name: "Van der Weijden",
+          locality: "Test Location",
+          gender: "Female",
+        },
+        {
+          number: 7,
+          initials: "K.",
+          first_name: "Klaas",
+          last_name: "Oud",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 8,
+          initials: "S.",
+          first_name: "Sophie",
+          last_name: "Bakker",
+          locality: "Test Location",
+          gender: "Female",
+        },
+        {
+          number: 9,
+          initials: "J.",
+          first_name: "Johan",
+          last_name: "De Vries",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 10,
+          initials: "M.",
+          first_name: "Marijke",
+          last_name: "Van den Berg",
+          locality: "Test Location",
+          gender: "Female",
+        },
+        {
+          number: 11,
+          initials: "R.",
+          first_name: "Rolf",
+          last_name: "De Jong",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 12,
+          initials: "K.",
+          first_name: "Karin",
+          last_name: "Kok",
+          locality: "Test Location",
+          gender: "Female",
         },
       ],
     },
@@ -640,18 +813,51 @@ export const election: Election = {
       candidates: [
         {
           number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
+          initials: "T.",
+          first_name: "Tinus",
+          last_name: "Bakker",
+          locality: "Test Location",
+          gender: "Male",
         },
         {
           number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
+          initials: "D.",
+          first_name: "Drs.",
+          last_name: "P.",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 3,
+          initials: "W.",
+          first_name: "Willem",
+          last_name: "de Vries",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 4,
+          initials: "K.",
+          first_name: "Klaas",
+          last_name: "Kloosterboer",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 5,
+          initials: "L.",
+          first_name: "Liesbeth",
+          last_name: "Jansen",
+          locality: "Test Location",
+          gender: "Female",
+        },
+        {
+          number: 6,
+          initials: "H.",
+          first_name: "Henk",
+          last_name: "Van den Berg",
+          locality: "Test Location",
+          gender: "Male",
         },
       ],
     },
@@ -662,17 +868,50 @@ export const election: Election = {
         {
           number: 1,
           initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
+          first_name: "Adelbert",
+          last_name: "Van Doorn",
+          locality: "Test Location",
+          gender: "Male",
         },
         {
           number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
+          initials: "M.",
+          first_name: "Margriet",
+          last_name: "Van der Linden",
+          locality: "Test Location",
+          gender: "Female",
+        },
+        {
+          number: 3,
+          initials: "P.",
+          first_name: "Paul",
+          last_name: "Veldkamp",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 4,
+          initials: "S.",
+          first_name: "Sophie",
+          last_name: "De Groot",
+          locality: "Test Location",
+          gender: "Female",
+        },
+        {
+          number: 5,
+          initials: "R.",
+          first_name: "Rik",
+          last_name: "De Ruiter",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 6,
+          initials: "N.",
+          first_name: "Nico",
+          last_name: "Ruiter",
+          locality: "Test Location",
+          gender: "Male",
         },
       ],
     },
@@ -682,18 +921,43 @@ export const election: Election = {
       candidates: [
         {
           number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
+          initials: "G.",
+          first_name: "Gerard",
+          last_name: "Bogaert",
+          locality: "Test Location",
+          gender: "Male",
         },
         {
           number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
+          initials: "J.",
+          first_name: "Jan",
+          last_name: "Stevens",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 3,
+          initials: "E.",
+          first_name: "Els",
+          last_name: "Groot",
+          locality: "Test Location",
+          gender: "Female",
+        },
+        {
+          number: 4,
+          initials: "B.",
+          first_name: "Bart",
+          last_name: "Smit",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 5,
+          initials: "F.",
+          first_name: "Frits",
+          last_name: "Veldman",
+          locality: "Test Location",
+          gender: "Male",
         },
       ],
     },
@@ -703,18 +967,35 @@ export const election: Election = {
       candidates: [
         {
           number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
+          initials: "G.",
+          first_name: "Gert",
+          last_name: "Smit",
+          locality: "Test Location",
+          gender: "Male",
         },
         {
           number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
+          initials: "E.",
+          first_name: "Eva",
+          last_name: "Koster",
+          locality: "Test Location",
+          gender: "Female",
+        },
+        {
+          number: 3,
+          initials: "L.",
+          first_name: "Leon",
+          last_name: "Hofman",
+          locality: "Test Location",
+          gender: "Male",
+        },
+        {
+          number: 4,
+          initials: "S.",
+          first_name: "Sophie",
+          last_name: "Visser",
+          locality: "Test Location",
+          gender: "Female",
         },
       ],
     },

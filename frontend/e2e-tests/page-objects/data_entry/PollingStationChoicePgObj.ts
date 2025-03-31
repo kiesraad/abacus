@@ -1,4 +1,6 @@
-import { type Locator, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
+
+import { PollingStation } from "@/api";
 
 export class PollingStationChoicePage {
   readonly fieldset: Locator;
@@ -6,12 +8,12 @@ export class PollingStationChoicePage {
   readonly pollingStationNumber: Locator;
   readonly pollingStationFeedback: Locator;
   readonly pollingStationSubmitFeedback: Locator;
-  protected readonly start: Locator; // use clickStart() instead
   readonly alertInputSaved: Locator;
   readonly dataEntrySuccess: Locator;
   readonly resumeDataEntry: Locator;
   readonly alertDataEntryInProgress: Locator;
   readonly allDataEntriesInProgress: Locator;
+  protected readonly start: Locator; // use clickStart() instead
 
   constructor(protected readonly page: Page) {
     this.fieldset = page.getByRole("group", {
@@ -47,8 +49,9 @@ export class PollingStationChoicePage {
     await button.click({ timeout: 2000 });
   }
 
-  async selectPollingStationAndClickStart(pollingStationNumber: number) {
-    await this.pollingStationNumber.fill(pollingStationNumber.toString());
+  async selectPollingStationAndClickStart(pollingStation: PollingStation) {
+    await this.pollingStationNumber.pressSequentially(pollingStation.number.toString(), { delay: 50 });
+    await expect(this.pollingStationFeedback).toContainText(pollingStation.name);
     await this.clickStart();
   }
 

@@ -9,23 +9,27 @@ __Niveau:__ hoog-over, wolk, ☁️
 __Trigger:__ één of meer stembureaus moeten herteld worden n.a.v. verzoek CSB
 
 __Hoofdscenario:__  
-
-TODO: 3-5 naar use case(s) op lager niveau
-
 1. Het GSB ontvangt één of meerdere verzoeken tot onderzoek/hertelling van het CSB.
 2. Het GSB opent de zitting. (Wanneer dat gebeurt is een afweging van het GSB: liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten)
-3. [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
-4. ~~(voor elk herteld stembureau met gewijzigde uitslag) [Het GSB voert de corrigendum PV's in de applicatie in.](./gsb-invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)~~
-    -> naar behandel use case
+3. De coördinator GSB opent de zitting in de applicatie.
+4. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
 5. Het GSB voert de andere onderdelen van het GSB-corrigendum in.
-    -> naar behandel use case; nee! want dit is op GSB-niveau
 6. Het GSB leest voor en controleert Na 14-2 (corrigendum op GSB eerste zitting) en de P 2a (verslag tweede zitting).
 7. Het GSB sluit de zitting.
-8. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+8. De coördinator GSB sluit de zitting in de applicatie.
+9. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 
 __Uitbreidingen:__
 
-3-5. Het GSB schorst de zitting, omdat er mogelijk nog een verzoek komt.
+3a. Er is al een open zitting:  
+&emsp; 3a1. De applicatie toont een foutmelding en opent geen nieuwe zitting.
+
+3b. De coördinator GSB opent per ongeluk de zitting in de applicatie:  
+&emsp; 3b1. De coördinator GSB verwijdert de geopende zitting.  
+&emsp;&emsp; 3b1a. Er is al invoer voor de geopende zitting:  
+&emsp;&emsp;&emsp; 3b1a1. De applicatie toont een foutmelding en verwijdert de geopende zitting niet.
+
+4-6a. Het GSB schorst de zitting, omdat er mogelijk nog een verzoek komt:
 
 6a. Het GSB stelt een probleem vast met het PV:  
 &emsp; 6a1. Het GSB stelt het bezwaar vast.  
@@ -37,6 +41,7 @@ __Uitbreidingen:__
 - Maakt het voor de tweede zitting uit of een gemeente DSO of CSO doet?
 - Hoe ziet de trigger voor hertelling er precies uit voor gemeenteraadsverkiezingen? Het GSB (dus de gemeente) stelt de telling op gemeente-niveau vast, het CSB (ook de gemeente) controleert die telling en verzoekt als nodig om onderzoek en/of hertelling?
 - Verschil CSO/DSO: modellen. Dus hopelijk mogelijk zelfde use case.
+- Is er een Na 14-2 (corrigendum op GSB eerste zitting) als er geen hertellingen met een ander resultaat uit de onderzoeken komen?
 
 
 ## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)
@@ -56,8 +61,6 @@ __Hoofdscenario:__
 7. De coördinator GSB drukt de overige bladzijdes van het 'leeg' corrigendum af.
 8. Het GSB stelt een ander resultaat vast in de hertelling.
 9.[Het GSB voert de hertelling in de applicatie in.](./gsb-invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)
-
-TODO: Invoeren in applicatie en zitting etc. uitwerken zoals bij eerste zitting.
 
 __Uitbreidingen:__
 6a. Het GSB besluit dat er geen hertelling nodig is:

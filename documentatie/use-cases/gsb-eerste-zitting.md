@@ -23,11 +23,6 @@ __Hoofdscenario:__
 12. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
 
 __Uitbreidingen:__  
-TODO: verwijderen van een zitting in de applicatie (alleen als geen latere zitting met invoer)
-  - wanneer wordt zitting aangemaakt? bij start use case tweede zitting?
-
-TODO: De coördinator GSB kan een latere zitting openen. (als geen andere open zitting)
-
 7a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
 &emsp; 7a1. Het GSB controleert de resultaten van het controleprotocol.  
 &emsp; 7a2. Het GSB vindt een fout en corrigeert de resultaten van het controleprotocol.  

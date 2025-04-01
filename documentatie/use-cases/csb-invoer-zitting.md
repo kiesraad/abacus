@@ -47,3 +47,7 @@ __Uitbreidingen:__
 2b. De coördinator CSB stelt vast dat zowel de digitale als de handmatige invoer niet correct zijn:  
 &emsp; 2b1. De coördinator CSB gooit beide invoeren weg.  
 &emsp; 2b2. De coördinator CSB laat twee keer opnieuw handmatig invoeren.
+
+2c. Beide invoeren zijn handmatig gedaan:  
+&emsp; 2c1. De coördinator CSB gooit de incorrecte invoer(en) weg.  
+&emsp; 2c2. De coördinator CSB laat de invoer(en) opnieuw handmatig invoeren.

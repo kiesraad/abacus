@@ -563,7 +563,7 @@ pub fn seat_assignment(
     info!("Seats: {}", seats);
 
     if totals.votes_counts.votes_candidates_count == 0 {
-        info!("Zero votes cast");
+        info!("No votes on candidates cast");
         return Err(ApportionmentError::ZeroVotesCast);
     }
 

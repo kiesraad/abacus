@@ -293,7 +293,11 @@ impl IntoResponse for APIError {
                     ),
                     ApportionmentError::ZeroVotesCast => (
                         StatusCode::UNPROCESSABLE_ENTITY,
-                        to_error("Zero votes cast", ErrorReference::ZeroVotesCast, false),
+                        to_error(
+                            "No votes on candidates cast",
+                            ErrorReference::ZeroVotesCast,
+                            false,
+                        ),
                     ),
                 }
             }

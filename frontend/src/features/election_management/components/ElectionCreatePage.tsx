@@ -49,11 +49,8 @@ export function ElectionCreatePage() {
         </StickyNav>
 
         <article>
-          <h2>Importeer verkiezingsdefinitie</h2>
-          <p className="mt-lg mb-lg">
-            Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het
-            bestand op deze computer en importeer het.
-          </p>
+          <h2>{t("election.import_eml")}</h2>
+          <p className="mt-lg mb-lg">{t("election.use_instructions_to_import_eml")}</p>
           <FileInput id="upload-eml">{t("select_file")}</FileInput>
         </article>
       </main>

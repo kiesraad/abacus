@@ -20,12 +20,12 @@ import { DataEntryLayout } from "@/features/data_entry/components/DataEntryLayou
 import { DifferencesPage } from "@/features/data_entry/components/DifferencesPage";
 import { RecountedPage } from "@/features/data_entry/components/RecountedPage";
 import { VotersAndVotesPage } from "@/features/data_entry/components/VotersAndVotesPage";
+import { ElectionCreatePage } from "@/features/election_management/components";
 import { ElectionHomePage } from "@/features/election_management/components/ElectionHomePage";
 import { ElectionReportPage } from "@/features/election_management/components/ElectionReportPage";
 import { OverviewLayout } from "@/features/election_overview/components/OverviewLayout";
 import { OverviewPage } from "@/features/election_overview/components/OverviewPage";
 import { ElectionStatusPage } from "@/features/election_status/components/ElectionStatusPage";
-import { ElectionCreatePage } from "@/features/election_management/components";
 import { LogsHomePage } from "@/features/logs/components/LogsHomePage";
 import { PollingStationCreatePage } from "@/features/polling_stations/components/PollingStationCreatePage";
 import { PollingStationListPage } from "@/features/polling_stations/components/PollingStationListPage";

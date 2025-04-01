@@ -6,11 +6,9 @@ import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { Alert, Button, PageTitle, Table, Toolbar } from "@/components/ui";
 import { t } from "@/lib/i18n";
-
 import { IconPlus } from "@/lib/icon";
 
 import { useElectionList } from "../hooks/useElectionList";
-
 
 export function OverviewPage() {
   const navigate = useNavigate();

@@ -41,6 +41,8 @@ pub struct ElectionApportionmentResponse {
         (status = 200, description = "Election Apportionment", body = ElectionApportionmentResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 412, description = "Election data entry first needs to be finalised", body = ErrorResponse),
+        (status = 422, description = "All lists are exhausted, not enough candidates to fill all seats", body = ErrorResponse),
         (status = 422, description = "Drawing of lots is required", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
   ),

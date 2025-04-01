@@ -1011,9 +1011,9 @@ mod tests {
             assert_eq!(total_seats, [0, 0, 0, 0, 1, 9]);
         }
 
-        /// Apportionment with 0 votes
+        /// Apportionment with 0 votes on candidates
         ///
-        /// Zero votes cast
+        /// No votes on candidates cast
         #[test]
         fn test_with_0_votes() {
             let totals = election_summary_fixture_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
@@ -1567,9 +1567,9 @@ mod tests {
             assert_eq!(total_seats, vec![15, 1, 1, 1, 1, 0, 0, 0, 0]);
         }
 
-        /// Apportionment with 0 votes
+        /// Apportionment with 0 votes on candidates
         ///
-        /// Zero votes cast
+        /// No votes on candidates cast
         #[test]
         fn test_with_0_votes() {
             let totals = election_summary_fixture_with_default_50_candidates(vec![0]);

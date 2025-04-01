@@ -7,10 +7,7 @@ export type RecountedValue = Pick<PollingStationResults, "recounted">;
 
 export function useRecounted() {
   const { onSubmit: _onSubmit, ...section } = useDataEntryFormSection<boolean | undefined>({
-    section: {
-      id: "recounted",
-      type: "recounted",
-    },
+    section: "recounted",
     getDefaultFormValues: (results) => results.recounted,
   });
 

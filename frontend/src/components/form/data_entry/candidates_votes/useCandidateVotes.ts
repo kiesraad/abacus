@@ -11,11 +11,7 @@ import {
 
 export function useCandidateVotes(political_group_number: number) {
   const { onSubmit: _onSubmit, ...section } = useDataEntryFormSection<CandidateVotesFormValues>({
-    section: {
-      id: `political_group_votes_${political_group_number}`,
-      type: "political_group_votes",
-      number: political_group_number,
-    },
+    section: `political_group_votes_${political_group_number}`,
     getDefaultFormValues: (results, cache) =>
       cache?.key === `political_group_votes_${political_group_number}`
         ? valuesToFormValues(cache.data as CandidateVotesValues)

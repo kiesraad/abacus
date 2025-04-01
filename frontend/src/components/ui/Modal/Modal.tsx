@@ -28,13 +28,32 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
 
   // show the dialog as a modal and focus on the title
   useEffect(() => {
-    // open the modal
-    dialogRef.current?.showModal();
     // set the previous active element
     lastActiveElement.current = document.activeElement as HTMLElement;
     // focus on the modal
     document.getElementById("modal-title")?.focus();
-  }, [dialogRef]);
+
+    if (dialogRef.current) {
+      const dialog = dialogRef.current;
+      // open the modal
+      dialog.showModal();
+
+      // when the user presses the escape key, close the modal by calling the onClose function
+      const cancel = (e: Event) => {
+        e.preventDefault();
+        // focus on the last active element
+        lastActiveElement.current?.focus();
+        if (onClose) {
+          onClose();
+        }
+      };
+
+      dialog.addEventListener("cancel", cancel);
+      return () => {
+        dialog.removeEventListener("cancel", cancel);
+      };
+    }
+  }, [dialogRef, onClose]);
 
   return (
     <dialog id="modal-dialog" className={cls.modal} ref={dialogRef}>

@@ -1,5 +1,7 @@
 # GSB: Tweede zitting
 
+N.B.: Alle use cases voor de tweede zitting gelden ook voor elke latere zitting (derde, etc.).
+
 ## Gemeentelijk stembureau (GSB) stelt uitslag vast in tweede zitting (corrigenda) (wolk)
 
 __Niveau:__ hoog-over, wolk, ☁️
@@ -13,11 +15,13 @@ __Hoofdscenario:__
 2. Het GSB opent de zitting. (Wanneer dat gebeurt is een afweging van het GSB: liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten)
 3. De coördinator GSB opent de zitting in de applicatie.
 4. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
+5. De coördinator GSB maakt de GSB PVs aan: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB).
 5. Het GSB voert de andere onderdelen van het GSB-corrigendum in.
-6. Het GSB leest voor en controleert Na 14-2 (corrigendum op GSB eerste zitting) en de P 2a (verslag tweede zitting).
-7. Het GSB sluit de zitting.
-8. De coördinator GSB sluit de zitting in de applicatie.
-9. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+6. Het GSB leest de PVs voor: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
+7. Het GSB ondertekent de Pvs.
+8. Het GSB sluit de zitting.
+9. De coördinator GSB sluit de zitting in de applicatie.
+10. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 
 __Uitbreidingen:__
 
@@ -38,13 +42,6 @@ __Uitbreidingen:__
 &emsp; 6a1. Het GSB stelt het bezwaar vast.  
 &emsp; 6a2. Het GSB gaat over tot hertelling.
 
-### Open punten
-
-- Is er een verschil tussen hoe een derde/vierde/.. zitting loopt en de tweede zitting?
-- Maakt het voor de tweede zitting uit of een gemeente DSO of CSO doet?
-- Hoe ziet de trigger voor hertelling er precies uit voor gemeenteraadsverkiezingen? Het GSB (dus de gemeente) stelt de telling op gemeente-niveau vast, het CSB (ook de gemeente) controleert die telling en verzoekt als nodig om onderzoek en/of hertelling?
-- Verschil CSO/DSO: modellen. Dus hopelijk mogelijk zelfde use case.
-- Is er een Na 14-2 (corrigendum op GSB eerste zitting) als er geen hertellingen met een ander resultaat uit de onderzoeken komen?
 
 
 ## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)
@@ -55,30 +52,32 @@ __Niveau:__ hoog-over, vlieger, 🪁
 
 __Hoofdscenario:__  
 
-1. De coördinator GSB voert het verzoek (vrije tekst) in de applicatie in.
-2. De applicatie genereert een 'leeg' corrigendum, Na 14-1 (DSO). ('leeg' == klaar om in te vullen: kandidatenlijst, oorspr. tellingen, verzoek CSB (aanleiding))
+1. De coördinator GSB selecteert een stembureau en voert "Aanleiding van het onderzoek" (vrije tekst) in de applicatie in.
+2. De applicatie genereert een 'leeg' corrigendum, Na 14-1 versie 2 (DSO) of Bijlage 1 van Na 14-2 (CSO). ('leeg' == klaar om in te vullen: kandidatenlijst, oorspr. tellingen, verzoek CSB (aanleiding))
 3. De coördinator drukt het eerste blad van het 'lege' corrigendum af.
 4. Het GSB voert het onderzoek uit.
 5. Het GSB noteert de bevindingen op het corrigendum.
 6. Het GSB besluit dat er een hertelling nodig is.
 7. De coördinator GSB drukt de overige bladzijdes van het 'leeg' corrigendum af.
 8. Het GSB stelt een ander resultaat vast in de hertelling.
-9. [Het GSB voert de hertelling in de applicatie in.](./gsb-invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)
+9. [Het GSB voert de uitkomst van het onderzoek en de hertelling in de applicatie in.](./gsb-invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)
+10. Het GSB voegt het corrigendum toe aan de PVs van de zitting.
 
 __Uitbreidingen:__  
+1a. Het GSB besluit om n.a.v. een verzoek additionele stembureaus te onderzoeken:  
+&emsp; 1a1. De coördinator GSB selecteert een stembureau en voert "Aanleiding van het onderzoek" (vrije tekst) in de applicatie in.
+
 6a. Het GSB besluit dat er geen hertelling nodig is:  
-&emsp; 6a1. Het GSB zorgt ervoor dat de bevindingen in het PV P 2a worden opgenomen.  
-&emsp; 6a2. Het GSB gooit het eerste blad van het 'lege' corrigendum weg.
+&emsp; 6a1. Het GSB voert de uitkomst van het onderzoek in de applicatie in.  
+&emsp; 6a2. Het GSB gooit het corrigendum weg.
 
 8a. Het GSB bevestigt het oorspronkelijke resultaat in de hertelling:  
-&emsp; 8a1. Het GSB zorgt ervoor dat de bevindingen in het PV P 2a worden opgenomen.  
-&emsp; 8a2. Het GSB gooit het corrigendum met de hertelling weg.
+&emsp; 8a1. Het GSB voert de uitkomst van het onderzoek in de applicatie in.  
+&emsp; 8a2. Het GSB gooit het corrigendum weg.
 
 
 ### Open punten
 
-- modellen verschillen DSO/CSO
 - 'leeg' corrigendum is geen heel goede term
     - Moet je kunnen selecteren welke lijsten er opgenomen moeten worden in het 'lege' corrigendum? Nee, want nieuwe modellen: corrigendum bevat aantallen modellen vorige zitting (niet: eerste zitting tenzij dat de vorige zitting is), dus handig om alle lijsten in corrigendum te hebben.
-- Hoe zorgt het GSB ervoor dat de bevindingen in het PV P 2a worden opgenomen?
-- Is het mogelijk dat er een hertelling wordt uitgevoerd voor een stembureau waar geen verzoek voor is ingediend? Heeft mogelijk gevolgen voor welke stembureaus we toestaan dat er een corrigendum wordt ingevoerd.
+- Hoe expliciet willen we zijn over de verschillende momenten waarop welke onderdelen van het corrigendum afgedrukt kunnen worden?

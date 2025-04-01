@@ -97,7 +97,7 @@ __Uitbreidingen:__
 &emsp; 6a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
 
 7a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
-&emsp; 7a1. [De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.](#de-coördinator-gsb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-op-zee)
+&emsp; 7a1. [De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.](#de-coördinator-gsb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-zee)
 
 ### Open punten
 - Waar in het scenario kan de coördinator GSB verklaringen maken over de waarschuwingen, zodat het CSB deze beter kan beoordelen? Na de eerste of tweede invoer? Of pas nadat het resultaat van een stembureau definitief is?
@@ -163,7 +163,7 @@ __Uitbreidingen:__
 - De use case beschrijft de oude modellen, met daarin alleen de vraag "Is er herteld?" In de nieuwe modellen zijn er drie vragen.
 
 
-## De coördinator GSB beoordeelt de verschillen tussen de twee invoeren op (zee)
+## De coördinator GSB beoordeelt de verschillen tussen de twee invoeren (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

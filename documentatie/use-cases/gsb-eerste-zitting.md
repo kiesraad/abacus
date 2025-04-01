@@ -101,7 +101,7 @@ __Uitbreidingen:__
   - Waarschijnlijk niet, bijvoorbeeld geen "Is er herteld?" op SB PV.
   - Nieuwe modellen op nalopen.
 - Is het wenselijk om een 'leeg' corrigendum (wel ingevuld: kandidatenlijsten (keuze welke lijsten), stembureau(?), gemeente, oorspronkelijke resultaten?) te kunnen genereren in applicatie?
-  - N 10-1 (PV SB DSO) en Na 14-1 (corrigendum op PV SB DSO)
+  - N 10-1 (PV SB DSO) en Na 14-1 versie 1 (corrigendum op PV SB DSO)
   - Ja.
   - Meerdere opties mogelijk:
     - minimaal kandidatenlijst en gemeente

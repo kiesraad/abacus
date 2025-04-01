@@ -1113,6 +1113,11 @@ mod tests {
     /// EntriesDifferent --> SecondEntryInProgress: resolve (keep first entry)
     #[test]
     fn entries_different_to_second_entry_not_started_keep_first_entry() {
+        // Create a difference, so we can check that we keep the right entry
+        let first_entry = polling_station_result();
+        let mut second_entry = polling_station_result();
+        second_entry.recounted = Some(true);
+
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: polling_station_result(),
             first_entry_user_id: 0,
@@ -1122,21 +1127,38 @@ mod tests {
             second_entry_finished_at: Utc::now(),
         });
         let next = initial.keep_first_entry().unwrap();
-        assert!(matches!(next, DataEntryStatus::SecondEntryNotStarted(_)));
+
+        if let DataEntryStatus::SecondEntryNotStarted(kept_entry) = next {
+            assert_eq!(kept_entry.finalised_first_entry, first_entry);
+            assert_ne!(kept_entry.finalised_first_entry, second_entry);
+        } else {
+            panic!()
+        };
     }
 
     #[test]
     fn entries_different_to_second_entry_not_started_keep_second_entry() {
+        // Create a difference, so we can check that we keep the right entry
+        let first_entry = polling_station_result();
+        let mut second_entry = polling_station_result();
+        second_entry.recounted = Some(true);
+
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
-            first_entry: polling_station_result(),
+            first_entry: first_entry.clone(),
             first_entry_user_id: 0,
-            second_entry: polling_station_result(),
+            second_entry: second_entry.clone(),
             second_entry_user_id: 0,
             first_entry_finished_at: Utc::now(),
             second_entry_finished_at: Utc::now(),
         });
         let next = initial.keep_second_entry().unwrap();
-        assert!(matches!(next, DataEntryStatus::SecondEntryNotStarted(_)));
+
+        if let DataEntryStatus::SecondEntryNotStarted(kept_entry) = next {
+            assert_eq!(kept_entry.finalised_first_entry, second_entry);
+            assert_ne!(kept_entry.finalised_first_entry, first_entry);
+        } else {
+            panic!()
+        };
     }
 
     #[test]

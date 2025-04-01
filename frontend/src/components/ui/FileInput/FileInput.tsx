@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { t } from "@/lib/i18n";
 
-import btnCls from "../Button/Button.module.css";
+import { Button } from "../Button/Button";
 import cls from "./FileInput.module.css";
 
 export type FileInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
@@ -12,9 +12,7 @@ export function FileInput({ id, children, ...props }: FileInputProps) {
 
   return (
     <>
-      <label htmlFor={id} className={btnCls.button}>
-        {children}
-      </label>
+      <Button.Label htmlFor={id}>{children}</Button.Label>
       <input
         {...props}
         id={id}

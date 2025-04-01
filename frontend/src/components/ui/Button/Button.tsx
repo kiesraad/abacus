@@ -55,3 +55,21 @@ function ButtonLink({ disabled, variant = "primary", size = "md", children, ...l
 }
 
 Button.Link = ButtonLink;
+
+export interface ButtonLabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+  disabled?: boolean;
+  variant?: ButtonVariant;
+  size?: Size;
+  children: React.ReactNode;
+}
+
+function ButtonLabel({ disabled, variant = "primary", size = "md", children, ...labelProps }: ButtonLabelProps) {
+  const className = cn(cls.button, cls[variant], cls[size], disabled ? cls.disabled : undefined);
+  return (
+    <label className={className} {...labelProps}>
+      {children}
+    </label>
+  );
+}
+
+Button.Label = ButtonLabel;

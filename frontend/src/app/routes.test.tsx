@@ -1,11 +1,11 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler } from "@kiesraad/api-mocks";
-import { expectErrorPage, expectNotFound, overrideOnce, Providers, server, setupTestRouter } from "@kiesraad/test";
+import { expectErrorPage, expectNotFound, overrideOnce, Providers, server, setupTestRouter } from "@/testing";
+import { ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks";
+import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 
 import { routes } from "./routes";
-import { statusResponseMock } from "./testing/api-mocks/ElectionStatusMockData";
 
 const renderWithRouter = () => {
   const router = setupTestRouter(routes);

@@ -6,8 +6,8 @@ import { TranslationPath } from "./i18n.types";
 
 export type RenderCallback = (contents: ReactElement) => ReactElement;
 
-// get the translation for the given path key
-export function translate(path: TranslationPath): string {
+// get the translation for the given path key, return undefined if not found
+function getTranslation(path: string): string | undefined {
   const segments = path.split(".");
 
   const value = segments.reduce((o: unknown, k: string) => {
@@ -17,6 +17,24 @@ export function translate(path: TranslationPath): string {
       return undefined;
     }
   }, translations[locale]);
+
+  if (typeof value === "string") {
+    return value;
+  }
+
+  return undefined;
+}
+
+// check if the given path key exists in the translations
+export function hasTranslation(path: string): boolean {
+  const value = getTranslation(path);
+
+  return typeof value === "string" ? true : false;
+}
+
+// get the translation for the given path key, return the path key if not found
+export function translate(path: TranslationPath): string {
+  const value = getTranslation(path);
 
   return typeof value === "string" ? value : path;
 }

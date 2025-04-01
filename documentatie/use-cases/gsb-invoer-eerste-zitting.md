@@ -19,8 +19,8 @@ __Uitbreidingen:__
 
 2b. (CSO) Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
 &emsp; 2b1. Het GSB voert de hertelling uit.  
-&emsp; 2b2. Het GSB corrigeert de Bijlage 1 of vult een nieuwe Bijlage 1 in.  
-&emsp; 2b3. Het GSB voert de nieuwe Bijlage 1 in de applicatie in.  
+&emsp; 2b2. Het GSB corrigeert de Na 31-2 Bijlage 1 of vult een nieuwe Na 31-2 Bijlage 1 in.  
+&emsp; 2b3. Het GSB voert de gecorrigeerde/nieuwe Na 31-2 Bijlage 1 in de applicatie in.  
 &emsp; 2b4. Het GSB vermeldt het stembureau bij "extra onderzoeken van het GSB" in het PV.
 
 2-3a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  

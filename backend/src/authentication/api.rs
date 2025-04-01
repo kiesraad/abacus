@@ -8,6 +8,7 @@ use super::{
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
+    error::ErrorReference,
 };
 use axum::{
     extract::{Path, State},
@@ -448,13 +449,28 @@ pub async fn user_update(
 async fn user_delete(
     _user: Admin,
     State(users_repo): State<Users>,
+    audit_service: AuditService,
     Path(user_id): Path<u32>,
 ) -> Result<StatusCode, APIError> {
+    let Some(user) = users_repo.get_by_id(user_id).await? else {
+        return Err(APIError::NotFound(
+            format!("User with id {user_id} not found"),
+            ErrorReference::EntryNotFound,
+        ));
+    };
+
     let deleted = users_repo.delete(user_id).await?;
 
     if deleted {
+        audit_service
+            .log(&AuditEvent::UserDeleted((&user).into()), None)
+            .await?;
+
         Ok(StatusCode::OK)
     } else {
-        Ok(StatusCode::NOT_FOUND)
+        Err(APIError::NotFound(
+            format!("Error deleting user with id {user_id}"),
+            ErrorReference::EntryNotFound,
+        ))
     }
 }

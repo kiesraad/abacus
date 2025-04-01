@@ -21,7 +21,7 @@ use utoipa::ToSchema;
 use zip::result::ZipError;
 
 /// Error reference used to show the corresponding error message to the end-user
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[derive(Serialize, Deserialize, ToSchema, PartialEq, Eq, Debug)]
 pub enum ErrorReference {
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,

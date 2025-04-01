@@ -7,6 +7,7 @@ use crate::{
     authentication::LoginResponse,
     data_entry::PollingStationDataEntry,
     election::{Election, ElectionCategory, ElectionStatus},
+    error::ErrorReference,
     polling_station::{PollingStation, PollingStationType},
 };
 
@@ -97,6 +98,7 @@ pub struct DataEntryDetails {
     #[schema(value_type = Option<String>)]
     pub finished_at: Option<DateTime<Utc>>,
     pub first_entry_user_id: Option<u32>,
+    pub second_entry_user_id: Option<u32>,
 }
 
 impl From<PollingStationDataEntry> for DataEntryDetails {
@@ -108,8 +110,16 @@ impl From<PollingStationDataEntry> for DataEntryDetails {
             data_entry_progress: state.get_progress(),
             finished_at: state.finished_at().cloned(),
             first_entry_user_id: state.get_first_entry_user_id(),
+            second_entry_user_id: state.get_second_entry_user_id(),
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+pub struct ErrorDetails {
+    pub reference: ErrorReference,
+    pub path: String,
+    pub level: AuditEventLevel,
 }
 
 #[derive(
@@ -120,8 +130,7 @@ pub enum AuditEvent {
     // authentication and account events
     UserLoggedIn(UserLoggedInDetails),
     UserLoggedOut(UserLoggedOutDetails),
-    UserAccountUpdateFailed,
-    UserAccountUpdateSuccess(LoginResponse),
+    UserAccountUpdated(LoginResponse),
     UserSessionExtended,
     // user managament events
     UserCreated(LoginResponse),
@@ -140,6 +149,8 @@ pub enum AuditEvent {
     DataEntrySaved(DataEntryDetails),
     DataEntryDeleted(DataEntryDetails),
     DataEntryFinalized(DataEntryDetails),
+    // api errors
+    Error(ErrorDetails),
     #[default]
     UnknownEvent,
 }
@@ -155,9 +166,8 @@ impl AuditEvent {
         match self {
             AuditEvent::UserLoggedIn(_) => AuditEventLevel::Success,
             AuditEvent::UserLoggedOut(_) => AuditEventLevel::Success,
-            AuditEvent::UserAccountUpdateFailed => AuditEventLevel::Error,
-            AuditEvent::UserAccountUpdateSuccess(_) => AuditEventLevel::Success,
             AuditEvent::UserSessionExtended => AuditEventLevel::Info,
+            AuditEvent::UserAccountUpdated(_) => AuditEventLevel::Success,
             AuditEvent::UserCreated(_) => AuditEventLevel::Success,
             AuditEvent::UserUpdated(_) => AuditEventLevel::Success,
             AuditEvent::UserDeleted(_) => AuditEventLevel::Info,
@@ -170,6 +180,7 @@ impl AuditEvent {
             AuditEvent::DataEntrySaved(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryFinalized(_) => AuditEventLevel::Success,
+            AuditEvent::Error(ErrorDetails { level, .. }) => *level,
             AuditEvent::UnknownEvent => AuditEventLevel::Warning,
         }
     }

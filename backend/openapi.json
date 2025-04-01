@@ -1750,20 +1750,6 @@
             ]
           },
           {
-            "type": "object",
-            "required": [
-              "eventType"
-            ],
-            "properties": {
-              "eventType": {
-                "type": "string",
-                "enum": [
-                  "UserAccountUpdateFailed"
-                ]
-              }
-            }
-          },
-          {
             "allOf": [
               {
                 "$ref": "#/components/schemas/LoginResponse"
@@ -1777,7 +1763,7 @@
                   "eventType": {
                     "type": "string",
                     "enum": [
-                      "UserAccountUpdateSuccess"
+                      "UserAccountUpdated"
                     ]
                   }
                 }
@@ -2044,6 +2030,27 @@
                     "type": "string",
                     "enum": [
                       "DataEntryFinalized"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "Error"
                     ]
                   }
                 }
@@ -2370,6 +2377,14 @@
           },
           "pollingStationId": {
             "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "secondEntryUserId": {
+            "type": [
+              "integer",
+              "null"
+            ],
             "format": "int32",
             "minimum": 0
           }
@@ -2770,6 +2785,25 @@
           "votes_counts": {
             "$ref": "#/components/schemas/VotesCounts",
             "description": "The total number of votes"
+          }
+        }
+      },
+      "ErrorDetails": {
+        "type": "object",
+        "required": [
+          "reference",
+          "path",
+          "level"
+        ],
+        "properties": {
+          "level": {
+            "$ref": "#/components/schemas/AuditEventLevel"
+          },
+          "path": {
+            "type": "string"
+          },
+          "reference": {
+            "$ref": "#/components/schemas/ErrorReference"
           }
         }
       },

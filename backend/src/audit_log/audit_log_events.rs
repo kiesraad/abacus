@@ -15,7 +15,7 @@ use crate::{
 use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 
 #[derive(
-    Serialize, Deserialize, VariantNames, Clone, Debug, PartialEq, Eq, Hash, ToSchema, Type,
+    Serialize, Deserialize, VariantNames, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type,
 )]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "snake_case")]

@@ -177,19 +177,9 @@ async fn account_update(
     }
 
     // Update the password
-    let result = users
+    users
         .update_password(user.id(), &account.username, &account.password)
-        .await;
-
-    // Register audit event if the password update failed
-    if let Err(e) = result {
-        audit_service
-            .with_user(user.clone())
-            .log(&AuditEvent::UserAccountUpdateFailed, None)
-            .await?;
-
-        return Err(e.into());
-    }
+        .await?;
 
     // Update the fullname
     if let Some(fullname) = account.fullname {
@@ -204,10 +194,7 @@ async fn account_update(
 
     audit_service
         .with_user(updated_user.clone())
-        .log(
-            &AuditEvent::UserAccountUpdateSuccess(response.clone()),
-            None,
-        )
+        .log(&AuditEvent::UserAccountUpdated(response.clone()), None)
         .await?;
 
     Ok(Json(response))

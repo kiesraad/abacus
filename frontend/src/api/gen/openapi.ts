@@ -172,8 +172,7 @@ export interface AccountUpdateRequest {
 export type AuditEvent =
   | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
   | (UserLoggedOutDetails & { eventType: "UserLoggedOut" })
-  | { eventType: "UserAccountUpdateFailed" }
-  | (LoginResponse & { eventType: "UserAccountUpdateSuccess" })
+  | (LoginResponse & { eventType: "UserAccountUpdated" })
   | { eventType: "UserSessionExtended" }
   | (LoginResponse & { eventType: "UserCreated" })
   | (LoginResponse & { eventType: "UserUpdated" })
@@ -187,6 +186,7 @@ export type AuditEvent =
   | (DataEntryDetails & { eventType: "DataEntrySaved" })
   | (DataEntryDetails & { eventType: "DataEntryDeleted" })
   | (DataEntryDetails & { eventType: "DataEntryFinalized" })
+  | (ErrorDetails & { eventType: "Error" })
   | { eventType: "UnknownEvent" };
 
 export type AuditEventLevel = "info" | "success" | "warning" | "error";
@@ -281,6 +281,7 @@ export interface DataEntryDetails {
   finishedAt?: string | null;
   firstEntryUserId?: number | null;
   pollingStationId: number;
+  secondEntryUserId?: number | null;
 }
 
 export type DataEntryStatusName =
@@ -430,6 +431,12 @@ export interface ElectionSummary {
   voters_counts: VotersCounts;
   /** The total number of votes */
   votes_counts: VotesCounts;
+}
+
+export interface ErrorDetails {
+  level: AuditEventLevel;
+  path: string;
+  reference: ErrorReference;
 }
 
 /**

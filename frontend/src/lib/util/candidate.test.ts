@@ -1,40 +1,40 @@
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { Candidate } from "@/api";
 
-import { getCandidateFullName } from "./candidate";
+import { getCandidateFullName, getCandidateFullNameWithGender } from "./candidate";
 
-test("getCandidateFullName util", () => {
-  const candidateWithoutFirstName: Candidate = {
-    initials: "A.B.",
-    last_name: "Boer",
-    locality: "Juinen",
-    number: 1,
-  };
-  const candidateWithFirstName: Candidate = {
-    ...candidateWithoutFirstName,
-    first_name: "Anne",
-    number: 2,
-  };
-  const candidateWithFirstNameAndLastNamePrefix: Candidate = {
-    ...candidateWithFirstName,
-    last_name_prefix: "de",
-    number: 3,
-  };
-  const candidateWithFirstNameAndLastNamePrefixAndGender: Candidate = {
-    ...candidateWithFirstNameAndLastNamePrefix,
-    gender: "Female",
-    number: 4,
-  };
-  const fullNameWithoutFirstName = getCandidateFullName(candidateWithoutFirstName, false);
-  const fullNameWithFirstName = getCandidateFullName(candidateWithFirstName, false);
-  const fullNameWithFirstNameAndLastNamePrefix = getCandidateFullName(candidateWithFirstNameAndLastNamePrefix, true);
-  const fullNameWithFirstNameAndLastNamePrefixAndGender = getCandidateFullName(
-    candidateWithFirstNameAndLastNamePrefixAndGender,
-    true,
-  );
-  expect(fullNameWithoutFirstName).toBe("Boer, A.B.");
-  expect(fullNameWithFirstName).toBe("Boer, A.B. (Anne)");
-  expect(fullNameWithFirstNameAndLastNamePrefix).toBe("de Boer, A.B. (Anne)");
-  expect(fullNameWithFirstNameAndLastNamePrefixAndGender).toBe("de Boer, A.B. (Anne) (v)");
+const last_name_prefix = "de";
+const last_name = "Boer";
+const initials = "A.B.";
+const first_name = "Anne";
+const gender = "Female";
+
+describe("getCandidateFullName util", () => {
+  test("without first name", () => {
+    const candidate = { last_name, initials } as Candidate;
+    expect(getCandidateFullName(candidate)).toBe("Boer, A.B.");
+  });
+
+  test("with first name", () => {
+    const candidate = { last_name, initials, first_name } as Candidate;
+    expect(getCandidateFullName(candidate)).toBe("Boer, A.B. (Anne)");
+  });
+
+  test("with firstname and lastname prefix", () => {
+    const candidate = { last_name_prefix, last_name, initials, first_name } as Candidate;
+    expect(getCandidateFullName(candidate)).toBe("de Boer, A.B. (Anne)");
+  });
+});
+
+describe("getCandidateFullNameWithGender util", () => {
+  test("with gender", () => {
+    const candidate = { last_name, initials, first_name, gender } as Candidate;
+    expect(getCandidateFullNameWithGender(candidate)).toBe("Boer, A.B. (Anne) (v)");
+  });
+
+  test("without gender", () => {
+    const candidate = { last_name, initials, first_name } as Candidate;
+    expect(getCandidateFullNameWithGender(candidate)).toBe("Boer, A.B. (Anne)");
+  });
 });

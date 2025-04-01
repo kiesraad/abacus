@@ -87,7 +87,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           {group.candidates.map((candidate, index) => {
             const addSeparator = (index + 1) % 25 === 0 && index + 1 !== group.candidates.length;
             const defaultValue = currentValues.candidate_votes[index] || "";
-            const candidateFullName = getCandidateFullName(candidate, false);
+            const candidateFullName = getCandidateFullName(candidate);
 
             return (
               <InputGridRow

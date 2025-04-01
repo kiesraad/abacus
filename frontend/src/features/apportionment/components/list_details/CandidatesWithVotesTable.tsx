@@ -1,7 +1,7 @@
 import { Candidate, CandidateVotes } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { cn, getCandidateFullName } from "@/lib/util";
+import { cn, getCandidateFullNameWithGender } from "@/lib/util";
 
 import cls from "../Apportionment.module.css";
 
@@ -36,7 +36,7 @@ export function CandidatesWithVotesTable({
           return (
             <Table.Row key={candidate.number}>
               {showNumber && <Table.Cell>{candidate.number}</Table.Cell>}
-              <Table.Cell>{getCandidateFullName(candidate, true)}</Table.Cell>
+              <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
               {showLocality && <Table.Cell>{candidate.locality}</Table.Cell>}
               <Table.Cell className="text-align-r">{candidate.votes}</Table.Cell>
             </Table.Row>

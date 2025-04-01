@@ -26,6 +26,9 @@ __Uitbreidingen:__
 3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 3a1. [De coördinator CSB beoordeelt de verschillen tussen de twee invoeren(zee)](#de-coördinator-csb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-zee)
 
+### Open punten
+- De startdatum en -tijd van de zitting CSB zijn bekend, hoewel de zitting pas plaats vindt, nadat alle gegevens in de applicatie zijn ingevoerd. Willen we dat de coördinator de gegevens van de zitting alvast invoert?
+
 
 ## De coördinator CSB beoordeelt de verschillen tussen de twee invoeren (zee)
 

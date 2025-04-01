@@ -17,8 +17,8 @@ __Hoofdscenario:__
 4. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
 5. De coördinator GSB maakt de GSB PVs aan: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB).
 5. Het GSB voert de andere onderdelen van het GSB-corrigendum in.
-6. Het GSB leest de PVs voor: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
-7. Het GSB ondertekent de Pvs.
+6. Het GSB leest de PV's voor: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
+7. Het GSB ondertekent de PV's.
 8. Het GSB sluit de zitting.
 9. De coördinator GSB sluit de zitting in de applicatie.
 10. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
@@ -61,7 +61,7 @@ __Hoofdscenario:__
 7. De coördinator GSB drukt de overige bladzijdes van het 'leeg' corrigendum af.
 8. Het GSB stelt een ander resultaat vast in de hertelling.
 9. [Het GSB voert de uitkomst van het onderzoek en de hertelling in de applicatie in.](./gsb-invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)
-10. Het GSB voegt het corrigendum toe aan de PVs van de zitting.
+10. Het GSB voegt het corrigendum toe aan de PV's van de zitting.
 
 __Uitbreidingen:__  
 1a. Het GSB besluit om n.a.v. een verzoek additionele stembureaus te onderzoeken:  

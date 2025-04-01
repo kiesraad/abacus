@@ -13,7 +13,7 @@ en het componentendiagram.
 
 [C4-model]: https://c4model.com/ "C4 model"
 
-## Systeemlandscha
+## Systeemlandschap
 
 Het systeemlandschap geeft een overzicht van de systemen die in de omgeving van
 het systeem bestaan. Dit diagram is bedoeld om de context van het systeem te

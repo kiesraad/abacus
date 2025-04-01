@@ -15,6 +15,8 @@ use crate::{
 };
 
 #[cfg(feature = "dev-database")]
+use crate::audit_log::{AuditEvent, AuditService};
+#[cfg(feature = "dev-database")]
 use crate::authentication::Admin;
 #[cfg(feature = "dev-database")]
 use axum::http::StatusCode;
@@ -115,12 +117,17 @@ async fn election_details(
 )]
 #[cfg(feature = "dev-database")]
 async fn election_create(
-    _user: Admin,
+    user: Admin,
     State(elections_repo): State<Elections>,
+    audit_service: AuditService,
     Json(new_election): Json<ElectionRequest>,
 ) -> Result<(StatusCode, Election), APIError> {
-    Ok((
-        StatusCode::CREATED,
-        elections_repo.create(new_election).await?,
-    ))
+    let election = elections_repo.create(new_election).await?;
+
+    audit_service
+        .with_user(user.0)
+        .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
+        .await?;
+
+    Ok((StatusCode::CREATED, election))
 }

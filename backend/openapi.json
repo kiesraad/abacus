@@ -1980,7 +1980,7 @@
                   "eventType": {
                     "type": "string",
                     "enum": [
-                      "DataEntryCreated"
+                      "DataEntryClaimed"
                     ]
                   }
                 }
@@ -2001,7 +2001,7 @@
                   "eventType": {
                     "type": "string",
                     "enum": [
-                      "DataEntryUpdated"
+                      "DataEntrySaved"
                     ]
                   }
                 }
@@ -2023,27 +2023,6 @@
                     "type": "string",
                     "enum": [
                       "DataEntryDeleted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "eventType"
-                ],
-                "properties": {
-                  "eventType": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryClaimed"
                     ]
                   }
                 }

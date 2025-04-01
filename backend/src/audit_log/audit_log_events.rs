@@ -159,13 +159,13 @@ impl AuditLog {
         &self,
         user: &User,
         event: &AuditEvent,
-        event_level: AuditEventLevel,
         message: Option<String>,
         ip: Option<IpAddr>,
     ) -> Result<AuditLogEvent, APIError> {
         // TODO: set workstation id once we have one
         let workstation: Option<u32> = None;
         let event_name = event.to_string();
+        let event_level = event.level();
         let event = serde_json::to_value(event)?;
         let user_id = user.id();
         let username = user.username();

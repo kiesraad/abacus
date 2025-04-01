@@ -102,11 +102,12 @@ async fn polling_station_data_entry_claim(
 
     // Save the new data entry state
     polling_station_data_entries.upsert(id, &new_state).await?;
+
     let data_entry = polling_station_data_entries.get_row(id).await?;
 
     audit_service
         .with_user(user.0)
-        .log_success(&AuditEvent::DataEntryClaimed(data_entry.into()), None)
+        .log(&AuditEvent::DataEntryClaimed(data_entry.into()), None)
         .await?;
 
     let client_state = new_state.get_client_state().map(|v| v.to_owned());
@@ -167,6 +168,7 @@ async fn polling_station_data_entry_save(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(elections): State<Elections>,
+    audit_service: AuditService,
     data_entry_request: DataEntry,
 ) -> Result<SaveDataEntryResponse, APIError> {
     // TODO: execute all checks in this function in a single SQL transaction
@@ -198,6 +200,13 @@ async fn polling_station_data_entry_save(
     // Save the new data entry state
     polling_station_data_entries.upsert(id, &new_state).await?;
 
+    let data_entry = polling_station_data_entries.get_row(id).await?;
+
+    audit_service
+        .with_user(user.0)
+        .log(&AuditEvent::DataEntrySaved(data_entry.into()), None)
+        .await?;
+
     Ok(SaveDataEntryResponse { validation_results })
 }
 
@@ -220,6 +229,7 @@ async fn polling_station_data_entry_save(
 async fn polling_station_data_entry_delete(
     user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
+    audit_service: AuditService,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<StatusCode, APIError> {
     let user_id = user.0.id();
@@ -229,6 +239,13 @@ async fn polling_station_data_entry_delete(
         EntryNumber::SecondEntry => state.delete_second_entry(user_id)?,
     };
     polling_station_data_entries.upsert(id, &new_state).await?;
+
+    let data_entry = polling_station_data_entries.get_row(id).await?;
+
+    audit_service
+        .with_user(user.0)
+        .log(&AuditEvent::DataEntryDeleted(data_entry.into()), None)
+        .await?;
 
     Ok(StatusCode::NO_CONTENT)
 }
@@ -255,6 +272,7 @@ async fn polling_station_data_entry_finalise(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
+    audit_service: AuditService,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<(), APIError> {
     let state = polling_station_data_entries.get_or_default(id).await?;
@@ -288,6 +306,13 @@ async fn polling_station_data_entry_finalise(
             }
         }
     }
+
+    let data_entry = polling_station_data_entries.get_row(id).await?;
+
+    audit_service
+        .with_user(user.0)
+        .log(&AuditEvent::DataEntryFinalized(data_entry.into()), None)
+        .await?;
 
     Ok(())
 }
@@ -418,12 +443,14 @@ pub mod tests {
         request_body: DataEntry,
         entry_number: EntryNumber,
     ) -> Response {
+        let user = User::test_user(Role::Typist);
         polling_station_data_entry_save(
-            Typist(User::test_user(Role::Typist)),
+            Typist(user.clone()),
             Path((1, entry_number)),
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
             State(Elections::new(pool.clone())),
+            AuditService::new(AuditLog(pool), user, None),
             request_body.clone(),
         )
         .await
@@ -431,9 +458,11 @@ pub mod tests {
     }
 
     async fn delete(pool: SqlitePool, entry_number: EntryNumber) -> Response {
+        let user = User::test_user(Role::Typist);
         polling_station_data_entry_delete(
-            Typist(User::test_user(Role::Typist)),
+            Typist(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
+            AuditService::new(AuditLog(pool), user, None),
             Path((1, entry_number)),
         )
         .await
@@ -441,11 +470,13 @@ pub mod tests {
     }
 
     async fn finalise(pool: SqlitePool, entry_number: EntryNumber) -> Response {
+        let user = User::test_user(Role::Typist);
         polling_station_data_entry_finalise(
-            Typist(User::test_user(Role::Typist)),
+            Typist(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
             State(Elections::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
+            AuditService::new(AuditLog(pool), user, None),
             Path((1, entry_number)),
         )
         .await
@@ -658,10 +689,12 @@ pub mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entry_delete_nonexistent(pool: SqlitePool) {
+        let user = User::test_user(Role::Typist);
         // check that deleting a non-existing data entry returns 404
         let response = polling_station_data_entry_delete(
-            Typist(User::test_user(Role::Typist)),
+            Typist(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
+            AuditService::new(AuditLog(pool), user, None),
             Path((1, EntryNumber::FirstEntry)),
         )
         .await

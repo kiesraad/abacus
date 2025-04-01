@@ -157,9 +157,9 @@ mod tests {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 1,
         });
-        service.log_success(&audit_event, None).await.unwrap();
-        service.log_success(&audit_event, None).await.unwrap();
-        service.log_success(&audit_event, None).await.unwrap();
+        service.log(&audit_event, None).await.unwrap();
+        service.log(&audit_event, None).await.unwrap();
+        service.log(&audit_event, None).await.unwrap();
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

@@ -42,8 +42,7 @@
     "PollingStationCreated": "Stembureau aangemaakt",
     "PollingStationUpdated": "Stembureau bijgewerkt",
     "PollingStationDeleted": "Stembureau verwijderd",
-    "DataEntryCreated": "Invoer aangemaakt",
-    "DataEntryUpdated": "Invoer bijgewerkt",
+    "DataEntrySaved": "Invoer opgeslagen",
     "DataEntryDeleted": "Invoer verwijderd",
     "DataEntryClaimed": "Invoer geclaimd",
     "DataEntryFinalized": "Invoer afgerond"

@@ -114,7 +114,7 @@ async fn login(
     // Log the login event
     audit_service
         .with_user(user.clone())
-        .log_success(
+        .log(
             &AuditEvent::UserLoggedIn(UserLoggedInDetails {
                 user_agent,
                 logged_in_users_count: sessions.count().await?,
@@ -185,7 +185,7 @@ async fn account_update(
     if let Err(e) = result {
         audit_service
             .with_user(user.clone())
-            .log_error(&AuditEvent::UserAccountUpdateFailed, None)
+            .log(&AuditEvent::UserAccountUpdateFailed, None)
             .await?;
 
         return Err(e.into());
@@ -204,7 +204,7 @@ async fn account_update(
 
     audit_service
         .with_user(updated_user.clone())
-        .log_success(
+        .log(
             &AuditEvent::UserAccountUpdateSuccess(response.clone()),
             None,
         )
@@ -242,7 +242,7 @@ async fn logout(
             // Log the logout event
             audit_service
                 .with_user(user)
-                .log_success(
+                .log(
                     &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
                         session_duration: session.duration().as_secs(),
                     }),
@@ -283,7 +283,7 @@ pub async fn extend_session(
         if let Some(user) = users.get_by_id(session.user_id()).await.ok().flatten() {
             let _ = audit_service
                 .with_user(user)
-                .log_success(&AuditEvent::UserSessionExtended, None)
+                .log(&AuditEvent::UserSessionExtended, None)
                 .await;
 
             let mut cookie = session.get_cookie();
@@ -384,7 +384,7 @@ pub async fn user_create(
 
     audit_service
         .with_user(admin.0)
-        .log_success(&AuditEvent::UserCreated(LoginResponse::from(&user)), None)
+        .log(&AuditEvent::UserCreated(LoginResponse::from(&user)), None)
         .await?;
 
     Ok((StatusCode::CREATED, Json(user)))
@@ -452,7 +452,7 @@ pub async fn user_update(
 
     audit_service
         .with_user(admin.0)
-        .log_success(&AuditEvent::UserUpdated(LoginResponse::from(&user)), None)
+        .log(&AuditEvent::UserUpdated(LoginResponse::from(&user)), None)
         .await?;
 
     Ok(Json(user))

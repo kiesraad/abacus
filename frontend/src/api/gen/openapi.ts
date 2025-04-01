@@ -183,10 +183,9 @@ export type AuditEvent =
   | (PollingStationDetails & { eventType: "PollingStationCreated" })
   | (PollingStationDetails & { eventType: "PollingStationUpdated" })
   | (PollingStationDetails & { eventType: "PollingStationDeleted" })
-  | (DataEntryDetails & { eventType: "DataEntryCreated" })
-  | (DataEntryDetails & { eventType: "DataEntryUpdated" })
-  | (DataEntryDetails & { eventType: "DataEntryDeleted" })
   | (DataEntryDetails & { eventType: "DataEntryClaimed" })
+  | (DataEntryDetails & { eventType: "DataEntrySaved" })
+  | (DataEntryDetails & { eventType: "DataEntryDeleted" })
   | (DataEntryDetails & { eventType: "DataEntryFinalized" })
   | { eventType: "UnknownEvent" };
 

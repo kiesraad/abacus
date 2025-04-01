@@ -1,6 +1,7 @@
 use crate::{
     APIError, AppState, ErrorResponse,
     apportionment::{ApportionmentError, SeatAssignmentResult, seat_assignment},
+    audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     data_entry::{
         repository::{PollingStationDataEntries, PollingStationResultsEntries},
@@ -45,11 +46,12 @@ pub struct ElectionApportionmentResponse {
   ),
 )]
 async fn election_apportionment(
-    _user: Coordinator,
+    user: Coordinator,
     State(elections_repo): State<Elections>,
     State(data_entry_repo): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
+    audit_service: AuditService,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionApportionmentResponse>, APIError> {
     let election = elections_repo.get(id).await?;
@@ -64,6 +66,15 @@ async fn election_apportionment(
             .await?;
         let election_summary = ElectionSummary::from_results(&election, &results)?;
         let seat_assignment = seat_assignment(election.number_of_seats, &election_summary)?;
+
+        audit_service
+            .with_user(user.0)
+            .log(
+                &AuditEvent::ApportionmentCreated(election.clone().into()),
+                None,
+            )
+            .await?;
+
         Ok(Json(ElectionApportionmentResponse {
             seat_assignment,
             election_summary,

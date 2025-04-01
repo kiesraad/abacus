@@ -15,7 +15,7 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__
 
-1a. De CSB-applicatie draait op een andere machine dan de GSB-applicatie:
+1a. De CSB-applicatie draait op een andere machine dan de GSB-applicatie:  
 &emsp; 1a1. Het CSB importeert het digitale bestand.
 
 1b. Het is niet mogelijk het digitale bestand te importeren:  

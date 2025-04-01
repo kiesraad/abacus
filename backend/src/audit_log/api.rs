@@ -1,16 +1,20 @@
-use crate::{APIError, AppState, ErrorResponse, authentication::AdminOrCoordinator};
-use axum::{
-    Json,
-    extract::{Query, State},
-};
+use axum::{Json, extract::State};
+use axum_extra::extract::Query;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{AuditLog, AuditLogEvent};
+use crate::{
+    APIError, AppState, ErrorResponse,
+    authentication::{AdminOrCoordinator, Role},
+};
+
+use super::{AuditLog, AuditLogEvent, LogFilter};
 
 pub fn router() -> OpenApiRouter<AppState> {
-    OpenApiRouter::default().routes(routes!(audit_log_list))
+    OpenApiRouter::default()
+        .routes(routes!(audit_log_list))
+        .routes(routes!(audit_log_list_users))
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -34,11 +38,19 @@ fn default_per_page() -> u32 {
 
 #[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct Pagination {
+pub struct LogFilterQuery {
     #[serde(default = "default_page")]
-    page: u32,
+    pub page: u32,
     #[serde(default = "default_per_page")]
-    per_page: u32,
+    pub per_page: u32,
+    #[serde(default)]
+    pub level: Vec<String>,
+    #[serde(default)]
+    pub event: Vec<String>,
+    #[serde(default)]
+    pub user: Vec<u32>,
+    #[serde(default)]
+    pub since: Option<i64>,
 }
 
 /// Lists all users
@@ -53,16 +65,15 @@ pub struct Pagination {
 )]
 async fn audit_log_list(
     _user: AdminOrCoordinator,
-    pagination: Query<Pagination>,
+    Query(filter_query): Query<LogFilterQuery>,
     State(audit_log): State<AuditLog>,
 ) -> Result<Json<AuditLogListResponse>, APIError> {
-    let offset = (pagination.page - 1) * pagination.per_page;
-    let limit = pagination.per_page;
+    let filter = LogFilter::from_query(&filter_query);
+    let events = audit_log.list(&filter).await?;
 
-    let events = audit_log.list(offset, limit).await?;
-    let count = audit_log.count().await?;
-    let pages = if count > 0 && limit > 0 {
-        count.div_ceil(limit)
+    let count = audit_log.count(&filter).await?;
+    let pages = if count > 0 && filter.limit > 0 {
+        count.div_ceil(filter.limit)
     } else {
         1
     };
@@ -70,9 +81,36 @@ async fn audit_log_list(
     Ok(Json(AuditLogListResponse {
         events,
         pages,
-        page: pagination.page,
-        per_page: pagination.per_page,
+        page: filter_query.page,
+        per_page: filter_query.per_page,
     }))
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+pub struct AuditLogUser {
+    pub id: u32,
+    pub username: String,
+    pub fullname: String,
+    pub role: Role,
+}
+
+/// Lists all users
+#[utoipa::path(
+    get,
+    path = "/api/log-users",
+    responses(
+        (status = 200, description = "Audit log list of all users", body = Vec<AuditLogUser>),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+async fn audit_log_list_users(
+    _user: AdminOrCoordinator,
+    State(audit_log): State<AuditLog>,
+) -> Result<Json<Vec<AuditLogUser>>, APIError> {
+    let users = audit_log.list_users().await?;
+
+    Ok(Json(users))
 }
 
 #[cfg(test)]
@@ -93,26 +131,14 @@ mod tests {
     use crate::{
         AppState,
         audit_log::{
-            AuditEvent, AuditLog, AuditLogListResponse, AuditService, UserLoggedInDetails,
-            api::audit_log_list,
+            AuditEvent, AuditLog, AuditLogListResponse, AuditLogUser, AuditService,
+            UserLoggedInDetails,
+            api::{audit_log_list, audit_log_list_users},
         },
         authentication::{Sessions, Users},
     };
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
-    async fn test_list(pool: SqlitePool) {
-        let state = AppState { pool: pool.clone() };
-
-        let session = Sessions::new(pool.clone())
-            .create(1, TimeDelta::seconds(60 * 30))
-            .await
-            .unwrap();
-
-        let app = Router::new()
-            .route("/api/log", get(audit_log_list))
-            .with_state(state);
-
-        // create some log entries
+    async fn create_log_entries(pool: SqlitePool) {
         let service = AuditService::new(
             AuditLog::new(pool.clone()),
             Ipv4Addr::new(203, 0, 113, 0).into(),
@@ -129,6 +155,22 @@ mod tests {
         service.log_success(&audit_event, None).await.unwrap();
         service.log_success(&audit_event, None).await.unwrap();
         service.log_success(&audit_event, None).await.unwrap();
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_list(pool: SqlitePool) {
+        let state = AppState { pool: pool.clone() };
+
+        let session = Sessions::new(pool.clone())
+            .create(1, TimeDelta::seconds(60 * 30))
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .route("/api/log", get(audit_log_list))
+            .with_state(state);
+
+        create_log_entries(pool).await;
 
         let response = app
             .clone()
@@ -168,5 +210,40 @@ mod tests {
         assert_eq!(result.events.len(), 1);
         assert_eq!(result.page, 2);
         assert_eq!(result.pages, 2);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_list_users(pool: SqlitePool) {
+        let state = AppState { pool: pool.clone() };
+
+        let session = Sessions::new(pool.clone())
+            .create(1, TimeDelta::seconds(60 * 30))
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .route("/api/log-users", get(audit_log_list_users))
+            .with_state(state);
+
+        create_log_entries(pool).await;
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .header("cookie", session.get_cookie().encoded().to_string())
+                    .uri("/api/log-users")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: Vec<AuditLogUser> = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0].username, "admin");
     }
 }

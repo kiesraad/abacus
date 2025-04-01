@@ -3,7 +3,7 @@ import { renderToString } from "react-dom/server";
 import { locale, translations } from ".";
 import { describe, expect, test } from "vitest";
 
-import { t, tx } from "./i18n";
+import { hasTranslation, t, translate, tx } from "./i18n";
 
 function updateTestTranslation(value: string) {
   translations[locale].test = value;
@@ -11,6 +11,16 @@ function updateTestTranslation(value: string) {
 
 describe("i18n", () => {
   test("Use translation functions", () => {
+    expect(hasTranslation("election.title.singular")).toEqual(true);
+    expect(hasTranslation("foo.bar")).toEqual(false);
+
+    expect(translate("election.title.singular")).toEqual("Verkiezing");
+
+    // we need to disable the linter to test the method with an unknown translation key
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    expect(translate("foo.bar")).toEqual("foo.bar");
+
     // simple translation
     expect(t("election.title.singular")).toEqual("Verkiezing");
 

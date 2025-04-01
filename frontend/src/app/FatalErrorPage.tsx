@@ -1,10 +1,10 @@
+import { ErrorReference } from "@/api";
 import { Error } from "@/components/error";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
+import { AppLayout } from "@/components/ui";
+import { t, tx } from "@/lib/i18n";
 
-import { ErrorReference } from "@kiesraad/api";
-import { t, tx } from "@kiesraad/i18n";
-import { AppLayout } from "@kiesraad/ui";
 import { isDevelopment } from "@kiesraad/util";
 
 interface FatalErrorPageProps {

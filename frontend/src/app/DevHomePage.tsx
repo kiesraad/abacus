@@ -1,11 +1,12 @@
 import { Link } from "react-router";
 
 import { useApiState, useUserRole } from "@/api";
-import { MockTest } from "@/components/MockTest";
 import { AppLayout, PageTitle } from "@/components/ui";
 import { ElectionListProvider } from "@/features/election_overview/hooks/ElectionListProvider";
 import { useElectionList } from "@/features/election_overview/hooks/useElectionList";
 import { t } from "@/lib/i18n";
+
+import { MockTest } from "./MockTest";
 
 function TypistLinks() {
   const { electionList } = useElectionList();
@@ -156,14 +157,14 @@ function DevLinks() {
           </ul>
         </li>
       </ul>
-      {isTypist && (
-        <ElectionListProvider>
-          <TypistLinks />
-        </ElectionListProvider>
-      )}
-      {(isAdministrator || isCoordinator) && (
+      {(__API_MSW__ || isAdministrator || isCoordinator) && (
         <ElectionListProvider>
           <AdministratorCoordinatorLinks />
+        </ElectionListProvider>
+      )}
+      {(__API_MSW__ || isTypist) && (
+        <ElectionListProvider>
+          <TypistLinks />
         </ElectionListProvider>
       )}
     </>

@@ -1,13 +1,34 @@
 .details {
-  margin-bottom: 2cqi;
+  margin-bottom: 2rem;
+  background-color: var(--white);
 
   dt {
+    padding: 0.5rem 0 0 0;
     font-weight: bold;
+    color: var(--color-help-text);
+    font-size: var(--font-size-xs);
+    border-top: 1px solid var(--gray-200);
   }
 
   dd {
+    padding: 0 0 0.5rem 0;
+    margin: 0;
+    color: var(--text-color-body);
+    &:last-child {
+      border-bottom: 1px solid var(--gray-200);
+    }
+  }
+}
+
+.filters {
+  margin-top: 1rem;
+
+  & > div {
+    margin: 1rem 0;
+  }
+
+  ul {
+    list-style: none;
     padding: 0;
-    margin: 0 0 1rem 0;
-    color: var(--gray-600);
   }
 }

@@ -12,14 +12,14 @@ import {
   DataEntryDispatch,
   DataEntryState,
   FormSection,
-  FormSectionReference,
+  FormSectionId,
   SubmitCurrentFormOptions,
   TemporaryCache,
 } from "./types";
 
 export function registerForm(dispatch: DataEntryDispatch) {
-  return (form: FormSectionReference) => {
-    dispatch({ type: "REGISTER_CURRENT_FORM", form });
+  return (formSectionId: FormSectionId) => {
+    dispatch({ type: "REGISTER_CURRENT_FORM", formSectionId });
   };
 }
 

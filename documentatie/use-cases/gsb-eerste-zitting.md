@@ -25,7 +25,7 @@ __Hoofdscenario:__
 __Uitbreidingen:__  
 7a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
 &emsp; 7a1. Het GSB controleert de resultaten van het controleprotocol.  
-&emsp; 7a2. Het GSB vindt een fout en corrigeert de resultaten van het controleprotocol.  
+&emsp; 7a2. Het GSB vindt een fout in de resultaten van het controleprotocol en corrigeert deze.  
 &emsp;&emsp; 7a2a. Het GSB vindt geen fout en bevestigt een verschil tussen de controles en de resultaten van de applicatie:  
 &emsp;&emsp;&emsp; 7a2a1. Het GSB neemt contact op met de Kiesraad.  
 

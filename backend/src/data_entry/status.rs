@@ -1137,6 +1137,14 @@ mod tests {
     }
 
     #[test]
+    fn definitive_keep_first_entry_error() {
+        assert_eq!(
+            definitive().keep_first_entry(),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    #[test]
     fn entries_different_to_second_entry_not_started_keep_second_entry() {
         // Create a difference, so we can check that we keep the right entry
         let first_entry = polling_station_result();
@@ -1159,6 +1167,14 @@ mod tests {
         } else {
             panic!()
         };
+    }
+
+    #[test]
+    fn definitive_keep_second_entry_error() {
+        assert_eq!(
+            definitive().keep_second_entry(),
+            Err(DataEntryTransitionError::Invalid)
+        );
     }
 
     #[test]

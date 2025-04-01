@@ -85,7 +85,7 @@ async fn polling_station_list(
     ),
 )]
 async fn polling_station_create(
-    user: AdminOrCoordinator,
+    _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
     Path(election_id): Path<u32>,
@@ -100,7 +100,6 @@ async fn polling_station_create(
         .await?;
 
     audit_service
-        .with_user(user.0)
         .log(
             &AuditEvent::PollingStationCreated(polling_station.clone().into()),
             None,
@@ -155,7 +154,7 @@ async fn polling_station_get(
     ),
 )]
 async fn polling_station_update(
-    user: AdminOrCoordinator,
+    _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
@@ -171,7 +170,6 @@ async fn polling_station_update(
             .await?;
 
         audit_service
-            .with_user(user.0)
             .log(
                 &AuditEvent::PollingStationUpdated(polling_station.clone().into()),
                 None,
@@ -199,7 +197,7 @@ async fn polling_station_update(
     ),
 )]
 async fn polling_station_delete(
-    user: AdminOrCoordinator,
+    _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
@@ -214,7 +212,6 @@ async fn polling_station_delete(
 
     if deleted {
         audit_service
-            .with_user(user.0)
             .log(
                 &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
                 None,

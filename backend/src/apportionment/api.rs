@@ -46,7 +46,7 @@ pub struct ElectionApportionmentResponse {
   ),
 )]
 async fn election_apportionment(
-    user: Coordinator,
+    _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(data_entry_repo): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
@@ -68,7 +68,6 @@ async fn election_apportionment(
         let seat_assignment = seat_assignment(election.number_of_seats, &election_summary)?;
 
         audit_service
-            .with_user(user.0)
             .log(
                 &AuditEvent::ApportionmentCreated(election.clone().into()),
                 None,

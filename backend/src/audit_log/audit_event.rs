@@ -1,9 +1,11 @@
+use axum::http::Uri;
 use chrono::{DateTime, NaiveDate, Utc};
 use serde::{self, Deserialize, Serialize};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
 use crate::{
+    ErrorResponse,
     authentication::LoginResponse,
     data_entry::PollingStationDataEntry,
     election::{Election, ElectionCategory, ElectionStatus},
@@ -120,6 +122,24 @@ pub struct ErrorDetails {
     pub reference: ErrorReference,
     pub path: String,
     pub level: AuditEventLevel,
+}
+
+impl ErrorDetails {
+    pub fn from_error_response(error_response: &ErrorResponse, original_uri: Uri) -> Option<Self> {
+        match error_response.reference {
+            // ignore common user errors
+            ErrorReference::InvalidSession | ErrorReference::UserNotFound => None,
+            _ => Some(Self {
+                reference: error_response.reference,
+                path: original_uri.path().to_string(),
+                level: if error_response.fatal {
+                    AuditEventLevel::Error
+                } else {
+                    AuditEventLevel::Warning
+                },
+            }),
+        }
+    }
 }
 
 #[derive(

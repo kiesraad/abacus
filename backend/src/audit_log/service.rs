@@ -53,6 +53,10 @@ impl AuditService {
         self
     }
 
+    pub fn has_user(&self) -> bool {
+        self.user.is_some()
+    }
+
     pub async fn log(
         &self,
         event: &AuditEvent,

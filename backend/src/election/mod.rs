@@ -117,7 +117,7 @@ async fn election_details(
 )]
 #[cfg(feature = "dev-database")]
 async fn election_create(
-    user: Admin,
+    _user: Admin,
     State(elections_repo): State<Elections>,
     audit_service: AuditService,
     Json(new_election): Json<ElectionRequest>,
@@ -125,7 +125,6 @@ async fn election_create(
     let election = elections_repo.create(new_election).await?;
 
     audit_service
-        .with_user(user.0)
         .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
         .await?;
 

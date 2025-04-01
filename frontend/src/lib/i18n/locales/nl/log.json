@@ -30,8 +30,7 @@
   "event": {
     "UserLoggedIn": "Gebruiker ingelogd",
     "UserLoggedOut": "Gebruiker uitgelogd",
-    "UserAccountUpdateFailed": "Gebruikersaccount bijwerken mislukt",
-    "UserAccountUpdateSuccess": "Gebruikersaccount bijgewerkt",
+    "UserAccountUpdated": "Gebruikersaccount opgeslagen",
     "UserSessionExtended": "Gebruikerssessie verlengd",
     "UserCreated": "Gebruiker aangemaakt",
     "UserUpdated": "Gebruiker bijgewerkt",
@@ -45,7 +44,8 @@
     "DataEntrySaved": "Invoer opgeslagen",
     "DataEntryDeleted": "Invoer verwijderd",
     "DataEntryClaimed": "Invoer geclaimd",
-    "DataEntryFinalized": "Invoer afgerond"
+    "DataEntryFinalized": "Invoer afgerond",
+    "Error": "API fout"
   },
   "field": {
     "userAgent": "User agent",
@@ -55,6 +55,30 @@
     "user_id": "Gebruikers-ID",
     "username": "Gebruikersnaam",
     "role": "Rol",
-    "fullname": "Volledige naam"
+    "fullname": "Volledige naam",
+    "path": "Pad",
+    "electionId": "Verkiezings-ID",
+    "electionName": "Verkiezingsnaam",
+    "electionLocation": "Verkiezingslocatie",
+    "electionNumberOfVoters": "Aantal kiezers",
+    "electionCategory": "Verkiezingscategorie",
+    "electionNumberOfSeats": "Aantal zetels",
+    "electionElectionDate": "Verkiezingsdatum",
+    "electionNominationDate": "Nominatiedatum",
+    "electionStatus": "Verkiezingsstatus",
+    "pollingStationId": "Stembureau-ID",
+    "pollingStationElectionId": "Verkiezings-ID",
+    "pollingStationName": "Stembureau naam",
+    "pollingStationNumber": "Stembureau nummer",
+    "pollingStationNumberOfVoters": "Aantal kiezers",
+    "pollingStationType": "Stembureau type",
+    "pollingStationAddress": "Stembureau adres",
+    "pollingStationPostalCode": "Stembureau postcode",
+    "pollingStationLocality": "Stembureau plaats",
+    "dataEntryProgress": "Voortgang",
+    "finishedAt": "Afgerond op",
+    "firstEntryUserId": "Eerste invoer Gebruikers-ID",
+    "secondEntryUserId": "Tweede invoer Gebruikers-ID",
+    "reference": "Foute referentie"
   }
 }

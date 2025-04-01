@@ -106,7 +106,6 @@ async fn polling_station_data_entry_claim(
     let data_entry = polling_station_data_entries.get_row(id).await?;
 
     audit_service
-        .with_user(user.0)
         .log(&AuditEvent::DataEntryClaimed(data_entry.into()), None)
         .await?;
 
@@ -203,7 +202,6 @@ async fn polling_station_data_entry_save(
     let data_entry = polling_station_data_entries.get_row(id).await?;
 
     audit_service
-        .with_user(user.0)
         .log(&AuditEvent::DataEntrySaved(data_entry.into()), None)
         .await?;
 
@@ -243,7 +241,6 @@ async fn polling_station_data_entry_delete(
     let data_entry = polling_station_data_entries.get_row(id).await?;
 
     audit_service
-        .with_user(user.0)
         .log(&AuditEvent::DataEntryDeleted(data_entry.into()), None)
         .await?;
 
@@ -310,7 +307,6 @@ async fn polling_station_data_entry_finalise(
     let data_entry = polling_station_data_entries.get_row(id).await?;
 
     audit_service
-        .with_user(user.0)
         .log(&AuditEvent::DataEntryFinalized(data_entry.into()), None)
         .await?;
 

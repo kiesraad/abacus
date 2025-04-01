@@ -193,7 +193,6 @@ async fn account_update(
     let response = LoginResponse::from(&updated_user);
 
     audit_service
-        .with_user(updated_user.clone())
         .log(&AuditEvent::UserAccountUpdated(response.clone()), None)
         .await?;
 
@@ -211,7 +210,6 @@ async fn account_update(
 )]
 async fn logout(
     State(sessions): State<Sessions>,
-    State(users): State<Users>,
     audit_service: AuditService,
     jar: CookieJar,
 ) -> Result<impl IntoResponse, APIError> {
@@ -225,18 +223,15 @@ async fn logout(
 
     // Log audit event when a valid session exists
     if let Some(session) = sessions.get_by_key(session_key).await.ok().flatten() {
-        if let Some(user) = users.get_by_id(session.user_id()).await.ok().flatten() {
-            // Log the logout event
-            audit_service
-                .with_user(user)
-                .log(
-                    &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
-                        session_duration: session.duration().as_secs(),
-                    }),
-                    None,
-                )
-                .await?;
-        }
+        // Log the logout event
+        audit_service
+            .log(
+                &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
+                    session_duration: session.duration().as_secs(),
+                }),
+                None,
+            )
+            .await?;
     }
 
     // Remove session from the database
@@ -251,7 +246,6 @@ async fn logout(
 
 /// Middleware to extend the session lifetime
 pub async fn extend_session(
-    State(users): State<Users>,
     State(sessions): State<Sessions>,
     jar: CookieJar,
     audit_service: AuditService,
@@ -267,20 +261,17 @@ pub async fn extend_session(
     if let Ok(Some(session)) = sessions.extend_session(session_cookie.value()).await {
         info!("Session extended for user {}", session.user_id());
 
-        if let Some(user) = users.get_by_id(session.user_id()).await.ok().flatten() {
-            let _ = audit_service
-                .with_user(user)
-                .log(&AuditEvent::UserSessionExtended, None)
-                .await;
+        let _ = audit_service
+            .log(&AuditEvent::UserSessionExtended, None)
+            .await;
 
-            let mut cookie = session.get_cookie();
-            set_default_cookie_properties(&mut cookie);
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
 
-            debug!("Setting cookie: {:?}", cookie);
+        debug!("Setting cookie: {:?}", cookie);
 
-            if let Ok(header_value) = cookie.encoded().to_string().parse() {
-                response.headers_mut().append(SET_COOKIE, header_value);
-            }
+        if let Ok(header_value) = cookie.encoded().to_string().parse() {
+            response.headers_mut().append(SET_COOKIE, header_value);
         }
 
         expires = Some(session.expires_at());
@@ -355,7 +346,7 @@ pub struct UpdateUserRequest {
     ),
 )]
 pub async fn user_create(
-    admin: Admin,
+    _admin: Admin,
     State(users_repo): State<Users>,
     audit_service: AuditService,
     Json(create_user_req): Json<CreateUserRequest>,
@@ -370,7 +361,6 @@ pub async fn user_create(
         .await?;
 
     audit_service
-        .with_user(admin.0)
         .log(&AuditEvent::UserCreated(LoginResponse::from(&user)), None)
         .await?;
 
@@ -413,7 +403,7 @@ async fn user_get(
     ),
 )]
 pub async fn user_update(
-    admin: Admin,
+    _admin: Admin,
     State(users_repo): State<Users>,
     State(session_repo): State<Sessions>,
     audit_service: AuditService,
@@ -438,7 +428,6 @@ pub async fn user_update(
         .ok_or(Error::RowNotFound)?;
 
     audit_service
-        .with_user(admin.0)
         .log(&AuditEvent::UserUpdated(LoginResponse::from(&user)), None)
         .await?;
 

@@ -214,7 +214,7 @@
             }
           },
           "412": {
-            "description": "Election data entry first needs to be finalised",
+            "description": "Election apportionment is not yet available",
             "content": {
               "application/json": {
                 "schema": {
@@ -224,7 +224,7 @@
             }
           },
           "422": {
-            "description": "Drawing of lots is required",
+            "description": "Election apportionment is not possible",
             "content": {
               "application/json": {
                 "schema": {

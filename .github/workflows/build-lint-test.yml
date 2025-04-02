@@ -14,20 +14,8 @@ env:
 
 jobs:
   backend:
-    name: Backend (${{ matrix.target.os }})
-    strategy:
-      matrix:
-        target:
-          - os: ubuntu-latest
-            name: x86_64-unknown-linux-musl
-            binary: backend/target/x86_64-unknown-linux-musl/debug/abacus
-          - os: macos-latest
-            name: aarch64-apple-darwin
-            binary: backend/target/aarch64-apple-darwin/debug/abacus
-          - os: windows-latest
-            name: x86_64-pc-windows-msvc
-            binary: backend/target/x86_64-pc-windows-msvc/debug/abacus.exe
-    runs-on: ${{ matrix.target.os }}
+    name: Backend
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./backend
@@ -70,23 +58,22 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-
       - name: Install musl
         run: sudo apt-get update && sudo apt-get install -y musl-tools
-        if: matrix.target.os == 'ubuntu-latest'
       - name: Install target
-        run: rustup target add ${{ matrix.target.name }}
+        run: rustup target add x86_64-unknown-linux-musl
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
       - name: Check Clippy with all features
-        run: cargo --verbose --locked clippy --target=${{ matrix.target.name }} --all-targets --all-features -- -D warnings
+        run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --all-targets --all-features -- -D warnings
       - name: Check Clippy without default features
-        run: cargo --verbose --locked clippy --target=${{ matrix.target.name }} --all-targets --no-default-features -- -D warnings
+        run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --all-targets --no-default-features -- -D warnings
       - name: Run tests
-        run: cargo --verbose --locked test --target=${{ matrix.target.name }} --features embed-typst -- --nocapture
+        run: cargo --verbose --locked test --target=x86_64-unknown-linux-musl --features embed-typst -- --nocapture
       - name: Build
-        run: cargo --verbose --locked build --features memory-serve,embed-typst --target=${{ matrix.target.name }}
+        run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --features memory-serve,embed-typst
       - uses: actions/upload-artifact@v4
         with:
-          name: abacus-${{ matrix.target.os }}
-          path: ${{ matrix.target.binary }}
+          name: abacus
+          path: backend/target/x86_64-unknown-linux-musl/debug/abacus
 
   frontend:
     name: Frontend
@@ -116,11 +103,8 @@ jobs:
           path: frontend/dist
 
   playwright-ladle:
-    name: Playwright ladle tests
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    name: Playwright Ladle tests
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
@@ -141,20 +125,16 @@ jobs:
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          name: "Playwright Ladle ${{ matrix.os }}"
+          name: "Playwright Ladle ubuntu-latest"
           files: frontend/playwright.ladle.junit.xml
           disable_search: true
           fail_ci_if_error: true
 
   playwright-e2e:
-    name: Playwright e2e tests (${{ matrix.os }})
+    name: Playwright e2e tests
     needs:
       - backend
-      - frontend # for the tests, frontend build is included in backend job
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
@@ -168,21 +148,20 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps --no-shell
-      - name: Download abacus
+      - name: Download Abacus
         uses: actions/download-artifact@v4
         with:
-          name: abacus-${{ matrix.os }}
+          name: abacus
           path: builds/backend
-      - name: make backend build executable
+      - name: Make Abacus executable
         run: chmod a+x ../builds/backend/abacus
-        if: runner.os != 'Windows'
       - name: Run e2e playwright tests
         run: npm run test:e2e
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report-${{ matrix.os }}
+          name: playwright-report-ubuntu-latest
           path: frontend/playwright-report/
           retention-days: 30
       - name: Upload test results to Codecov
@@ -190,7 +169,7 @@ jobs:
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          name: "Playwright e2e ${{ matrix.os }}"
+          name: "Playwright e2e"
           files: frontend/playwright.e2e.junit.xml
           disable_search: true
           fail_ci_if_error: true
@@ -200,7 +179,6 @@ jobs:
     name: Deploy to abacus-test.nl
     needs:
       - backend
-      - frontend # for the tests, frontend build is included in backend job
     environment:
       name: test
       url: https://${{ github.sha }}.abacus-test.nl
@@ -210,10 +188,10 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - name: Download abacus
+      - name: Download Abacus
         uses: actions/download-artifact@v4
         with:
-          name: abacus-ubuntu-latest
+          name: abacus
       - name: Strip debug symbols
         run: strip abacus
       - name: Upload binary to test server

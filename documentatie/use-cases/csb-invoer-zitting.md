@@ -28,6 +28,7 @@ __Uitbreidingen:__
 
 ### Open punten
 - De startdatum en -tijd van de zitting CSB zijn bekend, hoewel de zitting pas plaats vindt, nadat alle gegevens in de applicatie zijn ingevoerd. Willen we dat de coördinator de gegevens van de zitting alvast invoert?
+- Anders dan bij het GSB, gebeurt de invoer CSB vóór het openen van de zitting. Dus laten we alleen de invoer openstellen door de coördinator CSB en moet deze niet aangeven in de applicatie dat de zitting geopend is?
 
 
 ## De coördinator CSB beoordeelt de verschillen tussen de twee invoeren (zee)

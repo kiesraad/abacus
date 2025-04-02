@@ -12,15 +12,14 @@ __Hoofdscenario:__
 1. Het GSB opent de zitting.
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na 31-2 Bijlage 1 in.
-4. De coördinator GSB geeft in de applicatie aan dat de zitting is geopend
+4. De coördinator GSB geeft in de applicatie aan dat de zitting is geopend.
 5. [De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in.](./gsb-invoer-eerste-zitting.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger)
 6. [De coördinator GSB maakt het PV en het digitale bestand aan.](#de-coördinator-gsb-maakt-het-pv-en-het-digitale-bestand-aan-zee)
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
-9. De coördinator GSB sluit de zitting in de applicatie.
-10. Het GSB stelt de benodigde EML_NL bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
-11. Het GSB stelt het PV GSB (inc. bijlagen) beschikbaar aan de burgemeester.
-12. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
+9. Het GSB stelt de benodigde EML_NL bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+10. Het GSB stelt het PV GSB (inc. bijlagen) beschikbaar aan de burgemeester.
+11. De burgemeester publiceert het PV GSB (inc. bijlagen) en brengt het over naar het CSB.
 
 __Uitbreidingen:__  
 7a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
@@ -36,13 +35,6 @@ __Uitbreidingen:__
 8b. Er zijn bezwaren en/of bijzonderheden tijdens het voorlezen van het PV:  
 &emsp; 8b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren PV.
 
-9a. De coördinator GSB sluit de zitting niet in de applicatie:  
-&emsp; 9a1. (nadat de zitting meer dan een dag open staat) De applicatie toont een melding over het sluiten van de zitting en het openen van een nieuwe zitting.
-
-9b. De coördinator GSB sluit per ongeluk de zitting:  
-&emsp; 9b1. De coördinator GSB heropent de zitting.  
-&emsp;&emsp; 9b1a. De applicatie stelt vast dat er een latere zitting met invoer is:  
-&emsp;&emsp;&emsp; 9b1a1. De applicatie toont een foutmelding en heropent de zitting niet.
 
 ### Niet in scope
 
@@ -56,7 +48,6 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- Is het toegestaan de zitting te sluiten als nog niet alle stembureaus definitieve invoer hebben? Dit wordt nu een stap later gecontroleerd, nl. vlak voor het genereren van het PV.
 - Hoe ziet de overdracht van het EML_NL bestand van GSB naar CSB binnen de applicatie er precies uit?
   - De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
   - Proces via uitwisselplatform loopt parallel.

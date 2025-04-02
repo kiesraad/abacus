@@ -74,13 +74,13 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       return;
     }
 
-    if (pollingStation.userStatus === PollingStationUserStatus.FINISHED) {
+    if (pollingStation.userStatus === PollingStationUserStatus.Finished) {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
       setLoading(false);
       return;
     }
 
-    if (pollingStation.userStatus === PollingStationUserStatus.IN_PROGRESS_OTHER_USER) {
+    if (pollingStation.userStatus === PollingStationUserStatus.InProgressOtherUser) {
       setAlert(
         t("polling_station_choice.polling_station_in_progress_different_user", {
           nr: pollingStation.number,
@@ -98,10 +98,10 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     (pollingStation) => pollingStation.statusEntry && !dataEntryFinished.includes(pollingStation.statusEntry.status),
   );
   const pollingStationsForDataEntryCurrentUser = pollingStationsForDataEntry.filter(
-    (pollingStation) => pollingStation.userStatus !== PollingStationUserStatus.IN_PROGRESS_OTHER_USER,
+    (pollingStation) => pollingStation.userStatus !== PollingStationUserStatus.InProgressOtherUser,
   );
   const inProgressCurrentUser = pollingStationsForDataEntryCurrentUser.filter(
-    (pollingStation) => pollingStation.userStatus === PollingStationUserStatus.IN_PROGRESS_CURRENT_USER,
+    (pollingStation) => pollingStation.userStatus === PollingStationUserStatus.InProgressCurrentUser,
   );
 
   if (!user) {

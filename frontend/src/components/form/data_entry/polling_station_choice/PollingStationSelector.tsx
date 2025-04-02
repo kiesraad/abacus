@@ -61,7 +61,7 @@ export function PollingStationSelector({
             );
           } else if (currentPollingStation) {
             switch (currentPollingStation.userStatus) {
-              case PollingStationUserStatus.FINISHED:
+              case PollingStationUserStatus.Finished:
                 return (
                   <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.warning)}>
                     <span className={cls.icon}>
@@ -75,7 +75,7 @@ export function PollingStationSelector({
                     </span>
                   </div>
                 );
-              case PollingStationUserStatus.IN_PROGRESS_OTHER_USER:
+              case PollingStationUserStatus.InProgressOtherUser:
                 return (
                   <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.warning)}>
                     <span className={cls.icon}>

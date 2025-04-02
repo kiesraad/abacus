@@ -1,11 +1,11 @@
 import { DataEntryStatusName, ElectionStatusResponseEntry, LoginResponse, PollingStation } from "@/api";
 
 export enum PollingStationUserStatus {
-  MISSING = "MISSING",
-  IN_PROGRESS_CURRENT_USER = "IN_PROGRESS_CURRENT_USER",
-  IN_PROGRESS_OTHER_USER = "IN_PROGRESS_OTHER_USER",
-  FINISHED = "FINISHED",
-  UNKNOWN = "UNKNOWN",
+  Missing,
+  InProgressCurrentUser,
+  InProgressOtherUser,
+  Finished,
+  Unknown,
 }
 
 export type PollingStationWithStatus = PollingStation & {
@@ -27,7 +27,7 @@ export function getPollingStationWithStatusList({
   return pollingStations.map((pollingStation: PollingStation) => {
     const result: PollingStationWithStatus = {
       ...pollingStation,
-      userStatus: PollingStationUserStatus.UNKNOWN,
+      userStatus: PollingStationUserStatus.Unknown,
     };
     const statusEntry = statuses.find((status) => status.polling_station_id === pollingStation.id);
 
@@ -36,18 +36,18 @@ export function getPollingStationWithStatusList({
     result.statusEntry = statusEntry;
 
     if (dataEntryFinished.includes(statusEntry.status)) {
-      result.userStatus = PollingStationUserStatus.FINISHED;
+      result.userStatus = PollingStationUserStatus.Finished;
     } else if (statusEntry.status === "first_entry_in_progress") {
       if (statusEntry.first_entry_user_id === user?.user_id) {
-        result.userStatus = PollingStationUserStatus.IN_PROGRESS_CURRENT_USER;
+        result.userStatus = PollingStationUserStatus.InProgressCurrentUser;
       } else {
-        result.userStatus = PollingStationUserStatus.IN_PROGRESS_OTHER_USER;
+        result.userStatus = PollingStationUserStatus.InProgressOtherUser;
       }
     } else if (statusEntry.status === "second_entry_in_progress") {
       if (statusEntry.second_entry_user_id === user?.user_id) {
-        result.userStatus = PollingStationUserStatus.IN_PROGRESS_CURRENT_USER;
+        result.userStatus = PollingStationUserStatus.InProgressCurrentUser;
       } else {
-        result.userStatus = PollingStationUserStatus.IN_PROGRESS_OTHER_USER;
+        result.userStatus = PollingStationUserStatus.InProgressOtherUser;
       }
     }
 

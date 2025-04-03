@@ -163,8 +163,7 @@ impl Debug for Fraction {
 
 impl PartialEq for DisplayFraction {
     fn eq(&self, other: &Self) -> bool {
-        (self.integer == other.integer)
-            && (self.numerator * other.denominator == self.denominator * other.numerator)
+        Fraction::from(*self) == Fraction::from(*other)
     }
 }
 
@@ -315,6 +314,38 @@ mod tests {
                 integer: 0,
                 numerator: 2,
                 denominator: 5
+            }
+        );
+    }
+
+    #[test]
+    fn test_display_fraction_eq() {
+        assert_eq!(
+            DisplayFraction {
+                integer: 1,
+                numerator: 1,
+                denominator: 4
+            },
+            DisplayFraction {
+                integer: 0,
+                numerator: 10,
+                denominator: 8
+            }
+        );
+    }
+
+    #[test]
+    fn test_display_fraction_ne() {
+        assert_ne!(
+            DisplayFraction {
+                integer: 1,
+                numerator: 1,
+                denominator: 4
+            },
+            DisplayFraction {
+                integer: 0,
+                numerator: 9,
+                denominator: 8
             }
         );
     }

@@ -1,12 +1,13 @@
-import { LargestRemainderAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatChangeStep } from "@/api";
+import { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
 
+import { LargestRemainderStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface LargestRemaindersTableProps {
-  largestRemainderSteps: SeatChangeStep[];
+  largestRemainderSteps: LargestRemainderStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
@@ -32,11 +33,9 @@ export function LargestRemaindersTable({
       </Table.Header>
       <Table.Body>
         {finalStandingPgsMeetingThreshold.map((pg_seat_assignment) => {
-          const residual_seats =
-            largestRemainderSteps.filter((step) => {
-              const change = step.change as LargestRemainderAssignedSeat;
-              return change.selected_pg_number == pg_seat_assignment.pg_number;
-            }).length || 0;
+          const residual_seats = largestRemainderSteps.filter((step) => {
+            return step.change.selected_pg_number == pg_seat_assignment.pg_number;
+          }).length;
           return (
             <Table.Row key={pg_seat_assignment.pg_number}>
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>

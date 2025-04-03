@@ -1,12 +1,13 @@
-import { HighestAverageAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatChangeStep } from "@/api";
+import { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
 
+import { HighestAverageStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface HighestAveragesForLessThan19SeatsTableProps {
-  highestAverageSteps: SeatChangeStep[];
+  highestAverageSteps: HighestAverageStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
@@ -31,8 +32,7 @@ export function HighestAveragesForLessThan19SeatsTable({
         {finalStanding.map((pg_seat_assignment) => {
           const average = highestAverageSteps[0]?.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
           const residual_seats = highestAverageSteps.filter((step) => {
-            const change = step.change as HighestAverageAssignedSeat;
-            return change.selected_pg_number == pg_seat_assignment.pg_number;
+            return step.change.selected_pg_number == pg_seat_assignment.pg_number;
           }).length;
           return (
             <Table.Row key={pg_seat_assignment.pg_number}>

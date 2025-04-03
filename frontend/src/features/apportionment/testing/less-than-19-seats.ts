@@ -1,6 +1,8 @@
 import { Election, ElectionSummary, SeatAssignmentResult, SeatChangeStep } from "@/api";
 
-export const largest_remainder_steps: SeatChangeStep[] = [
+import { HighestAverageStep, LargestRemainderStep } from "../utils/seat-change";
+
+export const largest_remainder_steps: LargestRemainderStep[] = [
   {
     residual_seat_number: 1,
     change: {
@@ -307,7 +309,7 @@ export const largest_remainder_steps: SeatChangeStep[] = [
   },
 ];
 
-export const highest_average_steps: SeatChangeStep[] = [
+export const highest_average_steps: HighestAverageStep[] = [
   {
     residual_seat_number: 3,
     change: {
@@ -775,7 +777,7 @@ export const seat_assignment: SeatAssignmentResult = {
     numerator: 0,
     denominator: 15,
   },
-  steps: largest_remainder_steps.concat(highest_average_steps),
+  steps: (largest_remainder_steps as SeatChangeStep[]).concat(highest_average_steps),
   final_standing: [
     {
       pg_number: 1,

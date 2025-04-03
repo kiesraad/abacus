@@ -1,6 +1,7 @@
 import { Story } from "@ladle/react";
 
 import { PoliticalGroup } from "@/api";
+import { HighestAverageStep } from "@/features/apportionment/utils/seat-change";
 
 import * as gte19Seats from "../testing/19-or-more-seats";
 import * as lt19Seats from "../testing/less-than-19-seats";
@@ -57,7 +58,7 @@ DefaultLargestAveragesForLessThan19SeatsTable.storyName = "Largest averages for 
 
 export const DefaultLargestAveragesFor19OrMoreSeatsTable: Story = () => (
   <HighestAveragesFor19OrMoreSeatsTable
-    highestAverageSteps={gte19Seats.seat_assignment.steps}
+    highestAverageSteps={gte19Seats.seat_assignment.steps as HighestAverageStep[]}
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups as PoliticalGroup[]}
   />

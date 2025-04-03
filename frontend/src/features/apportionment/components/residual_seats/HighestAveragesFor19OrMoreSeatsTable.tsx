@@ -1,12 +1,13 @@
-import { HighestAverageAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatChangeStep } from "@/api";
+import { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
 
+import { HighestAverageStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface HighestAveragesFor19OrMoreSeatsTableProps {
-  highestAverageSteps: SeatChangeStep[];
+  highestAverageSteps: HighestAverageStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
@@ -25,13 +26,11 @@ export function HighestAveragesFor19OrMoreSeatsTable({
         <Table.Header>
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>{t("list")}</Table.HeaderCell>
           <Table.HeaderCell className={cls.sticky}>{t("list_name")}</Table.HeaderCell>
-          {highestAverageSteps.map((step: SeatChangeStep) => {
-            return (
-              <Table.HeaderCell key={step.residual_seat_number} className="text-align-r" span={2}>
-                {t("apportionment.residual_seat.singular")} {step.residual_seat_number}
-              </Table.HeaderCell>
-            );
-          })}
+          {highestAverageSteps.map((step) => (
+            <Table.HeaderCell key={step.residual_seat_number} className="text-align-r" span={2}>
+              {t("apportionment.residual_seat.singular")} {step.residual_seat_number}
+            </Table.HeaderCell>
+          ))}
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>
             {t("apportionment.residual_seats_count")}
           </Table.HeaderCell>
@@ -46,15 +45,14 @@ export function HighestAveragesFor19OrMoreSeatsTable({
                 <Table.Cell className={cls.sticky}>
                   {politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}
                 </Table.Cell>
-                {highestAverageSteps.map((step: SeatChangeStep) => {
-                  const change = step.change as HighestAverageAssignedSeat;
+                {highestAverageSteps.map((step) => {
                   const average = step.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
                   if (average) {
                     return (
                       <Table.DisplayFractionCells
                         key={`${pg_seat_assignment.pg_number}-${step.residual_seat_number}`}
                         className={
-                          change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow bold" : undefined
+                          step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow bold" : undefined
                         }
                       >
                         {average}
@@ -73,14 +71,11 @@ export function HighestAveragesFor19OrMoreSeatsTable({
             <Table.Cell className={cn(cls.sticky, "text-align-r", "nowrap", "bold")}>
               {t("apportionment.residual_seat_assigned_to_list")}
             </Table.Cell>
-            {highestAverageSteps.map((step: SeatChangeStep) => {
-              const change = step.change as HighestAverageAssignedSeat;
-              return (
-                <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
-                  {change.selected_pg_number}
-                </Table.NumberCell>
-              );
-            })}
+            {highestAverageSteps.map((step) => (
+              <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
+                {step.change.selected_pg_number}
+              </Table.NumberCell>
+            ))}
             <Table.Cell className={cls.sticky} />
           </Table.TotalRow>
         </Table.Body>

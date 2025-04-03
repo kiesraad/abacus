@@ -28,10 +28,7 @@ export function CheckAndSaveForm() {
 
   const navigate = useNavigate();
   const { election } = useElection();
-  const { error, formState, status, onFinaliseDataEntry, pollingStationId, entryNumber } = useDataEntryContext({
-    id: "save",
-    type: "save",
-  });
+  const { error, formState, status, onFinaliseDataEntry, pollingStationId, entryNumber } = useDataEntryContext("save");
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionId) => {

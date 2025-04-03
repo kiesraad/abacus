@@ -9,10 +9,7 @@ import {
 
 export function useVotersAndVotes() {
   const { onSubmit: _onSubmit, ...section } = useDataEntryFormSection<VotersAndVotesFormValues>({
-    section: {
-      id: "voters_votes_counts",
-      type: "voters_and_votes",
-    },
+    section: "voters_votes_counts",
     getDefaultFormValues: (results, cache) =>
       cache?.key === "voters_votes_counts"
         ? valuesToFormValues(cache.data as VotersAndVotesValues)

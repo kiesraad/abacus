@@ -29,7 +29,7 @@ export interface DataEntryStateAndActions extends DataEntryState {
   onSubmitForm: (data: Partial<PollingStationResults>, options?: SubmitCurrentFormOptions) => Promise<boolean>;
   onDeleteDataEntry: () => Promise<boolean>;
   onFinaliseDataEntry: () => Promise<boolean>;
-  register: (form: FormSectionReference) => void;
+  register: (formSectionId: FormSectionId) => void;
   setCache: (cache: TemporaryCache) => void;
   updateFormSection: (partialFormSection: Partial<FormSection>) => void;
 }
@@ -81,7 +81,7 @@ export type DataEntryAction =
     }
   | {
       type: "REGISTER_CURRENT_FORM";
-      form: FormSectionReference;
+      formSectionId: FormSectionId;
     };
 
 export type FormSectionData =
@@ -104,29 +104,6 @@ export type FormSectionId =
   | "differences_counts"
   | `political_group_votes_${number}`
   | "save";
-
-export type FormSectionReference =
-  | {
-      id: "recounted";
-      type: "recounted";
-    }
-  | {
-      id: "voters_votes_counts";
-      type: "voters_and_votes";
-    }
-  | {
-      id: "differences_counts";
-      type: "differences";
-    }
-  | {
-      id: `political_group_votes_${number}`;
-      type: "political_group_votes";
-      number: number;
-    }
-  | {
-      id: "save";
-      type: "save";
-    };
 
 //store unvalidated data
 export type TemporaryCache = {

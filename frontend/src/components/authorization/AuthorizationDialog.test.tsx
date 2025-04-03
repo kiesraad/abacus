@@ -4,7 +4,8 @@ import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { routes } from "@/routes";
+// eslint-disable-next-line import/no-restricted-paths -- #1283
+import { routes } from "@/app/routes";
 
 import { TestUserProvider } from "@kiesraad/api";
 import { overrideOnce, render, screen, setupTestRouter, waitFor } from "@kiesraad/test";

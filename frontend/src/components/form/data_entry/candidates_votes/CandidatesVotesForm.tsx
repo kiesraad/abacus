@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { ErrorModal } from "@/components/error";
+import { getCandidateFullName } from "@/lib/util/candidate";
 
 import { ApiError, PoliticalGroup } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -80,15 +81,13 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         <InputGrid.Header>
           <th>{t("number")}</th>
           <th>{t("vote_count")}</th>
-          <th>{t("candidate")}</th>
+          <th>{t("candidate.title")}</th>
         </InputGrid.Header>
         <InputGrid.Body>
           {group.candidates.map((candidate, index) => {
             const addSeparator = (index + 1) % 25 === 0 && index + 1 !== group.candidates.length;
             const defaultValue = currentValues.candidate_votes[index] || "";
-            const candidateFullName = candidate.first_name
-              ? `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`
-              : `${candidate.last_name}, ${candidate.initials}`;
+            const candidateFullName = getCandidateFullName(candidate);
 
             return (
               <InputGridRow

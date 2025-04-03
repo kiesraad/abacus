@@ -9,7 +9,7 @@ export interface ToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 export function Toolbar({ children, ...htmlProps }: ToolbarProps) {
   return (
-    <nav className={cls.toolbar} {...htmlProps}>
+    <nav className={cn(cls.toolbar)} {...htmlProps}>
       {children}
     </nav>
   );

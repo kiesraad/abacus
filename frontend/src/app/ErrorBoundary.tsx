@@ -1,9 +1,9 @@
 import { Navigate, useRouteError } from "react-router";
 
-import { FatalErrorPage } from "@/features/FatalErrorPage";
-import { NotFoundPage } from "@/features/NotFoundPage";
+import { ApiError, FatalApiError, NetworkError, NotFoundError } from "@/api";
+import { NotFoundPage } from "@/app/NotFoundPage";
 
-import { ApiError, FatalApiError, NetworkError, NotFoundError } from "@kiesraad/api";
+import { FatalErrorPage } from "./FatalErrorPage";
 
 export function ErrorBoundary() {
   const error = useRouteError() as Error;

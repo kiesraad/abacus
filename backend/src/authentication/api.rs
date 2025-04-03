@@ -42,7 +42,7 @@ pub struct Credentials {
     pub password: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 pub struct LoginResponse {
     pub user_id: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -202,7 +202,7 @@ async fn account_update(
 
     audit_service
         .with_user(updated_user.clone())
-        .log_error(&AuditEvent::UserAccountUpdateSuccess, None)
+        .log_success(&AuditEvent::UserAccountUpdateSuccess, None)
         .await?;
 
     Ok(Json(LoginResponse::from(&updated_user)))

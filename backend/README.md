@@ -83,6 +83,7 @@ The following dependencies (crates) are used:
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `zip`: creating a zip of the EML_NL and PDF PV.
+- `strum`: Converting enums from their string representation and back
 
 Additionally, the following development dependencies are used:
 

@@ -3,7 +3,8 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { routes } from "@/routes";
+// eslint-disable-next-line import/no-restricted-paths -- #1283
+import { routes } from "@/app/routes";
 
 import {
   ElectionProvider,

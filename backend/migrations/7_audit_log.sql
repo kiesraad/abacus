@@ -10,6 +10,8 @@ CREATE TABLE audit_log
     ip                 TEXT            ,
     user_id            INTEGER         NOT NULL,
     username           TEXT            NOT NULL,
+    user_fullname      TEXT            NOT NULL,
+    user_role          TEXT            NOT NULL,
     time               DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE(id)

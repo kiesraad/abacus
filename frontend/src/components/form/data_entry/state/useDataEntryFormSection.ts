@@ -3,13 +3,13 @@ import * as React from "react";
 import { PollingStationResults } from "@kiesraad/api";
 import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
-import { FormSectionReference, SubmitCurrentFormOptions, TemporaryCache } from "./types";
+import { FormSectionId, SubmitCurrentFormOptions, TemporaryCache } from "./types";
 import { useDataEntryContext } from "./useDataEntryContext";
 import { mapValidationResultsToFields } from "./ValidationResults";
 
 export interface UseDataEntryFormSectionParams<FORM_VALUES> {
   getDefaultFormValues: (results: PollingStationResults, cache?: TemporaryCache | null) => FORM_VALUES;
-  section: FormSectionReference;
+  section: FormSectionId;
 }
 
 export function useDataEntryFormSection<FORM_VALUES>({
@@ -25,9 +25,9 @@ export function useDataEntryFormSection<FORM_VALUES>({
   );
 
   // derived state
-  const formSection = formState.sections[section.id];
+  const formSection = formState.sections[section];
   if (!formSection) {
-    throw new Error(`Form section ${section.id} not found in form state`);
+    throw new Error(`Form section ${section} not found in form state`);
   }
   const { errors, warnings, isSaved, acceptWarnings, hasChanges } = formSection;
   const defaultProps = {

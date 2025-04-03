@@ -24,3 +24,8 @@ __Hoofdscenario:__
 __Uitbreidingen:__  
 2a. Er zijn verschillen tussen de eerste en de tweede invoer:  
 &emsp; 2a1. De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.
+
+### Open punten
+
+- Welke validaties moet de applicatie doen op de invoer? Zelfde als bij invoer eerste zitting.
+- Tekst foutmeldingen aanpassen? Om handelingsperspectief te geven als bijv tellingen voor een kandidaat zijn aangepast, maar geen andere velden (totaal lijst, totaal geldige stemmen, etc).

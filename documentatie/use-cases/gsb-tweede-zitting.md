@@ -53,7 +53,7 @@ __Hoofdscenario:__
 
 1. De coördinator GSB selecteert een stembureau en voert "Aanleiding van het onderzoek" (vrije tekst) in de applicatie in.
 2. De applicatie genereert een 'leeg' corrigendum, Na 14-1 versie 2 (DSO) of Bijlage 1 van Na 14-2 (CSO). ('leeg' == klaar om in te vullen: kandidatenlijst, oorspr. tellingen, verzoek CSB (aanleiding))
-3. De coördinator drukt het eerste blad van het 'lege' corrigendum af.
+3. De coördinator GSB drukt het eerste blad van het 'lege' corrigendum af.
 4. Het GSB voert het onderzoek uit.
 5. Het GSB noteert de bevindingen op het corrigendum.
 6. Het GSB besluit dat er een hertelling nodig is.
@@ -80,3 +80,5 @@ __Uitbreidingen:__
 - 'leeg' corrigendum is geen heel goede term
     - Moet je kunnen selecteren welke lijsten er opgenomen moeten worden in het 'lege' corrigendum? Nee, want nieuwe modellen: corrigendum bevat aantallen modellen vorige zitting (niet: eerste zitting tenzij dat de vorige zitting is), dus handig om alle lijsten in corrigendum te hebben.
 - Hoe expliciet willen we zijn over de verschillende momenten waarop welke onderdelen van het corrigendum afgedrukt kunnen worden?
+- Meerdere corrigenda op één stembureau? Tijdens één zitting maar één corrigendum.
+- Als geen hertelling met ander resultaat, invoer door coördinator? En alleen invoerder laten invoeren als hertelling met ander resultaat?

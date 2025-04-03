@@ -191,10 +191,10 @@ describe("ApportionmentResidualSeatsPage", () => {
       "Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaalt, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 4 omdat die de laatste restzetel toegewezen heeft gekregen.",
     );
     expect(await screen.findByTestId("list-exhaustion-step-1-information")).toHaveTextContent(
-      "Omdat lijst 1 geen kandidaat heeft voor deze zetel, gaat deze zetel naar lijst 5. (Kieswet, artikel P 10 of P 13 eerste lid)",
+      "Omdat lijst 1 geen kandidaat heeft voor een zetel, gaat deze zetel naar lijst 5. (Kieswet, artikel P 10 of P 13 eerste lid)",
     );
     expect(await screen.findByTestId("list-exhaustion-step-2-information")).toHaveTextContent(
-      "Omdat lijst 1 geen kandidaat heeft voor deze zetel, gaat deze zetel naar lijst 2.",
+      "Omdat lijst 1 geen kandidaat heeft voor een zetel, gaat deze zetel naar lijst 2.",
     );
 
     expect(screen.queryByTestId("highest-averages-for-19-or-more-seats-table")).not.toBeInTheDocument();

@@ -1,0 +1,32 @@
+{
+  "field": {
+    "recounted": "Is er herteld?",
+    "voters_counts": {
+      "poll_card_count": "Stempassen",
+      "proxy_certificate_count": "Volmachtbewijzen",
+      "total_admitted_voters_count": "Totaal toegelaten kiezers",
+      "voter_card_count": "Kiezerspassen"
+    },
+    "votes_counts": {
+      "blank_votes_count": "Blanco stemmen",
+      "invalid_votes_count": "Ongeldige stemmen",
+      "total_votes_cast_count": "Totaal uitgebrachte stemmen",
+      "votes_candidates_count": "Stemmen op kandidaten"
+    },
+    "voters_recounts": {
+      "poll_card_count": "Stempassen",
+      "proxy_certificate_count": "Volmachtbewijzen",
+      "total_admitted_voters_count": "Totaal toegelaten kiezers",
+      "voter_card_count": "Kiezerspassen"
+    },
+    "differences_counts": {
+      "fewer_ballots_count": "Stembiljetten minder geteld",
+      "more_ballots_count": "Stembiljetten méér geteld",
+      "no_explanation_count": "Geen verklaring voor het verschil",
+      "other_explanation_count": "Andere verklaring voor het verschil",
+      "too_few_ballots_handed_out_count": "Te weinig uitgereikte stembiljetten",
+      "too_many_ballots_handed_out_count": "Te veel uitgereikte stembiljetten",
+      "unreturned_ballots_count": "Niet ingeleverde stembiljetten"
+    }
+  }
+}

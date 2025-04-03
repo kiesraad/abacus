@@ -427,6 +427,7 @@ export type ErrorReference =
   | "AllListsExhausted"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "DatabaseError"
+  | "DataEntryAlreadyClaimed"
   | "DrawingOfLotsRequired"
   | "EntryNotFound"
   | "EntryNotUnique"

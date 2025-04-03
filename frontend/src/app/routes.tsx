@@ -21,6 +21,7 @@ import { DataEntryLayout } from "@/features/data_entry/components/DataEntryLayou
 import { DifferencesPage } from "@/features/data_entry/components/DifferencesPage";
 import { RecountedPage } from "@/features/data_entry/components/RecountedPage";
 import { VotersAndVotesPage } from "@/features/data_entry/components/VotersAndVotesPage";
+import { ElectionCreatePage } from "@/features/election_management/components";
 import { ElectionHomePage } from "@/features/election_management/components/ElectionHomePage";
 import { ElectionReportPage } from "@/features/election_management/components/ElectionReportPage";
 import { OverviewLayout } from "@/features/election_overview/components/OverviewLayout";
@@ -56,6 +57,7 @@ export const routes = createRoutesFromElements(
     </Route>
     <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />
+      <Route path="create" element={<ElectionCreatePage />} />
       <Route path=":electionId" element={<ElectionLayout />}>
         <Route index element={<ElectionHomePage />} />
         <Route path="apportionment" element={<ApportionmentLayout />}>

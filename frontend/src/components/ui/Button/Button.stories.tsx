@@ -59,6 +59,22 @@ export const ButtonLinks: Story<Props> = ({ text, size, disabled }) => (
   </>
 );
 
+export const ButtonLabel: Story<Props> = ({ text, size, disabled }) => (
+  <>
+    {buttonVariants.map((variant) => (
+      <div key={variant} className="mb-lg">
+        <h2>{variant}</h2>
+        <Button.Label id={"button-variant-" + variant} size={size} variant={variant} disabled={disabled}>
+          {text}
+        </Button.Label>
+      </div>
+    ))}
+    <aside>
+      <i>Disabled and different sizes can be seen using the Controls below</i>
+    </aside>
+  </>
+);
+
 export default {
   args: {
     text: "Invoer",

@@ -80,6 +80,7 @@ describe("NavBar", () => {
     { pathname: "/workstations" },
     { pathname: "/logs" },
     { pathname: "/elections/1" },
+    { pathname: "/elections/create" },
   ])("top level management links for $pathname", async (location) => {
     await renderNavBar(location, "administrator");
 

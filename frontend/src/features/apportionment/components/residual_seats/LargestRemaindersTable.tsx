@@ -3,11 +3,11 @@ import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
 
-import { LargestRemainderStep } from "../../utils/seat-change";
+import { LargestRemainderAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface LargestRemaindersTableProps {
-  largestRemainderSteps: LargestRemainderStep[];
+  largestRemainderSteps: LargestRemainderAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }

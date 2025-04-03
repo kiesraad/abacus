@@ -5,7 +5,7 @@ import { Alert, FormLayout, PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { isHighestAverageStep, isLargestRemainderStep } from "../../utils/seat-change";
+import { isHighestAverageAssignmentStep, isLargestRemainderAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 import { HighestAveragesFor19OrMoreSeatsTable } from "./HighestAveragesFor19OrMoreSeatsTable";
 import { HighestAveragesForLessThan19SeatsTable } from "./HighestAveragesForLessThan19SeatsTable";
@@ -63,8 +63,8 @@ export function ApportionmentResidualSeatsPage() {
     );
   }
   if (seatAssignment) {
-    const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderStep);
-    const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageStep);
+    const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderAssignmentStep);
+    const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
     const absoluteMajorityChange = seatAssignment.steps
       .map((step) => step.change)
       .find((change) => change.changed_by === "AbsoluteMajorityReassignment") as

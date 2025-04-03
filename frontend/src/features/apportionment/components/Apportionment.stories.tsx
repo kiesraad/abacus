@@ -4,7 +4,7 @@ import { PoliticalGroup } from "@/api";
 
 import * as gte19Seats from "../testing/19-or-more-seats";
 import * as lt19Seats from "../testing/less-than-19-seats";
-import { HighestAverageStep } from "../utils/seat-change";
+import { HighestAverageAssignmentStep } from "../utils/seat-change";
 import { ApportionmentTable } from "./ApportionmentTable";
 import { ElectionSummaryTable } from "./ElectionSummaryTable";
 import { FullSeatsTable } from "./full_seats/FullSeatsTable";
@@ -58,7 +58,7 @@ DefaultLargestAveragesForLessThan19SeatsTable.storyName = "Largest averages for 
 
 export const DefaultLargestAveragesFor19OrMoreSeatsTable: Story = () => (
   <HighestAveragesFor19OrMoreSeatsTable
-    highestAverageSteps={gte19Seats.seat_assignment.steps as HighestAverageStep[]}
+    highestAverageSteps={gte19Seats.seat_assignment.steps as HighestAverageAssignmentStep[]}
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups as PoliticalGroup[]}
   />

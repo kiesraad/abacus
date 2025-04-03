@@ -3,11 +3,11 @@ import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
 
-import { HighestAverageStep } from "../../utils/seat-change";
+import { HighestAverageAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface HighestAveragesFor19OrMoreSeatsTableProps {
-  highestAverageSteps: HighestAverageStep[];
+  highestAverageSteps: HighestAverageAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }

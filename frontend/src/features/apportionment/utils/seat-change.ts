@@ -6,18 +6,18 @@ import {
   SeatChangeStep,
 } from "@/api";
 
-export type HighestAverageStep = SeatChangeStep & { change: HighestAverageAssignedSeat };
-export type LargestRemainderStep = SeatChangeStep & { change: LargestRemainderAssignedSeat };
-export type AbsoluteMajorityStep = SeatChangeStep & { change: AbsoluteMajorityReassignedSeat };
+export type HighestAverageAssignmentStep = SeatChangeStep & { change: HighestAverageAssignedSeat };
+export type LargestRemainderAssignmentStep = SeatChangeStep & { change: LargestRemainderAssignedSeat };
+export type AbsoluteMajorityReassignmentStep = SeatChangeStep & { change: AbsoluteMajorityReassignedSeat };
 export type ListExhaustionRemovalStep = SeatChangeStep & { change: ListExhaustionRemovedSeat };
 
-export function isHighestAverageStep(step: SeatChangeStep): step is HighestAverageStep {
+export function isHighestAverageAssignmentStep(step: SeatChangeStep): step is HighestAverageAssignmentStep {
   return step.change.changed_by === "HighestAverageAssignment";
 }
-export function isLargestRemainderStep(step: SeatChangeStep): step is LargestRemainderStep {
+export function isLargestRemainderAssignmentStep(step: SeatChangeStep): step is LargestRemainderAssignmentStep {
   return step.change.changed_by === "LargestRemainderAssignment";
 }
-export function isAbsoluteMajorityStep(step: SeatChangeStep): step is AbsoluteMajorityStep {
+export function isAbsoluteMajorityReassignmentStep(step: SeatChangeStep): step is AbsoluteMajorityReassignmentStep {
   return step.change.changed_by === "AbsoluteMajorityReassignment";
 }
 export function isListExhaustionRemovalStep(step: SeatChangeStep): step is ListExhaustionRemovalStep {

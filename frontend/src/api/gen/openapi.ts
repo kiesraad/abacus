@@ -172,11 +172,11 @@ export interface AccountUpdateRequest {
 export type AuditEvent =
   | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
   | (UserLoggedOutDetails & { eventType: "UserLoggedOut" })
-  | (LoginResponse & { eventType: "UserAccountUpdated" })
+  | (UserDetails & { eventType: "UserAccountUpdated" })
   | { eventType: "UserSessionExtended" }
-  | (LoginResponse & { eventType: "UserCreated" })
-  | (LoginResponse & { eventType: "UserUpdated" })
-  | (LoginResponse & { eventType: "UserDeleted" })
+  | (UserDetails & { eventType: "UserCreated" })
+  | (UserDetails & { eventType: "UserUpdated" })
+  | (UserDetails & { eventType: "UserDeleted" })
   | (ElectionDetails & { eventType: "ElectionCreated" })
   | (ElectionDetails & { eventType: "ApportionmentCreated" })
   | (PollingStationDetails & { eventType: "PollingStationCreated" })
@@ -342,7 +342,7 @@ export interface ElectionApportionmentResponse {
 export type ElectionCategory = "Municipal";
 
 export interface ElectionDetails {
-  electionCategory: ElectionCategory;
+  electionCategory: string;
   electionElectionDate: string;
   electionId: number;
   electionLocation: string;
@@ -350,7 +350,7 @@ export interface ElectionDetails {
   electionNominationDate: string;
   electionNumberOfSeats: number;
   electionNumberOfVoters: number;
-  electionStatus: ElectionStatus;
+  electionStatus: string;
 }
 
 /**
@@ -617,7 +617,7 @@ export interface PollingStationDetails {
   pollingStationNumber: number;
   pollingStationNumberOfVoters?: number | null;
   pollingStationPostalCode: string;
-  pollingStationType?: PollingStationType;
+  pollingStationType?: string;
 }
 
 /**
@@ -750,6 +750,13 @@ export interface User {
   last_activity_at?: string;
   role: Role;
   updated_at: string;
+  username: string;
+}
+
+export interface UserDetails {
+  fullname?: string;
+  role: string;
+  userId: number;
   username: string;
 }
 

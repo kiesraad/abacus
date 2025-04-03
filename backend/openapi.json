@@ -1752,7 +1752,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/LoginResponse"
+                "$ref": "#/components/schemas/UserDetails"
               },
               {
                 "type": "object",
@@ -1787,7 +1787,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/LoginResponse"
+                "$ref": "#/components/schemas/UserDetails"
               },
               {
                 "type": "object",
@@ -1808,7 +1808,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/LoginResponse"
+                "$ref": "#/components/schemas/UserDetails"
               },
               {
                 "type": "object",
@@ -1829,7 +1829,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/LoginResponse"
+                "$ref": "#/components/schemas/UserDetails"
               },
               {
                 "type": "object",
@@ -2554,7 +2554,7 @@
         ],
         "properties": {
           "electionCategory": {
-            "$ref": "#/components/schemas/ElectionCategory"
+            "type": "string"
           },
           "electionElectionDate": {
             "type": "string",
@@ -2586,7 +2586,7 @@
             "minimum": 0
           },
           "electionStatus": {
-            "$ref": "#/components/schemas/ElectionStatus"
+            "type": "string"
           }
         }
       },
@@ -3262,7 +3262,7 @@
             "type": "string"
           },
           "pollingStationType": {
-            "$ref": "#/components/schemas/PollingStationType"
+            "type": "string"
           }
         }
       },
@@ -3642,6 +3642,30 @@
           },
           "updated_at": {
             "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "UserDetails": {
+        "type": "object",
+        "required": [
+          "userId",
+          "username",
+          "role"
+        ],
+        "properties": {
+          "fullname": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           },
           "username": {
             "type": "string"

@@ -1,5 +1,6 @@
 use crate::{
     APIError,
+    audit_log::DataEntryDetails,
     data_entry::status::DataEntryStatus,
     election::{CandidateNumber, PGNumber, PoliticalGroup},
     error::ErrorReference,
@@ -17,6 +18,20 @@ pub struct PollingStationDataEntry {
     pub state: Json<DataEntryStatus>,
     #[schema(value_type = String)]
     pub updated_at: DateTime<Utc>,
+}
+
+impl From<PollingStationDataEntry> for DataEntryDetails {
+    fn from(value: PollingStationDataEntry) -> Self {
+        let state = value.state.0;
+
+        Self {
+            polling_station_id: value.polling_station_id,
+            data_entry_progress: state.get_progress(),
+            finished_at: state.finished_at().cloned(),
+            first_entry_user_id: state.get_first_entry_user_id(),
+            second_entry_user_id: state.get_second_entry_user_id(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

@@ -185,15 +185,12 @@ test("should handle RESET_TARGET_FORM_SECTION", () => {
 test("should handle REGISTER_CURRENT_FORM", () => {
   const action: DataEntryAction = {
     type: "REGISTER_CURRENT_FORM",
-    form: {
-      id: "voters_votes_counts",
-      type: "voters_and_votes",
-    },
+    formSectionId: "voters_votes_counts",
   };
 
   const state = dataEntryReducer(getInitialState(), action);
   expect(state.formState.current).toBeDefined();
-  expect(state.formState.current).toEqual(action.form.id);
+  expect(state.formState.current).toEqual(action.formSectionId);
   expect(state.formState.sections.recounted.isSubmitted).toBeDefined();
   expect(state.formState.sections.recounted.isSubmitted).toEqual(false);
 });

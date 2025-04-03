@@ -26,6 +26,7 @@ pub enum ErrorReference {
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DatabaseError,
+    DataEntryAlreadyClaimed,
     DrawingOfLotsRequired,
     EntryNotFound,
     EntryNotUnique,
@@ -356,7 +357,13 @@ impl From<SeError> for APIError {
 
 impl From<DataEntryTransitionError> for APIError {
     fn from(err: DataEntryTransitionError) -> Self {
-        Self::Conflict(err.to_string(), ErrorReference::InvalidStateTransition)
+        match err {
+            DataEntryTransitionError::FirstEntryAlreadyClaimed
+            | DataEntryTransitionError::SecondEntryAlreadyClaimed => {
+                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyClaimed)
+            }
+            _ => APIError::Conflict(err.to_string(), ErrorReference::InvalidStateTransition),
+        }
     }
 }
 

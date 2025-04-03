@@ -31,10 +31,10 @@ verduidelijken. Het omvat ook het systeemcontextdiagram.
 
 ## Onderdelen
 
-Het containerdiagram geeft een overzicht onderdelen van het systeem en de
-bijbehorende van de high-level technologiekeuzes. In dit diagram is het
-Abacus-systeem verder uitgesplitst in verschillende containers (frontend,
-backend, en database).
+Het containerdiagram geeft een overzicht van de onderdelen van het systeem en de
+bijbehorende high-level technologiekeuzes. In dit diagram is het Abacus-systeem
+verder uitgesplitst in verschillende containers (frontend, backend, en
+database).
 
 ![Containerdiagram](./diagrammen/container.png)
 
@@ -52,8 +52,8 @@ frontend en backend.
 
 ![Diagram met componenten backend](./diagrammen/component-backend.png)
 
-Deze componenten zijn in de geïmplementeerd als verschillende modules in de
-Rust-codebase.
+Deze componenten zijn in de backend geïmplementeerd als verschillende modules in
+de Rust-codebase.
 
 ## Componenten frontend
 

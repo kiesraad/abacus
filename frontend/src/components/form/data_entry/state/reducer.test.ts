@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { mockElection } from "@/components/election/status/mockData";
+import { electionMockData } from "@/testing/api-mocks";
 
 import { ApiResponseStatus, Election, PollingStationResults } from "@kiesraad/api";
 
@@ -8,7 +8,7 @@ import dataEntryReducer, { getInitialState as _getInitialState } from "./reducer
 import { DataEntryAction, DataEntryState } from "./types";
 
 function getInitialState(): DataEntryState {
-  return _getInitialState(mockElection, 1, 1);
+  return _getInitialState(electionMockData, 1, 1);
 }
 
 export function _getInitialValues(
@@ -52,7 +52,7 @@ export function _getInitialValues(
 }
 
 function getInitialValues() {
-  return _getInitialValues(mockElection);
+  return _getInitialValues(electionMockData);
 }
 
 test("should handle DATA_ENTRY_CLAIMED with client_state", () => {
@@ -185,15 +185,12 @@ test("should handle RESET_TARGET_FORM_SECTION", () => {
 test("should handle REGISTER_CURRENT_FORM", () => {
   const action: DataEntryAction = {
     type: "REGISTER_CURRENT_FORM",
-    form: {
-      id: "voters_votes_counts",
-      type: "voters_and_votes",
-    },
+    formSectionId: "voters_votes_counts",
   };
 
   const state = dataEntryReducer(getInitialState(), action);
   expect(state.formState.current).toBeDefined();
-  expect(state.formState.current).toEqual(action.form.id);
+  expect(state.formState.current).toEqual(action.formSectionId);
   expect(state.formState.sections.recounted.isSubmitted).toBeDefined();
   expect(state.formState.sections.recounted.isSubmitted).toEqual(false);
 });

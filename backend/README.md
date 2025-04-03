@@ -21,17 +21,14 @@ Use `cargo run` to run the API on port 8080 (http://localhost:8080).
 
 To let the API server serve the frontend, first compile the frontend using
 `npm run build` in the `frontend` directory. Then run the API server with the
-`memory-serve` feature enabled. Also make sure to point the `ASSET_DIR` environment
-variable to the directory where `vite` outputs the assets, e.g. `frontend/dist`.
-In this version of `memory-serve`, the path must be absolute, since `build.rs`
-has no knowledge of the project it is currently built in. Example:
+`memory-serve` feature enabled:
 
 ```shell
 cd frontend
 npm run build
 cd ../backend
 sqlx database setup
-ASSET_DIR=$PWD/../frontend/dist cargo run --features memory-serve
+cargo run --features memory-serve
 ```
 
 By default Abacus will use an external typst binary which should be available on
@@ -42,7 +39,7 @@ can simply enable the `embed-typst` feature. This can be combined with the
 memory-serve feature as well, e.g.:
 
 ```shell
-ASSET_DIR=$PWD/../frontend/dist cargo build --features memory-serve,embed-typst
+cargo build --features memory-serve,embed-typst
 ```
 
 [typst releases page]: https://github.com/typst/typst/releases
@@ -86,6 +83,7 @@ The following dependencies (crates) are used:
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `zip`: creating a zip of the EML_NL and PDF PV.
+- `strum`: Converting enums from their string representation and back
 
 Additionally, the following development dependencies are used:
 

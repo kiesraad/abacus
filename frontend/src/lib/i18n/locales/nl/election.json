@@ -1,17 +1,20 @@
 {
-  "manage": "Beheer verkiezingen",
-  "title": {
-    "singular": "Verkiezing",
-    "plural": "Verkiezingen",
-    "details": "Details verkiezing",
-    "overview": "Overzicht verkiezingen",
-    "finish_data_entry": "Invoerfase afronden"
-  },
+  "create": "Verkiezing toevoegen",
+  "import_eml": "Importeer verkiezingsdefinitie",
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",
+  "manage": "Beheer verkiezingen",
   "no_elections_added": "Nog geen verkiezingen ingesteld",
   "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",
   "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
+  "start_when_count_list_received": "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.",
   "status": "Status",
-  "start_when_count_list_received": "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren."
+  "title": {
+    "details": "Details verkiezing",
+    "finish_data_entry": "Invoerfase afronden",
+    "overview": "Overzicht verkiezingen",
+    "plural": "Verkiezingen",
+    "singular": "Verkiezing"
+  },
+  "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het."
 }

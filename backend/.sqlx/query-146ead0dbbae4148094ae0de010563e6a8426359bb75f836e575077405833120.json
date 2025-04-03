@@ -1,0 +1,80 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, user_fullname, user_role, ip)\n            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                username,\n                ip,\n                user_fullname,\n                user_role\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "time: _",
+        "ordinal": 1,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "event: serde_json::Value",
+        "ordinal": 2,
+        "type_info": "Null"
+      },
+      {
+        "name": "event_level: _",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "message",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "workstation: _",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "user_id: u32",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "username",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "ip",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_fullname",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_role",
+        "ordinal": 10,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 10
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "146ead0dbbae4148094ae0de010563e6a8426359bb75f836e575077405833120"
+}

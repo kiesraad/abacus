@@ -1,13 +1,9 @@
 import { Election } from "@kiesraad/api";
 
 import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
-import { ClientState, DataEntryAction, DataEntryState, FormSectionId, FormSectionReference } from "./types";
+import { ClientState, DataEntryAction, DataEntryState, FormSectionId } from "./types";
 
 export const INITIAL_FORM_SECTION_ID: FormSectionId = "recounted";
-export const INITIAL_FORM_SECTION_REFERENCE: FormSectionReference = {
-  id: "recounted",
-  type: "recounted",
-};
 
 export function getInitialState(
   election: Required<Election>,
@@ -117,7 +113,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         ...state,
         formState: {
           ...state.formState,
-          current: action.form.id,
+          current: action.formSectionId,
           sections: {
             ...state.formState.sections,
             ...(state.formState.sections[state.formState.current]

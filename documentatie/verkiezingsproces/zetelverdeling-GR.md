@@ -4,19 +4,18 @@ In dit document staat beschreven hoe de zetelverdeling en de aanwijzing van geko
 
 ## Verschillen in proces o.b.v. aantal raadszetels
 
-Op drie punten zijn er verschillen in het proces op basis van het aantal raadszetels waar de verkiezing over gaat:
+Op twee punten zijn er verschillen in het proces op basis van het aantal raadszetels waar de verkiezing over gaat:
 
 - A. Zetelverdeling: 3. toedelen restzetels (\>= 19 vs < 19 raadszetels)
 - B. Aanwijzing gekozen kandidaten: 1. vaststellen voorkeursdrempel (\>= 19 vs < 19 raadszetels)
-- B. Aanwijzing gekozen kandidaten: 3. rangschikking lijsten (\>=13 vs < 13 raadszetels)
 
 Op alle overige punten is het proces gelijk.
 
 ## Context
 
-Het aantal zetels is minimaal 9 en maximaal 45. Het aantal zetels is altijd oneven. Gemeentes met 20.000 of minder inwoners hebben minder dan 19 zetels. Gemeentes met 6.000 of minder inwoners hebben minder dan 13 zetels. (Gemeentewet artikel 8)
+Het aantal zetels is minimaal 9 en maximaal 45. Het aantal zetels is altijd oneven. Gemeentes met 20.000 of minder inwoners hebben minder dan 19 zetels. (Gemeentewet artikel 8)
 
-Van de 342 gemeentes in Nederland hebben er iets minder dan 20% minder dan 19 zetels. Er zijn 6 gemeentes met minder dan 13 zetels. ([bron](https://allecijfers.nl/ranglijst/grootste-en-kleinste-gemeenten-in-inwoners-in-nederland/))
+Van de 342 gemeentes in Nederland hebben er iets minder dan 20% minder dan 19 zetels. ([bron](https://allecijfers.nl/ranglijst/grootste-en-kleinste-gemeenten-in-inwoners-in-nederland/))
 
 Het maximaal mogelijke aantal restzetels is het aantal lijsten - 1. De restzetels komen namelijk uit het getal achter de komma voor elke lijst bij de verdeling van de volle zetels. Dus het maximale mogelijke aantal restzetels is de som van een reeks getallen die als lengte het aantal lijsten heeft en als maximale waarde voor elk getal in de reeks een getal kleiner dan 1.
 
@@ -81,7 +80,7 @@ Als in één van bovenstaande stappen meer zetels aan een lijst toegewezen moete
 
 ---
 
-## B. Aanwijzing van de gekozen kandidaten - 19 of meer zetels
+## B. Aanwijzing van de gekozen kandidaten
 
 Overleden kandidaten worden buiten beschouwing gelaten. (art P19a)
 
@@ -102,9 +101,8 @@ Overleden kandidaten worden buiten beschouwing gelaten. (art P19a)
 
 - Met het oog op het vervullen van vacatures: volgorde lijst wijzigen o.b.v. voorkeurstemmen
 - Lijsten die in aanmerking komen voor rangschikking:
-  - \>= 13 raadszetels: lijsten met minstens één zetel
-  - < 13 raadszetels: alle lijsten
-  - EN minstens één kandidaat heeft meer stemmen dan voorkeursdrempel
+  - meer dan 19 zetels: lijsten (1) met minstens één zetel EN (2) waarop kandidaten aantal stemmen hebben behaald hoger dan 25% van de kiesdeler (voorkeurdrempel)
+  - minder dan 19 zetels: lijsten waarop kandidaten aantal stemmen hebben behaald hoger dan 50% van de kiesdeler (voorkeurdrempel)
 - Rangschikking
   - Eerst kandidaten die met voorkeurstemmen zijn gekozen, in volgorde waarin zetels toegewezen
   - Daarna kandidaten met stemmen hoger dan voorkeursdrempel maar geen zetel, in volgorde van aantal stemmen
@@ -114,5 +112,5 @@ Overleden kandidaten worden buiten beschouwing gelaten. (art P19a)
 
 ## Referenties
 
-- [Formele Beschrijving van de Berekening van de Zetelverdeling (versie 20-11-2017)](https://www.kiesraad.nl/adviezen-en-publicaties/formulieren/2016/osv/osv-bestanden/formele-beschrijving-berekening-zetelverdeling)
+- [Formele Beschrijving van de Berekening van de Zetelverdeling (versie 20-12-2024)](https://www.kiesraad.nl/adviezen-en-publicaties/formulieren/2016/osv/osv-bestanden/formele-beschrijving-van-de-berekening-van-de-zetelverdeling)
 - [Determination of the Election Results (v7.3, 01-10-2020)](https://www.kiesraad.nl/adviezen-en-publicaties/formulieren/2016/osv/osv-bestanden/determination-of-the-election-result)

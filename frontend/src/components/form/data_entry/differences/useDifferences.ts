@@ -4,10 +4,7 @@ import { DifferencesFormValues, DifferencesValues, formValuesToValues, valuesToF
 
 export function useDifferences() {
   const { onSubmit: _onSubmit, ...section } = useDataEntryFormSection<DifferencesFormValues>({
-    section: {
-      id: "differences_counts",
-      type: "differences",
-    },
+    section: "differences_counts",
     getDefaultFormValues: (results, cache) =>
       cache?.key === "differences_counts"
         ? valuesToFormValues(cache.data as DifferencesValues)

@@ -23,6 +23,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "sqlx",
+ "strum 0.27.1",
  "test-log",
  "tokio",
  "tower",
@@ -286,6 +287,7 @@ dependencies = [
  "axum-core",
  "bytes",
  "cookie",
+ "form_urlencoded",
  "futures-util",
  "headers",
  "http",
@@ -295,6 +297,8 @@ dependencies = [
  "pin-project-lite",
  "rustversion",
  "serde",
+ "serde_html_form",
+ "serde_path_to_error",
  "tower",
  "tower-layer",
  "tower-service",
@@ -359,7 +363,7 @@ checksum = "a35a7317fcbdbef94b60d0dd0a658711a936accfce4a631fea4bf8e527eff3c2"
 dependencies = [
  "numerals",
  "paste",
- "strum",
+ "strum 0.26.3",
  "unicode-normalization",
  "unscanny",
 ]
@@ -1861,9 +1865,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve"
-version = "1.1.0"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cfc92aa7fd45743d406a4e8ab0ecc3262d35851525c85903ca296db0cf10f3c"
+checksum = "e3cc9a6d8b135c31154a1f3b14f902a77cd9172871dedc7df503e7b05c433182"
 dependencies = [
  "axum",
  "brotli",
@@ -1876,9 +1880,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-core"
-version = "1.1.0"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e08a56e08967b27df85eed2b90d3fbe92300481188d8f2f6bb377f09c8e35d03"
+checksum = "520282572b66169a1362b4e843bcccea5fb59dc92f8617a08a9c0c25e89ab47f"
 dependencies = [
  "brotli",
  "mime_guess",
@@ -1889,9 +1893,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-macros"
-version = "1.1.0"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfd1d3e59fb7742ad32e357cf504fd0fe36c9f35aa5b2797321eb13cf52603af"
+checksum = "dc76af6993714bb4f3ef5192c3d78cccf1c4df5f9c75a6bfbc25fa5b84208a88"
 dependencies = [
  "memory-serve-core",
 ]
@@ -2706,6 +2710,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_html_form"
+version = "0.2.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d2de91cf02bbc07cde38891769ccd5d4f073d22a40683aa4bc7a95781aaa2c4"
+dependencies = [
+ "form_urlencoded",
+ "indexmap",
+ "itoa",
+ "ryu",
+ "serde",
+]
+
+[[package]]
 name = "serde_json"
 version = "1.0.140"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3153,7 +3170,16 @@ version = "0.26.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8fec0f0aef304996cf250b31b5a10dee7980c85da9d759361292b8bca5a18f06"
 dependencies = [
- "strum_macros",
+ "strum_macros 0.26.4",
+]
+
+[[package]]
+name = "strum"
+version = "0.27.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f64def088c51c9510a8579e3c5d67c65349dcf755e5479ad3d010aa6454e2c32"
+dependencies = [
+ "strum_macros 0.27.1",
 ]
 
 [[package]]
@@ -3161,6 +3187,19 @@ name = "strum_macros"
 version = "0.26.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4c6bee85a5a24955dc440386795aa378cd9cf82acd5f764469152d2270e581be"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "rustversion",
+ "syn",
+]
+
+[[package]]
+name = "strum_macros"
+version = "0.27.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c77a8c5abcaf0f9ce05d62342b7d298c346515365c36b673df4ebe3ced01fde8"
 dependencies = [
  "heck",
  "proc-macro2",

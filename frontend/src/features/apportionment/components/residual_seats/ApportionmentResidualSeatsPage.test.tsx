@@ -163,22 +163,41 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
-      ["1", "Political Group A", "7", "189", "2/15", "0"],
+      ["1", "Political Group A", "6", "189", "2/15", "0"],
       ["2", "Political Group B", "2", "296", "7/15", "1"],
       ["3", "Political Group C", "1", "226", "11/15", "1"],
-      ["4", "Political Group D", "1", "195", "11/15", "2"],
-      ["5", "Political Group E", "1", "112", "11/15", "0"],
+      ["4", "Political Group D", "1", "195", "11/15", "1"],
+      ["5", "Political Group E", "1", "112", "11/15", "1"],
+    ]);
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Verdeling overige restzetels",
+      }),
+    );
+    const highest_averages_table = await screen.findByTestId("highest-averages-for-less-than-19-seats-table");
+    expect(highest_averages_table).toBeVisible();
+    expect(highest_averages_table).toHaveTableContent([
+      ["Lijst", "Lijstnaam", "Aantal volle zetels", "Gemiddelde", "Aantal restzetels"],
+      ["1", "Political Group A", "6", "321", "3/8", "0"],
+      ["2", "Political Group B", "2", "244", "1/4", "1"],
+      ["3", "Political Group C", "1", "189", "", "0"],
+      ["4", "Political Group D", "1", "178", "2/3", "0"],
+      ["5", "Political Group E", "1", "151", "", "0"],
     ]);
 
     expect(await screen.findByTestId("absolute-majority-reassignment-information")).toHaveTextContent(
-      "Overeenkomstig artikel P 9 van de Kieswet (volstrekte meerderheid) wordt aan lijst 1 alsnog één zetel toegewezen en vervalt daartegenover één zetel, die eerder was toegewezen aan lijst 4.",
+      "Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaalt, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 4 omdat die de laatste restzetel toegewezen heeft gekregen.",
     );
     expect(await screen.findByTestId("list-exhaustion-step-1-information")).toHaveTextContent(
-      "Overeenkomstig artikel P 10 of artikel P 13, eerste lid, van de Kieswet (lijstuitputting) vindt er een overgang plaats van een zetel van lijst 1 naar een andere lijst.",
+      "Omdat lijst 1 geen kandidaat heeft voor deze zetel, gaat deze zetel naar lijst 5. (Kieswet, artikel P 10 of P 13 eerste lid)",
+    );
+    expect(await screen.findByTestId("list-exhaustion-step-2-information")).toHaveTextContent(
+      "Omdat lijst 1 geen kandidaat heeft voor deze zetel, gaat deze zetel naar lijst 2.",
     );
 
     expect(screen.queryByTestId("highest-averages-for-19-or-more-seats-table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("highest-averages-for-less-than-19-seats-table")).not.toBeInTheDocument();
   });
 
   describe("Apportionment not yet available", () => {

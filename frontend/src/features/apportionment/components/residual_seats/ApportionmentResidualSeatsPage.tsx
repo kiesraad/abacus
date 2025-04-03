@@ -5,6 +5,7 @@ import { Alert, FormLayout, PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
+import { isHighestAverageAssignmentStep, isLargestRemainderAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 import { HighestAveragesFor19OrMoreSeatsTable } from "./HighestAveragesFor19OrMoreSeatsTable";
 import { HighestAveragesForLessThan19SeatsTable } from "./HighestAveragesForLessThan19SeatsTable";
@@ -62,12 +63,8 @@ export function ApportionmentResidualSeatsPage() {
     );
   }
   if (seatAssignment) {
-    const largestRemainderSteps = seatAssignment.steps.filter(
-      (step) => step.change.changed_by === "LargestRemainderAssignment",
-    );
-    const highestAverageSteps = seatAssignment.steps.filter(
-      (step) => step.change.changed_by === "HighestAverageAssignment",
-    );
+    const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderAssignmentStep);
+    const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
     const absoluteMajorityChange = seatAssignment.steps
       .map((step) => step.change)
       .find((change) => change.changed_by === "AbsoluteMajorityReassignment") as
@@ -86,7 +83,7 @@ export function ApportionmentResidualSeatsPage() {
                     {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
                     {highestAverageSteps.length > 0 && (
                       <HighestAveragesFor19OrMoreSeatsTable
-                        highestAverageSteps={highestAverageSteps}
+                        steps={highestAverageSteps}
                         finalStanding={seatAssignment.final_standing}
                         politicalGroups={election.political_groups}
                       />
@@ -99,7 +96,7 @@ export function ApportionmentResidualSeatsPage() {
                       {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
                       {largestRemainderSteps.length > 0 && (
                         <LargestRemaindersTable
-                          largestRemainderSteps={largestRemainderSteps}
+                          steps={largestRemainderSteps}
                           finalStanding={seatAssignment.final_standing}
                           politicalGroups={election.political_groups}
                         />
@@ -116,7 +113,7 @@ export function ApportionmentResidualSeatsPage() {
                         </span>
                         {
                           <HighestAveragesForLessThan19SeatsTable
-                            highestAverageSteps={highestAverageSteps}
+                            steps={highestAverageSteps}
                             finalStanding={seatAssignment.final_standing}
                             politicalGroups={election.political_groups}
                           />

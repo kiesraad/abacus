@@ -18,7 +18,7 @@ export interface ModalProps {
  *
  * @param {string} title - The title of the modal.
  * @param {boolean} noFlex - If true, the modal will not use flexbox for is contents layout.
- * @param {function} onClose - Callback function to be called when the modal is closed.
+ * @param {function} onClose - Callback function to be called when the modal should be closed.
  * @param {ReactNode} children - The content of the modal.
  * @returns {ReactNode} The rendered modal component.
  */

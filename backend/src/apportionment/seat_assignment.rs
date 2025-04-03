@@ -644,6 +644,7 @@ fn assign_remainder(
             });
 
         let change = if seats >= 19 {
+            debug!("Assign residual seat using highest averages method");
             // [Artikel P 7 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_7&z=2025-02-12&g=2025-02-12)
             step_assign_remainder_using_highest_averages(
                 current_standings.iter(),
@@ -781,7 +782,8 @@ fn political_group_highest_average_assigned_seats(
 }
 
 fn political_group_qualifies_for_extra_seat(
-    number_of_seats: usize,
+    number_of_seats_largest_remainders: usize,
+    number_of_seats_unique_highest_averages_option: Option<usize>,
     previous_steps: &[SeatChangeStep],
     pg_number: PGNumber,
 ) -> bool {
@@ -789,7 +791,19 @@ fn political_group_qualifies_for_extra_seat(
         prev.change.is_changed_by_absolute_majority_reassignment()
             && prev.change.political_group_number_retracted() == pg_number
     });
-    number_of_seats == 0 || (number_of_seats == 1 && has_retracted_seat)
+    if number_of_seats_unique_highest_averages_option.is_none() {
+        number_of_seats_largest_remainders == 0
+            || (has_retracted_seat && number_of_seats_largest_remainders == 1)
+    } else if let Some(number_of_seats_unique_highest_averages) =
+        number_of_seats_unique_highest_averages_option
+    {
+        number_of_seats_unique_highest_averages == 0
+            || (has_retracted_seat
+                && number_of_seats_unique_highest_averages == 1
+                && number_of_seats_largest_remainders <= 1)
+    } else {
+        false
+    }
 }
 
 /// Get an iterator that lists all the political groups that qualify for getting a seat through
@@ -809,6 +823,7 @@ fn political_group_standings_qualifying_for_largest_remainder<'a>(
             && !exhausted_pg_numbers.contains(&s.pg_number)
             && political_group_qualifies_for_extra_seat(
                 political_group_largest_remainder_assigned_seats(previous_steps, s.pg_number),
+                None,
                 previous_steps,
                 s.pg_number,
             )
@@ -827,7 +842,11 @@ fn political_group_standings_qualifying_for_unique_highest_average<'a>(
     standings.iter().filter(|&s| {
         !exhausted_pg_numbers.contains(&s.pg_number)
             && political_group_qualifies_for_extra_seat(
-                political_group_highest_average_assigned_seats(previous_steps, s.pg_number),
+                political_group_largest_remainder_assigned_seats(previous_steps, s.pg_number),
+                Some(political_group_highest_average_assigned_seats(
+                    previous_steps,
+                    s.pg_number,
+                )),
                 previous_steps,
                 s.pg_number,
             )
@@ -852,6 +871,7 @@ fn step_assign_remainder_using_largest_remainder(
 
     // If there is at least one element in the iterator, we know we can still do a largest remainder assignment
     if qualifying_for_remainder.peek().is_some() {
+        debug!("Assign residual seat using largest remainders method");
         let selected_pgs =
             political_groups_with_largest_remainder(qualifying_for_remainder, residual_seats)?;
         let selected_pg = selected_pgs[0];
@@ -879,6 +899,7 @@ fn step_assign_remainder_using_largest_remainder(
             )
             .peekable();
         if qualifying_for_unique_highest_average.peek().is_some() {
+            debug!("Assign residual seat using unique highest averages method");
             step_assign_remainder_using_highest_averages(
                 qualifying_for_unique_highest_average,
                 residual_seats,
@@ -890,6 +911,7 @@ fn step_assign_remainder_using_largest_remainder(
             // got a largest remainder seat, and every group also had at least a single residual seat
             // assigned to them. We now allow any residual seats to be assigned using the largest
             // averages procedure
+            debug!("Assign residual seat using highest averages method");
             step_assign_remainder_using_highest_averages(
                 standings.iter(),
                 residual_seats,
@@ -1500,7 +1522,7 @@ mod tests {
             /// 1st round of highest averages method (assignment to unique political groups):  
             /// 6 - highest average: [6 2/5, 8 1/5, 7] seat assigned to list 3
             #[test]
-            fn test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion_triggering_highest_average_assignment()
+            fn test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion_triggering_unique_highest_averages_assignment()
              {
                 let totals = election_summary_fixture_with_given_candidate_votes(vec![
                     vec![32, 0, 0, 0, 0],
@@ -1533,6 +1555,36 @@ mod tests {
                 assert_eq!(result.steps[5].change.political_group_number_assigned(), 3);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [4, 3, 1]);
+            }
+
+            /// Apportionment with residual seats assigned with largest remainders and highest averages methods  
+            /// This test triggers Kieswet Article P 9 and P 10
+            ///
+            /// Full seats: [2, 1, 5] - Remainder seats: 1  
+            /// Remainders: [50 4/8, 10, 61 1/8], only votes of lists [1, 3] meet the threshold of 75% of the quota  
+            /// 1 - largest remainder: seat assigned to list 3  
+            /// 2 - Seat first assigned to list 3 has been re-assigned to list 1 in accordance with Article P 9 Kieswet    
+            /// 3 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 4 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 5 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
+            /// 6 - largest remainder: seat assigned to list 3  
+            /// 1st round of highest averages method (assignment to unique political groups):  
+            /// 6 - highest average: [107 2/5, 10, 85 1/5] seat assigned to list 3  
+            /// 7 - highest average: [107 2/5, 10, 71] seat assigned to list 2
+            #[test]
+            fn test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion_triggering_multiple_unique_highest_averages_assignment()
+             {
+                let totals = election_summary_fixture_with_given_candidate_votes(vec![
+                    vec![537, 0],
+                    vec![10],
+                    vec![426, 0, 0, 0, 0, 0],
+                ]);
+                let result = seat_assignment(8, &totals).unwrap();
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, [2, 1, 5]);
             }
 
             /// Apportionment with no residual seats  

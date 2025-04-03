@@ -14,17 +14,25 @@ const test = base.extend<{ modal: Locator }>({
 });
 
 test.describe("Modal", () => {
-  test("closes on clicking X button", async ({ modal }) => {
+  test("opens again after closing it with X button", async ({ page, modal }) => {
     await expect(modal).toBeVisible();
     await expect(modal.getByRole("heading", { level: 2 })).toBeFocused();
     await modal.getByRole("button", { name: "Annuleren" }).click();
     await expect(modal).toBeHidden();
+
+    await page.getByRole("button", { name: "Open modal" }).click();
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole("heading", { level: 2 })).toBeFocused();
   });
 
-  test("closes on Escape key press", async ({ page, modal }) => {
+  test("opens again after closing it by pressing Escape", async ({ page, modal }) => {
     await expect(modal).toBeVisible();
     await expect(modal.getByRole("heading", { level: 2 })).toBeFocused();
     await page.keyboard.press("Escape");
     await expect(modal).toBeHidden();
+
+    await page.getByRole("button", { name: "Open modal" }).click();
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole("heading", { level: 2 })).toBeFocused();
   });
 });

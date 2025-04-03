@@ -83,7 +83,7 @@ export function ApportionmentResidualSeatsPage() {
                     {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
                     {highestAverageSteps.length > 0 && (
                       <HighestAveragesFor19OrMoreSeatsTable
-                        highestAverageSteps={highestAverageSteps}
+                        steps={highestAverageSteps}
                         finalStanding={seatAssignment.final_standing}
                         politicalGroups={election.political_groups}
                       />
@@ -96,7 +96,7 @@ export function ApportionmentResidualSeatsPage() {
                       {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
                       {largestRemainderSteps.length > 0 && (
                         <LargestRemaindersTable
-                          largestRemainderSteps={largestRemainderSteps}
+                          steps={largestRemainderSteps}
                           finalStanding={seatAssignment.final_standing}
                           politicalGroups={election.political_groups}
                         />
@@ -113,7 +113,7 @@ export function ApportionmentResidualSeatsPage() {
                         </span>
                         {
                           <HighestAveragesForLessThan19SeatsTable
-                            highestAverageSteps={highestAverageSteps}
+                            steps={highestAverageSteps}
                             finalStanding={seatAssignment.final_standing}
                             politicalGroups={election.political_groups}
                           />

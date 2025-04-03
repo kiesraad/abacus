@@ -7,16 +7,12 @@ import { LargestRemainderAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface LargestRemaindersTableProps {
-  largestRemainderSteps: LargestRemainderAssignmentStep[];
+  steps: LargestRemainderAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
-export function LargestRemaindersTable({
-  largestRemainderSteps,
-  finalStanding,
-  politicalGroups,
-}: LargestRemaindersTableProps) {
+export function LargestRemaindersTable({ steps, finalStanding, politicalGroups }: LargestRemaindersTableProps) {
   const finalStandingPgsMeetingThreshold = finalStanding.filter(
     (pg_seat_assignment) => pg_seat_assignment.meets_remainder_threshold,
   );
@@ -33,7 +29,7 @@ export function LargestRemaindersTable({
       </Table.Header>
       <Table.Body>
         {finalStandingPgsMeetingThreshold.map((pg_seat_assignment) => {
-          const residual_seats = largestRemainderSteps.filter((step) => {
+          const residual_seats = steps.filter((step) => {
             return step.change.selected_pg_number == pg_seat_assignment.pg_number;
           }).length;
           return (

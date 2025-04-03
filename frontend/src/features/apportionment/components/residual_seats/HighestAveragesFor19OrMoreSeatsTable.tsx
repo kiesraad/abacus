@@ -7,13 +7,13 @@ import { HighestAverageAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface HighestAveragesFor19OrMoreSeatsTableProps {
-  highestAverageSteps: HighestAverageAssignmentStep[];
+  steps: HighestAverageAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
 export function HighestAveragesFor19OrMoreSeatsTable({
-  highestAverageSteps,
+  steps,
   finalStanding,
   politicalGroups,
 }: HighestAveragesFor19OrMoreSeatsTableProps) {
@@ -26,7 +26,7 @@ export function HighestAveragesFor19OrMoreSeatsTable({
         <Table.Header>
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>{t("list")}</Table.HeaderCell>
           <Table.HeaderCell className={cls.sticky}>{t("list_name")}</Table.HeaderCell>
-          {highestAverageSteps.map((step) => (
+          {steps.map((step) => (
             <Table.HeaderCell key={step.residual_seat_number} className="text-align-r" span={2}>
               {t("apportionment.residual_seat.singular")} {step.residual_seat_number}
             </Table.HeaderCell>
@@ -45,7 +45,7 @@ export function HighestAveragesFor19OrMoreSeatsTable({
                 <Table.Cell className={cls.sticky}>
                   {politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}
                 </Table.Cell>
-                {highestAverageSteps.map((step) => {
+                {steps.map((step) => {
                   const average = step.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
                   if (average) {
                     return (
@@ -71,7 +71,7 @@ export function HighestAveragesFor19OrMoreSeatsTable({
             <Table.Cell className={cn(cls.sticky, "text-align-r", "nowrap", "bold")}>
               {t("apportionment.residual_seat_assigned_to_list")}
             </Table.Cell>
-            {highestAverageSteps.map((step) => (
+            {steps.map((step) => (
               <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
                 {step.change.selected_pg_number}
               </Table.NumberCell>

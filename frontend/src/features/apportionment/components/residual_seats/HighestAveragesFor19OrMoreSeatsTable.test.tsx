@@ -11,7 +11,7 @@ describe("HighestAveragesFor19OrMoreSeatsTable", () => {
   test("renders a table with the residual seat assignment with highest averages method for 19 or more seats", async () => {
     render(
       <HighestAveragesFor19OrMoreSeatsTable
-        highestAverageSteps={seat_assignment.steps as HighestAverageAssignmentStep[]}
+        steps={seat_assignment.steps as HighestAverageAssignmentStep[]}
         finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
       />,

@@ -7,7 +7,7 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse,
-    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
+    audit_log::{AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails},
     error::ErrorReference,
 };
 use axum::{
@@ -62,6 +62,17 @@ impl From<&User> for LoginResponse {
             username: user.username().to_string(),
             role: user.role(),
             needs_password_change: user.needs_password_change(),
+        }
+    }
+}
+
+impl From<LoginResponse> for UserDetails {
+    fn from(user: LoginResponse) -> Self {
+        Self {
+            user_id: user.user_id,
+            fullname: user.fullname,
+            username: user.username,
+            role: user.role.to_string(),
         }
     }
 }
@@ -194,7 +205,10 @@ async fn account_update(
     let response = LoginResponse::from(&updated_user);
 
     audit_service
-        .log(&AuditEvent::UserAccountUpdated(response.clone()), None)
+        .log(
+            &AuditEvent::UserAccountUpdated(response.clone().into()),
+            None,
+        )
         .await?;
 
     Ok(Json(response))
@@ -362,7 +376,7 @@ pub async fn user_create(
         .await?;
 
     audit_service
-        .log(&AuditEvent::UserCreated(LoginResponse::from(&user)), None)
+        .log(&AuditEvent::UserCreated(user.clone().into()), None)
         .await?;
 
     Ok((StatusCode::CREATED, Json(user)))
@@ -429,7 +443,7 @@ pub async fn user_update(
         .ok_or(Error::RowNotFound)?;
 
     audit_service
-        .log(&AuditEvent::UserUpdated(LoginResponse::from(&user)), None)
+        .log(&AuditEvent::UserUpdated(user.clone().into()), None)
         .await?;
 
     Ok(Json(user))
@@ -463,7 +477,7 @@ async fn user_delete(
 
     if deleted {
         audit_service
-            .log(&AuditEvent::UserDeleted((&user).into()), None)
+            .log(&AuditEvent::UserDeleted(user.clone().into()), None)
             .await?;
 
         Ok(StatusCode::OK)

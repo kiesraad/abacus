@@ -13,8 +13,11 @@ use super::{
     user::{User, Users},
 };
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type)]
+#[derive(
+    Serialize, Deserialize, strum::Display, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type,
+)]
 #[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 #[sqlx(rename_all = "snake_case")]
 pub enum Role {
     Administrator,

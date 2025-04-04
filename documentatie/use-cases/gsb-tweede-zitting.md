@@ -13,7 +13,7 @@ __Trigger:__ één of meer stembureaus moeten herteld worden n.a.v. verzoek CSB
 __Hoofdscenario:__  
 1. Het GSB ontvangt één of meerdere verzoeken tot onderzoek/hertelling van het CSB.
 2. Het GSB opent de zitting. (Wanneer dat gebeurt is een afweging van het GSB: liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten)
-3. De coördinator GSB geeft in de applicatie aan dat de zitting is geopend. Hiermee wordt de vorige zitting in de applicatie gesloten.
+3. De coördinator GSB geeft in de applicatie aan dat de zitting is geopend en voert de locatie en starttijd in. Hiermee wordt de vorige zitting in de applicatie gesloten.
 4. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
 5. De coördinator GSB maakt de GSB PVs en het EML_NL-bestand aan: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB).
 6. Het GSB voert de andere onderdelen van het GSB-corrigendum in.
@@ -41,6 +41,8 @@ __Uitbreidingen:__
 &emsp; 7a1. Het GSB stelt het bezwaar vast.  
 &emsp; 7a2. Het GSB gaat over tot hertelling.
 
+### Open punten
+- We willen zoveel mogelijk van het PV in de applicatie invoeren. Dus idealiter worden alleen de handtekeningen van de GSB-leden met pen gezet. Dat is niet wat er op dit moment in de use cases staat.
 
 
 ## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)

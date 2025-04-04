@@ -5,9 +5,10 @@ import {
   ValidationResultCode,
 } from "@/api";
 import { electionMockData } from "@/testing/api-mocks";
+import { FormSectionId } from "@/types/types";
 
-import { DataEntryState, FormSection, FormSectionId } from "../stores/types";
 import { ValidationResultSet } from "../stores/ValidationResults";
+import { DataEntryState, FormSection } from "../types/types";
 
 export function getInitialValues(): PollingStationResults {
   return {

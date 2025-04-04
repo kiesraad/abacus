@@ -1,7 +1,7 @@
 import { PollingStationResults } from "@/api";
 
-import { SubmitCurrentFormOptions } from "../../stores/types";
 import { useDataEntryFormSection } from "../../stores/useDataEntryFormSection";
+import { SubmitCurrentFormOptions } from "../../types/types";
 
 export type RecountedValue = Pick<PollingStationResults, "recounted">;
 

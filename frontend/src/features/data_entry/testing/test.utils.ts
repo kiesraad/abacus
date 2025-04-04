@@ -10,7 +10,7 @@ import { getCandidateFullName } from "@/lib/util";
 import { overrideOnce, screen, within } from "@/testing";
 
 import { getClientState } from "../stores/dataEntryUtils";
-import { FormState } from "../stores/types";
+import { FormState } from "../types/types";
 import { getInitialValues } from "./mock-data";
 
 export interface OverrideServerClaimDataEntryResponseProps {

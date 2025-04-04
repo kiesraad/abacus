@@ -14,9 +14,9 @@ import {
   useFormKeyboardNavigation,
 } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
+import { FormSectionId } from "@/types/types";
 
 import { DataEntryFormSectionStatus, getDataEntrySummary } from "../../stores/dataEntryUtils";
-import { FormSectionId } from "../../stores/types";
 import { useDataEntryContext } from "../../stores/useDataEntryContext";
 import { getUrlForFormSectionID } from "../utils";
 

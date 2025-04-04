@@ -2,8 +2,9 @@ import * as React from "react";
 
 import { PollingStationResults } from "@/api";
 import { useFormKeyboardNavigation } from "@/components/ui";
+import { FormSectionId } from "@/types/types";
 
-import { FormSectionId, SubmitCurrentFormOptions, TemporaryCache } from "./types";
+import { SubmitCurrentFormOptions, TemporaryCache } from "../types/types";
 import { useDataEntryContext } from "./useDataEntryContext";
 import { mapValidationResultsToFields } from "./ValidationResults";
 

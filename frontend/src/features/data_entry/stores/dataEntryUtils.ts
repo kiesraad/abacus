@@ -1,8 +1,9 @@
 import { Election, PollingStationResults, ValidationResults } from "@/api";
 import { objectHasOnlyEmptyValues } from "@/lib/util";
+import { FormSectionId } from "@/types/types";
 
+import { ClientState, FormSection, FormState } from "../types/types";
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
-import { ClientState, FormSection, FormSectionId, FormState } from "./types";
 import { addValidationResultsToFormState, ValidationResultSet } from "./ValidationResults";
 
 export function formSectionComplete(section: FormSection): boolean {

@@ -1,7 +1,8 @@
 import { Election } from "@/api";
+import { FormSectionId } from "@/types/types";
 
+import { ClientState, DataEntryAction, DataEntryState } from "../types/types";
 import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
-import { ClientState, DataEntryAction, DataEntryState, FormSectionId } from "./types";
 
 export const INITIAL_FORM_SECTION_ID: FormSectionId = "recounted";
 

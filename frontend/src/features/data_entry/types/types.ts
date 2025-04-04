@@ -1,8 +1,9 @@
 import { Dispatch } from "react";
 
-import { AnyApiError, ClaimDataEntryResponse, Election, PollingStationResults, ValidationResults } from "@/api";
+import { AnyApiError, ClaimDataEntryResponse, Election, PollingStationResults, ValidationResults } from "@kiesraad/api";
 
-import { ValidationResultSet } from "./ValidationResults";
+import { FormSectionId } from "../../../types/types";
+import { ValidationResultSet } from "../stores/ValidationResults";
 
 export interface DataEntryState {
   // state from providers
@@ -84,26 +85,12 @@ export type DataEntryAction =
       formSectionId: FormSectionId;
     };
 
-export type FormSectionData =
-  | Pick<PollingStationResults, "recounted">
-  | Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">
-  | Pick<PollingStationResults, "differences_counts">
-  | PollingStationResults["political_group_votes"][0]
-  | object; // save
-
 export interface SubmitCurrentFormOptions {
   acceptWarnings?: boolean;
   aborting?: boolean;
   continueToNextSection?: boolean;
   showAcceptWarnings?: boolean;
 }
-
-export type FormSectionId =
-  | "recounted"
-  | "voters_votes_counts"
-  | "differences_counts"
-  | `political_group_votes_${number}`
-  | "save";
 
 //store unvalidated data
 export type TemporaryCache = {

@@ -7,6 +7,7 @@ import {
   useApiClient,
 } from "@/api";
 
+import { DataEntryStateAndActions } from "../types/types";
 import {
   onDeleteDataEntry,
   onFinaliseDataEntry,
@@ -16,7 +17,6 @@ import {
   updateFormSection,
 } from "./actions";
 import dataEntryReducer, { getInitialState } from "./reducer";
-import { DataEntryStateAndActions } from "./types";
 import useDataEntryNavigation from "./useDataEntryNavigation";
 import { useInitialDataEntryState } from "./useInitialDataEntryState";
 

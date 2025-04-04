@@ -1,7 +1,9 @@
 import { useContext, useEffect } from "react";
 
+import { FormSectionId } from "@/types/types";
+
+import { DataEntryStateAndActionsLoaded } from "../types/types";
 import { DataEntryContext } from "./DataEntryContext";
-import { DataEntryStateAndActionsLoaded, FormSectionId } from "./types";
 
 export function useDataEntryContext(formSectionId?: FormSectionId): DataEntryStateAndActionsLoaded {
   const context = useContext(DataEntryContext);

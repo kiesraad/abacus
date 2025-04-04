@@ -1,6 +1,5 @@
 import { PollingStationResults } from "@/api";
-
-import { FormSectionId } from "../../data_entry/stores/types";
+import { FormSectionId } from "@/types/types";
 
 type ObjectPath<T> = {
   // For each entry, if it is an object (including optional)

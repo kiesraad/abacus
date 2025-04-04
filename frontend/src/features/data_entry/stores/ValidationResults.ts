@@ -1,6 +1,7 @@
 import { ValidationResult, ValidationResultCode } from "@/api";
+import { FormSectionId } from "@/types/types";
 
-import { FormSectionId, FormState } from "./types";
+import { FormState } from "../types/types";
 
 /*
  * A set of validation results.

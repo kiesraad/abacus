@@ -12,9 +12,9 @@ import {
 } from "@/testing/api-mocks";
 
 import { DataEntryProvider } from "../../stores/DataEntryProvider";
-import { DataEntryState } from "../../stores/types";
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../../testing/test.utils";
+import { DataEntryState } from "../../types/types";
 import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
 function getDefaultValues() {

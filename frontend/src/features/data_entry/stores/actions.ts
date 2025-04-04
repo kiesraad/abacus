@@ -1,14 +1,14 @@
 import { ApiClient, ApiResult, DataEntry, isSuccess, PollingStationResults, SaveDataEntryResponse } from "@/api";
+import { FormSectionId } from "@/types/types";
 
-import { calculateDataEntryProgress, getClientState } from "./dataEntryUtils";
 import {
   DataEntryDispatch,
   DataEntryState,
   FormSection,
-  FormSectionId,
   SubmitCurrentFormOptions,
   TemporaryCache,
-} from "./types";
+} from "../types/types";
+import { calculateDataEntryProgress, getClientState } from "./dataEntryUtils";
 
 export function registerForm(dispatch: DataEntryDispatch) {
   return (formSectionId: FormSectionId) => {

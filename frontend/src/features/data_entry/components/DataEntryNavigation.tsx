@@ -4,8 +4,8 @@ import { PollingStationResults, useUser } from "@/api";
 import { Button, Modal } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
-import { SubmitCurrentFormOptions } from "../stores/types";
 import { useDataEntryContext } from "../stores/useDataEntryContext";
+import { SubmitCurrentFormOptions } from "../types/types";
 
 export interface DataEntryNavigationProps {
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;

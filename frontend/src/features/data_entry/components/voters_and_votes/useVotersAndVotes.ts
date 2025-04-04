@@ -1,5 +1,5 @@
-import { SubmitCurrentFormOptions } from "../../stores/types";
 import { useDataEntryFormSection } from "../../stores/useDataEntryFormSection";
+import { SubmitCurrentFormOptions } from "../../types/types";
 import {
   formValuesToValues,
   valuesToFormValues,

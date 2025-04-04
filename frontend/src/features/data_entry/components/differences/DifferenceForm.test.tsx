@@ -10,7 +10,6 @@ import {
 } from "@/testing/api-mocks";
 
 import { DataEntryProvider } from "../../stores/DataEntryProvider";
-import { DataEntryState } from "../../stores/types";
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
@@ -19,6 +18,7 @@ import {
   expectFieldsToNotHaveIcon,
   overrideServerClaimDataEntryResponse,
 } from "../../testing/test.utils";
+import { DataEntryState } from "../../types/types";
 import { DifferencesForm } from "./DifferencesForm";
 
 const defaultDataEntryState: DataEntryState = {

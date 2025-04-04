@@ -2,8 +2,8 @@ import { ReactNode } from "react";
 
 import { Election } from "@/api";
 
+import { DataEntryStateAndActionsLoaded } from "../types/types";
 import { DataEntryContext } from "./DataEntryContext";
-import { DataEntryStateAndActionsLoaded } from "./types";
 import useDataEntry from "./useDataEntry";
 
 export interface DataEntryProviderProps {

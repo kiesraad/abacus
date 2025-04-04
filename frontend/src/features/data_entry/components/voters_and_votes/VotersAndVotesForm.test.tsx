@@ -11,7 +11,6 @@ import {
 
 import { DataEntryProvider } from "../../stores/DataEntryProvider";
 import { getClientState } from "../../stores/dataEntryUtils";
-import { DataEntryState } from "../../stores/types";
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
@@ -20,6 +19,7 @@ import {
   expectFieldsToNotHaveIcon,
   overrideServerClaimDataEntryResponse,
 } from "../../testing/test.utils";
+import { DataEntryState } from "../../types/types";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const initialValues: PollingStationResults = {

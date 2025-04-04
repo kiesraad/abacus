@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { Election } from "@/api";
 
 import { getBaseUrl, getUrlForFormSectionID } from "../components/utils";
-import { DataEntryDispatch, DataEntryState } from "./types";
+import { DataEntryDispatch, DataEntryState } from "../types/types";
 
 export default function useDataEntryNavigation(
   state: DataEntryState,

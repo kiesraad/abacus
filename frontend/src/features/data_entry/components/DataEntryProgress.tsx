@@ -4,10 +4,11 @@ import { Link, useParams } from "react-router";
 import { useElection } from "@/api";
 import { MenuStatus, ProgressList } from "@/components/ui";
 import { t } from "@/lib/i18n";
+import { FormSectionId } from "@/types/types";
 
 import { isFormSectionEmpty } from "../stores/dataEntryUtils";
-import { FormSection, FormSectionId } from "../stores/types";
 import { useDataEntryContext } from "../stores/useDataEntryContext";
+import { FormSection } from "../types/types";
 
 export function DataEntryProgress() {
   const { pollingStationId } = useParams();

@@ -3,8 +3,8 @@ import { expect, test } from "vitest";
 import { ApiResponseStatus, Election, PollingStationResults } from "@/api";
 import { electionMockData } from "@/testing/api-mocks";
 
+import { DataEntryAction, DataEntryState } from "../types/types";
 import dataEntryReducer, { getInitialState as _getInitialState } from "./reducer";
-import { DataEntryAction, DataEntryState } from "./types";
 
 function getInitialState(): DataEntryState {
   return _getInitialState(electionMockData, 1, 1);

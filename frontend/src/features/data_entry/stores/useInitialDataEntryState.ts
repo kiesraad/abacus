@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { ApiClient, ClaimDataEntryResponse, DEFAULT_CANCEL_REASON, Election, isSuccess } from "@/api";
 
-import { DataEntryDispatch } from "./types";
+import { DataEntryDispatch } from "../types/types";
 
 export function useInitialDataEntryState(
   client: ApiClient,

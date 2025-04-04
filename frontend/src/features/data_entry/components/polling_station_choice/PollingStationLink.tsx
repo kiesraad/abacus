@@ -4,7 +4,7 @@ import { DataEntryStatusName, PollingStation } from "@/api";
 import { IconArrowNarrowRight } from "@/lib/icon";
 import { getUrlForDataEntry } from "@/lib/util";
 
-import cls from "./PollingStationLink.module.css";
+import cls from "./PollingStationChoice.module.css";
 
 interface PollingStationLinkProps {
   pollingStation: PollingStation;

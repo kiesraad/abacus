@@ -8,7 +8,7 @@ import { IconError } from "@/lib/icon";
 import { cn, getUrlForDataEntry, parseIntUserInput } from "@/lib/util";
 
 import { useDebouncedCallback } from "../../hooks/useDebouncedCallback";
-import cls from "./PollingStationChoiceForm.module.css";
+import cls from "./PollingStationChoice.module.css";
 import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationSelector } from "./PollingStationSelector";
 import { PollingStationsList } from "./PollingStationsList";

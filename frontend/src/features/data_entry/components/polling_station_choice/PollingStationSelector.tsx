@@ -5,7 +5,7 @@ import { t, tx } from "@/lib/i18n";
 import { IconError, IconWarning } from "@/lib/icon";
 import { cn, removeLeadingZeros } from "@/lib/util";
 
-import cls from "./PollingStationSelector.module.css";
+import cls from "./PollingStationChoice.module.css";
 import { PollingStationUserStatus, PollingStationWithStatus } from "./util";
 
 export interface PollingStationSelectorProps {
@@ -52,7 +52,7 @@ export function PollingStationSelector({
         (() => {
           if (loading) {
             return (
-              <div id="pollingStationSelectorFeedback" className={cls.message}>
+              <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.notify)}>
                 <span className={cls.icon}>
                   <Icon icon={<Spinner size="md" />} />
                 </span>

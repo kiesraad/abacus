@@ -13,8 +13,13 @@ import { ApportionmentLayout } from "@/features/apportionment/components/Apporti
 import { ApportionmentPage } from "@/features/apportionment/components/ApportionmentPage";
 import { ApportionmentFullSeatsPage } from "@/features/apportionment/components/full_seats/ApportionmentFullSeatsPage";
 import { ApportionmentResidualSeatsPage } from "@/features/apportionment/components/residual_seats/ApportionmentResidualSeatsPage";
+import { CandidatesVotesPage } from "@/features/data_entry/components/candidates_votes/CandidatesVotesPage";
+import { CheckAndSavePage } from "@/features/data_entry/components/check_and_save/CheckAndSavePage";
 import { DataEntryHomePage } from "@/features/data_entry/components/DataEntryHomePage";
 import { DataEntryLayout } from "@/features/data_entry/components/DataEntryLayout";
+import { DifferencesPage } from "@/features/data_entry/components/differences/DifferencesPage";
+import { RecountedPage } from "@/features/data_entry/components/recounted/RecountedPage";
+import { VotersAndVotesPage } from "@/features/data_entry/components/voters_and_votes/VotersAndVotesPage";
 import { ElectionCreatePage } from "@/features/election_management/components";
 import { ElectionHomePage } from "@/features/election_management/components/ElectionHomePage";
 import { ElectionReportPage } from "@/features/election_management/components/ElectionReportPage";
@@ -35,11 +40,6 @@ import { UserListPage } from "@/features/users/components/UserListPage";
 import { WorkstationsHomePage } from "@/features/workstations/components/WorkstationsHomePage";
 import { t } from "@/lib/i18n";
 
-import { CandidatesVotesPage } from "../features/data_entry/components/candidates_votes/CandidatesVotesPage";
-import { CheckAndSaveForm } from "../features/data_entry/components/check_and_save/CheckAndSaveForm";
-import { DifferencesPage } from "../features/data_entry/components/differences/DifferencesPage";
-import { RecountedPage } from "../features/data_entry/components/recounted/RecountedPage";
-import { VotersAndVotesPage } from "../features/data_entry/components/voters_and_votes/VotersAndVotesPage";
 import { AdministratorLayout } from "./AdministratorLayout";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { RootLayout } from "./RootLayout";
@@ -83,13 +83,12 @@ export const routes = createRoutesFromElements(
         <Route path="data-entry" element={null}>
           <Route index element={<DataEntryHomePage />} />
           <Route path=":pollingStationId/:entryNumber" element={<DataEntryLayout />}>
-            {/* The PollingStationFormController will navigate to the correct section. */}
             <Route index element={null} />
             <Route path="recounted" element={<RecountedPage />} />
             <Route path="voters-and-votes" element={<VotersAndVotesPage />} />
             <Route path="differences" element={<DifferencesPage />} />
             <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-            <Route path="save" element={<CheckAndSaveForm />} />
+            <Route path="save" element={<CheckAndSavePage />} />
           </Route>
         </Route>
       </Route>

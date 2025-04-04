@@ -1,6 +1,6 @@
-import { POLLING_STATION_GET_REQUEST_PATH, useInitialApiGet, UseInitialApiGetReturn } from "@kiesraad/api";
+import { POLLING_STATION_GET_REQUEST_PATH, useInitialApiGet, UseInitialApiGetReturn } from "@/api";
 
-import { PollingStation } from "../gen/openapi";
+import { PollingStation } from "../../../api/gen/openapi";
 
 export function usePollingStationGet(
   electionId: number,

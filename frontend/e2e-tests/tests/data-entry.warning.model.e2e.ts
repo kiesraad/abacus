@@ -11,8 +11,8 @@ import { createMachine } from "xstate";
 
 import { VotersCounts, VotesCounts } from "@kiesraad/api";
 
-import { test } from "./fixtures";
-import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
+import { test } from "../fixtures";
+import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "../helpers-utils/xstate-helpers";
 
 /*
 The names of the states in the machine keep track of two states:

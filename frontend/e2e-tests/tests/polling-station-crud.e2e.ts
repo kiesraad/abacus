@@ -1,9 +1,9 @@
 import { expect } from "@playwright/test";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 
-import { test } from "./fixtures";
-import { PollingStationListEmptyPgObj } from "./page-objects/polling_station/PollingStationListEmptyPgObj";
-import { PollingStationListPgObj } from "./page-objects/polling_station/PollingStationListPgObj";
+import { test } from "../fixtures";
+import { PollingStationListEmptyPgObj } from "../page-objects/polling_station/PollingStationListEmptyPgObj";
+import { PollingStationListPgObj } from "../page-objects/polling_station/PollingStationListPgObj";
 
 test.use({
   storageState: "e2e-tests/state/admin.json",

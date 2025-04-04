@@ -10,9 +10,9 @@ import {
 
 import { PollingStation, VotersCounts, VotesCounts } from "@kiesraad/api";
 
-import { test } from "./fixtures";
-import { loginAs } from "./setup";
-import { emptyDataEntryResponse } from "./test-data/request-response-templates";
+import { test } from "../fixtures";
+import { loginAs } from "../setup";
+import { emptyDataEntryResponse } from "../test-data/request-response-templates";
 
 test.use({
   storageState: "e2e-tests/state/typist.json",

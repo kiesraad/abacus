@@ -1,9 +1,9 @@
 import { expect } from "@playwright/test";
 
-import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "./fixtures";
-import { AccountSetupPgObj } from "./page-objects/authentication/AccountSetupPgObj";
-import { LoginPgObj } from "./page-objects/authentication/LoginPgObj";
-import { OverviewPgObj } from "./page-objects/election/OverviewPgObj";
+import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
+import { AccountSetupPgObj } from "../page-objects/authentication/AccountSetupPgObj";
+import { LoginPgObj } from "../page-objects/authentication/LoginPgObj";
+import { OverviewPgObj } from "../page-objects/election/OverviewPgObj";
 
 test.describe("authentication", () => {
   test("login happy path", async ({ page }) => {

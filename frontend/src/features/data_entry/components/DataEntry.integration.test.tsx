@@ -5,6 +5,8 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { SaveDataEntryResponse, TestUserProvider } from "@/api";
+// eslint-disable-next-line import/no-restricted-paths -- #1283
+import { routes } from "@/app/routes";
 import { overrideOnce, Router, screen, server, setupTestRouter, userTypeInputs, waitFor } from "@/testing";
 import {
   ElectionListRequestHandler,
@@ -16,8 +18,6 @@ import {
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks";
 
-// eslint-disable-next-line import/no-restricted-paths -- #1283
-import { routes } from "../../../app/routes";
 import { errorWarningMocks } from "../testing/mock-data";
 
 function renderWithRouter() {

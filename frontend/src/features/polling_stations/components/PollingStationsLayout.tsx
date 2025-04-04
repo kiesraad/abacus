@@ -1,8 +1,7 @@
 import { Outlet } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
-
-import { AppLayout } from "@kiesraad/ui";
+import { AppLayout } from "@/components/ui";
 
 export function PollingStationsLayout() {
   return (

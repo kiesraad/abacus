@@ -1,9 +1,11 @@
 import { useSearchParams } from "react-router";
 
-import { useElection, usePollingStationListRequest } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { IconPlus } from "@kiesraad/icon";
-import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
+import { useElection } from "@/api";
+import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@/components/ui";
+import { t } from "@/lib/i18n";
+import { IconPlus } from "@/lib/icon";
+
+import { usePollingStationListRequest } from "../hooks/usePollingStationListRequest";
 
 export function PollingStationListPage() {
   const { election } = useElection();

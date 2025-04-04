@@ -1,9 +1,11 @@
 import * as React from "react";
 
-import { isSuccess, PollingStation, PollingStationRequest, useCrud } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@kiesraad/ui";
-import { FormFields, useForm, ValidationError } from "@kiesraad/util";
+import { isSuccess, PollingStation, PollingStationRequest, useCrud } from "@/api";
+import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@/components/ui";
+import { t } from "@/lib/i18n";
+import { FormFields, ValidationError } from "@/lib/util";
+
+import { useForm } from "../hooks/useForm";
 
 export interface PollingStationFormProps {
   electionId: number;

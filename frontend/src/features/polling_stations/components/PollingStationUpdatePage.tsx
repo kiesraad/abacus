@@ -1,15 +1,15 @@
 import * as React from "react";
 import { useNavigate } from "react-router";
 
-import { PollingStationForm } from "@/components/form/polling_station/PollingStationForm";
+import { useElection } from "@/api";
+import { Alert, Button, Loader, PageTitle } from "@/components/ui";
+import { t } from "@/lib/i18n";
+import { IconTrash } from "@/lib/icon";
+import { useNumericParam } from "@/lib/util";
 
-import { useElection, usePollingStationGet } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { IconTrash } from "@kiesraad/icon";
-import { Alert, Button, Loader, PageTitle } from "@kiesraad/ui";
-import { useNumericParam } from "@kiesraad/util";
-
+import { usePollingStationGet } from "../hooks/usePollingStationGet";
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";
+import { PollingStationForm } from "./PollingStationForm";
 
 export function PollingStationUpdatePage() {
   const pollingStationId = useNumericParam("pollingStationId");

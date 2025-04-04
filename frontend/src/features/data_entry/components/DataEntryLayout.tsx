@@ -6,9 +6,9 @@ import { t } from "@/lib/i18n";
 import { useNumericParam } from "@/lib/util";
 
 import { usePollingStationStatus } from "../hooks/usePollingStationStatus";
-import { DataEntryProvider } from "../stores/DataEntryProvider";
 import { AbortDataEntryControl } from "./AbortDataEntryControl";
 import { DataEntryProgress } from "./DataEntryProgress";
+import { DataEntryProvider } from "./DataEntryProvider";
 
 export function DataEntryLayout() {
   const pollingStationId = useNumericParam("pollingStationId");

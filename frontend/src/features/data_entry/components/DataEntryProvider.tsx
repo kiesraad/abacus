@@ -2,9 +2,9 @@ import { ReactNode } from "react";
 
 import { Election } from "@/api";
 
+import { DataEntryContext } from "../hooks/DataEntryContext";
+import useDataEntry from "../hooks/useDataEntry";
 import { DataEntryStateAndActionsLoaded } from "../types/types";
-import { DataEntryContext } from "./DataEntryContext";
-import useDataEntry from "./useDataEntry";
 
 export interface DataEntryProviderProps {
   election: Required<Election>;

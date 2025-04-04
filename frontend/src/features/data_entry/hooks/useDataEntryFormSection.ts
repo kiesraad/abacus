@@ -5,8 +5,8 @@ import { useFormKeyboardNavigation } from "@/components/ui";
 import { FormSectionId } from "@/types/types";
 
 import { SubmitCurrentFormOptions, TemporaryCache } from "../types/types";
+import { mapValidationResultsToFields } from "../utils/ValidationResults";
 import { useDataEntryContext } from "./useDataEntryContext";
-import { mapValidationResultsToFields } from "./ValidationResults";
 
 export interface UseDataEntryFormSectionParams<FORM_VALUES> {
   getDefaultFormValues: (results: PollingStationResults, cache?: TemporaryCache | null) => FORM_VALUES;

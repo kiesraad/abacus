@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { useDataEntryFormSection } from "../../stores/useDataEntryFormSection";
+import { useDataEntryFormSection } from "../../hooks/useDataEntryFormSection";
 import { SubmitCurrentFormOptions } from "../../types/types";
 import {
   CandidateVotesFormValues,

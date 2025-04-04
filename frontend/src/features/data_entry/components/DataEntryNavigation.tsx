@@ -4,7 +4,7 @@ import { PollingStationResults, useUser } from "@/api";
 import { Button, Modal } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
-import { useDataEntryContext } from "../stores/useDataEntryContext";
+import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { SubmitCurrentFormOptions } from "../types/types";
 
 export interface DataEntryNavigationProps {

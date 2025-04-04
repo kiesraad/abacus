@@ -9,8 +9,8 @@ import {
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks";
 
-import { DataEntryProvider } from "../../stores/DataEntryProvider";
 import { errorWarningMocks, getEmptyDataEntryRequest } from "../../testing/mock-data";
+import { DataEntryProvider } from "../DataEntryProvider";
 import { RecountedForm } from "./RecountedForm";
 
 const Component = (

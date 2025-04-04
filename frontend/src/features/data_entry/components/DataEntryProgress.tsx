@@ -6,9 +6,9 @@ import { MenuStatus, ProgressList } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { FormSectionId } from "@/types/types";
 
-import { isFormSectionEmpty } from "../stores/dataEntryUtils";
-import { useDataEntryContext } from "../stores/useDataEntryContext";
+import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { FormSection } from "../types/types";
+import { isFormSectionEmpty } from "../utils/dataEntryUtils";
 
 export function DataEntryProgress() {
   const { pollingStationId } = useParams();

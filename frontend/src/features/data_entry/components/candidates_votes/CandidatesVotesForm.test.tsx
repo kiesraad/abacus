@@ -10,7 +10,6 @@ import {
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks";
 
-import { DataEntryProvider } from "../../stores/DataEntryProvider";
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
@@ -21,6 +20,7 @@ import {
   overrideServerClaimDataEntryResponse,
 } from "../../testing/test.utils";
 import { DataEntryState } from "../../types/types";
+import { DataEntryProvider } from "../DataEntryProvider";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const defaultDataEntryState: DataEntryState = {

@@ -4,7 +4,7 @@ import { FormSectionId } from "@/types/types";
 
 import { AnyApiError, ClaimDataEntryResponse, Election, PollingStationResults, ValidationResults } from "@kiesraad/api";
 
-import { ValidationResultSet } from "../stores/ValidationResults";
+import { ValidationResultSet } from "../utils/ValidationResults";
 
 export interface DataEntryState {
   // state from providers

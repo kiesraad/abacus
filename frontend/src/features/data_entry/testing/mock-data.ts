@@ -7,8 +7,8 @@ import {
 import { electionMockData } from "@/testing/api-mocks";
 import { FormSectionId } from "@/types/types";
 
-import { ValidationResultSet } from "../stores/ValidationResults";
 import { DataEntryState, FormSection } from "../types/types";
+import { ValidationResultSet } from "../utils/ValidationResults";
 
 export function getInitialValues(): PollingStationResults {
   return {

@@ -15,8 +15,8 @@ import {
   registerForm,
   setCache,
   updateFormSection,
-} from "./actions";
-import dataEntryReducer, { getInitialState } from "./reducer";
+} from "../utils/actions";
+import dataEntryReducer, { getInitialState } from "../utils/reducer";
 import useDataEntryNavigation from "./useDataEntryNavigation";
 import { useInitialDataEntryState } from "./useInitialDataEntryState";
 

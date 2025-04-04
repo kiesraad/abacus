@@ -16,9 +16,9 @@ import {
 import { t, tx } from "@/lib/i18n";
 import { FormSectionId } from "@/types/types";
 
-import { DataEntryFormSectionStatus, getDataEntrySummary } from "../../stores/dataEntryUtils";
-import { useDataEntryContext } from "../../stores/useDataEntryContext";
-import { getUrlForFormSectionID } from "../utils";
+import { useDataEntryContext } from "../../hooks/useDataEntryContext";
+import { DataEntryFormSectionStatus, getDataEntrySummary } from "../../utils/dataEntryUtils";
+import { getUrlForFormSectionID } from "../../utils/utils";
 
 export function CheckAndSaveForm() {
   const formRef = React.useRef<HTMLFormElement>(null);

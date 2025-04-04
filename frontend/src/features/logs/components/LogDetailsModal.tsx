@@ -7,8 +7,20 @@ import { formatDateTimeFull } from "@kiesraad/util";
 
 import cls from "./LogsHomePage.module.css";
 
-// field valuas that should be translated
-const SHOULD_TRANSLATE = ["role"];
+// whether a value should be translated, and if so, what translation prefix to use
+const SHOULD_TRANSLATE: Record<string, string> = {
+  role: "",
+  reference: "error.api_error.",
+};
+
+// format an audit log event detail value
+function formatValue(key: string, value: string) {
+  if (SHOULD_TRANSLATE[key] === undefined) {
+    return value || "-";
+  }
+
+  return t(`${SHOULD_TRANSLATE[key]}${value}` as TranslationPath);
+}
 
 interface LogDetailsModalProps {
   details: AuditLogEvent;
@@ -48,10 +60,10 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
           <>
             <h3>{t("log.header.details")}</h3>
             <dl className={cls.details} role="list">
-              {filteredDetails.map(([key, value]) => (
+              {filteredDetails.map(([key, value]: [string, string]) => (
                 <Fragment key={key}>
                   <dt>{t(`log.field.${key}` as TranslationPath)}</dt>
-                  <dd>{SHOULD_TRANSLATE.includes(key) ? t(value as TranslationPath) : value || "-"}</dd>
+                  <dd>{formatValue(key, value)}</dd>
                 </Fragment>
               ))}
             </dl>

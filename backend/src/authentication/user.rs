@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{Error, FromRow, SqlitePool, query, query_as};
 use utoipa::ToSchema;
 
-use crate::{APIError, AppState};
+use crate::{APIError, AppState, audit_log::UserDetails};
 
 use super::{
     SESSION_COOKIE_NAME,
@@ -40,6 +40,17 @@ pub struct User {
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
     created_at: DateTime<Utc>,
+}
+
+impl From<User> for UserDetails {
+    fn from(user: User) -> Self {
+        Self {
+            user_id: user.id,
+            fullname: user.fullname,
+            username: user.username,
+            role: user.role.to_string(),
+        }
+    }
 }
 
 impl User {

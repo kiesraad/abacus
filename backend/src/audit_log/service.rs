@@ -4,16 +4,17 @@ use axum::{
 };
 use std::net::{IpAddr, SocketAddr};
 
-use super::audit_log_events::{AuditEvent, AuditEventLevel, AuditLog, AuditLogEvent};
 use crate::{
     APIError,
     authentication::{User, Users, error::AuthenticationError},
 };
 
+use super::{AuditEvent, AuditLog, AuditLogEvent};
+
 pub struct AuditService {
     log: AuditLog,
-    ip: Option<IpAddr>,
     user: Option<User>,
+    ip: Option<IpAddr>,
 }
 
 impl<S> FromRequestParts<S> for AuditService
@@ -38,11 +39,11 @@ where
 
 impl AuditService {
     #[cfg(test)]
-    pub fn new(log: AuditLog, ip: IpAddr, user: User) -> Self {
+    pub fn new(log: AuditLog, user: User, ip: Option<IpAddr>) -> Self {
         Self {
             log,
-            ip: Some(ip),
             user: Some(user),
+            ip,
         }
     }
 
@@ -52,58 +53,27 @@ impl AuditService {
         self
     }
 
-    pub async fn log_error(
-        &self,
-        event: &AuditEvent,
-        message: Option<String>,
-    ) -> Result<AuditLogEvent, APIError> {
-        self.log(event, AuditEventLevel::Error, message).await
-    }
-
-    pub async fn log_warning(
-        &self,
-        event: &AuditEvent,
-        message: Option<String>,
-    ) -> Result<AuditLogEvent, APIError> {
-        self.log(event, AuditEventLevel::Warning, message).await
-    }
-
-    pub async fn log_info(
-        &self,
-        event: &AuditEvent,
-        message: Option<String>,
-    ) -> Result<AuditLogEvent, APIError> {
-        self.log(event, AuditEventLevel::Info, message).await
-    }
-
-    pub async fn log_success(
-        &self,
-        event: &AuditEvent,
-        message: Option<String>,
-    ) -> Result<AuditLogEvent, APIError> {
-        self.log(event, AuditEventLevel::Success, message).await
+    pub fn has_user(&self) -> bool {
+        self.user.is_some()
     }
 
     pub async fn log(
         &self,
         event: &AuditEvent,
-        event_type: AuditEventLevel,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
         let Some(user) = &self.user else {
             return Err(AuthenticationError::UserNotFound.into());
         };
 
-        self.log
-            .create(user, event, event_type, message, self.ip)
-            .await
+        self.log.create(user, event, message, self.ip).await
     }
 }
 
 // write some tests
 #[cfg(test)]
 mod test {
-    use crate::audit_log::UserLoggedInDetails;
+    use crate::audit_log::{AuditEventLevel, UserLoggedInDetails};
     use sqlx::SqlitePool;
     use std::net::Ipv4Addr;
     use test_log::test;
@@ -118,43 +88,26 @@ mod test {
             user: Users::new(pool).get_by_username("admin").await.unwrap(),
         };
 
-        for level in [
-            AuditEventLevel::Error,
-            AuditEventLevel::Warning,
-            AuditEventLevel::Info,
-            AuditEventLevel::Success,
-        ] {
-            let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
+        let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
+            user_agent: "Mozilla/5.0".to_string(),
+            logged_in_users_count: 5,
+        });
+        let message = Some("User logged in".to_string());
+        let event = service.log(&audit_event, message).await.unwrap();
+
+        assert_eq!(
+            event.event(),
+            &AuditEvent::UserLoggedIn(UserLoggedInDetails {
                 user_agent: "Mozilla/5.0".to_string(),
                 logged_in_users_count: 5,
-            });
-            let message = Some("User logged in".to_string());
+            })
+        );
 
-            let event = match level {
-                AuditEventLevel::Error => service.log_error(&audit_event, message).await.unwrap(),
-                AuditEventLevel::Warning => {
-                    service.log_warning(&audit_event, message).await.unwrap()
-                }
-                AuditEventLevel::Info => service.log_info(&audit_event, message).await.unwrap(),
-                AuditEventLevel::Success => {
-                    service.log_success(&audit_event, message).await.unwrap()
-                }
-            };
-
-            assert_eq!(
-                event.event(),
-                &AuditEvent::UserLoggedIn(UserLoggedInDetails {
-                    user_agent: "Mozilla/5.0".to_string(),
-                    logged_in_users_count: 5,
-                })
-            );
-
-            assert_eq!(event.event_level(), &level);
-            assert_eq!(event.message(), Some(&"User logged in".to_string()));
-            assert_eq!(event.user_id(), 1);
-            assert_eq!(event.username(), "admin");
-            assert_eq!(event.ip(), Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))));
-        }
+        assert_eq!(event.event_level(), &AuditEventLevel::Success);
+        assert_eq!(event.message(), Some(&"User logged in".to_string()));
+        assert_eq!(event.user_id(), 1);
+        assert_eq!(event.username(), "admin");
+        assert_eq!(event.ip(), Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))));
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -170,7 +123,7 @@ mod test {
             logged_in_users_count: 5,
         });
 
-        let error = service.log_info(&audit_event, None).await.unwrap_err();
+        let error = service.log(&audit_event, None).await.unwrap_err();
 
         assert!(
             matches!(

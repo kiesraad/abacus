@@ -1,11 +1,3 @@
-use std::error::Error;
-
-use crate::{
-    apportionment::ApportionmentError,
-    authentication::error::AuthenticationError,
-    data_entry::{DataError, status::DataEntryTransitionError},
-    pdf_gen::PdfGenError,
-};
 use axum::{
     Json,
     extract::rejection::JsonRejection,
@@ -16,12 +8,20 @@ use hyper::header::InvalidHeaderValue;
 use quick_xml::SeError;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
+use std::error::Error;
 use tracing::error;
 use utoipa::ToSchema;
 use zip::result::ZipError;
 
+use crate::{
+    apportionment::ApportionmentError,
+    authentication::error::AuthenticationError,
+    data_entry::{DataError, status::DataEntryTransitionError},
+    pdf_gen::PdfGenError,
+};
+
 /// Error reference used to show the corresponding error message to the end-user
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, ToSchema, PartialEq, Eq, Debug)]
 pub enum ErrorReference {
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
@@ -57,7 +57,7 @@ pub enum ErrorReference {
 }
 
 /// Response structure for errors
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[derive(Serialize, Deserialize, Clone, ToSchema, Debug)]
 pub struct ErrorResponse {
     pub error: String,
     pub fatal: bool,
@@ -101,7 +101,7 @@ impl IntoResponse for APIError {
             }
         }
 
-        let (status, response) = match self {
+        let (status, error_response) = match self {
             APIError::BadRequest(message, reference) => {
                 (StatusCode::BAD_REQUEST, to_error(&message, reference, true))
             }
@@ -189,7 +189,10 @@ impl IntoResponse for APIError {
                 )
             }
             APIError::Authentication(err) => {
-                error!("Authentication error: {:?}", err);
+                // note that we don't log the UserNotFound error, as it is triggered for every whoami call
+                if !matches!(err, AuthenticationError::UserNotFound) {
+                    error!("Authentication error: {:?}", err);
+                }
 
                 match err {
                     // client errors
@@ -291,7 +294,10 @@ impl IntoResponse for APIError {
             }
         };
 
-        (status, response).into_response()
+        let mut response = (status, error_response.clone()).into_response();
+        response.extensions_mut().insert(error_response);
+
+        response
     }
 }
 

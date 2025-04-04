@@ -1,12 +1,7 @@
 import { expect } from "@playwright/test";
 import { createTestModel } from "@xstate/graph";
-import {
-  AbortInputModal,
-  DifferencesPage,
-  PollingStationChoicePage,
-  RecountedPage,
-  VotersAndVotesPage,
-} from "e2e-tests/page-objects/data_entry";
+import { AbortInputModal, DifferencesPage, RecountedPage, VotersAndVotesPage } from "e2e-tests/page-objects/data_entry";
+import { DataEntryChoicePage } from "e2e-tests/page-objects/data_entry_choice/DataEntryChoicePgObj";
 import { createMachine } from "xstate";
 
 import { VotersCounts, VotesCounts } from "@kiesraad/api";
@@ -177,7 +172,7 @@ test.describe("Data entry model test - valid data", () => {
     .forEach((path) => {
       // eslint-disable-next-line playwright/valid-title
       test(path.description, async ({ page, pollingStation, election }) => {
-        const pollingStationChoicePage = new PollingStationChoicePage(page);
+        const dataEntryChoicePage = new DataEntryChoicePage(page);
         const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
@@ -185,24 +180,24 @@ test.describe("Data entry model test - valid data", () => {
 
         const pollingStationsPageStates = {
           pollingStationsPageDiscarded: async () => {
-            await expect(pollingStationChoicePage.fieldset).toBeVisible();
-            await expect(pollingStationChoicePage.alertDataEntryInProgress).toBeHidden();
+            await expect(dataEntryChoicePage.fieldset).toBeVisible();
+            await expect(dataEntryChoicePage.alertDataEntryInProgress).toBeHidden();
           },
           pollingStationsPageEmptySaved: async () => {
-            await expect(pollingStationChoicePage.fieldset).toBeVisible();
-            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
+            await expect(dataEntryChoicePage.fieldset).toBeVisible();
+            await expect(dataEntryChoicePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
           pollingStationsPageFilledSaved: async () => {
-            await expect(pollingStationChoicePage.fieldset).toBeVisible();
-            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
+            await expect(dataEntryChoicePage.fieldset).toBeVisible();
+            await expect(dataEntryChoicePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
           pollingStationsPageChangedSaved: async () => {
-            await expect(pollingStationChoicePage.fieldset).toBeVisible();
-            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
+            await expect(dataEntryChoicePage.fieldset).toBeVisible();
+            await expect(dataEntryChoicePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
@@ -210,7 +205,7 @@ test.describe("Data entry model test - valid data", () => {
 
         const PollingStationsPageEvents = {
           RESUME_DATA_ENTRY: async () => {
-            await pollingStationChoicePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
+            await dataEntryChoicePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
           },
         };
 
@@ -369,7 +364,7 @@ test.describe("Data entry model test - valid data", () => {
         expect(new Set(events)).toEqual(new Set(machineEvents));
 
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
-        await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation);
+        await dataEntryChoicePage.selectPollingStationAndClickStart(pollingStation);
         await recountedPage.checkNoAndClickNext();
 
         type MachineStates = typeof dataEntryMachineDefinition.states;

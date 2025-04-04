@@ -213,7 +213,7 @@ async function abortDelete() {
   await user.click(screen.getByRole("button", { name: "Niet bewaren" }));
 }
 
-async function expectPollingStationChoicePage(router: Router) {
+async function expectDataEntryChoicePage(router: Router) {
   await waitFor(() => {
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
   });
@@ -595,7 +595,7 @@ describe("Polling Station data entry integration tests", () => {
       await executeStepsForPendingChanges(router);
       await abortDataEntry();
       await abortSaveChanges();
-      await expectPollingStationChoicePage(router);
+      await expectDataEntryChoicePage(router);
     });
 
     test("Abort and delete with pending changes is possible", async () => {
@@ -603,7 +603,7 @@ describe("Polling Station data entry integration tests", () => {
       await executeStepsForPendingChanges(router);
       await abortDataEntry();
       await abortDelete();
-      await expectPollingStationChoicePage(router);
+      await expectDataEntryChoicePage(router);
     });
   });
 

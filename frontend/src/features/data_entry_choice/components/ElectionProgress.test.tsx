@@ -5,7 +5,7 @@ import { useElectionStatus } from "@/api";
 
 import { ElectionProgress } from "./ElectionProgress";
 
-vi.mock("@kiesraad/api", () => {
+vi.mock("@/api", () => {
   return {
     useElectionStatus: vi.fn(),
   };

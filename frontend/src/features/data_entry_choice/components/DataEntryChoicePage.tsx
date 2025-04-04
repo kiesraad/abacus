@@ -6,10 +6,10 @@ import { Footer } from "@/components/footer/Footer";
 import { Alert, PageTitle } from "@/components/ui";
 import { t } from "@/lib/i18n";
 
+import { DataEntryChoiceForm } from "./DataEntryChoiceForm";
 import { ElectionProgress } from "./ElectionProgress";
-import { PollingStationChoiceForm } from "./polling_station_choice/PollingStationChoiceForm";
 
-export function DataEntryHomePage() {
+export function DataEntryChoicePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { election } = useElection();
@@ -66,7 +66,7 @@ export function DataEntryHomePage() {
       )}
       <main>
         <article id="polling-station-choice-form">
-          <PollingStationChoiceForm anotherEntry={dataEntryDone} />
+          <DataEntryChoiceForm anotherEntry={dataEntryDone} />
         </article>
         <ElectionProgress />
       </main>

@@ -5,7 +5,7 @@ import { t, tx } from "@/lib/i18n";
 import { IconError, IconWarning } from "@/lib/icon";
 import { cn, removeLeadingZeros } from "@/lib/util";
 
-import cls from "./PollingStationChoice.module.css";
+import cls from "./DataEntryChoice.module.css";
 import { PollingStationUserStatus, PollingStationWithStatus } from "./util";
 
 export interface PollingStationSelectorProps {

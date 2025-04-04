@@ -7,8 +7,8 @@ import { t, tx } from "@/lib/i18n";
 import { IconError } from "@/lib/icon";
 import { cn, getUrlForDataEntry, parseIntUserInput } from "@/lib/util";
 
-import { useDebouncedCallback } from "../../hooks/useDebouncedCallback";
-import cls from "./PollingStationChoice.module.css";
+import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
+import cls from "./DataEntryChoice.module.css";
 import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationSelector } from "./PollingStationSelector";
 import { PollingStationsList } from "./PollingStationsList";
@@ -21,14 +21,14 @@ import {
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
 
-export interface PollingStationChoiceFormProps {
+export interface DataEntryChoiceFormProps {
   anotherEntry?: boolean;
 }
 
 const INVALID_POLLING_STATION_ALERT: string = t("polling_station_choice.enter_a_valid_number_to_start");
 const DEFINITIVE_POLLING_STATION_ALERT: string = t("polling_station_choice.polling_station_entry_not_possible");
 
-export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
+export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) {
   const navigate = useNavigate();
   const user = useUser();
 
@@ -170,7 +170,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           </BottomBar.Row>
         </BottomBar>
       </fieldset>
-      <div className={cls.pollingStationList}>
+      <div className={cls.dataEntryList}>
         <details>
           <summary>
             {t("polling_station_choice.unknown_number")}

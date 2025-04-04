@@ -105,6 +105,9 @@ components:
   - name: "(Frontend) Modules/data_entry"
     include:
       - ".*/frontend/src/features/data_entry/.*"
+  - name: "(Frontend) Modules/data_entry_choice"
+    include:
+      - ".*/frontend/src/features/data_entry_choice/.*"
   - name: "(Frontend) Modules/election_management"
     include:
       - ".*/frontend/src/features/election_management/.*"

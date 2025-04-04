@@ -61,7 +61,7 @@
   }
 }
 
-.polling-station-list {
+.data-entry-list {
   details[open] {
     summary {
       display: none;

@@ -3,7 +3,6 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse, LoginResponse, useUser } from "@/api";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
 import { overrideOnce, Providers, render, screen, server, setupTestRouter, within } from "@/testing";
@@ -14,9 +13,17 @@ import {
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks";
 
-import { DataEntryHomePage } from "./DataEntryHomePage";
+import {
+  ElectionProvider,
+  ElectionStatusProvider,
+  ElectionStatusResponse,
+  LoginResponse,
+  useUser,
+} from "@kiesraad/api";
 
-vi.mock("../../../api/useUser");
+import { DataEntryChoicePage } from "./DataEntryChoicePage";
+
+vi.mock("@/api/useUser");
 
 const testUser: LoginResponse = {
   username: "test-user-1",
@@ -29,7 +36,7 @@ const renderDataEntryHomePage = () =>
   render(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
-        <DataEntryHomePage />
+        <DataEntryChoicePage />
       </ElectionStatusProvider>
     </ElectionProvider>,
   );

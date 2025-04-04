@@ -15,11 +15,11 @@ import { ApportionmentFullSeatsPage } from "@/features/apportionment/components/
 import { ApportionmentResidualSeatsPage } from "@/features/apportionment/components/residual_seats/ApportionmentResidualSeatsPage";
 import { CandidatesVotesPage } from "@/features/data_entry/components/candidates_votes/CandidatesVotesPage";
 import { CheckAndSavePage } from "@/features/data_entry/components/check_and_save/CheckAndSavePage";
-import { DataEntryHomePage } from "@/features/data_entry/components/DataEntryHomePage";
 import { DataEntryLayout } from "@/features/data_entry/components/DataEntryLayout";
 import { DifferencesPage } from "@/features/data_entry/components/differences/DifferencesPage";
 import { RecountedPage } from "@/features/data_entry/components/recounted/RecountedPage";
 import { VotersAndVotesPage } from "@/features/data_entry/components/voters_and_votes/VotersAndVotesPage";
+import { DataEntryChoicePage } from "@/features/data_entry_choice/components/DataEntryChoicePage";
 import { ElectionCreatePage } from "@/features/election_management/components";
 import { ElectionHomePage } from "@/features/election_management/components/ElectionHomePage";
 import { ElectionReportPage } from "@/features/election_management/components/ElectionReportPage";
@@ -81,7 +81,7 @@ export const routes = createRoutesFromElements(
           <Route path=":pollingStationId/update" element={<PollingStationUpdatePage />} />
         </Route>
         <Route path="data-entry" element={null}>
-          <Route index element={<DataEntryHomePage />} />
+          <Route index element={<DataEntryChoicePage />} />
           <Route path=":pollingStationId/:entryNumber" element={<DataEntryLayout />}>
             <Route index element={null} />
             <Route path="recounted" element={<RecountedPage />} />

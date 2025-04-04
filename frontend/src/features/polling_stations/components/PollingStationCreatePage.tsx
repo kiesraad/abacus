@@ -2,8 +2,9 @@ import { useNavigate } from "react-router";
 
 import { PollingStation, useElection } from "@/api";
 import { PageTitle } from "@/components/ui";
-import { PollingStationForm } from "@/features/polling_stations/components/PollingStationForm";
 import { t } from "@/lib/i18n";
+
+import { PollingStationForm } from "./PollingStationForm";
 
 export function PollingStationCreatePage() {
   const { election } = useElection();

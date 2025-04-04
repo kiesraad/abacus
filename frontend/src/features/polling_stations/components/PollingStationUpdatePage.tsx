@@ -3,13 +3,13 @@ import { useNavigate } from "react-router";
 
 import { useElection } from "@/api";
 import { Alert, Button, Loader, PageTitle } from "@/components/ui";
-import { PollingStationForm } from "@/features/polling_stations/components/PollingStationForm";
 import { t } from "@/lib/i18n";
 import { IconTrash } from "@/lib/icon";
 import { useNumericParam } from "@/lib/util";
 
 import { usePollingStationGet } from "../hooks/usePollingStationGet";
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";
+import { PollingStationForm } from "./PollingStationForm";
 
 export function PollingStationUpdatePage() {
   const pollingStationId = useNumericParam("pollingStationId");

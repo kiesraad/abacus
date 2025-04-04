@@ -7,15 +7,11 @@ import { cn } from "@kiesraad/util";
 import { getFractionInteger, getFractionWithoutInteger } from "../util";
 import cls from "./Table.module.css";
 
-export interface TableProps {
-  id?: string;
-  children?: React.ReactNode;
-  className?: string;
-}
+export type TableProps = React.TableHTMLAttributes<HTMLTableElement>;
 
-export function Table({ id, children, className }: TableProps) {
+export function Table({ children, className, ...props }: TableProps) {
   return (
-    <table id={id} className={cn(cls.table, className)}>
+    <table className={cn(cls.table, className)} {...props}>
       {children}
     </table>
   );

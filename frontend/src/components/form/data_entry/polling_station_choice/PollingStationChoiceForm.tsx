@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
-import { DataEntryStatusName, PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
+import { useElection, useElectionStatus, useUser } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
@@ -11,6 +11,12 @@ import cls from "./PollingStationChoiceForm.module.css";
 import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationSelector } from "./PollingStationSelector";
 import { PollingStationsList } from "./PollingStationsList";
+import {
+  dataEntryFinished,
+  getPollingStationWithStatusList,
+  PollingStationUserStatus,
+  PollingStationWithStatus,
+} from "./util";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
 
@@ -23,15 +29,24 @@ const DEFINITIVE_POLLING_STATION_ALERT: string = t("polling_station_choice.polli
 
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
+  const user = useUser();
 
   const { election, pollingStations } = useElection();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
-  const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(undefined);
+  const [currentPollingStation, setCurrentPollingStation] = useState<PollingStationWithStatus | undefined>(undefined);
   const electionStatus = useElectionStatus();
 
-  const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
+  const pollingStationsWithStatus = useMemo(() => {
+    return getPollingStationWithStatusList({
+      pollingStations,
+      statuses: electionStatus.statuses,
+      user,
+    });
+  }, [electionStatus, pollingStations, user]);
+
+  const debouncedCallback = useDebouncedCallback((pollingStation: PollingStationWithStatus | undefined) => {
     setLoading(false);
     setCurrentPollingStation(pollingStation);
   }, USER_INPUT_DEBOUNCE);
@@ -39,8 +54,8 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   useMemo(() => {
     const parsedInt = parseIntUserInput(pollingStationNumber);
     setLoading(true);
-    debouncedCallback(pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt));
-  }, [pollingStationNumber, pollingStations, debouncedCallback]);
+    debouncedCallback(pollingStationsWithStatus.find((pollingStation) => pollingStation.number === parsedInt));
+  }, [pollingStationNumber, pollingStationsWithStatus, debouncedCallback]);
 
   const handleSubmit = () => {
     if (pollingStationNumber === "") {
@@ -49,38 +64,49 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     }
 
     const parsedStationNumber = parseIntUserInput(pollingStationNumber);
-    const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const pollingStationStatus = electionStatus.statuses.find(
-      (status) => status.polling_station_id === pollingStation?.id,
-    )?.status;
-    const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
+    const pollingStation = pollingStationsWithStatus.find(
+      (pollingStation) => pollingStation.number === parsedStationNumber,
+    );
 
-    if (pollingStationStatus && firstAndSecondEntryFinished.includes(pollingStationStatus)) {
+    if (!pollingStation) {
+      setAlert(INVALID_POLLING_STATION_ALERT);
+      setLoading(false);
+      return;
+    }
+
+    if (pollingStation.userStatus === PollingStationUserStatus.Finished) {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
       setLoading(false);
       return;
     }
 
-    if (pollingStation) {
-      void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
-    } else {
-      setAlert(INVALID_POLLING_STATION_ALERT);
+    if (pollingStation.userStatus === PollingStationUserStatus.InProgressOtherUser) {
+      setAlert(
+        t("polling_station_choice.polling_station_in_progress_different_user", {
+          nr: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      );
       setLoading(false);
       return;
     }
+
+    void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStation.statusEntry?.status));
   };
 
-  const unfinished = electionStatus.statuses
-    .filter((status) => ["first_entry_in_progress", "second_entry_in_progress"].includes(status.status))
-    .map((status) => ({
-      pollingStation: pollingStations.find((ps) => ps.id === status.polling_station_id),
-      status: status.status,
-    }));
+  const pollingStationsForDataEntry = pollingStationsWithStatus.filter(
+    (pollingStation) => pollingStation.statusEntry && !dataEntryFinished.includes(pollingStation.statusEntry.status),
+  );
+  const pollingStationsForDataEntryCurrentUser = pollingStationsForDataEntry.filter(
+    (pollingStation) => pollingStation.userStatus !== PollingStationUserStatus.InProgressOtherUser,
+  );
+  const inProgressCurrentUser = pollingStationsForDataEntryCurrentUser.filter(
+    (pollingStation) => pollingStation.userStatus === PollingStationUserStatus.InProgressCurrentUser,
+  );
 
-  const pollingStationsForDataEntry = pollingStations.filter((pollingStation: PollingStation) => {
-    const status = electionStatus.statuses.find((status) => status.polling_station_id === pollingStation.id)?.status;
-    return status !== "definitive" && status !== "entries_different";
-  });
+  if (!user) {
+    return <Navigate to="/account/login" />;
+  }
 
   return (
     <form
@@ -89,16 +115,20 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         return;
       }}
     >
-      {unfinished.length > 0 && (
-        <div className="mb-lg">
+      {inProgressCurrentUser.length > 0 && (
+        <div className="mb-lg" id="unfinished-list">
           <Alert type="notify" variant="no-icon">
             <h2>{t("polling_station_choice.unfinished_input_title")}</h2>
             <p>{t("polling_station_choice.unfinished_input_content")}</p>
-            {unfinished.map(({ pollingStation, status }) => {
-              return pollingStation === undefined ? null : (
-                <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} status={status} />
-              );
-            })}
+            {inProgressCurrentUser.map((pollingStation) =>
+              pollingStation.statusEntry?.status ? (
+                <PollingStationLink
+                  key={pollingStation.id}
+                  pollingStation={pollingStation}
+                  status={pollingStation.statusEntry.status}
+                />
+              ) : null,
+            )}
           </Alert>
         </div>
       )}
@@ -112,7 +142,6 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           loading={loading}
           setLoading={setLoading}
           currentPollingStation={currentPollingStation}
-          setCurrentPollingStation={setCurrentPollingStation}
           setAlert={setAlert}
           handleSubmit={handleSubmit}
         />
@@ -159,7 +188,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
               <p>{t("polling_station_choice.all_polling_stations_filled_in_twice")}</p>
             </Alert>
           ) : (
-            <PollingStationsList pollingStations={pollingStationsForDataEntry} />
+            <PollingStationsList pollingStations={pollingStationsForDataEntryCurrentUser} />
           )}
         </details>
       </div>

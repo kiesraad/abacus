@@ -1,13 +1,26 @@
 import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { PollingStationChoiceForm } from "@/components/form/data_entry/polling_station_choice/PollingStationChoiceForm";
-import { electionDetailsMockResponse, ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks";
+import {
+  electionDetailsMockResponse,
+  ElectionRequestHandler,
+  ElectionStatusRequestHandler,
+  pollingStationMockData,
+} from "@/testing/api-mocks";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 
-import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
+import {
+  ElectionProvider,
+  ElectionStatusProvider,
+  ElectionStatusResponse,
+  LoginResponse,
+  useUser,
+} from "@kiesraad/api";
 import { overrideOnce, render, renderReturningRouter, screen, server, within } from "@kiesraad/test";
+
+vi.mock("../../../../api/useUser");
 
 function renderPollingStationChoicePage() {
   return renderReturningRouter(
@@ -19,8 +32,17 @@ function renderPollingStationChoicePage() {
   );
 }
 
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
+};
+
 describe("Test PollingStationChoiceForm", () => {
   beforeEach(() => {
+    // mock a current logged in user
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(ElectionStatusRequestHandler);
   });
   describe("Polling station choice form", () => {
@@ -277,6 +299,26 @@ describe("Test PollingStationChoiceForm", () => {
       expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
     });
 
+    test("Show polling station list for current user only", async () => {
+      server.use(ElectionRequestHandler);
+      const testPollingStation = pollingStationMockData[0]!;
+      overrideOnce("get", "api/elections/1/status", 200, {
+        statuses: [
+          {
+            polling_station_id: testPollingStation.id,
+            status: "first_entry_in_progress",
+            first_entry_user_id: testUser.user_id + 1,
+            first_entry_progress: 42,
+          },
+        ],
+      } satisfies ElectionStatusResponse);
+
+      renderPollingStationChoicePage();
+
+      const pollingStationList = await screen.findByTestId("polling_station_list");
+      expect(pollingStationList).not.toHaveTextContent(testPollingStation.name);
+    });
+
     test("All data entries of polling stations are finished, polling station list shows message", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       overrideOnce("get", "/api/elections/1/status", 200, {
@@ -371,5 +413,106 @@ describe("Test PollingStationChoiceForm", () => {
       const pollingStations = await within(alert).findAllByRole("link");
       expect(pollingStations.map((ps) => ps.textContent)).toEqual(["34 - Testplek", "35 - Testschool"]);
     });
+
+    test("Show polling stations as 'in progress' with different users", async () => {
+      const testPollingStation = pollingStationMockData[0]!;
+
+      server.use(ElectionRequestHandler);
+
+      // Have the server return an in progress polling station that is owned by a different user.
+      overrideOnce("get", "api/elections/1/status", 200, {
+        statuses: [
+          {
+            polling_station_id: testPollingStation.id,
+            status: "first_entry_in_progress",
+            first_entry_user_id: testUser.user_id + 1,
+            first_entry_progress: 42,
+          },
+        ],
+      } satisfies ElectionStatusResponse);
+
+      // Render the polling station choice page with the overridden server responses
+      renderPollingStationChoicePage();
+
+      // Search for polling station 2
+      const user = userEvent.setup();
+      const pollingStation = await screen.findByTestId("pollingStation");
+
+      await user.type(pollingStation, `${testPollingStation.number}`);
+
+      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      expect(
+        await within(pollingStationFeedback).findByText(
+          `Een andere invoerder is bezig met stembureau ${testPollingStation.number}`,
+        ),
+      ).toBeVisible();
+
+      const submitButton = await screen.findByRole("button", { name: "Beginnen" });
+
+      // Click submit and see that the alert appears
+      await user.click(submitButton);
+
+      // Test if the warning message is shown correctly
+      await waitFor(() => {
+        expect(screen.getByTestId("pollingStationSubmitFeedback").textContent).toBe(
+          `Een andere invoerder is bezig met stembureau ${testPollingStation.number} (${testPollingStation.name})`,
+        );
+      });
+    });
+
+    test("Show in progress for current user", async () => {
+      const testPollingStation = pollingStationMockData[0]!;
+
+      server.use(ElectionRequestHandler);
+
+      // Have the server return an in progress polling station that is owned by a logged-in user.
+      overrideOnce("get", "api/elections/1/status", 200, {
+        statuses: [
+          {
+            polling_station_id: testPollingStation.id,
+            status: "first_entry_in_progress",
+            first_entry_user_id: testUser.user_id,
+            first_entry_progress: 42,
+          },
+        ],
+      } satisfies ElectionStatusResponse);
+
+      // Render the polling station choice page with the overridden server responses
+      renderPollingStationChoicePage();
+
+      // Search for polling station 2
+      const user = userEvent.setup();
+      const pollingStation = await screen.findByTestId("pollingStation");
+
+      await user.type(pollingStation, `${testPollingStation.number}`);
+
+      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      expect(await within(pollingStationFeedback).findByText(testPollingStation.name)).toBeVisible();
+
+      expect(within(pollingStationFeedback).getByRole("img")).toHaveAttribute("data-icon", "IconPencil");
+    });
+  });
+
+  test("Show unfinished data entries for current user", async () => {
+    server.use(ElectionRequestHandler);
+    const testPollingStation = pollingStationMockData[0]!;
+    // Have the server return an in progress polling station that is owned by a logged-in user.
+    overrideOnce("get", "api/elections/1/status", 200, {
+      statuses: [
+        {
+          polling_station_id: testPollingStation.id,
+          status: "first_entry_in_progress",
+          first_entry_user_id: testUser.user_id,
+          first_entry_progress: 42,
+        },
+      ],
+    } satisfies ElectionStatusResponse);
+
+    renderPollingStationChoicePage();
+
+    const list = await screen.findByTestId("unfinished-list");
+    expect(list).toBeVisible();
+
+    expect(within(list).getByRole("link")).toHaveTextContent(testPollingStation.name);
   });
 });

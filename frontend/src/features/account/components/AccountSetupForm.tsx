@@ -8,9 +8,9 @@ import {
   isSuccess,
   LoginResponse,
   useCrud,
-} from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { Alert, BottomBar, Button, Form, FormLayout, InputField } from "@kiesraad/ui";
+} from "@/api";
+import { Alert, BottomBar, Button, Form, FormLayout, InputField } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
 type ValidationErrors = {
   fullname?: string;

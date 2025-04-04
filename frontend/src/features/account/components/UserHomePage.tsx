@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
-import { t } from "@kiesraad/i18n";
-import { PageTitle } from "@kiesraad/ui";
+import { PageTitle } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
 export function UserHomePage() {
   return (

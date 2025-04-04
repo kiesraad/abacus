@@ -2,9 +2,9 @@ import { within } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { LoginResponse } from "@kiesraad/api";
-import { AccountUpdateRequestHandler, loginResponseMockData } from "@kiesraad/api-mocks";
-import { render, screen, server, spyOnHandler } from "@kiesraad/test";
+import { LoginResponse } from "@/api";
+import { render, screen, server, spyOnHandler } from "@/testing";
+import { AccountUpdateRequestHandler, loginResponseMockData } from "@/testing/api-mocks";
 
 import { AccountSetupForm } from "./AccountSetupForm";
 

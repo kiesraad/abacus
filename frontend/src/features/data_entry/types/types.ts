@@ -1,8 +1,9 @@
 import { Dispatch } from "react";
 
+import { FormSectionId } from "@/types/types";
+
 import { AnyApiError, ClaimDataEntryResponse, Election, PollingStationResults, ValidationResults } from "@kiesraad/api";
 
-import { FormSectionId } from "../../../types/types";
 import { ValidationResultSet } from "../stores/ValidationResults";
 
 export interface DataEntryState {

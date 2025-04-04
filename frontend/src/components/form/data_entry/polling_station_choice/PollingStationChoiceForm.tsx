@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 import { useElection, useElectionStatus, useUser } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
@@ -105,7 +105,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   );
 
   if (!user) {
-    return <div>Unauthenticated</div>;
+    return <Navigate to="/account/login" />;
   }
 
   return (

@@ -3,23 +3,16 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
+import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse, LoginResponse, useUser } from "@/api";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
-
-import {
-  ElectionProvider,
-  ElectionStatusProvider,
-  ElectionStatusResponse,
-  LoginResponse,
-  useUser,
-} from "@kiesraad/api";
+import { overrideOnce, Providers, render, screen, server, setupTestRouter, within } from "@/testing";
 import {
   electionDetailsMockResponse,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-} from "@kiesraad/api-mocks";
-import { overrideOnce, Providers, render, screen, server, setupTestRouter, within } from "@kiesraad/test";
+} from "@/testing/api-mocks";
 
 import { DataEntryHomePage } from "./DataEntryHomePage";
 

@@ -1,14 +1,13 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
+import { DEFAULT_CANCEL_REASON, useElection, useElectionStatus } from "@/api";
 import { Footer } from "@/components/footer/Footer";
-import { PollingStationChoiceForm } from "@/components/form/data_entry/polling_station_choice/PollingStationChoiceForm";
-
-import { DEFAULT_CANCEL_REASON, useElection, useElectionStatus } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { Alert, PageTitle } from "@kiesraad/ui";
+import { Alert, PageTitle } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
 import { ElectionProgress } from "./ElectionProgress";
+import { PollingStationChoiceForm } from "./polling_station_choice/PollingStationChoiceForm";
 
 export function DataEntryHomePage() {
   const navigate = useNavigate();

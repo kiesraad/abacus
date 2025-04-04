@@ -1,8 +1,8 @@
 import { Fragment, useId } from "react";
 
-import cls from "@/features/resolve_differences/components/ResolveDifferences.module.css";
+import { Table } from "@/components/ui";
 
-import { Table } from "@kiesraad/ui";
+import cls from "./ResolveDifferences.module.css";
 
 interface DifferencesTableProps {
   title: string;

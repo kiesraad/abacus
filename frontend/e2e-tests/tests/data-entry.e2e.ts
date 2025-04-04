@@ -9,6 +9,7 @@ import {
   RecountedPage,
   VotersAndVotesPage,
 } from "e2e-tests/page-objects/data_entry";
+import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 
 import { VotersCounts, VotesCounts } from "@kiesraad/api";
 
@@ -811,5 +812,95 @@ test.describe("navigation", () => {
       await checkAndSavePage.navPanel.list(1).click();
       await expect(candidatesListPage_1.navPanel.checkAndSaveIcon).toHaveAccessibleName("nog niet afgerond");
     });
+  });
+});
+
+test.describe("api error responses", () => {
+  test("4xx response results in error shown", async ({ page, pollingStation }) => {
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkNoAndClickNext();
+
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
+    const voters: VotersCounts = {
+      poll_card_count: 99,
+      proxy_certificate_count: 1,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
+    };
+    const votes: VotesCounts = {
+      votes_candidates_count: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
+    };
+    await votersAndVotesPage.inputVotersCounts(voters);
+    await votersAndVotesPage.inputVotesCounts(votes);
+
+    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1`, async (route) => {
+      await route.fulfill({
+        status: 422,
+        json: {
+          error: "JSON error or invalid data (Unprocessable Content)",
+          fatal: false,
+          reference: "InvalidJson",
+        },
+      });
+    });
+    await votersAndVotesPage.next.click();
+
+    const errorModal = new ErrorModalPgObj(page);
+    await expect(errorModal.dialog).toBeVisible();
+    await expect(errorModal.title).toHaveText("Sorry, er ging iets mis");
+    await expect(errorModal.text).toHaveText("De JSON is niet geldig");
+
+    await errorModal.close.click();
+    await expect(errorModal.dialog).toBeHidden();
+  });
+
+  test("5xx response results in error shown", async ({ page, pollingStation }) => {
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkNoAndClickNext();
+
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
+    const voters: VotersCounts = {
+      poll_card_count: 99,
+      proxy_certificate_count: 1,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
+    };
+    const votes: VotesCounts = {
+      votes_candidates_count: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
+    };
+    await votersAndVotesPage.inputVotersCounts(voters);
+    await votersAndVotesPage.inputVotesCounts(votes);
+
+    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1`, async (route) => {
+      await route.fulfill({
+        status: 500,
+        json: {
+          error: "Internal server error",
+          fatal: false,
+          reference: "InternalServerError",
+        },
+      });
+    });
+    await votersAndVotesPage.next.click();
+
+    const errorModal = new ErrorModalPgObj(page);
+    await expect(errorModal.dialog).toBeVisible();
+    await expect(errorModal.title).toHaveText("Sorry, er ging iets mis");
+    await expect(errorModal.text).toHaveText("Er is een interne fout opgetreden");
+
+    await errorModal.close.click();
+    await expect(errorModal.dialog).toBeHidden();
   });
 });

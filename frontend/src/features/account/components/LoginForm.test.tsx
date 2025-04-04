@@ -1,9 +1,9 @@
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { LOGIN_REQUEST_PATH, LoginResponse } from "@kiesraad/api";
-import { LoginHandler } from "@kiesraad/api-mocks";
-import { overrideOnce, render, screen, server, spyOnHandler, waitFor } from "@kiesraad/test";
+import { LOGIN_REQUEST_PATH, LoginResponse } from "@/api";
+import { overrideOnce, render, screen, server, spyOnHandler, waitFor } from "@/testing";
+import { LoginHandler } from "@/testing/api-mocks";
 
 import { LoginForm } from "./LoginForm";
 

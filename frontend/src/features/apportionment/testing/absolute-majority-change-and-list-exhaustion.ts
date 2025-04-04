@@ -594,14 +594,107 @@ export const seat_assignment: SeatAssignmentResult = {
       ],
     },
     {
+      change: {
+        changed_by: "ListExhaustionRemoval",
+        pg_retracted_seat: 1,
+      },
+      standings: [
+        {
+          pg_number: 1,
+          votes_cast: 2571,
+          remainder_votes: {
+            integer: 189,
+            numerator: 2,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 321,
+            numerator: 3,
+            denominator: 8,
+          },
+          full_seats: 5,
+          residual_seats: 0,
+        },
+        {
+          pg_number: 2,
+          votes_cast: 977,
+          remainder_votes: {
+            integer: 296,
+            numerator: 7,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 244,
+            numerator: 1,
+            denominator: 4,
+          },
+          full_seats: 2,
+          residual_seats: 1,
+        },
+        {
+          pg_number: 3,
+          votes_cast: 567,
+          remainder_votes: {
+            integer: 226,
+            numerator: 11,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 189,
+            numerator: 0,
+            denominator: 3,
+          },
+          full_seats: 1,
+          residual_seats: 1,
+        },
+        {
+          pg_number: 4,
+          votes_cast: 536,
+          remainder_votes: {
+            integer: 195,
+            numerator: 11,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 178,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+        {
+          pg_number: 5,
+          votes_cast: 453,
+          remainder_votes: {
+            integer: 112,
+            numerator: 11,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 226,
+            numerator: 1,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+      ],
+    },
+    {
       residual_seat_number: 4,
       change: {
         changed_by: "LargestRemainderAssignment",
-        selected_pg_number: 5,
-        pg_options: [5],
-        pg_assigned: [5],
+        selected_pg_number: 4,
+        pg_options: [4],
+        pg_assigned: [4],
         remainder_votes: {
-          integer: 112,
+          integer: 195,
           numerator: 11,
           denominator: 15,
         },
@@ -621,7 +714,7 @@ export const seat_assignment: SeatAssignmentResult = {
             numerator: 3,
             denominator: 8,
           },
-          full_seats: 6,
+          full_seats: 5,
           residual_seats: 0,
         },
         {
@@ -697,14 +790,14 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       residual_seat_number: 5,
       change: {
-        changed_by: "HighestAverageAssignment",
-        selected_pg_number: 2,
-        pg_options: [2],
-        pg_assigned: [2],
-        votes_per_seat: {
-          integer: 244,
-          numerator: 1,
-          denominator: 4,
+        changed_by: "LargestRemainderAssignment",
+        selected_pg_number: 5,
+        pg_options: [5],
+        pg_assigned: [5],
+        remainder_votes: {
+          integer: 112,
+          numerator: 11,
+          denominator: 15,
         },
       },
       standings: [
@@ -722,7 +815,7 @@ export const seat_assignment: SeatAssignmentResult = {
             numerator: 3,
             denominator: 8,
           },
-          full_seats: 6,
+          full_seats: 5,
           residual_seats: 0,
         },
         {
@@ -774,7 +867,108 @@ export const seat_assignment: SeatAssignmentResult = {
             denominator: 3,
           },
           full_seats: 1,
+          residual_seats: 1,
+        },
+        {
+          pg_number: 5,
+          votes_cast: 453,
+          remainder_votes: {
+            integer: 112,
+            numerator: 11,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 226,
+            numerator: 1,
+            denominator: 2,
+          },
+          full_seats: 1,
           residual_seats: 0,
+        },
+      ],
+    },
+    {
+      residual_seat_number: 6,
+      change: {
+        changed_by: "HighestAverageAssignment",
+        selected_pg_number: 2,
+        pg_options: [2],
+        pg_assigned: [2],
+        votes_per_seat: {
+          integer: 244,
+          numerator: 1,
+          denominator: 4,
+        },
+      },
+      standings: [
+        {
+          pg_number: 1,
+          votes_cast: 2571,
+          remainder_votes: {
+            integer: 189,
+            numerator: 2,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 321,
+            numerator: 3,
+            denominator: 8,
+          },
+          full_seats: 5,
+          residual_seats: 0,
+        },
+        {
+          pg_number: 2,
+          votes_cast: 977,
+          remainder_votes: {
+            integer: 296,
+            numerator: 7,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 244,
+            numerator: 1,
+            denominator: 4,
+          },
+          full_seats: 2,
+          residual_seats: 1,
+        },
+        {
+          pg_number: 3,
+          votes_cast: 567,
+          remainder_votes: {
+            integer: 226,
+            numerator: 11,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 189,
+            numerator: 0,
+            denominator: 3,
+          },
+          full_seats: 1,
+          residual_seats: 1,
+        },
+        {
+          pg_number: 4,
+          votes_cast: 536,
+          remainder_votes: {
+            integer: 195,
+            numerator: 11,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 178,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 1,
+          residual_seats: 1,
         },
         {
           pg_number: 5,
@@ -806,9 +1000,9 @@ export const seat_assignment: SeatAssignmentResult = {
         denominator: 15,
       },
       meets_remainder_threshold: true,
-      full_seats: 6,
+      full_seats: 5,
       residual_seats: 0,
-      total_seats: 6,
+      total_seats: 5,
     },
     {
       pg_number: 2,
@@ -846,8 +1040,8 @@ export const seat_assignment: SeatAssignmentResult = {
       },
       meets_remainder_threshold: true,
       full_seats: 1,
-      residual_seats: 0,
-      total_seats: 1,
+      residual_seats: 1,
+      total_seats: 2,
     },
     {
       pg_number: 5,
@@ -899,6 +1093,14 @@ export const candidate_nomination: CandidateNominationResult = {
       last_name: "Hekking",
       locality: "Test Location",
       gender: "Male",
+    },
+    {
+      number: 2,
+      initials: "H.",
+      first_name: "Henny",
+      last_name: "Hekking",
+      locality: "Test Location",
+      gender: "Female",
     },
     {
       number: 1,
@@ -989,20 +1191,12 @@ export const candidate_nomination: CandidateNominationResult = {
       locality: "Test Location",
       gender: "Male",
     },
-    {
-      number: 6,
-      initials: "B.",
-      first_name: "Berta",
-      last_name_prefix: "van der",
-      last_name: "Weijden",
-      locality: "Test Location",
-    },
   ],
   political_group_candidate_nomination: [
     {
       pg_number: 1,
       pg_name: "Political Group A",
-      pg_seats: 6,
+      pg_seats: 5,
       preferential_candidate_nomination: [
         {
           number: 1,
@@ -1017,20 +1211,15 @@ export const candidate_nomination: CandidateNominationResult = {
           votes: 403,
         },
         {
+          number: 5,
+          votes: 368,
+        },
+        {
           number: 4,
           votes: 310,
         },
-        {
-          number: 6,
-          votes: 232,
-        },
       ],
-      other_candidate_nomination: [
-        {
-          number: 5,
-          votes: 136,
-        },
-      ],
+      other_candidate_nomination: [],
       updated_candidate_ranking: [
         {
           number: 1,
@@ -1057,22 +1246,6 @@ export const candidate_nomination: CandidateNominationResult = {
           gender: "Male",
         },
         {
-          number: 4,
-          initials: "A.",
-          first_name: "Arie",
-          last_name: "Jansen",
-          locality: "Test Location",
-          gender: "X",
-        },
-        {
-          number: 6,
-          initials: "B.",
-          first_name: "Berta",
-          last_name_prefix: "van der",
-          last_name: "Weijden",
-          locality: "Test Location",
-        },
-        {
           number: 5,
           initials: "H.",
           first_name: "Henk",
@@ -1080,6 +1253,14 @@ export const candidate_nomination: CandidateNominationResult = {
           last_name: "Weijden",
           locality: "Test Location",
           gender: "Male",
+        },
+        {
+          number: 4,
+          initials: "A.",
+          first_name: "Arie",
+          last_name: "Jansen",
+          locality: "Test Location",
+          gender: "X",
         },
       ],
     },
@@ -1162,14 +1343,19 @@ export const candidate_nomination: CandidateNominationResult = {
     {
       pg_number: 4,
       pg_name: "Political Group D",
-      pg_seats: 1,
+      pg_seats: 2,
       preferential_candidate_nomination: [
         {
           number: 1,
           votes: 447,
         },
       ],
-      other_candidate_nomination: [],
+      other_candidate_nomination: [
+        {
+          number: 2,
+          votes: 89,
+        },
+      ],
       updated_candidate_ranking: [],
     },
     {
@@ -1259,11 +1445,7 @@ export const election_summary: ElectionSummary = {
         },
         {
           number: 5,
-          votes: 136,
-        },
-        {
-          number: 6,
-          votes: 232,
+          votes: 368,
         },
       ],
     },
@@ -1389,14 +1571,6 @@ export const election: Election = {
           last_name: "Weijden",
           locality: "Test Location",
           gender: "Male",
-        },
-        {
-          number: 6,
-          initials: "B.",
-          first_name: "Berta",
-          last_name_prefix: "van der",
-          last_name: "Weijden",
-          locality: "Test Location",
         },
       ],
     },

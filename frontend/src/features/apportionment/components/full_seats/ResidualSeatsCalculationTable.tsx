@@ -12,7 +12,7 @@ interface ResidualSeatsCalculationTableProps {
 
 export function ResidualSeatsCalculationTable({ seats, fullSeats, residualSeats }: ResidualSeatsCalculationTableProps) {
   return (
-    <Table id="residual_seats_calculation_table" className={cn(cls.table, cls.residualSeatsCalculationTable)}>
+    <Table id="residual-seats-calculation-table" className={cn(cls.table, cls.residualSeatsCalculationTable)}>
       <Table.Body>
         <Table.Row>
           <Table.HeaderCell scope="row" className="bb-none normal">

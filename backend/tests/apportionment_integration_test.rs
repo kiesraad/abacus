@@ -79,7 +79,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
     assert_eq!(body.seat_assignment.seats, 15);
     assert_eq!(body.seat_assignment.quota, Fraction::new(1200, 15));
     assert_eq!(body.seat_assignment.steps.len(), 5);
-    let total_seats = get_total_seats_from_apportionment_result(body.seat_assignment);
+    let total_seats = get_total_seats_from_apportionment_result(&body.seat_assignment);
     assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
 }
 
@@ -136,7 +136,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     assert_eq!(body.seat_assignment.seats, 23);
     assert_eq!(body.seat_assignment.quota, Fraction::new(1200, 23));
     assert_eq!(body.seat_assignment.steps.len(), 4);
-    let total_seats = get_total_seats_from_apportionment_result(body.seat_assignment);
+    let total_seats = get_total_seats_from_apportionment_result(&body.seat_assignment);
     assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
 }
 

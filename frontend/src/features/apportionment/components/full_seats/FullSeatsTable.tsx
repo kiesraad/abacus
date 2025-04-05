@@ -13,7 +13,7 @@ interface FullSeatsTableProps {
 
 export function FullSeatsTable({ finalStanding, politicalGroups, quota }: FullSeatsTableProps) {
   return (
-    <Table id="full_seats_table" className={cn(cls.table, cls.fullSeatsTable)}>
+    <Table id="full-seats-table" className={cn(cls.table, cls.fullSeatsTable)}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>

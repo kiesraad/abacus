@@ -25,7 +25,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 3,
                "initials": "W.",
                "first_name": "Hans",
-               "last_name": "Van der Vaart",
+               "last_name_prefix": "van der",
+               "last_name": "Vaart",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -49,7 +50,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 6,
                "initials": "F.",
                "first_name": "Frank",
-               "last_name": "Van Putten",
+               "last_name_prefix": "van",
+               "last_name": "Putten",
                "locality": "Juinen",
                "gender": null
              },
@@ -57,7 +59,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 7,
                "initials": "C.",
                "first_name": "Carla",
-               "last_name": "Van Putten",
+               "last_name_prefix": "van",
+               "last_name": "Putten",
                "locality": "Juinen",
                "gender": "Female"
              },
@@ -87,7 +90,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 2,
                "initials": "T.J.",
                "first_name": "Tedje Johannes",
-               "last_name": "van Es",
+               "last_name_prefix": "van",
+               "last_name": "Es",
                "locality": "Den Haag",
                "gender": "Male"
              },
@@ -95,7 +99,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 3,
                "initials": "K.",
                "first_name": "Karel",
-               "last_name": "van Es",
+               "last_name_prefix": "van",
+               "last_name": "Es",
                "locality": "Den Haag",
                "gender": "Male"
              },
@@ -103,7 +108,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 4,
                "initials": "T.",
                "first_name": "Tilly",
-               "last_name": "van Yvonne",
+               "last_name_prefix": "van",
+               "last_name": "Yvonne",
                "locality": "Den Haag",
                "gender": "Female"
              },
@@ -111,7 +117,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 5,
                "initials": "W.",
                "first_name": "Willy",
-               "last_name": "van Yvonne",
+               "last_name_prefix": "van",
+               "last_name": "Yvonne",
                "locality": "Den Haag",
                "gender": "Female"
              },
@@ -119,7 +126,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 6,
                "initials": "F.",
                "first_name": "Henkie",
-               "last_name": "de Knip",
+               "last_name_prefix": "de",
+               "last_name": "Knip",
                "locality": "Den Haag",
                "gender": null
              }
@@ -165,7 +173,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 5,
                "initials": "H.",
                "first_name": "Henk",
-               "last_name": "Van der Weijden",
+               "last_name_prefix": "van der",
+               "last_name": "Weijden",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -173,7 +182,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 6,
                "initials": "B.",
                "first_name": "Berta",
-               "last_name": "Van der Weijden",
+               "last_name_prefix": "van der",
+               "last_name": "Weijden",
                "locality": "Juinen",
                "gender": "Female"
              },
@@ -197,7 +207,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 9,
                "initials": "J.",
                "first_name": "Johan",
-               "last_name": "De Vries",
+               "last_name_prefix": "de",
+               "last_name": "Vries",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -205,7 +216,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 10,
                "initials": "M.",
                "first_name": "Marijke",
-               "last_name": "Van den Berg",
+               "last_name_prefix": "van den",
+               "last_name": "Berg",
                "locality": "Juinen",
                "gender": "Female"
              },
@@ -213,7 +225,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 11,
                "initials": "R.",
                "first_name": "Rolf",
-               "last_name": "De Jong",
+               "last_name_prefix": "de",
+               "last_name": "Jong",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -277,7 +290,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 19,
                "initials": "A.",
                "first_name": "Annelies",
-               "last_name": "Van Loon",
+               "last_name_prefix": "van",
+               "last_name": "Loon",
                "locality": "Juinen",
                "gender": "Female"
              },
@@ -325,7 +339,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 25,
                "initials": "J.V.",
                "first_name": "Jan",
-               "last_name": "Van Dijk",
+               "last_name_prefix": "van",
+               "last_name": "Dijk",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -333,7 +348,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 26,
                "initials": "S.D.",
                "first_name": "Suzan",
-               "last_name": "De Wit",
+               "last_name_prefix": "de",
+               "last_name": "Wit",
                "locality": "Juinen",
                "gender": "Female"
              },
@@ -341,7 +357,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 27,
                "initials": "K.V.",
                "first_name": "Koen",
-               "last_name": "Van der Meer",
+               "last_name_prefix": "van der",
+               "last_name": "Meer",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -386,16 +403,16 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
              {
                "number": 2,
                "initials": "D.",
-               "first_name": "Drs.",
-               "last_name": "P.",
+               "last_name": "Po",
                "locality": "Juinen",
-               "gender": "Male"
+               "gender": "X"
              },
              {
                "number": 3,
                "initials": "W.",
                "first_name": "Willem",
-               "last_name": "de Vries",
+               "last_name_prefix": "de",
+               "last_name": "Vries",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -419,7 +436,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 6,
                "initials": "H.",
                "first_name": "Henk",
-               "last_name": "Van den Berg",
+               "last_name_prefix": "van den",
+               "last_name": "Berg",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -427,7 +445,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 7,
                "initials": "A.",
                "first_name": "Adelbert",
-               "last_name": "Van Doorn",
+               "last_name_prefix": "van",
+               "last_name": "Doorn",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -435,7 +454,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 8,
                "initials": "M.",
                "first_name": "Margriet",
-               "last_name": "Van der Linden",
+               "last_name_prefix": "van der",
+               "last_name": "Linden",
                "locality": "Juinen",
                "gender": "Female"
              },
@@ -451,7 +471,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 10,
                "initials": "S.",
                "first_name": "Sophie",
-               "last_name": "De Groot",
+               "last_name_prefix": "de",
+               "last_name": "Groot",
                "locality": "Juinen",
                "gender": "Female"
              },
@@ -459,7 +480,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 11,
                "initials": "R.",
                "first_name": "Rik",
-               "last_name": "De Ruiter",
+               "last_name_prefix": "de",
+               "last_name": "Ruiter",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -539,7 +561,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 21,
                "initials": "A.V.",
                "first_name": "Aart",
-               "last_name": "Van der Meer",
+               "last_name_prefix": "van der",
+               "last_name": "Meer",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -547,7 +570,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 22,
                "initials": "R.D.",
                "first_name": "Ria",
-               "last_name": "De Vries",
+               "last_name_prefix": "de",
+               "last_name": "Vries",
                "locality": "Juinen",
                "gender": "Female"
              },
@@ -555,7 +579,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 23,
                "initials": "J.D.",
                "first_name": "Joris",
-               "last_name": "De Vries",
+               "last_name_prefix": "de",
+               "last_name": "Vries",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -571,7 +596,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 25,
                "initials": "P.D.",
                "first_name": "Pieter",
-               "last_name": "De Graaf",
+               "last_name_prefix": "de",
+               "last_name": "Graaf",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -667,7 +693,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 37,
                "initials": "R.V.",
                "first_name": "Rik",
-               "last_name": "Van der Laan",
+               "last_name_prefix": "van der",
+               "last_name": "Laan",
                "locality": "Juinen",
                "gender": "Male"
              },
@@ -763,7 +790,8 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '
                "number": 49,
                "initials": "L.V.",
                "first_name": "Laura",
-               "last_name": "Van Leeuwen",
+               "last_name_prefix": "van",
+               "last_name": "Leeuwen",
                "locality": "Juinen",
                "gender": "Female"
              },

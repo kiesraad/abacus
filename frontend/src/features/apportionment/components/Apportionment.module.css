@@ -16,10 +16,6 @@
   margin-bottom: 2rem;
 }
 
-.absolute-majority-change-information {
-  width: 53rem;
-}
-
 /* Styling for the apportionment tables */
 .table {
   max-width: 52rem;
@@ -30,6 +26,7 @@
   }
   th {
     text-wrap: nowrap;
+    color: var(--gray-600);
   }
   th[scope="row"] {
     font-size: var(--font-size-md);

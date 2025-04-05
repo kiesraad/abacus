@@ -43,7 +43,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 5,
                 "initials": "H.",
                 "first_name": "Henk",
-                "last_name": "Van der Weijden",
+                "last_name_prefix": "van der",
+                "last_name": "Weijden",
                 "locality": "Test Location",
                 "gender": "Male"
               },
@@ -51,7 +52,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 6,
                 "initials": "B.",
                 "first_name": "Berta",
-                "last_name": "Van der Weijden",
+                "last_name_prefix": "van der",
+                "last_name": "Weijden",
                 "locality": "Test Location",
                 "gender": "Female"
               },
@@ -75,7 +77,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 9,
                 "initials": "J.",
                 "first_name": "Johan",
-                "last_name": "De Vries",
+                "last_name_prefix": "de",
+                "last_name": "Vries",
                 "locality": "Test Location",
                 "gender": "Male"
               },
@@ -83,7 +86,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 10,
                 "initials": "M.",
                 "first_name": "Marijke",
-                "last_name": "Van den Berg",
+                "last_name_prefix": "van den",
+                "last_name": "Berg",
                 "locality": "Test Location",
                 "gender": "Female"
               },
@@ -91,7 +95,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 11,
                 "initials": "R.",
                 "first_name": "Rolf",
-                "last_name": "De Jong",
+                "last_name_prefix": "de",
+                "last_name": "Jong",
                 "locality": "Test Location",
                 "gender": "Male"
               },
@@ -120,16 +125,16 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
               {
                 "number": 2,
                 "initials": "D.",
-                "first_name": "Drs.",
-                "last_name": "P.",
+                "last_name": "Po",
                 "locality": "Test Location",
-                "gender": "Male"
+                "gender": "X"
               },
               {
                 "number": 3,
                 "initials": "W.",
                 "first_name": "Willem",
-                "last_name": "de Vries",
+                "last_name_prefix": "de",
+                "last_name": "Vries",
                 "locality": "Test Location",
                 "gender": "Male"
               },
@@ -153,7 +158,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 6,
                 "initials": "H.",
                 "first_name": "Henk",
-                "last_name": "Van den Berg",
+                "last_name_prefix": "van den",
+                "last_name": "Berg",
                 "locality": "Test Location",
                 "gender": "Male"
               }
@@ -166,7 +172,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 1,
                 "initials": "A.",
                 "first_name": "Adelbert",
-                "last_name": "Van Doorn",
+                "last_name_prefix": "van",
+                "last_name": "Doorn",
                 "locality": "Test Location",
                 "gender": "Male"
               },
@@ -174,7 +181,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 2,
                 "initials": "M.",
                 "first_name": "Margriet",
-                "last_name": "Van der Linden",
+                "last_name_prefix": "van der",
+                "last_name": "Linden",
                 "locality": "Test Location",
                 "gender": "Female"
               },
@@ -190,7 +198,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 4,
                 "initials": "S.",
                 "first_name": "Sophie",
-                "last_name": "De Groot",
+                "last_name_prefix": "de",
+                "last_name": "Groot",
                 "locality": "Test Location",
                 "gender": "Female"
               },
@@ -198,7 +207,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 5,
                 "initials": "R.",
                 "first_name": "Rik",
-                "last_name": "De Ruiter",
+                "last_name_prefix": "de",
+                "last_name": "Ruiter",
                 "locality": "Test Location",
                 "gender": "Male"
               },
@@ -317,7 +327,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 3,
                 "initials": "A.",
                 "first_name": "Annelies",
-                "last_name": "Van Loon",
+                "last_name_prefix": "van",
+                "last_name": "Loon",
                 "locality": "Test Location",
                 "gender": "Female"
               },
@@ -354,7 +365,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 3,
                 "initials": "W.",
                 "first_name": "Hans",
-                "last_name": "Van der Vaart",
+                "last_name_prefix": "van der",
+                "last_name": "Vaart",
                 "locality": "Test Location",
                 "gender": "Male"
               },
@@ -383,7 +395,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 2,
                 "initials": "T.J.",
                 "first_name": "Tedje Johannes",
-                "last_name": "van Es",
+                "last_name_prefix": "van",
+                "last_name": "Es",
                 "locality": "Test Location",
                 "gender": "Male"
               },
@@ -391,7 +404,8 @@ VALUES (4, 'Test Election < 19 seats', 'Test Location', 2000, 'Municipal', 15, '
                 "number": 3,
                 "initials": "K.",
                 "first_name": "Karel",
-                "last_name": "van Es",
+                "last_name_prefix": "van",
+                "last_name": "Es",
                 "locality": "Test Location",
                 "gender": "Male"
               }

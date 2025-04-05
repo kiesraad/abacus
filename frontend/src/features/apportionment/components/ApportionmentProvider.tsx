@@ -21,6 +21,7 @@ export function ApportionmentProvider({ children, electionId }: ElectionApportio
     <ApportionmentProviderContext.Provider
       value={{
         seatAssignment: data?.seat_assignment,
+        candidateNomination: data?.candidate_nomination,
         electionSummary: data?.election_summary,
         error,
       }}

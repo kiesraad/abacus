@@ -23,3 +23,13 @@ export function isAbsoluteMajorityReassignmentStep(step: SeatChangeStep): step i
 export function isListExhaustionRemovalStep(step: SeatChangeStep): step is ListExhaustionRemovalStep {
   return step.change.changed_by === "ListExhaustionRemoval";
 }
+
+export function getAssignedSeat(step: SeatChangeStep): number | undefined {
+  if (isHighestAverageAssignmentStep(step) || isLargestRemainderAssignmentStep(step)) {
+    return step.change.selected_pg_number;
+  } else if (isAbsoluteMajorityReassignmentStep(step)) {
+    return step.change.pg_assigned_seat;
+  } else {
+    return undefined;
+  }
+}

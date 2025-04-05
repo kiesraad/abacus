@@ -1,6 +1,9 @@
+use crate::apportionment::{candidate_nomination, get_total_seats_from_apportionment_result};
 use crate::{
     APIError, AppState, ErrorResponse,
-    apportionment::{ApportionmentError, SeatAssignmentResult, seat_assignment},
+    apportionment::{
+        ApportionmentError, CandidateNominationResult, SeatAssignmentResult, seat_assignment,
+    },
     authentication::Coordinator,
     data_entry::{
         repository::{PollingStationDataEntries, PollingStationResultsEntries},
@@ -26,6 +29,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionApportionmentResponse {
     pub seat_assignment: SeatAssignmentResult,
+    pub candidate_nomination: CandidateNominationResult,
     pub election_summary: ElectionSummary,
 }
 
@@ -37,7 +41,8 @@ pub struct ElectionApportionmentResponse {
         (status = 200, description = "Election Apportionment", body = ElectionApportionmentResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 422, description = "Drawing of lots is required", body = ErrorResponse),
+        (status = 412, description = "Election apportionment is not yet available", body = ErrorResponse),
+        (status = 422, description = "Election apportionment is not possible", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
   params(
@@ -64,8 +69,15 @@ async fn election_apportionment(
             .await?;
         let election_summary = ElectionSummary::from_results(&election, &results)?;
         let seat_assignment = seat_assignment(election.number_of_seats, &election_summary)?;
+        let candidate_nomination = candidate_nomination(
+            &election,
+            seat_assignment.quota,
+            &election_summary,
+            get_total_seats_from_apportionment_result(&seat_assignment),
+        )?;
         Ok(Json(ElectionApportionmentResponse {
             seat_assignment,
+            candidate_nomination,
             election_summary,
         }))
     } else {

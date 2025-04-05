@@ -28,7 +28,7 @@ export function ApportionmentTable({
   seats,
 }: ApportionmentTableProps) {
   return (
-    <Table id="apportionment_table" className={cls.table}>
+    <Table id="apportionment-table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>
@@ -39,8 +39,7 @@ export function ApportionmentTable({
       <Table.Body>
         {finalStanding.map((standing: PoliticalGroupSeatAssignment) => {
           return (
-            /* TODO: Add row link */
-            <Table.LinkRow key={standing.pg_number} to=".">
+            <Table.LinkRow key={standing.pg_number} to={`./${standing.pg_number}`}>
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
                 {standing.pg_number}
               </Table.Cell>

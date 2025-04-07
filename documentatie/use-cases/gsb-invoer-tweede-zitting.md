@@ -2,7 +2,7 @@
 
 N.B.: Alle use cases voor de tweede zitting gelden ook voor elke latere zitting (derde, etc.).
 
-## Het GSB voert de corrigendum PV's in de applicatie in (vlieger)
+## De invoerders voeren de uitkomst van het onderzoek en de hertelling in de applicatie in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
 
@@ -17,10 +17,14 @@ __Trigger:__ Er is een corrigendum PV opgesteld.
 
 __Hoofdscenario:__  
 
-1. (voor elk corrigendum) De coördinator GSB stelt invoer open voor het stembureau met corrigendum.
-2. (voor elk corrigendum) De invoerders vullen de resultaten van de gecorrigeerde tellingen in. (dus alleen gewijzigde aantallen)
-3. De coördinator GSB genereert de PV's en EML's etc.
+1. De coördinator GSB stelt invoer open voor het stembureau met corrigendum.
+2. De invoerders vullen de uitkomst van het onderzoek en de resultaten van de gecorrigeerde tellingen (alleen gewijzigde aantallen) in.
 
 __Uitbreidingen:__  
 2a. Er zijn verschillen tussen de eerste en de tweede invoer:  
 &emsp; 2a1. De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.
+
+### Open punten
+
+- Welke validaties moet de applicatie doen op de invoer? Zelfde als bij invoer eerste zitting.
+- Tekst foutmeldingen aanpassen? Om handelingsperspectief te geven als bijv. tellingen voor een kandidaat zijn aangepast, maar geen andere velden (totaal lijst, totaal geldige stemmen, etc).

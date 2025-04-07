@@ -20,6 +20,8 @@ pub enum DataEntryTransitionError {
     SecondEntryAlreadyFinalised,
     /// An existing first/second data entry needs to be saved, finalised, or deleted by the same user
     CannotTransitionUsingDifferentUser,
+    /// The second data entry needs to be claimed by a user other than the one who claimed the first entry
+    SecondEntryNeedsDifferentUser,
     ValidatorError(DataError),
     ValidationError(ValidationResults),
 }
@@ -191,17 +193,20 @@ impl DataEntryStatus {
         current_data_entry: CurrentDataEntry,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
-            // TODO: #698 require second data entry user to be different from first data entry user
             DataEntryStatus::SecondEntryNotStarted(state) => {
-                Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
-                    first_entry_user_id: state.first_entry_user_id,
-                    finalised_first_entry: state.finalised_first_entry,
-                    first_entry_finished_at: state.first_entry_finished_at,
-                    progress: current_data_entry.progress.unwrap_or(0),
-                    second_entry_user_id: current_data_entry.user_id,
-                    second_entry: current_data_entry.entry,
-                    client_state: current_data_entry.client_state.unwrap_or_default(),
-                }))
+                if current_data_entry.user_id == state.first_entry_user_id {
+                    Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
+                } else {
+                    Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
+                        first_entry_user_id: state.first_entry_user_id,
+                        finalised_first_entry: state.finalised_first_entry,
+                        first_entry_finished_at: state.first_entry_finished_at,
+                        progress: current_data_entry.progress.unwrap_or(0),
+                        second_entry_user_id: current_data_entry.user_id,
+                        second_entry: current_data_entry.entry,
+                        client_state: current_data_entry.client_state.unwrap_or_default(),
+                    }))
+                }
             }
             DataEntryStatus::SecondEntryInProgress(_) => {
                 if current_data_entry.user_id
@@ -589,6 +594,12 @@ impl Display for DataEntryTransitionError {
             DataEntryTransitionError::CannotTransitionUsingDifferentUser => {
                 write!(f, "Cannot save using a different user")
             }
+            DataEntryTransitionError::SecondEntryNeedsDifferentUser => {
+                write!(
+                    f,
+                    "Second entry needs a different user than the first entry"
+                )
+            }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
             DataEntryTransitionError::ValidatorError(data_error) => {
                 write!(f, "Validator error: {}", data_error)
@@ -629,6 +640,15 @@ mod tests {
         CurrentDataEntry {
             progress: None,
             user_id: 0,
+            entry: polling_station_result(),
+            client_state: None,
+        }
+    }
+
+    fn empty_current_second_data_entry() -> CurrentDataEntry {
+        CurrentDataEntry {
+            progress: None,
+            user_id: 1,
             entry: polling_station_result(),
             client_state: None,
         }
@@ -882,9 +902,18 @@ mod tests {
     fn second_entry_not_started_to_second_entry_in_progress() {
         assert!(matches!(
             second_entry_not_started()
-                .claim_second_entry(empty_current_data_entry())
+                .claim_second_entry(empty_current_second_data_entry())
                 .unwrap(),
             DataEntryStatus::SecondEntryInProgress(_)
+        ));
+    }
+
+    /// SecondEntryNotStarted --> SecondEntryInProgress: claim with same user as first entry returns error
+    #[test]
+    fn second_entry_not_started_claim_second_entry_same_user_error() {
+        assert!(matches!(
+            second_entry_not_started().claim_second_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
         ));
     }
 

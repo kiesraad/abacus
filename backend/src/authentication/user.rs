@@ -91,9 +91,9 @@ impl User {
     }
 
     #[cfg(test)]
-    pub fn test_user(role: Role) -> Self {
+    pub fn test_user(role: Role, id: u32) -> Self {
         Self {
-            id: 1,
+            id,
             username: "test_user_1".to_string(),
             fullname: Some("Full Name".to_string()),
             role,

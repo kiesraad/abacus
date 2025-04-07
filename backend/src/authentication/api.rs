@@ -7,7 +7,8 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse,
-    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
+    audit_log::{AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails},
+    error::ErrorReference,
 };
 use axum::{
     extract::{Path, State},
@@ -65,6 +66,17 @@ impl From<&User> for LoginResponse {
     }
 }
 
+impl From<LoginResponse> for UserDetails {
+    fn from(user: LoginResponse) -> Self {
+        Self {
+            user_id: user.user_id,
+            fullname: user.fullname,
+            username: user.username,
+            role: user.role.to_string(),
+        }
+    }
+}
+
 /// Set default session cookie properties
 pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     cookie.set_path("/");
@@ -114,7 +126,7 @@ async fn login(
     // Log the login event
     audit_service
         .with_user(user.clone())
-        .log_success(
+        .log(
             &AuditEvent::UserLoggedIn(UserLoggedInDetails {
                 user_agent,
                 logged_in_users_count: sessions.count().await?,
@@ -177,19 +189,9 @@ async fn account_update(
     }
 
     // Update the password
-    let result = users
+    users
         .update_password(user.id(), &account.username, &account.password)
-        .await;
-
-    // Register audit event if the password update failed
-    if let Err(e) = result {
-        audit_service
-            .with_user(user.clone())
-            .log_error(&AuditEvent::UserAccountUpdateFailed, None)
-            .await?;
-
-        return Err(e.into());
-    }
+        .await?;
 
     // Update the fullname
     if let Some(fullname) = account.fullname {
@@ -200,12 +202,16 @@ async fn account_update(
         return Err(AuthenticationError::UserNotFound.into());
     };
 
+    let response = LoginResponse::from(&updated_user);
+
     audit_service
-        .with_user(updated_user.clone())
-        .log_success(&AuditEvent::UserAccountUpdateSuccess, None)
+        .log(
+            &AuditEvent::UserAccountUpdated(response.clone().into()),
+            None,
+        )
         .await?;
 
-    Ok(Json(LoginResponse::from(&updated_user)))
+    Ok(Json(response))
 }
 
 /// Logout endpoint, deletes the session cookie
@@ -219,7 +225,6 @@ async fn account_update(
 )]
 async fn logout(
     State(sessions): State<Sessions>,
-    State(users): State<Users>,
     audit_service: AuditService,
     jar: CookieJar,
 ) -> Result<impl IntoResponse, APIError> {
@@ -233,18 +238,15 @@ async fn logout(
 
     // Log audit event when a valid session exists
     if let Some(session) = sessions.get_by_key(session_key).await.ok().flatten() {
-        if let Some(user) = users.get_by_id(session.user_id()).await.ok().flatten() {
-            // Log the logout event
-            audit_service
-                .with_user(user)
-                .log_success(
-                    &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
-                        session_duration: session.duration().as_secs(),
-                    }),
-                    None,
-                )
-                .await?;
-        }
+        // Log the logout event
+        audit_service
+            .log(
+                &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
+                    session_duration: session.duration().as_secs(),
+                }),
+                None,
+            )
+            .await?;
     }
 
     // Remove session from the database
@@ -259,7 +261,6 @@ async fn logout(
 
 /// Middleware to extend the session lifetime
 pub async fn extend_session(
-    State(users): State<Users>,
     State(sessions): State<Sessions>,
     jar: CookieJar,
     audit_service: AuditService,
@@ -275,20 +276,17 @@ pub async fn extend_session(
     if let Ok(Some(session)) = sessions.extend_session(session_cookie.value()).await {
         info!("Session extended for user {}", session.user_id());
 
-        if let Some(user) = users.get_by_id(session.user_id()).await.ok().flatten() {
-            let _ = audit_service
-                .with_user(user)
-                .log_success(&AuditEvent::UserSessionExtended, None)
-                .await;
+        let _ = audit_service
+            .log(&AuditEvent::UserSessionExtended, None)
+            .await;
 
-            let mut cookie = session.get_cookie();
-            set_default_cookie_properties(&mut cookie);
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
 
-            debug!("Setting cookie: {:?}", cookie);
+        debug!("Setting cookie: {:?}", cookie);
 
-            if let Ok(header_value) = cookie.encoded().to_string().parse() {
-                response.headers_mut().append(SET_COOKIE, header_value);
-            }
+        if let Ok(header_value) = cookie.encoded().to_string().parse() {
+            response.headers_mut().append(SET_COOKIE, header_value);
         }
 
         expires = Some(session.expires_at());
@@ -363,7 +361,7 @@ pub struct UpdateUserRequest {
     ),
 )]
 pub async fn user_create(
-    admin: Admin,
+    _admin: Admin,
     State(users_repo): State<Users>,
     audit_service: AuditService,
     Json(create_user_req): Json<CreateUserRequest>,
@@ -378,8 +376,7 @@ pub async fn user_create(
         .await?;
 
     audit_service
-        .with_user(admin.0)
-        .log_success(&AuditEvent::UserCreated(LoginResponse::from(&user)), None)
+        .log(&AuditEvent::UserCreated(user.clone().into()), None)
         .await?;
 
     Ok((StatusCode::CREATED, Json(user)))
@@ -421,7 +418,7 @@ async fn user_get(
     ),
 )]
 pub async fn user_update(
-    admin: Admin,
+    _admin: Admin,
     State(users_repo): State<Users>,
     State(session_repo): State<Sessions>,
     audit_service: AuditService,
@@ -446,8 +443,7 @@ pub async fn user_update(
         .ok_or(Error::RowNotFound)?;
 
     audit_service
-        .with_user(admin.0)
-        .log_success(&AuditEvent::UserUpdated(LoginResponse::from(&user)), None)
+        .log(&AuditEvent::UserUpdated(user.clone().into()), None)
         .await?;
 
     Ok(Json(user))
@@ -467,13 +463,28 @@ pub async fn user_update(
 async fn user_delete(
     _user: Admin,
     State(users_repo): State<Users>,
+    audit_service: AuditService,
     Path(user_id): Path<u32>,
 ) -> Result<StatusCode, APIError> {
+    let Some(user) = users_repo.get_by_id(user_id).await? else {
+        return Err(APIError::NotFound(
+            format!("User with id {user_id} not found"),
+            ErrorReference::EntryNotFound,
+        ));
+    };
+
     let deleted = users_repo.delete(user_id).await?;
 
     if deleted {
+        audit_service
+            .log(&AuditEvent::UserDeleted(user.clone().into()), None)
+            .await?;
+
         Ok(StatusCode::OK)
     } else {
-        Ok(StatusCode::NOT_FOUND)
+        Err(APIError::NotFound(
+            format!("Error deleting user with id {user_id}"),
+            ErrorReference::EntryNotFound,
+        ))
     }
 }

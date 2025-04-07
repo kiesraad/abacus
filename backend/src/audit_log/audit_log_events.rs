@@ -9,57 +9,13 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, AppState,
-    authentication::{LoginResponse, Role, User},
+    authentication::{Role, User},
 };
 
-use super::{AuditLogUser, LogFilterQuery};
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct UserLoggedInDetails {
-    pub user_agent: String,
-    pub logged_in_users_count: u32,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct UserLoggedOutDetails {
-    pub session_duration: u64,
-}
+use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 
 #[derive(
-    Serialize,
-    Deserialize,
-    strum::Display,
-    VariantNames,
-    Clone,
-    Debug,
-    PartialEq,
-    Eq,
-    ToSchema,
-    Default,
-)]
-#[serde(rename_all = "PascalCase", tag = "eventType")]
-pub enum AuditEvent {
-    UserLoggedIn(UserLoggedInDetails),
-    UserLoggedOut(UserLoggedOutDetails),
-    UserAccountUpdateFailed,
-    UserAccountUpdateSuccess,
-    UserSessionExtended,
-    UserCreated(LoginResponse),
-    UserUpdated(LoginResponse),
-    #[default]
-    UnknownEvent,
-}
-
-impl From<serde_json::Value> for AuditEvent {
-    fn from(value: serde_json::Value) -> Self {
-        serde_json::from_value(value).unwrap_or_default()
-    }
-}
-
-#[derive(
-    Serialize, Deserialize, VariantNames, Clone, Debug, PartialEq, Eq, Hash, ToSchema, Type,
+    Serialize, Deserialize, VariantNames, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type,
 )]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "snake_case")]
@@ -71,7 +27,7 @@ pub enum AuditEventLevel {
     Error,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(transparent)]
 pub struct Ip(Option<IpAddr>);
 
@@ -127,7 +83,7 @@ impl AuditLogEvent {
 }
 
 #[derive(Clone)]
-pub struct AuditLog(SqlitePool);
+pub struct AuditLog(pub SqlitePool);
 
 impl FromRef<AppState> for AuditLog {
     fn from_ref(state: &AppState) -> Self {
@@ -203,13 +159,13 @@ impl AuditLog {
         &self,
         user: &User,
         event: &AuditEvent,
-        event_level: AuditEventLevel,
         message: Option<String>,
         ip: Option<IpAddr>,
     ) -> Result<AuditLogEvent, APIError> {
         // TODO: set workstation id once we have one
         let workstation: Option<u32> = None;
         let event_name = event.to_string();
+        let event_level = event.level();
         let event = serde_json::to_value(event)?;
         let user_id = user.id();
         let username = user.username();

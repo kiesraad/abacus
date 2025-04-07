@@ -82,6 +82,12 @@ export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PARAMS = Record<string, never>;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PATH = `/api/log-users`;
 
+// /api/polling_stations/{polling_station_id}/data_entries/resolve
+export interface POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/resolve`;
+
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;

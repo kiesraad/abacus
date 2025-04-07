@@ -1,7 +1,7 @@
 use crate::{
     APIError, AppState,
     audit_log::{AuditEvent, AuditService},
-    authentication::{Typist, User},
+    authentication::{Coordinator, Typist, User},
     data_entry::{
         PollingStationResults, ValidationResults,
         entry_number::EntryNumber,
@@ -39,6 +39,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_data_entry_save))
         .routes(routes!(polling_station_data_entry_delete))
         .routes(routes!(polling_station_data_entry_finalise))
+        .routes(routes!(polling_station_data_entry_resolve))
         .routes(routes!(election_status))
 }
 
@@ -308,6 +309,56 @@ async fn polling_station_data_entry_finalise(
 
     audit_service
         .log(&AuditEvent::DataEntryFinalized(data_entry.into()), None)
+        .await?;
+
+    Ok(())
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
+#[from_request(via(axum::Json), rejection(APIError))]
+#[serde(rename_all = "snake_case")]
+enum ResolveAction {
+    KeepFirstEntry,
+    KeepSecondEntry,
+    DiscardBothEntries,
+}
+
+/// Finalise the data entry for a polling station
+#[utoipa::path(
+    post,
+    path = "/api/polling_stations/{polling_station_id}/data_entries/resolve",
+    responses(
+        (status = 200, description = "Differences resolved successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+async fn polling_station_data_entry_resolve(
+    _user: Coordinator,
+    State(polling_station_data_entries): State<PollingStationDataEntries>,
+    Path(polling_station_id): Path<u32>,
+    resolve_action: ResolveAction,
+) -> Result<(), APIError> {
+    let state = polling_station_data_entries
+        .get_or_default(polling_station_id)
+        .await?;
+
+    let new_state = match resolve_action {
+        ResolveAction::KeepFirstEntry => state.keep_first_entry(),
+        ResolveAction::KeepSecondEntry => state.keep_second_entry(),
+        ResolveAction::DiscardBothEntries => state.delete_entries(),
+    }?;
+
+    // TODO: Logging
+
+    polling_station_data_entries
+        .upsert(polling_station_id, &new_state)
         .await?;
 
     Ok(())

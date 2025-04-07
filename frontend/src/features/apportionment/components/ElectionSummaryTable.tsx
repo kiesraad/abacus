@@ -1,4 +1,4 @@
-import { Fraction, VotesCounts } from "@/api";
+import { Fraction, PreferenceThreshold, VotesCounts } from "@/api";
 import { DisplayFraction, Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn, formatNumber } from "@/lib/util";
@@ -10,11 +10,18 @@ interface ElectionSummaryTableProps {
   seats: number;
   quota: Fraction;
   numberOfVoters: number | undefined;
+  preferenceThreshold: PreferenceThreshold;
 }
 
-export function ElectionSummaryTable({ votesCounts, seats, quota, numberOfVoters }: ElectionSummaryTableProps) {
+export function ElectionSummaryTable({
+  votesCounts,
+  seats,
+  quota,
+  numberOfVoters,
+  preferenceThreshold,
+}: ElectionSummaryTableProps) {
   return (
-    <Table id="election_summary_table" className={cn(cls.table, cls.electionSummaryTable)}>
+    <Table id="election-summary-table" className={cn(cls.table, cls.electionSummaryTable)}>
       <Table.Body>
         <Table.Row>
           <Table.HeaderCell scope="row" className={cn(cls.bt1Gray, "normal")}>
@@ -85,7 +92,17 @@ export function ElectionSummaryTable({ votesCounts, seats, quota, numberOfVoters
           </Table.NumberCell>
           <Table.Cell className="fs-sm">{t("apportionment.quota_description")}</Table.Cell>
         </Table.Row>
-        {/* TODO: Add apportionment.preference_threshold in epic #787 */}
+        <Table.Row>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("apportionment.preference_threshold")}
+          </Table.HeaderCell>
+          <Table.NumberCell className="font-number normal">
+            <DisplayFraction id="quota" fraction={preferenceThreshold.number_of_votes} />
+          </Table.NumberCell>
+          <Table.Cell className="fs-sm">
+            {t("apportionment.preference_threshold_description", { percentage: preferenceThreshold.percentage })}
+          </Table.Cell>
+        </Table.Row>
       </Table.Body>
     </Table>
   );

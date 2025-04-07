@@ -25,7 +25,7 @@ export function LogsTable({ events, setDetails }: LogsTableProps) {
             <Table.Cell colSpan={7}>{t("log.no_events")}</Table.Cell>
           </Table.Row>
         )}
-        {events.map((event) => (
+        {events.map((event: AuditLogEvent) => (
           <Table.ClickRow
             key={event.id}
             onClick={() => {
@@ -36,7 +36,10 @@ export function LogsTable({ events, setDetails }: LogsTableProps) {
             <Table.Cell>{formatDateTime(new Date(event.time), false)}</Table.Cell>
             {/* <Table.Cell>{event.workstation || "-"}</Table.Cell> */}
             <Table.Cell>{t(`log.level.${event.eventLevel}`)}</Table.Cell>
-            <Table.Cell>{t(`log.event.${event.event.eventType}`)}</Table.Cell>
+            <Table.Cell>
+              {t(`log.event.${event.event.eventType}`)}
+              {event.event.eventType == "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
+            </Table.Cell>
             <Table.Cell>{`${event.userId}, ${event.username} (${t(event.userRole)})`}</Table.Cell>
           </Table.ClickRow>
         ))}

@@ -1,10 +1,15 @@
 {
-  "errors_and_warnings": "Fouten en waarschuwingen",
-  "unfinished": "Niet afgeronde invoer",
-  "in_progress": "Invoer bezig",
-  "first_entry_finished": "Eerste invoer klaar",
-  "first_entry_finished_short": "1e invoer klaar",
   "definitive": "Eerste en tweede invoer klaar",
+  "entries_different": "Verschil invoer 1 en 2",
+  "errors_and_warnings": "Fouten en waarschuwingen",
   "first_and_second_entry_finished": "1e en 2e invoer klaar",
-  "not_started": "Werkvoorraad"
+  "first_entry_finished_short": "1e invoer klaar",
+  "first_entry_finished": "Eerste invoer klaar",
+  "first_entry_in_progress": "Eerste invoer bezig",
+  "first_entry_not_started": "Eerste invoer nog niet gestart",
+  "in_progress": "Invoer bezig",
+  "not_started": "Werkvoorraad",
+  "second_entry_in_progress": "Tweede invoer bezig",
+  "second_entry_not_started": "Tweede invoer nog niet gestart",
+  "unfinished": "Niet afgeronde invoer"
 }

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::APIError;
+use crate::{APIError, audit_log::PollingStationDetails};
 
 /// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
@@ -33,6 +33,22 @@ impl IntoResponse for PollingStation {
     }
 }
 
+impl From<PollingStation> for PollingStationDetails {
+    fn from(value: PollingStation) -> Self {
+        Self {
+            polling_station_id: value.id,
+            polling_station_election_id: value.election_id,
+            polling_station_name: value.name,
+            polling_station_number: value.number,
+            polling_station_number_of_voters: value.number_of_voters,
+            polling_station_type: value.polling_station_type.map(|t| t.to_string()),
+            polling_station_address: value.address,
+            polling_station_postal_code: value.postal_code,
+            polling_station_locality: value.locality,
+        }
+    }
+}
+
 /// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
@@ -51,7 +67,10 @@ pub struct PollingStationRequest {
 }
 
 /// Type of Polling station
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
+#[derive(
+    Serialize, Deserialize, strum::Display, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum PollingStationType {
     FixedLocation,
     Special,

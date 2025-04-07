@@ -28,7 +28,7 @@ export function ApportionmentTable({
   seats,
 }: ApportionmentTableProps) {
   return (
-    <Table id="apportionment_table" className={cls.table}>
+    <Table id="apportionment-table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>
@@ -37,24 +37,21 @@ export function ApportionmentTable({
         <Table.HeaderCell className="text-align-r link-cell-padding">{t("apportionment.total_seats")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((standing: PoliticalGroupSeatAssignment) => {
-          return (
-            /* TODO: Add row link */
-            <Table.LinkRow key={standing.pg_number} to=".">
-              <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
-                {standing.pg_number}
-              </Table.Cell>
-              <Table.Cell>{politicalGroups[standing.pg_number - 1]?.name || ""}</Table.Cell>
-              <Table.NumberCell className="font-number normal">
-                {convert_zero_to_dash(standing.full_seats)}
-              </Table.NumberCell>
-              <Table.NumberCell className="font-number normal">
-                {convert_zero_to_dash(standing.residual_seats)}
-              </Table.NumberCell>
-              <Table.NumberCell className="font-number">{convert_zero_to_dash(standing.total_seats)}</Table.NumberCell>
-            </Table.LinkRow>
-          );
-        })}
+        {finalStanding.map((standing: PoliticalGroupSeatAssignment) => (
+          <Table.LinkRow key={standing.pg_number} to={`./${standing.pg_number}`}>
+            <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
+              {standing.pg_number}
+            </Table.Cell>
+            <Table.Cell>{politicalGroups[standing.pg_number - 1]?.name || ""}</Table.Cell>
+            <Table.NumberCell className="font-number normal">
+              {convert_zero_to_dash(standing.full_seats)}
+            </Table.NumberCell>
+            <Table.NumberCell className="font-number normal">
+              {convert_zero_to_dash(standing.residual_seats)}
+            </Table.NumberCell>
+            <Table.NumberCell className="font-number">{convert_zero_to_dash(standing.total_seats)}</Table.NumberCell>
+          </Table.LinkRow>
+        ))}
         <Table.TotalRow>
           <Table.Cell />
           <Table.Cell className="text-align-r bold">{t("apportionment.total")}</Table.Cell>

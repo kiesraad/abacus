@@ -47,8 +47,9 @@ pub enum DataEntryStatus {
     Definitive(Definitive), // First and second entry are finished
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, strum::Display, Clone, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
 pub enum DataEntryStatusName {
     FirstEntryNotStarted,
     FirstEntryInProgress,
@@ -143,7 +144,7 @@ pub struct Definitive {
 }
 
 /// Current data entry, used for function parameters only
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CurrentDataEntry {
     pub progress: Option<u8>,
     pub user_id: u32,

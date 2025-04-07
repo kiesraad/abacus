@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
+use crate::audit_log::ElectionDetails;
+
 /// Election, optionally with its political groups
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
 pub struct Election {
@@ -23,6 +25,22 @@ pub struct Election {
     pub political_groups: Option<Vec<PoliticalGroup>>,
 }
 
+impl From<Election> for ElectionDetails {
+    fn from(value: Election) -> Self {
+        Self {
+            election_id: value.id,
+            election_name: value.name,
+            election_location: value.location,
+            election_number_of_voters: value.number_of_voters,
+            election_category: value.category.to_string(),
+            election_number_of_seats: value.number_of_seats,
+            election_election_date: value.election_date,
+            election_nomination_date: value.nomination_date,
+            election_status: value.status.to_string(),
+        }
+    }
+}
+
 /// Election request
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
 pub struct ElectionRequest {
@@ -40,7 +58,10 @@ pub struct ElectionRequest {
 }
 
 /// Election category (limited for now)
-#[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type)]
+#[derive(
+    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum ElectionCategory {
     Municipal,
 }
@@ -54,7 +75,10 @@ impl ElectionCategory {
 }
 
 /// Election status (limited for now)
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
+#[derive(
+    Serialize, Deserialize, strum::Display, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum ElectionStatus {
     DataEntryInProgress,
     DataEntryFinished,

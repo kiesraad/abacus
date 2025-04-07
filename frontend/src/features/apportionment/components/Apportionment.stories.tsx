@@ -4,6 +4,7 @@ import { PoliticalGroup } from "@/api";
 
 import * as gte19Seats from "../testing/19-or-more-seats";
 import * as lt19Seats from "../testing/less-than-19-seats";
+import { HighestAverageAssignmentStep } from "../utils/seat-change";
 import { ApportionmentTable } from "./ApportionmentTable";
 import { ElectionSummaryTable } from "./ElectionSummaryTable";
 import { FullSeatsTable } from "./full_seats/FullSeatsTable";
@@ -39,7 +40,7 @@ DefaultElectionSummaryTable.storyName = "ElectionSummaryTable";
 
 export const DefaultLargestRemaindersTable: Story = () => (
   <LargestRemaindersTable
-    largestRemainderSteps={lt19Seats.largest_remainder_steps}
+    steps={lt19Seats.largest_remainder_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
     politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
   />
@@ -48,7 +49,7 @@ DefaultLargestRemaindersTable.storyName = "LargestRemaindersTable";
 
 export const DefaultLargestAveragesForLessThan19SeatsTable: Story = () => (
   <HighestAveragesForLessThan19SeatsTable
-    highestAverageSteps={lt19Seats.highest_average_steps}
+    steps={lt19Seats.highest_average_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
     politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
   />
@@ -57,7 +58,7 @@ DefaultLargestAveragesForLessThan19SeatsTable.storyName = "Largest averages for 
 
 export const DefaultLargestAveragesFor19OrMoreSeatsTable: Story = () => (
   <HighestAveragesFor19OrMoreSeatsTable
-    highestAverageSteps={gte19Seats.seat_assignment.steps}
+    steps={gte19Seats.seat_assignment.steps as HighestAverageAssignmentStep[]}
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups as PoliticalGroup[]}
   />

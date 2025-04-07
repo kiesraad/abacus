@@ -6,10 +6,10 @@ import {
   CandidatesListPage,
   CheckAndSavePage,
   DifferencesPage,
-  PollingStationChoicePage,
   RecountedPage,
   VotersAndVotesPage,
 } from "../page-objects/data_entry";
+import { DataEntryChoicePage } from "../page-objects/data_entry_choice/DataEntryChoicePgObj";
 
 export async function fillDataEntry(page: Page, results: PollingStationResults) {
   const recountedPage = new RecountedPage(page);
@@ -44,6 +44,6 @@ export async function fillDataEntry(page: Page, results: PollingStationResults) 
   await expect(checkAndSavePage.fieldset).toBeVisible();
   await checkAndSavePage.save.click();
 
-  const pollingStationChoicePage = new PollingStationChoicePage(page);
-  await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
+  const dataEntryChoicePage = new DataEntryChoicePage(page);
+  await expect(dataEntryChoicePage.dataEntrySuccess).toBeVisible();
 }

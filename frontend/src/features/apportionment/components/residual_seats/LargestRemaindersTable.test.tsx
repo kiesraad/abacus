@@ -10,7 +10,7 @@ describe("LargestRemaindersTable", () => {
   test("renders a table with the residual seat assignment with largest remainders method", async () => {
     render(
       <LargestRemaindersTable
-        largestRemainderSteps={largest_remainder_steps}
+        steps={largest_remainder_steps}
         finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
       />,

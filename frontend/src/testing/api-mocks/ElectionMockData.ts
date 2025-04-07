@@ -212,7 +212,7 @@ export const politicalGroupMockData: PoliticalGroup = {
   ],
 };
 
-const politicalGroupsMockData: PoliticalGroup[] = [
+export const politicalGroupsMockData: PoliticalGroup[] = [
   politicalGroupMockData,
   {
     number: 2,

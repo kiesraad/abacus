@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "candidate": "Kandidaat",
+    "description": "Omschrijving",
+    "field": "Veld",
+    "first_entry": "Eerste invoer",
+    "number": "Nummer",
+    "second_entry": "Tweede invoer"
+  },
+  "no": "Nee",
+  "section": {
+    "differences_counts": "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+    "recounted": "Is het selectievakje op de eerste pagina aangevinkt?",
+    "voters_votes_counts": "Toegelaten kiezers en uitgebrachte stemmen"
+  },
+  "yes": "Ja"
+}

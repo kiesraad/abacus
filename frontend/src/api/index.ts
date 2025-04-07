@@ -1,6 +1,5 @@
 export * from "./election";
 export * from "./gen/openapi";
-export * from "./polling_station";
 export * from "./ApiClient";
 export * from "./ApiProvider";
 export * from "./ApiProviderContext";

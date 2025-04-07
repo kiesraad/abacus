@@ -1,4 +1,9 @@
-import type { ClaimDataEntryResponse, SaveDataEntryResponse, ValidationResults } from "@kiesraad/api";
+import type {
+  ClaimDataEntryResponse,
+  PollingStationResults,
+  SaveDataEntryResponse,
+  ValidationResults,
+} from "@kiesraad/api";
 
 import { electionMockData } from "./ElectionMockData";
 
@@ -7,7 +12,7 @@ export const emptyValidationResults: ValidationResults = {
   warnings: [],
 };
 
-export const emptyData = {
+export const emptyData: PollingStationResults = {
   voters_counts: {
     poll_card_count: 0,
     proxy_certificate_count: 0,

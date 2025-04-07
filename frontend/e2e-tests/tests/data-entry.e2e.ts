@@ -14,7 +14,11 @@ import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 import { VotersCounts, VotesCounts } from "@kiesraad/api";
 
 import { test } from "../fixtures";
-import { fillDataEntry } from "../helpers-utils/e2e-test-helpers";
+import {
+  fillDataEntryPages,
+  fillDataEntryPagesAndSave,
+  selectPollingStationForDataEntry,
+} from "../helpers-utils/e2e-test-helpers";
 import { formatNumber } from "../helpers-utils/e2e-test-utils";
 import {
   noErrorsWarningsResponse,
@@ -402,7 +406,7 @@ test.describe("second data entry", () => {
       `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`,
     );
 
-    await fillDataEntry(page, noRecountNoDifferencesDataEntry);
+    await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
 
     await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
     await expect(pollingStationChoicePage.alertInputSaved).toHaveText(
@@ -519,6 +523,22 @@ test.describe("errors and warnings", () => {
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
+  });
+
+  test("Changing recounted to yes results in error on differences page", async ({ page, pollingStation }) => {
+    await selectPollingStationForDataEntry(page, pollingStation);
+    const checkAndSavePage = await fillDataEntryPages(page, noRecountNoDifferencesDataEntry);
+
+    await checkAndSavePage.navPanel.recounted.click();
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkYesAndClickNext();
+
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
+    await expect(votersAndVotesPage.warning).toContainText(
+      "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezersW.204Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).Check of je het papieren proces-verbaal goed hebt overgenomen.",
+    );
   });
 
   test("correct warning on voters and votes page", async ({ page, pollingStation }) => {

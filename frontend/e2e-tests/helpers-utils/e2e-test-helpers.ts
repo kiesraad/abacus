@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 
-import { PollingStationResults } from "@kiesraad/api";
+import { PollingStation, PollingStationResults } from "@kiesraad/api";
 
 import {
   CandidatesListPage,
@@ -11,7 +11,21 @@ import {
   VotersAndVotesPage,
 } from "../page-objects/data_entry";
 
-export async function fillDataEntry(page: Page, results: PollingStationResults) {
+export async function selectPollingStationForDataEntry(page: Page, pollingStation: PollingStation) {
+  await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
+
+  const pollingStationChoicePage = new PollingStationChoicePage(page);
+  await expect(pollingStationChoicePage.fieldset).toBeVisible();
+  await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
+  await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation.name);
+  await pollingStationChoicePage.clickStart();
+
+  const recountedPage = new RecountedPage(page);
+  await expect(recountedPage.fieldset).toBeVisible();
+  return recountedPage;
+}
+
+export async function fillDataEntryPages(page: Page, results: PollingStationResults) {
   const recountedPage = new RecountedPage(page);
   await expect(recountedPage.fieldset).toBeVisible();
   await recountedPage.fillInPageAndClickNext(results.recounted ? results.recounted : false);
@@ -42,8 +56,17 @@ export async function fillDataEntry(page: Page, results: PollingStationResults) 
 
   const checkAndSavePage = new CheckAndSavePage(page);
   await expect(checkAndSavePage.fieldset).toBeVisible();
+  return checkAndSavePage;
+}
+
+export async function fillDataEntryPagesAndSave(page: Page, results: PollingStationResults) {
+  await fillDataEntryPages(page, results);
+
+  const checkAndSavePage = new CheckAndSavePage(page);
+  await expect(checkAndSavePage.fieldset).toBeVisible();
   await checkAndSavePage.save.click();
 
   const pollingStationChoicePage = new PollingStationChoicePage(page);
   await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
+  return pollingStationChoicePage;
 }

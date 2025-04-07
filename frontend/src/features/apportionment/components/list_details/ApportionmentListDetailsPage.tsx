@@ -27,10 +27,6 @@ export function ApportionmentListDetailsPage() {
   const { seatAssignment, candidateNomination, electionSummary, error } = useApportionmentContext();
   const pgNumber = useNumericParam("pgNumber");
 
-  if (!pgNumber) {
-    throw new Error("Missing 'pgNumber' parameter");
-  }
-
   const pg = election.political_groups.find((group) => group.number === pgNumber);
 
   if (!pg) {

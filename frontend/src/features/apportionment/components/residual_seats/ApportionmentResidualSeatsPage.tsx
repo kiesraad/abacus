@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { ListExhaustionRemovedSeat, SeatChangeStep, useElection } from "@/api";
+import { SeatChangeStep, useElection } from "@/api";
 import { PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
@@ -133,21 +133,18 @@ export function ApportionmentResidualSeatsPage() {
                       </span>
                     </div>
                   )}
-                  {listExhaustionSteps.map((pg_seat_removal, index) => {
-                    const change = pg_seat_removal.change as ListExhaustionRemovedSeat;
-                    return (
-                      <div className="mb-md w-39" key={`step-${index + 1}`}>
-                        <span id={`list-exhaustion-step-${index + 1}-information`}>
-                          {t("apportionment.list_exhaustion_removal", {
-                            pg_retracted_seat: change.pg_retracted_seat,
-                            pg_assigned_seat:
-                              getAssignedSeat(assignmentStepsAfterListExhaustion[index] as SeatChangeStep) || "",
-                          })}
-                          {index == 0 && ` ${t("apportionment.article_p10")}`}
-                        </span>
-                      </div>
-                    );
-                  })}
+                  {listExhaustionSteps.map((pg_seat_removal, index) => (
+                    <div className="mb-md w-39" key={`step-${index + 1}`}>
+                      <span id={`list-exhaustion-step-${index + 1}-information`}>
+                        {t("apportionment.list_exhaustion_removal", {
+                          pg_retracted_seat: pg_seat_removal.change.pg_retracted_seat,
+                          pg_assigned_seat:
+                            getAssignedSeat(assignmentStepsAfterListExhaustion[index] as SeatChangeStep) || "",
+                        })}
+                        {index == 0 && ` ${t("apportionment.article_p10")}`}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </>
             ) : (

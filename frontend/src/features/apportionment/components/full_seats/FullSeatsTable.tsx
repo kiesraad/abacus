@@ -26,19 +26,17 @@ export function FullSeatsTable({ finalStanding, politicalGroups, quota }: FullSe
         <Table.HeaderCell className="text-align-r">{t("apportionment.full_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((standing: PoliticalGroupSeatAssignment) => {
-          return (
-            <Table.Row key={standing.pg_number}>
-              <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "bold")}>{standing.pg_number}</Table.Cell>
-              <Table.Cell>{politicalGroups.find((pg) => pg.number === standing.pg_number)?.name ?? ""}</Table.Cell>
-              <Table.NumberCell className="font-number normal">{standing.votes_cast}</Table.NumberCell>
-              <Table.Cell>:</Table.Cell>
-              <Table.DisplayFractionCells>{quota}</Table.DisplayFractionCells>
-              <Table.Cell>=</Table.Cell>
-              <Table.NumberCell className="font-number">{standing.full_seats}</Table.NumberCell>
-            </Table.Row>
-          );
-        })}
+        {finalStanding.map((standing: PoliticalGroupSeatAssignment) => (
+          <Table.Row key={standing.pg_number}>
+            <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "bold")}>{standing.pg_number}</Table.Cell>
+            <Table.Cell>{politicalGroups.find((pg) => pg.number === standing.pg_number)?.name ?? ""}</Table.Cell>
+            <Table.NumberCell className="font-number normal">{standing.votes_cast}</Table.NumberCell>
+            <Table.Cell>:</Table.Cell>
+            <Table.DisplayFractionCells>{quota}</Table.DisplayFractionCells>
+            <Table.Cell>=</Table.Cell>
+            <Table.NumberCell className="font-number">{standing.full_seats}</Table.NumberCell>
+          </Table.Row>
+        ))}
       </Table.Body>
     </Table>
   );

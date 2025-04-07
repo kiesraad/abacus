@@ -32,16 +32,14 @@ export function CandidatesWithVotesTable({
         <Table.HeaderCell className="text-align-r">{t("vote_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {candidateWithVotesList.map((candidate) => {
-          return (
-            <Table.Row key={candidate.number}>
-              {showNumber && <Table.Cell>{candidate.number}</Table.Cell>}
-              <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
-              {showLocality && <Table.Cell>{candidate.locality}</Table.Cell>}
-              <Table.Cell className="text-align-r">{candidate.votes}</Table.Cell>
-            </Table.Row>
-          );
-        })}
+        {candidateWithVotesList.map((candidate) => (
+          <Table.Row key={candidate.number}>
+            {showNumber && <Table.Cell>{candidate.number}</Table.Cell>}
+            <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
+            {showLocality && <Table.Cell>{candidate.locality}</Table.Cell>}
+            <Table.Cell className="text-align-r">{candidate.votes}</Table.Cell>
+          </Table.Row>
+        ))}
       </Table.Body>
     </Table>
   );

@@ -17,14 +17,12 @@ export function CandidatesRankingTable({ candidateRanking }: CandidatesRankingTa
         <Table.HeaderCell>{t("candidate.locality")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {candidateRanking.map((candidate) => {
-          return (
-            <Table.Row key={candidate.number}>
-              <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
-              <Table.Cell>{candidate.locality}</Table.Cell>
-            </Table.Row>
-          );
-        })}
+        {candidateRanking.map((candidate) => (
+          <Table.Row key={candidate.number}>
+            <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
+            <Table.Cell>{candidate.locality}</Table.Cell>
+          </Table.Row>
+        ))}
       </Table.Body>
     </Table>
   );

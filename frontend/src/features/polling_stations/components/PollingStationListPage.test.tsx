@@ -1,9 +1,9 @@
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionProvider, PollingStationListResponse } from "@kiesraad/api";
-import { ElectionRequestHandler, PollingStationListRequestHandler } from "@kiesraad/api-mocks";
-import { overrideOnce, render, server } from "@kiesraad/test";
+import { ElectionProvider, PollingStationListResponse } from "@/api";
+import { overrideOnce, render, server } from "@/testing";
+import { ElectionRequestHandler, PollingStationListRequestHandler } from "@/testing/api-mocks";
 
 import { PollingStationListPage } from "./PollingStationListPage";
 

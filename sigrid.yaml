@@ -54,48 +54,25 @@ components:
     include:
       - ".*/frontend/src/app.test.ts"
       - ".*/frontend/src/main.tsx"
-      - ".*/frontend/src/routes.test.tsx"
-      - ".*/frontend/src/routes.tsx"
   - name: "(Frontend) App"
     include:
       - ".*/frontend/src/app/.*"
-  - name: "(Frontend) Components/apportionment"
-    include:
-      - ".*/frontend/src/components/apportionment/.*"
   - name: "(Frontend) Components/authorization"
     include:
       - ".*/frontend/src/components/authorization/.*"
   - name: "(Frontend) Components/election_status_with_icon"
     include:
       - ".*/frontend/src/components/election_status_with_icon/.*"
-  - name: "(Frontend) Components/election"
-    include:
-      - ".*/frontend/src/components/election/.*"
   - name: "(Frontend) Components/error"
     include:
       - ".*/frontend/src/components/error/.*"
   - name: "(Frontend) Components/footer"
     include:
       - ".*/frontend/src/components/footer/.*"
-  - name: "(Frontend) app/component/form/account"
-    include:
-      - ".*/frontend/src/components/form/account/.*"
-  - name: "(Frontend) app/component/form/polling_station"
-    include:
-      - ".*/frontend/src/components/form/polling_station/.*"
-  - name: "(Frontend) app/component/form/user"
-    include:
-      - ".*/frontend/src/components/form/user/.*"
   - name: "(Frontend) Components/navbar"
     include:
       - ".*/frontend/src/components/navbar/.*"
 
-  - name: "(Frontend) Modules/Root files"
-    include:
-      - ".*/frontend/src/features/AdministratorLayout.tsx"
-      - ".*/frontend/src/features/FatalError.tsx"
-      - ".*/frontend/src/features/NotFound.tsx"
-      - ".*/frontend/src/features/RootLayout.tsx"
   - name: "(Frontend) Modules/account"
     include:
       - ".*/frontend/src/features/account/.*"

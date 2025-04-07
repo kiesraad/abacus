@@ -1,9 +1,9 @@
 import { FormEvent, useState } from "react";
 import { Location, useLocation, useNavigate } from "react-router";
 
-import { AnyApiError, FatalError, isError, useApiState } from "@kiesraad/api";
-import { t, TranslationPath, tx } from "@kiesraad/i18n";
-import { Alert, BottomBar, Button, FormLayout, InputField } from "@kiesraad/ui";
+import { AnyApiError, FatalError, isError, useApiState } from "@/api";
+import { Alert, BottomBar, Button, FormLayout, InputField } from "@/components/ui";
+import { t, TranslationPath, tx } from "@/lib/i18n";
 
 interface UnauthorizedState {
   unauthorized?: boolean;

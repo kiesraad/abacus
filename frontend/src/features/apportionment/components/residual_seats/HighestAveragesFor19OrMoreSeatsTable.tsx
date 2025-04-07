@@ -20,7 +20,7 @@ export function HighestAveragesFor19OrMoreSeatsTable({
   return (
     <div className={cls.scrollable}>
       <Table
-        id="highest_averages_for_19_or_more_seats_table"
+        id="highest-averages-for-19-or-more-seats-table"
         className={cn(cls.table, cls.residualSeats19OrMoreSeatsTable)}
       >
         <Table.Header>
@@ -36,36 +36,34 @@ export function HighestAveragesFor19OrMoreSeatsTable({
           </Table.HeaderCell>
         </Table.Header>
         <Table.Body>
-          {finalStanding.map((pg_seat_assignment: PoliticalGroupSeatAssignment) => {
-            return (
-              <Table.Row key={pg_seat_assignment.pg_number}>
-                <Table.Cell className={cn(cls.listNumberColumn, cls.sticky, "text-align-r", "font-number")}>
-                  {pg_seat_assignment.pg_number}
-                </Table.Cell>
-                <Table.Cell className={cls.sticky}>
-                  {politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}
-                </Table.Cell>
-                {steps.map((step) => {
-                  const average = step.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
-                  if (average) {
-                    return (
-                      <Table.DisplayFractionCells
-                        key={`${pg_seat_assignment.pg_number}-${step.residual_seat_number}`}
-                        className={
-                          step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow bold" : undefined
-                        }
-                      >
-                        {average}
-                      </Table.DisplayFractionCells>
-                    );
-                  }
-                })}
-                <Table.NumberCell className={cn(cls.sticky, "font-number")}>
-                  {pg_seat_assignment.residual_seats}
-                </Table.NumberCell>
-              </Table.Row>
-            );
-          })}
+          {finalStanding.map((pg_seat_assignment: PoliticalGroupSeatAssignment) => (
+            <Table.Row key={pg_seat_assignment.pg_number}>
+              <Table.Cell className={cn(cls.listNumberColumn, cls.sticky, "text-align-r", "font-number")}>
+                {pg_seat_assignment.pg_number}
+              </Table.Cell>
+              <Table.Cell className={cls.sticky}>
+                {politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}
+              </Table.Cell>
+              {steps.map((step) => {
+                const average = step.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
+                if (average) {
+                  return (
+                    <Table.DisplayFractionCells
+                      key={`${pg_seat_assignment.pg_number}-${step.residual_seat_number}`}
+                      className={
+                        step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow bold" : undefined
+                      }
+                    >
+                      {average}
+                    </Table.DisplayFractionCells>
+                  );
+                }
+              })}
+              <Table.NumberCell className={cn(cls.sticky, "font-number")}>
+                {pg_seat_assignment.residual_seats}
+              </Table.NumberCell>
+            </Table.Row>
+          ))}
           <Table.TotalRow>
             <Table.Cell className={cls.sticky} />
             <Table.Cell className={cn(cls.sticky, "text-align-r", "nowrap", "bold")}>

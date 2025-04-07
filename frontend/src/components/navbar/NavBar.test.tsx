@@ -114,6 +114,7 @@ describe("NavBar", () => {
   });
 
   test.each([
+    { pathname: "/elections/1/apportionment/1" },
     { pathname: "/elections/1/apportionment/details-full-seats" },
     { pathname: "/elections/1/apportionment/details-residual-seats" },
   ])("polling station management links for $pathname", async (location) => {

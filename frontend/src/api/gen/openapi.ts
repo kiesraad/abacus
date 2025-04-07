@@ -238,6 +238,22 @@ export interface Candidate {
  */
 export type CandidateGender = "Male" | "Female" | "X";
 
+/**
+ * The result of the candidate nomination procedure.
+ * This contains the preference threshold and percentage that was used.
+ * It contains a list of all chosen candidates in alphabetical order.
+ * It also contains the preferential nomination of candidates, the remaining
+ * nomination of candidates and the final ranking of candidates for each political group.
+ */
+export interface CandidateNominationResult {
+  /** List of chosen candidates in alphabetical order */
+  chosen_candidates: Candidate[];
+  /** List of chosen candidates and candidate list ranking per political group */
+  political_group_candidate_nomination: PoliticalGroupCandidateNomination[];
+  /** Preference threshold percentage and number of votes */
+  preference_threshold: PreferenceThreshold;
+}
+
 export interface CandidateVotes {
   number: number;
   votes: number;
@@ -333,6 +349,7 @@ export interface Election {
  * Election apportionment response, including the seat assignment, candidate nomination and election summary
  */
 export interface ElectionApportionmentResponse {
+  candidate_nomination: CandidateNominationResult;
   election_summary: ElectionSummary;
   seat_assignment: SeatAssignmentResult;
 }
@@ -548,6 +565,25 @@ export interface PoliticalGroup {
 }
 
 /**
+ * Contains information about the chosen candidates and the candidate list ranking
+ * for a specific political group.
+ */
+export interface PoliticalGroupCandidateNomination {
+  /** The list of other chosen candidates, can be empty */
+  other_candidate_nomination: CandidateVotes[];
+  /** Political group name for which this nomination applies */
+  pg_name: string;
+  /** Political group number for which this nomination applies */
+  pg_number: number;
+  /** The number of seats assigned to this group */
+  pg_seats: number;
+  /** The list of chosen candidates via preferential votes, can be empty */
+  preferential_candidate_nomination: CandidateVotes[];
+  /** The updated ranking of the whole candidate list, can be empty */
+  updated_candidate_ranking: Candidate[];
+}
+
+/**
  * Contains information about the final assignment of seats for a specific political group.
  */
 export interface PoliticalGroupSeatAssignment {
@@ -670,6 +706,13 @@ When filled in, this field should replace `voters_counts` when using the results
  * Type of Polling station
  */
 export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
+
+export interface PreferenceThreshold {
+  /** Preference threshold as a number of votes */
+  number_of_votes: Fraction;
+  /** Preference threshold as a percentage (0 to 100) */
+  percentage: number;
+}
 
 export type Role = "administrator" | "typist" | "coordinator";
 

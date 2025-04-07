@@ -1,12 +1,19 @@
 import { Link } from "react-router";
 
-import { AbsoluteMajorityReassignedSeat, useElection } from "@/api";
-import { Alert, FormLayout, PageTitle } from "@/components/ui";
+import { SeatChangeStep, useElection } from "@/api";
+import { PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { isHighestAverageAssignmentStep, isLargestRemainderAssignmentStep } from "../../utils/seat-change";
+import {
+  getAssignedSeat,
+  isAbsoluteMajorityReassignmentStep,
+  isHighestAverageAssignmentStep,
+  isLargestRemainderAssignmentStep,
+  isListExhaustionRemovalStep,
+} from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
+import { ApportionmentError } from "../ApportionmentError";
 import { HighestAveragesFor19OrMoreSeatsTable } from "./HighestAveragesFor19OrMoreSeatsTable";
 import { HighestAveragesForLessThan19SeatsTable } from "./HighestAveragesForLessThan19SeatsTable";
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
@@ -28,7 +35,7 @@ function render_information(seats: number, residualSeats: number) {
   return (
     <span className={cls.tableInformation}>
       {tx(
-        `apportionment.full_seats_information_link.${residualSeats > 1 ? "plural" : "singular"}`,
+        `apportionment.full_seats_information_link.${residualSeats === 1 ? "singular" : "plural"}`,
         {
           link: (title) => <Link to="../details-full-seats">{title}</Link>,
         },
@@ -51,12 +58,7 @@ export function ApportionmentResidualSeatsPage() {
         {render_title_and_header()}
         <main>
           <article>
-            <FormLayout.Alert>
-              <Alert type="error">
-                <h2>{t("apportionment.not_available")}</h2>
-                <p>{t(`error.api_error.${error.reference}`)}</p>
-              </Alert>
-            </FormLayout.Alert>
+            <ApportionmentError error={error} />
           </article>
         </main>
       </>
@@ -65,11 +67,9 @@ export function ApportionmentResidualSeatsPage() {
   if (seatAssignment) {
     const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderAssignmentStep);
     const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
-    const absoluteMajorityChange = seatAssignment.steps
-      .map((step) => step.change)
-      .find((change) => change.changed_by === "AbsoluteMajorityReassignment") as
-      | AbsoluteMajorityReassignedSeat
-      | undefined;
+    const absoluteMajorityReassignment = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
+    const listExhaustionSteps = seatAssignment.steps.filter(isListExhaustionRemovalStep);
+    const assignmentStepsAfterListExhaustion = seatAssignment.steps.slice(-listExhaustionSteps.length);
     return (
       <>
         {render_title_and_header()}
@@ -107,7 +107,7 @@ export function ApportionmentResidualSeatsPage() {
                         <h2 className={cls.tableTitle}>{t("apportionment.remaining_residual_seats_assignment")}</h2>
                         <span className={cls.tableInformation}>
                           {t(
-                            `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length > 1 ? "plural" : "singular"}`,
+                            `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length === 1 ? "singular" : "plural"}`,
                             { num_seats: highestAverageSteps.length },
                           )}
                         </span>
@@ -122,14 +122,30 @@ export function ApportionmentResidualSeatsPage() {
                     )}
                   </>
                 )}
-                {absoluteMajorityChange && (
-                  <span id="absolute_majority_change_information" className={cls.absoluteMajorityChangeInformation}>
-                    {t("apportionment.absolute_majority_change", {
-                      pg_assigned_seat: absoluteMajorityChange.pg_assigned_seat,
-                      pg_retracted_seat: absoluteMajorityChange.pg_retracted_seat,
-                    })}
-                  </span>
-                )}
+                <div>
+                  {absoluteMajorityReassignment && (
+                    <div className="mb-md w-39">
+                      <span id="absolute-majority-reassignment-information">
+                        {t("apportionment.absolute_majority_reassignment", {
+                          pg_assigned_seat: absoluteMajorityReassignment.change.pg_assigned_seat,
+                          pg_retracted_seat: absoluteMajorityReassignment.change.pg_retracted_seat,
+                        })}
+                      </span>
+                    </div>
+                  )}
+                  {listExhaustionSteps.map((pg_seat_removal, index) => (
+                    <div className="mb-md w-39" key={`step-${index + 1}`}>
+                      <span id={`list-exhaustion-step-${index + 1}-information`}>
+                        {t("apportionment.list_exhaustion_removal", {
+                          pg_retracted_seat: pg_seat_removal.change.pg_retracted_seat,
+                          pg_assigned_seat:
+                            getAssignedSeat(assignmentStepsAfterListExhaustion[index] as SeatChangeStep) || "",
+                        })}
+                        {index == 0 && ` ${t("apportionment.article_p10")}`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </>
             ) : (
               <span>{t("apportionment.no_residual_seats_to_assign")}</span>

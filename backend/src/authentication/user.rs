@@ -158,21 +158,11 @@ where
         parts: &mut Parts,
         state: &S,
     ) -> Result<Option<Self>, Self::Rejection> {
-        let users = Users::from_ref(state);
-        let jar = CookieJar::from_headers(&parts.headers);
+        let user_result = <User as FromRequestParts<S>>::from_request_parts(parts, state).await;
 
-        let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
-            return Ok(None);
-        };
-
-        match users.get_by_session_key(session_cookie.value()).await {
-            Ok(user) => {
-                user.update_last_activity_at(&users).await?;
-                Ok(Some(user))
-            }
-            Err(AuthenticationError::UserNotFound)
-            | Err(AuthenticationError::SessionKeyNotFound) => Ok(None),
-            Err(e) => Err(e.into()),
+        match user_result {
+            Ok(user) => Ok(Some(user)),
+            Err(_) => Ok(None),
         }
     }
 }

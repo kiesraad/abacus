@@ -27,6 +27,7 @@ where
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, APIError> {
         let log = AuditLog::from_ref(state);
+
         let user: Option<User> = User::from_request_parts(parts, state).await.ok();
         let ip = ConnectInfo::<SocketAddr>::from_request_parts(parts, state)
             .await

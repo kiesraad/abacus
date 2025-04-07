@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::PollingStationDataEntry;
+use super::{PollingStationDataEntry, ResolveAction};
 
 /// Response structure for getting data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -316,19 +316,11 @@ async fn polling_station_data_entry_finalise(
     Ok(())
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
-#[from_request(via(axum::Json), rejection(APIError))]
-#[serde(rename_all = "snake_case")]
-enum ResolveAction {
-    KeepFirstEntry,
-    KeepSecondEntry,
-    DiscardBothEntries,
-}
-
-/// Finalise the data entry for a polling station
+/// Resolve data entry differences by providing a `ResolveAction`
 #[utoipa::path(
     post,
     path = "/api/polling_stations/{polling_station_id}/data_entries/resolve",
+    request_body = ResolveAction,
     responses(
         (status = 200, description = "Differences resolved successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),

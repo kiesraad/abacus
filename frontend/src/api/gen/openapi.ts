@@ -87,6 +87,7 @@ export interface POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PARAMS {
   polling_station_id: number;
 }
 export type POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/resolve`;
+export type POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY = ResolveAction;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
@@ -723,6 +724,7 @@ export interface PreferenceThreshold {
   /** Preference threshold as a percentage (0 to 100) */
   percentage: number;
 }
+export type ResolveAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
 
 export type Role = "administrator" | "typist" | "coordinator";
 

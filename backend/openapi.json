@@ -923,7 +923,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/resolve": {
       "post": {
-        "summary": "Finalise the data entry for a polling station",
+        "summary": "Resolve data entry differences by providing a `ResolveAction`",
         "operationId": "polling_station_data_entry_resolve",
         "parameters": [
           {
@@ -938,6 +938,16 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveAction"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Differences resolved successfully"
@@ -3618,17 +3628,24 @@
             "description": "Preference threshold as a percentage (0 to 100)",
             "minimum": 0
           }
-        }
-      },
-      "Role": {
-        "type": "string",
-        "enum": [
-          "administrator",
-          "typist",
-          "coordinator"
-        ]
-      },
-      "SaveDataEntryResponse": {
+        },
+        "ResolveAction": {
+          "type": "string",
+          "enum": [
+            "keep_first_entry",
+            "keep_second_entry",
+            "discard_both_entries"
+          ]
+        },
+        "Role": {
+          "type": "string",
+          "enum": [
+            "administrator",
+            "typist",
+            "coordinator"
+          ]
+        },
+        "SaveDataEntryResponse": {
         "type": "object",
         "description": "Response structure for saving data entry of polling station results",
         "required": [

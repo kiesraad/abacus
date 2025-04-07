@@ -5,6 +5,7 @@ use crate::{
     election::{CandidateNumber, PGNumber, PoliticalGroup},
     error::ErrorReference,
 };
+use axum::extract::FromRequest;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, types::Json};
@@ -262,6 +263,15 @@ pub struct CandidateVotes {
     pub number: CandidateNumber,
     #[schema(value_type = u32)]
     pub votes: Count,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
+#[from_request(via(axum::Json), rejection(APIError))]
+#[serde(rename_all = "snake_case")]
+pub enum ResolveAction {
+    KeepFirstEntry,
+    KeepSecondEntry,
+    DiscardBothEntries,
 }
 
 #[cfg(test)]

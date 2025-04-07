@@ -148,6 +148,7 @@ where
     }
 }
 
+#[derive(Clone)]
 pub struct Users(SqlitePool);
 
 impl Users {

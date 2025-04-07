@@ -106,7 +106,12 @@ pub async fn extend_session(
 
 #[cfg(test)]
 mod test {
-    use axum::{body::Body, extract::State, response::Response};
+    use axum::{
+        body::Body,
+        extract::{Request, State},
+        response::Response,
+    };
+    use axum_extra::extract::CookieJar;
     use chrono::TimeDelta;
     use cookie::Cookie;
     use hyper::header::SET_COOKIE;
@@ -114,10 +119,70 @@ mod test {
     use std::{net::Ipv4Addr, str::FromStr};
     use test_log::test;
 
+    use super::{extend_session, inject_user};
+
     use crate::{
         audit_log::{AuditLog, AuditService},
-        authentication::{Role, Sessions, User, extend_session},
+        authentication::{Role, Sessions, User, Users},
     };
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_inject_user(pool: SqlitePool) {
+        let sessions = Sessions::new(pool.clone());
+        let users = Users::new(pool.clone());
+        let jar = CookieJar::new();
+
+        let request = inject_user(
+            State(users.clone()),
+            State(sessions.clone()),
+            jar.clone(),
+            Request::new(Body::empty()),
+        )
+        .await;
+
+        assert!(
+            request.extensions().get::<User>().is_none(),
+            "inject_user should not inject a user if there is no session cookie"
+        );
+
+        let user = User::test_user(Role::Administrator);
+        let session = sessions
+            .create(user.id(), TimeDelta::seconds(60 * 20))
+            .await
+            .unwrap();
+
+        let mut jar = CookieJar::new();
+        let cookie = session.get_cookie();
+        jar = jar.add(cookie);
+
+        let request = inject_user(
+            State(users.clone()),
+            State(sessions.clone()),
+            jar.clone(),
+            Request::new(Body::empty()),
+        )
+        .await;
+
+        assert!(
+            request.extensions().get::<User>().is_some(),
+            "inject_user should inject a user if there is a session cookie"
+        );
+
+        users.delete(user.id()).await.unwrap();
+
+        let request = inject_user(
+            State(users.clone()),
+            State(sessions.clone()),
+            jar,
+            Request::new(Body::empty()),
+        )
+        .await;
+
+        assert!(
+            request.extensions().get::<User>().is_none(),
+            "inject_user should not inject a user if the user is removed from the database"
+        );
+    }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_extend_session(pool: SqlitePool) {
@@ -131,7 +196,7 @@ mod test {
         );
 
         let updated_response = extend_session(
-            State(sessions),
+            State(sessions.clone()),
             audit_service.clone(),
             None,
             None,
@@ -148,12 +213,10 @@ mod test {
         );
 
         let life_time = TimeDelta::seconds(60 * 20); // 20 minutes
-        let sessions = Sessions::new(pool.clone());
         let session = sessions.create(user.id(), life_time).await.unwrap();
 
-        let sessions = Sessions::new(pool.clone());
         let updated_response = extend_session(
-            State(sessions),
+            State(sessions.clone()),
             audit_service.clone(),
             Some(session.clone()),
             Some(user.clone()),
@@ -173,12 +236,10 @@ mod test {
         );
 
         let life_time = TimeDelta::seconds(60 * 10); // 10 minutes
-        let sessions = Sessions::new(pool.clone());
         let session = sessions.create(user.id(), life_time).await.unwrap();
 
-        let sessions = Sessions::new(pool.clone());
         let updated_response = extend_session(
-            State(sessions),
+            State(sessions.clone()),
             audit_service.clone(),
             Some(session.clone()),
             Some(user),
@@ -189,7 +250,6 @@ mod test {
         let cookie = updated_response.headers().get(SET_COOKIE).unwrap();
         let cookie = Cookie::from_str(cookie.to_str().unwrap()).unwrap();
 
-        let sessions = Sessions::new(pool.clone());
         let new_session = sessions.get_by_key(cookie.value()).await.unwrap().unwrap();
 
         assert_eq!(

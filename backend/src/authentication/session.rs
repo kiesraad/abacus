@@ -90,6 +90,7 @@ impl Session {
 }
 
 /// Sessions repository
+#[derive(Clone)]
 pub struct Sessions(SqlitePool);
 
 impl Sessions {

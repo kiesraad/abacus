@@ -1,7 +1,7 @@
-import { LoginForm } from "@/components/form/account/login/LoginForm";
+import { PageTitle } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
-import { t } from "@kiesraad/i18n";
-import { PageTitle } from "@kiesraad/ui";
+import { LoginForm } from "./LoginForm";
 
 export function LoginPage() {
   return (

@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router";
 
-import { PollingStationForm } from "@/components/form/polling_station/PollingStationForm";
+import { PollingStation, useElection } from "@/api";
+import { PageTitle } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
-import { PollingStation, useElection } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { PageTitle } from "@kiesraad/ui";
+import { PollingStationForm } from "./PollingStationForm";
 
 export function PollingStationCreatePage() {
   const { election } = useElection();

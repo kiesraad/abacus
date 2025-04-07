@@ -30,28 +30,20 @@ jobs:
         shell: bash
         run: >
           rustup update nightly &&
-          rustup default nightly &&
-          echo RUST_VERSION=$(rustc --version | awk -F '[( ]' '{print $4}') >> $GITHUB_ENV
+          rustup default nightly
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "backend -> target"
+          cache-bin: "false"
       - name: Install Binstall
         uses: cargo-bins/cargo-binstall@main
       - name: Install cargo-llvm-cov
         run: cargo binstall cargo-llvm-cov
       - name: Install Nextest
         run: cargo binstall cargo-nextest
-      - name: Cargo cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/.crates.toml
-            ~/.cargo/.crates2.json
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            ./backend/target/
-          key: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-
       - name: Run tests with coverage
-        run: cargo llvm-cov --branch nextest --profile ci --features embed-typst
+        run: cargo llvm-cov nextest --branch --profile ci --features embed-typst
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1

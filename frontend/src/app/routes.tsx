@@ -4,7 +4,6 @@ import { DevHomePage } from "@/app/DevHomePage";
 import { ElectionLayout } from "@/app/ElectionLayout";
 import { NotAvailableInMock } from "@/app/NotAvailableInMock";
 import { NotFoundPage } from "@/app/NotFoundPage";
-import { CheckAndSaveForm } from "@/components/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AccountSetupPage } from "@/features/account/components/AccountSetupPage";
 import { LoginLayout } from "@/features/account/components/LoginLayout";
 import { LoginPage } from "@/features/account/components/LoginPage";
@@ -15,12 +14,13 @@ import { ApportionmentPage } from "@/features/apportionment/components/Apportion
 import { ApportionmentFullSeatsPage } from "@/features/apportionment/components/full_seats/ApportionmentFullSeatsPage";
 import { ApportionmentListDetailsPage } from "@/features/apportionment/components/list_details/ApportionmentListDetailsPage";
 import { ApportionmentResidualSeatsPage } from "@/features/apportionment/components/residual_seats/ApportionmentResidualSeatsPage";
-import { CandidatesVotesPage } from "@/features/data_entry/components/CandidatesVotesPage";
-import { DataEntryHomePage } from "@/features/data_entry/components/DataEntryHomePage";
+import { CandidatesVotesPage } from "@/features/data_entry/components/candidates_votes/CandidatesVotesPage";
+import { CheckAndSavePage } from "@/features/data_entry/components/check_and_save/CheckAndSavePage";
 import { DataEntryLayout } from "@/features/data_entry/components/DataEntryLayout";
-import { DifferencesPage } from "@/features/data_entry/components/DifferencesPage";
-import { RecountedPage } from "@/features/data_entry/components/RecountedPage";
-import { VotersAndVotesPage } from "@/features/data_entry/components/VotersAndVotesPage";
+import { DifferencesPage } from "@/features/data_entry/components/differences/DifferencesPage";
+import { RecountedPage } from "@/features/data_entry/components/recounted/RecountedPage";
+import { VotersAndVotesPage } from "@/features/data_entry/components/voters_and_votes/VotersAndVotesPage";
+import { DataEntryChoicePage } from "@/features/data_entry_choice/components/DataEntryChoicePage";
 import { ElectionCreatePage } from "@/features/election_management/components";
 import { ElectionHomePage } from "@/features/election_management/components/ElectionHomePage";
 import { ElectionReportPage } from "@/features/election_management/components/ElectionReportPage";
@@ -83,15 +83,14 @@ export const routes = createRoutesFromElements(
           <Route path=":pollingStationId/update" element={<PollingStationUpdatePage />} />
         </Route>
         <Route path="data-entry" element={null}>
-          <Route index element={<DataEntryHomePage />} />
+          <Route index element={<DataEntryChoicePage />} />
           <Route path=":pollingStationId/:entryNumber" element={<DataEntryLayout />}>
-            {/* The PollingStationFormController will navigate to the correct section. */}
             <Route index element={null} />
             <Route path="recounted" element={<RecountedPage />} />
             <Route path="voters-and-votes" element={<VotersAndVotesPage />} />
             <Route path="differences" element={<DifferencesPage />} />
             <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-            <Route path="save" element={<CheckAndSaveForm />} />
+            <Route path="save" element={<CheckAndSavePage />} />
           </Route>
         </Route>
       </Route>

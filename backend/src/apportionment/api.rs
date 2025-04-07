@@ -1,8 +1,8 @@
-use crate::apportionment::{candidate_nomination, get_total_seats_from_apportionment_result};
 use crate::{
     APIError, AppState, ErrorResponse,
     apportionment::{
-        ApportionmentError, CandidateNominationResult, SeatAssignmentResult, seat_assignment,
+        ApportionmentError, CandidateNominationResult, SeatAssignmentResult, candidate_nomination,
+        get_total_seats_from_apportionment_result, seat_assignment,
     },
     authentication::Coordinator,
     data_entry::{

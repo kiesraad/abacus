@@ -12,7 +12,7 @@ __Hoofdscenario:__
 1. Het GSB opent de zitting.
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na 31-2 Bijlage 1 in.
-4. De coördinator GSB geeft in de applicatie aan dat de zitting is geopend.
+4. De coördinator GSB geeft in de applicatie aan dat de zitting is geopend en voert de locatie en starttijd in.
 5. [De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in.](./gsb-invoer-eerste-zitting.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger)
 6. [De coördinator GSB maakt het PV en het digitale bestand aan.](#de-coördinator-gsb-maakt-het-pv-en-het-digitale-bestand-aan-zee)
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
@@ -48,6 +48,7 @@ __Uitbreidingen:__
 
 ### Open punten
 
+- We willen zoveel mogelijk van het PV in de applicatie invoeren. Dus idealiter worden alleen de handtekeningen van de GSB-leden met pen gezet. Dat is niet wat er op dit moment in de use cases staat.
 - Hoe ziet de overdracht van het EML_NL bestand van GSB naar CSB binnen de applicatie er precies uit?
   - De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
   - Proces via uitwisselplatform loopt parallel.

@@ -2,7 +2,6 @@ use axum::{
     extract::{FromRef, FromRequestParts, OptionalFromRequestParts},
     http::request::Parts,
 };
-use axum_extra::extract::CookieJar;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{Error, FromRow, SqlitePool, query, query_as};
@@ -11,11 +10,9 @@ use utoipa::ToSchema;
 use crate::{APIError, AppState, audit_log::UserDetails};
 
 use super::{
-    SESSION_COOKIE_NAME,
     error::AuthenticationError,
     password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     role::Role,
-    session::Sessions,
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
@@ -121,49 +118,33 @@ impl User {
 }
 
 /// Implement the FromRequestParts trait for User, this allows us to extract a User from a request
-/// using the user repository and the session cookie
 impl<S> FromRequestParts<S> for User
 where
-    Users: FromRef<S>,
     S: Send + Sync,
 {
     type Rejection = APIError;
 
-    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let users = Users::from_ref(state);
-
-        let jar = CookieJar::from_headers(&parts.headers);
-        let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
-            return Err(AuthenticationError::NoSessionCookie.into());
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        let Some(user) = parts.extensions.get::<User>() else {
+            return Err(AuthenticationError::Unauthenticated.into());
         };
 
-        let user = users.get_by_session_key(session_cookie.value()).await?;
-
-        user.update_last_activity_at(&users).await?;
-
-        Ok(user)
+        Ok(user.clone())
     }
 }
 
 /// Implement the OptionalFromRequestParts trait for User, this allows us to extract a Option<User> from a request
-/// using the user repository and the session cookie
 impl<S> OptionalFromRequestParts<S> for User
 where
-    Users: FromRef<S>,
     S: Send + Sync,
 {
     type Rejection = APIError;
 
     async fn from_request_parts(
         parts: &mut Parts,
-        state: &S,
+        _state: &S,
     ) -> Result<Option<Self>, Self::Rejection> {
-        let user_result = <User as FromRequestParts<S>>::from_request_parts(parts, state).await;
-
-        match user_result {
-            Ok(user) => Ok(Some(user)),
-            Err(_) => Ok(None),
-        }
+        Ok(parts.extensions.get::<User>().cloned())
     }
 }
 
@@ -189,23 +170,6 @@ impl Users {
         } else {
             Err(AuthenticationError::InvalidPassword)
         }
-    }
-
-    /// Get a user by their session key
-    pub async fn get_by_session_key(&self, session_key: &str) -> Result<User, AuthenticationError> {
-        let sessions = Sessions::new(self.0.clone());
-
-        // fetch the session from the database
-        let Some(session) = sessions.get_by_key(session_key).await? else {
-            return Err(AuthenticationError::SessionKeyNotFound);
-        };
-
-        // fetch the user from the database
-        let Some(user) = self.get_by_id(session.user_id()).await? else {
-            return Err(AuthenticationError::UserNotFound);
-        };
-
-        Ok(user)
     }
 
     /// Create a new user, save an Argon2id v19 hash of the password
@@ -432,7 +396,6 @@ impl FromRef<AppState> for Users {
 
 #[cfg(test)]
 mod tests {
-    use chrono::TimeDelta;
     use sqlx::SqlitePool;
     use test_log::test;
 
@@ -440,7 +403,6 @@ mod tests {
         error::AuthenticationError,
         password,
         role::Role,
-        session::Sessions,
         user::{User, Users},
     };
 
@@ -533,45 +495,6 @@ mod tests {
         assert!(matches!(
             authenticated_user,
             AuthenticationError::UserNotFound
-        ));
-    }
-
-    #[test(sqlx::test)]
-    async fn test_from_session_key(pool: SqlitePool) {
-        let users = Users::new(pool.clone());
-        let sessions = Sessions::new(pool.clone());
-
-        let user = users
-            .create(
-                "test_user",
-                Some("Full Name"),
-                "TotallyValidP4ssW0rd",
-                Role::Administrator,
-            )
-            .await
-            .unwrap();
-        let session = sessions
-            .create(user.id, TimeDelta::seconds(60))
-            .await
-            .unwrap();
-
-        let fetched_user = users
-            .get_by_session_key(session.session_key())
-            .await
-            .unwrap();
-
-        assert_eq!(user, fetched_user);
-
-        sessions.delete(session.session_key()).await.unwrap();
-
-        let fetched_user = users
-            .get_by_session_key(session.session_key())
-            .await
-            .unwrap_err();
-
-        assert!(matches!(
-            fetched_user,
-            AuthenticationError::SessionKeyNotFound
         ));
     }
 

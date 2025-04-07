@@ -62,6 +62,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let router = Router::from(openapi_router());
 
     // Add middleware to trace all HTTP requests and extend the user's session lifetime if needed
+    // Caution: make sure "inject_user" is added after "extend_session"
     let router = router
         .layer(
             TraceLayer::new_for_http()
@@ -75,6 +76,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .layer(middleware::map_response_with_state(
             state.clone(),
             authentication::extend_session,
+        ))
+        .layer(middleware::map_request_with_state(
+            state.clone(),
+            authentication::inject_user,
         ));
 
     // Add the memory-serve router to serve the frontend (if the memory-serve feature is enabled)

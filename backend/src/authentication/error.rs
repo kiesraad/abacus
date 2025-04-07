@@ -11,6 +11,7 @@ pub enum AuthenticationError {
     HashPassword(password_hash::Error),
     BackwardTimeTravel,
     Unauthorized,
+    Unauthenticated,
     PasswordRejection,
 }
 

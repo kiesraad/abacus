@@ -229,7 +229,7 @@ impl IntoResponse for APIError {
                         StatusCode::UNAUTHORIZED,
                         to_error("Invalid session", ErrorReference::InvalidSession, false),
                     ),
-                    AuthenticationError::Unauthorized => (
+                    AuthenticationError::Unauthorized | AuthenticationError::Unauthenticated => (
                         StatusCode::UNAUTHORIZED,
                         to_error("Unauthorized", ErrorReference::Unauthorized, false),
                     ),

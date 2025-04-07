@@ -58,6 +58,10 @@ mod tests {
                 state.clone(),
                 extend_session,
             ))
+            .layer(middleware::map_request_with_state(
+                state.clone(),
+                inject_user,
+            ))
             .with_state(state)
     }
 

@@ -62,34 +62,31 @@ pub async fn extend_session(
     user: Option<User>,
     mut response: Response,
 ) -> Response {
-    let Some(session) = session else {
+    // check that there is a authenticated user and a session
+    let (Some(session), Some(user)) = (session, user) else {
         return response;
     };
 
     let mut expires = session.expires_at();
 
-    let Ok(min_life_time) = get_expires_at(SESSION_MIN_LIFE_TIME) else {
-        return response;
-    };
+    let min_life_time = get_expires_at(SESSION_MIN_LIFE_TIME);
     let now = Utc::now();
 
     // extend lifetime of session and set new cookie if the session is still valid and will soon be expired
     if expires < min_life_time && expires > now {
         if let Ok(session) = sessions.extend_session(&session).await {
-            if let Some(user) = user {
-                let _ = audit_service
-                    .with_user(user.clone())
-                    .log(&AuditEvent::UserSessionExtended, None)
-                    .await;
+            let _ = audit_service
+                .with_user(user.clone())
+                .log(&AuditEvent::UserSessionExtended, None)
+                .await;
 
-                let mut cookie = session.get_cookie();
-                set_default_cookie_properties(&mut cookie);
+            let mut cookie = session.get_cookie();
+            set_default_cookie_properties(&mut cookie);
 
-                debug!("Setting cookie: {:?}", cookie);
+            debug!("Setting cookie: {:?}", cookie);
 
-                if let Ok(header_value) = cookie.encoded().to_string().parse() {
-                    response.headers_mut().append(SET_COOKIE, header_value);
-                }
+            if let Ok(header_value) = cookie.encoded().to_string().parse() {
+                response.headers_mut().append(SET_COOKIE, header_value);
             }
 
             info!("Session extended for user {}", session.user_id());
@@ -105,4 +102,105 @@ pub async fn extend_session(
     }
 
     response
+}
+
+#[cfg(test)]
+mod test {
+    use axum::{body::Body, extract::State, response::Response};
+    use chrono::TimeDelta;
+    use cookie::Cookie;
+    use hyper::header::SET_COOKIE;
+    use sqlx::SqlitePool;
+    use std::{net::Ipv4Addr, str::FromStr};
+    use test_log::test;
+
+    use crate::{
+        audit_log::{AuditLog, AuditService},
+        authentication::{Role, Sessions, User, extend_session},
+    };
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_extend_session(pool: SqlitePool) {
+        let sessions = Sessions::new(pool.clone());
+        let user = User::test_user(Role::Administrator);
+
+        let audit_service = AuditService::new(
+            AuditLog::new(pool.clone()),
+            user.clone(),
+            Some(Ipv4Addr::new(203, 0, 113, 0).into()),
+        );
+
+        let updated_response = extend_session(
+            State(sessions),
+            audit_service.clone(),
+            None,
+            None,
+            Response::new(Body::empty()),
+        )
+        .await;
+
+        assert!(
+            updated_response
+                .headers()
+                .get("X-Session-Expires-At")
+                .is_none(),
+            "extend_session should not return a header given an unauthenticated request"
+        );
+
+        let life_time = TimeDelta::seconds(60 * 20); // 20 minutes
+        let sessions = Sessions::new(pool.clone());
+        let session = sessions.create(user.id(), life_time).await.unwrap();
+
+        let sessions = Sessions::new(pool.clone());
+        let updated_response = extend_session(
+            State(sessions),
+            audit_service.clone(),
+            Some(session.clone()),
+            Some(user.clone()),
+            Response::new(Body::empty()),
+        )
+        .await;
+
+        assert_eq!(
+            updated_response
+                .headers()
+                .get("X-Session-Expires-At")
+                .unwrap()
+                .to_str()
+                .unwrap(),
+            session.expires_at().to_rfc3339().as_str(),
+            "extend_session should return the current expiration time"
+        );
+
+        let life_time = TimeDelta::seconds(60 * 10); // 10 minutes
+        let sessions = Sessions::new(pool.clone());
+        let session = sessions.create(user.id(), life_time).await.unwrap();
+
+        let sessions = Sessions::new(pool.clone());
+        let updated_response = extend_session(
+            State(sessions),
+            audit_service.clone(),
+            Some(session.clone()),
+            Some(user),
+            Response::new(Body::empty()),
+        )
+        .await;
+
+        let cookie = updated_response.headers().get(SET_COOKIE).unwrap();
+        let cookie = Cookie::from_str(cookie.to_str().unwrap()).unwrap();
+
+        let sessions = Sessions::new(pool.clone());
+        let new_session = sessions.get_by_key(cookie.value()).await.unwrap().unwrap();
+
+        assert_eq!(
+            updated_response
+                .headers()
+                .get("X-Session-Expires-At")
+                .unwrap()
+                .to_str()
+                .unwrap(),
+            new_session.expires_at().to_rfc3339().as_str(),
+            "extend_session should update the expiration time"
+        );
+    }
 }

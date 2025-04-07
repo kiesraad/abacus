@@ -11,6 +11,7 @@ use crate::{
 
 use super::{AuditEvent, AuditLog, AuditLogEvent};
 
+#[derive(Clone)]
 pub struct AuditService {
     log: AuditLog,
     user: Option<User>,

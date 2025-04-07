@@ -45,7 +45,7 @@ impl Session {
     // Create a new session for a specific user
     pub(super) fn new(user_id: u32, life_time: TimeDelta) -> Result<Self, AuthenticationError> {
         let session_key = create_new_session_key();
-        let expires_at = get_expires_at(life_time)?;
+        let expires_at = get_expires_at(life_time);
         let created_at = Utc::now();
 
         Ok(Self {
@@ -194,7 +194,7 @@ impl Sessions {
         &self,
         session: &Session,
     ) -> Result<Session, AuthenticationError> {
-        let new_expires_at = get_expires_at(SESSION_LIFE_TIME)?;
+        let new_expires_at = get_expires_at(SESSION_LIFE_TIME);
         let session_key = session.session_key();
 
         let session = sqlx::query_as!(

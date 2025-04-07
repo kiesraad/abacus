@@ -240,7 +240,6 @@ impl IntoResponse for APIError {
                     // server errors
                     AuthenticationError::Database(_)
                     | AuthenticationError::HashPassword(_)
-                    | AuthenticationError::BackwardTimeTravel
                     | AuthenticationError::InvalidSessionDuration => (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         to_error(

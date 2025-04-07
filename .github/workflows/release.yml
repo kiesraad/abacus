@@ -50,7 +50,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y musl-tools
         if: matrix.target.os == 'ubuntu-latest'
       - name: Run tests
-        run: cargo --locked test --release
+        run: cargo --locked test --release --features embed-typst
       - name: Build
         run: cargo --locked build --release --features memory-serve,embed-typst --target=${{ matrix.target.name }}
       - uses: actions/upload-artifact@v4

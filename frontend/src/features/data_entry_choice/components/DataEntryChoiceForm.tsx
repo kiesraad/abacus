@@ -8,16 +8,16 @@ import { IconError } from "@/lib/icon";
 import { cn, getUrlForDataEntry, parseIntUserInput } from "@/lib/util";
 
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
-import cls from "./DataEntryChoice.module.css";
-import { PollingStationLink } from "./PollingStationLink";
-import { PollingStationSelector } from "./PollingStationSelector";
-import { PollingStationsList } from "./PollingStationsList";
 import {
   dataEntryFinished,
   getPollingStationWithStatusList,
   PollingStationUserStatus,
   PollingStationWithStatus,
-} from "./util";
+} from "../utils/util";
+import cls from "./DataEntryChoice.module.css";
+import { PollingStationLink } from "./PollingStationLink";
+import { PollingStationSelector } from "./PollingStationSelector";
+import { PollingStationsList } from "./PollingStationsList";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
 

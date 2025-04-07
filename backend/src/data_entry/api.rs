@@ -24,6 +24,8 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+use super::PollingStationDataEntry;
+
 /// Response structure for getting data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ClaimDataEntryResponse {
@@ -344,7 +346,7 @@ async fn polling_station_data_entry_resolve(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     Path(polling_station_id): Path<u32>,
     resolve_action: ResolveAction,
-) -> Result<(), APIError> {
+) -> Result<Json<PollingStationDataEntry>, APIError> {
     let state = polling_station_data_entries
         .get_or_default(polling_station_id)
         .await?;
@@ -357,11 +359,11 @@ async fn polling_station_data_entry_resolve(
 
     // TODO: Logging
 
-    polling_station_data_entries
-        .upsert(polling_station_id, &new_state)
-        .await?;
-
-    Ok(())
+    Ok(Json(
+        polling_station_data_entries
+            .upsert(polling_station_id, &new_state)
+            .await?,
+    ))
 }
 
 /// Election polling stations data entry statuses response

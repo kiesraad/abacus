@@ -72,9 +72,6 @@ components:
   - name: "(Frontend) app/component/form/data_entry"
     include:
       - ".*/frontend/src/components/form/data_entry/.*"
-  - name: "(Frontend) app/component/form/polling_station"
-    include:
-      - ".*/frontend/src/components/form/polling_station/.*"
   - name: "(Frontend) Components/navbar"
     include:
       - ".*/frontend/src/components/navbar/.*"

@@ -3,18 +3,18 @@ import { screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionProvider, PollingStation } from "@kiesraad/api";
+import { ElectionProvider, PollingStation } from "@/api";
+import { overrideOnce, render, renderReturningRouter, server, spyOnHandler } from "@/testing";
 import {
   ElectionRequestHandler,
   PollingStationDeleteHandler,
   PollingStationGetHandler,
   PollingStationUpdateHandler,
-} from "@kiesraad/api-mocks";
-import { overrideOnce, render, renderReturningRouter, server, spyOnHandler } from "@kiesraad/test";
+} from "@/testing/api-mocks";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
-vi.mock(import("@kiesraad/util"), async (importOriginal) => ({
+vi.mock(import("@/lib/util"), async (importOriginal) => ({
   ...(await importOriginal()),
   useNumericParam: () => 1,
 }));

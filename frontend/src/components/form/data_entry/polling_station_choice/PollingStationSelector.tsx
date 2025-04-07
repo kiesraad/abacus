@@ -1,20 +1,19 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { DataEntryStatusName, PollingStation } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError, IconWarning } from "@kiesraad/icon";
 import { Badge, Icon, InputField, Spinner } from "@kiesraad/ui";
-import { cn, removeLeadingZeros, usePollingStationStatus } from "@kiesraad/util";
+import { cn, removeLeadingZeros } from "@kiesraad/util";
 
 import cls from "./PollingStationSelector.module.css";
+import { PollingStationUserStatus, PollingStationWithStatus } from "./util";
 
 export interface PollingStationSelectorProps {
   pollingStationNumber: string;
   setPollingStationNumber: Dispatch<SetStateAction<string>>;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
-  currentPollingStation: PollingStation | undefined;
-  setCurrentPollingStation: Dispatch<SetStateAction<PollingStation | undefined>>;
+  currentPollingStation: PollingStationWithStatus | undefined;
   setAlert: Dispatch<SetStateAction<string | undefined>>;
   handleSubmit: () => void;
 }
@@ -27,9 +26,6 @@ export function PollingStationSelector({
   setAlert,
   handleSubmit,
 }: PollingStationSelectorProps) {
-  const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id);
-  const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
-
   return (
     <div className={cls.container}>
       <InputField
@@ -51,6 +47,7 @@ export function PollingStationSelector({
           }
         }}
       />
+
       {pollingStationNumber.trim() !== "" &&
         (() => {
           if (loading) {
@@ -63,27 +60,43 @@ export function PollingStationSelector({
               </div>
             );
           } else if (currentPollingStation) {
-            if (currentPollingStationStatus && firstAndSecondEntryFinished.includes(currentPollingStationStatus)) {
-              return (
-                <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.warning)}>
-                  <span className={cls.icon}>
-                    <Icon icon={<IconWarning aria-label={t("contains_warning")} />} color="warning" />
-                  </span>
-                  <span>
-                    {tx("polling_station_choice.has_already_been_filled_twice", undefined, {
-                      nr: currentPollingStation.number,
-                      name: currentPollingStation.name,
-                    })}
-                  </span>
-                </div>
-              );
-            } else {
-              return (
-                <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.success)}>
-                  <span className="bold">{currentPollingStation.name}</span>
-                  {currentPollingStationStatus && <Badge type={currentPollingStationStatus} showIcon />}
-                </div>
-              );
+            switch (currentPollingStation.userStatus) {
+              case PollingStationUserStatus.Finished:
+                return (
+                  <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.warning)}>
+                    <span className={cls.icon}>
+                      <Icon icon={<IconWarning aria-label={t("contains_warning")} />} color="warning" />
+                    </span>
+                    <span>
+                      {tx("polling_station_choice.has_already_been_filled_twice", undefined, {
+                        nr: currentPollingStation.number,
+                        name: currentPollingStation.name,
+                      })}
+                    </span>
+                  </div>
+                );
+              case PollingStationUserStatus.InProgressOtherUser:
+                return (
+                  <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.warning)}>
+                    <span className={cls.icon}>
+                      <Icon icon={<IconWarning aria-label={t("contains_warning")} />} color="warning" />
+                    </span>
+                    <span>
+                      {tx("polling_station_choice.assigned_to_different_user", undefined, {
+                        nr: currentPollingStation.number,
+                      })}
+                    </span>
+                  </div>
+                );
+              default:
+                return (
+                  <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.success)}>
+                    <span className="bold">{currentPollingStation.name}</span>
+                    {currentPollingStation.statusEntry && (
+                      <Badge type={currentPollingStation.statusEntry.status} showIcon />
+                    )}
+                  </div>
+                );
             }
           } else {
             return (

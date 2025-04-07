@@ -136,7 +136,7 @@ mod tests {
             UserLoggedInDetails,
             api::{audit_log_list, audit_log_list_users},
         },
-        authentication::{Sessions, Users, inject_user},
+        authentication::{Sessions, User, Users, inject_user},
     };
 
     fn new_test_audit_service(pool: SqlitePool, user: User) -> AuditService {

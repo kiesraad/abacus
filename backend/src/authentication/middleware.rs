@@ -79,7 +79,7 @@ pub async fn extend_session(
             if let Some(user) = user {
                 let _ = audit_service
                     .with_user(user.clone())
-                    .log_success(&AuditEvent::UserSessionExtended, None)
+                    .log(&AuditEvent::UserSessionExtended, None)
                     .await;
 
                 let mut cookie = session.get_cookie();

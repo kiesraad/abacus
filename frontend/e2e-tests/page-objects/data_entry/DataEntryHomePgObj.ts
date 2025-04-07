@@ -2,7 +2,7 @@ import { expect, type Locator, type Page } from "@playwright/test";
 
 import { PollingStation } from "@/api";
 
-export class PollingStationChoicePage {
+export class DataEntryHomePage {
   readonly fieldset: Locator;
   readonly fieldsetNextPollingStation: Locator;
   readonly pollingStationNumber: Locator;

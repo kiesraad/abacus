@@ -5,8 +5,8 @@ import { PollingStation, PollingStationResults } from "@kiesraad/api";
 import {
   CandidatesListPage,
   CheckAndSavePage,
+  DataEntryHomePage,
   DifferencesPage,
-  PollingStationChoicePage,
   RecountedPage,
   VotersAndVotesPage,
 } from "../page-objects/data_entry";
@@ -14,11 +14,11 @@ import {
 export async function selectPollingStationForDataEntry(page: Page, pollingStation: PollingStation) {
   await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
 
-  const pollingStationChoicePage = new PollingStationChoicePage(page);
-  await expect(pollingStationChoicePage.fieldset).toBeVisible();
-  await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
-  await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation.name);
-  await pollingStationChoicePage.clickStart();
+  const dataEntryHomePage = new DataEntryHomePage(page);
+  await expect(dataEntryHomePage.fieldset).toBeVisible();
+  await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
+  await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
+  await dataEntryHomePage.clickStart();
 
   const recountedPage = new RecountedPage(page);
   await expect(recountedPage.fieldset).toBeVisible();
@@ -66,7 +66,7 @@ export async function fillDataEntryPagesAndSave(page: Page, results: PollingStat
   await expect(checkAndSavePage.fieldset).toBeVisible();
   await checkAndSavePage.save.click();
 
-  const pollingStationChoicePage = new PollingStationChoicePage(page);
-  await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
-  return pollingStationChoicePage;
+  const dataEntryHomePage = new DataEntryHomePage(page);
+  await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+  return dataEntryHomePage;
 }

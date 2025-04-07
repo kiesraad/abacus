@@ -192,6 +192,9 @@ export type AuditEvent =
   | (DataEntryDetails & { eventType: "DataEntrySaved" })
   | (DataEntryDetails & { eventType: "DataEntryDeleted" })
   | (DataEntryDetails & { eventType: "DataEntryFinalized" })
+  | (DataEntryDetails & { eventType: "DataEntryKeptFirst" })
+  | (DataEntryDetails & { eventType: "DataEntryKeptSecond" })
+  | (DataEntryDetails & { eventType: "DataEntryDiscardedBoth" })
   | (ErrorDetails & { eventType: "Error" })
   | { eventType: "UnknownEvent" };
 

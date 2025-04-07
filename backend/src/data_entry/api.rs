@@ -345,25 +345,56 @@ async fn polling_station_data_entry_resolve(
     _user: Coordinator,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     Path(polling_station_id): Path<u32>,
+    audit_service: AuditService,
     resolve_action: ResolveAction,
 ) -> Result<Json<PollingStationDataEntry>, APIError> {
     let state = polling_station_data_entries
         .get_or_default(polling_station_id)
         .await?;
 
-    let new_state = match resolve_action {
-        ResolveAction::KeepFirstEntry => state.keep_first_entry(),
-        ResolveAction::KeepSecondEntry => state.keep_second_entry(),
-        ResolveAction::DiscardBothEntries => state.delete_entries(),
-    }?;
+    let data_entry = match resolve_action {
+        ResolveAction::KeepFirstEntry => {
+            let new_state = state.keep_first_entry()?;
+            let data_entry = polling_station_data_entries
+                .upsert(polling_station_id, &new_state)
+                .await?;
+            audit_service
+                .log(
+                    &AuditEvent::DataEntryKeptFirst(data_entry.clone().into()),
+                    None,
+                )
+                .await?;
+            data_entry
+        }
+        ResolveAction::KeepSecondEntry => {
+            let new_state = state.keep_second_entry()?;
+            let data_entry = polling_station_data_entries
+                .upsert(polling_station_id, &new_state)
+                .await?;
+            audit_service
+                .log(
+                    &AuditEvent::DataEntryKeptSecond(data_entry.clone().into()),
+                    None,
+                )
+                .await?;
+            data_entry
+        }
+        ResolveAction::DiscardBothEntries => {
+            let new_state = state.delete_entries()?;
+            let data_entry = polling_station_data_entries
+                .upsert(polling_station_id, &new_state)
+                .await?;
+            audit_service
+                .log(
+                    &AuditEvent::DataEntryDiscardedBoth(data_entry.clone().into()),
+                    None,
+                )
+                .await?;
+            data_entry
+        }
+    };
 
-    // TODO: Logging
-
-    Ok(Json(
-        polling_station_data_entries
-            .upsert(polling_station_id, &new_state)
-            .await?,
-    ))
+    Ok(Json(data_entry))
 }
 
 /// Election polling stations data entry statuses response
@@ -545,10 +576,12 @@ pub mod tests {
     }
 
     async fn resolve(pool: SqlitePool, resolve_action: ResolveAction) -> Response {
+        let user = User::test_user(Role::Coordinator);
         polling_station_data_entry_resolve(
-            Coordinator(User::test_user(Role::Coordinator)),
+            Coordinator(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
             Path(1),
+            AuditService::new(AuditLog(pool), user, None),
             resolve_action,
         )
         .await

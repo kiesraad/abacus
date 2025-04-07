@@ -70,6 +70,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .layer(middleware::map_response_with_state(
             state.clone(),
+            audit_log::log_error,
+        ))
+        .layer(middleware::map_response_with_state(
+            state.clone(),
             authentication::extend_session,
         ));
 

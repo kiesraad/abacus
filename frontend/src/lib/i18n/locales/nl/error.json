@@ -18,7 +18,7 @@
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
     "DataEntryAlreadyClaimed": "Een andere invoerder is bezig met dit stembureau",
     "DrawingOfLotsRequired": "Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus",
-    "EntryNotFound": "De invoer is niet gevonden",
+    "EntryNotFound": "Niet gevonden",
     "EntryNotUnique": "Deze invoer bestaat al",
     "EntryNumberNotSupported": "Ongeldige invoer voor dit stembureau",
     "InternalServerError": "Er is een interne fout opgetreden",

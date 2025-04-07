@@ -46,6 +46,7 @@ const dataEntryMachineDefinition = {
     recountedPageChangedToErrorSubmitted: {},
     recountedPageChangedToErrorDiscarded: {},
     recountedPageFilledError: {},
+    recountedPageCorrected: {},
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilledValid",
@@ -99,6 +100,12 @@ const dataEntryMachineDefinition = {
         SUBMIT: "differencesPageCorrected",
       },
     },
+    votersVotesPageCorrectBackToValid: {
+      on: {
+        SUBMIT: "differencesPageCorrected",
+        GO_TO_RECOUNTED_PAGE: "unsavedChangesModalCorrectBackToValid",
+      },
+    },
     votersVotesPageWarningSubmitted: {},
     votersVotesPageAfterResumeError: {},
     votersVotesPageAfterResumeErrorChanged: {},
@@ -125,6 +132,11 @@ const dataEntryMachineDefinition = {
       on: {
         SAVE_UNSUBMITTED_CHANGES: "recountedPageChangedToErrorSubmitted",
         DISCARD_UNSUBMITTED_CHANGES: "recountedPageChangedToErrorDiscarded",
+      },
+    },
+    unsavedChangesModalCorrectBackToValid: {
+      on: {
+        SAVE_UNSUBMITTED_CHANGES: "recountedPageCorrected",
       },
     },
   },
@@ -242,6 +254,11 @@ test.describe("Data entry model test - errors", () => {
             await expect(recountedPage.no).toBeChecked();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
+          recountedPageCorrected: async () => {
+            await expect(recountedPage.fieldset).toBeVisible();
+            await expect(recountedPage.no).toBeChecked();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+          },
         };
         const recountedPageEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
@@ -295,6 +312,11 @@ test.describe("Data entry model test - errors", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersChanged, votes });
           },
+          votersVotesPageCorrectBackToValid: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersChanged, votes });
+          },
           votersVotesPageAfterResumeError: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
@@ -318,6 +340,9 @@ test.describe("Data entry model test - errors", () => {
             );
           },
           unsavedChangesModalChangedToError: async () => {
+            await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
+          },
+          unsavedChangesModalCorrectBackToValid: async () => {
             await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
           },
         };

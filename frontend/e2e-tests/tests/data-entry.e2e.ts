@@ -858,6 +858,7 @@ test.describe("api error responses", () => {
 
     await errorModal.close.click();
     await expect(errorModal.dialog).toBeHidden();
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
   });
 
   test("5xx response results in error shown", async ({ page, pollingStation }) => {
@@ -902,5 +903,6 @@ test.describe("api error responses", () => {
 
     await errorModal.close.click();
     await expect(errorModal.dialog).toBeHidden();
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
   });
 });

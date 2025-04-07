@@ -26,6 +26,7 @@ impl From<PollingStationDataEntry> for DataEntryDetails {
 
         Self {
             polling_station_id: value.polling_station_id,
+            data_entry_status: state.status_name().to_string(),
             data_entry_progress: state.get_progress(),
             finished_at: state.finished_at().cloned(),
             first_entry_user_id: state.get_first_entry_user_id(),

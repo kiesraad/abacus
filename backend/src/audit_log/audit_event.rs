@@ -67,6 +67,7 @@ pub struct PollingStationDetails {
 #[serde(rename_all = "camelCase")]
 pub struct DataEntryDetails {
     pub polling_station_id: u32,
+    pub data_entry_status: String,
     pub data_entry_progress: u8,
     #[schema(value_type = Option<String>)]
     pub finished_at: Option<DateTime<Utc>>,

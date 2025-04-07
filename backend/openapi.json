@@ -2353,6 +2353,7 @@
         "type": "object",
         "required": [
           "pollingStationId",
+          "dataEntryStatus",
           "dataEntryProgress"
         ],
         "properties": {
@@ -2360,6 +2361,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "dataEntryStatus": {
+            "type": "string"
           },
           "finishedAt": {
             "type": [

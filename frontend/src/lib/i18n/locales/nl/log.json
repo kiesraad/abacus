@@ -49,6 +49,7 @@
   },
   "field": {
     "dataEntryProgress": "Voortgang",
+    "dataEntryStatus": "Status",
     "electionCategory": "Verkiezingscategorie",
     "electionElectionDate": "Verkiezingsdatum",
     "electionId": "Verkiezings-ID",

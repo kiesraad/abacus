@@ -278,6 +278,7 @@ export interface DataEntry {
 
 export interface DataEntryDetails {
   dataEntryProgress: number;
+  dataEntryStatus: string;
   finishedAt?: string | null;
   firstEntryUserId?: number | null;
   pollingStationId: number;

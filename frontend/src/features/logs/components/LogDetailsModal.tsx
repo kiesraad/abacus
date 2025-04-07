@@ -11,6 +11,7 @@ import cls from "./LogsHomePage.module.css";
 const SHOULD_TRANSLATE: Record<string, string> = {
   role: "",
   reference: "error.api_error.",
+  dataEntryStatus: "status.",
 };
 
 // format an audit log event detail value

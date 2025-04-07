@@ -30,36 +30,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install dependencies
+      - name: Install npm dependencies
         run: npm ci
         working-directory: ./frontend
-      - name: Build
+      - name: Build frontend
         run: npm run build
         working-directory: ./frontend
       # Compile and test backend
+      - name: Install musl
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
       - name: Setup Rust
         shell: bash
         run: >
           rustup update stable &&
           rustup default stable &&
-          echo RUST_VERSION=$(rustc --version | cut -d' ' -f2) >> $GITHUB_ENV
+          rustup target add x86_64-unknown-linux-musl
       - name: Cargo cache
-        uses: actions/cache@v4
+        uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/.crates.toml
-            ~/.cargo/.crates2.json
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            ./backend/target/
-          key: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-
-      - name: Install musl
-        run: sudo apt-get update && sudo apt-get install -y musl-tools
-      - name: Install target
-        run: rustup target add x86_64-unknown-linux-musl
+          workspaces: "backend -> target"
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
       - name: Check Clippy with all features

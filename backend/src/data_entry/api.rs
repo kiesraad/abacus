@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{PollingStationDataEntry, ResolveAction};
+use super::PollingStationDataEntry;
 
 /// Response structure for getting data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -43,6 +43,27 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_data_entry_finalise))
         .routes(routes!(polling_station_data_entry_resolve))
         .routes(routes!(election_status))
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
+#[from_request(via(axum::Json), rejection(APIError))]
+#[serde(rename_all = "snake_case")]
+pub enum ResolveAction {
+    KeepFirstEntry,
+    KeepSecondEntry,
+    DiscardBothEntries,
+}
+
+impl ResolveAction {
+    pub fn audit_event(&self, data_entry: PollingStationDataEntry) -> AuditEvent {
+        match self {
+            ResolveAction::KeepFirstEntry => AuditEvent::DataEntryKeptFirst(data_entry.into()),
+            ResolveAction::KeepSecondEntry => AuditEvent::DataEntryKeptSecond(data_entry.into()),
+            ResolveAction::DiscardBothEntries => {
+                AuditEvent::DataEntryDiscardedBoth(data_entry.into())
+            }
+        }
+    }
 }
 
 /// Claim a data entry for a polling station, returning any existing progress
@@ -344,47 +365,19 @@ async fn polling_station_data_entry_resolve(
         .get_or_default(polling_station_id)
         .await?;
 
-    let data_entry = match resolve_action {
-        ResolveAction::KeepFirstEntry => {
-            let new_state = state.keep_first_entry()?;
-            let data_entry = polling_station_data_entries
-                .upsert(polling_station_id, &new_state)
-                .await?;
-            audit_service
-                .log(
-                    &AuditEvent::DataEntryKeptFirst(data_entry.clone().into()),
-                    None,
-                )
-                .await?;
-            data_entry
-        }
-        ResolveAction::KeepSecondEntry => {
-            let new_state = state.keep_second_entry()?;
-            let data_entry = polling_station_data_entries
-                .upsert(polling_station_id, &new_state)
-                .await?;
-            audit_service
-                .log(
-                    &AuditEvent::DataEntryKeptSecond(data_entry.clone().into()),
-                    None,
-                )
-                .await?;
-            data_entry
-        }
-        ResolveAction::DiscardBothEntries => {
-            let new_state = state.delete_entries()?;
-            let data_entry = polling_station_data_entries
-                .upsert(polling_station_id, &new_state)
-                .await?;
-            audit_service
-                .log(
-                    &AuditEvent::DataEntryDiscardedBoth(data_entry.clone().into()),
-                    None,
-                )
-                .await?;
-            data_entry
-        }
+    let new_state = match resolve_action {
+        ResolveAction::KeepFirstEntry => state.keep_first_entry()?,
+        ResolveAction::KeepSecondEntry => state.keep_second_entry()?,
+        ResolveAction::DiscardBothEntries => state.delete_entries()?,
     };
+
+    let data_entry = polling_station_data_entries
+        .upsert(polling_station_id, &new_state)
+        .await?;
+
+    audit_service
+        .log(&resolve_action.audit_event(data_entry.clone()), None)
+        .await?;
 
     Ok(Json(data_entry))
 }

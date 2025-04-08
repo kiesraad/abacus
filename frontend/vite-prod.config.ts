@@ -43,7 +43,6 @@ export default defineConfig(({ command }) => {
       emptyOutDir: true,
       sourcemap: true,
       minify: false,
-      // cssMinify: 'lightningcss',
       rollupOptions: {
         input: {
           app: "index.html",
@@ -53,7 +52,7 @@ export default defineConfig(({ command }) => {
     css: {
       transformer: "lightningcss",
       lightningcss: {
-        targets: browserslistToTargets(browserslist(">= 0.25%")),
+        targets: browserslistToTargets(browserslist(">= 0.25% and not dead")),
       },
     },
     define: {

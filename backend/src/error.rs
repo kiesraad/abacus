@@ -42,6 +42,7 @@ pub enum ErrorReference {
     InvalidUsernameOrPassword,
     InvalidVoteCandidate,
     InvalidVoteGroup,
+    PasswordRejection,
     PdfGenerationError,
     PollingStationDataValidation,
     PollingStationFirstEntryAlreadyFinalised,
@@ -53,7 +54,7 @@ pub enum ErrorReference {
     UserNotFound,
     UsernameNotUnique,
     Unauthorized,
-    PasswordRejection,
+    ZeroVotesCast,
 }
 
 /// Response structure for errors
@@ -287,6 +288,14 @@ impl IntoResponse for APIError {
                         to_error(
                             "Drawing of lots is required",
                             ErrorReference::DrawingOfLotsRequired,
+                            false,
+                        ),
+                    ),
+                    ApportionmentError::ZeroVotesCast => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "No votes on candidates cast",
+                            ErrorReference::ZeroVotesCast,
                             false,
                         ),
                     ),

@@ -2935,6 +2935,7 @@
           "EntryNotFound",
           "EntryNotUnique",
           "EntryNumberNotSupported",
+          "EmlImportError",
           "InternalServerError",
           "InvalidData",
           "InvalidDataEntryNumber",

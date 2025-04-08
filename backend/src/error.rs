@@ -17,6 +17,7 @@ use crate::{
     apportionment::ApportionmentError,
     authentication::error::AuthenticationError,
     data_entry::{DataError, status::DataEntryTransitionError},
+    eml::EMLImportError,
     pdf_gen::PdfGenError,
 };
 
@@ -31,6 +32,7 @@ pub enum ErrorReference {
     EntryNotFound,
     EntryNotUnique,
     EntryNumberNotSupported,
+    EmlImportError,
     InternalServerError,
     InvalidData,
     InvalidDataEntryNumber,
@@ -89,6 +91,7 @@ pub enum APIError {
     AddError(String, ErrorReference),
     XmlError(SeError),
     XmlDeError(DeError),
+    EmlImportError(EMLImportError),
     Authentication(AuthenticationError),
     ZipError(ZipError),
     Apportionment(ApportionmentError),
@@ -272,6 +275,13 @@ impl IntoResponse for APIError {
                     ),
                 )
             }
+            APIError::EmlImportError(err) => {
+                error!("Error importing EML file: {:?}", err);
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("EML import error", ErrorReference::EmlImportError, false),
+                )
+            }
             APIError::Apportionment(err) => {
                 error!("Apportionment error: {:?}", err);
 
@@ -406,6 +416,12 @@ impl From<ZipError> for APIError {
 impl From<ApportionmentError> for APIError {
     fn from(err: ApportionmentError) -> Self {
         APIError::Apportionment(err)
+    }
+}
+
+impl From<EMLImportError> for APIError {
+    fn from(err: EMLImportError) -> Self {
+        APIError::EmlImportError(err)
     }
 }
 

@@ -145,3 +145,12 @@ pub struct ElectionDomain {
     #[serde(rename = "$text")]
     pub name: String,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EMLImportError {
+    MissingRegion,
+    OnlyMunicipalSupported,
+    MissingNumberOfSeats,
+    NumberOfSeatsNotInRange,
+    InvalidDateFormat,
+}

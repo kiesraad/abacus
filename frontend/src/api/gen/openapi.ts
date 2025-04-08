@@ -478,6 +478,7 @@ export type ErrorReference =
   | "EntryNotFound"
   | "EntryNotUnique"
   | "EntryNumberNotSupported"
+  | "EmlImportError"
   | "InternalServerError"
   | "InvalidData"
   | "InvalidDataEntryNumber"

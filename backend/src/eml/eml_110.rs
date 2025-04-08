@@ -1,8 +1,9 @@
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 use super::{
     EMLBase,
-    common::{ElectionIdentifier, ManagingAuthority},
+    common::{EMLImportError, ElectionCategory, ElectionIdentifier, ManagingAuthority},
 };
 
 /// Election definition (110a and 110b)
@@ -25,6 +26,64 @@ pub struct EML110 {
 
 impl super::base::EMLDocument for EML110 {}
 
+impl EML110 {
+    fn election(&self) -> &Election {
+        &self.election_event.election
+    }
+
+    fn election_tree(&self) -> Option<&ElectionTree> {
+        self.election().election_tree.as_ref()
+    }
+
+    fn election_identifier(&self) -> &ElectionIdentifier {
+        &self.election().election_identifier
+    }
+
+    fn first_region(&self) -> Option<&Region> {
+        self.election_tree().and_then(|t| t.regions.first())
+    }
+
+    pub fn as_crate_election(&self) -> Result<crate::election::Election, EMLImportError> {
+        let Some(region) = self.first_region() else {
+            return Err(EMLImportError::MissingRegion);
+        };
+        let ElectionCategory::GR = self.election_identifier().election_category else {
+            return Err(EMLImportError::OnlyMunicipalSupported);
+        };
+
+        let Some(number_of_seats) = self.election().number_of_seats else {
+            return Err(EMLImportError::MissingNumberOfSeats);
+        };
+
+        // clippy suggests way less readable alternative
+        #[allow(clippy::manual_range_contains)]
+        if number_of_seats < 9 || number_of_seats > 45 {
+            return Err(EMLImportError::NumberOfSeatsNotInRange);
+        }
+
+        let Ok(election_date) =
+            NaiveDate::parse_from_str(&self.election_identifier().election_date, "%Y-%m-%d")
+        else {
+            return Err(EMLImportError::InvalidDateFormat);
+        };
+
+        let election = crate::election::Election {
+            id: u32::MAX,
+            name: self.election_identifier().election_name.clone(),
+            location: region.region_name.clone(),
+            number_of_voters: u32::MAX,
+            category: crate::election::ElectionCategory::Municipal,
+            number_of_seats,
+            election_date,
+            nomination_date: election_date,
+            status: crate::election::ElectionStatus::DataEntryInProgress,
+            political_groups: Some(vec![]),
+        };
+
+        Ok(election)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ElectionEvent {
@@ -42,7 +101,7 @@ pub struct Election {
     election_identifier: ElectionIdentifier,
     contest: Contest,
     #[serde(skip_serializing_if = "Option::is_none", default)]
-    number_of_seats: Option<u64>,
+    number_of_seats: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none", default)]
     preference_threshold: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none", default)]

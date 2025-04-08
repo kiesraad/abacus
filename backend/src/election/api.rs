@@ -146,7 +146,8 @@ pub async fn election_import_validate(
     //_user: Admin,
     Json(edu): Json<ElectionDefinitionUploadRequest>,
 ) -> Result<Json<ElectionDefinitionUploadResponse>, APIError> {
-    let _ = EML110::from_str(&edu.data)?;
+    let eml = EML110::from_str(&edu.data)?;
+    let _election: Election = eml.as_crate_election()?;
     let hash = eml_document_hash(&edu.data, true);
     Ok(Json(ElectionDefinitionUploadResponse { hash }))
 }

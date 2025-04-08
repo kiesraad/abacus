@@ -724,6 +724,7 @@ export interface PreferenceThreshold {
   /** Preference threshold as a percentage (0 to 100) */
   percentage: number;
 }
+
 export type ResolveAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
 
 export type Role = "administrator" | "typist" | "coordinator";

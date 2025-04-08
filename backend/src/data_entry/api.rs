@@ -561,7 +561,7 @@ pub mod tests {
     }
 
     async fn resolve(pool: SqlitePool, resolve_action: ResolveAction) -> Response {
-        let user = User::test_user(Role::Coordinator);
+        let user = User::test_user(Role::Coordinator, 1);
         polling_station_data_entry_resolve(
             Coordinator(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),

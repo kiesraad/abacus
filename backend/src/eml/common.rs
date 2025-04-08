@@ -145,3 +145,161 @@ pub struct ElectionDomain {
     #[serde(rename = "$text")]
     pub name: String,
 }
+
+/// Name and id of the specific contest
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct ContestIdentifier {
+    #[serde(rename = "@Id")]
+    pub id: String,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contest_name: Option<String>,
+}
+
+impl ContestIdentifier {
+    pub fn new(id: impl Into<String>, contest_name: Option<String>) -> ContestIdentifier {
+        ContestIdentifier {
+            id: id.into(),
+            contest_name,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct Candidate {
+    pub candidate_identifier: CandidateIdentifier,
+    pub candidate_full_name: CandidateFullName,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub gender: Option<Gender>,
+    pub qualifying_address: QualifyingAddress,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct CandidateIdentifier {
+    #[serde(rename = "@Id")]
+    pub id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct CandidateFullName {
+    #[serde(rename(serialize = "xnl:PersonName", deserialize = "PersonName"))]
+    pub person_name: PersonName,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct PersonName {
+    #[serde(rename(serialize = "xnl:NameLine", deserialize = "NameLine"))]
+    pub name_line: Option<NameLine>,
+    #[serde(rename(serialize = "xnl:FirstName", deserialize = "FirstName"))]
+    pub first_name: Option<String>,
+    #[serde(
+        rename(serialize = "xnl:NamePrefix", deserialize = "NamePrefix"),
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
+    pub name_prefix: Option<String>,
+    #[serde(rename(serialize = "xnl:LastName", deserialize = "LastName"))]
+    pub last_name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct NameLine {
+    #[serde(rename = "@NameType")]
+    pub name_type: String,
+    #[serde(rename = "$text")]
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Gender {
+    Male,
+    Female,
+    Unknown,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct QualifyingAddress {
+    #[serde(rename = "$value")]
+    pub data: QualifyingAddressData,
+}
+
+impl QualifyingAddress {
+    #[cfg(test)]
+    pub fn locality_name(&self) -> &str {
+        match &self.data {
+            QualifyingAddressData::Locality(locality) => &locality.locality_name,
+            QualifyingAddressData::Country(country) => &country.locality.locality_name,
+        }
+    }
+
+    #[cfg(test)]
+    pub fn country_name_code(&self) -> Option<&str> {
+        match &self.data {
+            QualifyingAddressData::Locality(_) => None,
+            QualifyingAddressData::Country(country) => Some(&country.country_name_code),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub enum QualifyingAddressData {
+    #[serde(rename(serialize = "xal:Locality", deserialize = "Locality"))]
+    Locality(Locality),
+    #[serde(rename(serialize = "xal:Country", deserialize = "Country"))]
+    Country(Country),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Country {
+    pub country_name_code: String,
+    pub locality: Locality,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct Locality {
+    #[serde(rename(serialize = "xal:LocalityName", deserialize = "LocalityName"))]
+    pub locality_name: String,
+}
+
+/// An affiliation (i.e. party) identification
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct AffiliationIdentifier {
+    #[serde(default, skip_serializing_if = "Option::is_none", rename = "@Id")]
+    pub id: Option<String>,
+    pub registered_name: String,
+}
+
+pub mod bool_yes_no {
+    pub fn serialize<S>(value: &bool, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let s = if *value { "yes" } else { "no" };
+        serializer.serialize_str(s)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<bool, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        use serde::Deserialize;
+
+        let s = String::deserialize(deserializer)?;
+        Ok(match &s[..] {
+            "yes" => true,
+            "no" => false,
+            _ => return Err(serde::de::Error::custom("Unknown value")),
+        })
+    }
+}

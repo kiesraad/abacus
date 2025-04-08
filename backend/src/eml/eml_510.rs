@@ -10,8 +10,8 @@ use crate::{
 use super::{
     EMLBase,
     common::{
-        AuthorityAddress, AuthorityIdentifier, ElectionCategory, ElectionIdentifier,
-        ElectionSubcategory, ManagingAuthority,
+        AffiliationIdentifier, AuthorityAddress, AuthorityIdentifier, ContestIdentifier,
+        ElectionCategory, ElectionIdentifier, ElectionSubcategory, ManagingAuthority,
     },
 };
 
@@ -131,26 +131,6 @@ pub struct Contest {
     contest_identifier: ContestIdentifier,
     total_votes: TotalVotes,
     reporting_unit_votes: Vec<ReportingUnitVotes>,
-}
-
-/// Name and id of the specific contest
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct ContestIdentifier {
-    #[serde(rename = "@Id")]
-    id: String,
-
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    contest_name: Option<String>,
-}
-
-impl ContestIdentifier {
-    pub fn new(id: impl Into<String>, contest_name: Option<String>) -> ContestIdentifier {
-        ContestIdentifier {
-            id: id.into(),
-            contest_name,
-        }
-    }
 }
 
 /// The summary votes for a specific contest
@@ -484,15 +464,6 @@ pub enum Selector {
     Candidate(Candidate),
 }
 
-/// An affiliation (i.e. party) identification
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct AffiliationIdentifier {
-    #[serde(default, skip_serializing_if = "Option::is_none", rename = "@Id")]
-    id: Option<String>,
-    registered_name: String,
-}
-
 /// A candidate
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -523,7 +494,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_eml510() {
+    fn test_eml510b() {
         let value = EML510 {
             base: EMLBase::new("510b"),
             creation_date_time: "2021-09-01T12:00:00".into(),
@@ -631,11 +602,19 @@ mod tests {
     }
 
     #[test]
-    fn test_deserialize_eml510() {
+    fn test_deserialize_eml510b() {
         let data = include_str!("./tests/deserialize_eml510b_test.eml.xml");
         let doc = EML510::from_str(data).unwrap();
         assert_eq!(doc.count.election.contests.len(), 1);
         let contest = &doc.count.election.contests[0];
         assert_eq!(contest.total_votes.cast, 100);
+    }
+
+    #[test]
+    fn test_deserialize_eml510d() {
+        let data = include_str!("./tests/deserialize_eml510d_test.eml.xml");
+        let doc = EML510::from_str(data).unwrap();
+        assert_eq!(doc.count.election.contests.len(), 1);
+        assert_eq!(doc.base.id, "510d");
     }
 }

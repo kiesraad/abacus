@@ -1,8 +1,7 @@
 import { Badge, Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { getUrlForDataEntry } from "@/lib/util";
 
-import { PollingStationWithStatus } from "../utils/util";
+import { getUrlForDataEntry, PollingStationWithStatus } from "../utils/util";
 
 export interface PollingStationsListProps {
   pollingStations: PollingStationWithStatus[];
@@ -20,12 +19,12 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
           return (
             <Table.LinkRow
               key={pollingStation.number}
-              to={getUrlForDataEntry(pollingStation.election_id, pollingStation.id, pollingStation.statusEntry?.status)}
+              to={getUrlForDataEntry(pollingStation.election_id, pollingStation.id, pollingStation.statusEntry.status)}
             >
               <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
               <Table.Cell>
                 <span>{pollingStation.name}</span>
-                {pollingStation.statusEntry && <Badge type={pollingStation.statusEntry.status} showIcon />}
+                <Badge type={pollingStation.statusEntry.status} showIcon />
               </Table.Cell>
             </Table.LinkRow>
           );

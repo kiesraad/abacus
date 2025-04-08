@@ -5,12 +5,13 @@ import { useElection, useElectionStatus, useUser } from "@/api";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 import { IconError } from "@/lib/icon";
-import { cn, getUrlForDataEntry, parseIntUserInput } from "@/lib/util";
+import { cn, parseIntUserInput } from "@/lib/util";
 
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import {
   finishedStatuses,
   getPollingStationWithStatusList,
+  getUrlForDataEntry,
   PollingStationUserStatus,
   PollingStationWithStatus,
 } from "../utils/util";

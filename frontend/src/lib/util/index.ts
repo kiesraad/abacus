@@ -2,7 +2,6 @@ export * from "./hook";
 export * from "./candidate";
 export * from "./classnames";
 export * from "./compare";
-export * from "./data-entry";
 export * from "./domtoren";
 export * from "./env";
 export * from "./form";

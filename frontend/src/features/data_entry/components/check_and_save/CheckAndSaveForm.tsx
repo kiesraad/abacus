@@ -49,10 +49,13 @@ export function CheckAndSaveForm() {
       return false;
     }
 
-    await onFinaliseDataEntry();
-    await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
+    const result = await onFinaliseDataEntry();
 
-    return true;
+    if (result) {
+      await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
+    }
+
+    return result;
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

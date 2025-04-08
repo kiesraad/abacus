@@ -1,34 +1,51 @@
 use std::time::Duration;
 
-use axum::extract::FromRef;
+use axum::{
+    extract::{FromRef, OptionalFromRequestParts},
+    http::request::Parts,
+};
 use axum_extra::extract::cookie::Cookie;
 use chrono::{DateTime, TimeDelta, Utc};
 use cookie::CookieBuilder;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool};
 
-use crate::AppState;
+use crate::{APIError, AppState};
 
 use super::{
-    SESSION_COOKIE_NAME, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME,
+    SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
     error::AuthenticationError,
     util::{create_new_session_key, get_expires_at},
 };
 
 /// A session object, corresponds to a row in the sessions table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
-pub(crate) struct Session {
+pub struct Session {
     session_key: String,
     user_id: u32,
     expires_at: DateTime<Utc>,
     created_at: DateTime<Utc>,
 }
 
+impl<S> OptionalFromRequestParts<S> for Session
+where
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        _state: &S,
+    ) -> Result<Option<Self>, Self::Rejection> {
+        Ok(parts.extensions.get::<Session>().cloned())
+    }
+}
+
 impl Session {
     // Create a new session for a specific user
     pub(super) fn new(user_id: u32, life_time: TimeDelta) -> Result<Self, AuthenticationError> {
         let session_key = create_new_session_key();
-        let expires_at = get_expires_at(life_time)?;
+        let expires_at = get_expires_at(life_time);
         let created_at = Utc::now();
 
         Ok(Self {
@@ -45,7 +62,6 @@ impl Session {
     }
 
     /// Get the session key
-    #[cfg(test)]
     pub(super) fn session_key(&self) -> &str {
         &self.session_key
     }
@@ -74,6 +90,7 @@ impl Session {
 }
 
 /// Sessions repository
+#[derive(Clone)]
 pub struct Sessions(SqlitePool);
 
 impl Sessions {
@@ -115,6 +132,7 @@ impl Sessions {
         &self,
         session_key: &str,
     ) -> Result<Option<Session>, AuthenticationError> {
+        let now = Utc::now();
         let session: Option<Session> = sqlx::query_as!(
             Session,
             r#"
@@ -123,9 +141,12 @@ impl Sessions {
                 user_id as "user_id: u32",
                 expires_at as "expires_at: _",
                 created_at as "created_at: _"
-            FROM sessions WHERE session_key = ?
+            FROM sessions
+            WHERE session_key = ?
+            AND expires_at > ?
             "#,
-            session_key
+            session_key,
+            now
         )
         .fetch_optional(&self.0)
         .await?;
@@ -176,20 +197,17 @@ impl Sessions {
 
     pub(super) async fn extend_session(
         &self,
-        session_key: &str,
-    ) -> Result<Option<Session>, AuthenticationError> {
-        let new_expires_at = get_expires_at(SESSION_LIFE_TIME)?;
-        let min_life_time = get_expires_at(SESSION_MIN_LIFE_TIME)?;
-        let now = Utc::now();
+        session: &Session,
+    ) -> Result<Session, AuthenticationError> {
+        let new_expires_at = get_expires_at(SESSION_LIFE_TIME);
+        let session_key = session.session_key();
 
         let session = sqlx::query_as!(
             Session,
             r#"
           UPDATE sessions
           SET expires_at = ?
-          WHERE expires_at < ?
-          AND session_key = ?
-          AND expires_at > ?
+          WHERE session_key = ?
           RETURNING
               session_key,
               user_id as "user_id: u32",
@@ -197,11 +215,9 @@ impl Sessions {
               created_at as "created_at: _"
           "#,
             new_expires_at,
-            min_life_time,
-            session_key,
-            now
+            session_key
         )
-        .fetch_optional(&self.0)
+        .fetch_one(&self.0)
         .await?;
 
         Ok(session)
@@ -263,32 +279,5 @@ mod test {
         let session_from_db = sessions.get_by_key(session.session_key()).await.unwrap();
 
         assert_eq!(None, session_from_db);
-    }
-
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
-    async fn test_extend_session(pool: SqlitePool) {
-        let sessions = Sessions::new(pool);
-
-        // do not extend sessions that have a long life time
-        let session: crate::authentication::session::Session = sessions
-            .create(1, TimeDelta::seconds(60 * 60 * 60))
-            .await
-            .unwrap();
-        let session_from_db = sessions
-            .extend_session(session.session_key())
-            .await
-            .unwrap();
-        assert_eq!(session_from_db, None);
-
-        // extend sessions that have a short life time
-        let session = sessions.create(1, TimeDelta::seconds(10)).await.unwrap();
-        let session_from_db = sessions
-            .extend_session(session.session_key())
-            .await
-            .unwrap()
-            .unwrap();
-        assert_eq!(session.user_id(), session_from_db.user_id());
-        assert_eq!(session.session_key(), session_from_db.session_key());
-        assert!(session.expires_at() < session_from_db.expires_at());
     }
 }

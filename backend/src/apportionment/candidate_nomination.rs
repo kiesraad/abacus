@@ -557,6 +557,128 @@ mod tests {
         );
     }
 
+    /// Candidate nomination with candidate votes meeting preference threshold but no seat
+    ///
+    /// PG seats: [11, 7, 0]  
+    /// PG 1: Preferential candidate nominations of candidates 1, 2, 3, 4, 5, 6 and 7 and other candidate nominations of candidates 8, 9, 10 and 11  
+    /// PG 2: Preferential candidate nominations of candidates 1, 2, 3 and 4 and other candidate nominations of candidates 5, 6 and 7  
+    /// PG 3: No preferential candidate nominations and no other candidate nomination
+    #[test]
+    fn test_with_lt_19_seats_and_candidate_votes_meeting_preference_threshold_but_no_seat() {
+        let election = election_fixture_with_given_number_of_seats(&[12, 7, 5], 18);
+        let quota = Fraction::new(570, 18);
+        let totals = election_summary_fixture_with_given_candidate_votes(vec![
+            vec![80, 70, 60, 50, 40, 30, 20, 0, 0, 0, 0, 0],
+            vec![80, 60, 40, 20, 4, 0, 0],
+            vec![0, 0, 0, 0, 16],
+        ]);
+        let result = candidate_nomination(&election, quota, &totals, vec![11, 7, 0]).unwrap();
+        assert_eq!(result.preference_threshold.percentage, 50);
+        assert_eq!(
+            result.preference_threshold.number_of_votes,
+            quota * Fraction::new(result.preference_threshold.percentage, 100)
+        );
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[0],
+            &[1, 2, 3, 4, 5, 6, 7],
+            &[8, 9, 10, 11],
+            &[],
+        );
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[1],
+            &[1, 2, 3, 4],
+            &[5, 6, 7],
+            &[],
+        );
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[2],
+            &[],
+            &[],
+            &[5, 1, 2, 3, 4],
+        );
+
+        let pgs = election.political_groups.unwrap_or_default();
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[0].candidates[..11],
+            &pgs[0].candidates[11..],
+        );
+        check_chosen_candidates(&result.chosen_candidates, &pgs[1].candidates[..7], &[]);
+        check_chosen_candidates(&result.chosen_candidates, &[], &[]);
+    }
+
+    /// Candidate nomination with candidate votes meeting preference threshold but no seat
+    ///
+    /// PG seats: [6, 6, 5, 2, 0]  
+    /// PG 1: Preferential candidate nominations of candidates 1, 2, 3, 4 and 5 and other candidate nominations of candidate 6  
+    /// PG 2: Preferential candidate nominations of candidates 1, 2, 3 and 4 and other candidate nominations of candidates 5 and 6  
+    /// PG 3: Preferential candidate nominations of candidates 1, 2, 3 and 4 and other candidate nominations of candidate 5  
+    /// PG 4: Preferential candidate nominations of candidates 1 and 2 and no other candidate nominations  
+    /// PG 5: No preferential candidate nominations and no other candidate nomination
+    #[test]
+    fn test_with_gte_19_seats_and_candidate_votes_meeting_preference_threshold_but_no_seat() {
+        let election = election_fixture_with_given_number_of_seats(&[6, 6, 6, 5, 5], 19);
+        let quota = Fraction::new(960, 19);
+        let totals = election_summary_fixture_with_given_candidate_votes(vec![
+            vec![80, 70, 60, 50, 40, 0],
+            vec![80, 70, 60, 50, 5, 0],
+            vec![80, 70, 60, 50, 0, 0],
+            vec![80, 40, 0, 0, 0],
+            vec![0, 0, 0, 0, 15],
+        ]);
+        let result = candidate_nomination(&election, quota, &totals, vec![6, 6, 5, 2, 0]).unwrap();
+        assert_eq!(result.preference_threshold.percentage, 25);
+        assert_eq!(
+            result.preference_threshold.number_of_votes,
+            quota * Fraction::new(result.preference_threshold.percentage, 100)
+        );
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[0],
+            &[1, 2, 3, 4, 5],
+            &[6],
+            &[],
+        );
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[1],
+            &[1, 2, 3, 4],
+            &[5, 6],
+            &[],
+        );
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[2],
+            &[1, 2, 3, 4],
+            &[5],
+            &[],
+        );
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[3],
+            &[1, 2],
+            &[],
+            &[],
+        );
+        check_political_group_candidate_nomination(
+            &result.political_group_candidate_nomination[4],
+            &[],
+            &[],
+            &[],
+        );
+
+        let pgs = election.political_groups.unwrap_or_default();
+        check_chosen_candidates(&result.chosen_candidates, &pgs[0].candidates, &[]);
+        check_chosen_candidates(&result.chosen_candidates, &pgs[1].candidates, &[]);
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[2].candidates[..5],
+            &pgs[2].candidates[5..],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &pgs[3].candidates[..2],
+            &pgs[3].candidates[2..],
+        );
+        check_chosen_candidates(&result.chosen_candidates, &[], &pgs[4].candidates);
+    }
+
     /// Candidate nomination with more candidates eligible for preferential nomination than seats
     ///
     /// PG seats: [6, 5, 4, 2, 2]  

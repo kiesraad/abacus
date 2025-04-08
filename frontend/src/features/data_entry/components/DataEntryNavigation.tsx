@@ -9,10 +9,10 @@ import { SubmitCurrentFormOptions } from "../types/types";
 
 export interface DataEntryNavigationProps {
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;
-  currentValues: Partial<PollingStationResults>;
+  currentValues?: Partial<PollingStationResults>;
 }
 
-export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNavigationProps) {
+export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryNavigationProps) {
   const { status, election, pollingStationId, formState, setCache, entryNumber, onDeleteDataEntry, updateFormSection } =
     useDataEntryContext();
   const user = useUser();

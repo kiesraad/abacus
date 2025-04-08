@@ -19,6 +19,7 @@ import { FormSectionId } from "@/types/types";
 import { useDataEntryContext } from "../../hooks/useDataEntryContext";
 import { DataEntryFormSectionStatus, getDataEntrySummary } from "../../utils/dataEntryUtils";
 import { getUrlForFormSectionID } from "../../utils/utils";
+import { DataEntryNavigation } from "../DataEntryNavigation";
 
 export function CheckAndSaveForm() {
   const formRef = React.useRef<HTMLFormElement>(null);
@@ -43,18 +44,25 @@ export function CheckAndSaveForm() {
     (section) => section.errors.isEmpty() && (section.warnings.isEmpty() || section.acceptWarnings),
   );
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
-    void (async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
+  const onFinalise = async () => {
+    if (!finalisationAllowed) {
+      return false;
+    }
 
-      if (!finalisationAllowed) return;
+    await onFinaliseDataEntry();
+    await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
 
-      await onFinaliseDataEntry();
-      await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
-    })(event);
+    return true;
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    void onFinalise();
+  };
 
   return (
     <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save.title")} ref={formRef}>
+      <DataEntryNavigation onSubmit={onFinalise} />
       {error instanceof ApiError && <ErrorModal error={error} />}
       <section className="md" id="save-form-summary-text">
         {!summary.hasBlocks && summary.countsAddUp && (

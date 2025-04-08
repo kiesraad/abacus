@@ -18,7 +18,7 @@ import {
 } from "@/testing";
 import { getElectionMockData } from "@/testing/api-mocks";
 
-import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/less-than-19-seats";
+import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/lt-19-seats";
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 

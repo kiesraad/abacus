@@ -7,9 +7,10 @@ import { routes } from "@/app/routes";
 import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@/testing";
 import { getElectionMockData } from "@/testing/api-mocks";
 
-import * as gte19Seats from "../../testing/19-or-more-seats";
-import * as absoluteMajorityChangeAndListExhaustion from "../../testing/absolute-majority-change-and-list-exhaustion";
-import * as lt19Seats from "../../testing/less-than-19-seats";
+import * as gte19Seats from "../../testing/gte-19-seats";
+import * as gte19SeatsAndP9 from "../../testing/gte-19-seats-and-p9";
+import * as lt19Seats from "../../testing/lt-19-seats";
+import * as lt19SeatsAndP9AndP10 from "../../testing/lt-19-seats-and-p9-and-p10";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentResidualSeatsPage } from "./ApportionmentResidualSeatsPage";
 
@@ -58,6 +59,128 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
   });
 
+  test("Residual seats assignment highest highest averages table and absolute majority change information visible", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(gte19SeatsAndP9.election));
+    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+      seat_assignment: gte19SeatsAndP9.seat_assignment,
+      candidate_nomination: gte19SeatsAndP9.candidate_nomination,
+      election_summary: gte19SeatsAndP9.election_summary,
+    } satisfies ElectionApportionmentResponse);
+
+    renderApportionmentResidualSeatsPage();
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "De restzetels gaan naar de partijen met de grootste gemiddelden",
+      }),
+    );
+    const highest_averages_for_19_or_more_seats_table = await screen.findByTestId("highest-averages-table");
+    expect(highest_averages_for_19_or_more_seats_table).toBeVisible();
+    expect(highest_averages_for_19_or_more_seats_table).toHaveTableContent([
+      ["Lijst", "Lijstnaam", "Ronde 1", "Ronde 2", "Ronde 3", "Ronde 4", "Ronde 5", "Ronde 6", "Aantal restzetels"],
+      ["1", "Political Group A", "577", "", "577", "", "577", "", "577", "", "577", "", "577", "", "1"],
+      [
+        "2",
+        "Political Group B",
+        "624",
+        "1/2",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "1",
+      ],
+      [
+        "3",
+        "Political Group C",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "1",
+      ],
+      [
+        "4",
+        "Political Group D",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "1",
+      ],
+      [
+        "5",
+        "Political Group E",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "1",
+      ],
+      [
+        "6",
+        "Political Group F",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "416",
+        "1/3",
+        "1",
+      ],
+      ["7", "Political Group G", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "0"],
+      ["8", "Political Group H", "7", "", "7", "", "7", "", "7", "", "7", "", "7", "", "0"],
+      ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+    ]);
+
+    expect(await screen.findByTestId("absolute-majority-reassignment-information")).toHaveTextContent(
+      "Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaalt, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 7 omdat die de laatste restzetel toegewezen heeft gekregen.",
+    );
+
+    expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("list-exhaustion-step-1-information")).not.toBeInTheDocument();
+  });
+
   test("Residual seats assignment largest remainders and unique highest averages tables visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
@@ -101,6 +224,7 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("list-exhaustion-step-1-information")).not.toBeInTheDocument();
   });
 
   test("Residual seats assignment only largest remainders table visible", async () => {
@@ -135,14 +259,15 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("list-exhaustion-step-1-information")).not.toBeInTheDocument();
   });
 
   test("Residual seats assignment largest remainders and unique highest averages tables and absolute majority change and list exhaustion information visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(absoluteMajorityChangeAndListExhaustion.election));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19SeatsAndP9AndP10.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      seat_assignment: absoluteMajorityChangeAndListExhaustion.seat_assignment,
-      candidate_nomination: absoluteMajorityChangeAndListExhaustion.candidate_nomination,
-      election_summary: absoluteMajorityChangeAndListExhaustion.election_summary,
+      seat_assignment: lt19SeatsAndP9AndP10.seat_assignment,
+      candidate_nomination: lt19SeatsAndP9AndP10.candidate_nomination,
+      election_summary: lt19SeatsAndP9AndP10.election_summary,
     } satisfies ElectionApportionmentResponse);
 
     renderApportionmentResidualSeatsPage();
@@ -222,6 +347,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("list-exhaustion-step-1-information")).not.toBeInTheDocument();
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
@@ -246,6 +372,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("list-exhaustion-step-1-information")).not.toBeInTheDocument();
     });
 
     test("Not possible because all lists are exhausted", async () => {
@@ -272,6 +399,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("list-exhaustion-step-1-information")).not.toBeInTheDocument();
     });
 
     test("Not possible because no votes on candidates cast", async () => {
@@ -298,6 +426,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("absolute-majority-change-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("list-exhaustion-step-1-information")).not.toBeInTheDocument();
     });
 
     test("Internal Server Error renders error page", async () => {

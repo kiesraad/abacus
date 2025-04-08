@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing";
 
-import { political_group_1_candidate_nomination } from "../../testing/less-than-19-seats";
+import { political_group_1_candidate_nomination } from "../../testing/lt-19-seats";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
 
 describe("CandidatesRankingTable", () => {

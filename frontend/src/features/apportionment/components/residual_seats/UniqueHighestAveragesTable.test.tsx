@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import { PoliticalGroup } from "@/api";
 import { render, screen } from "@/testing";
 
-import { election, highest_average_steps, seat_assignment } from "../../testing/less-than-19-seats";
+import { election, highest_average_steps, seat_assignment } from "../../testing/lt-19-seats";
 import { UniqueHighestAveragesTable } from "./UniqueHighestAveragesTable";
 
 describe("UniqueHighestAveragesTable", () => {

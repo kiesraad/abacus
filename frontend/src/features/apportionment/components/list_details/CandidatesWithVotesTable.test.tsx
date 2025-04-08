@@ -6,7 +6,7 @@ import {
   political_group_1,
   political_group_1_candidate_nomination,
   political_group_1_votes,
-} from "../../testing/less-than-19-seats";
+} from "../../testing/lt-19-seats";
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
 
 describe("CandidatesWithVotesTable", () => {

@@ -2,8 +2,8 @@ import { Story } from "@ladle/react";
 
 import { PoliticalGroup } from "@/api";
 
-import * as gte19Seats from "../testing/19-or-more-seats";
-import * as lt19Seats from "../testing/less-than-19-seats";
+import * as gte19Seats from "../testing/gte-19-seats";
+import * as lt19Seats from "../testing/lt-19-seats";
 import { HighestAverageAssignmentStep } from "../utils/seat-change";
 import { ApportionmentTable } from "./ApportionmentTable";
 import { ChosenCandidatesTable } from "./ChosenCandidatesTable";

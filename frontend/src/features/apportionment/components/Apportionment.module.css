@@ -88,7 +88,7 @@
   max-width: 34rem;
 }
 
-.residualSeats19OrMoreSeatsTable {
+.highestAveragesTable {
   max-width: 68rem;
   width: fit-content;
   tr {
@@ -102,7 +102,7 @@
     th:nth-child(2) {
       left: 4.55rem;
     }
-    /* Number of residual seats sticky column*/
+    /* Number of residual seats sticky column */
     td:last-child,
     th:last-child {
       right: 0;

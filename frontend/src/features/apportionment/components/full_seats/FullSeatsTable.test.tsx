@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing";
 
-import { election, seat_assignment } from "../../testing/19-or-more-seats";
+import { election, seat_assignment } from "../../testing/gte-19-seats";
 import { FullSeatsTable } from "./FullSeatsTable";
 
 describe("FullSeatsTable", () => {

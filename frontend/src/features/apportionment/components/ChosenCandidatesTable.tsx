@@ -1,7 +1,7 @@
 import { Candidate } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { cn, getCandidateFullNameWithGender } from "@/lib/util";
+import { cn, getCandidateFullName, getCandidateFullNameWithGender } from "@/lib/util";
 
 import cls from "./Apportionment.module.css";
 
@@ -17,14 +17,12 @@ export function ChosenCandidatesTable({ chosenCandidates }: ChosenCandidatesTabl
         <Table.HeaderCell>{t("candidate.locality")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {chosenCandidates.map((candidate) => {
-          return (
-            <Table.Row key={`${candidate.number}-${candidate.last_name}`}>
-              <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
-              <Table.Cell>{candidate.locality}</Table.Cell>
-            </Table.Row>
-          );
-        })}
+        {chosenCandidates.map((candidate) => (
+          <Table.Row key={`${candidate.number}-${getCandidateFullName(candidate)}`}>
+            <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
+            <Table.Cell>{candidate.locality}</Table.Cell>
+          </Table.Row>
+        ))}
       </Table.Body>
     </Table>
   );

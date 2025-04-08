@@ -15,7 +15,7 @@ interface HighestAveragesTableProps {
 export function HighestAveragesTable({ steps, finalStanding, politicalGroups }: HighestAveragesTableProps) {
   return (
     <div className={cls.scrollable}>
-      <Table id="highest-averages-table" className={cn(cls.table, cls.residualSeats19OrMoreSeatsTable)}>
+      <Table id="highest-averages-table" className={cn(cls.table, cls.highestAveragesTable)}>
         <Table.Header>
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>{t("list")}</Table.HeaderCell>
           <Table.HeaderCell className={cls.sticky}>{t("list_name")}</Table.HeaderCell>

@@ -3,10 +3,11 @@ import { FormEvent, FormEventHandler, ReactNode } from "react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { render, screen } from "@kiesraad/test";
-import { useFormKeyboardNavigation } from "@kiesraad/ui";
+import { Form } from "@/components/ui/Form/Form";
 
-import { Form } from "./Form";
+import { render, screen } from "@kiesraad/test";
+
+import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
 export const FormWithNavigation = ({ onSubmit, children }: { onSubmit: FormEventHandler; children: ReactNode }) => {
   const ref = useFormKeyboardNavigation();

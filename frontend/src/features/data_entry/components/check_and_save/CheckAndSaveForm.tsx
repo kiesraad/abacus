@@ -3,20 +3,12 @@ import { Link, useNavigate } from "react-router";
 
 import { ApiError, useElection } from "@/api";
 import { ErrorModal } from "@/components/error";
-import {
-  BottomBar,
-  Button,
-  Form,
-  KeyboardKey,
-  KeyboardKeys,
-  MenuStatus,
-  StatusList,
-  useFormKeyboardNavigation,
-} from "@/components/ui";
+import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 import { FormSectionId } from "@/types/types";
 
 import { useDataEntryContext } from "../../hooks/useDataEntryContext";
+import { useFormKeyboardNavigation } from "../../hooks/useFormKeyboardNavigation";
 import { SubmitCurrentFormOptions } from "../../types/types";
 import { DataEntryFormSectionStatus, getDataEntrySummary } from "../../utils/dataEntryUtils";
 import { getUrlForFormSectionID } from "../../utils/utils";

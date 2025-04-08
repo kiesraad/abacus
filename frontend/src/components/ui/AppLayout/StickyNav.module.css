@@ -1,4 +1,4 @@
-.sticky-nav {
+.stickyNav {
   position: sticky;
   top: 0;
   max-height: calc(100vh - 7rem - 3rem);

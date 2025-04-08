@@ -1,4 +1,4 @@
-.progressbar-container {
+.progressbarContainer {
   label {
     display: block;
     font-weight: bold;
@@ -24,7 +24,7 @@
   }
 }
 
-.progressbar-outer {
+.progressbarOuter {
   flex: 1 1 auto;
   height: 0.5rem;
   background-color: var(--color-hover);
@@ -35,7 +35,7 @@
   gap: 1px;
 }
 
-.progressbar-inner {
+.progressbarInner {
   height: 100%;
 }
 

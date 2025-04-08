@@ -1,4 +1,4 @@
-.bottom-bar {
+.bottomBar {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -11,7 +11,7 @@
   &.form {
     margin: 2rem 0;
   }
-  &.input-grid {
+  &.inputGrid {
     background: var(--base-white);
     width: 100%;
     margin: 2.5rem 0;

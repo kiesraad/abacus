@@ -10,7 +10,7 @@ export interface AppFrameProps {
 
 export function AppFrame({ children }: AppFrameProps) {
   return (
-    <div id="app-frame" className={cls["app-frame"]}>
+    <div id="app-frame" className={cls.appFrame}>
       {children}
     </div>
   );

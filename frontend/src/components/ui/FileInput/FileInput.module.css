@@ -1,12 +1,12 @@
 /* Hides the browser-rendered input, so we can render our own */
-input.file-input {
+input.fileInput {
   opacity: 0;
   width: 0.1px;
   height: 0.1px;
   position: absolute;
 }
 
-label.selected-file {
+label.selectedFile {
   padding-left: 1rem;
   color: var(--gray-600);
 }

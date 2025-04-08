@@ -1,4 +1,4 @@
-.nav-bar {
+.navBar {
   flex: 0 0 2.75rem;
   padding: 0 5rem;
   background-color: var(--base-brand-blue);
@@ -46,7 +46,7 @@
     }
   }
 
-  .user-info {
+  .userInfo {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -73,7 +73,7 @@
   }
 }
 
-.nav-bar-menu {
+.navBarMenu {
   position: absolute;
   top: 0.75rem;
   left: 0;
@@ -118,7 +118,7 @@
   }
 }
 
-.nav-bar-menu-container {
+.navBarMenuContainer {
   position: relative;
   height: 3rem;
   padding: 0.75rem;

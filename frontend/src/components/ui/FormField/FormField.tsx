@@ -24,10 +24,10 @@ export function FormField({ id, children, hasError, hasWarning }: FormFieldProps
   return (
     <div
       id={id}
-      className={cn(cls["form-field"], {
-        "has-icon": !!icon,
-        "has-error": hasError,
-        "has-warning": hasWarning && !hasError,
+      className={cn(cls.formField, {
+        hasIcon: !!icon,
+        hasError: hasError,
+        hasWarning: hasWarning && !hasError,
       })}
     >
       <aside>{icon}</aside>

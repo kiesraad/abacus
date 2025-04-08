@@ -17,15 +17,18 @@ import { t, tx } from "@/lib/i18n";
 import { FormSectionId } from "@/types/types";
 
 import { useDataEntryContext } from "../../hooks/useDataEntryContext";
+import { SubmitCurrentFormOptions } from "../../types/types";
 import { DataEntryFormSectionStatus, getDataEntrySummary } from "../../utils/dataEntryUtils";
 import { getUrlForFormSectionID } from "../../utils/utils";
+import { DataEntryNavigation } from "../DataEntryNavigation";
 
 export function CheckAndSaveForm() {
   const formRef = useFormKeyboardNavigation();
 
   const navigate = useNavigate();
   const { election } = useElection();
-  const { error, formState, status, onFinaliseDataEntry, pollingStationId, entryNumber } = useDataEntryContext("save");
+  const { error, formState, onSubmitForm, status, onFinaliseDataEntry, pollingStationId, entryNumber } =
+    useDataEntryContext("save");
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionId) => {
@@ -42,18 +45,36 @@ export function CheckAndSaveForm() {
     (section) => section.errors.isEmpty() && (section.warnings.isEmpty() || section.acceptWarnings),
   );
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
-    void (async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
+  // save the current state, without finalising (for the abort dialog)
+  const onSubmit = async (options?: SubmitCurrentFormOptions) => {
+    return await onSubmitForm({}, options);
+  };
 
-      if (!finalisationAllowed) return;
+  // finalise the data entry and navigate away
+  const onFinalise = async () => {
+    if (!finalisationAllowed) {
+      return false;
+    }
 
-      await onFinaliseDataEntry();
+    if (await onFinaliseDataEntry()) {
       await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
-    })(event);
+      return true;
+    }
+
+    return false;
+  };
 
   return (
-    <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save.title")} ref={formRef}>
+    <Form
+      onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        void onFinalise();
+      }}
+      id="check_save_form"
+      title={t("check_and_save.title")}
+      ref={formRef}
+    >
+      <DataEntryNavigation onSubmit={onSubmit} />
       {error instanceof ApiError && <ErrorModal error={error} />}
       <section className="md" id="save-form-summary-text">
         {!summary.hasBlocks && summary.countsAddUp && (

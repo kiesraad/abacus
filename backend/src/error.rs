@@ -5,7 +5,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use hyper::header::InvalidHeaderValue;
-use quick_xml::SeError;
+use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use std::error::Error;
@@ -42,6 +42,7 @@ pub enum ErrorReference {
     InvalidUsernameOrPassword,
     InvalidVoteCandidate,
     InvalidVoteGroup,
+    InvalidXml,
     PasswordRejection,
     PdfGenerationError,
     PollingStationDataValidation,
@@ -87,6 +88,7 @@ pub enum APIError {
     StdError(Box<dyn Error>),
     AddError(String, ErrorReference),
     XmlError(SeError),
+    XmlDeError(DeError),
     Authentication(AuthenticationError),
     ZipError(ZipError),
     Apportionment(ApportionmentError),
@@ -187,6 +189,13 @@ impl IntoResponse for APIError {
                         ErrorReference::InternalServerError,
                         false,
                     ),
+                )
+            }
+            APIError::XmlDeError(err) => {
+                error!("Could not deserialize XML: {:?}", err);
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("Invalid XML", ErrorReference::InvalidXml, false),
                 )
             }
             APIError::Authentication(err) => {
@@ -361,6 +370,12 @@ impl From<InvalidHeaderValue> for APIError {
 impl From<SeError> for APIError {
     fn from(err: SeError) -> Self {
         APIError::XmlError(err)
+    }
+}
+
+impl From<DeError> for APIError {
+    fn from(err: DeError) -> Self {
+        APIError::XmlDeError(err)
     }
 }
 

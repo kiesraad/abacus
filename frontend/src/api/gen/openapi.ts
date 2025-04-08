@@ -9,6 +9,11 @@ export type ELECTION_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
 export type ELECTION_CREATE_REQUEST_BODY = ElectionRequest;
 
+// /api/elections/validate
+export type ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS = Record<string, never>;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionRequest;
+
 // /api/elections/{election_id}
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
   election_id: number;
@@ -73,11 +78,6 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
-
-// /api/elections/{election_id}/validate
-export type ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS = Record<string, never>;
-export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/{election_id}/validate`;
-export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionRequest;
 
 // /api/log
 export type AUDIT_LOG_LIST_REQUEST_PARAMS = Record<string, never>;
@@ -364,6 +364,10 @@ export interface ElectionApportionmentResponse {
  */
 export type ElectionCategory = "Municipal";
 
+export interface ElectionDefinitionUploadResponse {
+  hash: string;
+}
+
 export interface ElectionDetails {
   electionCategory: string;
   electionElectionDate: string;
@@ -485,6 +489,7 @@ export type ErrorReference =
   | "InvalidUsernameOrPassword"
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
+  | "InvalidXml"
   | "PasswordRejection"
   | "PdfGenerationError"
   | "PollingStationDataValidation"

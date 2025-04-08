@@ -25,6 +25,7 @@
     "InvalidData": "De invoer is niet geldig",
     "InvalidDataEntryNumber": "Het invoer nummer is ongeldig",
     "InvalidJson": "De JSON is niet geldig",
+    "InvalidXml": "De XML is niet geldig",
     "InvalidPassword": "Het opgegeven wachtwoord is onjuist",
     "InvalidPoliticalGroup": "De politieke partij is niet geldig",
     "InvalidSession": "De sessie is ongeldig",

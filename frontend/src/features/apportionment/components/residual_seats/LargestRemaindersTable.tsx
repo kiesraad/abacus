@@ -39,9 +39,7 @@ export function LargestRemaindersTable({ steps, finalStanding, politicalGroups }
               </Table.Cell>
               <Table.Cell>{politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
               <Table.NumberCell className="font-number">{pg_seat_assignment.full_seats}</Table.NumberCell>
-              <Table.DisplayFractionCells className={residual_seats > 0 ? "bg-yellow bold" : undefined}>
-                {pg_seat_assignment.remainder_votes}
-              </Table.DisplayFractionCells>
+              <Table.DisplayFractionCells>{pg_seat_assignment.remainder_votes}</Table.DisplayFractionCells>
               <Table.NumberCell className="font-number">{residual_seats}</Table.NumberCell>
             </Table.Row>
           );

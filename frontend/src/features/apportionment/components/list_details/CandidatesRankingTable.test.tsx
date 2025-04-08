@@ -17,16 +17,16 @@ describe("CandidatesRankingTable", () => {
       ["Kandidaat", "Woonplaats"],
       ["Kok, K. (Karin) (v)", "Test Location"],
       ["Oud, L. (Lidewij) (v)", "Test Location"],
-      ["van der Weijden, B. (Berta) (v)", "Test Location"],
+      ["Van der Weijden, B. (Berta) (v)", "Test Location"],
       ["Oud, K. (Klaas) (m)", "Test Location"],
       ["Oud, M. (Marijke) (v)", "Test Location"],
-      ["van der Weijden, H. (Henk) (m)", "Test Location"],
-      ["de Jong, R. (Rolf) (m)", "Test Location"],
+      ["Van der Weijden, H. (Henk) (m)", "Test Location"],
+      ["De Jong, R. (Rolf) (m)", "Test Location"],
       ["Jansen, A. (Arie) (m)", "Test Location"],
       ["Bakker, S. (Sophie) (v)", "Test Location"],
       ["Oud, J. (Johan) (m)", "Test Location"],
-      ["de Vries, J. (Johan) (m)", "Test Location"],
-      ["van den Berg, M. (Marijke) (v)", "Test Location"],
+      ["De Vries, J. (Johan) (m)", "Test Location"],
+      ["Van den Berg, M. (Marijke) (v)", "Test Location"],
     ]);
   });
 });

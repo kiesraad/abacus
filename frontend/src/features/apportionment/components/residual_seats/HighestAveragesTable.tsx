@@ -6,29 +6,22 @@ import { cn } from "@/lib/util";
 import { HighestAverageAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
-interface HighestAveragesFor19OrMoreSeatsTableProps {
+interface HighestAveragesTableProps {
   steps: HighestAverageAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
-export function HighestAveragesFor19OrMoreSeatsTable({
-  steps,
-  finalStanding,
-  politicalGroups,
-}: HighestAveragesFor19OrMoreSeatsTableProps) {
+export function HighestAveragesTable({ steps, finalStanding, politicalGroups }: HighestAveragesTableProps) {
   return (
     <div className={cls.scrollable}>
-      <Table
-        id="highest-averages-for-19-or-more-seats-table"
-        className={cn(cls.table, cls.residualSeats19OrMoreSeatsTable)}
-      >
+      <Table id="highest-averages-table" className={cn(cls.table, cls.residualSeats19OrMoreSeatsTable)}>
         <Table.Header>
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>{t("list")}</Table.HeaderCell>
           <Table.HeaderCell className={cls.sticky}>{t("list_name")}</Table.HeaderCell>
           {steps.map((step) => (
             <Table.HeaderCell key={step.residual_seat_number} className="text-align-r" span={2}>
-              {t("apportionment.residual_seat.singular")} {step.residual_seat_number}
+              {t("apportionment.round")} {step.residual_seat_number}
             </Table.HeaderCell>
           ))}
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>

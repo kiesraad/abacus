@@ -65,6 +65,7 @@
   "residual_seats_information_largest_remainders": "Omdat het totaal aantal zetels kleiner is dan 19, gebeurt dat via het systeem van de grootste overschotten.",
   "residual_seats_highest_averages": "De restzetels gaan naar de partijen met de grootste gemiddelden",
   "residual_seats_largest_remainders": "De restzetels gaan naar de partijen met de grootste overschotten",
+  "round": "Ronde",
   "seats_assigned": {
     "singular": "{num_seat} zetel werd als {type_seat} toegewezen",
     "plural": "{num_seat} zetels werden als {type_seat} toegewezen"

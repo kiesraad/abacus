@@ -6,19 +6,15 @@ import { cn } from "@/lib/util";
 import { HighestAverageAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
-interface HighestAveragesForLessThan19SeatsTableProps {
+interface UniqueHighestAveragesTableProps {
   steps: HighestAverageAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
-export function HighestAveragesForLessThan19SeatsTable({
-  steps,
-  finalStanding,
-  politicalGroups,
-}: HighestAveragesForLessThan19SeatsTableProps) {
+export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGroups }: UniqueHighestAveragesTableProps) {
   return (
-    <Table id="highest-averages-for-less-than-19-seats-table" className={cls.table}>
+    <Table id="unique-highest-averages-table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>
@@ -41,11 +37,7 @@ export function HighestAveragesForLessThan19SeatsTable({
               </Table.Cell>
               <Table.Cell>{politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
               <Table.NumberCell className="font-number">{pg_seat_assignment.full_seats}</Table.NumberCell>
-              {average && (
-                <Table.DisplayFractionCells className={residual_seats > 0 ? "bg-yellow bold" : undefined}>
-                  {average}
-                </Table.DisplayFractionCells>
-              )}
+              {average && <Table.DisplayFractionCells>{average}</Table.DisplayFractionCells>}
               <Table.NumberCell className="font-number">{residual_seats}</Table.NumberCell>
             </Table.Row>
           );

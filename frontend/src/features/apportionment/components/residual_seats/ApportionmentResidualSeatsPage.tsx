@@ -14,9 +14,9 @@ import {
 } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 import { ApportionmentError } from "../ApportionmentError";
-import { HighestAveragesFor19OrMoreSeatsTable } from "./HighestAveragesFor19OrMoreSeatsTable";
-import { HighestAveragesForLessThan19SeatsTable } from "./HighestAveragesForLessThan19SeatsTable";
+import { HighestAveragesTable } from "./HighestAveragesTable";
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
+import { UniqueHighestAveragesTable } from "./UniqueHighestAveragesTable";
 
 function render_title_and_header() {
   return (
@@ -82,7 +82,7 @@ export function ApportionmentResidualSeatsPage() {
                     <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
                     {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
                     {highestAverageSteps.length > 0 && (
-                      <HighestAveragesFor19OrMoreSeatsTable
+                      <HighestAveragesTable
                         steps={highestAverageSteps}
                         finalStanding={seatAssignment.final_standing}
                         politicalGroups={election.political_groups}
@@ -112,7 +112,7 @@ export function ApportionmentResidualSeatsPage() {
                           )}
                         </span>
                         {
-                          <HighestAveragesForLessThan19SeatsTable
+                          <UniqueHighestAveragesTable
                             steps={highestAverageSteps}
                             finalStanding={seatAssignment.final_standing}
                             politicalGroups={election.political_groups}

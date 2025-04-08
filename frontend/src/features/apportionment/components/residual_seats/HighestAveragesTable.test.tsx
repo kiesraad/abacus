@@ -5,12 +5,12 @@ import { render, screen } from "@/testing";
 
 import { election, seat_assignment } from "../../testing/19-or-more-seats";
 import { HighestAverageAssignmentStep } from "../../utils/seat-change";
-import { HighestAveragesFor19OrMoreSeatsTable } from "./HighestAveragesFor19OrMoreSeatsTable";
+import { HighestAveragesTable } from "./HighestAveragesTable";
 
-describe("HighestAveragesFor19OrMoreSeatsTable", () => {
-  test("renders a table with the residual seat assignment with highest averages method for 19 or more seats", async () => {
+describe("HighestAveragesTable", () => {
+  test("renders a table with the residual seat assignment with highest averages method", async () => {
     render(
-      <HighestAveragesFor19OrMoreSeatsTable
+      <HighestAveragesTable
         steps={seat_assignment.steps as HighestAverageAssignmentStep[]}
         finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
@@ -20,7 +20,7 @@ describe("HighestAveragesFor19OrMoreSeatsTable", () => {
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
-      ["Lijst", "Lijstnaam", "Restzetel 1", "Restzetel 2", "Restzetel 3", "Restzetel 4", "Aantal restzetels"],
+      ["Lijst", "Lijstnaam", "Ronde 1", "Ronde 2", "Ronde 3", "Ronde 4", "Aantal restzetels"],
       ["1", "Political Group A", "50", "", "50", "", "50", "", "46", "2/13", "1"],
       ["2", "Political Group B", "50", "2/6", "50", "2/6", "43", "1/7", "43", "1/7", "1"],
       ["3", "Political Group C", "49", "", "49", "", "49", "", "49", "", "0"],

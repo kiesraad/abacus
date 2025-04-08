@@ -23,7 +23,7 @@ describe("getCandidateFullName util", () => {
 
   test("with firstname and lastname prefix", () => {
     const candidate = { last_name_prefix, last_name, initials, first_name } as Candidate;
-    expect(getCandidateFullName(candidate)).toBe("de Boer, A.B. (Anne)");
+    expect(getCandidateFullName(candidate)).toBe("De Boer, A.B. (Anne)");
   });
 });
 

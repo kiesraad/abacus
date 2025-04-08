@@ -132,6 +132,7 @@ impl Sessions {
         &self,
         session_key: &str,
     ) -> Result<Option<Session>, AuthenticationError> {
+        let now = Utc::now();
         let session: Option<Session> = sqlx::query_as!(
             Session,
             r#"
@@ -140,9 +141,12 @@ impl Sessions {
                 user_id as "user_id: u32",
                 expires_at as "expires_at: _",
                 created_at as "created_at: _"
-            FROM sessions WHERE session_key = ?
+            FROM sessions
+            WHERE session_key = ?
+            AND expires_at > ?
             "#,
-            session_key
+            session_key,
+            now
         )
         .fetch_optional(&self.0)
         .await?;

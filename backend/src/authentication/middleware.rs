@@ -15,7 +15,6 @@ use tracing::{debug, error, info};
 use super::{
     SESSION_MIN_LIFE_TIME, Users,
     session::{Session, Sessions},
-    util::get_expires_at,
 };
 
 /// Inject user and session
@@ -68,12 +67,10 @@ pub async fn extend_session(
     };
 
     let mut expires = session.expires_at();
-
-    let min_life_time = get_expires_at(SESSION_MIN_LIFE_TIME);
     let now = Utc::now();
 
-    // extend lifetime of session and set new cookie if the session is still valid and will soon be expired
-    if expires < min_life_time && expires > now {
+    // extend lifetime of session and set new cookie if the session is still valid and will soon expire
+    if (expires - now) < SESSION_MIN_LIFE_TIME && expires > now {
         if let Ok(session) = sessions.extend_session(&session).await {
             let _ = audit_service
                 .with_user(user.clone())
@@ -123,7 +120,7 @@ mod test {
 
     use crate::{
         audit_log::{AuditLog, AuditService},
-        authentication::{Role, Sessions, User, Users},
+        authentication::{Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, Sessions, User, Users},
     };
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -146,10 +143,7 @@ mod test {
         );
 
         let user = User::test_user(Role::Administrator);
-        let session = sessions
-            .create(user.id(), TimeDelta::seconds(60 * 20))
-            .await
-            .unwrap();
+        let session = sessions.create(user.id(), SESSION_LIFE_TIME).await.unwrap();
 
         let mut jar = CookieJar::new();
         let cookie = session.get_cookie();
@@ -212,7 +206,7 @@ mod test {
             "extend_session should not return a header given an unauthenticated request"
         );
 
-        let life_time = TimeDelta::seconds(60 * 20); // 20 minutes
+        let life_time = SESSION_MIN_LIFE_TIME + TimeDelta::seconds(30); // min life time + 30 seconds
         let session = sessions.create(user.id(), life_time).await.unwrap();
 
         let updated_response = extend_session(
@@ -223,6 +217,8 @@ mod test {
             Response::new(Body::empty()),
         )
         .await;
+
+        assert!(updated_response.headers().get(SET_COOKIE).is_none());
 
         assert_eq!(
             updated_response
@@ -235,7 +231,7 @@ mod test {
             "extend_session should return the current expiration time"
         );
 
-        let life_time = TimeDelta::seconds(60 * 10); // 10 minutes
+        let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
         let session = sessions.create(user.id(), life_time).await.unwrap();
 
         let updated_response = extend_session(

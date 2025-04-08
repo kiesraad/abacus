@@ -21,8 +21,7 @@ import { DataEntryFormSectionStatus, getDataEntrySummary } from "../../utils/dat
 import { getUrlForFormSectionID } from "../../utils/utils";
 
 export function CheckAndSaveForm() {
-  const formRef = React.useRef<HTMLFormElement>(null);
-  useFormKeyboardNavigation(formRef);
+  const formRef = useFormKeyboardNavigation();
 
   const navigate = useNavigate();
   const { election } = useElection();

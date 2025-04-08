@@ -51,8 +51,7 @@ export function useDataEntryFormSection<FORM_VALUES>({
   };
 
   // form keyboard navigation
-  const formRef = React.useRef<HTMLFormElement>(null);
-  useFormKeyboardNavigation(formRef);
+  const formRef = useFormKeyboardNavigation();
 
   // submit and save to form contents
   const onSubmit = async (

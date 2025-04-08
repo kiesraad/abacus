@@ -421,7 +421,10 @@ pub mod tests {
     }
 
     async fn claim(pool: SqlitePool, entry_number: EntryNumber) -> Response {
-        let user = User::test_user(Role::Typist);
+        let user = match entry_number {
+            EntryNumber::FirstEntry => User::test_user(Role::Typist, 1),
+            EntryNumber::SecondEntry => User::test_user(Role::Typist, 2),
+        };
         polling_station_data_entry_claim(
             Typist(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
@@ -439,7 +442,10 @@ pub mod tests {
         request_body: DataEntry,
         entry_number: EntryNumber,
     ) -> Response {
-        let user = User::test_user(Role::Typist);
+        let user = match entry_number {
+            EntryNumber::FirstEntry => User::test_user(Role::Typist, 1),
+            EntryNumber::SecondEntry => User::test_user(Role::Typist, 2),
+        };
         polling_station_data_entry_save(
             Typist(user.clone()),
             Path((1, entry_number)),
@@ -454,7 +460,10 @@ pub mod tests {
     }
 
     async fn delete(pool: SqlitePool, entry_number: EntryNumber) -> Response {
-        let user = User::test_user(Role::Typist);
+        let user = match entry_number {
+            EntryNumber::FirstEntry => User::test_user(Role::Typist, 1),
+            EntryNumber::SecondEntry => User::test_user(Role::Typist, 2),
+        };
         polling_station_data_entry_delete(
             Typist(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
@@ -466,7 +475,10 @@ pub mod tests {
     }
 
     async fn finalise(pool: SqlitePool, entry_number: EntryNumber) -> Response {
-        let user = User::test_user(Role::Typist);
+        let user = match entry_number {
+            EntryNumber::FirstEntry => User::test_user(Role::Typist, 1),
+            EntryNumber::SecondEntry => User::test_user(Role::Typist, 2),
+        };
         polling_station_data_entry_finalise(
             Typist(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
@@ -685,10 +697,10 @@ pub mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entry_delete_nonexistent(pool: SqlitePool) {
-        let user = User::test_user(Role::Typist);
+        let user = User::test_user(Role::Typist, 1);
         // check that deleting a non-existing data entry returns 404
         let response = polling_station_data_entry_delete(
-            Typist(user.clone()),
+            Typist(User::test_user(Role::Typist, 1)),
             State(PollingStationDataEntries::new(pool.clone())),
             AuditService::new(AuditLog(pool), user, None),
             Path((1, EntryNumber::FirstEntry)),

@@ -227,41 +227,41 @@ async fn check_data_entry_status_is_definitive(
     );
 }
 
-pub async fn create_result(
-    addr: &SocketAddr,
-    cookie: HeaderValue,
-    polling_station_id: u32,
-    election_id: u32,
-) {
-    create_and_finalise_data_entry(addr, cookie.clone(), polling_station_id, 1).await;
-    create_and_finalise_data_entry(addr, cookie.clone(), polling_station_id, 2).await;
-    check_data_entry_status_is_definitive(addr, cookie, polling_station_id, election_id).await;
+pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: u32) {
+    let typist_cookie = typist_login(addr).await;
+    create_and_finalise_data_entry(addr, typist_cookie, polling_station_id, 1).await;
+    let typist2_cookie = typist2_login(addr).await;
+    create_and_finalise_data_entry(addr, typist2_cookie.clone(), polling_station_id, 2).await;
+    check_data_entry_status_is_definitive(addr, typist2_cookie, polling_station_id, election_id)
+        .await;
 }
 
 pub async fn create_result_with_non_example_data_entry(
     addr: &SocketAddr,
-    cookie: HeaderValue,
     polling_station_id: u32,
     election_id: u32,
     data_entry: DataEntry,
 ) {
+    let typist_cookie = typist_login(addr).await;
     create_and_finalise_non_example_data_entry(
         addr,
-        cookie.clone(),
+        typist_cookie,
         polling_station_id,
         1,
         data_entry.clone(),
     )
     .await;
+    let typist2_cookie = typist2_login(addr).await;
     create_and_finalise_non_example_data_entry(
         addr,
-        cookie.clone(),
+        typist2_cookie.clone(),
         polling_station_id,
         2,
         data_entry.clone(),
     )
     .await;
-    check_data_entry_status_is_definitive(addr, cookie, polling_station_id, election_id).await;
+    check_data_entry_status_is_definitive(addr, typist2_cookie, polling_station_id, election_id)
+        .await;
 }
 
 /// Calls the login endpoint for an Admin user and returns the session cookie

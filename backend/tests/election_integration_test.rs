@@ -161,9 +161,8 @@ async fn test_election_pdf_download(pool: SqlitePool) {
 async fn test_election_xml_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let typist_cookie = shared::typist_login(&addr).await;
-    create_result(&addr, typist_cookie.clone(), 1, 2).await;
-    create_result(&addr, typist_cookie.clone(), 2, 2).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/download_xml_results");
     let response = reqwest::Client::new()
@@ -187,9 +186,8 @@ async fn test_election_xml_download(pool: SqlitePool) {
 async fn test_election_zip_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let typist_cookie = shared::typist_login(&addr).await;
-    create_result(&addr, typist_cookie.clone(), 1, 2).await;
-    create_result(&addr, typist_cookie, 2, 2).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/download_zip_results");
     let response = reqwest::Client::new()

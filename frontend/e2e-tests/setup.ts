@@ -23,6 +23,9 @@ async function globalSetup(config: FullConfig) {
 
   await loginAs(session, "typist");
   await session.storageState({ path: "e2e-tests/state/typist.json" });
+
+  await loginAs(session, "typist2");
+  await session.storageState({ path: "e2e-tests/state/typist2.json" });
 }
 
 export default globalSetup;

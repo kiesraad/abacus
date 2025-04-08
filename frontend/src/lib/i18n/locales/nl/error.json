@@ -32,6 +32,7 @@
     "InvalidUsernameOrPassword": "De gebruikersnaam of het wachtwoord is onjuist",
     "InvalidVoteCandidate": "De kandidaat van de stem is niet geldig",
     "InvalidVoteGroup": "De politieke partij van de stem is niet geldig",
+    "PasswordRejection": "Het opgegeven wachtwoord voldoet niet aan de eisen",
     "PdfGenerationError": "Er is een fout opgetreden bij het genereren van de PDF",
     "PollingStationDataValidation": "De invoer voor dit stembureau is niet geldig",
     "PollingStationFirstEntryAlreadyFinalised": "De eerste invoer voor dit stembureau is al definitief",
@@ -43,6 +44,6 @@
     "Unauthorized": "Je hebt geen toestemming om deze actie uit te voeren",
     "UserNotFound": "De gebruiker is niet gevonden",
     "UsernameNotUnique": "De gebruikersnaam is al in gebruik",
-    "PasswordRejection": "Het opgegeven wachtwoord voldoet niet aan de eisen"
+    "ZeroVotesCast": "Er zijn geen stemmen op kandidaten uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad."
   }
 }

@@ -288,9 +288,8 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = shared::typist_login(&addr).await;
     let admin_cookie = shared::admin_login(&addr).await;
-    create_result(&addr, typist_cookie, 1, 2).await;
+    create_result(&addr, 1, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/polling_stations/1");
     let response = reqwest::Client::new()

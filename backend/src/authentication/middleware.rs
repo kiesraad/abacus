@@ -142,7 +142,7 @@ mod test {
             "inject_user should not inject a user if there is no session cookie"
         );
 
-        let user = User::test_user(Role::Administrator);
+        let user = User::test_user(Role::Administrator, 1);
         let session = sessions.create(user.id(), SESSION_LIFE_TIME).await.unwrap();
 
         let mut jar = CookieJar::new();
@@ -181,7 +181,7 @@ mod test {
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_extend_session(pool: SqlitePool) {
         let sessions = Sessions::new(pool.clone());
-        let user = User::test_user(Role::Administrator);
+        let user = User::test_user(Role::Administrator, 1);
 
         let audit_service = AuditService::new(
             AuditLog::new(pool.clone()),

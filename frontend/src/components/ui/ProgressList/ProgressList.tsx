@@ -11,7 +11,7 @@ export interface ProgressListProps {
 }
 
 export function ProgressList({ children }: ProgressListProps) {
-  return <div className={cls["progress-list"]}>{children}</div>;
+  return <div className={cls.progressList}>{children}</div>;
 }
 
 ProgressList.Fixed = ({ children }: { children: React.ReactNode }) => (

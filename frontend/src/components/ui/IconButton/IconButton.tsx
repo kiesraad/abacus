@@ -27,7 +27,7 @@ export function IconButton({
 }: IconButtonProps) {
   return (
     <button
-      className={cn(cls["iconbutton"], cls[variant], cls[size], {
+      className={cn(cls.iconButton, cls[variant], cls[size], {
         round: isRound,
       })}
       title={title}

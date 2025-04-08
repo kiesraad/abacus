@@ -4,11 +4,11 @@ import { NavLink } from "react-router";
 import { t } from "@kiesraad/i18n";
 import { IconCompass, IconFile, IconHamburger, IconLaptop, IconUsers } from "@kiesraad/icon";
 
-import styles from "./NavBar.module.css";
+import cls from "./NavBar.module.css";
 
 export function NavBarMenu() {
   return (
-    <div className={styles.navBarMenu}>
+    <div className={cls.navBarMenu}>
       <NavLink to={"/elections"}>
         <IconCompass />
         {t("election.title.plural")}
@@ -35,7 +35,7 @@ export function NavBarMenuButton() {
   React.useEffect(() => {
     if (isMenuVisible) {
       const handleClickOutside = (event: MouseEvent) => {
-        if (!document.querySelector(`.${styles.navBarMenu}`)?.contains(event.target as Node)) {
+        if (!document.querySelector(`.${cls.navBarMenu}`)?.contains(event.target as Node)) {
           setMenuVisible(false);
         }
       };
@@ -52,7 +52,7 @@ export function NavBarMenuButton() {
   };
 
   return (
-    <button className={styles.navBarMenuContainer} onClick={toggleMenu} title={t("menu")}>
+    <button className={cls.navBarMenuContainer} onClick={toggleMenu} title={t("menu")}>
       <IconHamburger />
       {isMenuVisible && <NavBarMenu />}
     </button>

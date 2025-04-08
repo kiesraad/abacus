@@ -1,11 +1,11 @@
-.display-fraction {
+.displayFraction {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
 
   /* Fraction part */
-  .fraction-part {
+  .fractionPart {
     font-size: var(--font-size-xs);
   }
 }

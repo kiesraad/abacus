@@ -105,7 +105,7 @@ The application uses the following dependencies:
 - `react-dom`: DOM implementation for rendering UI
 - `react-router`: Handling browser routing for React applications
 - `vite`: frontend build tool
-- `postcss` and `autoprefixer`: CSS post processors
+- `lightningcss`: CSS post processor
 
 #### Development dependencies
 

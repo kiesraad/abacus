@@ -28,7 +28,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`${cls["button"] || ""} ${cls[variant] || ""} ${cls[size] || ""}`}
+      className={`${cls.button || ""} ${cls[variant] || ""} ${cls[size] || ""}`}
       disabled={isDisabled || isLoading}
       {...htmlButtonProps}
     >

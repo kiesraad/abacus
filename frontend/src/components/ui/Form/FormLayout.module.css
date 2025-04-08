@@ -1,12 +1,12 @@
-.form-layout {
+.formLayout {
   margin-bottom: var(--space-md);
 }
 
-.form-layout.medium-width {
+.formLayout.mediumWidth {
   max-width: 32rem;
 }
 
-.form-section {
+.formSection {
   margin-bottom: var(--space-md);
 
   h2 {
@@ -16,12 +16,12 @@
   }
 }
 
-.form-row {
+.formRow {
   display: flex;
   gap: var(--space-md-lg);
 }
 
-.form-field {
+.formField {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
@@ -29,23 +29,23 @@
   margin-bottom: var(--space-lg);
 }
 
-.form-field > label {
+.formField > label {
   font-weight: bold;
 }
 
-.root-fieldset {
+.rootFieldset {
   border: none;
   padding: 0;
 }
 
-.form-alert {
+.formAlert {
   overflow: hidden;
   margin-top: -2.5rem;
   margin-left: -5rem;
   margin-right: -5rem;
 }
 
-.form-controls {
+.formControls {
   display: flex;
   gap: var(--space-md);
 }

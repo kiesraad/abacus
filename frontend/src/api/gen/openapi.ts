@@ -756,6 +756,7 @@ export interface SeatAssignmentResult {
  */
 export type SeatChange =
   | (HighestAverageAssignedSeat & { changed_by: "HighestAverageAssignment" })
+  | (HighestAverageAssignedSeat & { changed_by: "UniqueHighestAverageAssignment" })
   | (LargestRemainderAssignedSeat & { changed_by: "LargestRemainderAssignment" })
   | (AbsoluteMajorityReassignedSeat & { changed_by: "AbsoluteMajorityReassignment" })
   | (ListExhaustionRemovedSeat & { changed_by: "ListExhaustionRemoval" });

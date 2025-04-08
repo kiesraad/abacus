@@ -3,11 +3,11 @@ import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
 
-import { HighestAverageAssignmentStep } from "../../utils/seat-change";
+import { UniqueHighestAverageAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface UniqueHighestAveragesTableProps {
-  steps: HighestAverageAssignmentStep[];
+  steps: UniqueHighestAverageAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
@@ -27,7 +27,7 @@ export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGrou
       <Table.Body>
         {finalStanding.map((pg_seat_assignment) => {
           const average = steps[0]?.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
-          const residual_seats = steps.filter((step) => {
+          const residual_seat = steps.filter((step) => {
             return step.change.selected_pg_number == pg_seat_assignment.pg_number;
           }).length;
           return (
@@ -38,7 +38,7 @@ export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGrou
               <Table.Cell>{politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
               <Table.NumberCell className="font-number">{pg_seat_assignment.full_seats}</Table.NumberCell>
               {average && <Table.DisplayFractionCells>{average}</Table.DisplayFractionCells>}
-              <Table.NumberCell className="font-number">{residual_seats}</Table.NumberCell>
+              <Table.NumberCell className="font-number">{residual_seat}</Table.NumberCell>
             </Table.Row>
           );
         })}

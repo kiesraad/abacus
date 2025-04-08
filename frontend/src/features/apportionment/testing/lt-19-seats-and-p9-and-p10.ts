@@ -891,7 +891,7 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       residual_seat_number: 6,
       change: {
-        changed_by: "HighestAverageAssignment",
+        changed_by: "UniqueHighestAverageAssignment",
         selected_pg_number: 2,
         pg_options: [2],
         pg_assigned: [2],

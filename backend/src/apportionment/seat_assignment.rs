@@ -138,6 +138,7 @@ pub struct SeatChangeStep {
 #[serde(tag = "changed_by")]
 pub enum SeatChange {
     HighestAverageAssignment(HighestAverageAssignedSeat),
+    UniqueHighestAverageAssignment(HighestAverageAssignedSeat),
     LargestRemainderAssignment(LargestRemainderAssignedSeat),
     AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat),
     ListExhaustionRemoval(ListExhaustionRemovedSeat),
@@ -149,6 +150,9 @@ impl SeatChange {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
                 highest_average_assigned_seat.selected_pg_number
+            }
+            Self::UniqueHighestAverageAssignment(unique_highest_average_assigned_seat) => {
+                unique_highest_average_assigned_seat.selected_pg_number
             }
             Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
                 largest_remainder_assigned_seat.selected_pg_number
@@ -164,6 +168,7 @@ impl SeatChange {
     fn political_group_number_retracted(&self) -> PGNumber {
         match self {
             Self::HighestAverageAssignment(_) => unimplemented!(),
+            Self::UniqueHighestAverageAssignment(_) => unimplemented!(),
             Self::LargestRemainderAssignment(_) => unimplemented!(),
             Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
                 absolute_majority_reassigned_seat.pg_retracted_seat
@@ -180,6 +185,9 @@ impl SeatChange {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
                 highest_average_assigned_seat.pg_options.clone()
             }
+            Self::UniqueHighestAverageAssignment(unique_highest_average_assigned_seat) => {
+                unique_highest_average_assigned_seat.pg_options.clone()
+            }
             Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
                 largest_remainder_assigned_seat.pg_options.clone()
             }
@@ -193,6 +201,9 @@ impl SeatChange {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
                 highest_average_assigned_seat.pg_assigned.clone()
+            }
+            Self::UniqueHighestAverageAssignment(unique_highest_average_assigned_seat) => {
+                unique_highest_average_assigned_seat.pg_assigned.clone()
             }
             Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
                 largest_remainder_assigned_seat.pg_assigned.clone()
@@ -210,6 +221,11 @@ impl SeatChange {
     /// Returns true if the seat was changed through the highest average assignment
     pub fn is_changed_by_highest_average_assignment(&self) -> bool {
         matches!(self, Self::HighestAverageAssignment(_))
+    }
+
+    /// Returns true if the seat was changed through the unique highest average assignment
+    pub fn is_changed_by_unique_highest_average_assignment(&self) -> bool {
+        matches!(self, Self::UniqueHighestAverageAssignment(_))
     }
 
     /// Returns true if the seat was changed through the absolute majority reassignment
@@ -657,6 +673,7 @@ fn assign_remainder(
                 residual_seats,
                 &steps,
                 &exhausted_pg_numbers,
+                false,
             )?
         } else {
             // [Artikel P 8 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_8&z=2025-02-12&g=2025-02-12)
@@ -735,6 +752,7 @@ fn step_assign_remainder_using_highest_averages<'a>(
     residual_seats: u32,
     previous_steps: &[SeatChangeStep],
     exhausted_pg_numbers: &[PGNumber],
+    unique: bool,
 ) -> Result<SeatChange, ApportionmentError> {
     let mut qualifying_for_highest_average =
         non_exhausted_political_group_standings(standings, exhausted_pg_numbers).peekable();
@@ -743,18 +761,25 @@ fn step_assign_remainder_using_highest_averages<'a>(
         let selected_pgs =
             political_groups_with_highest_average(qualifying_for_highest_average, residual_seats)?;
         let selected_pg = selected_pgs[0];
-        Ok(SeatChange::HighestAverageAssignment(
-            HighestAverageAssignedSeat {
-                selected_pg_number: selected_pg.pg_number,
-                pg_assigned: pg_assigned_from_previous_step(
-                    selected_pg,
-                    previous_steps,
-                    SeatChange::is_changed_by_highest_average_assignment,
-                ),
-                pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
-                votes_per_seat: selected_pg.next_votes_per_seat,
-            },
-        ))
+        let assigned_seat: HighestAverageAssignedSeat = HighestAverageAssignedSeat {
+            selected_pg_number: selected_pg.pg_number,
+            pg_assigned: pg_assigned_from_previous_step(
+                selected_pg,
+                previous_steps,
+                if unique {
+                    SeatChange::is_changed_by_unique_highest_average_assignment
+                } else {
+                    SeatChange::is_changed_by_highest_average_assignment
+                },
+            ),
+            pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
+            votes_per_seat: selected_pg.next_votes_per_seat,
+        };
+        if unique {
+            Ok(SeatChange::UniqueHighestAverageAssignment(assigned_seat))
+        } else {
+            Ok(SeatChange::HighestAverageAssignment(assigned_seat))
+        }
     } else {
         info!("Seat cannot be (re)assigned because all lists are exhausted");
         Err(ApportionmentError::AllListsExhausted)
@@ -774,14 +799,15 @@ fn political_group_largest_remainder_assigned_seats(
         .count()
 }
 
-fn political_group_highest_average_assigned_seats(
+fn political_group_unique_highest_average_assigned_seats(
     previous_steps: &[SeatChangeStep],
     pg_number: PGNumber,
 ) -> usize {
     previous_steps
         .iter()
         .filter(|prev| {
-            prev.change.is_changed_by_highest_average_assignment()
+            prev.change
+                .is_changed_by_unique_highest_average_assignment()
                 && prev.change.political_group_number_assigned() == pg_number
         })
         .count()
@@ -849,7 +875,7 @@ fn political_group_standings_qualifying_for_unique_highest_average<'a>(
         !exhausted_pg_numbers.contains(&s.pg_number)
             && political_group_qualifies_for_extra_seat(
                 political_group_largest_remainder_assigned_seats(previous_steps, s.pg_number),
-                Some(political_group_highest_average_assigned_seats(
+                Some(political_group_unique_highest_average_assigned_seats(
                     previous_steps,
                     s.pg_number,
                 )),
@@ -911,6 +937,7 @@ fn step_assign_remainder_using_largest_remainder(
                 residual_seats,
                 previous_steps,
                 exhausted_pg_numbers,
+                true,
             )
         } else {
             // We've now even exhausted unique highest average seats: every group that qualified
@@ -923,6 +950,7 @@ fn step_assign_remainder_using_largest_remainder(
                 residual_seats,
                 previous_steps,
                 exhausted_pg_numbers,
+                false,
             )
         }
     }

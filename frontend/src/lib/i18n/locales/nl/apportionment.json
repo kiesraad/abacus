@@ -48,8 +48,9 @@
   "remainder": "Overschot",
   "remaining_residual_seats_assignment": "Verdeling overige restzetels",
   "remaining_residual_seats_amount_and_information": {
-    "singular": "Hierna was er nog {num_seats} restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben. Hierbij heeft iedere lijst niet meer dan één zetel toegewezen gekregen.",
-    "plural": "Hierna waren er nog {num_seats} restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben. Hierbij heeft iedere lijst niet meer dan één zetel toegewezen gekregen."
+    "singular": "Hierna was er nog {num_seats} restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zou hebben.",
+    "plural": "Hierna waren er nog {num_seats} restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben.",
+    "plural_unique": "Hierna waren er nog {num_seats} restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben. Hierbij heeft iedere lijst niet meer dan één zetel toegewezen gekregen."
   },
   "residual_seat": {
     "singular": "Restzetel",

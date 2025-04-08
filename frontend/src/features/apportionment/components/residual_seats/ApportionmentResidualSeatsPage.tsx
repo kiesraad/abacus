@@ -4,6 +4,8 @@ import { SeatChangeStep, useElection } from "@/api";
 import { PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
+import { cn } from "@kiesraad/util";
+
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import {
   getAssignedSeat,
@@ -11,6 +13,7 @@ import {
   isHighestAverageAssignmentStep,
   isLargestRemainderAssignmentStep,
   isListExhaustionRemovalStep,
+  isUniqueHighestAverageAssignmentStep,
 } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 import { ApportionmentError } from "../ApportionmentError";
@@ -66,6 +69,7 @@ export function ApportionmentResidualSeatsPage() {
   }
   if (seatAssignment) {
     const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderAssignmentStep);
+    const uniqueHighestAverageSteps = seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep);
     const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
     const absoluteMajorityReassignment = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
     const listExhaustionSteps = seatAssignment.steps.filter(isListExhaustionRemovalStep);
@@ -102,22 +106,39 @@ export function ApportionmentResidualSeatsPage() {
                         />
                       )}
                     </div>
-                    {highestAverageSteps.length > 0 && (
+                    {uniqueHighestAverageSteps.length > 0 && (
                       <div>
                         <h2 className={cls.tableTitle}>{t("apportionment.remaining_residual_seats_assignment")}</h2>
                         <span className={cls.tableInformation}>
                           {t(
-                            `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length === 1 ? "singular" : "plural"}`,
-                            { num_seats: highestAverageSteps.length },
+                            `apportionment.remaining_residual_seats_amount_and_information.${uniqueHighestAverageSteps.length === 1 ? "singular" : "plural_unique"}`,
+                            { num_seats: uniqueHighestAverageSteps.length },
                           )}
                         </span>
                         {
                           <UniqueHighestAveragesTable
-                            steps={highestAverageSteps}
+                            steps={uniqueHighestAverageSteps}
                             finalStanding={seatAssignment.final_standing}
                             politicalGroups={election.political_groups}
                           />
                         }
+                        {highestAverageSteps.length > 0 && (
+                          <>
+                            <span className={cn(cls.tableInformation, "mt-lg")}>
+                              {t(
+                                `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length === 1 ? "singular" : "plural"}`,
+                                { num_seats: highestAverageSteps.length },
+                              )}
+                            </span>
+                            {
+                              <HighestAveragesTable
+                                steps={highestAverageSteps}
+                                finalStanding={seatAssignment.final_standing}
+                                politicalGroups={election.political_groups}
+                              />
+                            }
+                          </>
+                        )}
                       </div>
                     )}
                   </>

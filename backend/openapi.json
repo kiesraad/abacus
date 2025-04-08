@@ -3728,6 +3728,27 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "UniqueHighestAverageAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/LargestRemainderAssignedSeat"
               },
               {

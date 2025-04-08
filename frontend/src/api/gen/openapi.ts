@@ -74,6 +74,11 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
+// /api/elections/{election_id}/validate
+export type ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS = Record<string, never>;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/{election_id}/validate`;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionRequest;
+
 // /api/log
 export type AUDIT_LOG_LIST_REQUEST_PARAMS = Record<string, never>;
 export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;

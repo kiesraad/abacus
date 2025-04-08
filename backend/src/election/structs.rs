@@ -1,3 +1,7 @@
+use axum::{
+    Json,
+    response::{IntoResponse, Response},
+};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
@@ -38,6 +42,12 @@ impl From<Election> for ElectionDetails {
             election_nomination_date: value.nomination_date,
             election_status: value.status.to_string(),
         }
+    }
+}
+
+impl IntoResponse for Election {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
     }
 }
 

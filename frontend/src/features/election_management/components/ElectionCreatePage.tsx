@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useLocation } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
@@ -8,6 +9,7 @@ import { t } from "@kiesraad/i18n";
 
 export function ElectionCreatePage() {
   const location = useLocation();
+  const [file, setFile] = useState<File | undefined>(undefined);
 
   return (
     <>
@@ -51,7 +53,15 @@ export function ElectionCreatePage() {
         <article>
           <h2>{t("election.import_eml")}</h2>
           <p className="mt-lg mb-lg">{t("election.use_instructions_to_import_eml")}</p>
-          <FileInput id="upload-eml">{t("select_file")}</FileInput>
+          <FileInput
+            id="upload-eml"
+            onChange={(e) => {
+              setFile(e.target.files ? e.target.files[0] : undefined);
+            }}
+            file={file}
+          >
+            {t("select_file")}
+          </FileInput>
         </article>
       </main>
       <Footer />

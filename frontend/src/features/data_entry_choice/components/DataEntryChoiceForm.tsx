@@ -9,7 +9,7 @@ import { cn, getUrlForDataEntry, parseIntUserInput } from "@/lib/util";
 
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import {
-  dataEntryFinished,
+  finishedStatuses,
   getPollingStationWithStatusList,
   PollingStationUserStatus,
   PollingStationWithStatus,
@@ -92,16 +92,18 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
       return;
     }
 
-    void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStation.statusEntry?.status));
+    void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStation.statusEntry.status));
   };
 
-  const pollingStationsForDataEntry = pollingStationsWithStatus.filter(
-    (pollingStation) => pollingStation.statusEntry && !dataEntryFinished.includes(pollingStation.statusEntry.status),
+  const available = pollingStationsWithStatus.filter(
+    (pollingStation) =>
+      !finishedStatuses.includes(pollingStation.statusEntry.status) &&
+      pollingStation.userStatus !== PollingStationUserStatus.SecondEntryNotAllowed,
   );
-  const pollingStationsForDataEntryCurrentUser = pollingStationsForDataEntry.filter(
+  const availableCurrentUser = available.filter(
     (pollingStation) => pollingStation.userStatus !== PollingStationUserStatus.InProgressOtherUser,
   );
-  const inProgressCurrentUser = pollingStationsForDataEntryCurrentUser.filter(
+  const inProgressCurrentUser = availableCurrentUser.filter(
     (pollingStation) => pollingStation.userStatus === PollingStationUserStatus.InProgressCurrentUser,
   );
 
@@ -121,15 +123,13 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
           <Alert type="notify" variant="no-icon">
             <h2>{t("polling_station_choice.unfinished_input_title")}</h2>
             <p>{t("polling_station_choice.unfinished_input_content")}</p>
-            {inProgressCurrentUser.map((pollingStation) =>
-              pollingStation.statusEntry?.status ? (
-                <PollingStationLink
-                  key={pollingStation.id}
-                  pollingStation={pollingStation}
-                  status={pollingStation.statusEntry.status}
-                />
-              ) : null,
-            )}
+            {inProgressCurrentUser.map((pollingStation) => (
+              <PollingStationLink
+                key={pollingStation.id}
+                pollingStation={pollingStation}
+                status={pollingStation.statusEntry.status}
+              />
+            ))}
           </Alert>
         </div>
       )}
@@ -166,6 +166,7 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
             >
               {t("start")}
             </Button>
+            ff
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
           </BottomBar.Row>
         </BottomBar>
@@ -184,12 +185,12 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
             <Alert type="error" variant="small">
               <p>{t("polling_station_choice.no_polling_stations_found")}</p>
             </Alert>
-          ) : !pollingStationsForDataEntry.length ? (
+          ) : !available.length ? (
             <Alert type="notify" variant="small">
               <p>{t("polling_station_choice.all_polling_stations_filled_in_twice")}</p>
             </Alert>
           ) : (
-            <PollingStationsList pollingStations={pollingStationsForDataEntryCurrentUser} />
+            <PollingStationsList pollingStations={availableCurrentUser} />
           )}
         </details>
       </div>

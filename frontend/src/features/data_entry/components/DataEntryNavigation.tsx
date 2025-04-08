@@ -30,6 +30,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
 
     if (
       status === "deleted" ||
+      status === "finalising" ||
       status === "finalised" ||
       status === "aborted" ||
       currentLocation.pathname === nextLocation.pathname

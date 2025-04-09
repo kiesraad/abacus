@@ -1,9 +1,5 @@
 # Input- en output-bestanden Abacus
 
-TODO: check/fix links to this doc
-
----
-
 Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig mogelijk met pen op de PV's moet worden geschreven. 
 
 ## Open punten
@@ -39,6 +35,8 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 - totaallijst (EML_NL 230c)
   - niet gebruikt door Abacus
   - zie open punt over beschikbaar stellen van adresgegevens voor benoemings- en geloofsbrieven
+
+---
 
 ## GSB
 
@@ -84,6 +82,7 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 #### Na 31-1 (DSO) en Na 31-2 (CSO): PV op GSB-niveau voor eerste zitting
 - gegenereerd door Abacus
 
+
 #### Na 14-1 versie 2 (DSO): Corrigendum op SB-niveau
 - gegenereerd door Abacus met resultaten vorige telling ingevuld
 - opdracht invoeren, genereren, handmatig invullen, resultaten (wel of niet hertelling), in Abacus invoeren
@@ -105,6 +104,7 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 - gegenereerd door Abacus
 - input voor CSB (?)
 
+
 ### Tellingsbestanden
 
 #### EML_NL
@@ -112,6 +112,7 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 - Telling 510b
   - tellingen GSB en SB's
   - output van Abacus - GSB, input voor Abacus - CSB
+
 
 #### CSV-bestand met tellingen
 
@@ -140,9 +141,11 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 
 - gegenereerd  door Abacus
 
+
 ### Benoemingsbrieven en geloofsbrieven
 
 - niet in scope Abacus
+
 
 ### Tellingsbestanden
 

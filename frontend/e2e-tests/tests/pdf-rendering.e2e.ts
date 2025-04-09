@@ -3,7 +3,7 @@ import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPg
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { stat } from "node:fs/promises";
 
-import { test } from "./fixtures";
+import { test } from "../fixtures";
 
 test.use({
   storageState: "e2e-tests/state/coordinator.json",

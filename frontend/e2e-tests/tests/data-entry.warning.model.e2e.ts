@@ -1,13 +1,18 @@
 import { expect } from "@playwright/test";
 import { createTestModel } from "@xstate/graph";
-import { AbortInputModal, DifferencesPage, RecountedPage, VotersAndVotesPage } from "e2e-tests/page-objects/data_entry";
-import { DataEntryChoicePage } from "e2e-tests/page-objects/data_entry_choice/DataEntryChoicePgObj";
+import {
+  AbortInputModal,
+  DataEntryHomePage,
+  DifferencesPage,
+  RecountedPage,
+  VotersAndVotesPage,
+} from "e2e-tests/page-objects/data_entry";
 import { createMachine } from "xstate";
 
 import { VotersCounts, VotesCounts } from "@kiesraad/api";
 
-import { test } from "./fixtures";
-import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
+import { test } from "../fixtures";
+import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "../helpers-utils/xstate-helpers";
 
 /*
 The names of the states in the machine keep track of two states:
@@ -183,7 +188,7 @@ test.describe("Data entry model test - warnings", () => {
     .forEach((path) => {
       // eslint-disable-next-line playwright/valid-title
       test(path.description, async ({ page, pollingStation, election }) => {
-        const dataEntryChoicePage = new DataEntryChoicePage(page);
+        const dataEntryHomePage = new DataEntryHomePage(page);
         const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
@@ -191,25 +196,25 @@ test.describe("Data entry model test - warnings", () => {
 
         const pollingStationsPageStates = {
           pollingStationsPageWarningSaved: async () => {
-            await expect(dataEntryChoicePage.fieldset).toBeVisible();
-            await expect(dataEntryChoicePage.allDataEntriesInProgress).toHaveText([
+            await expect(dataEntryHomePage.fieldset).toBeVisible();
+            await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
           pollingStationsPageChangedToWarningSaved: async () => {
-            await expect(dataEntryChoicePage.fieldset).toBeVisible();
-            await expect(dataEntryChoicePage.allDataEntriesInProgress).toHaveText([
+            await expect(dataEntryHomePage.fieldset).toBeVisible();
+            await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
           pollingStationsPageDiscarded: async () => {
-            await expect(dataEntryChoicePage.fieldset).toBeVisible();
-            await expect(dataEntryChoicePage.alertDataEntryInProgress).toBeHidden();
+            await expect(dataEntryHomePage.fieldset).toBeVisible();
+            await expect(dataEntryHomePage.alertDataEntryInProgress).toBeHidden();
           },
         };
         const PollingStationsPageEvents = {
           RESUME_DATA_ENTRY: async () => {
-            await dataEntryChoicePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
+            await dataEntryHomePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
           },
         };
 
@@ -416,14 +421,14 @@ test.describe("Data entry model test - warnings", () => {
 
         const abortInputModalStates = {
           pollingStationsPageWarningSaved: async () => {
-            await expect(dataEntryChoicePage.fieldset).toBeVisible();
-            await expect(dataEntryChoicePage.allDataEntriesInProgress).toHaveText([
+            await expect(dataEntryHomePage.fieldset).toBeVisible();
+            await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
           pollingStationsPageDiscarded: async () => {
-            await expect(dataEntryChoicePage.fieldset).toBeVisible();
-            await expect(dataEntryChoicePage.alertDataEntryInProgress).toBeHidden();
+            await expect(dataEntryHomePage.fieldset).toBeVisible();
+            await expect(dataEntryHomePage.alertDataEntryInProgress).toBeHidden();
           },
         };
         const abortInputModalEvents = {
@@ -455,7 +460,7 @@ test.describe("Data entry model test - warnings", () => {
         expect(new Set(events)).toEqual(new Set(machineEvents));
 
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
-        await dataEntryChoicePage.selectPollingStationAndClickStart(pollingStation);
+        await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
         await recountedPage.checkNoAndClickNext();
 
         type MachineStates = typeof dataEntryMachineDefinition.states;

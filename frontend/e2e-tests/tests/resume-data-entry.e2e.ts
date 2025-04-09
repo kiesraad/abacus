@@ -2,17 +2,17 @@ import { expect, Page } from "@playwright/test";
 import {
   AbortInputModal,
   CandidatesListPage,
+  DataEntryHomePage,
   DifferencesPage,
   RecountedPage,
   VotersAndVotesPage,
 } from "e2e-tests/page-objects/data_entry";
-import { DataEntryChoicePage } from "e2e-tests/page-objects/data_entry_choice/DataEntryChoicePgObj";
 
 import { PollingStation, VotersCounts, VotesCounts } from "@kiesraad/api";
 
-import { test } from "./fixtures";
-import { loginAs } from "./setup";
-import { emptyDataEntryResponse } from "./test-data/request-response-templates";
+import { test } from "../fixtures";
+import { loginAs } from "../setup";
+import { emptyDataEntryResponse } from "../test-data/request-response-templates";
 
 test.use({
   storageState: "e2e-tests/state/typist.json",
@@ -77,8 +77,8 @@ test.describe("resume data entry flow", () => {
       await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
-      const dataEntryChoicePage = new DataEntryChoicePage(page);
-      await expect(dataEntryChoicePage.fieldset).toBeVisible();
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
 
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
@@ -110,8 +110,8 @@ test.describe("resume data entry flow", () => {
       const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation);
       await abortInputModal.saveInput.click();
 
-      const dataEntryChoicePage = new DataEntryChoicePage(page);
-      await expect(dataEntryChoicePage.fieldset).toBeVisible();
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
 
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
@@ -152,9 +152,9 @@ test.describe("resume data entry flow", () => {
       await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
-      const dataEntryChoicePage = new DataEntryChoicePage(page);
-      await expect(dataEntryChoicePage.fieldset).toBeVisible();
-      await expect(dataEntryChoicePage.resumeDataEntry).toBeVisible();
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
+      await expect(dataEntryHomePage.resumeDataEntry).toBeVisible();
 
       await loginAs(request, "typist");
       const dataEntryResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
@@ -190,7 +190,7 @@ test.describe("resume data entry flow", () => {
         },
       });
 
-      await dataEntryChoicePage.selectPollingStationAndClickStart(pollingStation);
+      await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
     });
 
@@ -227,8 +227,8 @@ test.describe("resume data entry flow", () => {
       await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
-      const dataEntryChoicePage = new DataEntryChoicePage(page);
-      await expect(dataEntryChoicePage.fieldset).toBeVisible();
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
 
       await loginAs(request, "typist");
       const dataEntryResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
@@ -265,7 +265,7 @@ test.describe("resume data entry flow", () => {
         },
       });
 
-      await dataEntryChoicePage.selectPollingStationAndClickStart(pollingStation);
+      await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
     });
 
@@ -292,8 +292,8 @@ test.describe("resume data entry flow", () => {
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.saveInput.click();
 
-      const dataEntryChoicePage = new DataEntryChoicePage(page);
-      await dataEntryChoicePage.selectPollingStationAndClickStart(pollingStation);
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
 
       await expect(recountedPage.fieldset).toBeVisible();
       await recountedPage.navPanel.votersAndVotes.click();
@@ -338,8 +338,8 @@ test.describe("resume data entry flow", () => {
       const response = await responsePromise;
       expect(response.status()).toBe(200);
 
-      const dataEntryChoicePage = new DataEntryChoicePage(page);
-      await expect(dataEntryChoicePage.fieldset).toBeVisible();
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
     });
   });
 
@@ -349,8 +349,8 @@ test.describe("resume data entry flow", () => {
       await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
-      const dataEntryChoicePage = new DataEntryChoicePage(page);
-      await expect(dataEntryChoicePage.fieldset).toBeVisible();
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
 
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
@@ -380,8 +380,8 @@ test.describe("resume data entry flow", () => {
       await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
-      const dataEntryChoicePage = new DataEntryChoicePage(page);
-      await expect(dataEntryChoicePage.fieldset).toBeVisible();
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
 
       await loginAs(request, "typist");
       const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
@@ -422,8 +422,8 @@ test.describe("resume data entry flow", () => {
       await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
-      const dataEntryChoicePage = new DataEntryChoicePage(page);
-      await expect(dataEntryChoicePage.fieldset).toBeVisible();
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
 
       await loginAs(request, "typist");
       const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);

@@ -1,17 +1,31 @@
 import { expect, Page } from "@playwright/test";
 
-import { PollingStationResults } from "@kiesraad/api";
+import { PollingStation, PollingStationResults } from "@kiesraad/api";
 
 import {
   CandidatesListPage,
   CheckAndSavePage,
+  DataEntryHomePage,
   DifferencesPage,
   RecountedPage,
   VotersAndVotesPage,
 } from "../page-objects/data_entry";
-import { DataEntryChoicePage } from "../page-objects/data_entry_choice/DataEntryChoicePgObj";
 
-export async function fillDataEntry(page: Page, results: PollingStationResults) {
+export async function selectPollingStationForDataEntry(page: Page, pollingStation: PollingStation) {
+  await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
+
+  const dataEntryHomePage = new DataEntryHomePage(page);
+  await expect(dataEntryHomePage.fieldset).toBeVisible();
+  await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
+  await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
+  await dataEntryHomePage.clickStart();
+
+  const recountedPage = new RecountedPage(page);
+  await expect(recountedPage.fieldset).toBeVisible();
+  return recountedPage;
+}
+
+export async function fillDataEntryPages(page: Page, results: PollingStationResults) {
   const recountedPage = new RecountedPage(page);
   await expect(recountedPage.fieldset).toBeVisible();
   await recountedPage.fillInPageAndClickNext(results.recounted ? results.recounted : false);
@@ -42,8 +56,17 @@ export async function fillDataEntry(page: Page, results: PollingStationResults) 
 
   const checkAndSavePage = new CheckAndSavePage(page);
   await expect(checkAndSavePage.fieldset).toBeVisible();
+  return checkAndSavePage;
+}
+
+export async function fillDataEntryPagesAndSave(page: Page, results: PollingStationResults) {
+  await fillDataEntryPages(page, results);
+
+  const checkAndSavePage = new CheckAndSavePage(page);
+  await expect(checkAndSavePage.fieldset).toBeVisible();
   await checkAndSavePage.save.click();
 
-  const dataEntryChoicePage = new DataEntryChoicePage(page);
-  await expect(dataEntryChoicePage.dataEntrySuccess).toBeVisible();
+  const dataEntryHomePage = new DataEntryHomePage(page);
+  await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+  return dataEntryHomePage;
 }

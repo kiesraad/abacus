@@ -248,7 +248,7 @@ export function VotersAndVotesForm() {
           </>
         )}
       </InputGrid>
-      <BottomBar type="input-grid">
+      <BottomBar type="inputGrid">
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
             <Alert type="error" variant="small">

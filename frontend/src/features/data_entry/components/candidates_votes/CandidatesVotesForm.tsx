@@ -136,7 +136,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </Alert>
         </div>
       )}
-      <BottomBar type="input-grid">
+      <BottomBar type="inputGrid">
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
             <Alert type="error" variant="small">

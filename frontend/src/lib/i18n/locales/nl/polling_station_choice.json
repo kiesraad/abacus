@@ -1,5 +1,6 @@
 {
   "all_polling_stations_filled_in_twice": "Alle stembureaus zijn twee keer ingevoerd",
+  "assigned_to_different_user": "Een andere invoerder is bezig met stembureau {nr}",
   "choose_polling_station": "Kies het stembureau",
   "enter_a_valid_number_to_start": "Voer een geldig nummer van een stembureau in om te beginnen",
   "has_already_been_filled_twice": "Stembureau {nr} <strong>({name})</strong> is al twee keer ingevoerd",
@@ -11,10 +12,10 @@
   "no_polling_stations_found": "Geen stembureaus gevonden",
   "polling_station_entry_not_possible": "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
   "polling_station_in_progress_different_user": "Een andere invoerder is bezig met stembureau {nr} ({name})",
-  "assigned_to_different_user": "Een andere invoerder is bezig met stembureau {nr}",
   "searching": "aan het zoeken",
-  "unfinished_input_title": "Je hebt nog een openstaande invoer",
+  "second_entry_not_allowed": "Je mag stembureau {nr} niet nog een keer invoeren",
   "unfinished_input_content": "Je bent begonnen met het invoeren van onderstaande stembureaus, maar hebt deze nog niet helemaal afgerond:",
+  "unfinished_input_title": "Je hebt nog een openstaande invoer",
   "unknown_number": "Weet je het nummer niet?",
-  "view_list": "Bekijk de lijst met alle stembureaus"
+  "view_list": "Toon de lijst met nog in te vullen stembureau's"
 }

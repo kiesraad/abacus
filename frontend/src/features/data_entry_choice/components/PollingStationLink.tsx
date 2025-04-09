@@ -2,8 +2,8 @@ import { Link } from "react-router";
 
 import { DataEntryStatusName, PollingStation } from "@/api";
 import { IconArrowNarrowRight } from "@/lib/icon";
-import { getUrlForDataEntry } from "@/lib/util";
 
+import { getUrlForDataEntry } from "../utils/util";
 import cls from "./DataEntryChoice.module.css";
 
 interface PollingStationLinkProps {

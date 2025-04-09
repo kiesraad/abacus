@@ -119,6 +119,7 @@ mod tests {
         Router,
         body::Body,
         http::{Method, Request},
+        middleware,
         routing::get,
     };
     use chrono::TimeDelta;
@@ -135,7 +136,7 @@ mod tests {
             UserLoggedInDetails,
             api::{audit_log_list, audit_log_list_users},
         },
-        authentication::{Sessions, User, Users},
+        authentication::{Sessions, User, Users, inject_user},
     };
 
     fn new_test_audit_service(pool: SqlitePool, user: User) -> AuditService {
@@ -173,6 +174,10 @@ mod tests {
 
         let app = Router::new()
             .route("/api/log", get(audit_log_list))
+            .layer(middleware::map_request_with_state(
+                state.clone(),
+                inject_user,
+            ))
             .with_state(state);
 
         create_log_entries(pool).await;
@@ -228,6 +233,10 @@ mod tests {
 
         let app = Router::new()
             .route("/api/log-users", get(audit_log_list_users))
+            .layer(middleware::map_request_with_state(
+                state.clone(),
+                inject_user,
+            ))
             .with_state(state);
 
         create_log_entries(pool).await;

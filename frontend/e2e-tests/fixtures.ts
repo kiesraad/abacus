@@ -100,10 +100,14 @@ export const test = base.extend<Fixtures>({
     await use(pollingStation);
   },
   completedElection: async ({ request, election }, use) => {
-    await loginAs(request, "typist");
     // finalise both data entries for all polling stations
     for (const pollingStationId of election.polling_stations.map((ps) => ps.id)) {
       for (const entryNumber of [1, 2]) {
+        if (entryNumber === 1) {
+          await loginAs(request, "typist");
+        } else if (entryNumber === 2) {
+          await loginAs(request, "typist2");
+        }
         const save_url: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
         const claim_url: POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH = `${save_url}/claim`;
         const claimResponse = await request.post(claim_url);

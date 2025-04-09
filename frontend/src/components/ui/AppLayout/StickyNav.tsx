@@ -56,7 +56,7 @@ export function StickyNav({ children }: StickyNavProps) {
   }, []);
 
   return (
-    <nav ref={ref} className={cls["sticky-nav"]}>
+    <nav ref={ref} className={cls.stickyNav}>
       {children}
     </nav>
   );

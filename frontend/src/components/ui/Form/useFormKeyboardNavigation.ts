@@ -1,9 +1,11 @@
-import * as React from "react";
+import { RefObject, useCallback, useEffect, useRef } from "react";
 
 type Dir = "up" | "down" | "first" | "last";
 
-export function useFormKeyboardNavigation(innerRef: React.MutableRefObject<HTMLFormElement | null>) {
-  const moveFocus = React.useCallback(
+export function useFormKeyboardNavigation(): RefObject<HTMLFormElement> {
+  const innerRef = useRef<HTMLFormElement>(null);
+
+  const moveFocus = useCallback(
     (dir: Dir) => {
       if (!innerRef.current) {
         return;
@@ -54,7 +56,7 @@ export function useFormKeyboardNavigation(innerRef: React.MutableRefObject<HTMLF
     [innerRef],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
         case "ArrowUp":
@@ -97,4 +99,6 @@ export function useFormKeyboardNavigation(innerRef: React.MutableRefObject<HTMLF
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [innerRef, moveFocus]);
+
+  return innerRef;
 }

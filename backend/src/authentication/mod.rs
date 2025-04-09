@@ -1,13 +1,15 @@
-pub use self::api::*;
 use chrono::TimeDelta;
-pub use user::{User, Users};
 
-pub use self::role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
+pub use self::api::*;
 #[cfg(test)]
 pub use self::session::Sessions;
+pub use middleware::*;
+pub use role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
+pub use user::{User, Users};
 
 pub mod api;
 pub mod error;
+mod middleware;
 mod password;
 mod role;
 mod session;
@@ -45,7 +47,7 @@ mod tests {
 
     use crate::{
         AppState,
-        authentication::{session::Sessions, *},
+        authentication::{middleware::extend_session, session::Sessions, *},
     };
 
     fn create_app(pool: SqlitePool) -> Router {
@@ -55,6 +57,10 @@ mod tests {
             .layer(middleware::map_response_with_state(
                 state.clone(),
                 extend_session,
+            ))
+            .layer(middleware::map_request_with_state(
+                state.clone(),
+                inject_user,
             ))
             .with_state(state)
     }

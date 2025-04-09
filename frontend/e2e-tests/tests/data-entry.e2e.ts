@@ -391,6 +391,8 @@ test.describe("full data entry flow", () => {
 });
 
 test.describe("second data entry", () => {
+  test.use({ storageState: "e2e-tests/state/typist2.json" });
+
   test("equal second data entry after first data entry", async ({ page, pollingStationFirstEntryDone }) => {
     const pollingStation = pollingStationFirstEntryDone;
 

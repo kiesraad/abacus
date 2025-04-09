@@ -1,4 +1,4 @@
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 
 import type { Story } from "@ladle/react";
 
@@ -33,8 +33,7 @@ export const DefaultForm: Story = () => {
 };
 
 export const UseFormKeyboardNavigation: Story = () => {
-  const ref = useRef(null);
-  useFormKeyboardNavigation(ref);
+  const ref = useFormKeyboardNavigation();
 
   const [keyboardFormSubmitted, setKeyboardFormSubmitted] = useState(false);
 

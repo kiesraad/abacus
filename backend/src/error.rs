@@ -42,6 +42,7 @@ pub enum ErrorReference {
     InvalidUsernameOrPassword,
     InvalidVoteCandidate,
     InvalidVoteGroup,
+    PasswordRejection,
     PdfGenerationError,
     PollingStationDataValidation,
     PollingStationFirstEntryAlreadyFinalised,
@@ -53,7 +54,7 @@ pub enum ErrorReference {
     UserNotFound,
     UsernameNotUnique,
     Unauthorized,
-    PasswordRejection,
+    ZeroVotesCast,
 }
 
 /// Response structure for errors
@@ -229,7 +230,7 @@ impl IntoResponse for APIError {
                         StatusCode::UNAUTHORIZED,
                         to_error("Invalid session", ErrorReference::InvalidSession, false),
                     ),
-                    AuthenticationError::Unauthorized => (
+                    AuthenticationError::Unauthorized | AuthenticationError::Unauthenticated => (
                         StatusCode::UNAUTHORIZED,
                         to_error("Unauthorized", ErrorReference::Unauthorized, false),
                     ),
@@ -240,7 +241,6 @@ impl IntoResponse for APIError {
                     // server errors
                     AuthenticationError::Database(_)
                     | AuthenticationError::HashPassword(_)
-                    | AuthenticationError::BackwardTimeTravel
                     | AuthenticationError::InvalidSessionDuration => (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         to_error(
@@ -287,6 +287,14 @@ impl IntoResponse for APIError {
                         to_error(
                             "Drawing of lots is required",
                             ErrorReference::DrawingOfLotsRequired,
+                            false,
+                        ),
+                    ),
+                    ApportionmentError::ZeroVotesCast => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "No votes on candidates cast",
+                            ErrorReference::ZeroVotesCast,
                             false,
                         ),
                     ),

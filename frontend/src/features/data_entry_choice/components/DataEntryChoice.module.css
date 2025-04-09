@@ -61,7 +61,7 @@
   }
 }
 
-.data-entry-list {
+.dataEntryList {
   details[open] {
     summary {
       display: none;

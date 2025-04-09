@@ -1,26 +1,23 @@
-import { LargestRemainderAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatChangeStep } from "@/api";
+import { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
 
+import { LargestRemainderAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface LargestRemaindersTableProps {
-  largestRemainderSteps: SeatChangeStep[];
+  steps: LargestRemainderAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
-export function LargestRemaindersTable({
-  largestRemainderSteps,
-  finalStanding,
-  politicalGroups,
-}: LargestRemaindersTableProps) {
+export function LargestRemaindersTable({ steps, finalStanding, politicalGroups }: LargestRemaindersTableProps) {
   const finalStandingPgsMeetingThreshold = finalStanding.filter(
     (pg_seat_assignment) => pg_seat_assignment.meets_remainder_threshold,
   );
   return (
-    <Table id="largest_remainders_table" className={cls.table}>
+    <Table id="largest-remainders-table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>
@@ -32,11 +29,9 @@ export function LargestRemaindersTable({
       </Table.Header>
       <Table.Body>
         {finalStandingPgsMeetingThreshold.map((pg_seat_assignment) => {
-          const residual_seats =
-            largestRemainderSteps.filter((step) => {
-              const change = step.change as LargestRemainderAssignedSeat;
-              return change.selected_pg_number == pg_seat_assignment.pg_number;
-            }).length || 0;
+          const residual_seats = steps.filter((step) => {
+            return step.change.selected_pg_number == pg_seat_assignment.pg_number;
+          }).length;
           return (
             <Table.Row key={pg_seat_assignment.pg_number}>
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>

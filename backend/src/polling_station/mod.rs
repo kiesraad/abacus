@@ -2,6 +2,7 @@ use self::repository::PollingStations;
 pub use self::structs::*;
 use crate::{
     APIError, AppState, ErrorResponse,
+    audit_log::{AuditEvent, AuditService},
     authentication::{AdminOrCoordinator, User},
     election::repository::Elections,
 };
@@ -88,17 +89,24 @@ async fn polling_station_create(
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
     Path(election_id): Path<u32>,
+    audit_service: AuditService,
     new_polling_station: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     // Check if the election exists, will respond with NOT_FOUND otherwise
     elections.get(election_id).await?;
 
-    Ok((
-        StatusCode::CREATED,
-        polling_stations
-            .create(election_id, new_polling_station)
-            .await?,
-    ))
+    let polling_station = polling_stations
+        .create(election_id, new_polling_station)
+        .await?;
+
+    audit_service
+        .log(
+            &AuditEvent::PollingStationCreated(polling_station.clone().into()),
+            None,
+        )
+        .await?;
+
+    Ok((StatusCode::CREATED, polling_station))
 }
 
 /// Get a [PollingStation]
@@ -148,6 +156,7 @@ async fn polling_station_get(
 async fn polling_station_update(
     _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
+    audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
     polling_station_update: PollingStationRequest,
 ) -> Result<StatusCode, APIError> {
@@ -156,6 +165,17 @@ async fn polling_station_update(
         .await?;
 
     if updated {
+        let polling_station = polling_stations
+            .get_for_election(election_id, polling_station_id)
+            .await?;
+
+        audit_service
+            .log(
+                &AuditEvent::PollingStationUpdated(polling_station.clone().into()),
+                None,
+            )
+            .await?;
+
         Ok(StatusCode::OK)
     } else {
         Ok(StatusCode::NOT_FOUND)
@@ -179,13 +199,25 @@ async fn polling_station_update(
 async fn polling_station_delete(
     _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
+    audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<StatusCode, APIError> {
+    let polling_station = polling_stations
+        .get_for_election(election_id, polling_station_id)
+        .await?;
+
     let deleted = polling_stations
         .delete(election_id, polling_station_id)
         .await?;
 
     if deleted {
+        audit_service
+            .log(
+                &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
+                None,
+            )
+            .await?;
+
         Ok(StatusCode::OK)
     } else {
         Ok(StatusCode::NOT_FOUND)

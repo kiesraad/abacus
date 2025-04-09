@@ -1,11 +1,3 @@
-use std::error::Error;
-
-use crate::{
-    apportionment::ApportionmentError,
-    authentication::error::AuthenticationError,
-    data_entry::{DataError, status::DataEntryTransitionError},
-    pdf_gen::PdfGenError,
-};
 use axum::{
     Json,
     extract::rejection::JsonRejection,
@@ -16,16 +8,25 @@ use hyper::header::InvalidHeaderValue;
 use quick_xml::SeError;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
+use std::error::Error;
 use tracing::error;
 use utoipa::ToSchema;
 use zip::result::ZipError;
 
+use crate::{
+    apportionment::ApportionmentError,
+    authentication::error::AuthenticationError,
+    data_entry::{DataError, status::DataEntryTransitionError},
+    pdf_gen::PdfGenError,
+};
+
 /// Error reference used to show the corresponding error message to the end-user
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, ToSchema, PartialEq, Eq, Debug)]
 pub enum ErrorReference {
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DatabaseError,
+    DataEntryAlreadyClaimed,
     DrawingOfLotsRequired,
     EntryNotFound,
     EntryNotUnique,
@@ -41,6 +42,7 @@ pub enum ErrorReference {
     InvalidUsernameOrPassword,
     InvalidVoteCandidate,
     InvalidVoteGroup,
+    PasswordRejection,
     PdfGenerationError,
     PollingStationDataValidation,
     PollingStationFirstEntryAlreadyFinalised,
@@ -52,11 +54,11 @@ pub enum ErrorReference {
     UserNotFound,
     UsernameNotUnique,
     Unauthorized,
-    PasswordRejection,
+    ZeroVotesCast,
 }
 
 /// Response structure for errors
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[derive(Serialize, Deserialize, Clone, ToSchema, Debug)]
 pub struct ErrorResponse {
     pub error: String,
     pub fatal: bool,
@@ -100,7 +102,7 @@ impl IntoResponse for APIError {
             }
         }
 
-        let (status, response) = match self {
+        let (status, error_response) = match self {
             APIError::BadRequest(message, reference) => {
                 (StatusCode::BAD_REQUEST, to_error(&message, reference, true))
             }
@@ -188,7 +190,10 @@ impl IntoResponse for APIError {
                 )
             }
             APIError::Authentication(err) => {
-                error!("Authentication error: {:?}", err);
+                // note that we don't log the UserNotFound error, as it is triggered for every whoami call
+                if !matches!(err, AuthenticationError::UserNotFound) {
+                    error!("Authentication error: {:?}", err);
+                }
 
                 match err {
                     // client errors
@@ -225,7 +230,7 @@ impl IntoResponse for APIError {
                         StatusCode::UNAUTHORIZED,
                         to_error("Invalid session", ErrorReference::InvalidSession, false),
                     ),
-                    AuthenticationError::Unauthorized => (
+                    AuthenticationError::Unauthorized | AuthenticationError::Unauthenticated => (
                         StatusCode::UNAUTHORIZED,
                         to_error("Unauthorized", ErrorReference::Unauthorized, false),
                     ),
@@ -236,7 +241,6 @@ impl IntoResponse for APIError {
                     // server errors
                     AuthenticationError::Database(_)
                     | AuthenticationError::HashPassword(_)
-                    | AuthenticationError::BackwardTimeTravel
                     | AuthenticationError::InvalidSessionDuration => (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         to_error(
@@ -286,11 +290,22 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
+                    ApportionmentError::ZeroVotesCast => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "No votes on candidates cast",
+                            ErrorReference::ZeroVotesCast,
+                            false,
+                        ),
+                    ),
                 }
             }
         };
 
-        (status, response).into_response()
+        let mut response = (status, error_response.clone()).into_response();
+        response.extensions_mut().insert(error_response);
+
+        response
     }
 }
 
@@ -350,7 +365,13 @@ impl From<SeError> for APIError {
 
 impl From<DataEntryTransitionError> for APIError {
     fn from(err: DataEntryTransitionError) -> Self {
-        Self::Conflict(err.to_string(), ErrorReference::InvalidStateTransition)
+        match err {
+            DataEntryTransitionError::FirstEntryAlreadyClaimed
+            | DataEntryTransitionError::SecondEntryAlreadyClaimed => {
+                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyClaimed)
+            }
+            _ => APIError::Conflict(err.to_string(), ErrorReference::InvalidStateTransition),
+        }
     }
 }
 

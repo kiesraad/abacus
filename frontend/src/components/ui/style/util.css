@@ -27,6 +27,10 @@
   margin-bottom: var(--space-lg);
 }
 
+.mb-xl {
+  margin-bottom: var(--space-xl);
+}
+
 /* Color */
 .bg-gray {
   background-color: var(--bg-gray);
@@ -41,8 +45,20 @@
 }
 
 /* Width */
+.w-6 {
+  width: 6rem;
+}
+
+.w-13 {
+  width: 13rem;
+}
+
 .w-14 {
   width: 14rem;
+}
+
+.w-39 {
+  width: 39rem;
 }
 
 .w-full {

@@ -10,7 +10,7 @@ export interface ChoiceListProps {
 }
 
 export function ChoiceList({ children }: ChoiceListProps) {
-  return <fieldset className={cn(cls["choice-list"])}>{children}</fieldset>;
+  return <fieldset className={cn(cls.choiceList)}>{children}</fieldset>;
 }
 
 interface ChoiceListOptionProps extends CheckboxAndRadioProps {

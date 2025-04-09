@@ -80,6 +80,7 @@ describe("NavBar", () => {
     { pathname: "/workstations" },
     { pathname: "/logs" },
     { pathname: "/elections/1" },
+    { pathname: "/elections/create" },
   ])("top level management links for $pathname", async (location) => {
     await renderNavBar(location, "administrator");
 
@@ -113,6 +114,7 @@ describe("NavBar", () => {
   });
 
   test.each([
+    { pathname: "/elections/1/apportionment/1" },
     { pathname: "/elections/1/apportionment/details-full-seats" },
     { pathname: "/elections/1/apportionment/details-residual-seats" },
   ])("polling station management links for $pathname", async (location) => {

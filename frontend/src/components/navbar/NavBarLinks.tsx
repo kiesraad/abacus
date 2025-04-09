@@ -59,7 +59,9 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
           <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_stations")}</Link>
         </>
       )}
-      {location.pathname.match(/^\/elections\/\d+\/apportionment\/(details-full-seats|details-residual-seats)$/) && (
+      {location.pathname.match(
+        /^\/elections\/\d+\/apportionment\/(\d+|details-full-seats|details-residual-seats)$/,
+      ) && (
         <>
           <IconChevronRight />
           <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
@@ -88,7 +90,7 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
   const { isAdministrator, isCoordinator } = useUserRole();
 
   if (
-    (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||
+    (location.pathname.match(/^\/elections(\/\d+|\/create)?$/) && (isAdministrator || isCoordinator)) ||
     location.pathname.startsWith("/users") ||
     location.pathname === "/workstations" ||
     location.pathname === "/logs"

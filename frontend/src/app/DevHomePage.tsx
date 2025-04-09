@@ -157,14 +157,14 @@ function DevLinks() {
           </ul>
         </li>
       </ul>
-      {isTypist && (
-        <ElectionListProvider>
-          <TypistLinks />
-        </ElectionListProvider>
-      )}
-      {(isAdministrator || isCoordinator) && (
+      {(__API_MSW__ || isAdministrator || isCoordinator) && (
         <ElectionListProvider>
           <AdministratorCoordinatorLinks />
+        </ElectionListProvider>
+      )}
+      {(__API_MSW__ || isTypist) && (
+        <ElectionListProvider>
+          <TypistLinks />
         </ElectionListProvider>
       )}
     </>

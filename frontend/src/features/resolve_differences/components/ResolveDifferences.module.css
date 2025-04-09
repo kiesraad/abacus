@@ -1,0 +1,18 @@
+.differencesTable {
+  td {
+    height: 4.5rem;
+  }
+
+  td.gapRow {
+    height: 2rem;
+  }
+
+  td:not(.gapRow) {
+    border-left: 1px solid var(--bg-gray-darkest);
+  }
+}
+
+.zeroDash {
+  font-family: var(--font-text);
+  color: var(--gray-300);
+}

@@ -1,5 +1,6 @@
 import account from "./account.json";
 import apportionment from "./apportionment.json";
+import candidate from "./candidate.json";
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
 import data_entry from "./data_entry.json";
@@ -15,7 +16,9 @@ import log from "./log.json";
 import messages from "./messages.json";
 import polling_station from "./polling_station.json";
 import polling_station_choice from "./polling_station_choice.json";
+import polling_station_results from "./polling_station_results.json";
 import recounted from "./recounted.json";
+import resolve_differences from "./resolve_differences.json";
 import status from "./status.json";
 import users from "./users.json";
 import voters_and_votes from "./voters_and_votes.json";
@@ -25,6 +28,7 @@ const nl = {
   ...generic,
   account,
   apportionment,
+  candidate,
   candidates_votes,
   check_and_save,
   data_entry,
@@ -39,7 +43,9 @@ const nl = {
   messages,
   polling_station,
   polling_station_choice,
+  polling_station_results,
   recounted,
+  resolve_differences,
   status,
   users,
   voters_and_votes,

@@ -67,25 +67,6 @@ flowchart LR
     component --> msw
 ```
 
----
-
-```mermaid
----
-title: React integration test
----
-flowchart LR
-    fe(Frontend)
-
-    rtl([React Testing Library])
-    msw([Mock Service Worker])
-
-    rtl --> fe
-
-    fe --> msw
-```
-
-Plan is om binnenkort deze tests te vervangen door Playwright tests. ([issue 898](https://github.com/kiesraad/abacus/issues/898))
-
 
 ## Backend
 - Linting: [Rust compiler][rust-compiler] en [clippy][clippy]

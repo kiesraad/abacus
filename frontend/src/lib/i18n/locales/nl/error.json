@@ -16,8 +16,9 @@
     "AllListsExhausted": "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
     "ApportionmentNotAvailableUntilDataEntryFinalised": "De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd",
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
+    "DataEntryAlreadyClaimed": "Een andere invoerder is bezig met dit stembureau",
     "DrawingOfLotsRequired": "Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus",
-    "EntryNotFound": "De invoer is niet gevonden",
+    "EntryNotFound": "Niet gevonden",
     "EntryNotUnique": "Deze invoer bestaat al",
     "EntryNumberNotSupported": "Ongeldige invoer voor dit stembureau",
     "InternalServerError": "Er is een interne fout opgetreden",
@@ -31,6 +32,7 @@
     "InvalidUsernameOrPassword": "De gebruikersnaam of het wachtwoord is onjuist",
     "InvalidVoteCandidate": "De kandidaat van de stem is niet geldig",
     "InvalidVoteGroup": "De politieke partij van de stem is niet geldig",
+    "PasswordRejection": "Het opgegeven wachtwoord voldoet niet aan de eisen",
     "PdfGenerationError": "Er is een fout opgetreden bij het genereren van de PDF",
     "PollingStationDataValidation": "De invoer voor dit stembureau is niet geldig",
     "PollingStationFirstEntryAlreadyFinalised": "De eerste invoer voor dit stembureau is al definitief",
@@ -42,6 +44,6 @@
     "Unauthorized": "Je hebt geen toestemming om deze actie uit te voeren",
     "UserNotFound": "De gebruiker is niet gevonden",
     "UsernameNotUnique": "De gebruikersnaam is al in gebruik",
-    "PasswordRejection": "Het opgegeven wachtwoord voldoet niet aan de eisen"
+    "ZeroVotesCast": "Er zijn geen stemmen op kandidaten uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad."
   }
 }

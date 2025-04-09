@@ -366,8 +366,10 @@ async fn get_statuses(
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
     let typist_user_id = 3;
+    let typist2_cookie = shared::typist2_login(&addr).await;
+    let typist2_user_id = 4;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
 
     // Ensure the statuses are "NotStarted"
     let statuses = get_statuses(&addr, coordinator_cookie.clone()).await;
@@ -377,7 +379,6 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&1].second_entry_user_id, None);
     assert_eq!(statuses[&1].first_entry_progress, None);
     assert_eq!(statuses[&1].second_entry_progress, None);
-
     assert_eq!(statuses[&2].status, FirstEntryNotStarted);
     assert_eq!(statuses[&2].first_entry_user_id, None);
     assert_eq!(statuses[&2].second_entry_user_id, None);
@@ -414,10 +415,10 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_entry_progress, None);
 
     // Claim and save the entries
-    claim_data_entry(&addr, typist_cookie.clone(), 1, 2).await;
+    claim_data_entry(&addr, typist2_cookie.clone(), 1, 2).await;
     save_data_entry(
         &addr,
-        typist_cookie.clone(),
+        typist2_cookie.clone(),
         1,
         2,
         Some(r#"{"continue": true}"#),
@@ -437,7 +438,7 @@ async fn test_election_details_status(pool: SqlitePool) {
 
     assert_eq!(statuses[&1].status, SecondEntryInProgress);
     assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
-    assert_eq!(statuses[&1].second_entry_user_id, Some(typist_user_id));
+    assert_eq!(statuses[&1].second_entry_user_id, Some(typist2_user_id));
     assert_eq!(statuses[&1].first_entry_progress, Some(100));
     assert_eq!(statuses[&1].second_entry_progress, Some(60));
 
@@ -448,14 +449,14 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_entry_progress, None);
 
     // finalise second data entry for polling station 1
-    create_and_finalise_data_entry(&addr, typist_cookie.clone(), 1, 2).await;
+    create_and_finalise_data_entry(&addr, typist2_cookie.clone(), 1, 2).await;
 
     // polling station 1 should now be definitive
     let statuses = get_statuses(&addr, coordinator_cookie).await;
 
     assert_eq!(statuses[&1].status, Definitive);
     assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
-    assert_eq!(statuses[&1].second_entry_user_id, Some(typist_user_id));
+    assert_eq!(statuses[&1].second_entry_user_id, Some(typist2_user_id));
     assert_eq!(statuses[&1].first_entry_progress, Some(100));
     assert_eq!(statuses[&1].second_entry_progress, Some(100));
 

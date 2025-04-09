@@ -1,10 +1,10 @@
 import { Navigate, useNavigate } from "react-router";
 
-import { AccountSetupForm } from "@/components/form/account/account_setup/AccountSetupForm";
+import { LoginResponse, useApiState } from "@/api";
+import { PageTitle } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
-import { LoginResponse, useApiState } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { PageTitle } from "@kiesraad/ui";
+import { AccountSetupForm } from "./AccountSetupForm";
 
 export function AccountSetupPage() {
   const navigate = useNavigate();

@@ -1,23 +1,24 @@
-import { HighestAverageAssignedSeat, PoliticalGroup, PoliticalGroupSeatAssignment, SeatChangeStep } from "@/api";
+import { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
 
+import { HighestAverageAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface HighestAveragesForLessThan19SeatsTableProps {
-  highestAverageSteps: SeatChangeStep[];
+  steps: HighestAverageAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
 export function HighestAveragesForLessThan19SeatsTable({
-  highestAverageSteps,
+  steps,
   finalStanding,
   politicalGroups,
 }: HighestAveragesForLessThan19SeatsTableProps) {
   return (
-    <Table id="highest_averages_for_less_than_19_seats_table" className={cls.table}>
+    <Table id="highest-averages-for-less-than-19-seats-table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>
@@ -29,10 +30,9 @@ export function HighestAveragesForLessThan19SeatsTable({
       </Table.Header>
       <Table.Body>
         {finalStanding.map((pg_seat_assignment) => {
-          const average = highestAverageSteps[0]?.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
-          const residual_seats = highestAverageSteps.filter((step) => {
-            const change = step.change as HighestAverageAssignedSeat;
-            return change.selected_pg_number == pg_seat_assignment.pg_number;
+          const average = steps[0]?.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
+          const residual_seats = steps.filter((step) => {
+            return step.change.selected_pg_number == pg_seat_assignment.pg_number;
           }).length;
           return (
             <Table.Row key={pg_seat_assignment.pg_number}>

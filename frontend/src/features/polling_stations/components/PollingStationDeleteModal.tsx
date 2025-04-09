@@ -1,6 +1,6 @@
-import { isSuccess, useCrud } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { Button, Modal } from "@kiesraad/ui";
+import { isSuccess, useCrud } from "@/api";
+import { Button, Modal } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
 export interface PollingStationDeleteModalProps {
   electionId: number;

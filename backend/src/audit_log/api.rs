@@ -119,6 +119,7 @@ mod tests {
         Router,
         body::Body,
         http::{Method, Request},
+        middleware,
         routing::get,
     };
     use chrono::TimeDelta;
@@ -135,26 +136,31 @@ mod tests {
             UserLoggedInDetails,
             api::{audit_log_list, audit_log_list_users},
         },
-        authentication::{Sessions, Users},
+        authentication::{Sessions, User, Users, inject_user},
     };
 
-    async fn create_log_entries(pool: SqlitePool) {
-        let service = AuditService::new(
+    fn new_test_audit_service(pool: SqlitePool, user: User) -> AuditService {
+        AuditService::new(
             AuditLog::new(pool.clone()),
-            Ipv4Addr::new(203, 0, 113, 0).into(),
-            Users::new(pool)
-                .get_by_username("admin")
-                .await
-                .unwrap()
-                .unwrap(),
-        );
+            user,
+            Some(Ipv4Addr::new(203, 0, 113, 0).into()),
+        )
+    }
+
+    async fn create_log_entries(pool: SqlitePool) {
+        let user = Users::new(pool.clone())
+            .get_by_username("admin")
+            .await
+            .unwrap()
+            .unwrap();
+        let service = new_test_audit_service(pool, user);
         let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 1,
         });
-        service.log_success(&audit_event, None).await.unwrap();
-        service.log_success(&audit_event, None).await.unwrap();
-        service.log_success(&audit_event, None).await.unwrap();
+        service.log(&audit_event, None).await.unwrap();
+        service.log(&audit_event, None).await.unwrap();
+        service.log(&audit_event, None).await.unwrap();
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -168,6 +174,10 @@ mod tests {
 
         let app = Router::new()
             .route("/api/log", get(audit_log_list))
+            .layer(middleware::map_request_with_state(
+                state.clone(),
+                inject_user,
+            ))
             .with_state(state);
 
         create_log_entries(pool).await;
@@ -223,6 +233,10 @@ mod tests {
 
         let app = Router::new()
             .route("/api/log-users", get(audit_log_list_users))
+            .layer(middleware::map_request_with_state(
+                state.clone(),
+                inject_user,
+            ))
             .with_state(state);
 
         create_log_entries(pool).await;

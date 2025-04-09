@@ -1,14 +1,14 @@
 import { Outlet } from "react-router";
 
 import { NotFoundError, useElection } from "@/api";
-import { DataEntryProgress } from "@/components/form/data_entry/DataEntryProgress";
-import { DataEntryProvider } from "@/components/form/data_entry/state/DataEntryProvider";
+import { Badge, PageTitle, PollingStationNumber, StickyNav } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { useNumericParam, usePollingStationStatus } from "@/lib/util";
+import { useNumericParam } from "@/lib/util";
 
-import { Badge, PageTitle, PollingStationNumber, StickyNav } from "@kiesraad/ui";
-
+import { usePollingStationStatus } from "../hooks/usePollingStationStatus";
 import { AbortDataEntryControl } from "./AbortDataEntryControl";
+import { DataEntryProgress } from "./DataEntryProgress";
+import { DataEntryProvider } from "./DataEntryProvider";
 
 export function DataEntryLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
@@ -20,7 +20,7 @@ export function DataEntryLayout() {
     throw new NotFoundError("error.polling_station_not_found");
   }
 
-  if (pollingStationStatus === "definitive") {
+  if (pollingStationStatus.status === "definitive") {
     throw new Error("error.polling_station_already_definitive");
   }
 
@@ -31,7 +31,7 @@ export function DataEntryLayout() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          {pollingStationStatus && <Badge type={pollingStationStatus} />}
+          {pollingStationStatus.status && <Badge type={pollingStationStatus.status} />}
         </section>
         <section>
           <AbortDataEntryControl />

@@ -6,9 +6,7 @@ use sqlx::Type;
 use utoipa::ToSchema;
 
 use crate::{
-    data_entry::{PollingStationResults, entry_number::EntryNumber},
-    election::Election,
-    polling_station::PollingStation,
+    data_entry::PollingStationResults, election::Election, polling_station::PollingStation,
 };
 
 use super::{DataError, ValidationResults, validate_polling_station_results};
@@ -22,6 +20,8 @@ pub enum DataEntryTransitionError {
     SecondEntryAlreadyFinalised,
     /// An existing first/second data entry needs to be saved, finalised, or deleted by the same user
     CannotTransitionUsingDifferentUser,
+    /// The second data entry needs to be claimed by a user other than the one who claimed the first entry
+    SecondEntryNeedsDifferentUser,
     ValidatorError(DataError),
     ValidationError(ValidationResults),
 }
@@ -49,8 +49,9 @@ pub enum DataEntryStatus {
     Definitive(Definitive), // First and second entry are finished
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, strum::Display, Clone, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
 pub enum DataEntryStatusName {
     FirstEntryNotStarted,
     FirstEntryInProgress,
@@ -128,6 +129,10 @@ pub struct EntriesDifferent {
     pub second_entry_user_id: u32,
     pub first_entry: PollingStationResults,
     pub second_entry: PollingStationResults,
+    #[schema(value_type = String)]
+    pub first_entry_finished_at: DateTime<Utc>,
+    #[schema(value_type = String)]
+    pub second_entry_finished_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
@@ -141,7 +146,7 @@ pub struct Definitive {
 }
 
 /// Current data entry, used for function parameters only
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CurrentDataEntry {
     pub progress: Option<u8>,
     pub user_id: u32,
@@ -189,17 +194,20 @@ impl DataEntryStatus {
         current_data_entry: CurrentDataEntry,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
-            // TODO: #698 require second data entry user to be different from first data entry user
             DataEntryStatus::SecondEntryNotStarted(state) => {
-                Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
-                    first_entry_user_id: state.first_entry_user_id,
-                    finalised_first_entry: state.finalised_first_entry,
-                    first_entry_finished_at: state.first_entry_finished_at,
-                    progress: current_data_entry.progress.unwrap_or(0),
-                    second_entry_user_id: current_data_entry.user_id,
-                    second_entry: current_data_entry.entry,
-                    client_state: current_data_entry.client_state.unwrap_or_default(),
-                }))
+                if current_data_entry.user_id == state.first_entry_user_id {
+                    Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
+                } else {
+                    Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
+                        first_entry_user_id: state.first_entry_user_id,
+                        finalised_first_entry: state.finalised_first_entry,
+                        first_entry_finished_at: state.first_entry_finished_at,
+                        progress: current_data_entry.progress.unwrap_or(0),
+                        second_entry_user_id: current_data_entry.user_id,
+                        second_entry: current_data_entry.entry,
+                        client_state: current_data_entry.client_state.unwrap_or_default(),
+                    }))
+                }
             }
             DataEntryStatus::SecondEntryInProgress(_) => {
                 if current_data_entry.user_id
@@ -354,6 +362,8 @@ impl DataEntryStatus {
                             second_entry_user_id: state.second_entry_user_id,
                             first_entry: state.finalised_first_entry,
                             second_entry: state.second_entry,
+                            first_entry_finished_at: state.first_entry_finished_at,
+                            second_entry_finished_at: Utc::now(),
                         }),
                         None,
                     ))
@@ -420,47 +430,50 @@ impl DataEntryStatus {
     pub fn delete_entries(self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::EntriesDifferent(_) => Ok(Self::FirstEntryNotStarted),
-            DataEntryStatus::Definitive(_) => {
-                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
-            }
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
 
-    /// Resolve a conflicted data entry process to either the first or the
-    /// second entry
-    pub fn resolve(
-        self,
-        entry_number: EntryNumber,
-    ) -> Result<(Self, PollingStationResults), DataEntryTransitionError> {
+    pub fn keep_first_entry(self) -> Result<Self, DataEntryTransitionError> {
         let DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry,
-            second_entry,
             first_entry_user_id,
-            second_entry_user_id,
+            first_entry_finished_at,
+            ..
         }) = self
         else {
             return Err(DataEntryTransitionError::Invalid);
         };
 
-        match entry_number {
-            EntryNumber::FirstEntry => Ok((
-                Self::Definitive(Definitive {
-                    first_entry_user_id,
-                    second_entry_user_id,
-                    finished_at: Utc::now(),
-                }),
-                first_entry,
-            )),
-            EntryNumber::SecondEntry => Ok((
-                Self::Definitive(Definitive {
-                    first_entry_user_id,
-                    second_entry_user_id,
-                    finished_at: Utc::now(),
-                }),
-                second_entry,
-            )),
-        }
+        Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
+            // Note that by setting the second entry to the first
+            // entry, we keep the second entry and discard the first entry
+            first_entry_user_id,
+            finalised_first_entry: first_entry.clone(),
+            first_entry_finished_at,
+        }))
+    }
+
+    /// Resolve a conflicted data entry process to either the first or the
+    /// second entry
+    pub fn keep_second_entry(self) -> Result<Self, DataEntryTransitionError> {
+        let DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            second_entry,
+            second_entry_user_id,
+            second_entry_finished_at,
+            ..
+        }) = self
+        else {
+            return Err(DataEntryTransitionError::Invalid);
+        };
+
+        Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
+            // Note that by setting the second entry to the first
+            // entry, we keep the second entry and discard the first entry
+            first_entry_user_id: second_entry_user_id,
+            finalised_first_entry: second_entry.clone(),
+            first_entry_finished_at: second_entry_finished_at,
+        }))
     }
 
     /// Get the progress of the first entry (if there is a first entry), from 0 to 100
@@ -582,6 +595,12 @@ impl Display for DataEntryTransitionError {
             DataEntryTransitionError::CannotTransitionUsingDifferentUser => {
                 write!(f, "Cannot save using a different user")
             }
+            DataEntryTransitionError::SecondEntryNeedsDifferentUser => {
+                write!(
+                    f,
+                    "Second entry needs a different user than the first entry"
+                )
+            }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
             DataEntryTransitionError::ValidatorError(data_error) => {
                 write!(f, "Validator error: {}", data_error)
@@ -622,6 +641,15 @@ mod tests {
         CurrentDataEntry {
             progress: None,
             user_id: 0,
+            entry: polling_station_result(),
+            client_state: None,
+        }
+    }
+
+    fn empty_current_second_data_entry() -> CurrentDataEntry {
+        CurrentDataEntry {
+            progress: None,
+            user_id: 1,
             entry: polling_station_result(),
             client_state: None,
         }
@@ -875,9 +903,18 @@ mod tests {
     fn second_entry_not_started_to_second_entry_in_progress() {
         assert!(matches!(
             second_entry_not_started()
-                .claim_second_entry(empty_current_data_entry())
+                .claim_second_entry(empty_current_second_data_entry())
                 .unwrap(),
             DataEntryStatus::SecondEntryInProgress(_)
+        ));
+    }
+
+    /// SecondEntryNotStarted --> SecondEntryInProgress: claim with same user as first entry returns error
+    #[test]
+    fn second_entry_not_started_claim_second_entry_same_user_error() {
+        assert!(matches!(
+            second_entry_not_started().claim_second_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
         ));
     }
 
@@ -1103,33 +1140,92 @@ mod tests {
         );
     }
 
-    /// EntriesDifferent --> Definitive: resolve
+    /// EntriesDifferent --> SecondEntryInProgress: resolve (keep first entry)
     #[test]
-    fn entries_different_to_definitive() {
+    fn entries_different_to_second_entry_not_started_keep_first_entry() {
+        // Create a difference, so we can check that we keep the right entry
+        let first_entry = polling_station_result();
+        let mut second_entry = polling_station_result();
+        second_entry.recounted = Some(true);
+
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: polling_station_result(),
             first_entry_user_id: 0,
             second_entry: polling_station_result(),
             second_entry_user_id: 0,
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
         });
-        let next = initial.resolve(EntryNumber::SecondEntry).unwrap();
-        assert!(matches!(next.0, DataEntryStatus::Definitive(_)));
+        let next = initial.keep_first_entry().unwrap();
+
+        if let DataEntryStatus::SecondEntryNotStarted(kept_entry) = next {
+            assert_eq!(kept_entry.finalised_first_entry, first_entry);
+            assert_ne!(kept_entry.finalised_first_entry, second_entry);
+        } else {
+            panic!()
+        };
     }
 
     #[test]
-    fn definitive_resolve_error() {
+    fn definitive_keep_first_entry_error() {
         assert_eq!(
-            definitive().resolve(EntryNumber::SecondEntry),
+            definitive().keep_first_entry(),
             Err(DataEntryTransitionError::Invalid)
         );
     }
 
-    //TODO: Will be Implemented in #130:
-    // EntriesDifferent --> NotStarted: delete
-    /*
     #[test]
-    fn entries_not_equal_to_definitive() {
-        todo!();
+    fn entries_different_to_second_entry_not_started_keep_second_entry() {
+        // Create a difference, so we can check that we keep the right entry
+        let first_entry = polling_station_result();
+        let mut second_entry = polling_station_result();
+        second_entry.recounted = Some(true);
+
+        let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry: first_entry.clone(),
+            first_entry_user_id: 0,
+            second_entry: second_entry.clone(),
+            second_entry_user_id: 0,
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
+        });
+        let next = initial.keep_second_entry().unwrap();
+
+        if let DataEntryStatus::SecondEntryNotStarted(kept_entry) = next {
+            assert_eq!(kept_entry.finalised_first_entry, second_entry);
+            assert_ne!(kept_entry.finalised_first_entry, first_entry);
+        } else {
+            panic!()
+        };
     }
-     */
+
+    #[test]
+    fn definitive_keep_second_entry_error() {
+        assert_eq!(
+            definitive().keep_second_entry(),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    #[test]
+    fn entries_different_to_first_entry_not_started() {
+        let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry: polling_station_result(),
+            first_entry_user_id: 0,
+            second_entry: polling_station_result(),
+            second_entry_user_id: 0,
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
+        });
+        let next = initial.delete_entries().unwrap();
+        assert!(matches!(next, DataEntryStatus::FirstEntryNotStarted));
+    }
+
+    #[test]
+    fn definitive_delete_entries_error() {
+        assert_eq!(
+            definitive().delete_entries(),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
 }

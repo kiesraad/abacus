@@ -1,6 +1,5 @@
+import { PageTitle } from "@/components/ui";
 import { t } from "@/lib/i18n";
-
-import { PageTitle } from "@kiesraad/ui";
 
 export function WorkstationsHomePage() {
   return (

@@ -6,18 +6,14 @@
   gap: 4rem;
 }
 
-.table-title {
+.tableTitle {
   margin-bottom: 2rem;
 }
 
-.table-information {
+.tableInformation {
   display: block;
   width: 39rem;
   margin-bottom: 2rem;
-}
-
-.absolute-majority-change-information {
-  width: 53rem;
 }
 
 /* Styling for the apportionment tables */
@@ -30,19 +26,20 @@
   }
   th {
     text-wrap: nowrap;
+    color: var(--gray-600);
   }
   th[scope="row"] {
     font-size: var(--font-size-md);
   }
 }
 
-.list-number-column {
+.listNumberColumn {
   min-width: 3.5rem;
   width: 3.5rem;
   max-width: 3.5rem;
 }
 
-.bt-1-gray {
+.bt1Gray {
   border-top: 1px solid var(--bg-gray-darkest);
 }
 
@@ -57,7 +54,7 @@
   background-color: var(--bg-gray);
 }
 
-.election-summary-table {
+.electionSummaryTable {
   tr {
     th {
       color: var(--base-black);
@@ -71,7 +68,7 @@
   }
 }
 
-.full-seats-table {
+.fullSeatsTable {
   tr {
     th {
       /* Signs (: and =) */
@@ -87,11 +84,11 @@
   }
 }
 
-.residual-seats-calculation-table {
+.residualSeatsCalculationTable {
   max-width: 34rem;
 }
 
-.residual-seats-19-or-more-seats-table {
+.residualSeats19OrMoreSeatsTable {
   max-width: 68rem;
   width: fit-content;
   tr {

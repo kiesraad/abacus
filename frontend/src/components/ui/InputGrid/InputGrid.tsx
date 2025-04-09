@@ -13,7 +13,7 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   const ref = React.useRef<HTMLTableElement>(null);
 
   return (
-    <table role="none" ref={ref} className={cn(cls["input-grid"], { zebra: zebra })}>
+    <table role="none" ref={ref} className={cn(cls.inputGrid, { zebra: zebra })}>
       {children}
     </table>
   );

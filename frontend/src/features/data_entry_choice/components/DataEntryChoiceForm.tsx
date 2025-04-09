@@ -167,7 +167,6 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
             >
               {t("start")}
             </Button>
-            ff
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
           </BottomBar.Row>
         </BottomBar>

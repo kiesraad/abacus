@@ -27,7 +27,7 @@ export const BottomBarForm: Story = () => {
 
 export const BottomBarInputGrid: Story = () => {
   return (
-    <BottomBar type="input-grid">
+    <BottomBar type="inputGrid">
       <BottomBar.Row>
         <Button size="lg">Click me</Button>
         <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

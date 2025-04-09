@@ -1,14 +1,18 @@
 import { describe, expect, test } from "vitest";
 
-import { render } from "@kiesraad/test";
+import { render, screen, within } from "@/testing";
 
 import { ServerErrorModal } from "./ErrorModal.stories";
 
 describe("Component: ErrorModal", () => {
   test("Server error has expected children", () => {
-    const { getByText } = render(<ServerErrorModal />);
+    render(<ServerErrorModal />);
 
-    expect(getByText("Sorry, er ging iets mis")).toBeInTheDocument();
-    expect(getByText("Er is een interne fout opgetreden")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Sorry, er ging iets mis");
+
+    const modalBody = screen.getByTestId("error-modal");
+    expect(modalBody).toHaveTextContent("Er is een interne fout opgetreden");
+    expect(modalBody).not.toHaveTextContent("Foutcode: 500");
+    expect(within(modalBody).getByRole("button")).toHaveTextContent("Melding sluiten");
   });
 });

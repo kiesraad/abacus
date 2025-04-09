@@ -24,6 +24,7 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 - Titels/Namen van modellen bijwerken o.b.v. voorstel voor OSV.
 - Welke bestanden genereert OSV? Klopt dat met wat we van plan zijn met Abacus?
   - Leeg EML_NL-bestand: Telling 510b
+  - Totaaltelling 510d lijkt output van GSB, niet CSB. (te verifiëren)
 
 ---
 
@@ -110,6 +111,7 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 
 - Telling 510b
   - tellingen GSB en SB's
+  - output van Abacus - GSB, input voor Abacus - CSB
 
 #### CSV-bestand met tellingen
 
@@ -146,7 +148,12 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 
 #### EML_NL
 
+- Telling 510b
+  - tellingen GSB en SB's
+  - output van Abacus - GSB, input voor Abacus - CSB
 - Totaaltelling 510d
   - tellingen GSB
+  - output van Abacus - CSB
 - Resultaat 520
   - verkozen kandidaten
+  - output van Abacus - CSB

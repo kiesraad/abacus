@@ -7,13 +7,7 @@ import { ApiError, ApiResponseStatus } from "@kiesraad/api";
 export const ServerErrorModal: Story = () => {
   return (
     <ErrorModal
-      error={
-        {
-          status: ApiResponseStatus.ServerError,
-          code: 500,
-          message: "Internal Server Error",
-        } as ApiError
-      }
+      error={new ApiError(ApiResponseStatus.ServerError, 500, "Internal Server Error", "InternalServerError")}
     />
   );
 };

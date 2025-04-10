@@ -112,7 +112,9 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 
 - Telling 510b
   - tellingen GSB en SB's
-  - output van Abacus - GSB, input voor Abacus - CSB
+  - output van Abacus - GSB
+  - input voor Abacus - CSB
+  - mogelijk input voor Abacus - GSB, als de telresultaten van de vorige zitting niet meer beschikbaar zijn in Abacus
 
 
 #### CSV-bestand met tellingen

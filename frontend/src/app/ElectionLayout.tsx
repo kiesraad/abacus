@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router";
 
-import { ElectionProvider, ElectionStatusProvider } from "@/api";
+import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
 import { NavBar } from "@/components/navbar/NavBar";
 import { useNumericParam } from "@/hooks/useNumericParam";
 

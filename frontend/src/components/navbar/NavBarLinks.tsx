@@ -1,6 +1,8 @@
 import { Link, NavLink } from "react-router";
 
-import { Election, useElection, useUserRole } from "@kiesraad/api";
+import { useElection } from "@/api/election/useElection";
+
+import { Election, useUserRole } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 

@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-import { useElection, useElectionStatus, useUser } from "@/api";
+import { useUser } from "@/api";
+import { useElection } from "@/api/election/useElection";
+import { useElectionStatus } from "@/api/election/useElectionStatus";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 import { IconError } from "@/lib/icon";

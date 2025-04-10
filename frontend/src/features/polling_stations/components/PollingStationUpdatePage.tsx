@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useNavigate } from "react-router";
 
-import { useElection } from "@/api";
+import { useElection } from "@/api/election/useElection";
 import { Alert, Button, Loader, PageTitle } from "@/components/ui";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";

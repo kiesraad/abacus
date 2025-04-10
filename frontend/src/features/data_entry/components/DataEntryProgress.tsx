@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link, useParams } from "react-router";
 
-import { useElection } from "@/api";
+import { useElection } from "@/api/election/useElection";
 import { MenuStatus, ProgressList } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { FormSectionId } from "@/types/types";

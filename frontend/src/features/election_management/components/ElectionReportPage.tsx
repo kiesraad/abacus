@@ -1,4 +1,5 @@
-import { useElection, useElectionStatus } from "@/api";
+import { useElection } from "@/api/election/useElection";
+import { useElectionStatus } from "@/api/election/useElectionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { Button, FormLayout, PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";

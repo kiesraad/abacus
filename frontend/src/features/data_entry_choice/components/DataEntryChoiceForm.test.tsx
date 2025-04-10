@@ -1,7 +1,9 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse, LoginResponse, useUser } from "@/api";
+import { ElectionStatusResponse, LoginResponse, useUser } from "@/api";
+import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";

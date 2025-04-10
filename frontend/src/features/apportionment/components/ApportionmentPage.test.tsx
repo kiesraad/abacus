@@ -2,7 +2,8 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@/api";
+import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionApportionmentResponse, ErrorResponse } from "@/api/gen/openapi";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";

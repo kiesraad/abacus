@@ -66,11 +66,11 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__
 
-2b. Er zijn minder beschikbare restzetels dan lijsten met gelijke overschotten of gemiddelden:  
-&emsp;2b1. De restzetel wordt bij loting toegekend.
-
 2a. Er zijn geen geldige stemmen uitgebracht op kandidaten:  
 &emsp; 2a1. De applicatie toont een foutmelding om contact op te nemen met de Kiesraad.
+
+2b. Er zijn minder beschikbare restzetels dan lijsten met gelijke overschotten of gemiddelden:  
+&emsp;2b1. De restzetel wordt bij loting toegekend.
 
 2c. (art P 9) Een lijst heeft een meerderheid van stemmen, maar geen meerderheid van zetels:  
 &emsp; 2c1. De laatst toegewezen restzetel wordt toegekend aan die lijst.  

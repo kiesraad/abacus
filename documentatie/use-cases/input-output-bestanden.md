@@ -30,6 +30,7 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
   - wordt geïmporteerd in Abacus
 - stembureaus (EML_NL 110b)
   - wordt geïmporteerd in Abacus
+  - kan ook geëxporteerd worden
 - kandidatenlijst (EML_NL 230b)
   - wordt geïmporteerd in Abacus
 - totaallijst (EML_NL 230c)
@@ -47,7 +48,7 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 | N 10-1            |  X   |      | PV SB                         |                       |         X         |                   |
 | Na 14-1 versie 1  |  X   |      | Corrigendum SB - 1ste zitting |         X(?)          |         X         |                   |
 | N 10-2            |      |  X   | PV SB                         |                       |         X         |                   |
-| Na 31-2 Bijlage 1 |      |  X   | PV SB                         |                       |         X         |                   |
+| Na 31-2 Bijlage 1 |      |  X   | Telresultaten SB                         |                       |         X         |                   |
 | Na 31-2 Bijlage 2 |      |  X   | Bezwaren SB's                 |                       |                   |                   |
 | Na 31-1           |  X   |      | PV GSB - 1ste zitting         |                       |                   |         X         |
 | Na 31-2           |      |  X   | PV GSB - 1ste zitting         |                       |                   |         X         |
@@ -69,13 +70,13 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 - wordt gegenereerd door Abacus, met de hand ingevuld, dan ingevoerd in Abacus
 
 
-#### Na 31-2 Bijlage 1 (CSO): PV op SB-niveau
+#### Na 31-2 Bijlage 1 (CSO): Telresultaten op SB-niveau
 - door gemeente ruim op voorhand aangemaakt met eigen huisstijl, voorblad, etc.
 - worden met de hand ingevuld en dan ingevoerd in Abacus
 
 
 #### Na 31-2 Bijlage 2 (CSO): Bezwaren SB's
-- niet gegenereerd door Abacus; uit toolkit?
+- niet gegenereerd door Abacus; uit toolkit of door gemeente zelf gemaakt
 - typist (niet invoerder) neemt deze over van SB PV's, buiten Abacus om
 
 

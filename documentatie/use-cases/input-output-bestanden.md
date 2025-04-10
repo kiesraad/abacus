@@ -84,16 +84,14 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 - gegenereerd door Abacus
 
 
-#### Na 14-1 versie 2 (DSO): Corrigendum op SB-niveau
-- gegenereerd door Abacus met resultaten vorige telling ingevuld
-- opdracht invoeren, genereren, handmatig invullen, resultaten (wel of niet hertelling), in Abacus invoeren
-- worden ingevuld en dan ingevoerd in Abacus
+#### Na 14-1 versie 2 (DSO): Corrigendum op SB-niveau voor tweede zitting
+- gegenereerd door Abacus met aanleiding van het onderzoek en resultaten vorige telling gevuld
+- wordt afgedrukt en handmatig ingevuld met resultaten onderzoek en eventuele hertelling, dan ingevoerd in Abacus
 
 
-#### Na 14-2 Bijlage 1 (CSO): Corrigendum op SB-niveau
-- gegenereerd door Abacus met resultaten vorige telling ingevuld
-- opdracht invoeren, genereren, handmatig invullen, resultaten (wel of niet hertelling), in Abacus invoeren
-- worden ingevuld en dan ingevoerd in Abacus
+#### Na 14-2 Bijlage 1 (CSO): Corrigendum op SB-niveau voor tweede zitting
+- gegenereerd door Abacus met aanleiding van het onderzoek en resultaten vorige telling gevuld
+- wordt afgedrukt en handmatig ingevuld met resultaten onderzoek en eventuele hertelling, dan ingevoerd in Abacus
 
 
 #### Na 14-2 (DSO en CSO): Corrigendum op GSB-niveau voor tweede zitting

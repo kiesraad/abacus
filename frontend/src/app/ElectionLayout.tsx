@@ -2,7 +2,7 @@ import { Outlet, useLocation } from "react-router";
 
 import { ElectionProvider, ElectionStatusProvider } from "@/api";
 import { NavBar } from "@/components/navbar/NavBar";
-import { useNumericParam } from "@/lib/util";
+import { useNumericParam } from "@/hooks/useNumericParam";
 
 export function ElectionLayout() {
   const electionId = useNumericParam("electionId");

@@ -1,7 +1,7 @@
 import { NotFoundError, useElection } from "@/api";
 import { PageTitle } from "@/components/ui";
+import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/lib/i18n";
-import { useNumericParam } from "@/lib/util";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import cls from "../Apportionment.module.css";

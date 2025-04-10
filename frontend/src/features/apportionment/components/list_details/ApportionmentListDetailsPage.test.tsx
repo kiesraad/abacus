@@ -17,8 +17,7 @@ const { mockedUseNumericParam } = vi.hoisted(() => {
   return { mockedUseNumericParam: vi.fn() };
 });
 
-vi.mock(import("@/lib/util"), async (importOriginal) => ({
-  ...(await importOriginal()),
+vi.mock(import("@/hooks/useNumericParam"), () => ({
   useNumericParam: mockedUseNumericParam,
 }));
 

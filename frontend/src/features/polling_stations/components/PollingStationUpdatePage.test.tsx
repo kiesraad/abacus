@@ -13,8 +13,7 @@ import { render, renderReturningRouter, screen, spyOnHandler, waitFor, within } 
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
-vi.mock(import("@/lib/util"), async (importOriginal) => ({
-  ...(await importOriginal()),
+vi.mock(import("@/hooks/useNumericParam"), () => ({
   useNumericParam: () => 1,
 }));
 

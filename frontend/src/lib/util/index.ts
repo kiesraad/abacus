@@ -1,4 +1,3 @@
-export * from "./hook";
 export * from "./candidate";
 export * from "./classnames";
 export * from "./compare";

@@ -13,8 +13,7 @@ import { UserUpdatePage } from "./UserUpdatePage";
 
 const navigate = vi.fn();
 
-vi.mock(import("@/lib/util"), async (importOriginal) => ({
-  ...(await importOriginal()),
+vi.mock(import("@/hooks/useNumericParam"), () => ({
   useNumericParam: () => 1,
 }));
 

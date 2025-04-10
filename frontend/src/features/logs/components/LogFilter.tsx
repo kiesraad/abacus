@@ -1,6 +1,6 @@
-import { t } from "@kiesraad/i18n";
-import { IconCross } from "@kiesraad/icon";
-import { Button, Checkbox, InputField } from "@kiesraad/ui";
+import { Button, Checkbox, InputField } from "@/components/ui";
+import { t } from "@/lib/i18n";
+import { IconCross } from "@/lib/icon";
 
 import { LogFilterState } from "../hooks/useAuditLog";
 import { LogFilterName, useLogFilterOptions } from "../hooks/useLogFilterOptions";

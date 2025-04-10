@@ -1,7 +1,7 @@
-import { AuditLogEvent } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
-import { Table } from "@kiesraad/ui";
-import { formatDateTime } from "@kiesraad/util";
+import { AuditLogEvent } from "@/api";
+import { Table } from "@/components/ui";
+import { t } from "@/lib/i18n";
+import { formatDateTime } from "@/lib/util";
 
 interface LogsTableProps {
   events: AuditLogEvent[];

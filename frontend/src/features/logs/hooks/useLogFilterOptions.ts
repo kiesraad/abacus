@@ -1,6 +1,5 @@
 import { AUDIT_LOG_LIST_USERS_REQUEST_PATH, AuditLogUser, useInitialApiGet } from "@/api";
-
-import { locale, translations } from "@kiesraad/i18n";
+import { locale, translations } from "@/lib/i18n";
 
 export const LogFilterNames = ["event", "level", "user"] as const;
 export type LogFilterName = (typeof LogFilterNames)[number];

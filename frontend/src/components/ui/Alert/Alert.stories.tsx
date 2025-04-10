@@ -31,6 +31,30 @@ export const SmallAlert: Story<Props> = ({ type, text }) => (
   </Alert>
 );
 
+export const NoIconAlert: Story<Props> = ({ type, text }) => (
+  <Alert type={type} variant="no-icon">
+    <p>{text}</p>
+  </Alert>
+);
+
+export const InlineAlert: Story<Props> = ({ type, title, text }) => (
+  <Alert type={type} inline title={title}>
+    <p>{text}</p>
+  </Alert>
+);
+
+export const InlineClosableAlert: Story<Props> = ({ type, title, text, onClose }) => (
+  <Alert type={type} inline title={title} onClose={onClose}>
+    <p>{text}</p>
+  </Alert>
+);
+
+export const InlineNoIconAlert: Story<Props> = ({ type, title, text }) => (
+  <Alert type={type} inline variant="no-icon" title={title}>
+    <p>{text}</p>
+  </Alert>
+);
+
 export default {
   args: {
     title: "Nog niet ingesteld",

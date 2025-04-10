@@ -1,6 +1,6 @@
 # Input- en output-bestanden Abacus
 
-Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig mogelijk met pen op de PV's moet worden geschreven. 
+Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig mogelijk met pen op de processen-verbaal (PV's) moet worden geschreven. 
 
 ## Open punten
 
@@ -134,7 +134,7 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 | P 2a[^4]         |  X   |  X   | Verslag 2de zitting           |        ???        |                   |
 | P 22-2           |  X   |  X   |                               |                   |         X         |
 
-[^3]: NA 14-2 wordt alleen aangemaakt als hertellingen tot een ander resultaat leiden.
+[^3]: Na 14-2 wordt alleen aangemaakt als hertellingen tot een ander resultaat leiden.
 [^4]: P 2a wordt alleen aangemaakt als er een tweede zitting is.
 
 #### P 22-2

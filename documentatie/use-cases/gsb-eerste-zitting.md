@@ -137,7 +137,7 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Hoofdscenario:__  
 1. De applicatie stelt vast dat alle stembureaus definitieve invoer hebben en dat invoer is afgesloten.
-2. De coördinator GSB genereert het [PV](./input-output-bestanden.md#gsb) en het [digitale bestand](./input-output-bestanden.md#gsb).
+2. De coördinator GSB genereert het [PV en het digitale bestand](./input-output-bestanden.md#gsb).
 3. De coördinator GSB voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
 
 __Uitbreidingen:__  

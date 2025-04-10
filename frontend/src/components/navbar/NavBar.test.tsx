@@ -1,8 +1,9 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+
 import { ElectionProvider, Role, TestUserProvider } from "@kiesraad/api";
-import { ElectionRequestHandler } from "@kiesraad/api-mocks";
 import { render, screen, server } from "@kiesraad/test";
 
 import { NavBar } from "./NavBar";

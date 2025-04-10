@@ -3,13 +3,13 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionProvider } from "@/api";
 import { renderReturningRouter, screen, server, spyOnHandler, within } from "@/testing";
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
-  electionMockData,
   ElectionRequestHandler,
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntryFinaliseHandler,
   PollingStationDataEntrySaveHandler,
-} from "@/testing/api-mocks";
+} from "@/testing/api-mocks/RequestHandlers";
 
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../../testing/test.utils";

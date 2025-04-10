@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 import { ElectionProvider } from "@/api";
 import { render, server } from "@/testing";
-import { ElectionRequestHandler } from "@/testing/api-mocks";
+import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 
 import { PollingStationCreatePage } from "./PollingStationCreatePage";
 

@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { LoginResponse } from "@/api";
 import { render, screen, server, spyOnHandler } from "@/testing";
-import { AccountUpdateRequestHandler, loginResponseMockData } from "@/testing/api-mocks";
+import { AccountUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { loginResponseMockData } from "@/testing/api-mocks/UserMockData";
 
 import { AccountSetupForm } from "./AccountSetupForm";
 

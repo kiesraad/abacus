@@ -5,7 +5,7 @@ import { ElectionProvider, ElectionStatusProvider } from "@/api";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
 import { expectErrorPage, overrideOnce, Providers, render, screen, server, setupTestRouter } from "@/testing";
-import { ElectionRequestHandler } from "@/testing/api-mocks";
+import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 
 import { ElectionReportPage } from "./ElectionReportPage";
 

@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ClaimDataEntryResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@/api";
 import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs, waitFor } from "@/testing";
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
-  electionMockData,
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
-} from "@/testing/api-mocks";
+} from "@/testing/api-mocks/RequestHandlers";
 
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {

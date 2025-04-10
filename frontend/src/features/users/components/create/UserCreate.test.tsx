@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
 import { overrideOnce, Providers, server, setupTestRouter } from "@/testing";
-import { ElectionListRequestHandler, UserListRequestHandler } from "@/testing/api-mocks";
+import { ElectionListRequestHandler, UserListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 
 function renderWithRouter() {
   const router = setupTestRouter(routes);

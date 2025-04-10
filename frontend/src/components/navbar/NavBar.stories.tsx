@@ -3,9 +3,9 @@ import * as React from "react";
 import { Story } from "@ladle/react";
 
 import { ElectionProviderContext } from "@/api/election/ElectionProviderContext";
+import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 
 import { Election, Role, TestUserProvider } from "@kiesraad/api";
-import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
 
 import { NavBar } from "./NavBar";
 import cls from "./NavBar.module.css";

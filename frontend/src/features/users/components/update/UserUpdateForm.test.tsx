@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { User, USER_UPDATE_REQUEST_PATH } from "@/api";
 import { overrideOnce, render, server, spyOnHandler } from "@/testing";
-import { userMockData, UserUpdateRequestHandler } from "@/testing/api-mocks";
+import { UserUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { userMockData } from "@/testing/api-mocks/UserMockData";
 
 import { UserUpdateForm } from "./UserUpdateForm";
 

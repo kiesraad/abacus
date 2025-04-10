@@ -5,7 +5,7 @@ import { ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
 import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@/testing";
-import { getElectionMockData } from "@/testing/api-mocks";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 
 import * as gte19Seats from "../../testing/19-or-more-seats";
 import * as absoluteMajorityChangeAndListExhaustion from "../../testing/absolute-majority-change-and-list-exhaustion";

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorResponse, PollingStation } from "@/api";
 import { overrideOnce, render, screen, server, waitFor } from "@/testing";
-import { PollingStationCreateHandler, PollingStationUpdateHandler } from "@/testing/api-mocks";
+import { PollingStationCreateHandler, PollingStationUpdateHandler } from "@/testing/api-mocks/RequestHandlers";
 
 import { PollingStationForm } from "./PollingStationForm";
 

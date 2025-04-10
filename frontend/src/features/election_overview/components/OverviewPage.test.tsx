@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionListResponse } from "@/api";
 import { overrideOnce, render, server } from "@/testing";
-import { ElectionListRequestHandler } from "@/testing/api-mocks";
+import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 
 import { ElectionListProvider } from "../hooks/ElectionListProvider";
 import { OverviewPage } from "./OverviewPage";

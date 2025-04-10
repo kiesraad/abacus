@@ -2,7 +2,8 @@ import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { overrideOnce, render, server } from "@/testing";
-import { UserListRequestHandler, userMockData } from "@/testing/api-mocks";
+import { UserListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { userMockData } from "@/testing/api-mocks/UserMockData";
 
 import { UserListPage } from "./UserListPage";
 

@@ -16,7 +16,7 @@ import {
   setupTestRouter,
   within,
 } from "@/testing";
-import { getElectionMockData } from "@/testing/api-mocks";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 
 import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/less-than-19-seats";
 import { ApportionmentPage } from "./ApportionmentPage";

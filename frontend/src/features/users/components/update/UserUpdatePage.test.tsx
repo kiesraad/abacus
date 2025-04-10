@@ -3,7 +3,11 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { render, server } from "@/testing";
-import { UserDeleteRequestHandler, UserGetRequestHandler, UserUpdateRequestHandler } from "@/testing/api-mocks";
+import {
+  UserDeleteRequestHandler,
+  UserGetRequestHandler,
+  UserUpdateRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 
 import { UserUpdatePage } from "./UserUpdatePage";
 

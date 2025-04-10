@@ -10,7 +10,7 @@ import {
   PollingStationDeleteHandler,
   PollingStationGetHandler,
   PollingStationUpdateHandler,
-} from "@/testing/api-mocks";
+} from "@/testing/api-mocks/RequestHandlers";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 

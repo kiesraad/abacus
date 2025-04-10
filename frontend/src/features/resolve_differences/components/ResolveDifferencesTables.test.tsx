@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing";
-import { politicalGroupsMockData } from "@/testing/api-mocks";
+import { politicalGroupsMockData } from "@/testing/api-mocks/ElectionMockData";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";

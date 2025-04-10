@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { formatDateTime, formatDateTimeFull } from "@/lib/util";
 import { render, server, spyOnHandler } from "@/testing";
-import { LogRequestHandler, LogUsersRequestHandler } from "@/testing/api-mocks";
+import { LogRequestHandler, LogUsersRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 
 import { LogsHomePage } from "./LogsHomePage";
 

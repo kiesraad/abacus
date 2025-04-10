@@ -5,7 +5,8 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { Role, USER_CREATE_REQUEST_PATH } from "@/api";
 import { overrideOnce, render, server, spyOnHandler } from "@/testing";
-import { UserCreateRequestHandler, userMockData } from "@/testing/api-mocks";
+import { UserCreateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { userMockData } from "@/testing/api-mocks/UserMockData";
 
 import { UserCreateDetailsForm } from "./UserCreateDetailsForm";
 

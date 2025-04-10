@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
-import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
+
 import { overrideOnce, Providers, renderHook, waitFor } from "@kiesraad/test";
 
 import { useElectionDataRequest } from "./useElectionDataRequest";

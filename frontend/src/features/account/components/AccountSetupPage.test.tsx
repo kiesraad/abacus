@@ -2,7 +2,8 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { render, screen, server } from "@/testing";
-import { AccountUpdateRequestHandler, loginResponseMockData } from "@/testing/api-mocks";
+import { AccountUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { loginResponseMockData } from "@/testing/api-mocks/UserMockData";
 
 import { AccountSetupPage } from "./AccountSetupPage";
 

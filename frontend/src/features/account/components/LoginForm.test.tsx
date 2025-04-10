@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 
 import { LOGIN_REQUEST_PATH, LoginResponse } from "@/api";
 import { overrideOnce, render, screen, server, spyOnHandler, waitFor } from "@/testing";
-import { LoginHandler } from "@/testing/api-mocks";
+import { LoginHandler } from "@/testing/api-mocks/RequestHandlers";
 
 import { LoginForm } from "./LoginForm";
 

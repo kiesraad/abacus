@@ -25,18 +25,18 @@ export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGrou
         <Table.HeaderCell className="text-align-r">{t("apportionment.residual_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((pg_seat_assignment) => {
-          const average = steps[0]?.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
+        {finalStanding.map((pgSeatAssignment) => {
+          const average = steps[0]?.standings[pgSeatAssignment.pg_number - 1]?.next_votes_per_seat;
           const residual_seat = steps.filter((step) => {
-            return step.change.selected_pg_number == pg_seat_assignment.pg_number;
+            return step.change.selected_pg_number == pgSeatAssignment.pg_number;
           }).length;
           return (
-            <Table.Row key={pg_seat_assignment.pg_number}>
+            <Table.Row key={pgSeatAssignment.pg_number}>
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
-                {pg_seat_assignment.pg_number}
+                {pgSeatAssignment.pg_number}
               </Table.Cell>
-              <Table.Cell>{politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
-              <Table.NumberCell className="font-number">{pg_seat_assignment.full_seats}</Table.NumberCell>
+              <Table.Cell>{politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}</Table.Cell>
+              <Table.NumberCell className="font-number">{pgSeatAssignment.full_seats}</Table.NumberCell>
               {average && <Table.DisplayFractionCells>{average}</Table.DisplayFractionCells>}
               <Table.NumberCell className="font-number">{residual_seat}</Table.NumberCell>
             </Table.Row>

@@ -3,16 +3,22 @@ import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util";
 
-import { HighestAverageAssignmentStep } from "../../utils/seat-change";
+import { getFootnotes, HighestAverageAssignmentStep, resultChange } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface HighestAveragesTableProps {
   steps: HighestAverageAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
+  resultChanges: resultChange[];
 }
 
-export function HighestAveragesTable({ steps, finalStanding, politicalGroups }: HighestAveragesTableProps) {
+export function HighestAveragesTable({
+  steps,
+  finalStanding,
+  politicalGroups,
+  resultChanges,
+}: HighestAveragesTableProps) {
   return (
     <div className={cls.scrollable}>
       <Table id="highest-averages-table" className={cn(cls.table, cls.highestAveragesTable)}>
@@ -29,34 +35,43 @@ export function HighestAveragesTable({ steps, finalStanding, politicalGroups }: 
           </Table.HeaderCell>
         </Table.Header>
         <Table.Body>
-          {finalStanding.map((pg_seat_assignment: PoliticalGroupSeatAssignment) => (
-            <Table.Row key={pg_seat_assignment.pg_number}>
-              <Table.Cell className={cn(cls.listNumberColumn, cls.sticky, "text-align-r", "font-number")}>
-                {pg_seat_assignment.pg_number}
-              </Table.Cell>
-              <Table.Cell className={cls.sticky}>
-                {politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}
-              </Table.Cell>
-              {steps.map((step) => {
-                const average = step.standings[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
-                if (average) {
-                  return (
-                    <Table.DisplayFractionCells
-                      key={`${pg_seat_assignment.pg_number}-${step.residual_seat_number}`}
-                      className={
-                        step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow bold" : undefined
-                      }
-                    >
-                      {average}
-                    </Table.DisplayFractionCells>
-                  );
-                }
-              })}
-              <Table.NumberCell className={cn(cls.sticky, "font-number")}>
-                {pg_seat_assignment.residual_seats}
-              </Table.NumberCell>
-            </Table.Row>
-          ))}
+          {finalStanding.map((pgSeatAssignment: PoliticalGroupSeatAssignment) => {
+            let residualSeats = steps.filter((step) => {
+              return step.change.selected_pg_number == pgSeatAssignment.pg_number;
+            }).length;
+            const pgResultChanges = resultChanges.filter((change) => change.pgNumber === pgSeatAssignment.pg_number);
+            pgResultChanges.forEach((pgResultChange) => {
+              residualSeats = residualSeats + pgResultChange.increase - pgResultChange.decrease;
+            });
+            return (
+              <Table.Row key={pgSeatAssignment.pg_number}>
+                <Table.Cell className={cn(cls.listNumberColumn, cls.sticky, "text-align-r", "font-number")}>
+                  {pgSeatAssignment.pg_number}
+                </Table.Cell>
+                <Table.Cell className={cls.sticky}>
+                  {politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}
+                </Table.Cell>
+                {steps.map((step) => {
+                  const average = step.standings[pgSeatAssignment.pg_number - 1]?.next_votes_per_seat;
+                  if (average) {
+                    return (
+                      <Table.DisplayFractionCells
+                        key={`${pgSeatAssignment.pg_number}-${step.residual_seat_number}`}
+                        className={
+                          step.change.pg_options.includes(pgSeatAssignment.pg_number) ? "bg-yellow bold" : undefined
+                        }
+                      >
+                        {average}
+                      </Table.DisplayFractionCells>
+                    );
+                  }
+                })}
+                <Table.NumberCell className={cn(cls.sticky, "font-number")}>
+                  {getFootnotes(pgResultChanges)} {residualSeats}
+                </Table.NumberCell>
+              </Table.Row>
+            );
+          })}
           <Table.TotalRow>
             <Table.Cell className={cls.sticky} />
             <Table.Cell className={cn(cls.sticky, "text-align-r", "nowrap", "bold")}>

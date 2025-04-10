@@ -52,6 +52,7 @@ export const DefaultFullSeatsTable: Story = () => (
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups ?? []}
     quota={gte19Seats.seat_assignment.quota}
+    resultChanges={[]}
   />
 );
 DefaultFullSeatsTable.storyName = "FullSeatsTable";
@@ -103,6 +104,7 @@ export const DefaultHighestAveragesTable: Story = () => (
     steps={gte19Seats.seat_assignment.steps as HighestAverageAssignmentStep[]}
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups as PoliticalGroup[]}
+    resultChanges={[]}
   />
 );
 DefaultHighestAveragesTable.storyName = "HighestAveragesTable";
@@ -112,6 +114,7 @@ export const DefaultLargestRemaindersTable: Story = () => (
     steps={lt19Seats.largest_remainder_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
     politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
+    resultChanges={[]}
   />
 );
 DefaultLargestRemaindersTable.storyName = "LargestRemaindersTable";

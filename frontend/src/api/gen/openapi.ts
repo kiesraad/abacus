@@ -554,6 +554,8 @@ export interface LargestRemainderAssignedSeat {
  * Contains information about the enactment of article P 10 of the Kieswet.
  */
 export interface ListExhaustionRemovedSeat {
+  /** Whether the removed seat was a full seat */
+  full_seat: boolean;
   /** Political group number which the seat is retracted from */
   pg_retracted_seat: number;
 }

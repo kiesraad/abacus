@@ -3169,9 +3169,14 @@
         "type": "object",
         "description": "Contains information about the enactment of article P 10 of the Kieswet.",
         "required": [
-          "pg_retracted_seat"
+          "pg_retracted_seat",
+          "full_seat"
         ],
         "properties": {
+          "full_seat": {
+            "type": "boolean",
+            "description": "Whether the removed seat was a full seat"
+          },
           "pg_retracted_seat": {
             "type": "integer",
             "format": "int32",

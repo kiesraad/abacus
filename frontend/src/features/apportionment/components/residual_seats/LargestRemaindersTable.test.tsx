@@ -13,6 +13,7 @@ describe("LargestRemaindersTable", () => {
         steps={largest_remainder_steps}
         finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
+        resultChanges={[]}
       />,
     );
 

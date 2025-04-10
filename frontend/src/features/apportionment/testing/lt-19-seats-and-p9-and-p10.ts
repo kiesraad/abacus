@@ -411,6 +411,7 @@ export const seat_assignment: SeatAssignmentResult = {
       change: {
         changed_by: "ListExhaustionRemoval",
         pg_retracted_seat: 1,
+        full_seat: false,
       },
       standings: [
         {
@@ -504,6 +505,7 @@ export const seat_assignment: SeatAssignmentResult = {
       change: {
         changed_by: "ListExhaustionRemoval",
         pg_retracted_seat: 1,
+        full_seat: true,
       },
       standings: [
         {
@@ -597,6 +599,7 @@ export const seat_assignment: SeatAssignmentResult = {
       change: {
         changed_by: "ListExhaustionRemoval",
         pg_retracted_seat: 1,
+        full_seat: true,
       },
       standings: [
         {

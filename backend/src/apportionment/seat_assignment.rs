@@ -288,6 +288,8 @@ pub struct ListExhaustionRemovedSeat {
     /// Political group number which the seat is retracted from
     #[schema(value_type = u32)]
     pg_retracted_seat: PGNumber,
+    /// Whether the removed seat was a full seat
+    full_seat: bool,
 }
 
 /// Errors that can occur during apportionment
@@ -532,11 +534,13 @@ fn reassign_residual_seats_for_exhausted_lists(
         // Remove excess seats from exhausted lists
         for (pg_number, seats) in exhausted_lists {
             seats_to_reassign += seats;
+            let mut full_seat: bool = false;
             for _ in 1..=seats {
                 if current_standings[pg_number as usize - 1].residual_seats > 0 {
                     current_standings[pg_number as usize - 1].residual_seats -= 1;
                 } else {
                     current_standings[pg_number as usize - 1].full_seats -= 1;
+                    full_seat = true;
                 }
                 info!(
                     "Seat first assigned to list {} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
@@ -547,6 +551,7 @@ fn reassign_residual_seats_for_exhausted_lists(
                     residual_seat_number: None,
                     change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
                         pg_retracted_seat: pg_number,
+                        full_seat,
                     }),
                 });
             }

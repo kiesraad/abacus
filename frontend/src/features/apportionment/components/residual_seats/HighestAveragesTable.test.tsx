@@ -14,6 +14,7 @@ describe("HighestAveragesTable", () => {
         steps={seat_assignment.steps as HighestAverageAssignmentStep[]}
         finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
+        resultChanges={[]}
       />,
     );
 

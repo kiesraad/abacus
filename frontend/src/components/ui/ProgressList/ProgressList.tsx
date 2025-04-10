@@ -4,8 +4,7 @@ import { cn } from "@/lib/util/classnames";
 import { domtoren } from "@/lib/util/domtoren";
 import { MenuStatus } from "@/types/ui";
 
-import { renderStatusIcon } from "@kiesraad/ui";
-
+import { StatusIcon } from "../Icon/StatusIcon";
 import cls from "./ProgressList.module.css";
 import { ProgressListScroll } from "./ProgressListScroll";
 
@@ -44,7 +43,6 @@ ProgressList.Item = function ProgressListItem({
   id,
   scrollIntoView,
 }: ProgressListItemProps) {
-  const icon = renderStatusIcon(active ? "active" : status);
   const ref = React.useRef<HTMLLIElement>(null);
 
   React.useEffect(() => {
@@ -62,7 +60,9 @@ ProgressList.Item = function ProgressListItem({
       className={cn(active ? "active" : "idle", status, { disabled: !!disabled })}
       aria-current={active ? "step" : false}
     >
-      <aside>{icon}</aside>
+      <aside>
+        <StatusIcon status={active ? "active" : status} />
+      </aside>
       <label>{children}</label>
     </li>
   );

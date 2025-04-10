@@ -2,7 +2,8 @@ import * as React from "react";
 import { useNavigate } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
-import { Alert, Button, Loader, PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/page-title/page-title";
+import { Alert, Button, Loader } from "@/components/ui";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";
 import { IconTrash } from "@/lib/icon";

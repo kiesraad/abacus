@@ -1,4 +1,4 @@
-import { PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/page-title/page-title";
 import { t } from "@/lib/i18n";
 
 export function WorkstationsHomePage() {

@@ -5,7 +5,8 @@ import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { useElection } from "@/api/election/useElection";
 import { useElectionStatus } from "@/api/election/useElectionStatus";
 import { Footer } from "@/components/footer/Footer";
-import { Alert, PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/page-title/page-title";
+import { Alert } from "@/components/ui";
 import { t } from "@/lib/i18n";
 
 import { DataEntryChoiceForm } from "./DataEntryChoiceForm";

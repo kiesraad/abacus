@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
-import { PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/page-title/page-title";
 import { t, tx } from "@/lib/i18n";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";

@@ -1,7 +1,8 @@
 import { useSearchParams } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
-import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@/components/ui";
+import { PageTitle } from "@/components/page-title/page-title";
+import { Alert, Button, Loader, Table, Toolbar } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { IconPlus } from "@/lib/icon";
 

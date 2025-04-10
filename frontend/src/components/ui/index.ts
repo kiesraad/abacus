@@ -25,6 +25,5 @@ export * from "./ProgressList/ProgressList";
 export * from "./Spinner/Spinner";
 export * from "./StatusList/StatusList";
 export * from "./Table/Table";
-export * from "./util";
 export * from "./Toolbar/Toolbar";
 export * from "./Pagination/Pagination";

@@ -3,7 +3,7 @@ import { Link, Navigate } from "react-router";
 import { useElection } from "@/api/election/useElection";
 import { useUserRole } from "@/api/useUserRole";
 import { Footer } from "@/components/footer/Footer";
-import { PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/page-title/page-title";
 import { t } from "@/lib/i18n";
 
 export function ElectionHomePage() {

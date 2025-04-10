@@ -5,7 +5,8 @@ import { useUserRole } from "@/api/useUserRole";
 import { ElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
-import { Alert, Button, PageTitle, Table, Toolbar } from "@/components/ui";
+import { PageTitle } from "@/components/page-title/page-title";
+import { Alert, Button, Table, Toolbar } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { IconPlus } from "@/lib/icon";
 

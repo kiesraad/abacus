@@ -5,8 +5,9 @@ import { AlertType } from "@/types/ui";
 
 import { t } from "@kiesraad/i18n";
 import { IconCross } from "@kiesraad/icon";
-import { IconButton, renderIconForType } from "@kiesraad/ui";
+import { IconButton } from "@kiesraad/ui";
 
+import { AlertIcon } from "../Icon/AlertIcon";
 import cls from "./Alert.module.css";
 
 export interface AlertProps {
@@ -33,11 +34,19 @@ export function Alert({ type, onClose, children, margin, title, inline, variant 
 
       {inline ? (
         <header>
-          {variant !== "no-icon" && <aside>{renderIconForType(type)}</aside>}
+          {variant !== "no-icon" && (
+            <aside>
+              <AlertIcon type={type} />
+            </aside>
+          )}
           {title && <h2>{title}</h2>}
         </header>
       ) : (
-        variant !== "no-icon" && <aside>{renderIconForType(type)}</aside>
+        variant !== "no-icon" && (
+          <aside>
+            <AlertIcon type={type} />
+          </aside>
+        )
       )}
       <section id={id}>{children}</section>
     </div>

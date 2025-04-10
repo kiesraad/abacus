@@ -6,7 +6,8 @@ import { USER_LIST_REQUEST_PATH, UserListResponse } from "@/api/gen/openapi";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { HeaderElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
-import { Alert, Button, PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/page-title/page-title";
+import { Alert, Button } from "@/components/ui";
 import { t } from "@/lib/i18n";
 
 import { ElectionStatus } from "./ElectionStatus";

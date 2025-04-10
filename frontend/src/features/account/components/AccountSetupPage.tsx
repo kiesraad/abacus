@@ -2,7 +2,7 @@ import { Navigate, useNavigate } from "react-router";
 
 import { LoginResponse } from "@/api/gen/openapi";
 import { useApiState } from "@/api/useApiState";
-import { PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/page-title/page-title";
 import { t } from "@/lib/i18n";
 
 import { AccountSetupForm } from "./AccountSetupForm";

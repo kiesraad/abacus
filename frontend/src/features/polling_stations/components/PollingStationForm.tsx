@@ -4,10 +4,10 @@ import { isSuccess } from "@/api/ApiResult";
 import { PollingStation, PollingStationRequest } from "@/api/gen/openapi";
 import { useCrud } from "@/api/useCrud";
 import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@/components/ui";
-import { FormFields, ValidationError } from "@/features/polling_stations/utils/form";
 import { t } from "@/lib/i18n";
 
 import { useForm } from "../hooks/useForm";
+import { FormFields, ValidationError } from "../utils/form";
 
 export interface PollingStationFormProps {
   electionId: number;

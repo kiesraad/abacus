@@ -28,6 +28,7 @@ export function Alert({ type, onClose, children, margin, title, inline, variant 
       {onClose && (
         <IconButton icon={<IconCross />} title={t("close_message")} variant="tertiary" size="lg" onClick={onClose} />
       )}
+
       {inline ? (
         <header>
           {variant !== "no-icon" && <aside>{renderIconForType(type)}</aside>}

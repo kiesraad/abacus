@@ -4,6 +4,7 @@ use quick_xml::{
     DeError, SeError,
     se::{Serializer, WriteResult},
 };
+use rand::Rng;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
 /// Base EML XML document that contains all the mostly irrelevant for our logic
@@ -99,6 +100,33 @@ pub fn eml_document_hash(input: &str, chunked: bool) -> String {
         write!(&mut res, "{:02x}", b).expect("Writing to a string cannot fail");
     }
     res
+}
+
+fn random_chunk_indexes(chunk_count: usize) -> [usize; 2] {
+    let mut rng = rand::rng();
+    let first_idx = rng.random_range(0..chunk_count);
+    let mut second_idx = rng.random_range(0..chunk_count);
+    while first_idx == second_idx {
+        second_idx = rng.random_range(0..chunk_count);
+    }
+
+    [first_idx, second_idx]
+}
+
+pub fn eml_document_incomplete_hash(input: &str) -> Vec<String> {
+    let hash = eml_document_hash(input, true);
+    let chunks = hash.split(' ');
+    let random_chunk_indexes = random_chunk_indexes(chunks.clone().count());
+    chunks
+        .enumerate()
+        .map(|(idx, chunk)| {
+            if random_chunk_indexes.contains(&idx) {
+                "####".to_string()
+            } else {
+                chunk.to_string()
+            }
+        })
+        .collect()
 }
 
 #[cfg(test)]

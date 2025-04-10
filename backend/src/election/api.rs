@@ -7,7 +7,7 @@ use crate::authentication::Admin;
 use crate::authentication::User;
 use crate::election::ElectionRequest;
 use crate::election::repository::Elections;
-use crate::eml::{EML110, EMLDocument, eml_document_hash};
+use crate::eml::{EML110, EMLDocument, eml_document_incomplete_hash};
 use crate::polling_station::PollingStation;
 use crate::polling_station::repository::PollingStations;
 use crate::{AppState, ErrorResponse};
@@ -127,7 +127,7 @@ pub struct ElectionDefinitionUploadRequest {
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct ElectionDefinitionUploadResponse {
-    hash: String,
+    hash: Vec<String>,
 }
 
 /// Create an election. For test usage only!
@@ -148,6 +148,6 @@ pub async fn election_import_validate(
 ) -> Result<Json<ElectionDefinitionUploadResponse>, APIError> {
     let eml = EML110::from_str(&edu.data)?;
     let _election: Election = eml.as_crate_election()?;
-    let hash = eml_document_hash(&edu.data, true);
+    let hash = eml_document_incomplete_hash(&edu.data);
     Ok(Json(ElectionDefinitionUploadResponse { hash }))
 }

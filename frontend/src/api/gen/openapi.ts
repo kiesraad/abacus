@@ -365,7 +365,7 @@ export interface ElectionApportionmentResponse {
 export type ElectionCategory = "Municipal";
 
 export interface ElectionDefinitionUploadResponse {
-  hash: string;
+  hash: string[];
 }
 
 export interface ElectionDetails {

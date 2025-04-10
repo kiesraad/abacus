@@ -7,7 +7,8 @@ import {
   PollingStationResults,
 } from "@/api";
 import { getCandidateFullName } from "@/lib/util";
-import { overrideOnce, screen, within } from "@/testing";
+import { overrideOnce } from "@/testing/server";
+import { screen, within } from "@/testing/test-utils";
 
 import { FormState } from "../types/types";
 import { getClientState } from "../utils/dataEntryUtils";

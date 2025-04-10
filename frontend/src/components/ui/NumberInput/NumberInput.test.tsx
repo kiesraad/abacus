@@ -1,7 +1,8 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { render, screen } from "@kiesraad/test";
+import { render, screen } from "@/testing/test-utils";
+
 import { NumberInput } from "@kiesraad/ui";
 
 describe("UI Component: number input", () => {

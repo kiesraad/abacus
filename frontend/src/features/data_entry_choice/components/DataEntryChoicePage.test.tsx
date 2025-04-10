@@ -5,13 +5,15 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
-import { overrideOnce, Providers, render, screen, server, setupTestRouter, within } from "@/testing";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { Providers } from "@/testing/Providers";
+import { overrideOnce, server } from "@/testing/server";
+import { render, screen, setupTestRouter, within } from "@/testing/test-utils";
 
 import {
   ElectionProvider,

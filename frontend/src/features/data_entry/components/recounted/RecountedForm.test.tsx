@@ -2,12 +2,13 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, SaveDataEntryResponse } from "@/api";
-import { getUrlMethodAndBody, overrideOnce, render, screen, server } from "@/testing";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { overrideOnce, server } from "@/testing/server";
+import { getUrlMethodAndBody, render, screen } from "@/testing/test-utils";
 
 import { errorWarningMocks, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import { DataEntryProvider } from "../DataEntryProvider";

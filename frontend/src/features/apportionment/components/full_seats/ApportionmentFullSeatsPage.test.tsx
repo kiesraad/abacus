@@ -4,8 +4,10 @@ import { describe, expect, test, vi } from "vitest";
 import { ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@/api";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
-import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@/testing";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { Providers } from "@/testing/Providers";
+import { overrideOnce } from "@/testing/server";
+import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
 
 import { candidate_nomination, election, election_summary, seat_assignment } from "../../testing/less-than-19-seats";
 import { ApportionmentProvider } from "../ApportionmentProvider";

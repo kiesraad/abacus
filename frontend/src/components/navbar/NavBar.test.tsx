@@ -2,9 +2,10 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { server } from "@/testing/server";
+import { render, screen } from "@/testing/test-utils";
 
 import { ElectionProvider, Role, TestUserProvider } from "@kiesraad/api";
-import { render, screen, server } from "@kiesraad/test";
 
 import { NavBar } from "./NavBar";
 import { NavBarLinks } from "./NavBarLinks";

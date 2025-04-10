@@ -2,7 +2,6 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionProvider } from "@/api";
-import { renderReturningRouter, screen, server, spyOnHandler, within } from "@/testing";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionRequestHandler,
@@ -10,6 +9,8 @@ import {
   PollingStationDataEntryFinaliseHandler,
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { server } from "@/testing/server";
+import { renderReturningRouter, screen, spyOnHandler, within } from "@/testing/test-utils";
 
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../../testing/test.utils";

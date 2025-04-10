@@ -2,7 +2,7 @@ import { within } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { render, renderReturningRouter, screen } from "@kiesraad/test";
+import { render, renderReturningRouter, screen } from "@/testing/test-utils";
 
 import { BasicTable, IconBadgeTable, LinkTable, StyledTable, TotalTableWithFractions } from "./Table.stories";
 

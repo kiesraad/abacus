@@ -1,12 +1,13 @@
-import { within } from "@testing-library/dom";
-import { render as rtlRender, screen, waitFor } from "@testing-library/react";
+import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
-import { overrideOnce, Providers, server, setupTestRouter } from "@/testing";
 import { ElectionListRequestHandler, UserListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { Providers } from "@/testing/Providers";
+import { overrideOnce, server } from "@/testing/server";
+import { screen, setupTestRouter, waitFor, within } from "@/testing/test-utils";
 
 function renderWithRouter() {
   const router = setupTestRouter(routes);

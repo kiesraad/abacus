@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { render } from "@kiesraad/test";
+import { render } from "@/testing/test-utils";
 
 import { DefaultIconButton, DisabledIconButton } from "./IconButton.stories";
 

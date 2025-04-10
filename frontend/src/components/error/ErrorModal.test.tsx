@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { render, screen, within } from "@/testing";
+import { render, screen, within } from "@/testing/test-utils";
 
 import { NetworkErrorModal, ServerErrorModal, UnknownServerErrorModal } from "./ErrorModal.stories";
 

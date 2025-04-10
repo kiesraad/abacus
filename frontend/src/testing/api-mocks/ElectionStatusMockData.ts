@@ -1,4 +1,4 @@
-import { ElectionStatusResponse, ElectionStatusResponseEntry } from "@/api";
+import { ElectionStatusResponse, ElectionStatusResponseEntry } from "@/api/gen/openapi";
 
 const today = new Date();
 today.setHours(10, 20);

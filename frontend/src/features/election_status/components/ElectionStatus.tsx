@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { DataEntryStatusName, Election, ElectionStatusResponseEntry, PollingStation, User } from "@/api";
+import { DataEntryStatusName, Election, ElectionStatusResponseEntry, PollingStation, User } from "@/api/gen/openapi";
 import {
   Badge,
   Button,

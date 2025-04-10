@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { TestUserProvider } from "@/api";
+import { TestUserProvider } from "@/api/TestUserProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";

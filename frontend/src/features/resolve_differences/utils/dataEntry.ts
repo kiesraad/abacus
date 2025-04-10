@@ -1,4 +1,4 @@
-import { PollingStationResults } from "@/api";
+import { PollingStationResults } from "@/api/gen/openapi";
 import { FormSectionId } from "@/types/types";
 
 type ObjectPath<T> = {

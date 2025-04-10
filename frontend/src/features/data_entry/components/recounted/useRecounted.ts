@@ -1,4 +1,4 @@
-import { PollingStationResults } from "@/api";
+import { PollingStationResults } from "@/api/gen/openapi";
 
 import { useDataEntryFormSection } from "../../hooks/useDataEntryFormSection";
 import { SubmitCurrentFormOptions } from "../../types/types";

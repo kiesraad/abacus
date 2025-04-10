@@ -5,7 +5,7 @@ import {
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   PollingStationResults,
-} from "@/api";
+} from "@/api/gen/openapi";
 import { getCandidateFullName } from "@/lib/util/candidate";
 import { overrideOnce } from "@/testing/server";
 import { screen, within } from "@/testing/test-utils";

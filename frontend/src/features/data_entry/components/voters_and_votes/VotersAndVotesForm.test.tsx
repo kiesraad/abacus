@@ -1,7 +1,11 @@
 import { userEvent, UserEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ClaimDataEntryResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@/api";
+import {
+  ClaimDataEntryResponse,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  PollingStationResults,
+} from "@/api/gen/openapi";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,

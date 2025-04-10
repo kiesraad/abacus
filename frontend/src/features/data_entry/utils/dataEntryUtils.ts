@@ -1,4 +1,4 @@
-import { Election, PollingStationResults, ValidationResults } from "@/api";
+import { Election, PollingStationResults, ValidationResults } from "@/api/gen/openapi";
 import { objectHasOnlyEmptyValues } from "@/lib/util/compare";
 import { FormSectionId } from "@/types/types";
 

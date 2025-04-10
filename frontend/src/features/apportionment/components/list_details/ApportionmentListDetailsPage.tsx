@@ -1,4 +1,4 @@
-import { NotFoundError } from "@/api";
+import { NotFoundError } from "@/api/ApiResult";
 import { useElection } from "@/api/election/useElection";
 import { PageTitle } from "@/components/ui";
 import { useNumericParam } from "@/hooks/useNumericParam";

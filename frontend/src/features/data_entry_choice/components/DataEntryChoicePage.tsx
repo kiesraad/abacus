@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
-import { DEFAULT_CANCEL_REASON } from "@/api";
+import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { useElection } from "@/api/election/useElection";
 import { useElectionStatus } from "@/api/election/useElectionStatus";
 import { Footer } from "@/components/footer/Footer";

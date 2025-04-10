@@ -1,7 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { User, USER_CREATE_REQUEST_PATH } from "@/api";
+import { User, USER_CREATE_REQUEST_PATH } from "@/api/gen/openapi";
 import { overrideOnce } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 

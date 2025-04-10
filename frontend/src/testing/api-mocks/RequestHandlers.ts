@@ -37,7 +37,7 @@ import {
   UserListResponse,
   WHOAMI_REQUEST_PARAMS,
   WHOAMI_REQUEST_PATH,
-} from "@kiesraad/api";
+} from "@/api/gen/openapi";
 
 import { claimDataEntryResponse, saveDataEntryResponse } from "./DataEntryMockData";
 import { electionDetailsMockResponse, electionListMockResponse } from "./ElectionMockData";

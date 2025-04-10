@@ -1,4 +1,4 @@
-import { ApiError } from "@/api";
+import { ApiError } from "@/api/ApiResult";
 import { Alert, FormLayout } from "@/components/ui";
 import { t } from "@/lib/i18n";
 

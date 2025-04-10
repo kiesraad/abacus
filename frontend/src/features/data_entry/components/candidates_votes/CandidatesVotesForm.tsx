@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { ApiError, PoliticalGroup } from "@/api";
+import { ApiError } from "@/api/ApiResult";
+import { PoliticalGroup } from "@/api/gen/openapi";
 import { ErrorModal } from "@/components/error";
 import {
   Alert,

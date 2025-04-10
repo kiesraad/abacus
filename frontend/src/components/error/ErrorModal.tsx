@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { AnyApiError, ApiError } from "@kiesraad/api";
+import { AnyApiError, ApiError } from "@/api/ApiResult";
+
 import { t, TranslationPath } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 

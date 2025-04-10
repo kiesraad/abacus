@@ -9,7 +9,7 @@ import {
 } from "e2e-tests/page-objects/data_entry";
 import { createMachine } from "xstate";
 
-import { VotersCounts, VotesCounts } from "@kiesraad/api";
+import { VotersCounts, VotesCounts } from "@/api/gen/openapi";
 
 import { test } from "../fixtures";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "../helpers-utils/xstate-helpers";

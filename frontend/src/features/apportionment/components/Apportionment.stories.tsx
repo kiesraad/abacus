@@ -1,6 +1,6 @@
 import { Story } from "@ladle/react";
 
-import { PoliticalGroup } from "@/api";
+import { PoliticalGroup } from "@/api/gen/openapi";
 
 import * as gte19Seats from "../testing/19-or-more-seats";
 import * as lt19Seats from "../testing/less-than-19-seats";

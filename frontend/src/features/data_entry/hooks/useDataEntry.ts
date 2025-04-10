@@ -4,8 +4,8 @@ import {
   Election,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
-  useApiClient,
-} from "@/api";
+} from "@/api/gen/openapi";
+import { useApiClient } from "@/api/useApiClient";
 
 import { DataEntryStateAndActions } from "../types/types";
 import {

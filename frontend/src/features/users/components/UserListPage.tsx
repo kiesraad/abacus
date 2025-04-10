@@ -1,4 +1,4 @@
-import { Role } from "@/api";
+import { Role } from "@/api/gen/openapi";
 import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { IconPlus } from "@/lib/icon";

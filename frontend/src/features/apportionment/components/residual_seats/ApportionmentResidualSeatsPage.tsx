@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
-import { SeatChangeStep } from "@/api";
 import { useElection } from "@/api/election/useElection";
+import { SeatChangeStep } from "@/api/gen/openapi";
 import { PageTitle } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 

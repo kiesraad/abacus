@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
 
-import { NotFoundError } from "@/api";
+import { NotFoundError } from "@/api/ApiResult";
 import { useElection } from "@/api/election/useElection";
 import { Badge, PageTitle, PollingStationNumber, StickyNav } from "@/components/ui";
 import { useNumericParam } from "@/hooks/useNumericParam";

@@ -1,8 +1,7 @@
 import { Story } from "@ladle/react";
 
+import { ApiError, ApiResponseStatus, NetworkError } from "@/api/ApiResult";
 import { ErrorModal } from "@/components/error/ErrorModal";
-
-import { ApiError, ApiResponseStatus, NetworkError } from "@kiesraad/api";
 
 export const ServerErrorModal: Story = () => {
   return (

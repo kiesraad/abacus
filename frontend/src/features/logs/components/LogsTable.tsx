@@ -1,4 +1,4 @@
-import { AuditLogEvent } from "@/api";
+import { AuditLogEvent } from "@/api/gen/openapi";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { formatDateTime } from "@/lib/util/format";

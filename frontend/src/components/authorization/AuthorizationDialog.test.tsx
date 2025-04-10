@@ -4,12 +4,11 @@ import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
+import { TestUserProvider } from "@/api/TestUserProvider";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
 import { overrideOnce } from "@/testing/server";
 import { render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
-
-import { TestUserProvider } from "@kiesraad/api";
 
 import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 import { AuthorizationDialog } from "./AuthorizationDialog";

@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/api/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
+import { ElectionStatusResponse, LoginResponse } from "@/api/gen/openapi";
+import { useUser } from "@/api/useUser";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
@@ -16,8 +18,6 @@ import {
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, setupTestRouter, within } from "@/testing/test-utils";
-
-import { ElectionStatusResponse, LoginResponse, useUser } from "@kiesraad/api";
 
 import { DataEntryChoicePage } from "./DataEntryChoicePage";
 

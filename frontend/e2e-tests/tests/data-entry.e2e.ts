@@ -11,7 +11,7 @@ import {
 } from "e2e-tests/page-objects/data_entry";
 import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 
-import { VotersCounts, VotesCounts } from "@kiesraad/api";
+import { VotersCounts, VotesCounts } from "@/api/gen/openapi";
 
 import { test } from "../fixtures";
 import {

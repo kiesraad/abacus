@@ -8,7 +8,7 @@ import {
   VotersAndVotesPage,
 } from "e2e-tests/page-objects/data_entry";
 
-import { PollingStation, VotersCounts, VotesCounts } from "@kiesraad/api";
+import { PollingStation, VotersCounts, VotesCounts } from "@/api/gen/openapi";
 
 import { test } from "../fixtures";
 import { loginAs } from "../setup";

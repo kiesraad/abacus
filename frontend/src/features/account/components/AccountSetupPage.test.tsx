@@ -17,7 +17,7 @@ vi.mock(import("react-router"), async (importOriginal) => ({
 
 const setUser = vi.fn();
 
-vi.mock("@kiesraad/api", async (importOriginal) => ({
+vi.mock("@/api/useApiState", async (importOriginal) => ({
   ...(await importOriginal()),
   useApiState: () => ({ user: {}, setUser }),
 }));

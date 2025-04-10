@@ -1,8 +1,8 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { PollingStation } from "@/api";
 import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { PollingStation } from "@/api/gen/openapi";
 import {
   ElectionRequestHandler,
   PollingStationDeleteHandler,

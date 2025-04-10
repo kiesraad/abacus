@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link, useNavigate } from "react-router";
 
-import { ApiError } from "@/api";
+import { ApiError } from "@/api/ApiResult";
 import { useElection } from "@/api/election/useElection";
 import { ErrorModal } from "@/components/error";
 import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList } from "@/components/ui";

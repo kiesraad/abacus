@@ -1,4 +1,4 @@
-import { Fraction, PoliticalGroup, PoliticalGroupSeatAssignment } from "@/api";
+import { Fraction, PoliticalGroup, PoliticalGroupSeatAssignment } from "@/api/gen/openapi";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/util/classnames";

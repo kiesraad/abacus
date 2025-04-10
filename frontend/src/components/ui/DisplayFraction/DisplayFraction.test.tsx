@@ -1,8 +1,7 @@
 import { describe, expect, test } from "vitest";
 
+import { Fraction } from "@/api/gen/openapi";
 import { render } from "@/testing/test-utils";
-
-import { Fraction } from "@kiesraad/api";
 
 import { DisplayFraction } from "./DisplayFraction";
 import { DefaultDisplayFractions } from "./DisplayFraction.stories";

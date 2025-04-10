@@ -1,4 +1,4 @@
-import { DataEntryStatusName, ElectionStatusResponseEntry, LoginResponse, PollingStation } from "@/api";
+import { DataEntryStatusName, ElectionStatusResponseEntry, LoginResponse, PollingStation } from "@/api/gen/openapi";
 
 export enum PollingStationUserStatus {
   Available,

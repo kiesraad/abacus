@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { LoginResponse } from "@/api";
+import { LoginResponse } from "@/api/gen/openapi";
 import { AccountUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { loginResponseMockData } from "@/testing/api-mocks/UserMockData";
 import { server } from "@/testing/server";

@@ -1,4 +1,4 @@
-import { ErrorReference } from "@/api";
+import { ErrorReference } from "@/api/gen/openapi";
 import { Error } from "@/components/error";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";

@@ -1,4 +1,4 @@
-import { Candidate, CandidateVotes } from "@/api";
+import { Candidate, CandidateVotes } from "@/api/gen/openapi";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { getCandidateFullNameWithGender } from "@/lib/util/candidate";

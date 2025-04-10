@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionListResponse } from "@/api";
+import { ElectionListResponse } from "@/api/gen/openapi";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";

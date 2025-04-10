@@ -1,4 +1,4 @@
-import { ApiError } from "@/api";
+import { ApiError } from "@/api/ApiResult";
 import { ErrorModal } from "@/components/error";
 import {
   Alert,

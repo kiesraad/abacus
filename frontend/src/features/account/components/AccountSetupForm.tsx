@@ -1,14 +1,8 @@
 import { FormEvent, useState } from "react";
 
-import {
-  ACCOUNT_UPDATE_REQUEST_PATH,
-  AccountUpdateRequest,
-  AnyApiError,
-  ApiError,
-  isSuccess,
-  LoginResponse,
-  useCrud,
-} from "@/api";
+import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
+import { ACCOUNT_UPDATE_REQUEST_PATH, AccountUpdateRequest, LoginResponse } from "@/api/gen/openapi";
+import { useCrud } from "@/api/useCrud";
 import { Alert, BottomBar, Button, Form, FormLayout, InputField } from "@/components/ui";
 import { t } from "@/lib/i18n";
 

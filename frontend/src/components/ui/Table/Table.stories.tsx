@@ -1,6 +1,7 @@
 import { Story } from "@ladle/react";
 
-import { Fraction } from "@kiesraad/api";
+import { Fraction } from "@/api/gen/openapi";
+
 import { IconCheckHeart } from "@kiesraad/icon";
 import { Badge, Icon } from "@kiesraad/ui";
 

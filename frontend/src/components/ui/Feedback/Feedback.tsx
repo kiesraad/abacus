@@ -2,9 +2,10 @@ import { ReactElement, useEffect, useRef } from "react";
 import { Link } from "react-router";
 
 import { cn } from "@/lib/util/classnames";
+import { AlertType, FeedbackId } from "@/types/ui";
 
 import { t, tx } from "@kiesraad/i18n";
-import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
+import { renderIconForType } from "@kiesraad/ui";
 
 import cls from "./Feedback.module.css";
 import { ClientValidationResultCode, FeedbackItem } from "./Feedback.types";

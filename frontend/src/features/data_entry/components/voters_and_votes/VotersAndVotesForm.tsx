@@ -9,10 +9,10 @@ import {
   Form,
   InputGrid,
   InputGridRow,
-  KeyboardKey,
   KeyboardKeys,
 } from "@/components/ui";
 import { t } from "@/lib/i18n";
+import { KeyboardKey } from "@/types/ui";
 
 import { DataEntryNavigation } from "../DataEntryNavigation";
 import { useVotersAndVotes } from "./useVotersAndVotes";

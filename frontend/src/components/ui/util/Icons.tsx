@@ -1,3 +1,5 @@
+import { AlertType, MenuStatus } from "@/types/ui";
+
 import { t } from "@kiesraad/i18n";
 import {
   IconArrowNarrowRight,
@@ -9,7 +11,6 @@ import {
   IconThumbsUp,
   IconWarning,
 } from "@kiesraad/icon";
-import { AlertType, MenuStatus } from "@kiesraad/ui";
 
 export function renderIconForType(type: AlertType) {
   switch (type) {

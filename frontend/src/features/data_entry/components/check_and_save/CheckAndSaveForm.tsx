@@ -4,9 +4,10 @@ import { Link, useNavigate } from "react-router";
 import { ApiError } from "@/api/ApiResult";
 import { useElection } from "@/api/election/useElection";
 import { ErrorModal } from "@/components/error";
-import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList } from "@/components/ui";
+import { BottomBar, Button, Form, KeyboardKeys, StatusList } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 import { FormSectionId } from "@/types/types";
+import { KeyboardKey, MenuStatus } from "@/types/ui";
 
 import { useDataEntryContext } from "../../hooks/useDataEntryContext";
 import { useFormKeyboardNavigation } from "../../hooks/useFormKeyboardNavigation";

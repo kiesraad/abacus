@@ -21,7 +21,7 @@ describe("Component: ErrorModal", () => {
     expect(screen.queryByRole("heading", { level: 2, name: "Sorry, er ging iets mis" })).not.toBeInTheDocument();
   });
 
-  test("Unknown server modal is shown and can be closed", async () => {
+  test("Unknown server error modal is shown and can be closed", async () => {
     render(<UnknownServerErrorModal />);
 
     expect(screen.getByRole("heading", { level: 2, name: "Sorry, er ging iets mis" })).toBeVisible();

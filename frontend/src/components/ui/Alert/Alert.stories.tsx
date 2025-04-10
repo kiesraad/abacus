@@ -43,6 +43,12 @@ export const InlineAlert: Story<Props> = ({ type, title, text }) => (
   </Alert>
 );
 
+export const InlineSmall: Story<Props> = ({ type, title, text }) => (
+  <Alert type={type} inline variant="small" title={title}>
+    <p>{text}</p>
+  </Alert>
+);
+
 export const InlineClosableAlert: Story<Props> = ({ type, title, text, onClose }) => (
   <Alert type={type} inline title={title} onClose={onClose}>
     <p>{text}</p>

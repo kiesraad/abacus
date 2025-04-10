@@ -1,9 +1,9 @@
 import { Fragment } from "react";
 
-import { AuditLogEvent } from "@/api";
+import { AuditLogEvent } from "@/api/gen/openapi";
 import { Modal } from "@/components/ui";
 import { hasTranslation, t, TranslationPath } from "@/lib/i18n";
-import { formatDateTimeFull } from "@/lib/util";
+import { formatDateTimeFull } from "@/lib/util/format";
 
 import cls from "./LogsHomePage.module.css";
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { AnyFormField, FieldValue, FormFields, processForm, ValidationError } from "@kiesraad/util";
+import { AnyFormField, FieldValue, FormFields, processForm, ValidationError } from "./form";
 
 type ExpectedError = ValidationError | undefined;
 type ExpectedValue = string | number | undefined;

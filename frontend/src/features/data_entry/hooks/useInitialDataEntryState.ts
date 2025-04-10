@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 
-import { ApiClient, ClaimDataEntryResponse, DEFAULT_CANCEL_REASON, Election, isSuccess } from "@/api";
+import { ApiClient, DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
+import { isSuccess } from "@/api/ApiResult";
+import { ClaimDataEntryResponse, Election } from "@/api/gen/openapi";
 
 import { DataEntryDispatch } from "../types/types";
 

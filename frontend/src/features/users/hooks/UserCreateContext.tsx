@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { Role } from "@/api";
+import { Role } from "@/api/gen/openapi";
 
 export type UserType = "fullname" | "anonymous";
 

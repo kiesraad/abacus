@@ -1,9 +1,10 @@
 import * as React from "react";
 
+import { cn } from "@/lib/util/classnames";
+
 import { t } from "@kiesraad/i18n";
 import { IconCross } from "@kiesraad/icon";
 import { AlertType, IconButton, renderIconForType } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
 
 import cls from "./Alert.module.css";
 

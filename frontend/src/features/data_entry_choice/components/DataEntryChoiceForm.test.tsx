@@ -1,16 +1,16 @@
-import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse, LoginResponse, useUser } from "@/api";
-import { overrideOnce, render, renderReturningRouter, screen, server, within } from "@/testing";
-import {
-  electionDetailsMockResponse,
-  ElectionRequestHandler,
-  ElectionStatusRequestHandler,
-  pollingStationMockData,
-} from "@/testing/api-mocks";
+import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
+import { ElectionStatusResponse, LoginResponse } from "@/api/gen/openapi";
+import { useUser } from "@/api/useUser";
+import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
+import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { overrideOnce, server } from "@/testing/server";
+import { render, renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
 
 import { DataEntryChoiceForm } from "./DataEntryChoiceForm";
 

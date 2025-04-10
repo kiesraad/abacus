@@ -1,4 +1,5 @@
-import { deformatNumber, parseIntUserInput } from "@kiesraad/util";
+import { deformatNumber } from "@/lib/util/format";
+import { parseIntUserInput } from "@/lib/util/strings";
 
 export type ValidationError =
   | "FORM_VALIDATION_RESULT_REQUIRED"

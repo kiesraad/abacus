@@ -1,9 +1,15 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { expectErrorPage, expectNotFound, overrideOnce, Providers, server, setupTestRouter } from "@/testing";
-import { ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
+import {
+  ElectionListRequestHandler,
+  ElectionRequestHandler,
+  ElectionStatusRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
+import { Providers } from "@/testing/Providers";
+import { overrideOnce, server } from "@/testing/server";
+import { expectErrorPage, expectNotFound, setupTestRouter } from "@/testing/test-utils";
 
 import { routes } from "./routes";
 

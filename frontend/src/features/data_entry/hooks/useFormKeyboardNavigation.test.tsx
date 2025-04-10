@@ -4,8 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { Form } from "@/components/ui/Form/Form";
-
-import { render, screen } from "@kiesraad/test";
+import { render, screen } from "@/testing/test-utils";
 
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 

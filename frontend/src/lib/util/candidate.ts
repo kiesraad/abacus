@@ -1,4 +1,4 @@
-import { Candidate } from "@/api";
+import { Candidate } from "@/api/gen/openapi";
 
 import { t } from "@kiesraad/i18n";
 

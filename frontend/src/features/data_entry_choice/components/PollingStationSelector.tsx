@@ -3,7 +3,8 @@ import { Dispatch, ReactNode, SetStateAction } from "react";
 import { Badge, Icon, InputField, Spinner } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 import { IconError, IconWarning } from "@/lib/icon";
-import { cn, removeLeadingZeros } from "@/lib/util";
+import { cn } from "@/lib/util/classnames";
+import { removeLeadingZeros } from "@/lib/util/strings";
 
 import { PollingStationUserStatus, PollingStationWithStatus } from "../utils/util";
 import cls from "./DataEntryChoice.module.css";

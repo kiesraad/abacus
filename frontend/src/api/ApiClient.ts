@@ -1,8 +1,8 @@
-import { ApiResult, type ErrorResponse } from "@kiesraad/api";
 import { TranslationPath } from "@kiesraad/i18n";
 
 import { ApiErrorEvent, SessionExpirationEvent } from "./ApiEvents";
-import { ApiError, ApiResponseStatus, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
+import { ApiError, ApiResponseStatus, ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
+import { ErrorResponse } from "./gen/openapi";
 
 const MIME_JSON = "application/json";
 const HEADER_ACCEPT = "Accept";

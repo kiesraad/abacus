@@ -1,7 +1,9 @@
 import * as React from "react";
 
+import { cn } from "@/lib/util/classnames";
+import { domtoren } from "@/lib/util/domtoren";
+
 import { MenuStatus, renderStatusIcon } from "@kiesraad/ui";
-import { cn, domtoren } from "@kiesraad/util";
 
 import cls from "./ProgressList.module.css";
 import { ProgressListScroll } from "./ProgressListScroll";

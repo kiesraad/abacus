@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 
-import { overrideOnce } from "@kiesraad/test";
+import { overrideOnce } from "@/testing/server";
 
 import { ApiClient } from "./ApiClient";
 import { ApiError, ApiResponseStatus, FatalApiError } from "./ApiResult";

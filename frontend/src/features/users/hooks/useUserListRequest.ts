@@ -1,4 +1,5 @@
-import { useInitialApiGetWithErrors, USER_LIST_REQUEST_PATH, UserListResponse } from "@/api";
+import { USER_LIST_REQUEST_PATH, UserListResponse } from "@/api/gen/openapi";
+import { useInitialApiGetWithErrors } from "@/api/useInitialApiGet";
 
 export function useUserListRequest() {
   const path: USER_LIST_REQUEST_PATH = `/api/user`;

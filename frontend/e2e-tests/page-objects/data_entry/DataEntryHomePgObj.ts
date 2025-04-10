@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
-import { PollingStation } from "@/api";
+import { PollingStation } from "@/api/gen/openapi";
 
 export class DataEntryHomePage {
   readonly fieldset: Locator;

@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { ApiError, PoliticalGroup } from "@/api";
+import { ApiError } from "@/api/ApiResult";
+import { PoliticalGroup } from "@/api/gen/openapi";
 import { ErrorModal } from "@/components/error";
 import {
   Alert,
@@ -15,7 +16,7 @@ import {
   KeyboardKeys,
 } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { getCandidateFullName } from "@/lib/util";
+import { getCandidateFullName } from "@/lib/util/candidate";
 
 import { DataEntryNavigation } from "../DataEntryNavigation";
 import { formValuesToValues } from "./candidatesVotesValues";

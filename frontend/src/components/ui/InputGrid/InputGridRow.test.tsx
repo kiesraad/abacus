@@ -1,7 +1,8 @@
 import { within } from "@testing-library/dom";
 import { describe, expect, test } from "vitest";
 
-import { render, screen } from "@kiesraad/test";
+import { render, screen } from "@/testing/test-utils";
+
 import { InputGrid, InputGridRow, InputGridRowProps } from "@kiesraad/ui";
 
 const defaultProps: InputGridRowProps = {

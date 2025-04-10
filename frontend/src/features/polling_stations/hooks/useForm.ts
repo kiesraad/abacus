@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { FormFields, processForm, ValidationResult } from "@kiesraad/util";
+import { FormFields, processForm, ValidationResult } from "../utils/form";
 
 export interface UseFormReturn<RequestObject> {
   process: (elements: { [key in keyof RequestObject]: HTMLInputElement }) => {

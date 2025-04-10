@@ -1,15 +1,12 @@
 import { expect, Page } from "@playwright/test";
+import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
+import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
+import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
+import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
+import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 
 import { PollingStation, PollingStationResults } from "@/api/gen/openapi";
-
-import {
-  CandidatesListPage,
-  CheckAndSavePage,
-  DataEntryHomePage,
-  DifferencesPage,
-  RecountedPage,
-  VotersAndVotesPage,
-} from "../page-objects/data_entry";
 
 export async function selectPollingStationForDataEntry(page: Page, pollingStation: PollingStation) {
   await page.goto(`/elections/${pollingStation.election_id}/data-entry`);

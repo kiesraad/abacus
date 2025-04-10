@@ -1,12 +1,10 @@
 import { expect } from "@playwright/test";
 import { createTestModel } from "@xstate/graph";
-import {
-  AbortInputModal,
-  DataEntryHomePage,
-  DifferencesPage,
-  RecountedPage,
-  VotersAndVotesPage,
-} from "e2e-tests/page-objects/data_entry";
+import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
+import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
+import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
+import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { createMachine } from "xstate";
 
 import { VotersCounts, VotesCounts } from "@/api/gen/openapi";

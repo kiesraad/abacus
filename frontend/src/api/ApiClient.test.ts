@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 import { overrideOnce } from "@kiesraad/test";
 
 import { ApiClient } from "./ApiClient";
-import { ApiResponseStatus, FatalApiError } from "./ApiResult";
+import { ApiError, ApiResponseStatus, FatalApiError } from "./ApiResult";
 
 describe("ApiClient", () => {
   test("200 response is parsed as success", async () => {
@@ -35,7 +35,7 @@ describe("ApiClient", () => {
     expect(parsedResponse).toStrictEqual(expectedResponse);
   });
 
-  test("500 response is parsed as server error", async () => {
+  test("fatal 500 response is parsed as fatal server error", async () => {
     const responseBody = {
       error: "foo",
       fatal: true,
@@ -49,6 +49,40 @@ describe("ApiClient", () => {
     });
 
     expect(parsedResponse).toStrictEqual(new FatalApiError(ApiResponseStatus.ServerError, 500, responseBody.error));
+  });
+
+  test("non-fatal 500 response is parsed as server error", async () => {
+    const responseBody = {
+      error: "foo",
+      fatal: false,
+      reference: "InternalServerError",
+    };
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, responseBody);
+
+    const client = new ApiClient();
+    const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
+      data: null,
+    });
+
+    expect(parsedResponse).toStrictEqual(new ApiError(ApiResponseStatus.ServerError, 500, responseBody.error));
+  });
+
+  test("300 response with body is parsed as fatal server error", async () => {
+    const responseBody = {
+      error: "foo",
+      fatal: false,
+      reference: "MultipleChoices",
+    };
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 300, responseBody);
+
+    const client = new ApiClient();
+    const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
+      data: null,
+    });
+
+    expect(parsedResponse).toStrictEqual(
+      new FatalApiError(ApiResponseStatus.ServerError, 300, "Unexpected response status: 300", "InvalidData"),
+    );
   });
 
   test("318 response returns an error", async () => {

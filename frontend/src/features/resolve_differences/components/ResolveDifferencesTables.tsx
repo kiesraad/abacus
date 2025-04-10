@@ -1,6 +1,6 @@
 import { PoliticalGroup, PoliticalGroupVotes, PollingStationResults } from "@/api";
 import { t } from "@/lib/i18n";
-import { getCandidateFullName } from "@/lib/util";
+import { getCandidateFullName } from "@/lib/util/candidate";
 
 import { DataEntrySection, getFromResults, sections } from "../utils/dataEntry";
 import { DifferencesTable } from "./DifferencesTable";

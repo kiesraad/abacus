@@ -15,7 +15,7 @@ import {
   KeyboardKeys,
 } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { getCandidateFullName } from "@/lib/util";
+import { getCandidateFullName } from "@/lib/util/candidate";
 
 import { DataEntryNavigation } from "../DataEntryNavigation";
 import { formValuesToValues } from "./candidatesVotesValues";

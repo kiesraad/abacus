@@ -1,5 +1,5 @@
 import { PoliticalGroupVotes } from "@/api";
-import { deformatNumber, formatNumber } from "@/lib/util";
+import { deformatNumber, formatNumber } from "@/lib/util/format";
 
 export interface CandidateVotesFormValues extends Omit<PoliticalGroupVotes, "total" | "candidate_votes"> {
   total: string;

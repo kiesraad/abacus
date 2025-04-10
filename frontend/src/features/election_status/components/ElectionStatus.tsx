@@ -13,7 +13,7 @@ import {
 } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { IconPlus } from "@/lib/icon";
-import { formatDateTime } from "@/lib/util";
+import { formatDateTime } from "@/lib/util/format";
 
 import cls from "./ElectionStatus.module.css";
 

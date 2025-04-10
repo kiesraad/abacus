@@ -6,7 +6,7 @@ import {
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   PollingStationResults,
 } from "@/api";
-import { getCandidateFullName } from "@/lib/util";
+import { getCandidateFullName } from "@/lib/util/candidate";
 import { overrideOnce } from "@/testing/server";
 import { screen, within } from "@/testing/test-utils";
 

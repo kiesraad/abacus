@@ -1,5 +1,5 @@
 import { Election, PollingStationResults, ValidationResults } from "@/api";
-import { objectHasOnlyEmptyValues } from "@/lib/util";
+import { objectHasOnlyEmptyValues } from "@/lib/util/compare";
 import { FormSectionId } from "@/types/types";
 
 import { ClientState, FormSection, FormState } from "../types/types";

@@ -5,7 +5,8 @@ import { useElection, useElectionStatus, useUser } from "@/api";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 import { IconError } from "@/lib/icon";
-import { cn, parseIntUserInput } from "@/lib/util";
+import { cn } from "@/lib/util/classnames";
+import { parseIntUserInput } from "@/lib/util/strings";
 
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import {

@@ -1,7 +1,8 @@
 import { Fraction, PreferenceThreshold, VotesCounts } from "@/api";
 import { DisplayFraction, Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { cn, formatNumber } from "@/lib/util";
+import { cn } from "@/lib/util/classnames";
+import { formatNumber } from "@/lib/util/format";
 
 import cls from "./Apportionment.module.css";
 

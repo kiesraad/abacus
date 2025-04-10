@@ -4,8 +4,7 @@ import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { AppLayout } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
-
-import { isDevelopment } from "@kiesraad/util";
+import { isDevelopment } from "@/lib/util/env";
 
 interface FatalErrorPageProps {
   message: string;

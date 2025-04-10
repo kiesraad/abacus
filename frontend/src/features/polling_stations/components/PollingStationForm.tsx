@@ -2,8 +2,8 @@ import * as React from "react";
 
 import { isSuccess, PollingStation, PollingStationRequest, useCrud } from "@/api";
 import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@/components/ui";
+import { FormFields, ValidationError } from "@/features/polling_stations/utils/form";
 import { t } from "@/lib/i18n";
-import { FormFields, ValidationError } from "@/lib/util";
 
 import { useForm } from "../hooks/useForm";
 

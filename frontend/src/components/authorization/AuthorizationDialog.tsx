@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router";
 
+import { formatTimeToGo } from "@/lib/util/format";
+
 import { useApiState } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
-import { formatTimeToGo } from "@kiesraad/util";
 
 import { ALLOW_UNAUTHORIZED, EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 

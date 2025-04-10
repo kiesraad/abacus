@@ -1,5 +1,6 @@
+import { formatNumber } from "@/lib/util/format";
+
 import { Fraction } from "@kiesraad/api";
-import { formatNumber } from "@kiesraad/util";
 
 export function getFractionInteger(fraction: Fraction) {
   return fraction.integer ? formatNumber(fraction.integer) : fraction.numerator === 0 ? "0" : "";

@@ -1,7 +1,7 @@
 import { AuditLogEvent } from "@/api";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { formatDateTime } from "@/lib/util";
+import { formatDateTime } from "@/lib/util/format";
 
 interface LogsTableProps {
   events: AuditLogEvent[];

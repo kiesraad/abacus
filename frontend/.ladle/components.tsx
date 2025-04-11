@@ -2,7 +2,7 @@ import { StaticRouter } from "react-router";
 
 import type { GlobalProvider } from "@ladle/react";
 
-import "@/components/ui/style/index.css";
+import "@/styles/index.css";
 
 import "./override.css";
 

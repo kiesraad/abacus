@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { Election } from "@/api";
+import { ApiError, Election } from "@/api";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
 import useDataEntry from "../hooks/useDataEntry";
@@ -20,10 +20,14 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
 
   // handle error
   useEffect(() => {
-    if (stateAndActions.error) {
-      void navigate(`/elections/${election.id}/data-entry?error=data_entry_error`);
+    if (
+      stateAndActions.error &&
+      stateAndActions.error instanceof ApiError &&
+      stateAndActions.error.reference === "DataEntryAlreadyClaimed"
+    ) {
+      void navigate(`/elections/${election.id}/data-entry#data-entry-claimed-${pollingStationId}`);
     }
-  }, [election.id, navigate, stateAndActions.error]);
+  }, [election.id, navigate, stateAndActions.error, pollingStationId]);
 
   if (!stateAndActions.pollingStationResults) {
     return null;

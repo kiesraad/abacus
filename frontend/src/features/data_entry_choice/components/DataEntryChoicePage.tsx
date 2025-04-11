@@ -12,7 +12,7 @@ import { ElectionProgress } from "./ElectionProgress";
 export function DataEntryChoicePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { election } = useElection();
+  const { election, pollingStations } = useElection();
   const { statuses, refetch } = useElectionStatus();
 
   // re-fetch statuses when component mounts
@@ -28,10 +28,25 @@ export function DataEntryChoicePage() {
 
   const showFirstDataEntrySavedAlert = location.hash === "#data-entry-saved-1";
   const showSecondDataEntrySavedAlert = location.hash === "#data-entry-saved-2";
+  const showDataEntryClaimedAlert = location.hash.startsWith("#data-entry-claimed-") ? location.hash : null;
+
   const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
 
   function closeDataEntrySavedAlert() {
     void navigate(location.pathname);
+  }
+
+  function closeDataEntryClaimedAlert() {
+    void navigate(location.pathname);
+  }
+
+  function getPollingStationNumber(pollingStationId: string | number | null) {
+    if (!pollingStationId) {
+      return 0;
+    }
+    pollingStationId = typeof pollingStationId === "string" ? parseInt(pollingStationId) : pollingStationId;
+    const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
+    return pollingStation ? pollingStation.number : 0;
   }
 
   return (
@@ -56,6 +71,20 @@ export function DataEntryChoicePage() {
           </p>
         </Alert>
       )}
+
+      {showDataEntryClaimedAlert && (
+        <Alert type="warning" onClose={closeDataEntryClaimedAlert}>
+          <h2>
+            {t("data_entry.warning.data_entry_not_possible", {
+              nr: getPollingStationNumber(
+                showDataEntryClaimedAlert.substring(showDataEntryClaimedAlert.lastIndexOf("-") + 1),
+              ),
+            })}
+          </h2>
+          <p>{t("data_entry.warning.data_entry_already_claimed")}</p>
+        </Alert>
+      )}
+
       {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
           <h2>{t("data_entry.completed.all_entries_completed")}</h2>

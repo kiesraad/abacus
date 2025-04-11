@@ -927,4 +927,22 @@ test.describe("api error responses", () => {
     await expect(errorModal.dialog).toBeHidden();
     await expect(votersAndVotesPage.fieldset).toBeVisible();
   });
+
+  test("Already claimed polling station results in error shown", async ({ page, pollingStation }) => {
+    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1/claim`, async (route) => {
+      await route.fulfill({
+        status: 409,
+        json: {
+          error: "Conflict",
+          fatal: false,
+          reference: "DataEntryAlreadyClaimed",
+        },
+      });
+    });
+
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+  });
 });

@@ -1,6 +1,8 @@
 import type { Story } from "@ladle/react";
 
-import { Button, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
+import { KeyboardKey } from "@/types/ui";
+
+import { Button, KeyboardKeys } from "@kiesraad/ui";
 
 import { BottomBar } from "./BottomBar";
 

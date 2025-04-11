@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 
 import { Fraction } from "@/api/gen/openapi";
+import { getFractionInteger, getFractionWithoutInteger } from "@/lib/util/fraction";
 
-import { getFractionInteger, getFractionWithoutInteger } from "../util";
 import cls from "./DisplayFraction.module.css";
 
 export function DisplayFraction({ id, fraction }: { id: string; fraction: Fraction }): ReactNode {

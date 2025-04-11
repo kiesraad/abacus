@@ -2,7 +2,8 @@ import { useState } from "react";
 
 import { AuditLogEvent } from "@/api/gen/openapi";
 import { ErrorModal } from "@/components/error";
-import { Button, Loader, PageTitle, Pagination, Toolbar, ToolbarSection } from "@/components/ui";
+import { PageTitle } from "@/components/page_title/PageTitle";
+import { Button, Loader, Pagination, Toolbar, ToolbarSection } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { IconFilter } from "@/lib/icon";
 

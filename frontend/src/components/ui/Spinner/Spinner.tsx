@@ -1,8 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/util/classnames";
-
-import { Size } from "@kiesraad/ui";
+import { Size } from "@/types/ui";
 
 import cls from "./Spinner.module.css";
 

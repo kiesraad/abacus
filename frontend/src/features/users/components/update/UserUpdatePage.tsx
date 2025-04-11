@@ -4,7 +4,8 @@ import { useNavigate } from "react-router";
 import { AnyApiError, ApiError } from "@/api/ApiResult";
 import { User, USER_GET_REQUEST_PATH } from "@/api/gen/openapi";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
-import { Alert, FormLayout, Loader, PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/page_title/PageTitle";
+import { Alert, FormLayout, Loader } from "@/components/ui";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";
 

@@ -1,7 +1,8 @@
 import { useElection } from "@/api/election/useElection";
 import { useElectionStatus } from "@/api/election/useElectionStatus";
 import { Footer } from "@/components/footer/Footer";
-import { Button, FormLayout, PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/page_title/PageTitle";
+import { Button, FormLayout } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
 import cls from "./ElectionReportPage.module.css";

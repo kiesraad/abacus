@@ -2,7 +2,8 @@ import { Link } from "react-router";
 
 import { useApiState } from "@/api/useApiState";
 import { useUserRole } from "@/api/useUserRole";
-import { AppLayout, PageTitle } from "@/components/ui";
+import { PageTitle } from "@/components/page_title/PageTitle";
+import { AppLayout } from "@/components/ui";
 import { ElectionListProvider } from "@/features/election_overview/hooks/ElectionListProvider";
 import { useElectionList } from "@/features/election_overview/hooks/useElectionList";
 import { t } from "@/lib/i18n";

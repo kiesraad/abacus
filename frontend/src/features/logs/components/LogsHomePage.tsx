@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { AuditLogEvent } from "@/api/gen/openapi";
-import { ErrorModal } from "@/components/error";
+import { ErrorModal } from "@/components/error/ErrorModal";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
 import { Loader } from "@/components/ui/Loader/Loader";

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 
 import { ApiError } from "@/api/ApiResult";
 import { useElection } from "@/api/election/useElection";
-import { ErrorModal } from "@/components/error";
+import { ErrorModal } from "@/components/error/ErrorModal";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";

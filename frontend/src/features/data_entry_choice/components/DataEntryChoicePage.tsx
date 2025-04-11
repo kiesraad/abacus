@@ -32,6 +32,12 @@ export function DataEntryChoicePage() {
   const showSecondDataEntrySavedAlert = location.hash === "#data-entry-saved-2";
   const showDataEntryClaimedAlert = location.hash.startsWith("#data-entry-claimed-") ? location.hash : null;
 
+  let claimedPollingStationNumber = 0;
+  if (showDataEntryClaimedAlert) {
+    const id = parseInt(showDataEntryClaimedAlert.substring(showDataEntryClaimedAlert.lastIndexOf("-") + 1));
+    claimedPollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
+  }
+
   const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
 
   function closeDataEntrySavedAlert() {
@@ -40,15 +46,6 @@ export function DataEntryChoicePage() {
 
   function closeDataEntryClaimedAlert() {
     void navigate(location.pathname);
-  }
-
-  function getPollingStationNumber(pollingStationId: string | number | null) {
-    if (!pollingStationId) {
-      return 0;
-    }
-    pollingStationId = typeof pollingStationId === "string" ? parseInt(pollingStationId) : pollingStationId;
-    const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
-    return pollingStation ? pollingStation.number : 0;
   }
 
   return (
@@ -74,13 +71,11 @@ export function DataEntryChoicePage() {
         </Alert>
       )}
 
-      {showDataEntryClaimedAlert && (
+      {claimedPollingStationNumber && (
         <Alert type="warning" onClose={closeDataEntryClaimedAlert}>
           <h2>
             {t("data_entry.warning.data_entry_not_possible", {
-              nr: getPollingStationNumber(
-                showDataEntryClaimedAlert.substring(showDataEntryClaimedAlert.lastIndexOf("-") + 1),
-              ),
+              nr: claimedPollingStationNumber,
             })}
           </h2>
           <p>{t("data_entry.warning.data_entry_already_claimed")}</p>

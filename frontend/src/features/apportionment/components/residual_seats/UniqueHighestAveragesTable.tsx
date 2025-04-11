@@ -26,21 +26,25 @@ export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGrou
       </Table.Header>
       <Table.Body>
         {finalStanding.map((pgSeatAssignment) => {
-          const average = steps[0]?.standings[pgSeatAssignment.pg_number - 1]?.next_votes_per_seat;
-          const residual_seat = steps.filter((step) => {
-            return step.change.selected_pg_number == pgSeatAssignment.pg_number;
-          }).length;
-          return (
-            <Table.Row key={pgSeatAssignment.pg_number}>
-              <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
-                {pgSeatAssignment.pg_number}
-              </Table.Cell>
-              <Table.Cell>{politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}</Table.Cell>
-              <Table.NumberCell className="font-number">{pgSeatAssignment.full_seats}</Table.NumberCell>
-              {average && <Table.DisplayFractionCells>{average}</Table.DisplayFractionCells>}
-              <Table.NumberCell className="font-number">{residual_seat}</Table.NumberCell>
-            </Table.Row>
-          );
+          if (steps[0]?.change.pg_exhausted.includes(pgSeatAssignment.pg_number)) {
+            return;
+          } else {
+            const average = steps[0]?.standings[pgSeatAssignment.pg_number - 1]?.next_votes_per_seat;
+            const pgSeatAssignmentSteps = steps.filter((step) => {
+              return step.change.selected_pg_number == pgSeatAssignment.pg_number;
+            });
+            return (
+              <Table.Row key={pgSeatAssignment.pg_number}>
+                <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
+                  {pgSeatAssignment.pg_number}
+                </Table.Cell>
+                <Table.Cell>{politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}</Table.Cell>
+                <Table.NumberCell className="font-number">{pgSeatAssignment.full_seats}</Table.NumberCell>
+                <Table.DisplayFractionCells>{average}</Table.DisplayFractionCells>
+                <Table.NumberCell className="font-number">{pgSeatAssignmentSteps.length}</Table.NumberCell>
+              </Table.Row>
+            );
+          }
         })}
       </Table.Body>
     </Table>

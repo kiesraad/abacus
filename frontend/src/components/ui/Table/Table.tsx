@@ -125,11 +125,13 @@ function NumberCell({
   );
 }
 
-function DisplayFractionCells({ children, className }: { children: Fraction; className?: string }) {
+function DisplayFractionCells({ children, className }: { children: Fraction | undefined; className?: string }) {
   return (
     <>
-      <td className={cn(cls.integerCell, "font-number", className)}>{getFractionInteger(children)}</td>
-      <td className={cn(cls.fractionCell, "font-number", className)}>{getFractionWithoutInteger(children)}</td>
+      <td className={cn(cls.integerCell, "font-number", className)}>{children && getFractionInteger(children)}</td>
+      <td className={cn(cls.fractionCell, "font-number", className)}>
+        {children && getFractionWithoutInteger(children)}
+      </td>
     </>
   );
 }

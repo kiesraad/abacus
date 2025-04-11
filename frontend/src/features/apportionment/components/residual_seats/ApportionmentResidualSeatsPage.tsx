@@ -1,13 +1,12 @@
 import { Link } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
-import { SeatChangeStep } from "@/api/gen/openapi";
 import { t, tx } from "@/lib/i18n";
 import { cn } from "@/lib/util/classnames";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import {
-  getAssignedSeat,
+  getResultChanges,
   isAbsoluteMajorityReassignmentStep,
   isHighestAverageAssignmentStep,
   isLargestRemainderAssignmentStep,
@@ -61,41 +60,29 @@ export function ApportionmentResidualSeatsPage() {
     const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
     const absoluteMajorityReassignment = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
     const listExhaustionSteps = seatAssignment.steps.filter(isListExhaustionRemovalStep);
+    const fullSeatRemovalSteps = listExhaustionSteps.filter((step) => step.change.full_seat);
     const residualSeatRemovalSteps = listExhaustionSteps.filter((step) => !step.change.full_seat);
-    const assignmentStepsAfterListExhaustion = seatAssignment.steps.slice(-residualSeatRemovalSteps.length);
-    const resultChanges: resultChange[] = [];
-    if (absoluteMajorityReassignment) {
-      resultChanges.push({
-        pgNumber: absoluteMajorityReassignment.change.pg_assigned_seat,
-        footnoteNumber: 1,
-        increase: 1,
-        decrease: 0,
-      });
-      resultChanges.push({
-        pgNumber: absoluteMajorityReassignment.change.pg_retracted_seat,
-        footnoteNumber: 1,
-        increase: 0,
-        decrease: 1,
-      });
-    }
-    residualSeatRemovalSteps.forEach((step, index) => {
-      const footnoteNumber = absoluteMajorityReassignment ? index + 2 : index + 1;
-      resultChanges.push({
-        pgNumber: step.change.pg_retracted_seat,
-        footnoteNumber: footnoteNumber,
-        increase: 0,
-        decrease: 1,
-      });
+    const uniquePgNumbersWithFullSeatsRemoved: number[] = [];
+    fullSeatRemovalSteps.map((step) => {
+      if (!uniquePgNumbersWithFullSeatsRemoved.includes(step.change.pg_retracted_seat)) {
+        uniquePgNumbersWithFullSeatsRemoved.push(step.change.pg_retracted_seat);
+      }
     });
+    const resultChanges: resultChange[] = getResultChanges(
+      absoluteMajorityReassignment,
+      uniquePgNumbersWithFullSeatsRemoved,
+      residualSeatRemovalSteps,
+    );
 
     function render_footnotes() {
+      let footnoteNumber = absoluteMajorityReassignment ? 1 : 0;
       return (
         <div className={cls.footnoteDiv}>
           {absoluteMajorityReassignment && (
             <div className="w-39">
               <span id="1-absolute-majority-reassignment-information">
                 <sup id="footnote-1" className={cls.footnoteNumber}>
-                  1
+                  {footnoteNumber}
                 </sup>{" "}
                 {t("apportionment.absolute_majority_reassignment", {
                   pg_assigned_seat: absoluteMajorityReassignment.change.pg_assigned_seat,
@@ -104,18 +91,31 @@ export function ApportionmentResidualSeatsPage() {
               </span>
             </div>
           )}
-          {residualSeatRemovalSteps.map((pgSeatRemoval, index) => {
-            const footnoteNumber = absoluteMajorityReassignment ? index + 2 : index + 1;
+          {uniquePgNumbersWithFullSeatsRemoved.map((pgNumber) => {
+            footnoteNumber += 1;
             return (
               <div className="w-39" key={`step-${footnoteNumber}`}>
-                <span id={`${footnoteNumber}-list-exhaustion-information`}>
+                <span id={`${footnoteNumber}-full-seat-list-exhaustion-information`}>
+                  <sup id={`footnote-${footnoteNumber}`} className={cls.footnoteNumber}>
+                    {footnoteNumber}
+                  </sup>{" "}
+                  {t("apportionment.full_seat_removed_remainder_information", {
+                    num_full_seats: seatAssignment?.steps[0]?.standings[pgNumber - 1]?.full_seats || "",
+                  })}
+                </span>
+              </div>
+            );
+          })}
+          {residualSeatRemovalSteps.map((pgSeatRemoval, index) => {
+            footnoteNumber += 1;
+            return (
+              <div className="w-39" key={`step-${footnoteNumber}`}>
+                <span id={`${footnoteNumber}-residual-seat-list-exhaustion-information`}>
                   <sup id={`footnote-${footnoteNumber}`} className={cls.footnoteNumber}>
                     {footnoteNumber}
                   </sup>{" "}
                   {t("apportionment.list_exhaustion_residual_seat_removal", {
                     pg_retracted_seat: pgSeatRemoval.change.pg_retracted_seat,
-                    pg_assigned_seat:
-                      getAssignedSeat(assignmentStepsAfterListExhaustion[index] as SeatChangeStep) || "",
                   })}
                   {index == 0 && ` ${t("apportionment.article_p10")}`}
                 </span>

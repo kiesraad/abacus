@@ -11,6 +11,7 @@
     "singular": "volle zetel",
     "plural": "Volle zetels"
   },
+  "full_seat_removed_remainder_information": "Het overschot is berekend op basis van de {num_full_seats} volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen (Kieswet, artikel P 8).",
   "full_seats_count": "Aantal volle zetels",
   "full_seats_information": "Per politieke groepering wordt berekend hoe vaak de kiesdeler in het aantal stemmen past. Het resultaat van deze deling geeft het aantal volle zetels dat is behaald.",
   "full_seats_information_link": {
@@ -22,8 +23,8 @@
   "in_alphabetical_order": "In alfabetische volgorde",
   "information_highest_averages": "Er zijn 19 of meer zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste gemiddelden</strong>. De partij die na toewijzing van een restzetel het hoogste aantal stemmen per zetel heeft, krijgt de restzetel.\nIn de tabel is het gemiddeld aantal stemmen per zetel te vinden dat elke lijst zou krijgen als een restzetel zou worden toegekend.",
   "information_largest_remainders": "Er zijn minder dan 19 zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste overschotten</strong>. De restzetels zijn één voor één toegewezen aan de lijsten die na verdeling van de zetels het grootste overschot aan stemmen hebben. Lijsten die minder dan 75% van de kiesdeler hebben gehaald, komen niet in aanmerking voor een restzetel.",
-  "list_exhaustion_full_seat_removal": "Omdat lijst {pg_retracted_seat} onvoldoende kandidaten heeft, is een zetel herverdeeld als restzetel.",
-  "list_exhaustion_residual_seat_removal": "Omdat lijst {pg_retracted_seat} geen kandidaat heeft voor een zetel, gaat deze zetel naar lijst {pg_assigned_seat}.",
+  "list_exhaustion_full_seat_removal": "Omdat lijst {pg_retracted_seat} onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.",
+  "list_exhaustion_residual_seat_removal": "Omdat lijst {pg_retracted_seat} geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst.",
   "minus": "min",
   "not_possible": "Zetelverdeling is niet mogelijk",
   "not_yet_available": "Zetelverdeling is nog niet beschikbaar",

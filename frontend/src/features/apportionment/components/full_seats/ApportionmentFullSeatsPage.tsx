@@ -39,6 +39,7 @@ export function ApportionmentFullSeatsPage() {
         footnoteNumber: footnoteNumber,
         increase: 0,
         decrease: 1,
+        type: "full_seat",
       });
     });
     return (

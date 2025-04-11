@@ -15,6 +15,53 @@ export interface resultChange {
   footnoteNumber: number;
   increase: number;
   decrease: number;
+  type: "full_seat" | "residual_seat";
+}
+
+export function getResultChanges(
+  absoluteMajorityReassignment: AbsoluteMajorityReassignmentStep | undefined,
+  uniquePgNumbersWithFullSeatsRemoved: number[],
+  residualSeatRemovalSteps: ListExhaustionRemovalStep[],
+) {
+  const resultChanges: resultChange[] = [];
+  let footnoteNumber = absoluteMajorityReassignment ? 1 : 0;
+  if (absoluteMajorityReassignment) {
+    resultChanges.push({
+      pgNumber: absoluteMajorityReassignment.change.pg_assigned_seat,
+      footnoteNumber: footnoteNumber,
+      increase: 1,
+      decrease: 0,
+      type: "residual_seat",
+    });
+    resultChanges.push({
+      pgNumber: absoluteMajorityReassignment.change.pg_retracted_seat,
+      footnoteNumber: footnoteNumber,
+      increase: 0,
+      decrease: 1,
+      type: "residual_seat",
+    });
+  }
+  uniquePgNumbersWithFullSeatsRemoved.forEach((pgNumber) => {
+    footnoteNumber += 1;
+    resultChanges.push({
+      pgNumber: pgNumber,
+      footnoteNumber: footnoteNumber,
+      increase: 0,
+      decrease: 1,
+      type: "full_seat",
+    });
+  });
+  residualSeatRemovalSteps.forEach((step) => {
+    footnoteNumber += 1;
+    resultChanges.push({
+      pgNumber: step.change.pg_retracted_seat,
+      footnoteNumber: footnoteNumber,
+      increase: 0,
+      decrease: 1,
+      type: "residual_seat",
+    });
+  });
+  return resultChanges;
 }
 
 export type HighestAverageAssignmentStep = SeatChangeStep & { change: HighestAverageAssignedSeat };
@@ -41,20 +88,6 @@ export function isAbsoluteMajorityReassignmentStep(step: SeatChangeStep): step i
 
 export function isListExhaustionRemovalStep(step: SeatChangeStep): step is ListExhaustionRemovalStep {
   return step.change.changed_by === "ListExhaustionRemoval";
-}
-
-export function getAssignedSeat(step: SeatChangeStep): number | undefined {
-  if (
-    isHighestAverageAssignmentStep(step) ||
-    isUniqueHighestAverageAssignmentStep(step) ||
-    isLargestRemainderAssignmentStep(step)
-  ) {
-    return step.change.selected_pg_number;
-  } else if (isAbsoluteMajorityReassignmentStep(step)) {
-    return step.change.pg_assigned_seat;
-  } else {
-    return undefined;
-  }
 }
 
 export function getFootnotes(pgResultChanges: resultChange[]) {

@@ -25,9 +25,9 @@ export function HighestAveragesTable({
         <Table.Header>
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>{t("list")}</Table.HeaderCell>
           <Table.HeaderCell className={cls.sticky}>{t("list_name")}</Table.HeaderCell>
-          {steps.map((step) => (
+          {steps.map((step, index) => (
             <Table.HeaderCell key={step.residual_seat_number} className="text-align-r" span={2}>
-              {t("apportionment.round")} {step.residual_seat_number}
+              {t("apportionment.round")} {index + 1}
             </Table.HeaderCell>
           ))}
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>
@@ -53,18 +53,16 @@ export function HighestAveragesTable({
                 </Table.Cell>
                 {steps.map((step) => {
                   const average = step.standings[pgSeatAssignment.pg_number - 1]?.next_votes_per_seat;
-                  if (!step.change.pg_exhausted.includes(pgSeatAssignment.pg_number) && average) {
-                    return (
-                      <Table.DisplayFractionCells
-                        key={`${pgSeatAssignment.pg_number}-${step.residual_seat_number}`}
-                        className={
-                          step.change.pg_options.includes(pgSeatAssignment.pg_number) ? "bg-yellow bold" : undefined
-                        }
-                      >
-                        {average}
-                      </Table.DisplayFractionCells>
-                    );
-                  }
+                  return (
+                    <Table.DisplayFractionCells
+                      key={`${pgSeatAssignment.pg_number}-${step.residual_seat_number}`}
+                      className={
+                        step.change.pg_options.includes(pgSeatAssignment.pg_number) ? "bg-yellow bold" : undefined
+                      }
+                    >
+                      {!step.change.pg_exhausted.includes(pgSeatAssignment.pg_number) ? average : undefined}
+                    </Table.DisplayFractionCells>
+                  );
                 })}
                 <Table.NumberCell className={cn(cls.sticky, "font-number")}>
                   {getFootnotes(pgResultChanges)} {residualSeats}

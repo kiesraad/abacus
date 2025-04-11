@@ -34,6 +34,7 @@
 }
 
 td > .footnoteNumber {
+  margin-left: 0;
   margin-bottom: 1rem;
   padding-right: 0;
 }
@@ -66,7 +67,7 @@ td > .footnoteNumber {
 }
 
 .scrollable {
-  width: 68rem;
+  width: calc(100vw - 10rem);
   overflow-x: auto;
 }
 
@@ -111,7 +112,7 @@ td > .footnoteNumber {
 }
 
 .highestAveragesTable {
-  max-width: 68rem;
+  max-width: calc(100vw - 10rem);
   width: fit-content;
   tr {
     /* List number sticky column */

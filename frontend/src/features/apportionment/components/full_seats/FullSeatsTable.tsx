@@ -39,6 +39,7 @@ export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultCh
               <Table.DisplayFractionCells>{quota}</Table.DisplayFractionCells>
               <Table.Cell>=</Table.Cell>
               <Table.NumberCell className="font-number">
+                {pgResultChanges.length > 0 && <s>{standing.full_seats + pgResultChanges.length}</s>}{" "}
                 {getFootnotes(pgResultChanges)} {standing.full_seats}
               </Table.NumberCell>
             </Table.Row>

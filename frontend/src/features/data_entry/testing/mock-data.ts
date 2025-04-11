@@ -3,8 +3,8 @@ import {
   PollingStationResults,
   ValidationResult,
   ValidationResultCode,
-} from "@/api";
-import { electionMockData } from "@/testing/api-mocks";
+} from "@/api/gen/openapi";
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { FormSectionId } from "@/types/types";
 
 import { DataEntryState, FormSection } from "../types/types";

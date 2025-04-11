@@ -1,7 +1,8 @@
 import * as React from "react";
 
+import { cn } from "@/lib/util/classnames";
+
 import { Checkbox, CheckboxAndRadioProps, Radio } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
 
 import cls from "./CheckboxAndRadio.module.css";
 

@@ -1,11 +1,14 @@
 import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@/api";
+import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionApportionmentResponse, ErrorResponse } from "@/api/gen/openapi";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
-import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@/testing";
-import { getElectionMockData } from "@/testing/api-mocks";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { Providers } from "@/testing/Providers";
+import { overrideOnce } from "@/testing/server";
+import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
 
 import * as gte19Seats from "../../testing/gte-19-seats";
 import * as gte19SeatsAndP9 from "../../testing/gte-19-seats-and-p9";

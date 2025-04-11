@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
-import { pingHandler } from "@kiesraad/api-mocks";
-import { server } from "@kiesraad/test";
+import { pingHandler } from "@/testing/api-mocks/RequestHandlers";
+import { server } from "@/testing/server";
 
 type Response = {
   pong: string;

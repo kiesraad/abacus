@@ -89,7 +89,7 @@ module.exports = {
       },
     },
     {
-      files: ["*.test.tsx", "src/testing/**/*.ts"],
+      files: ["*.test.ts{,x}", "src/testing/**/*.ts"],
       rules: {
         "@typescript-eslint/no-non-null-assertion": "off",
       },

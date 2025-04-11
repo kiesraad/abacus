@@ -1,8 +1,10 @@
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { render, screen, server } from "@/testing";
-import { AccountUpdateRequestHandler, loginResponseMockData } from "@/testing/api-mocks";
+import { AccountUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { loginResponseMockData } from "@/testing/api-mocks/UserMockData";
+import { server } from "@/testing/server";
+import { render, screen } from "@/testing/test-utils";
 
 import { AccountSetupPage } from "./AccountSetupPage";
 
@@ -15,7 +17,7 @@ vi.mock(import("react-router"), async (importOriginal) => ({
 
 const setUser = vi.fn();
 
-vi.mock("@kiesraad/api", async (importOriginal) => ({
+vi.mock("@/api/useApiState", async (importOriginal) => ({
   ...(await importOriginal()),
   useApiState: () => ({ user: {}, setUser }),
 }));

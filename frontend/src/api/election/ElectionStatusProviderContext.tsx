@@ -1,6 +1,7 @@
 import { createContext } from "react";
 
-import { ApiResult, ElectionStatusResponse, ElectionStatusResponseEntry } from "@kiesraad/api";
+import { ApiResult } from "../ApiResult";
+import { ElectionStatusResponse, ElectionStatusResponseEntry } from "../gen/openapi";
 
 export interface iElectionStatusProviderContext {
   statuses: Required<ElectionStatusResponseEntry[]>;

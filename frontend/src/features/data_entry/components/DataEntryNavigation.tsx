@@ -1,6 +1,7 @@
 import { useBlocker } from "react-router";
 
-import { PollingStationResults, useUser } from "@/api";
+import { PollingStationResults } from "@/api/gen/openapi";
+import { useUser } from "@/api/useUser";
 import { Button, Modal } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 

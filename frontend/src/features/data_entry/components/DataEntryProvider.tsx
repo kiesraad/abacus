@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { Election } from "@/api";
+import { Election } from "@/api/gen/openapi";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
 import useDataEntry from "../hooks/useDataEntry";

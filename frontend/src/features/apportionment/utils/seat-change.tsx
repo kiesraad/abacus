@@ -6,7 +6,7 @@ import {
   LargestRemainderAssignedSeat,
   ListExhaustionRemovedSeat,
   SeatChangeStep,
-} from "@/api";
+} from "@/api/gen/openapi";
 
 import cls from "../components/Apportionment.module.css";
 

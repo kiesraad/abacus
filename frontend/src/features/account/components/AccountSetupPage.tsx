@@ -1,6 +1,7 @@
 import { Navigate, useNavigate } from "react-router";
 
-import { LoginResponse, useApiState } from "@/api";
+import { LoginResponse } from "@/api/gen/openapi";
+import { useApiState } from "@/api/useApiState";
 import { PageTitle } from "@/components/ui";
 import { t } from "@/lib/i18n";
 

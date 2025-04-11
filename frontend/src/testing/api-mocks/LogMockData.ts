@@ -1,4 +1,4 @@
-import { AuditLogListResponse } from "@/api";
+import { AuditLogListResponse } from "@/api/gen/openapi";
 
 export const logMockResponse: AuditLogListResponse = {
   events: [

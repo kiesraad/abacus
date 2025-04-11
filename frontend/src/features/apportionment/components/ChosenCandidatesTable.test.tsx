@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { render, screen } from "@/testing";
+import { render, screen } from "@/testing/test-utils";
 
 import { candidate_nomination } from "../testing/gte-19-seats";
 import { ChosenCandidatesTable } from "./ChosenCandidatesTable";

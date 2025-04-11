@@ -1,15 +1,8 @@
 import { FormEvent, useState } from "react";
 
-import {
-  AnyApiError,
-  ApiError,
-  CreateUserRequest,
-  isSuccess,
-  Role,
-  useCrud,
-  User,
-  USER_CREATE_REQUEST_PATH,
-} from "@/api";
+import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
+import { CreateUserRequest, Role, User, USER_CREATE_REQUEST_PATH } from "@/api/gen/openapi";
+import { useCrud } from "@/api/useCrud";
 import { Alert, Button, Form, FormLayout, InputField } from "@/components/ui";
 import { t } from "@/lib/i18n";
 

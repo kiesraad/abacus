@@ -1,6 +1,8 @@
 import { FormEvent, useState } from "react";
 
-import { AnyApiError, ApiError, isSuccess, UpdateUserRequest, useCrud, User, USER_UPDATE_REQUEST_PATH } from "@/api";
+import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
+import { UpdateUserRequest, User, USER_UPDATE_REQUEST_PATH } from "@/api/gen/openapi";
+import { useCrud } from "@/api/useCrud";
 import { Alert, Button, Form, FormLayout, InputField } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { IconPencil } from "@/lib/icon";

@@ -1,7 +1,8 @@
-import { Candidate } from "@/api";
+import { Candidate } from "@/api/gen/openapi";
 import { Table } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { cn, getCandidateFullName, getCandidateFullNameWithGender } from "@/lib/util";
+import { getCandidateFullName, getCandidateFullNameWithGender } from "@/lib/util/candidate";
+import { cn } from "@/lib/util/classnames";
 
 import cls from "./Apportionment.module.css";
 

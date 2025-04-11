@@ -1,17 +1,17 @@
 import { expect } from "@playwright/test";
+import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
+import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
+import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import {
-  CandidatesListPage,
-  CheckAndSavePage,
-  DataEntryHomePage,
   DifferencesPage,
   FewerBallotsFields,
   MoreBallotsFields,
-  RecountedPage,
-  VotersAndVotesPage,
-} from "e2e-tests/page-objects/data_entry";
+} from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
+import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 
-import { VotersCounts, VotesCounts } from "@kiesraad/api";
+import { VotersCounts, VotesCounts } from "@/api/gen/openapi";
 
 import { test } from "../fixtures";
 import {

@@ -1,7 +1,18 @@
 import { describe, expect, test } from "vitest";
 
-import { errorWarningMocks, getDefaultDataEntryState, getInitialValues } from "../testing/mock-data";
-import { formSectionComplete, getDataEntrySummary, getNextSectionID, resetFormSectionState } from "./dataEntryUtils";
+import {
+  errorWarningMocks,
+  getDefaultDataEntryState,
+  getDefaultFormSection,
+  getInitialValues,
+} from "../testing/mock-data";
+import {
+  formSectionComplete,
+  getDataEntrySummary,
+  getNextSectionID,
+  isFormSectionEmpty,
+  resetFormSectionState,
+} from "./dataEntryUtils";
 import { ValidationResultSet } from "./ValidationResults";
 
 describe("formSectionComplete", () => {
@@ -54,6 +65,84 @@ describe("getNextSectionID", () => {
     const nextSection = getNextSectionID(formState);
 
     expect(nextSection).toBe("voters_votes_counts");
+  });
+});
+
+describe("isFormSectionEmpty", () => {
+  test("political group form is empty", () => {
+    const section = getDefaultFormSection("political_group_votes_1", 0);
+    const values = getInitialValues();
+
+    expect(isFormSectionEmpty(section, values)).toBeTruthy();
+  });
+
+  test("political group form: total is not empty", () => {
+    const section = getDefaultFormSection("political_group_votes_1", 0);
+    const values = getInitialValues();
+    values.political_group_votes[0]!.total = 100;
+
+    expect(isFormSectionEmpty(section, values)).toBeFalsy();
+  });
+
+  test("political group formL: candidate votes is not empty", () => {
+    const section = getDefaultFormSection("political_group_votes_1", 0);
+    const values = getInitialValues();
+    values.political_group_votes[0]!.candidate_votes[0]!.votes = 100;
+
+    expect(isFormSectionEmpty(section, values)).toBeFalsy();
+  });
+
+  test("voters and votes form is empty", () => {
+    const section = getDefaultFormSection("political_group_votes_1", 0);
+    const values = getInitialValues();
+
+    expect(isFormSectionEmpty(section, values)).toBeTruthy();
+  });
+
+  test("voters and votes form: votes is not empty", () => {
+    const section = getDefaultFormSection("voters_votes_counts", 0);
+    const values = getInitialValues();
+    values.votes_counts.invalid_votes_count = 3;
+
+    expect(isFormSectionEmpty(section, values)).toBeFalsy();
+  });
+
+  test("voters and votes form: voters is not empty", () => {
+    const section = getDefaultFormSection("voters_votes_counts", 0);
+    const values = getInitialValues();
+    values.voters_counts.total_admitted_voters_count = 6;
+
+    expect(isFormSectionEmpty(section, values)).toBeFalsy();
+  });
+
+  test("differences form is empty", () => {
+    const section = getDefaultFormSection("differences_counts", 0);
+    const values = getInitialValues();
+
+    expect(isFormSectionEmpty(section, values)).toBeTruthy();
+  });
+
+  test("differences form is not empty", () => {
+    const section = getDefaultFormSection("differences_counts", 0);
+    const values = getInitialValues();
+    values.differences_counts.more_ballots_count = 5;
+
+    expect(isFormSectionEmpty(section, values)).toBeFalsy();
+  });
+
+  test("recounted form is empty", () => {
+    const section = getDefaultFormSection("recounted", 0);
+    const values = getInitialValues();
+
+    expect(isFormSectionEmpty(section, values)).toBeTruthy();
+  });
+
+  test("recounted form is not empty", () => {
+    const section = getDefaultFormSection("recounted", 0);
+    const values = getInitialValues();
+    values.recounted = false;
+
+    expect(isFormSectionEmpty(section, values)).toBeFalsy();
   });
 });
 

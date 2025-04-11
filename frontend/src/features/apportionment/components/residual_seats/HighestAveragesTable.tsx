@@ -53,7 +53,7 @@ export function HighestAveragesTable({
                 </Table.Cell>
                 {steps.map((step) => {
                   const average = step.standings[pgSeatAssignment.pg_number - 1]?.next_votes_per_seat;
-                  if (average) {
+                  if (!step.change.pg_exhausted.includes(pgSeatAssignment.pg_number) && average) {
                     return (
                       <Table.DisplayFractionCells
                         key={`${pgSeatAssignment.pg_number}-${step.residual_seat_number}`}

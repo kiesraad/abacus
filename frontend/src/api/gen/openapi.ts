@@ -528,6 +528,8 @@ export interface Fraction {
 export interface HighestAverageAssignedSeat {
   /** The list of political groups with the same average, that have been assigned a seat */
   pg_assigned: number[];
+  /** The list of political groups that are exhausted, and will not be assigned a seat */
+  pg_exhausted: number[];
   /** The list of political groups with the same average, that have not been assigned a seat */
   pg_options: number[];
   /** The political group that was selected for this seat has this political group number */

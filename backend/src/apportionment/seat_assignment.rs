@@ -251,6 +251,9 @@ pub struct HighestAverageAssignedSeat {
     /// The list of political groups with the same average, that have been assigned a seat
     #[schema(value_type = Vec<u32>)]
     pg_assigned: Vec<PGNumber>,
+    /// The list of political groups that are exhausted, and will not be assigned a seat
+    #[schema(value_type = Vec<u32>)]
+    pg_exhausted: Vec<PGNumber>,
     /// This is the votes per seat achieved by the selected political group
     votes_per_seat: Fraction,
 }
@@ -637,10 +640,13 @@ pub fn seat_assignment(
         totals,
     )?;
 
+    let final_full_seats = final_standing.iter().map(|pg| pg.full_seats).sum::<u32>();
+    let final_residual_seats = seats - final_full_seats;
+
     Ok(SeatAssignmentResult {
         seats,
-        full_seats,
-        residual_seats,
+        full_seats: final_full_seats,
+        residual_seats: final_residual_seats,
         quota,
         steps: final_steps,
         final_standing: final_standing.into_iter().map(Into::into).collect(),
@@ -778,6 +784,7 @@ fn step_assign_remainder_using_highest_averages<'a>(
                 },
             ),
             pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
+            pg_exhausted: exhausted_pg_numbers.to_vec(),
             votes_per_seat: selected_pg.next_votes_per_seat,
         };
         if unique {

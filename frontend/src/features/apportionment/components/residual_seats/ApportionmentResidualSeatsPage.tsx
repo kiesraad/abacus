@@ -62,8 +62,6 @@ export function ApportionmentResidualSeatsPage() {
     const absoluteMajorityReassignment = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
     const listExhaustionSteps = seatAssignment.steps.filter(isListExhaustionRemovalStep);
     const residualSeatRemovalSteps = listExhaustionSteps.filter((step) => !step.change.full_seat);
-    const numResidualSeats =
-      seatAssignment.residual_seats + listExhaustionSteps.length - residualSeatRemovalSteps.length;
     const assignmentStepsAfterListExhaustion = seatAssignment.steps.slice(-residualSeatRemovalSteps.length);
     const resultChanges: resultChange[] = [];
     if (absoluteMajorityReassignment) {
@@ -133,13 +131,13 @@ export function ApportionmentResidualSeatsPage() {
         {render_title_and_header(t("apportionment.details_residual_seats"))}
         <main>
           <article className={cls.article}>
-            {numResidualSeats > 0 ? (
+            {seatAssignment.residual_seats > 0 ? (
               <>
                 {seatAssignment.seats >= 19 ? (
                   <div className={cn(cls.tableDiv, "mb-lg")}>
                     <div>
                       <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
-                      {render_information(seatAssignment.seats, numResidualSeats)}
+                      {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
                       {highestAverageSteps.length > 0 && (
                         <HighestAveragesTable
                           steps={highestAverageSteps}
@@ -156,7 +154,7 @@ export function ApportionmentResidualSeatsPage() {
                     <div className={cn(cls.tableDiv, "mb-lg")}>
                       <div>
                         <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_remainders")}</h2>
-                        {render_information(seatAssignment.seats, numResidualSeats)}
+                        {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
                         {largestRemainderSteps.length > 0 && (
                           <LargestRemaindersTable
                             steps={largestRemainderSteps}
@@ -174,8 +172,8 @@ export function ApportionmentResidualSeatsPage() {
                           <h2 className={cls.tableTitle}>{t("apportionment.remaining_residual_seats_assignment")}</h2>
                           <span className={cls.tableInformation}>
                             {t(
-                              `apportionment.remaining_residual_seats_amount_and_information.${uniqueHighestAverageSteps.length === 1 ? "singular" : "plural_unique"}`,
-                              { num_seats: uniqueHighestAverageSteps.length },
+                              `apportionment.remaining_residual_seats_amount_and_information.${uniqueHighestAverageSteps.length + highestAverageSteps.length === 1 ? "singular" : "plural_unique"}`,
+                              { num_seats: uniqueHighestAverageSteps.length + highestAverageSteps.length },
                             )}
                           </span>
                           {

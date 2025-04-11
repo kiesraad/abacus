@@ -3092,6 +3092,7 @@
           "selected_pg_number",
           "pg_options",
           "pg_assigned",
+          "pg_exhausted",
           "votes_per_seat"
         ],
         "properties": {
@@ -3103,6 +3104,15 @@
               "minimum": 0
             },
             "description": "The list of political groups with the same average, that have been assigned a seat"
+          },
+          "pg_exhausted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The list of political groups that are exhausted, and will not be assigned a seat"
           },
           "pg_options": {
             "type": "array",

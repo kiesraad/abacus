@@ -41,7 +41,6 @@ export function ApportionmentFullSeatsPage() {
         decrease: 1,
       });
     });
-    const numResidualSeats = seatAssignment.residual_seats + fullSeatRemovalSteps.length;
     return (
       <>
         {render_title_and_header(t("apportionment.details_full_seats"))}
@@ -84,11 +83,11 @@ export function ApportionmentFullSeatsPage() {
                 <h2 className={cls.tableTitle}>{t("apportionment.how_many_residual_seats")}</h2>
                 <span className={cls.tableInformation}>
                   {tx(
-                    `apportionment.residual_seats_information_amount_and_link.${numResidualSeats === 1 ? "singular" : "plural"}`,
+                    `apportionment.residual_seats_information_amount_and_link.${seatAssignment.residual_seats === 1 ? "singular" : "plural"}`,
                     {
                       link: (title) => <Link to="../details-residual-seats">{title}</Link>,
                     },
-                    { num_residual_seats: numResidualSeats },
+                    { num_residual_seats: seatAssignment.residual_seats },
                   )}{" "}
                   {t(
                     `apportionment.residual_seats_information_${seatAssignment.seats >= 19 ? "highest_averages" : "largest_remainders"}`,
@@ -96,8 +95,8 @@ export function ApportionmentFullSeatsPage() {
                 </span>
                 <ResidualSeatsCalculationTable
                   seats={seatAssignment.seats}
-                  fullSeats={seatAssignment.full_seats - fullSeatRemovalSteps.length}
-                  residualSeats={numResidualSeats}
+                  fullSeats={seatAssignment.full_seats}
+                  residualSeats={seatAssignment.residual_seats}
                 />
               </div>
             </div>

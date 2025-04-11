@@ -326,6 +326,7 @@ export const highest_average_steps: UniqueHighestAverageAssignmentStep[] = [
       selected_pg_number: 1,
       pg_options: [1],
       pg_assigned: [1],
+      pg_exhausted: [],
       votes_per_seat: {
         integer: 67,
         numerator: 4,
@@ -478,6 +479,7 @@ export const highest_average_steps: UniqueHighestAverageAssignmentStep[] = [
       selected_pg_number: 3,
       pg_options: [3],
       pg_assigned: [3],
+      pg_exhausted: [],
       votes_per_seat: {
         integer: 58,
         numerator: 0,
@@ -630,6 +632,7 @@ export const highest_average_steps: UniqueHighestAverageAssignmentStep[] = [
       selected_pg_number: 4,
       pg_options: [4],
       pg_assigned: [4],
+      pg_exhausted: [],
       votes_per_seat: {
         integer: 57,
         numerator: 0,

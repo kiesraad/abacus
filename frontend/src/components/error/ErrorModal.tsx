@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 
 import { AnyApiError, ApiError } from "@/api/ApiResult";
+import { Button } from "@/components/ui/Button/Button";
+import { Modal } from "@/components/ui/Modal/Modal";
 
 import { t, TranslationPath } from "@kiesraad/i18n";
-import { Button, Modal } from "@kiesraad/ui";
 
 import cls from "./ErrorModal.module.css";
 

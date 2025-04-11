@@ -6,7 +6,7 @@ import { useElection } from "@/api/election/useElection";
 import { useElectionStatus } from "@/api/election/useElectionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Alert } from "@/components/ui";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { t } from "@/lib/i18n";
 
 import { DataEntryChoiceForm } from "./DataEntryChoiceForm";

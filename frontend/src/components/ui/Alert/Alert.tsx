@@ -1,13 +1,12 @@
 import * as React from "react";
 
+import { t } from "@/lib/i18n";
+import { IconCross } from "@/lib/icon";
 import { cn } from "@/lib/util/classnames";
 import { AlertType } from "@/types/ui";
 
-import { t } from "@kiesraad/i18n";
-import { IconCross } from "@kiesraad/icon";
-import { IconButton } from "@kiesraad/ui";
-
 import { AlertIcon } from "../Icon/AlertIcon";
+import { IconButton } from "../IconButton/IconButton";
 import cls from "./Alert.module.css";
 
 export interface AlertProps {

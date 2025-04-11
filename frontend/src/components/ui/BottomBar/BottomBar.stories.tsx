@@ -2,8 +2,8 @@ import type { Story } from "@ladle/react";
 
 import { KeyboardKey } from "@/types/ui";
 
-import { Button, KeyboardKeys } from "@kiesraad/ui";
-
+import { Button } from "../Button/Button";
+import { KeyboardKeys } from "../KeyboardKeys/KeyboardKeys";
 import { BottomBar } from "./BottomBar";
 
 export const BottomBarFooter: Story = () => {

@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
 
-import { NumberInput } from "@kiesraad/ui";
+import { NumberInput } from "./NumberInput";
 
 describe("UI Component: number input", () => {
   test("should render a number input", () => {

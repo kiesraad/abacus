@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
 
-import { PercentageAndColorClass, ProgressBar } from "@kiesraad/ui";
+import { PercentageAndColorClass, ProgressBar } from "../ProgressBar/ProgressBar";
 
 describe("UI Component: ProgressBar", () => {
   test("renders a progress bar with a title and percentage", () => {

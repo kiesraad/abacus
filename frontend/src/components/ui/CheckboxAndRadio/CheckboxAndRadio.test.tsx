@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
 
-import { Checkbox, Radio } from "@kiesraad/ui";
+import { Checkbox, Radio } from "./CheckboxAndRadio";
 
 describe("UI component: Checkbox", () => {
   test("The checkbox renders with label", () => {

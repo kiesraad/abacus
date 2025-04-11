@@ -2,7 +2,10 @@ import { FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Button, ChoiceList, Form, FormLayout } from "@/components/ui";
+import { Button } from "@/components/ui/Button/Button";
+import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
+import { Form } from "@/components/ui/Form/Form";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/lib/i18n";
 
 import { UserType } from "../../hooks/UserCreateContext";

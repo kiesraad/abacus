@@ -1,8 +1,8 @@
 import { Story } from "@ladle/react";
 
 import { IconPlus } from "@kiesraad/icon";
-import { Button } from "@kiesraad/ui";
 
+import { Button } from "../Button/Button";
 import { Toolbar, ToolbarSection } from "./Toolbar";
 
 type Props = {

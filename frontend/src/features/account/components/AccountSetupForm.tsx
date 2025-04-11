@@ -3,7 +3,12 @@ import { FormEvent, useState } from "react";
 import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
 import { ACCOUNT_UPDATE_REQUEST_PATH, AccountUpdateRequest, LoginResponse } from "@/api/gen/openapi";
 import { useCrud } from "@/api/useCrud";
-import { Alert, BottomBar, Button, Form, FormLayout, InputField } from "@/components/ui";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
+import { Button } from "@/components/ui/Button/Button";
+import { Form } from "@/components/ui/Form/Form";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
+import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/lib/i18n";
 
 type ValidationErrors = {

@@ -1,6 +1,8 @@
 import * as React from "react";
 
-import { FormField, InputGrid, NumberInput } from "@kiesraad/ui";
+import { FormField } from "../FormField/FormField";
+import { InputGrid } from "../InputGrid/InputGrid";
+import { NumberInput } from "../NumberInput/NumberInput";
 
 export interface InputGridRowProps {
   id: string;

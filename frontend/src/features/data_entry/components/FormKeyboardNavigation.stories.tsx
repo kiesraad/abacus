@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 
 import type { Story } from "@ladle/react";
 
-import { Form } from "@/components/ui";
+import { Form } from "@/components/ui/Form/Form";
 
 import { useFormKeyboardNavigation } from "../hooks/useFormKeyboardNavigation";
 

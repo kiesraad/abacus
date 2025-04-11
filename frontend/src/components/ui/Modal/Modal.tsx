@@ -2,8 +2,8 @@ import { ReactNode, useEffect, useRef } from "react";
 
 import { t } from "@kiesraad/i18n";
 import { IconCross } from "@kiesraad/icon";
-import { IconButton } from "@kiesraad/ui";
 
+import { IconButton } from "../IconButton/IconButton";
 import cls from "./Modal.module.css";
 
 export interface ModalProps {

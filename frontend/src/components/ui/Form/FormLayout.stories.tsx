@@ -1,7 +1,8 @@
 import type { Story } from "@ladle/react";
 
-import { Button, ChoiceList, InputField } from "@kiesraad/ui";
-
+import { Button } from "../Button/Button";
+import { ChoiceList } from "../CheckboxAndRadio/ChoiceList";
+import { InputField } from "../InputField/InputField";
 import { FormLayout } from "./FormLayout";
 
 export const DefaultFormLayout: Story = () => (

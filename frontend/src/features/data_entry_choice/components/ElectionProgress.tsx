@@ -2,7 +2,8 @@ import { useMemo } from "react";
 
 import { useElectionStatus } from "@/api/election/useElectionStatus";
 import { DataEntryStatusName } from "@/api/gen/openapi";
-import { Progress, ProgressBar } from "@/components/ui";
+import { Progress } from "@/components/ui/ProgressBar/Progress";
+import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { t } from "@/lib/i18n";
 
 type Stat = {

@@ -1,4 +1,6 @@
-import { Button, Checkbox, InputField } from "@/components/ui";
+import { Button } from "@/components/ui/Button/Button";
+import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
+import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/lib/i18n";
 import { IconCross } from "@/lib/icon";
 

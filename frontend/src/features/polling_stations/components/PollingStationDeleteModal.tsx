@@ -1,6 +1,7 @@
 import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
-import { Button, Modal } from "@/components/ui";
+import { Button } from "@/components/ui/Button/Button";
+import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/lib/i18n";
 
 export interface PollingStationDeleteModalProps {

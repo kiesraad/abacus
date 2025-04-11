@@ -3,8 +3,9 @@ import { Story } from "@ladle/react";
 import { Fraction } from "@/api/gen/openapi";
 
 import { IconCheckHeart } from "@kiesraad/icon";
-import { Badge, Icon } from "@kiesraad/ui";
 
+import { Badge } from "../Badge/Badge";
+import { Icon } from "../Icon/Icon";
 import { Table } from "./Table";
 
 const data: [number, string, string][] = [

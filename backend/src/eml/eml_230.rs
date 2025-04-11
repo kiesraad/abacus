@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     EMLBase, EMLDocument,
-    common::{ElectionIdentifier, ManagingAuthority},
+    common::{Candidate, ContestIdentifier, ElectionIdentifier, ManagingAuthority},
 };
 
 /// Candidate list (230b)
@@ -53,13 +53,6 @@ pub struct Contest {
     affiliations: Vec<Affiliation>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct ContestIdentifier {
-    #[serde(rename = "@Id")]
-    id: String,
-}
-
 /// Political group and their candidates
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -100,110 +93,6 @@ pub struct ListData {
     publication_language: String,
     #[serde(rename = "@PublishGender")]
     publish_gender: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct Candidate {
-    candidate_identifier: CandidateIdentifier,
-    candidate_full_name: CandidateFullName,
-    gender: Gender,
-    qualifying_address: QualifyingAddress,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct CandidateIdentifier {
-    #[serde(rename = "@Id")]
-    id: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct CandidateFullName {
-    #[serde(rename(serialize = "xnl:PersonName", deserialize = "PersonName"))]
-    person_name: PersonName,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct PersonName {
-    #[serde(rename(serialize = "xnl:NameLine", deserialize = "NameLine"))]
-    name_line: Option<NameLine>,
-    #[serde(rename(serialize = "xnl:FirstName", deserialize = "FirstName"))]
-    first_name: Option<String>,
-    #[serde(
-        rename(serialize = "xnl:NamePrefix", deserialize = "NamePrefix"),
-        skip_serializing_if = "Option::is_none",
-        default
-    )]
-    name_prefix: Option<String>,
-    #[serde(rename(serialize = "xnl:LastName", deserialize = "LastName"))]
-    last_name: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct NameLine {
-    #[serde(rename = "@NameType")]
-    name_type: String,
-    #[serde(rename = "$text")]
-    value: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum Gender {
-    Male,
-    Female,
-    Unknown,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct QualifyingAddress {
-    #[serde(rename = "$value")]
-    data: QualifyingAddressData,
-}
-
-impl QualifyingAddress {
-    #[cfg(test)]
-    pub fn locality_name(&self) -> &str {
-        match &self.data {
-            QualifyingAddressData::Locality(locality) => &locality.locality_name,
-            QualifyingAddressData::Country(country) => &country.locality.locality_name,
-        }
-    }
-
-    #[cfg(test)]
-    pub fn country_name_code(&self) -> Option<&str> {
-        match &self.data {
-            QualifyingAddressData::Locality(_) => None,
-            QualifyingAddressData::Country(country) => Some(&country.country_name_code),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub enum QualifyingAddressData {
-    #[serde(rename(serialize = "xal:Locality", deserialize = "Locality"))]
-    Locality(Locality),
-    #[serde(rename(serialize = "xal:Country", deserialize = "Country"))]
-    Country(Country),
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Country {
-    country_name_code: String,
-    locality: Locality,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct Locality {
-    #[serde(rename(serialize = "xal:LocalityName", deserialize = "LocalityName"))]
-    locality_name: String,
 }
 
 #[cfg(test)]

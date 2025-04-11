@@ -1,11 +1,11 @@
-import { within } from "@testing-library/dom";
-import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { Role, USER_CREATE_REQUEST_PATH } from "@/api";
-import { overrideOnce, render, server, spyOnHandler } from "@/testing";
-import { UserCreateRequestHandler, userMockData } from "@/testing/api-mocks";
+import { Role, USER_CREATE_REQUEST_PATH } from "@/api/gen/openapi";
+import { UserCreateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { userMockData } from "@/testing/api-mocks/UserMockData";
+import { overrideOnce, server } from "@/testing/server";
+import { render, screen, spyOnHandler, within } from "@/testing/test-utils";
 
 import { UserCreateDetailsForm } from "./UserCreateDetailsForm";
 

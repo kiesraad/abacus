@@ -1,11 +1,14 @@
 import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@/api";
+import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionApportionmentResponse, ErrorResponse } from "@/api/gen/openapi";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
-import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@/testing";
-import { getElectionMockData } from "@/testing/api-mocks";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { Providers } from "@/testing/Providers";
+import { overrideOnce } from "@/testing/server";
+import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
 
 import * as gte19Seats from "../../testing/19-or-more-seats";
 import * as absoluteMajorityChangeAndListExhaustion from "../../testing/absolute-majority-change-and-list-exhaustion";
@@ -163,10 +166,10 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
-      ["1", "Political Group A", "6", "189", "2/15", "0"],
+      ["1", "Political Group A", "5", "189", "2/15", "0"],
       ["2", "Political Group B", "2", "296", "7/15", "1"],
       ["3", "Political Group C", "1", "226", "11/15", "1"],
-      ["4", "Political Group D", "1", "195", "11/15", "1"],
+      ["4", "Political Group D", "1", "195", "11/15", "2"],
       ["5", "Political Group E", "1", "112", "11/15", "1"],
     ]);
 
@@ -180,7 +183,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(highest_averages_table).toBeVisible();
     expect(highest_averages_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Gemiddelde", "Aantal restzetels"],
-      ["1", "Political Group A", "6", "321", "3/8", "0"],
+      ["1", "Political Group A", "5", "321", "3/8", "0"],
       ["2", "Political Group B", "2", "244", "1/4", "1"],
       ["3", "Political Group C", "1", "189", "", "0"],
       ["4", "Political Group D", "1", "178", "2/3", "0"],
@@ -191,9 +194,12 @@ describe("ApportionmentResidualSeatsPage", () => {
       "Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaalt, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 4 omdat die de laatste restzetel toegewezen heeft gekregen.",
     );
     expect(await screen.findByTestId("list-exhaustion-step-1-information")).toHaveTextContent(
-      "Omdat lijst 1 geen kandidaat heeft voor een zetel, gaat deze zetel naar lijst 5. (Kieswet, artikel P 10 of P 13 eerste lid)",
+      "Omdat lijst 1 geen kandidaat heeft voor een zetel, gaat deze zetel naar lijst 4. (Kieswet, artikel P 10 of P 13 eerste lid)",
     );
     expect(await screen.findByTestId("list-exhaustion-step-2-information")).toHaveTextContent(
+      "Omdat lijst 1 geen kandidaat heeft voor een zetel, gaat deze zetel naar lijst 5.",
+    );
+    expect(await screen.findByTestId("list-exhaustion-step-3-information")).toHaveTextContent(
       "Omdat lijst 1 geen kandidaat heeft voor een zetel, gaat deze zetel naar lijst 2.",
     );
 

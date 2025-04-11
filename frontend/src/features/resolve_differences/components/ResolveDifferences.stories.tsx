@@ -1,6 +1,6 @@
 import { Story } from "@ladle/react";
 
-import { politicalGroupsMockData } from "@/testing/api-mocks";
+import { politicalGroupsMockData } from "@/testing/api-mocks/ElectionMockData";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";

@@ -11,7 +11,7 @@ use sqlx::{FromRow, types::Json};
 use std::ops::AddAssign;
 use utoipa::ToSchema;
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Default)]
+#[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]
 pub struct PollingStationDataEntry {
     pub polling_station_id: u32,
     #[schema(value_type = DataEntryStatus)]

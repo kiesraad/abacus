@@ -1,7 +1,6 @@
-import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { render } from "@kiesraad/test";
+import { render, screen } from "@/testing/test-utils";
 
 describe("Custom matchers", () => {
   describe("toHaveTableContent", () => {

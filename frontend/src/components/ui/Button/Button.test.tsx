@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { render, screen } from "@kiesraad/test";
+import { render, screen } from "@/testing/test-utils";
 
 import cls from "./Button.module.css";
 import { ButtonLinks, Buttons } from "./Button.stories";

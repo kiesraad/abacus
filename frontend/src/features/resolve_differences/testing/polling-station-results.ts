@@ -1,4 +1,4 @@
-import { PollingStationResults } from "@/api";
+import { PollingStationResults } from "@/api/gen/openapi";
 
 /**
  * Return PollingStationResults data for testing the resolve differences feature.

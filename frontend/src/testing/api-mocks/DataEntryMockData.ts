@@ -3,7 +3,7 @@ import type {
   PollingStationResults,
   SaveDataEntryResponse,
   ValidationResults,
-} from "@kiesraad/api";
+} from "@/api/gen/openapi";
 
 import { electionMockData } from "./ElectionMockData";
 

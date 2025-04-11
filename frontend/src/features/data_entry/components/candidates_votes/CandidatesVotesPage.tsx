@@ -1,8 +1,8 @@
 import { useParams } from "react-router";
 
-import { useElection } from "@/api";
+import { useElection } from "@/api/election/useElection";
 import { t } from "@/lib/i18n";
-import { parseIntStrict } from "@/lib/util";
+import { parseIntStrict } from "@/lib/util/strings";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 

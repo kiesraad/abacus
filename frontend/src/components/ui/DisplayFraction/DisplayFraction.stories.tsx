@@ -1,6 +1,6 @@
 import type { Story } from "@ladle/react";
 
-import { Fraction } from "@kiesraad/api";
+import { Fraction } from "@/api/gen/openapi";
 
 import { DisplayFraction } from "./DisplayFraction";
 

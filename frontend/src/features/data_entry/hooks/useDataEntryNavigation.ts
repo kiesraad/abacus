@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { Election } from "@/api";
+import { Election } from "@/api/gen/openapi";
 
 import { DataEntryDispatch, DataEntryState } from "../types/types";
 import { getBaseUrl, getUrlForFormSectionID } from "../utils/utils";

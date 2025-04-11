@@ -1,4 +1,4 @@
-import { ElectionStatus } from "@/api";
+import { ElectionStatus } from "@/api/gen/openapi";
 import { Icon } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { IconCheckHeart, IconCheckVerified } from "@/lib/icon";

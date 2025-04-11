@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router";
 
-import type { User } from "@/api";
+import { User } from "@/api/gen/openapi";
 import { PageTitle } from "@/components/ui";
 import { t } from "@/lib/i18n";
 

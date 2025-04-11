@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 
-import { fireEvent, render } from "@kiesraad/test";
+import { fireEvent, render } from "@/testing/test-utils";
 
 import { ClosableAlert, DefaultAlert } from "./Alert.stories";
 

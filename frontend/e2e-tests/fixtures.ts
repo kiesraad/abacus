@@ -15,7 +15,7 @@ import {
   User,
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PATH,
-} from "@kiesraad/api";
+} from "@/api/gen/openapi";
 
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import { loginAs } from "./setup";

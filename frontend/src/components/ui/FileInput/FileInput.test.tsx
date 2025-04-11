@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
-import { render, screen } from "@kiesraad/test";
+import { render, screen } from "@/testing/test-utils";
+
 import { FileInput } from "@kiesraad/ui";
 
 describe("UI Component: file input", () => {

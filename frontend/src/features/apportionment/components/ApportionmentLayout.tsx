@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
-import { useNumericParam } from "@/lib/util";
+import { useNumericParam } from "@/hooks/useNumericParam";
 
 import { ApportionmentProvider } from "./ApportionmentProvider";
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { render } from "@/testing";
+import { render } from "@/testing/test-utils";
 
 import { LoginPage } from "./LoginPage";
 

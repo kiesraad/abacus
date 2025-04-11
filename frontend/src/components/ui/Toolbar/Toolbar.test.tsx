@@ -1,7 +1,6 @@
-import { within } from "@testing-library/dom";
 import { describe, expect, test } from "vitest";
 
-import { render, screen } from "@kiesraad/test";
+import { render, screen, within } from "@/testing/test-utils";
 
 import { BasicToolbar } from "./Toolbar.stories";
 

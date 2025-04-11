@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
-import { AUDIT_LOG_LIST_REQUEST_PATH, AuditLogEvent, AuditLogListResponse, useInitialApiGet } from "@kiesraad/api";
+import { AUDIT_LOG_LIST_REQUEST_PATH, AuditLogEvent, AuditLogListResponse } from "@/api/gen/openapi";
+import { useInitialApiGet } from "@/api/useInitialApiGet";
 
 import { clearEmptySince, getLogFilterOptionsFromSearchParams, hasLogFilters } from "../utils/searchParamFilter";
 import { LogFilterName } from "./useLogFilterOptions";

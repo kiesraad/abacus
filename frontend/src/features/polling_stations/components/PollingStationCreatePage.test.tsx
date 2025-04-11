@@ -1,9 +1,9 @@
-import { screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { ElectionProvider } from "@/api";
-import { render, server } from "@/testing";
-import { ElectionRequestHandler } from "@/testing/api-mocks";
+import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { server } from "@/testing/server";
+import { render, screen } from "@/testing/test-utils";
 
 import { PollingStationCreatePage } from "./PollingStationCreatePage";
 

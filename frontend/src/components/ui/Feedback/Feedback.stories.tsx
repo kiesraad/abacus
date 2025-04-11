@@ -1,9 +1,8 @@
-import type { Story } from "@ladle/react";
+import { Story } from "@ladle/react";
 
 import { AlertType, FeedbackId } from "@/types/ui";
 
-import { ClientValidationResultCode } from "@kiesraad/ui";
-
+import { ClientValidationResultCode } from "../Feedback/Feedback.types";
 import { Feedback } from "./Feedback";
 
 type Props = {

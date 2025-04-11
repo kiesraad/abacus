@@ -1,7 +1,7 @@
 import { Error } from "@/components/error";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
-import { AppLayout } from "@/components/ui";
+import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
 import { t, TranslationPath, tx } from "@/lib/i18n";
 
 export interface NotFoundPageProps {

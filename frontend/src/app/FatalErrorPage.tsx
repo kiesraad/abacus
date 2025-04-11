@@ -2,7 +2,7 @@ import { ErrorReference } from "@/api/gen/openapi";
 import { Error } from "@/components/error";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
-import { AppLayout } from "@/components/ui";
+import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
 import { t, tx } from "@/lib/i18n";
 import { isDevelopment } from "@/lib/util/env";
 

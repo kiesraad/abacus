@@ -3,7 +3,12 @@ import * as React from "react";
 import { isSuccess } from "@/api/ApiResult";
 import { PollingStation, PollingStationRequest } from "@/api/gen/openapi";
 import { useCrud } from "@/api/useCrud";
-import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@/components/ui";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
+import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
+import { Form } from "@/components/ui/Form/Form";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
+import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/lib/i18n";
 
 import { useForm } from "../hooks/useForm";

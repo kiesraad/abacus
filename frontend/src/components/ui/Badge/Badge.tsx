@@ -5,7 +5,7 @@ import { type DataEntryStatusName } from "@/api/gen/openapi";
 import { t } from "@kiesraad/i18n";
 import { IconPencil } from "@kiesraad/icon";
 
-import { Icon } from "../Icon";
+import { Icon } from "../Icon/Icon";
 import cls from "./Badge.module.css";
 
 const typeToLabel: { [S in DataEntryStatusName]: { label: string; icon?: ReactElement } } = {

@@ -15,7 +15,7 @@ import { ElectionProgress } from "./ElectionProgress";
 export function DataEntryChoicePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { election } = useElection();
+  const { election, pollingStations } = useElection();
   const { statuses, refetch } = useElectionStatus();
 
   // re-fetch statuses when component mounts
@@ -31,9 +31,21 @@ export function DataEntryChoicePage() {
 
   const showFirstDataEntrySavedAlert = location.hash === "#data-entry-saved-1";
   const showSecondDataEntrySavedAlert = location.hash === "#data-entry-saved-2";
+  const showDataEntryClaimedAlert = location.hash.startsWith("#data-entry-claimed-") ? location.hash : null;
+
+  let claimedPollingStationNumber = 0;
+  if (showDataEntryClaimedAlert) {
+    const id = parseInt(showDataEntryClaimedAlert.substring(showDataEntryClaimedAlert.lastIndexOf("-") + 1));
+    claimedPollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
+  }
+
   const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
 
   function closeDataEntrySavedAlert() {
+    void navigate(location.pathname);
+  }
+
+  function closeDataEntryClaimedAlert() {
     void navigate(location.pathname);
   }
 
@@ -59,6 +71,18 @@ export function DataEntryChoicePage() {
           </p>
         </Alert>
       )}
+
+      {claimedPollingStationNumber && (
+        <Alert type="warning" onClose={closeDataEntryClaimedAlert}>
+          <h2>
+            {t("data_entry.warning.data_entry_not_possible", {
+              nr: claimedPollingStationNumber,
+            })}
+          </h2>
+          <p>{t("data_entry.warning.data_entry_already_claimed")}</p>
+        </Alert>
+      )}
+
       {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
           <h2>{t("data_entry.completed.all_entries_completed")}</h2>

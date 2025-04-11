@@ -2,8 +2,8 @@ import { CandidateNominationResult, Election, ElectionSummary, SeatAssignmentRes
 
 export const seat_assignment: SeatAssignmentResult = {
   seats: 15,
-  full_seats: 12,
-  residual_seats: 3,
+  full_seats: 10,
+  residual_seats: 5,
   quota: {
     integer: 340,
     numerator: 4,
@@ -411,6 +411,7 @@ export const seat_assignment: SeatAssignmentResult = {
       change: {
         changed_by: "ListExhaustionRemoval",
         pg_retracted_seat: 1,
+        full_seat: false,
       },
       standings: [
         {
@@ -504,6 +505,7 @@ export const seat_assignment: SeatAssignmentResult = {
       change: {
         changed_by: "ListExhaustionRemoval",
         pg_retracted_seat: 1,
+        full_seat: true,
       },
       standings: [
         {
@@ -597,6 +599,7 @@ export const seat_assignment: SeatAssignmentResult = {
       change: {
         changed_by: "ListExhaustionRemoval",
         pg_retracted_seat: 1,
+        full_seat: true,
       },
       standings: [
         {
@@ -891,10 +894,11 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       residual_seat_number: 6,
       change: {
-        changed_by: "HighestAverageAssignment",
+        changed_by: "UniqueHighestAverageAssignment",
         selected_pg_number: 2,
         pg_options: [2],
         pg_assigned: [2],
+        pg_exhausted: [1, 3, 4, 5],
         votes_per_seat: {
           integer: 244,
           numerator: 1,

@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
 
-import { election, seat_assignment } from "../../testing/19-or-more-seats";
+import { election, seat_assignment } from "../../testing/gte-19-seats";
 import { FullSeatsTable } from "./FullSeatsTable";
 
 describe("FullSeatsTable", () => {
@@ -12,6 +12,7 @@ describe("FullSeatsTable", () => {
         finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups!}
         quota={seat_assignment.quota}
+        resultChanges={[]}
       />,
     );
 

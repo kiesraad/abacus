@@ -17,6 +17,7 @@ export const seat_assignment: SeatAssignmentResult = {
         selected_pg_number: 5,
         pg_options: [5],
         pg_assigned: [5],
+        pg_exhausted: [],
         votes_per_seat: {
           integer: 50,
           numerator: 1,
@@ -118,6 +119,7 @@ export const seat_assignment: SeatAssignmentResult = {
         selected_pg_number: 2,
         pg_options: [2],
         pg_assigned: [2],
+        pg_exhausted: [],
         votes_per_seat: {
           integer: 50,
           numerator: 2,
@@ -219,6 +221,7 @@ export const seat_assignment: SeatAssignmentResult = {
         selected_pg_number: 1,
         pg_options: [1],
         pg_assigned: [1],
+        pg_exhausted: [],
         votes_per_seat: {
           integer: 50,
           numerator: 0,
@@ -320,6 +323,7 @@ export const seat_assignment: SeatAssignmentResult = {
         selected_pg_number: 4,
         pg_options: [4],
         pg_assigned: [4],
+        pg_exhausted: [],
         votes_per_seat: {
           integer: 49,
           numerator: 1,

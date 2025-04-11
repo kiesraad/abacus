@@ -12,11 +12,11 @@ import {
   Form,
   InputGrid,
   InputGridRow,
-  KeyboardKey,
   KeyboardKeys,
 } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { getCandidateFullName } from "@/lib/util/candidate";
+import { KeyboardKey } from "@/types/ui";
 
 import { DataEntryNavigation } from "../DataEntryNavigation";
 import { formValuesToValues } from "./candidatesVotesValues";

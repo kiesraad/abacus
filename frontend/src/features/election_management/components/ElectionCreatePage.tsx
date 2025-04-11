@@ -2,7 +2,8 @@ import { useLocation } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
-import { FileInput, PageTitle, ProgressList, StickyNav } from "@/components/ui";
+import { PageTitle } from "@/components/page_title/PageTitle";
+import { FileInput, ProgressList, StickyNav } from "@/components/ui";
 
 import { t } from "@kiesraad/i18n";
 

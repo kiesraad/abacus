@@ -4,11 +4,12 @@ import { Navigate, useNavigate } from "react-router";
 import { useElection } from "@/api/election/useElection";
 import { useElectionStatus } from "@/api/election/useElectionStatus";
 import { useUser } from "@/api/useUser";
-import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@/components/ui";
+import { Alert, BottomBar, Button, Icon, KeyboardKeys } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 import { IconError } from "@/lib/icon";
 import { cn } from "@/lib/util/classnames";
 import { parseIntUserInput } from "@/lib/util/strings";
+import { KeyboardKey } from "@/types/ui";
 
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import {

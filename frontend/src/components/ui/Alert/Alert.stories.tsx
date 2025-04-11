@@ -1,6 +1,6 @@
 import type { Story } from "@ladle/react";
 
-import { AlertType } from "@kiesraad/ui";
+import { AlertType } from "@/types/ui";
 
 import { Alert } from "./Alert";
 

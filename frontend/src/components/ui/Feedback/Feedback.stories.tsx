@@ -1,6 +1,8 @@
 import type { Story } from "@ladle/react";
 
-import { AlertType, ClientValidationResultCode, FeedbackId } from "@kiesraad/ui";
+import { AlertType, FeedbackId } from "@/types/ui";
+
+import { ClientValidationResultCode } from "@kiesraad/ui";
 
 import { Feedback } from "./Feedback";
 

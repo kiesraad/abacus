@@ -60,8 +60,8 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
     expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
     expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
   });
 
@@ -230,8 +230,8 @@ describe("ApportionmentResidualSeatsPage", () => {
     ]);
 
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
     expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
     expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
   });
 
@@ -266,8 +266,8 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
     expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
     expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
   });
 
@@ -293,10 +293,10 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
-      ["1", "Political Group A", "2 5", "189", "2/15", "1 , 3 0"],
+      ["1", "Political Group A", "1 5", "189", "2/15", "2 , 3 0"],
       ["2", "Political Group B", "2", "296", "7/15", "1"],
       ["3", "Political Group C", "1", "226", "11/15", "1"],
-      ["4", "Political Group D", "1", "195", "11/15", "1 1"],
+      ["4", "Political Group D", "1", "195", "11/15", "2 1"],
       ["5", "Political Group E", "1", "112", "11/15", "1"],
     ]);
 
@@ -313,15 +313,16 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["2", "Political Group B", "2", "244", "1/4", "1"],
     ]);
 
-    expect(await screen.findByTestId("1-absolute-majority-reassignment-information")).toHaveTextContent(
-      "1 Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 4 omdat die de laatste restzetel toegewezen heeft gekregen.",
+    expect(await screen.findByTestId("1-full-seat-list-exhaustion-information")).toHaveTextContent(
+      "1 Het overschot is berekend op basis van de 7 volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen (Kieswet, artikel P 8).",
     );
-    expect(await screen.findByTestId("2-full-seat-list-exhaustion-information")).toHaveTextContent(
-      "2 Het overschot is berekend op basis van de 7 volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen (Kieswet, artikel P 8).",
+    expect(await screen.findByTestId("2-absolute-majority-reassignment-information")).toHaveTextContent(
+      "2 Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 4 omdat die de laatste restzetel toegewezen heeft gekregen.",
     );
     expect(await screen.findByTestId("3-residual-seat-list-exhaustion-information")).toHaveTextContent(
       "3 Omdat lijst 1 geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst. (Kieswet, artikel P 10 of P 13 eerste lid)",
     );
+
     expect(screen.queryByTestId("4-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
   });
@@ -381,6 +382,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(await screen.findByTestId("2-residual-seat-list-exhaustion-information")).toHaveTextContent(
       "2 Omdat lijst 3 geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst. (Kieswet, artikel P 10 of P 13 eerste lid)",
     );
+
     expect(screen.queryByTestId("3-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
   });
 
@@ -406,8 +408,8 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
       expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
       expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
     });
 
@@ -432,8 +434,8 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
       expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
       expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
     });
 
@@ -460,8 +462,8 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
       expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
       expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
     });
 
@@ -488,8 +490,8 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
       expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
       expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
     });
 

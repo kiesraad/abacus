@@ -75,22 +75,9 @@ export function ApportionmentResidualSeatsPage() {
     );
 
     function render_footnotes() {
-      let footnoteNumber = absoluteMajorityReassignment ? 1 : 0;
+      let footnoteNumber = 0;
       return (
         <div className={cls.footnoteDiv}>
-          {absoluteMajorityReassignment && (
-            <div className="w-39">
-              <span id="1-absolute-majority-reassignment-information">
-                <sup id="footnote-1" className={cls.footnoteNumber}>
-                  {footnoteNumber}
-                </sup>{" "}
-                {t("apportionment.absolute_majority_reassignment", {
-                  pg_assigned_seat: absoluteMajorityReassignment.change.pg_assigned_seat,
-                  pg_retracted_seat: absoluteMajorityReassignment.change.pg_retracted_seat,
-                })}
-              </span>
-            </div>
-          )}
           {uniquePgNumbersWithFullSeatsRemoved.map((pgNumber) => {
             footnoteNumber += 1;
             return (
@@ -106,6 +93,19 @@ export function ApportionmentResidualSeatsPage() {
               </div>
             );
           })}
+          {absoluteMajorityReassignment && (
+            <div className="w-39">
+              <span id={`${(footnoteNumber += 1)}-absolute-majority-reassignment-information`}>
+                <sup id="footnote-1" className={cls.footnoteNumber}>
+                  {footnoteNumber}
+                </sup>{" "}
+                {t("apportionment.absolute_majority_reassignment", {
+                  pg_assigned_seat: absoluteMajorityReassignment.change.pg_assigned_seat,
+                  pg_retracted_seat: absoluteMajorityReassignment.change.pg_retracted_seat,
+                })}
+              </span>
+            </div>
+          )}
           {residualSeatRemovalSteps.map((pgSeatRemoval, index) => {
             footnoteNumber += 1;
             return (

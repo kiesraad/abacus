@@ -24,8 +24,19 @@ export function getResultChanges(
   residualSeatRemovalSteps: ListExhaustionRemovalStep[],
 ) {
   const resultChanges: resultChange[] = [];
-  let footnoteNumber = absoluteMajorityReassignment ? 1 : 0;
+  let footnoteNumber = 0;
+  uniquePgNumbersWithFullSeatsRemoved.forEach((pgNumber) => {
+    footnoteNumber += 1;
+    resultChanges.push({
+      pgNumber: pgNumber,
+      footnoteNumber: footnoteNumber,
+      increase: 0,
+      decrease: 1,
+      type: "full_seat",
+    });
+  });
   if (absoluteMajorityReassignment) {
+    footnoteNumber += 1;
     resultChanges.push({
       pgNumber: absoluteMajorityReassignment.change.pg_assigned_seat,
       footnoteNumber: footnoteNumber,
@@ -41,16 +52,6 @@ export function getResultChanges(
       type: "residual_seat",
     });
   }
-  uniquePgNumbersWithFullSeatsRemoved.forEach((pgNumber) => {
-    footnoteNumber += 1;
-    resultChanges.push({
-      pgNumber: pgNumber,
-      footnoteNumber: footnoteNumber,
-      increase: 0,
-      decrease: 1,
-      type: "full_seat",
-    });
-  });
   residualSeatRemovalSteps.forEach((step) => {
     footnoteNumber += 1;
     resultChanges.push({

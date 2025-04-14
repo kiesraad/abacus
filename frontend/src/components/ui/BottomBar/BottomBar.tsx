@@ -1,16 +1,16 @@
 import * as React from "react";
 
-import { cn } from "@kiesraad/util";
+import { cn } from "@/lib/util/classnames";
 
 import cls from "./BottomBar.module.css";
 
 export interface BottomBarProps {
-  type: "footer" | "form" | "input-grid";
+  type: "footer" | "form" | "inputGrid";
   children: React.ReactNode;
 }
 
 export function BottomBar({ type, children }: BottomBarProps) {
-  return <div className={cn(cls["bottom-bar"], cls[type])}>{children}</div>;
+  return <div className={cn(cls.bottomBar, cls[type])}>{children}</div>;
 }
 
 BottomBar.Row = function BottomBarRow({ children, hidden }: { children: React.ReactNode; hidden?: boolean }) {

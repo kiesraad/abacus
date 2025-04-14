@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { ButtonVariant, Size } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
+import { cn } from "@/lib/util/classnames";
+import { ButtonVariant, Size } from "@/types/ui";
 
 import cls from "./IconButton.module.css";
 
@@ -27,7 +27,7 @@ export function IconButton({
 }: IconButtonProps) {
   return (
     <button
-      className={cn(cls["iconbutton"], cls[variant], cls[size], {
+      className={cn(cls.iconButton, cls[variant], cls[size], {
         round: isRound,
       })}
       title={title}

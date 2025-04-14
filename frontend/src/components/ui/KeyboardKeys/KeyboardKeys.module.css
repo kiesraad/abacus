@@ -1,4 +1,4 @@
-.keyboard-keys {
+.keyboardKeys {
   display: flex;
   gap: 0.25rem;
 
@@ -23,7 +23,7 @@
   }
 }
 
-.keyboard-keys-hint-text {
+.keyboardKeysHintText {
   display: flex;
   align-items: center;
   gap: 1rem;

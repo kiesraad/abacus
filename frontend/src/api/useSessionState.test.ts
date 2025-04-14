@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { WhoAmIRequestHandler } from "@kiesraad/api-mocks";
-import { overrideOnce, renderHook, server, waitFor } from "@kiesraad/test";
+import { WhoAmIRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { overrideOnce, server } from "@/testing/server";
+import { renderHook, waitFor } from "@/testing/test-utils";
 
 import { ApiClient } from "./ApiClient";
 import useSessionState from "./useSessionState";

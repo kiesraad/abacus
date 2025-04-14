@@ -1,8 +1,9 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { Role } from "@/api";
-import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@/components/ui";
+import { Role } from "@/api/gen/openapi";
+import { PageTitle } from "@/components/page_title/PageTitle";
+import { Button, ChoiceList, Form, FormLayout } from "@/components/ui";
 import { t } from "@/lib/i18n";
 
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";

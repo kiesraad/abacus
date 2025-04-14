@@ -3,7 +3,9 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     EMLBase,
-    common::{EMLImportError, ElectionCategory, ElectionIdentifier, ManagingAuthority},
+    common::{
+        ContestIdentifier, EMLImportError, ElectionCategory, ElectionIdentifier, ManagingAuthority,
+    },
 };
 
 /// Election definition (110a and 110b)
@@ -202,15 +204,6 @@ pub struct LocalityName {
     locality_type: Option<String>,
     #[serde(rename = "@Code", skip_serializing_if = "Option::is_none", default)]
     code: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct ContestIdentifier {
-    // According to the spec this should always be 'geen', but this isn't always
-    // the case in external files
-    #[serde(rename = "@Id")]
-    id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]

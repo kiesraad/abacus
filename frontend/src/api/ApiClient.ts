@@ -1,8 +1,8 @@
-import { ApiResult, type ErrorResponse } from "@kiesraad/api";
 import { TranslationPath } from "@kiesraad/i18n";
 
 import { ApiErrorEvent, SessionExpirationEvent } from "./ApiEvents";
-import { ApiError, ApiResponseStatus, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
+import { ApiError, ApiResponseStatus, ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
+import { ErrorResponse } from "./gen/openapi";
 
 const MIME_JSON = "application/json";
 const HEADER_ACCEPT = "Accept";
@@ -123,7 +123,7 @@ export class ApiClient extends EventTarget {
   }
 
   // handle a response without a body, and return an error when there is a non-2xx status or a non-empty body
-  async handleEmptyBody<T>(response: Response): Promise<ApiResult<T>> {
+  async handleEmptyOrNonJsonBody<T>(response: Response): Promise<ApiResult<T>> {
     const body = await response.text();
 
     if (response.status === 404) {
@@ -185,7 +185,7 @@ export class ApiClient extends EventTarget {
       // handle the response, and return an error when state there is a non-2xx status
       const apiResult: ApiResult<T> = isJson
         ? await this.handleJsonBody<T>(response)
-        : await this.handleEmptyBody(response);
+        : await this.handleEmptyOrNonJsonBody(response);
 
       // dispatch error events to subscribers
       if (apiResult instanceof ApiError) {

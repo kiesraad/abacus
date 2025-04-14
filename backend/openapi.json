@@ -979,6 +979,90 @@
         }
       }
     },
+    "/api/polling_stations/{polling_station_id}/data_entries/resolve": {
+      "post": {
+        "summary": "Resolve data entry differences by providing a `ResolveAction`",
+        "operationId": "polling_station_data_entry_resolve",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveAction"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Differences resolved successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "JSON error or invalid data (Unprocessable Content)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
         "summary": "Save a data entry for a polling station",
@@ -2098,6 +2182,69 @@
                     "type": "string",
                     "enum": [
                       "DataEntryFinalized"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataEntryDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "DataEntryKeptFirst"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataEntryDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "DataEntryKeptSecond"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataEntryDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "DataEntryDiscardedBoth"
                     ]
                   }
                 }
@@ -3556,6 +3703,14 @@
             "minimum": 0
           }
         }
+      },
+      "ResolveAction": {
+        "type": "string",
+        "enum": [
+          "keep_first_entry",
+          "keep_second_entry",
+          "discard_both_entries"
+        ]
       },
       "Role": {
         "type": "string",

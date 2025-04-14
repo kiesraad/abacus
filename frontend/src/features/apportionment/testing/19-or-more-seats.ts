@@ -1,4 +1,4 @@
-import { CandidateNominationResult, Election, ElectionSummary, SeatAssignmentResult } from "@/api";
+import { CandidateNominationResult, Election, ElectionSummary, SeatAssignmentResult } from "@/api/gen/openapi";
 
 export const seat_assignment: SeatAssignmentResult = {
   seats: 23,

@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { ValidationResultCode } from "@kiesraad/api";
+import { ValidationResultCode } from "@/api/gen/openapi";
 
 export type ClientValidationResultCode = "F101" | ValidationResultCode;
 

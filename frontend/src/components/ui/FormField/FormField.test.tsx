@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { render, within } from "@kiesraad/test";
+import { render, within } from "@/testing/test-utils";
 
 import { DefaultFormField } from "./FormField.stories";
 

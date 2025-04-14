@@ -1,8 +1,9 @@
 import * as React from "react";
 
+import { cn } from "@/lib/util/classnames";
+import { KeyboardKey } from "@/types/ui";
+
 import { IconArrowBlockUp, IconArrowNarrowDown, IconArrowNarrowUp, IconCornerDownLeft } from "@kiesraad/icon";
-import { KeyboardKey } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
 
 import cls from "./KeyboardKeys.module.css";
 
@@ -44,11 +45,9 @@ function renderKey(keyboardKey: KeyboardKey, index: number): React.JSX.Element {
 }
 
 export function KeyboardKeys({ keys }: KeyboardKeysProps) {
-  return (
-    <div className={cn(cls["keyboard-keys"])}>{keys.map((keyboardKey, index) => renderKey(keyboardKey, index))}</div>
-  );
+  return <div className={cn(cls.keyboardKeys)}>{keys.map((keyboardKey, index) => renderKey(keyboardKey, index))}</div>;
 }
 
 KeyboardKeys.HintText = function KeyboardKeysHintText({ children }: { children: React.ReactNode }) {
-  return <div className={cls["keyboard-keys-hint-text"]}>{children}</div>;
+  return <div className={cls.keyboardKeysHintText}>{children}</div>;
 };

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
-import { PoliticalGroup } from "@/api";
-import { render, screen } from "@/testing";
+import { PoliticalGroup } from "@/api/gen/openapi";
+import { render, screen } from "@/testing/test-utils";
 
 import { election, largest_remainder_steps, seat_assignment } from "../../testing/less-than-19-seats";
 import { LargestRemaindersTable } from "./LargestRemaindersTable";

@@ -1,8 +1,7 @@
-import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { render } from "@/testing";
+import { render, screen } from "@/testing/test-utils";
 
 import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
 import { UserCreateRolePage } from "./UserCreateRolePage";

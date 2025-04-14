@@ -1,9 +1,9 @@
-import { Fragment } from "react/jsx-runtime";
+import { Fragment } from "react";
 
-import { AuditLogEvent } from "@kiesraad/api";
-import { hasTranslation, t, TranslationPath } from "@kiesraad/i18n";
-import { Modal } from "@kiesraad/ui";
-import { formatDateTimeFull } from "@kiesraad/util";
+import { AuditLogEvent } from "@/api/gen/openapi";
+import { Modal } from "@/components/ui";
+import { hasTranslation, t, TranslationPath } from "@/lib/i18n";
+import { formatDateTimeFull } from "@/lib/util/format";
 
 import cls from "./LogsHomePage.module.css";
 

@@ -87,6 +87,13 @@ export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PARAMS = Record<string, never>;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PATH = `/api/log-users`;
 
+// /api/polling_stations/{polling_station_id}/data_entries/resolve
+export interface POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/resolve`;
+export type POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY = ResolveAction;
+
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;
@@ -191,6 +198,9 @@ export type AuditEvent =
   | (DataEntryDetails & { eventType: "DataEntrySaved" })
   | (DataEntryDetails & { eventType: "DataEntryDeleted" })
   | (DataEntryDetails & { eventType: "DataEntryFinalized" })
+  | (DataEntryDetails & { eventType: "DataEntryKeptFirst" })
+  | (DataEntryDetails & { eventType: "DataEntryKeptSecond" })
+  | (DataEntryDetails & { eventType: "DataEntryDiscardedBoth" })
   | (ErrorDetails & { eventType: "Error" })
   | { eventType: "UnknownEvent" };
 
@@ -725,6 +735,8 @@ export interface PreferenceThreshold {
   /** Preference threshold as a percentage (0 to 100) */
   percentage: number;
 }
+
+export type ResolveAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
 
 export type Role = "administrator" | "typist" | "coordinator";
 

@@ -1,4 +1,4 @@
-import { Election, ElectionDetailsResponse, ElectionListResponse, PoliticalGroup } from "@/api";
+import { Election, ElectionDetailsResponse, ElectionListResponse, PoliticalGroup } from "@/api/gen/openapi";
 
 import { pollingStationMockData } from "./PollingStationMockData";
 

@@ -1,8 +1,8 @@
 import type { Story } from "@ladle/react";
 
-import { userMockData } from "@/testing/api-mocks";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
+import { userMockData } from "@/testing/api-mocks/UserMockData";
 
 import { ElectionStatus } from "./ElectionStatus";
 

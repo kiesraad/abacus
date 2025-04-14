@@ -1,6 +1,6 @@
 import type { Story } from "@ladle/react";
 
-import { AlertType } from "@kiesraad/ui";
+import { AlertType } from "@/types/ui";
 
 import { Alert } from "./Alert";
 
@@ -27,6 +27,36 @@ export const ClosableAlert: Story<Props> = ({ type, title, text, onClose }) => (
 
 export const SmallAlert: Story<Props> = ({ type, text }) => (
   <Alert type={type} variant="small">
+    <p>{text}</p>
+  </Alert>
+);
+
+export const NoIconAlert: Story<Props> = ({ type, text }) => (
+  <Alert type={type} variant="no-icon">
+    <p>{text}</p>
+  </Alert>
+);
+
+export const InlineAlert: Story<Props> = ({ type, title, text }) => (
+  <Alert type={type} inline title={title}>
+    <p>{text}</p>
+  </Alert>
+);
+
+export const InlineSmall: Story<Props> = ({ type, title, text }) => (
+  <Alert type={type} inline variant="small" title={title}>
+    <p>{text}</p>
+  </Alert>
+);
+
+export const InlineClosableAlert: Story<Props> = ({ type, title, text, onClose }) => (
+  <Alert type={type} inline title={title} onClose={onClose}>
+    <p>{text}</p>
+  </Alert>
+);
+
+export const InlineNoIconAlert: Story<Props> = ({ type, title, text }) => (
+  <Alert type={type} inline variant="no-icon" title={title}>
     <p>{text}</p>
   </Alert>
 );

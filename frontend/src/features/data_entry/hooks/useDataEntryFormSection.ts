@@ -1,12 +1,12 @@
 import * as React from "react";
 
-import { PollingStationResults } from "@/api";
-import { useFormKeyboardNavigation } from "@/components/ui";
+import { PollingStationResults } from "@/api/gen/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { SubmitCurrentFormOptions, TemporaryCache } from "../types/types";
 import { mapValidationResultsToFields } from "../utils/ValidationResults";
 import { useDataEntryContext } from "./useDataEntryContext";
+import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
 export interface UseDataEntryFormSectionParams<FORM_VALUES> {
   getDefaultFormValues: (results: PollingStationResults, cache?: TemporaryCache | null) => FORM_VALUES;
@@ -51,8 +51,7 @@ export function useDataEntryFormSection<FORM_VALUES>({
   };
 
   // form keyboard navigation
-  const formRef = React.useRef<HTMLFormElement>(null);
-  useFormKeyboardNavigation(formRef);
+  const formRef = useFormKeyboardNavigation();
 
   // submit and save to form contents
   const onSubmit = async (

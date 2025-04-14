@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { renderHook } from "@kiesraad/test";
+import { renderHook } from "@/testing/test-utils";
 
 import { useDebouncedCallback } from "./useDebouncedCallback";
 

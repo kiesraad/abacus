@@ -1,21 +1,20 @@
-import { within } from "@testing-library/dom";
-import { screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionProvider, PollingStation } from "@/api";
-import { overrideOnce, render, renderReturningRouter, server, spyOnHandler } from "@/testing";
+import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { PollingStation } from "@/api/gen/openapi";
 import {
   ElectionRequestHandler,
   PollingStationDeleteHandler,
   PollingStationGetHandler,
   PollingStationUpdateHandler,
-} from "@/testing/api-mocks";
+} from "@/testing/api-mocks/RequestHandlers";
+import { overrideOnce, server } from "@/testing/server";
+import { render, renderReturningRouter, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
-vi.mock(import("@/lib/util"), async (importOriginal) => ({
-  ...(await importOriginal()),
+vi.mock(import("@/hooks/useNumericParam"), () => ({
   useNumericParam: () => 1,
 }));
 

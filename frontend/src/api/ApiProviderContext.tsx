@@ -1,6 +1,8 @@
 import { createContext } from "react";
 
-import type { ApiClient, ApiResult, LoginResponse } from "@kiesraad/api";
+import { ApiClient } from "./ApiClient";
+import { ApiResult } from "./ApiResult";
+import { LoginResponse } from "./gen/openapi";
 
 export interface ApiState {
   client: ApiClient;

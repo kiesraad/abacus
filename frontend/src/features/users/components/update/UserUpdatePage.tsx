@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, ApiError, useInitialApiGet, User, USER_GET_REQUEST_PATH } from "@/api";
-import { Alert, FormLayout, Loader, PageTitle } from "@/components/ui";
+import { AnyApiError, ApiError } from "@/api/ApiResult";
+import { User, USER_GET_REQUEST_PATH } from "@/api/gen/openapi";
+import { useInitialApiGet } from "@/api/useInitialApiGet";
+import { PageTitle } from "@/components/page_title/PageTitle";
+import { Alert, FormLayout, Loader } from "@/components/ui";
+import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";
-import { useNumericParam } from "@/lib/util";
 
 import { UserDelete } from "./UserDelete";
 import { UserUpdateForm } from "./UserUpdateForm";

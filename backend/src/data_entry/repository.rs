@@ -75,9 +75,10 @@ impl PollingStationDataEntries {
         &self,
         polling_station_id: u32,
         state: &DataEntryStatus,
-    ) -> Result<(), sqlx::Error> {
+    ) -> Result<PollingStationDataEntry, sqlx::Error> {
         let state = Json(state);
-        sqlx::query!(
+        query_as!(
+            PollingStationDataEntry,
             r#"
                 INSERT INTO polling_station_data_entries (polling_station_id, state)
                 VALUES (?, ?)
@@ -85,14 +86,16 @@ impl PollingStationDataEntries {
                 UPDATE SET
                     state = excluded.state,
                     updated_at = CURRENT_TIMESTAMP
+                RETURNING
+                    polling_station_id AS "polling_station_id: u32",
+                    state AS "state: _",
+                    updated_at AS "updated_at: _"
             "#,
             polling_station_id,
             state
         )
-        .execute(&self.0)
-        .await?;
-
-        Ok(())
+        .fetch_one(&self.0)
+        .await
     }
 
     /// Get the status for each polling station data entry in an election

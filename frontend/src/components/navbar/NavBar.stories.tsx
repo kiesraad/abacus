@@ -3,12 +3,12 @@ import * as React from "react";
 import { Story } from "@ladle/react";
 
 import { ElectionProviderContext } from "@/api/election/ElectionProviderContext";
-
-import { Election, Role, TestUserProvider } from "@kiesraad/api";
-import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
+import { Election, Role } from "@/api/gen/openapi";
+import { TestUserProvider } from "@/api/TestUserProvider";
+import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 
 import { NavBar } from "./NavBar";
-import styles from "./NavBar.module.css";
+import cls from "./NavBar.module.css";
 import { NavBarMenu, NavBarMenuButton } from "./NavBarMenu";
 
 export default {
@@ -65,14 +65,14 @@ export const AllRoutes: Story = () => (
 );
 
 export const Menu: Story = () => (
-  <div className={styles.navBarMenuContainer}>
+  <div className={cls.navBarMenuContainer}>
     <NavBarMenu />
   </div>
 );
 
 export const MenuButton: Story = () => (
-  <nav aria-label="primary-navigation" className={styles.navBar}>
-    <div className={styles.links}>
+  <nav aria-label="primary-navigation" className={cls.navBar}>
+    <div className={cls.links}>
       <NavBarMenuButton />
     </div>
   </nav>

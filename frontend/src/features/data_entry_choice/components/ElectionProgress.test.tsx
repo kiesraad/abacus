@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, Mock, test, vi } from "vitest";
 
-import { useElectionStatus } from "@/api";
+import { useElectionStatus } from "@/api/election/useElectionStatus";
 
 import { ElectionProgress } from "./ElectionProgress";
 
-vi.mock("@/api", () => {
+vi.mock("@/api/election/useElectionStatus", () => {
   return {
     useElectionStatus: vi.fn(),
   };

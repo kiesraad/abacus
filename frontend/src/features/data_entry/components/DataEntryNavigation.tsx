@@ -1,6 +1,7 @@
 import { useBlocker } from "react-router";
 
-import { PollingStationResults, useUser } from "@/api";
+import { PollingStationResults } from "@/api/gen/openapi";
+import { useUser } from "@/api/useUser";
 import { Button, Modal } from "@/components/ui";
 import { t, tx } from "@/lib/i18n";
 
@@ -9,10 +10,10 @@ import { SubmitCurrentFormOptions } from "../types/types";
 
 export interface DataEntryNavigationProps {
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;
-  currentValues: Partial<PollingStationResults>;
+  currentValues?: Partial<PollingStationResults>;
 }
 
-export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNavigationProps) {
+export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryNavigationProps) {
   const { status, election, pollingStationId, formState, setCache, entryNumber, onDeleteDataEntry, updateFormSection } =
     useDataEntryContext();
   const user = useUser();
@@ -30,6 +31,7 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
 
     if (
       status === "deleted" ||
+      status === "finalising" ||
       status === "finalised" ||
       status === "aborted" ||
       currentLocation.pathname === nextLocation.pathname

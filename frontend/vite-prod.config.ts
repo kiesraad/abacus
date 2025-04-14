@@ -1,3 +1,5 @@
+import browserslist from "browserslist";
+import { browserslistToTargets } from "lightningcss";
 import { execSync } from "node:child_process";
 import path from "path";
 import { defineConfig, UserConfig } from "vite";
@@ -16,6 +18,7 @@ export default defineConfig(({ command }) => {
     __GIT_BRANCH__: undefined as string | undefined,
     __GIT_COMMIT__: undefined as string | undefined,
   };
+
   if (command == "build") {
     let gitDirty: boolean | undefined;
     let gitBranch: string | undefined;
@@ -47,10 +50,9 @@ export default defineConfig(({ command }) => {
       },
     },
     css: {
-      modules: {
-        // Only dashes in class names will be converted to camelCase,
-        // the original class name will not to be removed from the locals
-        localsConvention: "dashes",
+      transformer: "lightningcss",
+      lightningcss: {
+        targets: browserslistToTargets(browserslist(">= 0.25% and not dead")),
       },
     },
     define: {

@@ -1,5 +1,5 @@
 /* Fieldset styling */
-.choice-list {
+.choiceList {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -27,7 +27,7 @@
 }
 
 /* Checkbox and radio input styling */
-.checkbox-and-radio {
+.checkboxAndRadio {
   display: inline-flex;
 
   /* General checkbox and radio styling */

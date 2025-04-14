@@ -1,8 +1,7 @@
 import * as React from "react";
 
-import { useElectionStatusRequest } from "@kiesraad/api";
-
 import RequestStateHandler from "../RequestStateHandler";
+import { useElectionStatusRequest } from "../useElectionStatusRequest";
 import { ElectionStatusProviderContext } from "./ElectionStatusProviderContext";
 
 export interface ElectionStatusProviderProps {

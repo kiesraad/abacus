@@ -1,6 +1,6 @@
 import type { Story } from "@ladle/react";
 
-import { Size } from "@kiesraad/ui";
+import { Size } from "@/types/ui";
 
 import { Spinner } from "./Spinner";
 

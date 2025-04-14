@@ -58,7 +58,7 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
 
   return (
     <dialog id="modal-dialog" className={cls.modal} ref={dialogRef}>
-      <div className={cls["modal-container"]}>
+      <div className={cls.modalContainer}>
         {onClose && (
           <IconButton
             onClick={() => {
@@ -73,11 +73,11 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
             type="button"
           />
         )}
-        <div className={cls["modal-body"]}>
+        <div className={cls.modalBody}>
           <h2 id="modal-title" tabIndex={-1}>
             {title}
           </h2>
-          {noFlex ? <div className={cls["no-flex"]}>{children}</div> : children}
+          {noFlex ? <div className={cls.noFlex}>{children}</div> : children}
         </div>
       </div>
     </dialog>

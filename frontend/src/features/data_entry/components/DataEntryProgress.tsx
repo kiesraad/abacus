@@ -1,10 +1,11 @@
 import * as React from "react";
 import { Link, useParams } from "react-router";
 
-import { useElection } from "@/api";
-import { MenuStatus, ProgressList } from "@/components/ui";
+import { useElection } from "@/api/election/useElection";
+import { ProgressList } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { FormSectionId } from "@/types/types";
+import { MenuStatus } from "@/types/ui";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { FormSection } from "../types/types";

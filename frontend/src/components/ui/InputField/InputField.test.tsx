@@ -1,7 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { expect, test } from "vitest";
 
-import { render, screen } from "@kiesraad/test";
+import { render, screen } from "@/testing/test-utils";
 
 import { NarrowInputField, TextAreaInputField, WideInputField } from "./InputField.stories";
 

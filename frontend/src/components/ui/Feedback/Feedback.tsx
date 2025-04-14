@@ -1,10 +1,12 @@
 import { ReactElement, useEffect, useRef } from "react";
 import { Link } from "react-router";
 
-import { t, tx } from "@kiesraad/i18n";
-import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
+import { cn } from "@/lib/util/classnames";
+import { AlertType, FeedbackId } from "@/types/ui";
 
+import { t, tx } from "@kiesraad/i18n";
+
+import { AlertIcon } from "../Icon/AlertIcon";
 import cls from "./Feedback.module.css";
 import { ClientValidationResultCode, FeedbackItem } from "./Feedback.types";
 
@@ -37,7 +39,7 @@ export function Feedback({ id, type, data }: FeedbackProps) {
       {feedbackList.map((feedback, index) => (
         <div key={`feedback-${index}`} className="feedback-item">
           <header>
-            {renderIconForType(type)}
+            <AlertIcon type={type} />
             <h3 tabIndex={-1} ref={index === 0 ? feedbackHeader : undefined} className="feedback-header">
               {feedback.title}
             </h3>

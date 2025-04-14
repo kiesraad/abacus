@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useLocation } from "react-router";
 
-import { domtoren } from "@kiesraad/util";
+import { domtoren } from "@/lib/util/domtoren";
 
 import cls from "./StickyNav.module.css";
 
@@ -56,7 +56,7 @@ export function StickyNav({ children }: StickyNavProps) {
   }, []);
 
   return (
-    <nav ref={ref} className={cls["sticky-nav"]}>
+    <nav ref={ref} className={cls.stickyNav}>
       {children}
     </nav>
   );

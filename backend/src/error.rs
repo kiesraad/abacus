@@ -242,7 +242,7 @@ impl IntoResponse for APIError {
                         StatusCode::UNAUTHORIZED,
                         to_error("Invalid session", ErrorReference::InvalidSession, false),
                     ),
-                    AuthenticationError::Unauthorized => (
+                    AuthenticationError::Unauthorized | AuthenticationError::Unauthenticated => (
                         StatusCode::UNAUTHORIZED,
                         to_error("Unauthorized", ErrorReference::Unauthorized, false),
                     ),
@@ -253,7 +253,6 @@ impl IntoResponse for APIError {
                     // server errors
                     AuthenticationError::Database(_)
                     | AuthenticationError::HashPassword(_)
-                    | AuthenticationError::BackwardTimeTravel
                     | AuthenticationError::InvalidSessionDuration => (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         to_error(

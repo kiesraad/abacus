@@ -1,8 +1,9 @@
 import * as React from "react";
 
-import { ProgressBarColorClass, Size } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
+import { cn } from "@/lib/util/classnames";
+import { Size } from "@/types/ui";
 
+import { ProgressBarColorClass } from "../ProgressBar";
 import cls from "./Icon.module.css";
 
 export interface IconProps {

@@ -1,4 +1,4 @@
-import { ApiError } from "@/api";
+import { ApiError } from "@/api/ApiResult";
 import { ErrorModal } from "@/components/error";
 import {
   Alert,
@@ -9,10 +9,10 @@ import {
   Form,
   InputGrid,
   InputGridRow,
-  KeyboardKey,
   KeyboardKeys,
 } from "@/components/ui";
 import { t } from "@/lib/i18n";
+import { KeyboardKey } from "@/types/ui";
 
 import { DataEntryNavigation } from "../DataEntryNavigation";
 import { formValuesToValues } from "./differencesValues";
@@ -144,7 +144,7 @@ export function DifferencesForm() {
           />
         </InputGrid.Body>
       </InputGrid>
-      <BottomBar type="input-grid">
+      <BottomBar type="inputGrid">
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
             <Alert type="error" variant="small">

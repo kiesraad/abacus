@@ -1,16 +1,19 @@
-import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { render, server } from "@/testing";
-import { UserDeleteRequestHandler, UserGetRequestHandler, UserUpdateRequestHandler } from "@/testing/api-mocks";
+import {
+  UserDeleteRequestHandler,
+  UserGetRequestHandler,
+  UserUpdateRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
+import { server } from "@/testing/server";
+import { render, screen } from "@/testing/test-utils";
 
 import { UserUpdatePage } from "./UserUpdatePage";
 
 const navigate = vi.fn();
 
-vi.mock(import("@/lib/util"), async (importOriginal) => ({
-  ...(await importOriginal()),
+vi.mock(import("@/hooks/useNumericParam"), () => ({
   useNumericParam: () => 1,
 }));
 

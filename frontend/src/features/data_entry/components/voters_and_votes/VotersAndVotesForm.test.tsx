@@ -1,13 +1,18 @@
 import { userEvent, UserEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ClaimDataEntryResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@/api";
-import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs, waitFor } from "@/testing";
 import {
-  electionMockData,
+  ClaimDataEntryResponse,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  PollingStationResults,
+} from "@/api/gen/openapi";
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
-} from "@/testing/api-mocks";
+} from "@/testing/api-mocks/RequestHandlers";
+import { overrideOnce, server } from "@/testing/server";
+import { getUrlMethodAndBody, render, screen, userTypeInputs, waitFor } from "@/testing/test-utils";
 
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {

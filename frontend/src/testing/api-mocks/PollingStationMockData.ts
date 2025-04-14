@@ -1,4 +1,4 @@
-import { PollingStation } from "@kiesraad/api";
+import { PollingStation } from "@/api/gen/openapi";
 
 export const pollingStationMockData: PollingStation[] = [
   {

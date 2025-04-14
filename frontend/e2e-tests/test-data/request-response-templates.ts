@@ -5,7 +5,7 @@ import {
   PollingStationRequest,
   PollingStationResults,
   SaveDataEntryResponse,
-} from "@kiesraad/api";
+} from "@/api/gen/openapi";
 
 export const electionRequest: ElectionRequest = {
   name: "Test Election",

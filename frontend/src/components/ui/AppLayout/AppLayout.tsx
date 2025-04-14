@@ -7,5 +7,5 @@ export interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-  return <div className={cls["app-layout"]}>{children}</div>;
+  return <div className={cls.appLayout}>{children}</div>;
 }

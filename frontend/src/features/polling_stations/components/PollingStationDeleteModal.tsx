@@ -1,4 +1,5 @@
-import { isSuccess, useCrud } from "@/api";
+import { isSuccess } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { Button, Modal } from "@/components/ui";
 import { t } from "@/lib/i18n";
 

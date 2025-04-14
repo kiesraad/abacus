@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Link, LinkProps } from "react-router";
 
-import { ButtonVariant, Size } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
+import { cn } from "@/lib/util/classnames";
+import { ButtonVariant, Size } from "@/types/ui";
 
 import cls from "./Button.module.css";
 
@@ -28,7 +28,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`${cls["button"] || ""} ${cls[variant] || ""} ${cls[size] || ""}`}
+      className={`${cls.button || ""} ${cls[variant] || ""} ${cls[size] || ""}`}
       disabled={isDisabled || isLoading}
       {...htmlButtonProps}
     >

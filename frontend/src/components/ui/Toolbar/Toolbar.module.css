@@ -5,7 +5,7 @@
   min-height: 4.5rem;
 }
 
-.toolbar-section {
+.toolbarSection {
   display: flex;
   gap: var(--space-md-lg);
 

@@ -1,6 +1,6 @@
 import type { Story, StoryDefault } from "@ladle/react";
 
-import { ButtonVariant, Size } from "@kiesraad/ui";
+import { ButtonVariant, Size } from "@/types/ui";
 
 import { Button } from "./Button";
 

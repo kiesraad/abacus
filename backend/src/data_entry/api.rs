@@ -1,7 +1,7 @@
 use crate::{
     APIError, AppState,
     audit_log::{AuditEvent, AuditService},
-    authentication::{Typist, User},
+    authentication::{Coordinator, Typist, User},
     data_entry::{
         PollingStationResults, ValidationResults,
         entry_number::EntryNumber,
@@ -24,6 +24,8 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+use super::PollingStationDataEntry;
+
 /// Response structure for getting data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ClaimDataEntryResponse {
@@ -39,7 +41,29 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_data_entry_save))
         .routes(routes!(polling_station_data_entry_delete))
         .routes(routes!(polling_station_data_entry_finalise))
+        .routes(routes!(polling_station_data_entry_resolve))
         .routes(routes!(election_status))
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
+#[from_request(via(axum::Json), rejection(APIError))]
+#[serde(rename_all = "snake_case")]
+pub enum ResolveAction {
+    KeepFirstEntry,
+    KeepSecondEntry,
+    DiscardBothEntries,
+}
+
+impl ResolveAction {
+    pub fn audit_event(&self, data_entry: PollingStationDataEntry) -> AuditEvent {
+        match self {
+            ResolveAction::KeepFirstEntry => AuditEvent::DataEntryKeptFirst(data_entry.into()),
+            ResolveAction::KeepSecondEntry => AuditEvent::DataEntryKeptSecond(data_entry.into()),
+            ResolveAction::DiscardBothEntries => {
+                AuditEvent::DataEntryDiscardedBoth(data_entry.into())
+            }
+        }
+    }
 }
 
 /// Claim a data entry for a polling station, returning any existing progress
@@ -313,6 +337,51 @@ async fn polling_station_data_entry_finalise(
     Ok(())
 }
 
+/// Resolve data entry differences by providing a `ResolveAction`
+#[utoipa::path(
+    post,
+    path = "/api/polling_stations/{polling_station_id}/data_entries/resolve",
+    request_body = ResolveAction,
+    responses(
+        (status = 200, description = "Differences resolved successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+async fn polling_station_data_entry_resolve(
+    _user: Coordinator,
+    State(polling_station_data_entries): State<PollingStationDataEntries>,
+    Path(polling_station_id): Path<u32>,
+    audit_service: AuditService,
+    resolve_action: ResolveAction,
+) -> Result<Json<PollingStationDataEntry>, APIError> {
+    let state = polling_station_data_entries
+        .get_or_default(polling_station_id)
+        .await?;
+
+    let new_state = match resolve_action {
+        ResolveAction::KeepFirstEntry => state.keep_first_entry()?,
+        ResolveAction::KeepSecondEntry => state.keep_second_entry()?,
+        ResolveAction::DiscardBothEntries => state.delete_entries()?,
+    };
+
+    let data_entry = polling_station_data_entries
+        .upsert(polling_station_id, &new_state)
+        .await?;
+
+    audit_service
+        .log(&resolve_action.audit_event(data_entry.clone()), None)
+        .await?;
+
+    Ok(Json(data_entry))
+}
+
 /// Election polling stations data entry statuses response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionStatusResponse {
@@ -491,6 +560,41 @@ pub mod tests {
         .into_response()
     }
 
+    async fn resolve(pool: SqlitePool, resolve_action: ResolveAction) -> Response {
+        let user = User::test_user(Role::Coordinator, 1);
+        polling_station_data_entry_resolve(
+            Coordinator(user.clone()),
+            State(PollingStationDataEntries::new(pool.clone())),
+            Path(1),
+            AuditService::new(AuditLog(pool), user, None),
+            resolve_action,
+        )
+        .await
+        .into_response()
+    }
+
+    async fn finalise_different_entries(pool: SqlitePool) {
+        // Save and finalise the first data entry
+        let request_body = example_data_entry();
+        let response = claim(pool.clone(), EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(pool.clone(), request_body.clone(), EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Save and finalise a different second data entry
+        let mut request_body = example_data_entry();
+        request_body.data.voters_counts.poll_card_count = 99;
+        request_body.data.voters_counts.proxy_certificate_count = 0;
+        let response = claim(pool.clone(), EntryNumber::SecondEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(pool.clone(), request_body.clone(), EntryNumber::SecondEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), EntryNumber::SecondEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_create_data_entry(pool: SqlitePool) {
         let mut request_body = example_data_entry();
@@ -642,25 +746,7 @@ pub mod tests {
     // test creating first and different second data entry
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_first_second_data_entry_different(pool: SqlitePool) {
-        // Save and finalise the first data entry
-        let request_body = example_data_entry();
-        let response = claim(pool.clone(), EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-        let response = save(pool.clone(), request_body.clone(), EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise(pool.clone(), EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-
-        // Save and finalise a different second data entry
-        let mut request_body = example_data_entry();
-        request_body.data.voters_counts.poll_card_count = 99;
-        request_body.data.voters_counts.proxy_certificate_count = 0;
-        let response = claim(pool.clone(), EntryNumber::SecondEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-        let response = save(pool.clone(), request_body.clone(), EntryNumber::SecondEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise(pool.clone(), EntryNumber::SecondEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
+        finalise_different_entries(pool.clone()).await;
 
         // Check if entry is now in EntriesDifferent state
         let data = query!("SELECT state FROM polling_station_data_entries")
@@ -741,5 +827,58 @@ pub mod tests {
                 assert_eq!(row_count.count, 1);
             }
         }
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_data_entry_resolve_keep_first(pool: SqlitePool) {
+        finalise_different_entries(pool.clone()).await;
+        resolve(pool.clone(), ResolveAction::KeepFirstEntry).await;
+
+        let data = query!("SELECT state FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .expect("One row should exist");
+        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
+            assert_eq!(
+                entry.finalised_first_entry.voters_counts.poll_card_count,
+                98
+            )
+        } else {
+            panic!("invalid state")
+        }
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_data_entry_resolve_keep_second(pool: SqlitePool) {
+        finalise_different_entries(pool.clone()).await;
+        resolve(pool.clone(), ResolveAction::KeepSecondEntry).await;
+
+        let data = query!("SELECT state FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .expect("One row should exist");
+        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
+            assert_eq!(
+                entry.finalised_first_entry.voters_counts.poll_card_count,
+                99
+            )
+        } else {
+            panic!("invalid state")
+        }
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_data_entry_resolve_discard_both(pool: SqlitePool) {
+        finalise_different_entries(pool.clone()).await;
+        resolve(pool.clone(), ResolveAction::DiscardBothEntries).await;
+
+        let data = query!("SELECT state FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .expect("One row should exist");
+        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        assert!(matches!(status, DataEntryStatus::FirstEntryNotStarted));
     }
 }

@@ -1,9 +1,10 @@
 import { Link } from "react-router";
 
-import { useApiState } from "@kiesraad/api";
+import { useApiState } from "@/api/useApiState";
+
 import { t } from "@kiesraad/i18n";
 
-import styles from "./NavBar.module.css";
+import cls from "./NavBar.module.css";
 import { NavBarLinks } from "./NavBarLinks";
 
 type NavBarProps = { location: { pathname: string } };
@@ -12,15 +13,15 @@ export function NavBar({ location }: NavBarProps) {
   const { user } = useApiState();
 
   return (
-    <nav aria-label="primary-navigation" className={styles.navBar}>
-      <div className={styles.links}>
+    <nav aria-label="primary-navigation" className={cls.navBar}>
+      <div className={cls.links}>
         <NavBarLinks location={location} />
       </div>
-      <div className={styles.userInfo}>
+      <div className={cls.userInfo}>
         {user ? (
           <>
             <strong id="navbar-username">{user.fullname || user.username}</strong>
-            <span className={styles.lower} id="navbar-role">
+            <span className={cls.lower} id="navbar-role">
               ({t(user.role)})
             </span>
             <Link to={`/account/logout`}>{t("account.logout")}</Link>

@@ -1,8 +1,10 @@
 import * as React from "react";
 
-import { MenuStatus, renderStatusIcon } from "@kiesraad/ui";
-import { cn, domtoren } from "@kiesraad/util";
+import { cn } from "@/lib/util/classnames";
+import { domtoren } from "@/lib/util/domtoren";
+import { MenuStatus } from "@/types/ui";
 
+import { StatusIcon } from "../Icon/StatusIcon";
 import cls from "./ProgressList.module.css";
 import { ProgressListScroll } from "./ProgressListScroll";
 
@@ -11,7 +13,7 @@ export interface ProgressListProps {
 }
 
 export function ProgressList({ children }: ProgressListProps) {
-  return <div className={cls["progress-list"]}>{children}</div>;
+  return <div className={cls.progressList}>{children}</div>;
 }
 
 ProgressList.Fixed = ({ children }: { children: React.ReactNode }) => (
@@ -41,7 +43,6 @@ ProgressList.Item = function ProgressListItem({
   id,
   scrollIntoView,
 }: ProgressListItemProps) {
-  const icon = renderStatusIcon(active ? "active" : status);
   const ref = React.useRef<HTMLLIElement>(null);
 
   React.useEffect(() => {
@@ -59,7 +60,9 @@ ProgressList.Item = function ProgressListItem({
       className={cn(active ? "active" : "idle", status, { disabled: !!disabled })}
       aria-current={active ? "step" : false}
     >
-      <aside>{icon}</aside>
+      <aside>
+        <StatusIcon status={active ? "active" : status} />
+      </aside>
       <label>{children}</label>
     </li>
   );

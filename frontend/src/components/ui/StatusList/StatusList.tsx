@@ -1,8 +1,9 @@
 import * as React from "react";
 
-import { MenuStatus, renderStatusIcon } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
+import { cn } from "@/lib/util/classnames";
+import { MenuStatus } from "@/types/ui";
 
+import { StatusIcon } from "../Icon/StatusIcon";
 import cls from "./StatusList.module.css";
 
 export interface StatusListProps extends React.HTMLAttributes<HTMLUListElement> {
@@ -26,7 +27,9 @@ export interface StatusListItemProps extends React.HTMLAttributes<HTMLLIElement>
 StatusList.Item = function StatusListItem({ status, children, emphasis, padding, ...props }: StatusListItemProps) {
   return (
     <li className={cn(status, { emphasis: !!emphasis }, { padding: !!padding })} {...props}>
-      <aside>{renderStatusIcon(status)}</aside>
+      <aside>
+        <StatusIcon status={status} />
+      </aside>
       <span>{children}</span>
     </li>
   );

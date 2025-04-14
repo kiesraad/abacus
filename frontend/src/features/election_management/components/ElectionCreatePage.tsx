@@ -1,16 +1,13 @@
 import { useState } from "react";
 import { useLocation } from "react-router";
 
-import {
-  ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
-  ElectionDefinitionUploadResponse,
-  isError,
-  isSuccess,
-  useCrud,
-} from "@/api";
+import { isError, isSuccess } from "@/api/ApiResult";
+import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionUploadResponse } from "@/api/gen/openapi";
+import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
-import { Feedback, FileInput, PageTitle, ProgressList, StickyNav } from "@/components/ui";
+import { PageTitle } from "@/components/page_title/PageTitle";
+import { Feedback, FileInput, ProgressList, StickyNav } from "@/components/ui";
 
 import { t } from "@kiesraad/i18n";
 

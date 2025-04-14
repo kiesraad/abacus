@@ -2,21 +2,15 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@/api";
+import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionApportionmentResponse, ErrorResponse } from "@/api/gen/openapi";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
-import {
-  expectErrorPage,
-  overrideOnce,
-  Providers,
-  render,
-  renderReturningRouter,
-  Router,
-  screen,
-  setupTestRouter,
-  within,
-} from "@/testing";
-import { getElectionMockData } from "@/testing/api-mocks";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { Providers } from "@/testing/Providers";
+import { Router } from "@/testing/router";
+import { overrideOnce } from "@/testing/server";
+import { expectErrorPage, render, renderReturningRouter, screen, setupTestRouter, within } from "@/testing/test-utils";
 
 import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/less-than-19-seats";
 import { ApportionmentPage } from "./ApportionmentPage";

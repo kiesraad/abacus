@@ -1,19 +1,19 @@
-import { DataEntryStatusName, ElectionStatusResponseEntry, LoginResponse, PollingStation } from "@/api";
+import { DataEntryStatusName, ElectionStatusResponseEntry, LoginResponse, PollingStation } from "@/api/gen/openapi";
 
 export enum PollingStationUserStatus {
-  Missing,
+  Available,
   InProgressCurrentUser,
   InProgressOtherUser,
+  SecondEntryNotAllowed,
   Finished,
-  Unknown,
 }
 
 export type PollingStationWithStatus = PollingStation & {
-  statusEntry?: ElectionStatusResponseEntry;
+  statusEntry: ElectionStatusResponseEntry;
   userStatus: PollingStationUserStatus;
 };
 
-export const dataEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
+export const finishedStatuses: DataEntryStatusName[] = ["entries_different", "definitive"];
 
 export function getPollingStationWithStatusList({
   pollingStations,
@@ -24,18 +24,19 @@ export function getPollingStationWithStatusList({
   statuses: ElectionStatusResponseEntry[];
   user: LoginResponse | null;
 }): PollingStationWithStatus[] {
-  return pollingStations.map((pollingStation: PollingStation) => {
+  return pollingStations.flatMap((pollingStation: PollingStation) => {
+    const statusEntry = statuses.find((status) => status.polling_station_id === pollingStation.id);
+    if (!statusEntry) {
+      return [];
+    }
+
     const result: PollingStationWithStatus = {
       ...pollingStation,
-      userStatus: PollingStationUserStatus.Unknown,
+      statusEntry,
+      userStatus: PollingStationUserStatus.Available,
     };
-    const statusEntry = statuses.find((status) => status.polling_station_id === pollingStation.id);
 
-    if (!statusEntry) return result;
-
-    result.statusEntry = statusEntry;
-
-    if (dataEntryFinished.includes(statusEntry.status)) {
+    if (finishedStatuses.includes(statusEntry.status)) {
       result.userStatus = PollingStationUserStatus.Finished;
     } else if (statusEntry.status === "first_entry_in_progress") {
       if (statusEntry.first_entry_user_id === user?.user_id) {
@@ -49,8 +50,19 @@ export function getPollingStationWithStatusList({
       } else {
         result.userStatus = PollingStationUserStatus.InProgressOtherUser;
       }
+    } else if (statusEntry.status === "second_entry_not_started" && statusEntry.first_entry_user_id === user?.user_id) {
+      result.userStatus = PollingStationUserStatus.SecondEntryNotAllowed;
     }
 
     return result;
   });
+}
+
+export function getUrlForDataEntry(
+  electionId: number,
+  pollingStationId: number,
+  pollingStationStatus?: DataEntryStatusName,
+): string {
+  const entryNumber = pollingStationStatus?.startsWith("second_entry") ? 2 : 1;
+  return `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}`;
 }

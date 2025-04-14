@@ -24,7 +24,7 @@ Selecteer je eerst de verkiezing waarvoor je stemmen wilt invoeren. Meestal staa
 
 ### Stembureau invoeren of selecteren
 
-Voer vervolgens het nummer in van het stembureau dat je wilt invoeren. Weet je het nummer niet, klik dan onderaan de pagina op **Bekijk de lijst met alle stembureaus** en kies vervolgens het juiste stembureau.
+Voer vervolgens het nummer in van het stembureau dat je wilt invoeren. Het nummer vind je op het proces-verbaal. Weet je het nummer niet, klik dan onderaan de pagina op **Bekijk de lijst met alle stembureaus** en kies vervolgens het juiste stembureau op basis van de naam.
 
 ![Stembureaunummer invoeren](/documentatie/gebruikersdocumentatie/img/invoeren-stembureaunummer-invoeren.png)
 

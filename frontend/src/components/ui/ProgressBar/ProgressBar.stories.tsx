@@ -1,6 +1,6 @@
 import type { Story } from "@ladle/react";
 
-import { ProgressBar, ProgressBarProps } from "../ProgressBar/ProgressBar";
+import { ProgressBar, ProgressBarProps } from "./ProgressBar";
 
 export const DefaultProgressBar: Story<ProgressBarProps> = ({
   id = "test",

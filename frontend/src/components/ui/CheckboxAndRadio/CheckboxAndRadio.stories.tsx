@@ -1,6 +1,6 @@
 import type { Story } from "@ladle/react";
 
-import { Checkbox, Radio } from "../CheckboxAndRadio/CheckboxAndRadio";
+import { Checkbox, Radio } from "./CheckboxAndRadio";
 
 type Props = {
   label: string;

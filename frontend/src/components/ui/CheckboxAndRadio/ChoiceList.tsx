@@ -1,6 +1,6 @@
 import { cn } from "@/lib/util/classnames";
 
-import { Checkbox, CheckboxAndRadioProps, Radio } from "../CheckboxAndRadio/CheckboxAndRadio";
+import { Checkbox, CheckboxAndRadioProps, Radio } from "./CheckboxAndRadio";
 import cls from "./CheckboxAndRadio.module.css";
 
 export interface ChoiceListProps {

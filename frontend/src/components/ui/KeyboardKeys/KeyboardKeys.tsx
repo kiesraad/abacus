@@ -1,9 +1,13 @@
 import * as React from "react";
 
+import {
+  IconArrowBlockUp,
+  IconArrowNarrowDown,
+  IconArrowNarrowUp,
+  IconCornerDownLeft,
+} from "@/components/generated/icons";
 import { cn } from "@/lib/util/classnames";
 import { KeyboardKey } from "@/types/ui";
-
-import { IconArrowBlockUp, IconArrowNarrowDown, IconArrowNarrowUp, IconCornerDownLeft } from "@kiesraad/icon";
 
 import cls from "./KeyboardKeys.module.css";
 

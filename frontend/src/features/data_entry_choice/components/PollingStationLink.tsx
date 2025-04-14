@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import { DataEntryStatusName, PollingStation } from "@/api/gen/openapi";
-import { IconArrowNarrowRight } from "@/lib/icon";
+import { IconArrowNarrowRight } from "@/components/generated/icons";
 
 import { getUrlForDataEntry } from "../utils/util";
 import cls from "./DataEntryChoice.module.css";

@@ -4,6 +4,7 @@ import { Election } from "@/api/gen/openapi";
 import { useUserRole } from "@/api/useUserRole";
 import { ElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
+import { IconPlus } from "@/components/generated/icons";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -11,7 +12,6 @@ import { Button } from "@/components/ui/Button/Button";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/lib/i18n";
-import { IconPlus } from "@/lib/icon";
 
 import { useElectionList } from "../hooks/useElectionList";
 

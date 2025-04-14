@@ -1,6 +1,7 @@
 import { useSearchParams } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
+import { IconPlus } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -8,7 +9,6 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/lib/i18n";
-import { IconPlus } from "@/lib/icon";
 
 import { usePollingStationListRequest } from "../hooks/usePollingStationListRequest";
 

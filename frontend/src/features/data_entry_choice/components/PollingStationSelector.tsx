@@ -1,11 +1,11 @@
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
+import { IconError, IconWarning } from "@/components/generated/icons";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { Spinner } from "@/components/ui/Spinner/Spinner";
 import { t, tx } from "@/lib/i18n";
-import { IconError, IconWarning } from "@/lib/icon";
 import { cn } from "@/lib/util/classnames";
 import { removeLeadingZeros } from "@/lib/util/strings";
 

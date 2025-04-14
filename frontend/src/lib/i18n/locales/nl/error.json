@@ -21,6 +21,7 @@
     "EntryNotFound": "Niet gevonden",
     "EntryNotUnique": "Deze invoer bestaat al",
     "EntryNumberNotSupported": "Ongeldige invoer voor dit stembureau",
+    "EmlImportError": "Het EML bestand is niet geldig",
     "InternalServerError": "Er is een interne fout opgetreden",
     "InvalidData": "De invoer is niet geldig",
     "InvalidDataEntryNumber": "Het invoer nummer is ongeldig",

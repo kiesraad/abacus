@@ -7,16 +7,36 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 ### Vragen
 
 - Klopt het dat de Na 14-1 versie 1 (DSO) gegenereerd moeten worden door Abacus?
+  - Ja.
+
 - Hoe worden modellen die door Abacus worden gegenereerd afgedrukt? Waar staat de printer?
-- Filteren we welke modellen gegenereerd kunnen worden o.b.v. DSO/CSO?
-- Is de kandidatenlijst altijd een EML_NL 230b? Of is de kandidatenlijst voor sommige verkiezingen een EML_NL 210?
+  - niet voorgeschreven op dit moment
+
+- Wanneer kan wie welke 'template' modellen genereren?
+  - Filteren we welke modellen gegenereerd kunnen worden o.b.v. DSO/CSO?
+    - Ja, filteren op DSO/CSO.
+
+  - modellen versus corrigenda
+    - duidelijke UX, niet beperken
+    - goed voorbeeld: versie 1 en versie 2 van DSO Corrigendum
+
+  - Wie mag welk modellen genereren?
+    - niet spannend, iedereen mag alles
+    - welke rol? beheerder, coörd GSB, coörd CSB: hangt van fase af
+
 - Hoe stellen we de adresgegevens van de (verkozen) kandidaten beschikbaar, makkelijker dan d.m.v. totaallijst (EML_NL 230c)?
+- Moet Abacus alle modellen kunnen genereren? Zelfs als waarschijnlijk niet gebruikt?
+  - Ja.
+  - ook het Overdrachtsdocument GSB (N 5)? overdracht van burgemeester aan GSB (stembureaubescheiden)
+
 
 ### Te doen
 
 - Modellen nalopen: wat moet door Abacus worden ingevuld (blauwe tekst)? Wat niet?
 - EML_NL bestanden nalopen: hebben we alle data voor de EML_NL bestanden?
 - Titels/Namen van modellen bijwerken o.b.v. voorstel voor OSV.
+  - TODO: mail delen met team Abacus
+
 - Welke bestanden genereert OSV? Klopt dat met wat we van plan zijn met Abacus?
   - Leeg EML_NL-bestand: Telling 510b
   - Totaaltelling 510d lijkt output van GSB, niet CSB. (te verifiëren)
@@ -47,7 +67,7 @@ EML_NL 210 (kandidatenlijst voor een politieke groepering) wordt niet gebruikt, 
 | Model(onderdeel)  | DSO  | CSO  | Doel                          | 'template' uit Abacus | input voor Abacus | output van Abacus |
 | ----------------- | :--: | :--: | ----------------------------- | :-------------------: | :---------------: | :---------------: |
 | N 10-1            |  X   |      | PV SB                         |                       |         X         |                   |
-| Na 14-1 versie 1  |  X   |      | Corrigendum SB - 1ste zitting |         X(?)          |         X         |                   |
+| Na 14-1 versie 1  |  X   |      | Corrigendum SB - 1ste zitting |     X(?) TODO: JA     |         X         |                   |
 | N 10-2            |      |  X   | PV SB                         |                       |         X         |                   |
 | Na 31-2 Bijlage 1 |      |  X   | Telresultaten SB              |                       |         X         |                   |
 | Na 31-2 Bijlage 2 |      |  X   | Bezwaren SB's                 |                       |                   |                   |
@@ -122,7 +142,7 @@ EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
 
 - niet in scope Abacus
 - tellingen GSB en SB's
-- Uitwisselplatform zal EML_NLs omzetten naar CSVs
+- Uitwisselplatform zal EML_NLs omzetten naar CSVs, TODO: publicatie gemeente
 
 ---
 
@@ -135,8 +155,8 @@ EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
 | Na 31-1          |  X   |      | PV GSB - 1ste zitting         |         X         |                   |
 | Na 31-2          |      |  X   | PV GSB - 1ste zitting         |         X         |                   |
 | Na 14-2[^3]      |  X   |  X   | Corrigendum GSB - 2de zitting |         X         |                   |
-| P 2a[^4]         |  X   |  X   | Verslag 2de zitting           |        ???        |                   |
-| P 22-2           |  X   |  X   |                               |                   |         X         |
+| P 2a[^4]         |  X   |  X   | Verslag 2de zitting           |                   |                   |
+| P 22-2           |  X   |  X   | PV CSB - einduitslag          |                   |         X         |
 
 [^3]: Na 14-2 wordt alleen aangemaakt als hertellingen tot een ander resultaat leiden.
 [^4]: P 2a wordt alleen aangemaakt als er een tweede zitting is.
@@ -149,11 +169,14 @@ EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
 ### Benoemingsbrieven en geloofsbrieven
 
 - niet in scope Abacus
+- open punt: TODO adressen toegankelijk
 
 
 ### Tellingsbestanden
 
 #### EML_NL
+
+TODO: splitsen input/output
 
 - Telling 510b
   - tellingen GSB en SB's

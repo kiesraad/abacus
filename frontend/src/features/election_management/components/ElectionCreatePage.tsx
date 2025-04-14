@@ -7,7 +7,7 @@ import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Feedback, FileInput, ProgressList, StickyNav } from "@/components/ui";
+import { Alert, FileInput, ProgressList, StickyNav } from "@/components/ui";
 
 import { t } from "@kiesraad/i18n";
 
@@ -76,7 +76,11 @@ export function ElectionCreatePage() {
 
         <article>
           <h2>{t("election.import_eml")}</h2>
-          {error && <Feedback id="feedback-error" type={"error"} />}
+          {error && (
+            <Alert type="error" title={t("election.invalid_election_definition.title")} inline>
+              {t("election.invalid_election_definition.description")}
+            </Alert>
+          )}
           <p className="mt-lg mb-lg">{t("election.use_instructions_to_import_eml")}</p>
           <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)} file={file}>
             {t("select_file")}

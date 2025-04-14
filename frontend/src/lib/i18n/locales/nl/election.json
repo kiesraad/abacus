@@ -16,5 +16,9 @@
     "plural": "Verkiezingen",
     "singular": "Verkiezing"
   },
-  "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het."
+  "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
+  "invalid_election_definition": {
+    "title": "Ongeldige verkiezingsdefinitie",
+    "description": "Het gekozen bestand bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie."
+  }
 }

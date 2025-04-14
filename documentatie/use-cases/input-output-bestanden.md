@@ -9,7 +9,6 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 - Klopt het dat de Na 14-1 versie 1 (DSO) gegenereerd moeten worden door Abacus?
 - Hoe worden modellen die door Abacus worden gegenereerd afgedrukt? Waar staat de printer?
 - Filteren we welke modellen gegenereerd kunnen worden o.b.v. DSO/CSO?
-- Wordt Telling 510a (telling SB) ergens gebruikt of gegenereerd?
 - Is de kandidatenlijst altijd een EML_NL 230b? Of is de kandidatenlijst voor sommige verkiezingen een EML_NL 210?
 - Hoe stellen we de adresgegevens van de (verkozen) kandidaten beschikbaar, makkelijker dan d.m.v. totaallijst (EML_NL 230c)?
 
@@ -37,6 +36,8 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
   - niet gebruikt door Abacus
   - zie open punt over beschikbaar stellen van adresgegevens voor benoemings- en geloofsbrieven
 
+EML_NL 210 (kandidatenlijst voor een politieke groepering) wordt niet gebruikt, want alleen relevant binnen het kandidaatstellingsproces.
+
 ---
 
 ## GSB
@@ -48,7 +49,7 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 | N 10-1            |  X   |      | PV SB                         |                       |         X         |                   |
 | Na 14-1 versie 1  |  X   |      | Corrigendum SB - 1ste zitting |         X(?)          |         X         |                   |
 | N 10-2            |      |  X   | PV SB                         |                       |         X         |                   |
-| Na 31-2 Bijlage 1 |      |  X   | Telresultaten SB                         |                       |         X         |                   |
+| Na 31-2 Bijlage 1 |      |  X   | Telresultaten SB              |                       |         X         |                   |
 | Na 31-2 Bijlage 2 |      |  X   | Bezwaren SB's                 |                       |                   |                   |
 | Na 31-1           |  X   |      | PV GSB - 1ste zitting         |                       |                   |         X         |
 | Na 31-2           |      |  X   | PV GSB - 1ste zitting         |                       |                   |         X         |
@@ -114,6 +115,8 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
   - input voor Abacus - CSB
   - mogelijk input voor Abacus - GSB, als de telresultaten van de vorige zitting niet meer beschikbaar zijn in Abacus
 
+EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
+
 
 #### CSV-bestand met tellingen
 
@@ -161,3 +164,5 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 - Resultaat 520
   - verkozen kandidaten
   - output van Abacus - CSB
+
+EML_NL 510c (tellingsbestand hoofdstembureau) wordt niet gebruikt binnen de huidige scope, n.l. gemeenteraadsverkiezingen.

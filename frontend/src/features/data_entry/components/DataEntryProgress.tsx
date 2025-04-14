@@ -2,7 +2,7 @@ import * as React from "react";
 import { Link, useParams } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
-import { ProgressList } from "@/components/ui";
+import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { t } from "@/lib/i18n";
 import { FormSectionId } from "@/types/types";
 import { MenuStatus } from "@/types/ui";

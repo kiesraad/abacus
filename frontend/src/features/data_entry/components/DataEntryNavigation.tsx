@@ -2,7 +2,8 @@ import { useBlocker } from "react-router";
 
 import { PollingStationResults } from "@/api/gen/openapi";
 import { useUser } from "@/api/useUser";
-import { Button, Modal } from "@/components/ui";
+import { Button } from "@/components/ui/Button/Button";
+import { Modal } from "@/components/ui/Modal/Modal";
 import { t, tx } from "@/lib/i18n";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";

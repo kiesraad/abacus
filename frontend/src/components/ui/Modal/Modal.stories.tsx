@@ -2,8 +2,7 @@ import { useState } from "react";
 
 import type { Story } from "@ladle/react";
 
-import { Button } from "@kiesraad/ui";
-
+import { Button } from "../Button/Button";
 import { Modal } from "./Modal";
 
 export const DefaultModal: Story = () => {

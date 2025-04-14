@@ -3,7 +3,9 @@ import { useNavigate } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Alert, Button, Loader } from "@/components/ui";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";
 import { IconTrash } from "@/lib/icon";

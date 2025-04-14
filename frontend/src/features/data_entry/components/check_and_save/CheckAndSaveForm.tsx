@@ -3,8 +3,12 @@ import { Link, useNavigate } from "react-router";
 
 import { ApiError } from "@/api/ApiResult";
 import { useElection } from "@/api/election/useElection";
-import { ErrorModal } from "@/components/error";
-import { BottomBar, Button, Form, KeyboardKeys, StatusList } from "@/components/ui";
+import { ErrorModal } from "@/components/error/ErrorModal";
+import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
+import { Button } from "@/components/ui/Button/Button";
+import { Form } from "@/components/ui/Form/Form";
+import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
+import { StatusList } from "@/components/ui/StatusList/StatusList";
 import { t, tx } from "@/lib/i18n";
 import { FormSectionId } from "@/types/types";
 import { KeyboardKey, MenuStatus } from "@/types/ui";

@@ -3,7 +3,7 @@ import * as React from "react";
 import { cn } from "@/lib/util/classnames";
 import { Size } from "@/types/ui";
 
-import { ProgressBarColorClass } from "../ProgressBar";
+import { ProgressBarColorClass } from "../ProgressBar/ProgressBar";
 import cls from "./Icon.module.css";
 
 export interface IconProps {

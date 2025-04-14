@@ -1,8 +1,7 @@
 import { cn } from "@/lib/util/classnames";
 import { Size } from "@/types/ui";
 
-import { ProgressBarColorClass } from "@kiesraad/ui";
-
+import { ProgressBarColorClass } from "../ProgressBar/ProgressBar";
 import cls from "./Circle.module.css";
 
 export interface CircleProps {

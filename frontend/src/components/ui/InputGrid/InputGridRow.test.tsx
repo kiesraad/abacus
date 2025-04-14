@@ -3,7 +3,8 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
 
-import { InputGrid, InputGridRow, InputGridRowProps } from "@kiesraad/ui";
+import { InputGrid } from "./InputGrid";
+import { InputGridRow, InputGridRowProps } from "./InputGridRow";
 
 const defaultProps: InputGridRowProps = {
   id: "this-row-id",

@@ -2,7 +2,11 @@ import { useSearchParams } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Alert, Button, Loader, Table, Toolbar } from "@/components/ui";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
+import { Loader } from "@/components/ui/Loader/Loader";
+import { Table } from "@/components/ui/Table/Table";
+import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/lib/i18n";
 import { IconPlus } from "@/lib/icon";
 

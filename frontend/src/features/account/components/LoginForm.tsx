@@ -3,7 +3,11 @@ import { Location, useLocation, useNavigate } from "react-router";
 
 import { AnyApiError, FatalError, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
-import { Alert, BottomBar, Button, FormLayout, InputField } from "@/components/ui";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
+import { Button } from "@/components/ui/Button/Button";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
+import { InputField } from "@/components/ui/InputField/InputField";
 import { t, TranslationPath, tx } from "@/lib/i18n";
 
 interface UnauthorizedState {

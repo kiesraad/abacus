@@ -6,7 +6,10 @@ import { ElectionStatusWithIcon } from "@/components/election_status_with_icon/E
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Alert, Button, Table, Toolbar } from "@/components/ui";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
+import { Table } from "@/components/ui/Table/Table";
+import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/lib/i18n";
 import { IconPlus } from "@/lib/icon";
 

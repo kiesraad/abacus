@@ -1,6 +1,11 @@
 import { ApiError } from "@/api/ApiResult";
-import { ErrorModal } from "@/components/error";
-import { BottomBar, Button, ChoiceList, Feedback, Form, KeyboardKeys } from "@/components/ui";
+import { ErrorModal } from "@/components/error/ErrorModal";
+import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
+import { Button } from "@/components/ui/Button/Button";
+import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
+import { Feedback } from "@/components/ui/Feedback/Feedback";
+import { Form } from "@/components/ui/Form/Form";
+import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { t } from "@/lib/i18n";
 import { KeyboardKey } from "@/types/ui";
 

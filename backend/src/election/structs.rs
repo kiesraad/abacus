@@ -90,6 +90,7 @@ impl ElectionCategory {
 )]
 #[strum(serialize_all = "lowercase")]
 pub enum ElectionStatus {
+    Created,
     DataEntryInProgress,
     DataEntryFinished,
 }

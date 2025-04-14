@@ -41,7 +41,7 @@ pub struct CreatedByAuthority {
 #[serde(rename_all = "PascalCase")]
 pub struct AuthorityAddress {}
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ElectionCategory {
     /// Eerste kamer - senate
     EK,
@@ -73,7 +73,7 @@ impl From<crate::election::ElectionCategory> for ElectionCategory {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ElectionSubcategory {
     /// Provinciale staten (provinicial council), single electoral district
     PS1,
@@ -111,6 +111,8 @@ pub struct ElectionIdentifier {
     pub id: String,
     pub election_name: String,
     pub election_category: ElectionCategory,
+
+    // required in 110a
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -128,6 +130,8 @@ pub struct ElectionIdentifier {
     pub election_domain: Option<ElectionDomain>,
     #[serde(rename(serialize = "kr:ElectionDate", deserialize = "ElectionDate"))]
     pub election_date: String,
+
+    // required in 110a, omitted in 110b
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -153,6 +157,13 @@ pub enum EMLImportError {
     MissingNumberOfSeats,
     NumberOfSeatsNotInRange,
     InvalidDateFormat,
+    MissingNominationDate,
+    MissingSubcategory,
+    MismatchNumberOfSeats,
+    MissingPreferenceThreshold,
+    MismatchPreferenceThreshold,
+    Needs101a,
+    TooManyPoliticalGroups,
 }
 
 /// Name and id of the specific contest

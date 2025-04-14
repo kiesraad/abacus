@@ -2947,6 +2947,7 @@
         "type": "string",
         "description": "Election status (limited for now)",
         "enum": [
+          "Created",
           "DataEntryInProgress",
           "DataEntryFinished"
         ]

@@ -425,7 +425,7 @@ export interface ElectionRequest {
 /**
  * Election status (limited for now)
  */
-export type ElectionStatus = "DataEntryInProgress" | "DataEntryFinished";
+export type ElectionStatus = "Created" | "DataEntryInProgress" | "DataEntryFinished";
 
 /**
  * Election polling stations data entry statuses response

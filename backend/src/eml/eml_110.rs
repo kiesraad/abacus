@@ -1,10 +1,13 @@
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
+use crate::election::PoliticalGroup;
+
 use super::{
     EMLBase,
     common::{
-        ContestIdentifier, EMLImportError, ElectionCategory, ElectionIdentifier, ManagingAuthority,
+        ContestIdentifier, EMLImportError, ElectionCategory, ElectionIdentifier,
+        ElectionSubcategory, ManagingAuthority,
     },
 };
 
@@ -46,13 +49,22 @@ impl EML110 {
     }
 
     pub fn as_crate_election(&self) -> Result<crate::election::Election, EMLImportError> {
+        // we need to be importing from a 110a file
+        if self.base.id != "110a" {
+            return Err(EMLImportError::Needs101a);
+        }
+
+        // we need a region
         let Some(region) = self.first_region() else {
             return Err(EMLImportError::MissingRegion);
         };
+
+        // we currently only support GR elections
         let ElectionCategory::GR = self.election_identifier().election_category else {
             return Err(EMLImportError::OnlyMunicipalSupported);
         };
 
+        // extract number of seats, if not available: error
         let Some(number_of_seats) = self.election().number_of_seats else {
             return Err(EMLImportError::MissingNumberOfSeats);
         };
@@ -63,23 +75,85 @@ impl EML110 {
             return Err(EMLImportError::NumberOfSeatsNotInRange);
         }
 
+        // election subcategory is required
+        let Some(election_subcategory) = self.election_identifier().election_subcategory.clone()
+        else {
+            return Err(EMLImportError::MissingSubcategory);
+        };
+
+        // preference threshold is required
+        let Some(preference_threshold) = self.election().preference_threshold else {
+            return Err(EMLImportError::MissingPreferenceThreshold);
+        };
+
+        // check for consistency, number of seats, subcategory and preference threshold need to match
+        if election_subcategory == ElectionSubcategory::GR1 {
+            if number_of_seats >= 19 {
+                return Err(EMLImportError::MismatchNumberOfSeats);
+            }
+
+            if preference_threshold != 50 {
+                return Err(EMLImportError::MismatchPreferenceThreshold);
+            }
+        }
+
+        if election_subcategory == ElectionSubcategory::GR2 {
+            if number_of_seats < 19 {
+                return Err(EMLImportError::MismatchNumberOfSeats);
+            }
+
+            if preference_threshold != 25 {
+                return Err(EMLImportError::MismatchPreferenceThreshold);
+            }
+        }
+
+        // get and parse the election date
         let Ok(election_date) =
             NaiveDate::parse_from_str(&self.election_identifier().election_date, "%Y-%m-%d")
         else {
             return Err(EMLImportError::InvalidDateFormat);
         };
 
+        // get and parse the nomination date (required for 110a)
+        let nomination_date = self
+            .election_identifier()
+            .nomination_date
+            .as_ref()
+            .ok_or(EMLImportError::MissingNominationDate)?;
+        let Ok(nomination_date) = NaiveDate::parse_from_str(&nomination_date[..], "%Y-%m-%d")
+        else {
+            return Err(EMLImportError::InvalidDateFormat);
+        };
+
+        // extract initial listing of political groups
+        let political_groups = self
+            .election()
+            .registered_parties
+            .iter()
+            .enumerate()
+            .map(|(idx, rp)| {
+                Ok(PoliticalGroup {
+                    // temporary group number, actual group numbers will be imported from candidate list
+                    number: u32::try_from(idx + 1)
+                        .or(Err(EMLImportError::TooManyPoliticalGroups))?,
+                    name: rp.registered_appellation.clone(),
+                    candidates: vec![],
+                })
+            })
+            .collect::<Result<Vec<PoliticalGroup>, EMLImportError>>()?;
+
+        // construct the election
         let election = crate::election::Election {
-            id: u32::MAX,
+            id: u32::MAX, // automatically generated once inserted in the database
             name: self.election_identifier().election_name.clone(),
             location: region.region_name.clone(),
-            number_of_voters: u32::MAX,
+            number_of_voters: 0, // max votes is in 110b, so nothing for now
             category: crate::election::ElectionCategory::Municipal,
             number_of_seats,
             election_date,
-            nomination_date: election_date,
-            status: crate::election::ElectionStatus::DataEntryInProgress,
-            political_groups: Some(vec![]),
+            nomination_date,
+            status: crate::election::ElectionStatus::Created,
+            political_groups: Some(political_groups),
         };
 
         Ok(election)
@@ -102,8 +176,10 @@ pub struct EventIdentifier {}
 pub struct Election {
     election_identifier: ElectionIdentifier,
     contest: Contest,
+    // required in 110a, not in 110b
     #[serde(skip_serializing_if = "Option::is_none", default)]
     number_of_seats: Option<u32>,
+    // required in 110a, not in 110b
     #[serde(skip_serializing_if = "Option::is_none", default)]
     preference_threshold: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none", default)]

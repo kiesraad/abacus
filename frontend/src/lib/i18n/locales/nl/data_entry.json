@@ -26,5 +26,9 @@
     "return_paper": "Geef het papieren proces-verbaal terug aan de coördinator.",
     "second_entry_info": "Een andere invoerder doet straks de tweede invoer."
   },
+  "warning": {
+    "data_entry_not_possible": "Je kan stembureau {nr} niet invoeren.",
+    "data_entry_already_claimed": "Een andere invoerder is bezig met dit stembureau."
+  },
   "title": "Invoeren"
 }

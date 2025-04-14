@@ -1,21 +1,14 @@
-import { useParams } from "react-router";
-
 import { useElection } from "@/api/election/useElection";
+import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";
-import { parseIntStrict } from "@/lib/util/strings";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 export function CandidatesVotesPage() {
-  const { listNumber } = useParams();
+  const listNumber = useNumericParam("listNumber");
   const { election } = useElection();
 
-  if (!listNumber) {
-    throw new Error("Missing 'listNumber' parameter");
-  }
-
-  const parsedListNumber = parseIntStrict(listNumber);
-  const group = election.political_groups.find((group) => group.number === parsedListNumber);
+  const group = election.political_groups.find((group) => group.number === listNumber);
 
   if (!group) {
     return <div>{t("data_entry.list.not_found", { listNumber })}</div>;

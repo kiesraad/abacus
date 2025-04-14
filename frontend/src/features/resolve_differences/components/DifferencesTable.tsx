@@ -1,6 +1,6 @@
 import { Fragment, useId } from "react";
 
-import { Table } from "@/components/ui";
+import { Table } from "@/components/ui/Table/Table";
 
 import cls from "./ResolveDifferences.module.css";
 

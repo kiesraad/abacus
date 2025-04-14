@@ -124,7 +124,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ElectionDefinitionUploadResponse"
+                  "$ref": "#/components/schemas/RetractedEmlHash"
                 }
               }
             }
@@ -2791,20 +2791,6 @@
           "Municipal"
         ]
       },
-      "ElectionDefinitionUploadResponse": {
-        "type": "object",
-        "required": [
-          "hash"
-        ],
-        "properties": {
-          "hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
       "ElectionDetails": {
         "type": "object",
         "required": [
@@ -3052,6 +3038,20 @@
           "votes_counts": {
             "$ref": "#/components/schemas/VotesCounts",
             "description": "The total number of votes"
+          }
+        }
+      },
+      "EmlHash": {
+        "type": "object",
+        "required": [
+          "chunks"
+        ],
+        "properties": {
+          "chunks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -3712,6 +3712,32 @@
           "keep_second_entry",
           "discard_both_entries"
         ]
+      },
+      "RetractedEmlHash": {
+        "type": "object",
+        "required": [
+          "hash",
+          "retracted_indexes"
+        ],
+        "properties": {
+          "hash": {
+            "$ref": "#/components/schemas/EmlHash"
+          },
+          "retracted_indexes": {
+            "type": "array",
+            "items": false,
+            "prefixItems": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              }
+            ]
+          }
+        }
       },
       "Role": {
         "type": "string",

@@ -46,6 +46,7 @@ export class NetworkError extends FatalError {
 export class NotFoundError extends FatalError {
   path: string;
   message: TranslationPath;
+  vars?: Record<string, string | number>;
 
   constructor(message?: TranslationPath) {
     super(message || "error.not_found");
@@ -53,8 +54,9 @@ export class NotFoundError extends FatalError {
     this.path = window.location.pathname;
   }
 
-  withMessage(message: TranslationPath): this {
+  withMessage(message: TranslationPath, vars?: Record<string, string | number>): this {
     this.message = message;
+    this.vars = vars;
 
     return this;
   }

@@ -30,7 +30,7 @@ function render() {
 if (__API_MSW__) {
   // import msw-mock-api here instead of at the top of the file,
   // so that we only use MSW in development and don't need it in production
-  import("../msw-mock-api")
+  import("./msw-mock-api")
     .then((mockAPI) =>
       mockAPI
         .startMockAPI()

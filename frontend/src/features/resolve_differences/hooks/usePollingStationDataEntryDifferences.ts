@@ -15,7 +15,7 @@ interface PollingStationDataEntryStatus {
   status: { state: EntriesDifferent; status: "EntriesDifferent" } | null;
 }
 
-export function usePollingStationDataEntryStatus(pollingStationId: number): PollingStationDataEntryStatus {
+export function usePollingStationDataEntryDifferences(pollingStationId: number): PollingStationDataEntryStatus {
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
 

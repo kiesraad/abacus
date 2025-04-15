@@ -1,5 +1,7 @@
+import { useParams } from "react-router";
+
 import { render } from "@testing-library/react";
-import { beforeEach, describe, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/api/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
@@ -12,9 +14,11 @@ import {
   WhoAmIRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { waitFor } from "@/testing/test-utils";
+import { screen, waitFor } from "@/testing/test-utils";
 
 import { ResolveDifferencesPage } from "./ResolveDifferencesPage";
+
+vi.mock("react-router");
 
 const renderPage = () => {
   render(
@@ -34,12 +38,13 @@ describe("ResolveDifferencesPage", () => {
   });
 
   test("Should render a table", async () => {
-    overrideOnce("get", "/api/polling_stations/4/data_entries", 200, dataEntryStatusDifferences);
+    vi.mocked(useParams).mockReturnValue({ pollingStationId: "3" });
+    overrideOnce("get", "/api/polling_stations/3/data_entries", 200, dataEntryStatusDifferences);
     renderPage();
 
     // Wait for the page to be loaded
     await waitFor(() => {
-      // expect(screen.queryByRole("table")).toBeInTheDocument();
+      expect(screen.queryByRole("table")).toBeInTheDocument();
     });
   });
 });

@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 
 import { useElectionStatus } from "@/api/election/useElectionStatus";
-import { DataEntryStatusName } from "@/api/gen/openapi";
 import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { t } from "@/lib/i18n";
+import { DataEntryStatusName } from "@/types/generated/openapi";
 
 type Stat = {
   title: string;

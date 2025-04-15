@@ -1,4 +1,5 @@
-import { Election, ELECTION_DETAILS_REQUEST_PATH, PollingStation } from "./gen/openapi";
+import { Election, ELECTION_DETAILS_REQUEST_PATH, PollingStation } from "@/types/generated/openapi";
+
 import { useInitialApiGetWithErrors } from "./useInitialApiGet";
 
 export function useElectionDataRequest(electionId: number) {

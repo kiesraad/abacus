@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import { Election, PollingStation } from "@/api/gen/openapi";
+import { Election, PollingStation } from "@/types/generated/openapi";
 
 export interface iElectionProviderContext {
   election: Required<Election>;

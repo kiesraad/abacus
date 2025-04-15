@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { Fraction } from "@/api/gen/openapi";
+import { Fraction } from "@/types/generated/openapi";
 import { getFractionInteger, getFractionWithoutInteger } from "@/utils/fraction";
 
 import cls from "./DisplayFraction.module.css";

@@ -134,17 +134,17 @@ Generate Typescript types from `/backend/openapi.json`:
 npm run gen:openapi
 ```
 
-This results in `/frontend/lib/api/gen/openapi.ts`.
+This results in `/frontend/src/types/generated/openapi.ts`.
 
 #### gen_icons
 
-Generate React components from icons located in `/frontend/lib/ui/svg`:
+Generate React components from icons located in `/frontend/src/assets/icons`:
 
 ```sh
 npm run gen:icons
 ```
 
-This results in `/frontend/lib/icon/gen.tsx`.
+This results in `/frontend/src/components/generated/icons.tsx`.
 
 #### gen_po
 
@@ -152,7 +152,7 @@ Use this script to create `.po` files (one for every defined locale) that can de
 This script generates `.po` translation files from the current json translations in `/frontend/lib/i18n/loclales/<locale>/*.json`:
 
 ```sh
-npm run gen:po
+npm run generated:po
 ```
 
 This results in `/frontend/translations/<locale>.po`. These can be imported into translation software.
@@ -163,7 +163,7 @@ Use this script to convert modified `.po` files back to our application json tra
 This script generates json translation files from `.po` translation files in `/frontend/translations/<locale>.po`:
 
 ```sh
-npm run gen:translation-json
+npm run generated:translation-json
 ```
 
 This results in `/frontend/lib/i18n/loclales/<locale>/*.json`. These contain the texts used by the application.

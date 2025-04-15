@@ -1,9 +1,9 @@
 import { Link } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
-import { SeatChangeStep } from "@/api/gen/openapi";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { t, tx } from "@/lib/i18n";
+import { SeatChangeStep } from "@/types/generated/openapi";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import {

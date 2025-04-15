@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { Election } from "../gen/openapi";
+import { Election } from "@/types/generated/openapi";
+
 import RequestStateHandler from "../RequestStateHandler";
 import { useElectionDataRequest } from "../useElectionDataRequest";
 import { ElectionProviderContext } from "./ElectionProviderContext";

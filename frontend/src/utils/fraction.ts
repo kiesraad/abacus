@@ -1,4 +1,4 @@
-import { Fraction } from "@/api/gen/openapi";
+import { Fraction } from "@/types/generated/openapi";
 
 import { formatNumber } from "./format";
 

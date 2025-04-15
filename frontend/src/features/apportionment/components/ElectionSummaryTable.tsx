@@ -1,7 +1,7 @@
-import { Fraction, PreferenceThreshold, VotesCounts } from "@/api/gen/openapi";
 import { DisplayFraction } from "@/components/ui/DisplayFraction/DisplayFraction";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
+import { Fraction, PreferenceThreshold, VotesCounts } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/format";
 

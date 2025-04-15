@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
 import { AnyApiError, isSuccess } from "@/api/ApiResult";
-import { ELECTION_APPORTIONMENT_REQUEST_PATH, ElectionApportionmentResponse } from "@/api/gen/openapi";
 import { useApiClient } from "@/api/useApiClient";
+import { ELECTION_APPORTIONMENT_REQUEST_PATH, ElectionApportionmentResponse } from "@/types/generated/openapi";
 
 export function useApportionmentRequest(electionId: number) {
   const path: ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${electionId}/apportionment`;

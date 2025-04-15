@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { Fraction } from "@/api/gen/openapi";
+import { Fraction } from "@/types/generated/openapi";
 
 import { getFractionInteger, getFractionWithoutInteger } from "./fraction";
 

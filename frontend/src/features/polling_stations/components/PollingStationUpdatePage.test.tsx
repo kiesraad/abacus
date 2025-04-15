@@ -4,7 +4,6 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/api/election/ElectionProvider";
-import { PollingStation } from "@/api/gen/openapi";
 import {
   ElectionRequestHandler,
   PollingStationDeleteHandler,
@@ -13,6 +12,7 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, renderReturningRouter, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
+import { PollingStation } from "@/types/generated/openapi";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 

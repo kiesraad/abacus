@@ -1,4 +1,4 @@
-import { PollingStationResults } from "@/api/gen/openapi";
+import { PollingStationResults } from "@/types/generated/openapi";
 import { deformatNumber, formatNumber } from "@/utils/format";
 
 export type DifferencesValues = PollingStationResults["differences_counts"];

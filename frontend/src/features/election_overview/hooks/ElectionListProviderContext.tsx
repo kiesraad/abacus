@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import { Election } from "@/api/gen/openapi";
+import { Election } from "@/types/generated/openapi";
 
 export interface iElectionListProviderContext {
   electionList: Election[];

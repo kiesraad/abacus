@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import { DataEntryStatusName, Election, ElectionStatusResponseEntry, PollingStation, User } from "@/api/gen/openapi";
 import { IconPlus } from "@/components/generated/icons";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { Button } from "@/components/ui/Button/Button";
@@ -9,6 +8,13 @@ import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { PercentageAndColorClass, ProgressBar, ProgressBarColorClass } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
+import {
+  DataEntryStatusName,
+  Election,
+  ElectionStatusResponseEntry,
+  PollingStation,
+  User,
+} from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/format";
 
 import cls from "./ElectionStatus.module.css";

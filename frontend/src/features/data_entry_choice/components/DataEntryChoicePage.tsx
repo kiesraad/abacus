@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
-import { useElection } from "@/api/election/useElection";
-import { useElectionStatus } from "@/api/election/useElectionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
+import { useElection } from "@/hooks/election/useElection";
+import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/lib/i18n";
 
 import { DataEntryChoiceForm } from "./DataEntryChoiceForm";

@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { ApiClient, DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
-import { ApiResult, isSuccess } from "@/api/ApiResult";
+import { ApiClient, DEFAULT_CANCEL_REASON } from "./ApiClient";
+import { ApiResult, isSuccess } from "./ApiResult";
 import {
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PATH,
   LoginResponse,
   LOGOUT_REQUEST_PATH,
   WHOAMI_REQUEST_PATH,
-} from "@/api/gen/openapi";
+} from "./gen/openapi";
 
 export interface SessionState {
   user: LoginResponse | null;

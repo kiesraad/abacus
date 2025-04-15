@@ -7,7 +7,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/lib/i18n";
-import { formatDateTime } from "@/lib/util/format";
+import { formatDateTime } from "@/utils/format";
 
 import { useQueryParam } from "../hooks/useQueryParam";
 import { useUserListRequest } from "../hooks/useUserListRequest";

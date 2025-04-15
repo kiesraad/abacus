@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/Button/Button";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { t, tx } from "@/lib/i18n";
-import { cn } from "@/lib/util/classnames";
-import { parseIntUserInput } from "@/lib/util/strings";
 import { KeyboardKey } from "@/types/ui";
+import { cn } from "@/utils/classnames";
+import { parseIntUserInput } from "@/utils/strings";
 
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import {

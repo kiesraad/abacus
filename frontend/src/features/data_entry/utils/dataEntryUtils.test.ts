@@ -11,9 +11,19 @@ import {
   getDataEntrySummary,
   getNextSectionID,
   isFormSectionEmpty,
+  objectHasOnlyEmptyValues,
   resetFormSectionState,
 } from "./dataEntryUtils";
 import { ValidationResultSet } from "./ValidationResults";
+
+describe("objectHasOnlyEmptyValues", () => {
+  test("objectHasOnlyEmptyValues", () => {
+    expect(objectHasOnlyEmptyValues({ foo: "" })).equals(true);
+    expect(objectHasOnlyEmptyValues({ foo: 0 })).equals(true);
+    expect(objectHasOnlyEmptyValues({ foo: 1 })).equals(false);
+    expect(objectHasOnlyEmptyValues({ foo: 1, bar: "", baz: "" })).equals(false);
+  });
+});
 
 describe("formSectionComplete", () => {
   test("formSectionComplete", () => {

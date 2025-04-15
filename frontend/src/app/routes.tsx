@@ -32,6 +32,7 @@ import { PollingStationCreatePage } from "@/features/polling_stations/components
 import { PollingStationListPage } from "@/features/polling_stations/components/PollingStationListPage";
 import { PollingStationsLayout } from "@/features/polling_stations/components/PollingStationsLayout";
 import { PollingStationUpdatePage } from "@/features/polling_stations/components/PollingStationUpdatePage";
+import { ResolveDifferencesPage } from "@/features/resolve_differences/components/ResolveDifferencesPage";
 import { UserCreateDetailsPage } from "@/features/users/components/create/UserCreateDetailsPage";
 import { UserCreateLayout } from "@/features/users/components/create/UserCreateLayout";
 import { UserCreateRolePage } from "@/features/users/components/create/UserCreateRolePage";
@@ -76,7 +77,10 @@ export const routes = createRoutesFromElements(
             )
           }
         />
-        <Route path="status" element={<ElectionStatusPage />} />
+        <Route path="status" element={null}>
+          <Route index element={<ElectionStatusPage />} />
+          <Route path=":pollingStationId/resolve-differences" element={<ResolveDifferencesPage />} />
+        </Route>
         <Route path="polling-stations" element={<PollingStationsLayout />}>
           <Route index element={<PollingStationListPage />} />
           <Route path="create" element={<PollingStationCreatePage />} />

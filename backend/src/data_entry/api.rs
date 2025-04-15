@@ -463,6 +463,7 @@ async fn election_status(
 #[cfg(test)]
 pub mod tests {
     use axum::http::StatusCode;
+    use http_body_util::BodyExt;
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
@@ -613,6 +614,24 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone(), EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_polling_station_data_entry_status(pool: SqlitePool) {
+        finalise_different_entries(pool.clone()).await;
+        let response = polling_station_data_entry_status(
+            User::test_user(Role::Administrator, 1),
+            State(PollingStationDataEntries::new(pool.clone())),
+            Path(1),
+        )
+        .await
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let status: DataEntryStatus = serde_json::from_slice(&body).unwrap();
+
+        assert!(matches!(status, DataEntryStatus::EntriesDifferent(..)));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

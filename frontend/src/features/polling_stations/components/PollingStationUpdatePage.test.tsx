@@ -1,3 +1,5 @@
+import { useParams } from "react-router";
+
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -14,9 +16,7 @@ import { render, renderReturningRouter, screen, spyOnHandler, waitFor, within } 
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
-vi.mock(import("@/hooks/useNumericParam"), () => ({
-  useNumericParam: () => 1,
-}));
+vi.mock("react-router");
 
 describe("PollingStationUpdatePage", () => {
   const testPollingStation: PollingStation = {
@@ -33,6 +33,7 @@ describe("PollingStationUpdatePage", () => {
 
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationGetHandler, PollingStationUpdateHandler);
+    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1" });
   });
 
   test("Shows form", async () => {

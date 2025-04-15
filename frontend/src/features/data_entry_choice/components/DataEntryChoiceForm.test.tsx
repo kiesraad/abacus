@@ -585,20 +585,6 @@ describe("Test DataEntryChoiceForm", () => {
 
     renderDataEntryChoicePage();
 
-    // handlers are marked as "exhausted" after the first request so overriding it again without a reset will not work
-    // see: https://mswjs.io/docs/best-practices/network-behavior-overrides/#one-time-override
-    // server.resetHandlers();
-
-    // overrideOnce("get", "api/elections/1/status", 200, {
-    //   statuses: [
-    //     {
-    //       polling_station_id: testPollingStation.id,
-    //       status: "first_entry_in_progress",
-    //       first_entry_user_id: testUser.user_id + 1,
-    //     },
-    //   ],
-    // } satisfies ElectionStatusResponse);
-
     const user = userEvent.setup();
     const pollingStation = await screen.findByTestId("pollingStation");
     await user.type(pollingStation, testPollingStation.number.toString());

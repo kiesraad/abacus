@@ -37,6 +37,7 @@
     "vite.config.ts",
     "vite-prod.config.ts",
     "vitest.config.ts",
+    "__mocks__/**/*",
     "e2e-tests/**/*"
   ]
 }

@@ -1,3 +1,5 @@
+import { useParams } from "react-router";
+
 import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
@@ -14,13 +16,7 @@ import { candidate_nomination, election, election_summary, seat_assignment } fro
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentListDetailsPage } from "./ApportionmentListDetailsPage";
 
-const { mockedUseNumericParam } = vi.hoisted(() => {
-  return { mockedUseNumericParam: vi.fn() };
-});
-
-vi.mock(import("@/hooks/useNumericParam"), () => ({
-  useNumericParam: mockedUseNumericParam,
-}));
+vi.mock("react-router");
 
 const renderApportionmentPage = () =>
   render(
@@ -33,7 +29,7 @@ const renderApportionmentPage = () =>
 
 describe("ApportionmentListDetailsPage", () => {
   test("All tables visible", async () => {
-    mockedUseNumericParam.mockReturnValue(1);
+    vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment,
@@ -125,7 +121,7 @@ describe("ApportionmentListDetailsPage", () => {
   });
 
   test("No tables visible because 0 seats assigned", async () => {
-    mockedUseNumericParam.mockReturnValue(5);
+    vi.mocked(useParams).mockReturnValue({ pgNumber: "5" });
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment,
@@ -174,7 +170,7 @@ describe("ApportionmentListDetailsPage", () => {
 
   describe("Apportionment not yet available", () => {
     test("Not available until data entry is finalised", async () => {
-      mockedUseNumericParam.mockReturnValue(1);
+      vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 412, {
         error: "Election data entry first needs to be finalised",
@@ -199,7 +195,7 @@ describe("ApportionmentListDetailsPage", () => {
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
-      mockedUseNumericParam.mockReturnValue(1);
+      vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
@@ -224,7 +220,7 @@ describe("ApportionmentListDetailsPage", () => {
     });
 
     test("Not possible because all lists are exhausted", async () => {
-      mockedUseNumericParam.mockReturnValue(1);
+      vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "All lists are exhausted, not enough candidates to fill all seats",
@@ -251,7 +247,7 @@ describe("ApportionmentListDetailsPage", () => {
     });
 
     test("Internal Server Error renders error page", async () => {
-      mockedUseNumericParam.mockReturnValue(1);
+      vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
       // Since we test what happens after an error, we want vitest to ignore them
       vi.spyOn(console, "error").mockImplementation(() => {
         /* do nothing */

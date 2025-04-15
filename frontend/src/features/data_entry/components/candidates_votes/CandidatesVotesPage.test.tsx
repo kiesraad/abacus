@@ -1,3 +1,5 @@
+import { useParams } from "react-router";
+
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/api/election/ElectionProvider";
@@ -8,6 +10,8 @@ import { render, screen, waitFor } from "@/testing/test-utils";
 
 import { DataEntryProvider } from "../DataEntryProvider";
 import { CandidatesVotesPage } from "./CandidatesVotesPage";
+
+vi.mock("react-router");
 
 function renderPage() {
   return render(
@@ -20,21 +24,13 @@ function renderPage() {
   );
 }
 
-const { mockedUseNumericParam } = vi.hoisted(() => {
-  return { mockedUseNumericParam: vi.fn() };
-});
-
-vi.mock(import("@/hooks/useNumericParam"), () => ({
-  useNumericParam: mockedUseNumericParam,
-}));
-
 describe("Test CandidatesVotesPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler);
   });
 
   test("list not found shows error", async () => {
-    mockedUseNumericParam.mockReturnValue(123);
+    vi.mocked(useParams).mockReturnValue({ listNumber: "123" });
     renderPage();
 
     await waitFor(() => {
@@ -43,7 +39,7 @@ describe("Test CandidatesVotesPage", () => {
   });
 
   test("list found shows form", async () => {
-    mockedUseNumericParam.mockReturnValue(1);
+    vi.mocked(useParams).mockReturnValue({ listNumber: "1" });
     renderPage();
 
     await waitFor(() => {

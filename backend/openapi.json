@@ -106,7 +106,7 @@
     },
     "/api/elections/validate": {
       "post": {
-        "summary": "Create an election. For test usage only!",
+        "summary": "Uploads election definition, validates it and returns the associated election data and\na retracted hash, to be filled by the administrator",
         "operationId": "election_import_validate",
         "requestBody": {
           "content": {
@@ -124,7 +124,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RetractedEmlHash"
+                  "$ref": "#/components/schemas/ElectionDefinitionUploadResponse"
                 }
               }
             }
@@ -2791,6 +2791,21 @@
           "Municipal"
         ]
       },
+      "ElectionDefinitionUploadResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "election"
+        ],
+        "properties": {
+          "election": {
+            "$ref": "#/components/schemas/Election"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/RetractedEmlHash"
+          }
+        }
+      },
       "ElectionDetails": {
         "type": "object",
         "required": [
@@ -3038,20 +3053,6 @@
           "votes_counts": {
             "$ref": "#/components/schemas/VotesCounts",
             "description": "The total number of votes"
-          }
-        }
-      },
-      "EmlHash": {
-        "type": "object",
-        "required": [
-          "chunks"
-        ],
-        "properties": {
-          "chunks": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           }
         }
       },
@@ -3716,26 +3717,24 @@
       "RetractedEmlHash": {
         "type": "object",
         "required": [
-          "hash",
+          "chunks",
           "retracted_indexes"
         ],
         "properties": {
-          "hash": {
-            "$ref": "#/components/schemas/EmlHash"
+          "chunks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array holding the hash chunks as text"
           },
           "retracted_indexes": {
             "type": "array",
-            "items": false,
-            "prefixItems": [
-              {
-                "type": "integer",
-                "minimum": 0
-              },
-              {
-                "type": "integer",
-                "minimum": 0
-              }
-            ]
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Indexes of chunks that will be empty, sorted"
           }
         }
       },

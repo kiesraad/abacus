@@ -1,6 +1,14 @@
 {
   "create": "Verkiezing toevoegen",
   "import_eml": "Importeer verkiezingsdefinitie",
+  "check_eml": {
+    "title": "Controleer verkiezingsdefinitie",
+    "description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
+    "check_hash": {
+      "label": "Controle deel {stub}",
+      "hint": "Vul 4 karakters in"
+    }
+  },
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",
   "manage": "Beheer verkiezingen",

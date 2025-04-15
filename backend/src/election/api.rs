@@ -125,13 +125,20 @@ pub struct ElectionDefinitionUploadRequest {
     data: String,
 }
 
-/// Create an election. For test usage only!
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+pub struct ElectionDefinitionUploadResponse {
+    hash: RetractedEmlHash,
+    election: Election,
+}
+
+/// Uploads election definition, validates it and returns the associated election data and
+/// a retracted hash, to be filled by the administrator
 #[utoipa::path(
     post,
     path = "/api/elections/validate",
     request_body = ElectionRequest,
     responses(
-        (status = 201, description = "Election validated", body = RetractedEmlHash),
+        (status = 201, description = "Election validated", body = ElectionDefinitionUploadResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -140,8 +147,10 @@ pub struct ElectionDefinitionUploadRequest {
 pub async fn election_import_validate(
     //_user: Admin,
     Json(edu): Json<ElectionDefinitionUploadRequest>,
-) -> Result<Json<RetractedEmlHash>, APIError> {
+) -> Result<Json<ElectionDefinitionUploadResponse>, APIError> {
     let eml = EML110::from_str(&edu.data)?;
-    let _election: Election = eml.as_crate_election()?;
-    Ok(Json(RetractedEmlHash::from(edu.data.as_bytes())))
+    Ok(Json(ElectionDefinitionUploadResponse {
+        hash: RetractedEmlHash::from(edu.data.as_bytes()),
+        election: eml.as_crate_election()?,
+    }))
 }

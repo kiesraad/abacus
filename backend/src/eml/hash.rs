@@ -37,40 +37,46 @@ impl From<EmlHash> for String {
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct RetractedEmlHash {
-    hash: EmlHash,
-    pub retracted_indexes: (usize, usize),
+    /// Array holding the hash chunks as text
+    chunks: [String; CHUNK_COUNT],
+    /// Indexes of chunks that will be empty, sorted
+    pub retracted_indexes: [usize; 2],
 }
 
 impl From<&[u8]> for RetractedEmlHash {
     fn from(input: &[u8]) -> Self {
+        let mut chunks = EmlHash::from(input).chunks;
         let retracted_indexes = Self::random_chunk_indexes();
-        let mut hash = EmlHash::from(input);
-        hash.chunks[retracted_indexes.0] = String::new();
-        hash.chunks[retracted_indexes.1] = String::new();
+
+        // Retract the chunks by replacing it with an empty string
+        for index in retracted_indexes {
+            chunks[index] = String::new();
+        }
+
         Self {
-            hash,
+            chunks,
             retracted_indexes,
         }
     }
 }
 
 impl RetractedEmlHash {
-    pub fn retracted(&self) -> [String; CHUNK_COUNT] {
-        let mut result = self.hash.chunks.clone();
-        result[self.retracted_indexes.0] = String::new();
-        result[self.retracted_indexes.1] = String::new();
-        result
-    }
-
-    fn random_chunk_indexes() -> (usize, usize) {
+    fn random_chunk_indexes() -> [usize; 2] {
         use rand::Rng;
+
+        // Fill with random values
         let mut rng = rand::rng();
-        let first_idx = rng.random_range(0..CHUNK_COUNT);
-        let mut second_idx = rng.random_range(0..CHUNK_COUNT);
-        while first_idx == second_idx {
-            second_idx = rng.random_range(0..CHUNK_COUNT);
+        let mut result = [rng.random_range(0..CHUNK_COUNT); 2];
+
+        // Keep regenerating the second value until it differs from the first
+        while result[0] == result[1] {
+            result[1] = rng.random_range(0..CHUNK_COUNT);
         }
-        (first_idx, second_idx)
+
+        // We want the lowest index to be the first
+        result.sort();
+
+        result
     }
 }
 

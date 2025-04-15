@@ -374,6 +374,11 @@ export interface ElectionApportionmentResponse {
  */
 export type ElectionCategory = "Municipal";
 
+export interface ElectionDefinitionUploadResponse {
+  election: Election;
+  hash: RetractedEmlHash;
+}
+
 export interface ElectionDetails {
   electionCategory: string;
   electionElectionDate: string;
@@ -464,10 +469,6 @@ export interface ElectionSummary {
   voters_counts: VotersCounts;
   /** The total number of votes */
   votes_counts: VotesCounts;
-}
-
-export interface EmlHash {
-  chunks: string[];
 }
 
 export interface ErrorDetails {
@@ -739,8 +740,10 @@ export interface PreferenceThreshold {
 export type ResolveAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
 
 export interface RetractedEmlHash {
-  hash: EmlHash;
-  retracted_indexes: unknown[];
+  /** Array holding the hash chunks as text */
+  chunks: string[];
+  /** Indexes of chunks that will be empty, sorted */
+  retracted_indexes: number[];
 }
 
 export type Role = "administrator" | "typist" | "coordinator";

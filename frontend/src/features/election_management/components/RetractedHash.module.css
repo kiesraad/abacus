@@ -1,0 +1,17 @@
+.hash {
+  line-height: 2rem;
+}
+
+.hashChunkStub {
+  display: inline;
+  color: var(--base-white);
+  background-color: var(--gray-600);
+  width: 54px;
+  height: 24px;
+  text-align: center;
+  padding: 2px 25px 2px 25px;
+}
+
+.hashChunkStubHighlight {
+  background-color: var(--interactive-default);
+}

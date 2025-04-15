@@ -1,7 +1,7 @@
 import * as React from "react";
 import { RouterProvider } from "react-router";
 
-import { ApiProvider } from "@/api/ApiProvider";
+import { ApiProvider } from "@/app/ApiProvider";
 
 import { getRouter, Router } from "./router";
 

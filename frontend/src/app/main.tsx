@@ -2,9 +2,9 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 
-import { ApiProvider } from "@/api/ApiProvider";
 import "@/styles/index.css";
 
+import { ApiProvider } from "./ApiProvider";
 import { routes } from "./routes";
 
 const rootDiv = document.getElementById("root");

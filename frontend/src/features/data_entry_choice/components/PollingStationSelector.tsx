@@ -9,6 +9,7 @@ import { IconError, IconWarning } from "@/lib/icon";
 import { cn } from "@/lib/util/classnames";
 import { removeLeadingZeros } from "@/lib/util/strings";
 
+import { useSingleCall } from "../utils/useSingleCall";
 import { PollingStationUserStatus, PollingStationWithStatus } from "../utils/util";
 import cls from "./DataEntryChoice.module.css";
 
@@ -40,6 +41,7 @@ export interface PollingStationSelectorProps {
   currentPollingStation: PollingStationWithStatus | undefined;
   setAlert: Dispatch<SetStateAction<string | undefined>>;
   handleSubmit: () => void;
+  refetchStatuses: () => void;
 }
 
 export function PollingStationSelector({
@@ -49,7 +51,10 @@ export function PollingStationSelector({
   currentPollingStation,
   setAlert,
   handleSubmit,
+  refetchStatuses,
 }: PollingStationSelectorProps) {
+  const [refetch, reset] = useSingleCall(refetchStatuses);
+
   const renderWarningMessage = (content: ReactNode) => (
     <FeedbackMessage
       messageType="warning"
@@ -132,10 +137,12 @@ export function PollingStationSelector({
           setPollingStationNumber(e.target.value);
         }}
         onKeyDown={(e) => {
+          refetch();
           if (e.shiftKey && e.key === "Enter") {
             handleSubmit();
           }
         }}
+        onBlur={reset}
       />
 
       {pollingStationNumber.trim() !== "" && getFeedbackContent()}

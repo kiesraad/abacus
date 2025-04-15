@@ -72,7 +72,7 @@ export function DataEntryChoicePage() {
         </Alert>
       )}
 
-      {claimedPollingStationNumber && (
+      {claimedPollingStationNumber !== 0 && (
         <Alert type="warning" onClose={closeDataEntryClaimedAlert}>
           <h2>
             {t("data_entry.warning.data_entry_not_possible", {

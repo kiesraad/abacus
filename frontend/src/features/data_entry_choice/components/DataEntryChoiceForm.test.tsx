@@ -509,4 +509,46 @@ describe("Test DataEntryChoiceForm", () => {
 
     expect(within(list).getByRole("link")).toHaveTextContent(testPollingStation.name);
   });
+
+  test("Show recent status when searching for polling station", async () => {
+    server.use(ElectionRequestHandler);
+    const testPollingStation = pollingStationMockData[0]!;
+    // Have the server return an in progress polling station that is owned by a logged-in user.
+    overrideOnce("get", "api/elections/1/status", 200, {
+      statuses: [
+        {
+          polling_station_id: testPollingStation.id,
+          status: "first_entry_not_started",
+        },
+      ],
+    } satisfies ElectionStatusResponse);
+
+    renderDataEntryChoicePage();
+
+    // handlers are marked as "exhausted" after the first request so overriding it again without a reset will not work
+    // see: https://mswjs.io/docs/best-practices/network-behavior-overrides/#one-time-override
+    server.resetHandlers();
+
+    overrideOnce("get", "api/elections/1/status", 200, {
+      statuses: [
+        {
+          polling_station_id: testPollingStation.id,
+          status: "first_entry_in_progress",
+          first_entry_user_id: testUser.user_id + 1,
+        },
+      ],
+    } satisfies ElectionStatusResponse);
+
+    const user = userEvent.setup();
+    const pollingStation = await screen.findByTestId("pollingStation");
+    await user.type(pollingStation, testPollingStation.number.toString());
+
+    const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+
+    expect(
+      await within(pollingStationFeedback).findByText(
+        `Een andere invoerder is bezig met stembureau ${testPollingStation.number}`,
+      ),
+    ).toBeVisible();
+  });
 });

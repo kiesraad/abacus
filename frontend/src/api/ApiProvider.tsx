@@ -1,9 +1,8 @@
 import { ReactNode, useEffect } from "react";
 
-import { ApiClient } from "@/api/ApiClient";
-import { ApiProviderContext, ApiState } from "@/api/ApiProviderContext";
-import { ApiError } from "@/api/ApiResult";
-
+import { ApiClient } from "./ApiClient";
+import { ApiProviderContext, ApiState } from "./ApiProviderContext";
+import { ApiError } from "./ApiResult";
 import useSessionState from "./useSessionState";
 
 export interface ApiProviderProps {

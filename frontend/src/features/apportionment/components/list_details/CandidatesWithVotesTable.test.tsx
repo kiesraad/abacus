@@ -10,7 +10,7 @@ import {
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
 
 describe("CandidatesWithVotesTable", () => {
-  test("renders a table with the candidates, localities and number of votes", async () => {
+  test("renders a table with the candidates and localities", async () => {
     render(
       <CandidatesWithVotesTable
         id="test-table"
@@ -37,7 +37,7 @@ describe("CandidatesWithVotesTable", () => {
     ]);
   });
 
-  test("renders a table with the candidates, localities and number of votes", async () => {
+  test("renders a table with the candidates and number of votes", async () => {
     render(
       <CandidatesWithVotesTable
         id="test-table"

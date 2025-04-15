@@ -1,4 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
+//import { http, HttpResponse } from "msw";
+
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/api/election/ElectionProvider";
@@ -39,6 +42,10 @@ describe("Test DataEntryChoiceForm", () => {
     (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(ElectionStatusRequestHandler);
   });
+  // afterEach(() => {
+  //   server.resetHandlers();
+  //   vi.clearAllMocks();
+  // });
   describe("Polling station choice form", () => {
     test("Form field entry", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
@@ -232,18 +239,26 @@ describe("Test DataEntryChoiceForm", () => {
 
     test("Selecting polling station with second data entry opens correct page", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, {
-        statuses: [
-          {
-            polling_station_id: 1,
-            status: "second_entry_not_started",
-          },
-          {
-            polling_station_id: 2,
-            status: "definitive",
-          },
-        ],
-      } satisfies ElectionStatusResponse);
+
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                {
+                  polling_station_id: 1,
+                  status: "second_entry_not_started",
+                },
+                {
+                  polling_station_id: 2,
+                  status: "definitive",
+                },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
 
       const router = renderDataEntryChoicePage();
 
@@ -315,26 +330,34 @@ describe("Test DataEntryChoiceForm", () => {
 
     test("All data entries of polling stations are finished, polling station list shows message", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, {
-        statuses: [
-          {
-            polling_station_id: 1,
-            status: "definitive",
-          },
-          {
-            polling_station_id: 2,
-            status: "definitive",
-          },
-          {
-            polling_station_id: 3,
-            status: "definitive",
-          },
-          {
-            polling_station_id: 4,
-            status: "entries_different",
-          },
-        ],
-      } satisfies ElectionStatusResponse);
+
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                {
+                  polling_station_id: 1,
+                  status: "definitive",
+                },
+                {
+                  polling_station_id: 2,
+                  status: "definitive",
+                },
+                {
+                  polling_station_id: 3,
+                  status: "definitive",
+                },
+                {
+                  polling_station_id: 4,
+                  status: "entries_different",
+                },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
 
       const user = userEvent.setup();
       renderDataEntryChoicePage();
@@ -349,19 +372,25 @@ describe("Test DataEntryChoiceForm", () => {
 
     test("Second data entry has correct link", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, {
-        statuses: [
-          {
-            polling_station_id: 1,
-            status: "second_entry_not_started",
-          },
-          {
-            polling_station_id: 2,
-            status: "definitive",
-          },
-        ],
-      } satisfies ElectionStatusResponse);
-
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                {
+                  polling_station_id: 1,
+                  status: "second_entry_not_started",
+                },
+                {
+                  polling_station_id: 2,
+                  status: "definitive",
+                },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
       const router = renderDataEntryChoicePage();
 
       // Open the polling station list
@@ -414,16 +443,23 @@ describe("Test DataEntryChoiceForm", () => {
       server.use(ElectionRequestHandler);
 
       // Have the server return an in progress polling station that is owned by a different user.
-      overrideOnce("get", "api/elections/1/status", 200, {
-        statuses: [
-          {
-            polling_station_id: testPollingStation.id,
-            status: "first_entry_in_progress",
-            first_entry_user_id: testUser.user_id + 1,
-            first_entry_progress: 42,
-          },
-        ],
-      } satisfies ElectionStatusResponse);
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                {
+                  polling_station_id: testPollingStation.id,
+                  status: "first_entry_in_progress",
+                  first_entry_user_id: testUser.user_id + 1,
+                  first_entry_progress: 42,
+                },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
 
       // Render the polling station choice page with the overridden server responses
       renderDataEntryChoicePage();
@@ -460,16 +496,23 @@ describe("Test DataEntryChoiceForm", () => {
       server.use(ElectionRequestHandler);
 
       // Have the server return an in progress polling station that is owned by a logged-in user.
-      overrideOnce("get", "api/elections/1/status", 200, {
-        statuses: [
-          {
-            polling_station_id: testPollingStation.id,
-            status: "first_entry_in_progress",
-            first_entry_user_id: testUser.user_id,
-            first_entry_progress: 42,
-          },
-        ],
-      } satisfies ElectionStatusResponse);
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                {
+                  polling_station_id: testPollingStation.id,
+                  status: "first_entry_in_progress",
+                  first_entry_user_id: testUser.user_id,
+                  first_entry_progress: 42,
+                },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
 
       // Render the polling station choice page with the overridden server responses
       renderDataEntryChoicePage();
@@ -512,6 +555,23 @@ describe("Test DataEntryChoiceForm", () => {
 
   test("Show recent status when searching for polling station", async () => {
     server.use(ElectionRequestHandler);
+    server.use(
+      http.get("/api/elections/1/status", () =>
+        HttpResponse.json(
+          {
+            statuses: [
+              {
+                polling_station_id: testPollingStation.id,
+                status: "first_entry_in_progress",
+                first_entry_user_id: testUser.user_id + 1,
+              },
+            ],
+          } satisfies ElectionStatusResponse,
+          { status: 200 },
+        ),
+      ),
+    );
+
     const testPollingStation = pollingStationMockData[0]!;
     // Have the server return an in progress polling station that is owned by a logged-in user.
     overrideOnce("get", "api/elections/1/status", 200, {
@@ -527,17 +587,17 @@ describe("Test DataEntryChoiceForm", () => {
 
     // handlers are marked as "exhausted" after the first request so overriding it again without a reset will not work
     // see: https://mswjs.io/docs/best-practices/network-behavior-overrides/#one-time-override
-    server.resetHandlers();
+    // server.resetHandlers();
 
-    overrideOnce("get", "api/elections/1/status", 200, {
-      statuses: [
-        {
-          polling_station_id: testPollingStation.id,
-          status: "first_entry_in_progress",
-          first_entry_user_id: testUser.user_id + 1,
-        },
-      ],
-    } satisfies ElectionStatusResponse);
+    // overrideOnce("get", "api/elections/1/status", 200, {
+    //   statuses: [
+    //     {
+    //       polling_station_id: testPollingStation.id,
+    //       status: "first_entry_in_progress",
+    //       first_entry_user_id: testUser.user_id + 1,
+    //     },
+    //   ],
+    // } satisfies ElectionStatusResponse);
 
     const user = userEvent.setup();
     const pollingStation = await screen.findByTestId("pollingStation");

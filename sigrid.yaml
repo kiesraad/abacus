@@ -120,7 +120,7 @@ components:
       - ".*/frontend/src/components/ui/.*"
   - name: "(Frontend) Lib/Util"
     include:
-      - ".*/frontend/src/lib/util/.*"
+      - ".*/frontend/src/utils/.*"
 
   - name: "(Frontend) e2e tests"
     include:

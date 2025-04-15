@@ -67,7 +67,7 @@ describe("ElectionStatusPage", () => {
     renderElectionStatusPage();
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
     expect(screen.getByRole("button", { name: "Invoerfase afronden" })).toBeVisible();
@@ -85,7 +85,7 @@ describe("ElectionStatusPage", () => {
     renderElectionStatusPage();
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
 
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();

@@ -46,7 +46,7 @@ describe("Test DataEntryChoiceForm", () => {
 
       renderDataEntryChoicePage();
 
-      expect(await screen.findByRole("group", { name: "Welk stembureau ga je invoeren?" }));
+      expect(await screen.findByRole("group", { name: "Welk stembureau ga je invoeren?" })).toBeVisible();
       const pollingStation = screen.getByTestId("pollingStation");
 
       // Test if the feedback field shows an error
@@ -74,7 +74,7 @@ describe("Test DataEntryChoiceForm", () => {
         </ElectionProvider>,
       );
 
-      expect(await screen.findByRole("group", { name: "Verder met een volgend stembureau?" }));
+      expect(await screen.findByRole("group", { name: "Verder met een volgend stembureau?" })).toBeVisible();
       const pollingStation = screen.getByTestId("pollingStation");
 
       // Test if the polling station name is shown

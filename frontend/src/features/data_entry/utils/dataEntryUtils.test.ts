@@ -185,7 +185,7 @@ describe("getPollingStationSummary", () => {
       summary.notableFormSections.some(
         (item) => item.formSection.id === "differences_counts" && item.status === "accepted-warnings",
       ),
-    );
+    ).toBeTruthy();
 
     state.sections.voters_votes_counts.errors = new ValidationResultSet([errorWarningMocks.F201]);
 
@@ -199,7 +199,7 @@ describe("getPollingStationSummary", () => {
       summary.notableFormSections.some(
         (item) => item.formSection.id === "voters_votes_counts" && item.status === "errors",
       ),
-    );
+    ).toBeTruthy();
 
     state.sections.differences_counts.acceptWarnings = false;
 
@@ -213,6 +213,6 @@ describe("getPollingStationSummary", () => {
       summary.notableFormSections.some(
         (item) => item.formSection.id == "differences_counts" && item.status === "unaccepted-warnings",
       ),
-    );
+    ).toBeTruthy();
   });
 });

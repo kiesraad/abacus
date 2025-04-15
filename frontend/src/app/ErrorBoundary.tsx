@@ -18,7 +18,7 @@ export function ErrorBoundary() {
   console.error(error);
 
   if (error instanceof NotFoundError) {
-    return <NotFoundPage message={error.message} path={error.path} />;
+    return <NotFoundPage message={error.message} vars={error.vars} path={error.path} />;
   }
 
   if (error instanceof NetworkError) {

@@ -1,7 +1,7 @@
 use axum::{Json, extract::State};
 use axum_extra::extract::Query;
 use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -36,27 +36,34 @@ fn default_per_page() -> u32 {
     200
 }
 
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Deserialize, ToSchema, IntoParams)]
 #[serde(rename_all = "camelCase")]
 pub struct LogFilterQuery {
+    /// Page number, default 1
     #[serde(default = "default_page")]
     pub page: u32,
+    /// Number of items per page
     #[serde(default = "default_per_page")]
     pub per_page: u32,
+    /// Filter by log level
     #[serde(default)]
     pub level: Vec<String>,
+    /// Filter by event type
     #[serde(default)]
     pub event: Vec<String>,
+    /// Filter by user ID
     #[serde(default)]
     pub user: Vec<u32>,
+    /// Only show events since the specified timestamp
     #[serde(default)]
     pub since: Option<i64>,
 }
 
-/// Lists all users
+/// List audit events
 #[utoipa::path(
     get,
     path = "/api/log",
+    params(LogFilterQuery),
     responses(
         (status = 200, description = "Audit log event list", body = AuditLogListResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -94,7 +101,7 @@ pub struct AuditLogUser {
     pub role: Role,
 }
 
-/// Lists all users
+/// Lists all users that appear in the audit log
 #[utoipa::path(
     get,
     path = "/api/log-users",

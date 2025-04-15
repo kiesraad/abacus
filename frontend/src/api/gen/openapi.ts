@@ -75,7 +75,14 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
 // /api/log
-export type AUDIT_LOG_LIST_REQUEST_PARAMS = Record<string, never>;
+export interface AUDIT_LOG_LIST_REQUEST_PARAMS {
+  page: number;
+  perPage: number;
+  level: string[];
+  event: string[];
+  user: number[];
+  since: number | null;
+}
 export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 
 // /api/log-users

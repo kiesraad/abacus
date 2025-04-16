@@ -50,10 +50,6 @@ components:
       - ".*/backend/tests/.*"
 
   # Frontend components
-  - name: "(Frontend) App Root Files"
-    include:
-      - ".*/frontend/src/app.test.ts"
-      - ".*/frontend/src/main.tsx"
   - name: "(Frontend) App"
     include:
       - ".*/frontend/src/app/.*"

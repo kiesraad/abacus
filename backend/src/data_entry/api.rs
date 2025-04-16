@@ -37,12 +37,32 @@ pub struct ClaimDataEntryResponse {
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
+        .routes(routes!(polling_station_data_entry_status))
         .routes(routes!(polling_station_data_entry_claim))
         .routes(routes!(polling_station_data_entry_save))
         .routes(routes!(polling_station_data_entry_delete))
         .routes(routes!(polling_station_data_entry_finalise))
         .routes(routes!(polling_station_data_entry_resolve))
         .routes(routes!(election_status))
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/polling_stations/{polling_station_id}/data_entries",
+    responses(
+        (status = 200, description = "Get data entries for polling station", body = DataEntryStatus),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+async fn polling_station_data_entry_status(
+    _user: User,
+    State(data_entry_repo): State<PollingStationDataEntries>,
+    Path(id): Path<u32>,
+) -> Result<Json<DataEntryStatus>, APIError> {
+    let status = data_entry_repo.get(id).await?;
+
+    Ok(Json(status))
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
@@ -443,6 +463,7 @@ async fn election_status(
 #[cfg(test)]
 pub mod tests {
     use axum::http::StatusCode;
+    use http_body_util::BodyExt;
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
@@ -593,6 +614,24 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone(), EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_polling_station_data_entry_status(pool: SqlitePool) {
+        finalise_different_entries(pool.clone()).await;
+        let response = polling_station_data_entry_status(
+            User::test_user(Role::Administrator, 1),
+            State(PollingStationDataEntries::new(pool.clone())),
+            Path(1),
+        )
+        .await
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let status: DataEntryStatus = serde_json::from_slice(&body).unwrap();
+
+        assert!(matches!(status, DataEntryStatus::EntriesDifferent(..)));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

@@ -6,9 +6,9 @@ import { describe, expect, test } from "vitest";
 
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
-import { TestUserProvider } from "@/hooks/user/TestUserProvider";
 import { overrideOnce } from "@/testing/server";
 import { render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
+import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 import { AuthorizationDialog } from "./AuthorizationDialog";

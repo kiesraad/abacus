@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import { AuditLogEvent } from "@/api/gen/openapi";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { hasTranslation, t, TranslationPath } from "@/lib/i18n";
-import { formatDateTimeFull } from "@/lib/util/format";
+import { formatDateTimeFull } from "@/utils/format";
 
 import cls from "./LogsHomePage.module.css";
 

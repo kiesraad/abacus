@@ -4,7 +4,7 @@ import { Navigate, useLocation } from "react-router";
 import { useApiState } from "@/api/useApiState";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
-import { formatTimeToGo } from "@/lib/util/format";
+import { formatTimeToGo } from "@/utils/format";
 
 import { t, tx } from "@kiesraad/i18n";
 

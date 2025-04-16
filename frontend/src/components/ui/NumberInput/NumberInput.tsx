@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { deformatNumber, formatNumber, validateNumberString } from "@/lib/util/format";
+import { deformatNumber, formatNumber, validateNumberString } from "@/utils/format";
 
 export type NumberInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 

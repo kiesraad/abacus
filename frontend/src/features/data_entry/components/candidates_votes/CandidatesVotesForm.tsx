@@ -13,8 +13,8 @@ import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { t } from "@/lib/i18n";
-import { getCandidateFullName } from "@/lib/util/candidate";
 import { KeyboardKey } from "@/types/ui";
+import { getCandidateFullName } from "@/utils/candidate";
 
 import { DataEntryNavigation } from "../DataEntryNavigation";
 import { formValuesToValues } from "./candidatesVotesValues";

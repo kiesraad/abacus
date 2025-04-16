@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { PercentageAndColorClass, ProgressBar, ProgressBarColorClass } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
-import { formatDateTime } from "@/lib/util/format";
+import { formatDateTime } from "@/utils/format";
 
 import cls from "./ElectionStatus.module.css";
 

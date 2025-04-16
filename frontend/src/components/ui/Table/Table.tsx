@@ -2,8 +2,8 @@ import * as React from "react";
 import { To, useNavigate } from "react-router";
 
 import { Fraction } from "@/api/gen/openapi";
-import { cn } from "@/lib/util/classnames";
-import { getFractionInteger, getFractionWithoutInteger } from "@/lib/util/fraction";
+import { cn } from "@/utils/classnames";
+import { getFractionInteger, getFractionWithoutInteger } from "@/utils/fraction";
 
 import cls from "./Table.module.css";
 

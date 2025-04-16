@@ -39,14 +39,14 @@ describe("ApportionmentListDetailsPage", () => {
 
     renderApportionmentPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" })).toBeVisible();
     expect(await screen.findByTestId("text-political-group-assigned-nr-seats")).toHaveTextContent(
       "Lijst 1 - Political Group A heeft 12 zetels toegewezen gekregen.",
     );
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Met voorkeur gekozen kandidaten" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Met voorkeur gekozen kandidaten" })).toBeVisible();
     expect(await screen.findByTestId("text-preferentially-chosen-candidates")).toHaveTextContent(
       "De volgende kandidaten zijn met voorkeursstemmen gekozen. Deze kandidaten hebben meer dan 50% van de kiesdeler gehaald.",
     );
@@ -65,7 +65,7 @@ describe("ApportionmentListDetailsPage", () => {
       ["Bakker, S. (Sophie) (v)", "Test Location", "40"],
     ]);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Overige gekozen kandidaten" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Overige gekozen kandidaten" })).toBeVisible();
     expect(await screen.findByTestId("text-other-chosen-candidates")).toHaveTextContent(
       "De overige aan de lijst toegewezen zetels gaan naar de volgende kandidaten.",
     );
@@ -78,7 +78,7 @@ describe("ApportionmentListDetailsPage", () => {
       ["van den Berg, M. (Marijke) (v)", "Test Location", "20"],
     ]);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Rangschikking kandidaten" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Rangschikking kandidaten" })).toBeVisible();
     expect(await screen.findByTestId("text-ranking-candidates")).toHaveTextContent(
       "De kandidaten zijn gerangschikt in de volgorde zoals hieronder aangegeven.",
     );
@@ -100,7 +100,7 @@ describe("ApportionmentListDetailsPage", () => {
       ["van den Berg, M. (Marijke) (v)", "Test Location"],
     ]);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" })).toBeVisible();
     const total_votes_per_candidate_table = await screen.findByTestId("total-votes-per-candidate-table");
     expect(total_votes_per_candidate_table).toBeVisible();
     expect(total_votes_per_candidate_table).toHaveTableContent([
@@ -131,32 +131,32 @@ describe("ApportionmentListDetailsPage", () => {
 
     renderApportionmentPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Lijst 5 - Political Group E" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Lijst 5 - Political Group E" })).toBeVisible();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" })).toBeVisible();
     expect(await screen.findByTestId("text-political-group-assigned-nr-seats")).toHaveTextContent(
       "Lijst 5 - Political Group E heeft 0 zetels toegewezen gekregen.",
     );
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Met voorkeur gekozen kandidaten" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Met voorkeur gekozen kandidaten" })).toBeVisible();
     expect(await screen.findByTestId("text-preferentially-chosen-candidates")).toHaveTextContent(
       "Geen van de kandidaten heeft meer dan 50% van de kiesdeler gehaald. Niemand is met voorkeursstemmen gekozen.",
     );
     expect(screen.queryByTestId("preferentially-chosen-candidates-table")).not.toBeInTheDocument();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Overige gekozen kandidaten" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Overige gekozen kandidaten" })).toBeVisible();
     expect(await screen.findByTestId("text-other-chosen-candidates")).toHaveTextContent(
       "Er zijn geen andere kandidaten gekozen.",
     );
     expect(screen.queryByTestId("other-chosen-candidates-table")).not.toBeInTheDocument();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Rangschikking kandidaten" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Rangschikking kandidaten" })).toBeVisible();
     expect(await screen.findByTestId("text-ranking-candidates")).toHaveTextContent(
       "De kandidaten zijn gerangschikt in de volgorde zoals ze op de lijst stonden.",
     );
     expect(screen.queryByTestId("candidates-ranking-table")).not.toBeInTheDocument();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" })).toBeVisible();
     const total_votes_per_candidate_table = await screen.findByTestId("total-votes-per-candidate-table");
     expect(total_votes_per_candidate_table).toBeVisible();
     expect(total_votes_per_candidate_table).toHaveTableContent([
@@ -181,7 +181,7 @@ describe("ApportionmentListDetailsPage", () => {
       renderApportionmentPage();
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
@@ -206,7 +206,7 @@ describe("ApportionmentListDetailsPage", () => {
       renderApportionmentPage();
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
@@ -231,7 +231,7 @@ describe("ApportionmentListDetailsPage", () => {
       renderApportionmentPage();
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(

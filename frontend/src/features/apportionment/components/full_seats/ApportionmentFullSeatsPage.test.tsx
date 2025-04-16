@@ -34,9 +34,11 @@ describe("ApportionmentFullSeatsPage", () => {
 
     renderApportionmentFullSeatsPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" })).toBeVisible();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Hoe vaak haalde elke partij de kiesdeler?" }));
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Hoe vaak haalde elke partij de kiesdeler?" }),
+    ).toBeVisible();
     const full_seats_table = await screen.findByTestId("full-seats-table");
     expect(full_seats_table).toBeVisible();
     expect(full_seats_table).toHaveTableContent([
@@ -51,7 +53,9 @@ describe("ApportionmentFullSeatsPage", () => {
       ["8", "Political Group H", "52", ":", "80", "", "=", "0"],
     ]);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Hoeveel restzetels zijn er te verdelen?" }));
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Hoeveel restzetels zijn er te verdelen?" }),
+    ).toBeVisible();
     const residual_seats_calculation_table = await screen.findByTestId("residual-seats-calculation-table");
     expect(residual_seats_calculation_table).toBeVisible();
     expect(residual_seats_calculation_table).toHaveTableContent([
@@ -73,7 +77,7 @@ describe("ApportionmentFullSeatsPage", () => {
       renderApportionmentFullSeatsPage();
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
@@ -95,7 +99,7 @@ describe("ApportionmentFullSeatsPage", () => {
       renderApportionmentFullSeatsPage();
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
@@ -117,7 +121,7 @@ describe("ApportionmentFullSeatsPage", () => {
       renderApportionmentFullSeatsPage();
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
@@ -141,7 +145,7 @@ describe("ApportionmentFullSeatsPage", () => {
       renderApportionmentFullSeatsPage();
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(

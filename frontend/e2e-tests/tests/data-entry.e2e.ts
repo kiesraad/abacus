@@ -946,7 +946,7 @@ test.describe("api error responses", () => {
     await expect(dataEntryHomePage.fieldset).toBeVisible();
   });
 
-  test("Second data entry user must be different from first entry", async ({ page, pollingStation }) => {
+  test("UI Error: Second data entry user must be different from first entry", async ({ page, pollingStation }) => {
     await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1/claim`, async (route) => {
       await route.fulfill({
         status: 409,
@@ -963,5 +963,19 @@ test.describe("api error responses", () => {
 
     // Data entry currently returns "null" for all responses without results
     await expect(recountedPage.next).toBeHidden();
+  });
+
+  test("UI Warning: Second data entry user must be different from first entry", async ({
+    page,
+    pollingStationFirstEntryDone,
+  }) => {
+    await page.goto(`/elections/${pollingStationFirstEntryDone.election_id}/data-entry`);
+    const dataEntryHomePage = new DataEntryHomePage(page);
+
+    await dataEntryHomePage.pollingStationNumber.fill(pollingStationFirstEntryDone.number.toString());
+
+    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(
+      `Je mag stembureau ${pollingStationFirstEntryDone.number} niet nog een keer invoeren`,
+    );
   });
 });

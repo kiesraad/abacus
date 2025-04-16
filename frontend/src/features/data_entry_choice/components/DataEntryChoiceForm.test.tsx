@@ -1,7 +1,5 @@
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
-//import { http, HttpResponse } from "msw";
-
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/api/election/ElectionProvider";
@@ -42,10 +40,6 @@ describe("Test DataEntryChoiceForm", () => {
     (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(ElectionStatusRequestHandler);
   });
-  // afterEach(() => {
-  //   server.resetHandlers();
-  //   vi.clearAllMocks();
-  // });
   describe("Polling station choice form", () => {
     test("Form field entry", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);

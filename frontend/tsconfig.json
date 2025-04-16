@@ -20,11 +20,7 @@
     "rootDir": ".",
     "paths": {
       "ladle/*": [".ladle/*"],
-      "@/*": ["src/*"],
-      "@kiesraad/api-mocks": ["src/testing/api-mocks/index.ts"],
-      "@kiesraad/test": ["src/testing/index.ts"],
-      "@kiesraad/util": ["src/lib/util/index.ts"],
-      "@kiesraad/i18n": ["src/lib/i18n/index.ts"]
+      "@/*": ["src/*"]
     },
     "types": ["node", "vite/client", "vitest/importMeta"]
   },

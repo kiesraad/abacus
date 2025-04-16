@@ -1,6 +1,10 @@
 {
   "title": "Kandidaat",
   "Female": "v",
+  "list": {
+    "plural": "Kandidatenlijsten",
+    "singular": "Kandidatenlijst"
+  },
   "locality": "Woonplaats",
   "Male": "m",
   "X": "x"

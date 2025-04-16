@@ -1,6 +1,5 @@
+import { TranslationPath } from "@/lib/i18n";
 import { ErrorReference } from "@/types/generated/openapi";
-
-import { TranslationPath } from "@kiesraad/i18n";
 
 export class FatalError extends Error {}
 

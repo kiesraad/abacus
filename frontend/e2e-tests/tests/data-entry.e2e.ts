@@ -945,4 +945,23 @@ test.describe("api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
   });
+
+  test("Second data entry user must be different from first entry", async ({ page, pollingStation }) => {
+    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1/claim`, async (route) => {
+      await route.fulfill({
+        status: 409,
+        json: {
+          error: "Conflict",
+          fatal: false,
+          reference: "SecondEntryNeedsDifferentUser",
+        },
+      });
+    });
+
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+    const recountedPage = new RecountedPage(page);
+
+    // Data entry currently returns "null" for all responses without results
+    await expect(recountedPage.next).toBeHidden();
+  });
 });

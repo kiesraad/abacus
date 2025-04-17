@@ -45,7 +45,7 @@ export const DefaultProgressList: Story<Props> = ({ active }) => (
       </ProgressList.Scroll>
       <ProgressList.Fixed>
         <ProgressList.Item status="idle" id="idle-item">
-          <span>Controleren en opslaan -idle</span>
+          <span>Controleren en opslaan - idle</span>
         </ProgressList.Item>
       </ProgressList.Fixed>
     </ProgressList>

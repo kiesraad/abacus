@@ -5,13 +5,13 @@ import { isError, isSuccess } from "@/api/ApiResult";
 import {
   ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
   ElectionDefinitionUploadResponse,
-  RetractedEmlHash,
 } from "@/api/gen/openapi";
 import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert, Button, FileInput, InputField, ProgressList, StickyNav } from "@/components/ui";
+import { formatDateFull } from "@/lib/util/format";
 
 import { t, tx } from "@kiesraad/i18n";
 
@@ -87,59 +87,67 @@ export function ElectionCreatePage() {
           </ProgressList>
         </StickyNav>
         <article>
-          {file && data ? (
-            <article>
-              <h2>{t("election.check_eml.title")}</h2>
-              {tx("election.check_eml.description", {
-                file: () => {
-                  return <b>{file.name}</b>;
-                },
-              })}
-              <Alert type="notify" variant="no-icon" margin="mb-md-lg">
-                <b>{data.election.category}</b>
-                {data.election.election_date}
-                <span>
-                  <b>Digitale vingerafdruk</b> (hashcode):
-                </span>
-                <RetractedHash hash={data.hash.chunks} stubs={stubs} />
-              </Alert>
-              {stubs.map((stub, stubIndex) => (
-                <InputField
-                  key={stub.index}
-                  name={stub.index.toString()}
-                  type="text"
-                  label={t("election.check_eml.check_hash.label", { stub: stubIndex + 1 })}
-                  hint={t("election.check_eml.check_hash.hint")}
-                  fieldSize="medium"
-                  fieldWidth="narrow"
-                  onFocus={() => {
-                    const newStubs = [...stubs];
-                    newStubs[stubIndex]!.selected = true;
-                    setStubs(newStubs);
-                  }}
-                  onBlur={() => {
-                    const newStubs = [...stubs];
-                    newStubs[stubIndex]!.selected = false;
-                    setStubs(newStubs);
-                  }}
-                />
-              ))}
-              <Button>{t("next")}</Button>
-            </article>
-          ) : (
-            <article>
-              <h2>{t("election.import_eml")}</h2>
-              {error && (
-                <Alert type="error" title={t("election.invalid_election_definition.title")} inline>
-                  {t("election.invalid_election_definition.description")}
+          <section className="md">
+            {file && data ? (
+              <>
+                <h2>{t("election.check_eml.title")}</h2>
+                <p>
+                  {tx("election.check_eml.description", {
+                    file: () => {
+                      return <b>{file.name}</b>;
+                    },
+                  })}
+                </p>
+                <Alert type="notify" variant="no-icon" margin="mb-md-lg" small>
+                  <p>
+                    <strong>{data.election.category}</strong>
+                    <br />
+                    <span className="capitalize">{formatDateFull(new Date(data.election.election_date))}</span>
+                  </p>
+                  <p>
+                    <strong>Digitale vingerafdruk</strong> (hashcode):
+                    <RetractedHash hash={data.hash.chunks} stubs={stubs} />
+                  </p>
                 </Alert>
-              )}
-              <p className="mt-lg mb-lg">{t("election.use_instructions_to_import_eml")}</p>
-              <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)} file={file}>
-                {t("select_file")}
-              </FileInput>
-            </article>
-          )}
+                {stubs.map((stub, stubIndex) => (
+                  <InputField
+                    key={stub.index}
+                    name={stub.index.toString()}
+                    type="text"
+                    label={t("election.check_eml.check_hash.label", { stub: stubIndex + 1 })}
+                    hint={t("election.check_eml.check_hash.hint")}
+                    fieldSize="medium"
+                    fieldWidth="narrow"
+                    onFocus={() => {
+                      const newStubs = [...stubs];
+                      newStubs[stubIndex]!.selected = true;
+                      setStubs(newStubs);
+                    }}
+                    onBlur={() => {
+                      const newStubs = [...stubs];
+                      newStubs[stubIndex]!.selected = false;
+                      setStubs(newStubs);
+                    }}
+                    autoFocus={stubIndex === 0}
+                  />
+                ))}
+                <Button>{t("next")}</Button>
+              </>
+            ) : (
+              <>
+                <h2>{t("election.import_eml")}</h2>
+                {error && (
+                  <Alert type="error" title={t("election.invalid_election_definition.title")} inline>
+                    {t("election.invalid_election_definition.description")}
+                  </Alert>
+                )}
+                <p className="mt-lg mb-lg">{t("election.use_instructions_to_import_eml")}</p>
+                <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)} file={file}>
+                  {t("select_file")}
+                </FileInput>
+              </>
+            )}
+          </section>
         </article>
       </main>
       <Footer />

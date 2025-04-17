@@ -16,23 +16,26 @@ export function RetractedHash({ hash, stubs }: RetractedHashProps) {
   return (
     <div className={cls.hash}>
       {hash.map((chunk, hashIndex) => {
-        const prefix = hashIndex === 0 ? "" : "-";
+        const prefix = hashIndex === hash.length - 1 ? "" : "-";
         const stubIndex = stubs.findIndex((s) => s.index === hashIndex);
         // Either render a stub marker, or just return the prefix and chunk text
         if (stubIndex !== -1) {
           return (
             <>
-              {prefix}
-              <span
-                className={cn(cls.hashChunkStub, stubs[stubIndex]?.selected ? cls.hashChunkStubHighlight : undefined)}
-              >
+              <div className={cn(cls.chunkStub, stubs[stubIndex]?.selected ? cls.chunkStubFocus : undefined)}>
                 {stubIndex + 1}
-              </span>
+              </div>
+              {prefix}
             </>
           );
         }
 
-        return prefix + chunk;
+        return (
+          <>
+            <div className={cls.chunk}>{chunk}</div>
+            {prefix}
+          </>
+        );
       })}
     </div>
   );

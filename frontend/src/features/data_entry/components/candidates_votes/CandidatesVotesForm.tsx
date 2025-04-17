@@ -132,7 +132,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       </InputGrid>
       {missingTotalError && (
         <div id="missing-total-error">
-          <Alert type="error" variant="small">
+          <Alert type="error" small>
             <p>{t("candidates_votes.check_totals")}</p>
           </Alert>
         </div>
@@ -140,7 +140,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       <BottomBar type="inputGrid">
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
-            <Alert type="error" variant="small">
+            <Alert type="error" small>
               <p>{t("data_entry.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>

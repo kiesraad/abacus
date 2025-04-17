@@ -52,6 +52,15 @@ function isYesterday(date: Date): boolean {
   );
 }
 
+export function formatDateFull(date: Date) {
+  return date.toLocaleDateString(t("date_locale"), {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export function formatDateTimeFull(date: Date) {
   return date.toLocaleTimeString(t("date_locale"), {
     hour: "numeric",

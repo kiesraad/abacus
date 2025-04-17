@@ -63,20 +63,11 @@ impl From<&[u8]> for RetractedEmlHash {
 impl RetractedEmlHash {
     fn random_chunk_indexes() -> [usize; 2] {
         use rand::Rng;
-
-        // Fill with random values
         let mut rng = rand::rng();
-        let mut result = [rng.random_range(0..CHUNK_COUNT); 2];
-
-        // Keep regenerating the second value until it differs from the first
-        while result[0] == result[1] {
-            result[1] = rng.random_range(0..CHUNK_COUNT);
-        }
-
-        // We want the lowest index to be the first
-        result.sort();
-
-        result
+        [
+            rng.random_range(0..CHUNK_COUNT / 2),
+            rng.random_range((CHUNK_COUNT / 2) + 1..CHUNK_COUNT),
+        ]
     }
 }
 

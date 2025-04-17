@@ -186,11 +186,11 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
           </summary>
           <h2 className={cls.formTitle}>{t("polling_station_choice.choose_polling_station")}</h2>
           {!pollingStations.length ? (
-            <Alert type="error" variant="small">
+            <Alert type="error" small>
               <p>{t("polling_station_choice.no_polling_stations_found")}</p>
             </Alert>
           ) : !available.length ? (
-            <Alert type="notify" variant="small">
+            <Alert type="notify" small>
               <p>{t("polling_station_choice.all_polling_stations_filled_in_twice")}</p>
             </Alert>
           ) : (

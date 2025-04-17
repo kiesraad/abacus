@@ -1,17 +1,27 @@
 .hash {
-  line-height: 2rem;
+  margin-top: 0.25rem;
+  width: 30rem;
+  font-family: var(--font-number);
+  font-size: var(--font-size-md);
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
+  align-items: flex-start;
 }
 
-.hashChunkStub {
-  display: inline;
+.chunk {
+  height: 34px;
+}
+
+.chunkStub {
+  width: 54px;
+  font-weight: 700;
   color: var(--base-white);
   background-color: var(--gray-600);
-  width: 54px;
-  height: 24px;
+  padding: 0 20px 0 20px;
   text-align: center;
-  padding: 2px 25px 2px 25px;
 }
 
-.hashChunkStubHighlight {
+.chunkStubFocus {
   background-color: var(--interactive-default);
 }

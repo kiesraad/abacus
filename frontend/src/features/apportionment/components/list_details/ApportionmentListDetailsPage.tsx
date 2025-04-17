@@ -1,6 +1,6 @@
 import { NotFoundError } from "@/api/ApiResult";
-import { useElection } from "@/api/election/useElection";
 import { PageTitle } from "@/components/page_title/PageTitle";
+import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/lib/i18n";
 

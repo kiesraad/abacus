@@ -1,6 +1,5 @@
 import { To, useLocation, useNavigate } from "react-router";
 
-import { useUserRole } from "@/api/useUserRole";
 import { ElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { IconPlus } from "@/components/generated/icons";
@@ -10,10 +9,10 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
+import { useElectionList } from "@/hooks/election/useElectionList";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/lib/i18n";
 import { Election } from "@/types/generated/openapi";
-
-import { useElectionList } from "../hooks/useElectionList";
 
 export function OverviewPage() {
   const navigate = useNavigate();

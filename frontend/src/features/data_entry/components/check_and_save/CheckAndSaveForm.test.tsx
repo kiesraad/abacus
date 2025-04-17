@@ -1,7 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionRequestHandler,

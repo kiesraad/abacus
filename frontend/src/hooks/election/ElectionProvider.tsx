@@ -1,10 +1,10 @@
 import * as React from "react";
 
+import RequestStateHandler from "@/api/RequestStateHandler";
 import { Election } from "@/types/generated/openapi";
 
-import RequestStateHandler from "../RequestStateHandler";
-import { useElectionDataRequest } from "../useElectionDataRequest";
 import { ElectionProviderContext } from "./ElectionProviderContext";
+import { useElectionDataRequest } from "./useElectionDataRequest";
 
 export interface ElectionProviderProps {
   children: React.ReactNode;

@@ -1,8 +1,8 @@
 import { Outlet, useLocation } from "react-router";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
-import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
 import { NavBar } from "@/components/navbar/NavBar";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { useNumericParam } from "@/hooks/useNumericParam";
 
 export function ElectionLayout() {

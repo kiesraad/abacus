@@ -482,6 +482,7 @@ export type ErrorReference =
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "DatabaseError"
   | "DataEntryAlreadyClaimed"
+  | "DataEntryAlreadyFinalised"
   | "DrawingOfLotsRequired"
   | "EntryNotFound"
   | "EntryNotUnique"

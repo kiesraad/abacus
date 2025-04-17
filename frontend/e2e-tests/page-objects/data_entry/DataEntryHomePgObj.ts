@@ -13,6 +13,9 @@ export class DataEntryHomePage {
   readonly resumeDataEntry: Locator;
   readonly alertDataEntryInProgress: Locator;
   readonly allDataEntriesInProgress: Locator;
+  readonly dataEntryWarningAlertTitle: Locator;
+  readonly dataEntryWarningAlertDescription: Locator;
+  readonly alertDataEntryWarning: Locator;
   protected readonly start: Locator; // use clickStart() instead
 
   constructor(protected readonly page: Page) {
@@ -34,10 +37,14 @@ export class DataEntryHomePage {
       name: "Je invoer is opgeslagen",
     });
     this.resumeDataEntry = page.getByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" });
+    this.dataEntryWarningAlertTitle = page.getByTestId("dataEntryWarningAlertTitle");
+    this.dataEntryWarningAlertDescription = page.getByTestId("dataEntryWarningAlertDescription");
 
     this.alertInputSaved = page.getByRole("alert").filter({ has: this.dataEntrySuccess });
 
     this.alertDataEntryInProgress = page.getByRole("alert").filter({ has: this.resumeDataEntry });
+
+    this.alertDataEntryWarning = page.getByRole("alert").filter({ has: this.dataEntryWarningAlertTitle });
 
     this.allDataEntriesInProgress = this.alertDataEntryInProgress.getByRole("link");
   }

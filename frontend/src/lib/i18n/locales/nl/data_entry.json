@@ -28,7 +28,8 @@
   },
   "warning": {
     "data_entry_not_possible": "Je kan stembureau {nr} niet invoeren.",
-    "data_entry_already_claimed": "Een andere invoerder is bezig met dit stembureau."
+    "data_entry_already_claimed": "Een andere invoerder is bezig met dit stembureau.",
+    "data_entry_already_finalised": "De invoer voor dit stembureau is al gedaan."
   },
   "title": "Invoeren"
 }

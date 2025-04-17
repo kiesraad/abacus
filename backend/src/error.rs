@@ -27,6 +27,7 @@ pub enum ErrorReference {
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DatabaseError,
     DataEntryAlreadyClaimed,
+    DataEntryAlreadyFinalised,
     DrawingOfLotsRequired,
     EntryNotFound,
     EntryNotUnique,
@@ -369,6 +370,10 @@ impl From<DataEntryTransitionError> for APIError {
             DataEntryTransitionError::FirstEntryAlreadyClaimed
             | DataEntryTransitionError::SecondEntryAlreadyClaimed => {
                 APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyClaimed)
+            }
+            DataEntryTransitionError::FirstEntryAlreadyFinalised
+            | DataEntryTransitionError::SecondEntryAlreadyFinalised => {
+                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyFinalised)
             }
             _ => APIError::Conflict(err.to_string(), ErrorReference::InvalidStateTransition),
         }

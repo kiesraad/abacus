@@ -31,21 +31,25 @@ export function DataEntryChoicePage() {
 
   const showFirstDataEntrySavedAlert = location.hash === "#data-entry-saved-1";
   const showSecondDataEntrySavedAlert = location.hash === "#data-entry-saved-2";
-  const showDataEntryClaimedAlert = location.hash.startsWith("#data-entry-claimed-") ? location.hash : null;
+  const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
 
+  const showDataEntryClaimedAlert = location.hash.startsWith("#data-entry-claimed-") ? location.hash : null;
+  const showDataEntryFinalisedAlert = location.hash.startsWith("#data-entry-finalised-") ? location.hash : null;
   let claimedPollingStationNumber = 0;
   if (showDataEntryClaimedAlert) {
     const id = parseInt(showDataEntryClaimedAlert.substring(showDataEntryClaimedAlert.lastIndexOf("-") + 1));
     claimedPollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
   }
-
-  const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
+  if (showDataEntryFinalisedAlert) {
+    const id = parseInt(showDataEntryFinalisedAlert.substring(showDataEntryFinalisedAlert.lastIndexOf("-") + 1));
+    claimedPollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
+  }
 
   function closeDataEntrySavedAlert() {
     void navigate(location.pathname);
   }
 
-  function closeDataEntryClaimedAlert() {
+  function closeDataEntryWarningAlert() {
     void navigate(location.pathname);
   }
 
@@ -72,14 +76,19 @@ export function DataEntryChoicePage() {
         </Alert>
       )}
 
-      {claimedPollingStationNumber && (
-        <Alert type="warning" onClose={closeDataEntryClaimedAlert}>
-          <h2>
+      {claimedPollingStationNumber !== 0 && (
+        <Alert type="warning" onClose={closeDataEntryWarningAlert}>
+          <h2 id="dataEntryWarningAlertTitle">
             {t("data_entry.warning.data_entry_not_possible", {
               nr: claimedPollingStationNumber,
             })}
           </h2>
-          <p>{t("data_entry.warning.data_entry_already_claimed")}</p>
+          {showDataEntryClaimedAlert && (
+            <p id="dataEntryWarningAlertDescription">{t("data_entry.warning.data_entry_already_claimed")}</p>
+          )}
+          {showDataEntryFinalisedAlert && (
+            <p id="dataEntryWarningAlertDescription">{t("data_entry.warning.data_entry_already_finalised")}</p>
+          )}
         </Alert>
       )}
 

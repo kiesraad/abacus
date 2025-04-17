@@ -928,7 +928,7 @@ test.describe("api error responses", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
   });
 
-  test("Already claimed polling station results in error shown", async ({ page, pollingStation }) => {
+  test("UI Warning: Trying to load a data entry that was already claimed", async ({ page, pollingStation }) => {
     await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1/claim`, async (route) => {
       await route.fulfill({
         status: 409,
@@ -944,19 +944,32 @@ test.describe("api error responses", () => {
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
+    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+      `Je kan stembureau ${pollingStation.number} niet invoeren.`,
+    );
+    await expect(dataEntryHomePage.dataEntryWarningAlertDescription).toContainText(
+      "Een andere invoerder is bezig met dit stembureau.",
+    );
   });
 
-  test("UI Error: Second data entry user must be different from first entry", async ({
+  test("UI Warning: Trying to load the same finalised data entry again", async ({
     page,
     pollingStationFirstEntryDone,
   }) => {
     await page.goto(
       `/elections/${pollingStationFirstEntryDone.election_id}/data-entry/${pollingStationFirstEntryDone.id}/1/recounted`,
     );
-    const recountedPage = new RecountedPage(page);
 
-    // Data entry currently returns "null" for all responses without results
-    await expect(recountedPage.fieldset).toBeHidden();
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
+    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+      `Je kan stembureau ${pollingStationFirstEntryDone.number} niet invoeren.`,
+    );
+    await expect(dataEntryHomePage.dataEntryWarningAlertDescription).toContainText(
+      "De invoer voor dit stembureau is al gedaan.",
+    );
   });
 
   test("UI Warning: Second data entry user must be different from first entry", async ({

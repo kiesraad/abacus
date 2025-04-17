@@ -17,6 +17,7 @@
     "ApportionmentNotAvailableUntilDataEntryFinalised": "De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd",
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
     "DataEntryAlreadyClaimed": "Een andere invoerder is bezig met dit stembureau",
+    "DataEntryAlreadyFinalised": "De invoer voor dit stembureau is al gedaan",
     "DrawingOfLotsRequired": "Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus",
     "EntryNotFound": "Niet gevonden",
     "EntryNotUnique": "Deze invoer bestaat al",

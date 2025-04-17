@@ -2,19 +2,18 @@ import { useState } from "react";
 import { useLocation } from "react-router";
 
 import { isError, isSuccess } from "@/api/ApiResult";
-import {
-  ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
-  ElectionDefinitionUploadResponse,
-} from "@/api/gen/openapi";
+import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionUploadResponse } from "@/api/gen/openapi";
 import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert, Button, FileInput, InputField, ProgressList, StickyNav } from "@/components/ui";
+import { cn } from "@/lib/util/classnames";
 import { formatDateFull } from "@/lib/util/format";
 
 import { t, tx } from "@kiesraad/i18n";
 
+import cls from "./ElectionCreatePage.module.css";
 import { RetractedHash, Stub } from "./RetractedHash";
 
 export function ElectionCreatePage() {
@@ -87,7 +86,7 @@ export function ElectionCreatePage() {
           </ProgressList>
         </StickyNav>
         <article>
-          <section className="md">
+          <section className={cn("md", cls.container)}>
             {file && data ? (
               <>
                 <h2>{t("election.check_eml.title")}</h2>
@@ -98,7 +97,7 @@ export function ElectionCreatePage() {
                     },
                   })}
                 </p>
-                <Alert type="notify" variant="no-icon" margin="mb-md-lg" small>
+                <Alert type="notify" variant="no-icon" margin="mb-md" small>
                   <p>
                     <strong>{data.election.category}</strong>
                     <br />
@@ -109,6 +108,7 @@ export function ElectionCreatePage() {
                     <RetractedHash hash={data.hash.chunks} stubs={stubs} />
                   </p>
                 </Alert>
+                <p>{t("election.check_eml.check_hash.description")}</p>
                 {stubs.map((stub, stubIndex) => (
                   <InputField
                     key={stub.index}
@@ -118,6 +118,7 @@ export function ElectionCreatePage() {
                     hint={t("election.check_eml.check_hash.hint")}
                     fieldSize="medium"
                     fieldWidth="narrow"
+                    margin="mb-md"
                     onFocus={() => {
                       const newStubs = [...stubs];
                       newStubs[stubIndex]!.selected = true;
@@ -131,7 +132,9 @@ export function ElectionCreatePage() {
                     autoFocus={stubIndex === 0}
                   />
                 ))}
-                <Button>{t("next")}</Button>
+                <div className="mt-lg">
+                  <Button>{t("next")}</Button>
+                </div>
               </>
             ) : (
               <>

@@ -1,6 +1,6 @@
 .hash {
+  width: 27rem;
   margin-top: 0.25rem;
-  width: 30rem;
   font-family: var(--font-number);
   font-size: var(--font-size-md);
   display: flex;

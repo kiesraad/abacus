@@ -8,7 +8,7 @@ export interface CandidateVotesFormValues extends Omit<PoliticalGroupVotes, "tot
 
 export type CandidateVotesValues = PoliticalGroupVotes;
 
-export function valuesToFormValues(values: PoliticalGroupVotes): CandidateVotesFormValues {
+export function valuesToFormValues(values: CandidateVotesValues): CandidateVotesFormValues {
   return {
     number: values.number,
     total: formatNumber(values.total),
@@ -16,7 +16,7 @@ export function valuesToFormValues(values: PoliticalGroupVotes): CandidateVotesF
   };
 }
 
-export function formValuesToValues(formData: CandidateVotesFormValues): PoliticalGroupVotes {
+export function formValuesToValues(formData: CandidateVotesFormValues): CandidateVotesValues {
   return {
     number: formData.number,
     total: deformatNumber(formData.total),

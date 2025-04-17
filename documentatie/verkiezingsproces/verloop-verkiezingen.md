@@ -63,7 +63,7 @@ Organization for the Advancement of Structured Information Standards (OASIS).
 
 De EML_NL bevat de volgende schema's:
 
-- 210 Kandidatenlijst
+- 210 Kandidatenlijst (één per politieke groepering)
 - 230b Kandidatenlijsten (één per kieskring)
 - 230c Totaallijsten
 - 510a Tellingbestand van stembureau (SB)

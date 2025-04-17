@@ -38,14 +38,14 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     renderApportionmentResidualSeatsPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
     expect(
       await screen.findByRole("heading", {
         level: 2,
         name: "De restzetels gaan naar de partijen met de grootste gemiddelden",
       }),
-    );
+    ).toBeVisible();
     const highest_averages_table = await screen.findByTestId("highest-averages-table");
     expect(highest_averages_table).toBeVisible();
     expect(highest_averages_table).toHaveTableContent([
@@ -198,14 +198,14 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     renderApportionmentResidualSeatsPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
     expect(
       await screen.findByRole("heading", {
         level: 2,
         name: "De restzetels gaan naar de partijen met de grootste overschotten",
       }),
-    );
+    ).toBeVisible();
     const largest_remainders_table = await screen.findByTestId("largest-remainders-table");
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
@@ -214,7 +214,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["2", "Political Group B", "0", "60", "", "1"],
     ]);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Verdeling overige restzetels" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Verdeling overige restzetels" })).toBeVisible();
     const unique_highest_averages_table = await screen.findByTestId("unique-highest-averages-table");
     expect(unique_highest_averages_table).toBeVisible();
     expect(unique_highest_averages_table).toHaveTableContent([
@@ -248,14 +248,14 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     renderApportionmentResidualSeatsPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
     expect(
       await screen.findByRole("heading", {
         level: 2,
         name: "De restzetels gaan naar de partijen met de grootste overschotten",
       }),
-    );
+    ).toBeVisible();
     const largest_remainders_table = await screen.findByTestId("largest-remainders-table");
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
@@ -281,14 +281,14 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     renderApportionmentResidualSeatsPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
     expect(
       await screen.findByRole("heading", {
         level: 2,
         name: "De restzetels gaan naar de partijen met de grootste overschotten",
       }),
-    );
+    ).toBeVisible();
     const largest_remainders_table = await screen.findByTestId("largest-remainders-table");
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
@@ -305,7 +305,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         level: 2,
         name: "Verdeling overige restzetels",
       }),
-    );
+    ).toBeVisible();
     const unique_highest_averages_table = await screen.findByTestId("unique-highest-averages-table");
     expect(unique_highest_averages_table).toBeVisible();
     expect(unique_highest_averages_table).toHaveTableContent([
@@ -398,7 +398,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       renderApportionmentResidualSeatsPage();
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
@@ -424,7 +424,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       renderApportionmentResidualSeatsPage();
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
@@ -450,7 +450,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       renderApportionmentResidualSeatsPage();
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(

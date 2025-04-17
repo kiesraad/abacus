@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
 import { t } from "@/lib/i18n";
-import { cn } from "@/lib/util/classnames";
+import { cn } from "@/utils/classnames";
 
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
 import { render_title_and_header } from "../utils/utils";

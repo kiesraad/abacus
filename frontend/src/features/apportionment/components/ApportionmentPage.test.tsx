@@ -43,9 +43,9 @@ describe("ApportionmentPage", () => {
 
     const router = renderApportionmentPage(true) as Router;
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" })).toBeVisible();
     const election_summary_table = await screen.findByTestId("election-summary-table");
     expect(election_summary_table).toBeVisible();
     expect(election_summary_table).toHaveTableContent([
@@ -59,7 +59,7 @@ describe("ApportionmentPage", () => {
       ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
     ]);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" })).toBeVisible();
     const apportionment_table = await screen.findByTestId("apportionment-table");
     expect(apportionment_table).toBeVisible();
     expect(apportionment_table).toHaveTableContent([
@@ -88,7 +88,7 @@ describe("ApportionmentPage", () => {
       "/details-residual-seats",
     );
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Gekozen kandidaten" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Gekozen kandidaten" })).toBeVisible();
     const chosen_candidates_table = await screen.findByTestId("chosen-candidates-table");
     expect(chosen_candidates_table).toBeVisible();
     expect(chosen_candidates_table).toHaveTableContent([
@@ -130,7 +130,7 @@ describe("ApportionmentPage", () => {
       renderApportionmentPage(false);
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
@@ -153,7 +153,7 @@ describe("ApportionmentPage", () => {
       renderApportionmentPage(false);
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
@@ -176,7 +176,7 @@ describe("ApportionmentPage", () => {
       renderApportionmentPage(false);
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
@@ -201,7 +201,7 @@ describe("ApportionmentPage", () => {
       renderApportionmentPage(false);
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(

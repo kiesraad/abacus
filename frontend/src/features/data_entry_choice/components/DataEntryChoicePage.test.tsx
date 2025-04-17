@@ -54,7 +54,7 @@ describe("DataEntryHomePage", () => {
         level: 1,
         name: electionDetailsMockResponse.election.name,
       }),
-    );
+    ).toBeVisible();
   });
 
   test("Alert not visible when not finished", async () => {
@@ -66,7 +66,7 @@ describe("DataEntryHomePage", () => {
         level: 1,
         name: electionDetailsMockResponse.election.name,
       }),
-    );
+    ).toBeVisible();
 
     // Test that the message doesn't exist
     expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
@@ -126,7 +126,7 @@ describe("DataEntryHomePage", () => {
         level: 1,
         name: electionDetailsMockResponse.election.name,
       }),
-    );
+    ).toBeVisible();
 
     // Expect the alert to not be visible
     const alertHeading = "Je invoer is opgeslagen";
@@ -156,7 +156,7 @@ describe("DataEntryHomePage", () => {
         level: 1,
         name: electionDetailsMockResponse.election.name,
       }),
-    );
+    ).toBeVisible();
 
     const alertHeading = "Je kan stembureau 33 niet invoeren.";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();

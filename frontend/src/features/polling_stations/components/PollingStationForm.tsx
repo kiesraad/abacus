@@ -224,7 +224,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               {pollingStation ? t("polling_station.form.save_update") : t("polling_station.form.save_create")}
             </Button>
             {pollingStation && onCancel && (
-              <Button variant="secondary" name="cancel" onClick={onCancel}>
+              <Button type="button" variant="secondary" name="cancel" onClick={onCancel}>
                 {t("cancel")}
               </Button>
             )}

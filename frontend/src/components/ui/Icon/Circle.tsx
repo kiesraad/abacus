@@ -1,5 +1,5 @@
-import { cn } from "@/lib/util/classnames";
 import { Size } from "@/types/ui";
+import { cn } from "@/utils/classnames";
 
 import { ProgressBarColorClass } from "../ProgressBar/ProgressBar";
 import cls from "./Circle.module.css";

@@ -1,10 +1,18 @@
 import { Election, PollingStationResults, ValidationResults } from "@/api/gen/openapi";
-import { objectHasOnlyEmptyValues } from "@/lib/util/compare";
 import { FormSectionId } from "@/types/types";
 
 import { ClientState, FormSection, FormState } from "../types/types";
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
 import { addValidationResultsToFormState, ValidationResultSet } from "./ValidationResults";
+
+export function objectHasOnlyEmptyValues(obj: Record<string, "" | number>): boolean {
+  for (const key in obj) {
+    if (obj[key] !== "" && obj[key] !== 0) {
+      return false;
+    }
+  }
+  return true;
+}
 
 export function formSectionComplete(section: FormSection): boolean {
   return (

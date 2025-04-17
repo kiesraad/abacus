@@ -55,8 +55,8 @@ describe("ElectionReportPage", () => {
     );
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Steminvoer eerste zitting afronden" }));
-    expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Steminvoer eerste zitting afronden" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
   });

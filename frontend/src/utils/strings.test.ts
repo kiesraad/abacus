@@ -1,17 +1,8 @@
 import { describe, expect, test } from "vitest";
 
-import { ellipsis, parseIntStrict, parseIntUserInput, removeLeadingZeros } from "./strings";
+import { parseIntStrict, parseIntUserInput, removeLeadingZeros } from "./strings";
 
 describe("Strings util", () => {
-  test.each([
-    ["test", "test", 20],
-    ["test", "...", 2],
-    ["aaaaaaaxxx", "aaaa...", 7],
-    ["", "", 20],
-  ])("ellipsis %s as %s", (input: string, expected: string, maxLength: number) => {
-    expect(ellipsis(input, maxLength)).equals(expected);
-  });
-
   test.each([
     ["0", 0],
     ["00"],

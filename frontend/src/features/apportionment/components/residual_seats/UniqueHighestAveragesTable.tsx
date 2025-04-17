@@ -1,7 +1,7 @@
 import { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/api/gen/openapi";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
-import { cn } from "@/lib/util/classnames";
+import { cn } from "@/utils/classnames";
 
 import { UniqueHighestAverageAssignmentStep } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";

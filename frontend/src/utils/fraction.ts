@@ -1,5 +1,6 @@
 import { Fraction } from "@/api/gen/openapi";
-import { formatNumber } from "@/lib/util/format";
+
+import { formatNumber } from "./format";
 
 export function getFractionInteger(fraction: Fraction) {
   return fraction.integer ? formatNumber(fraction.integer) : fraction.numerator === 0 ? "0" : "";

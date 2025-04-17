@@ -2,10 +2,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 
-import { routes } from "@/app/routes";
+import { ApiProvider } from "@/api/ApiProvider";
 import "@/styles/index.css";
 
-import { ApiProvider } from "./api/ApiProvider";
+import { routes } from "./routes";
 
 const rootDiv = document.getElementById("root");
 
@@ -30,7 +30,7 @@ function render() {
 if (__API_MSW__) {
   // import msw-mock-api here instead of at the top of the file,
   // so that we only use MSW in development and don't need it in production
-  import("./msw-mock-api")
+  import("../testing/msw-mock-api")
     .then((mockAPI) =>
       mockAPI
         .startMockAPI()

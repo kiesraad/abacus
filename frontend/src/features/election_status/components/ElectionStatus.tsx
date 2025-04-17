@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { DataEntryStatusName, Election, ElectionStatusResponseEntry, PollingStation, User } from "@/api/gen/openapi";
+import { IconPlus } from "@/components/generated/icons";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { Button } from "@/components/ui/Button/Button";
 import { Circle } from "@/components/ui/Icon/Circle";
@@ -8,8 +9,7 @@ import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { PercentageAndColorClass, ProgressBar, ProgressBarColorClass } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
-import { IconPlus } from "@/lib/icon";
-import { formatDateTime } from "@/lib/util/format";
+import { formatDateTime } from "@/utils/format";
 
 import cls from "./ElectionStatus.module.css";
 

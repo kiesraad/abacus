@@ -30,7 +30,7 @@ describe("ElectionHomePage", () => {
     );
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
     const list = await screen.findByTestId("election-pages");
     expect(list).toBeVisible();
     expect(list.childElementCount).toBe(2);

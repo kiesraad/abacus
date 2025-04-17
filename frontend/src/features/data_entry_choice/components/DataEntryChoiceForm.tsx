@@ -48,6 +48,10 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
   const [currentPollingStation, setCurrentPollingStation] = useState<PollingStationWithStatus | undefined>(undefined);
   const electionStatus = useElectionStatus();
 
+  const refetchStatuses = () => {
+    void electionStatus.refetch();
+  };
+
   const pollingStationsWithStatus = useMemo(() => {
     return getPollingStationWithStatusList({
       pollingStations,
@@ -154,6 +158,7 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
           currentPollingStation={currentPollingStation}
           setAlert={setAlert}
           handleSubmit={handleSubmit}
+          refetchStatuses={refetchStatuses}
         />
         <p className="md">{tx("polling_station_choice.name_correct_warning")}</p>
         {alert && (
@@ -181,7 +186,7 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
       </fieldset>
       <div className={cls.dataEntryList}>
         <details>
-          <summary>
+          <summary onClick={refetchStatuses}>
             {t("polling_station_choice.unknown_number")}
             <br />
             <span id="openPollingStationList" className={cn(cls.underlined, cls.pointer)}>

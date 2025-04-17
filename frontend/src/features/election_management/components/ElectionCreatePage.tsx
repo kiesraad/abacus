@@ -7,20 +7,18 @@ import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Alert, Button, FileInput, InputField, ProgressList, StickyNav } from "@/components/ui";
+import { Alert, FileInput, ProgressList, StickyNav } from "@/components/ui";
 import { cn } from "@/lib/util/classnames";
-import { formatDateFull } from "@/lib/util/format";
 
-import { t, tx } from "@kiesraad/i18n";
+import { t } from "@kiesraad/i18n";
 
+import { CheckElectionDefinition } from "./CheckElectionDefinition";
 import cls from "./ElectionCreatePage.module.css";
-import { RetractedHash, Stub } from "./RetractedHash";
 
 export function ElectionCreatePage() {
   const location = useLocation();
   const [file, setFile] = useState<File | undefined>(undefined);
   const [data, setData] = useState<ElectionDefinitionUploadResponse | undefined>(undefined);
-  const [stubs, setStubs] = useState<Stub[]>([]);
   const [error, setError] = useState<boolean>(false);
   const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
   const { create } = useCrud<ElectionDefinitionUploadResponse>({ create: path });
@@ -32,13 +30,6 @@ export function ElectionCreatePage() {
       const response = await create({ data: await currentFile.text() });
       if (isSuccess(response)) {
         setData(response.data);
-        setStubs(
-          response.data.hash.retracted_indexes.map((retracted_index) => ({
-            selected: false,
-            index: retracted_index,
-          })),
-        );
-
         setError(false);
       } else if (isError(response)) {
         setData(undefined);
@@ -88,54 +79,7 @@ export function ElectionCreatePage() {
         <article>
           <section className={cn("md", cls.container)}>
             {file && data ? (
-              <>
-                <h2>{t("election.check_eml.title")}</h2>
-                <p>
-                  {tx("election.check_eml.description", {
-                    file: () => {
-                      return <b>{file.name}</b>;
-                    },
-                  })}
-                </p>
-                <Alert type="notify" variant="no-icon" margin="mb-md" small>
-                  <p>
-                    <strong>{data.election.category}</strong>
-                    <br />
-                    <span className="capitalize">{formatDateFull(new Date(data.election.election_date))}</span>
-                  </p>
-                  <p>
-                    <strong>Digitale vingerafdruk</strong> (hashcode):
-                    <RetractedHash hash={data.hash.chunks} stubs={stubs} />
-                  </p>
-                </Alert>
-                <p>{t("election.check_eml.check_hash.description")}</p>
-                {stubs.map((stub, stubIndex) => (
-                  <InputField
-                    key={stub.index}
-                    name={stub.index.toString()}
-                    type="text"
-                    label={t("election.check_eml.check_hash.label", { stub: stubIndex + 1 })}
-                    hint={t("election.check_eml.check_hash.hint")}
-                    fieldSize="medium"
-                    fieldWidth="narrow"
-                    margin="mb-md"
-                    onFocus={() => {
-                      const newStubs = [...stubs];
-                      newStubs[stubIndex]!.selected = true;
-                      setStubs(newStubs);
-                    }}
-                    onBlur={() => {
-                      const newStubs = [...stubs];
-                      newStubs[stubIndex]!.selected = false;
-                      setStubs(newStubs);
-                    }}
-                    autoFocus={stubIndex === 0}
-                  />
-                ))}
-                <div className="mt-lg">
-                  <Button>{t("next")}</Button>
-                </div>
-              </>
+              <CheckElectionDefinition file={file} election={data.election} hash={data.hash} />
             ) : (
               <>
                 <h2>{t("election.import_eml")}</h2>

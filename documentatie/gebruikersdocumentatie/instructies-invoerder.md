@@ -2,19 +2,33 @@
 
 Welkom bij Abacus! Deze tool is ontwikkeld om de verkiezingsuitslagen per stembureau na te rekenen en te controleren op fouten en afwijkende uitslagen. In dit document leggen we uit hoe je Abacus gebruikt als invoerder.
 
-Na het tellen van de stemmen wordt voor elk stembureau een proces-verbaal ingevuld. De cijfers op dit proces-verbaal neem je over in Abacus. Vervolgens controleert de applicatie of de cijfers kloppen, en als alles klopt kun je de resultaten opslaan. Als er fouten of waarschuwingen zijn, volg je de instructies op of overleg je het met je coördinator.
+Na het tellen van de stemmen wordt voor elk stembureau een proces-verbaal ingevuld. De cijfers op dit proces-verbaal neem je over in Abacus. Vervolgens controleert de applicatie of de cijfers kloppen met het proces-verbaal. Ook wordt gecheckt of er bijzondere afwijkingen zijn, bijvoorbeeld als het aantal ongeldige stemmen hoog is. Als er fouten of waarschuwingen zijn, volg je de instructies op of overleg je het met je coördinator.
+
+Elk stembureau wordt twee keer ingevoerd door twee verschillende invoerders. Na de tweede invoer controleert Abacus of de eerste en tweede invoer overeenkomen. Als alles klopt is de invoer van het betreffende stembureau compleet. Ook hier geldt dat je bij fouten of waarschuwingen de instructies volgt of overlegt met je coördinator.
 
 ## Inloggen en account instellen
 
-Als het goed is heb je al accountgegevens gekregen. Heb je die niet, vraag het dan aan je coördinator. Klik rechtsboven op **Inloggen** en vul de gegevens in. Als je al eerder ingelogd hebt, gebruik je het door jou ingestelde wachtwoord.
+Je krijgt inloginstructies van je coördinator. Klik rechtsboven op **Inloggen** en vul de gegevens in. Als je al eerder ingelogd hebt, gebruik je het door jou ingestelde wachtwoord.
 
-Wanneer je voor de eerste keer inlogt, stel je je account eerst in voor gebruik. Voer je naam in als er nog geen naam staat, of wijzig je naam als die onjuist is. Kies vervolgens een nieuw wachtwoord van minimaal 13 tekens en herhaal dit wachtwoord. 
+Wanneer je voor de eerste keer inlogt, stel je je account eerst in voor gebruik. Voer je naam in als er nog geen naam staat, of wijzig je naam als die onjuist is. Kies vervolgens een nieuw wachtwoord en vul dit twee keer in.
 
 ![Account instellen](/documentatie/gebruikersdocumentatie/img/invoeren-account-instellen.png)
 
 ## Invoeren
 
 Nu je bent ingelogd, ben je klaar om de resultaten van een stembureau in te voeren.
+
+### Navigeren en pauzeren
+
+Je kunt in Abacus een aantal sneltoetsen gebruiken waarmee je handig naar andere velden nagiveert. Dit zijn de sneltoetsen:
+
+- Met `tab`, `pijl omlaag` of `enter` ga je naar het volgende veld.
+- Met `shift+tab` of met `pijl omhoog` ga je naar het vorige veld.
+- Met `shift+pijl omlaag` ga je naar het laatste veld.
+- Met `shift+enter` ga je naar de volgende pagina/lijst.
+- Je hoeft geen nullen in te voeren. Als je een veld leeg laat, wordt dat gezien als een 0.
+
+Als je even pauze wilt, klik dan op **Invoer afbreken** en vervolgens op **Invoer bewaren**. Na je pauze klik je onder **Je hebt nog een openstaande invoer** op het stembureau en kun je doorgaan waar je gebleven was.
 
 ### Verkiezing selecteren
 
@@ -64,7 +78,7 @@ Neem de cijfers over zoals ze in het proces-verbaal staan. Met de tab-toets ga j
 
 **Let op:** Op het proces-verbaal staan ook velden voor het subtotaal van elke kolom. Deze kun je negeren.
 
-Als je bij de kandidaten alle aantallen hebt ingevuld en je tot het totaal alleen maar lege velden ziet, ga je met `shift+↓` direct naar het invoerveld voor het totaal.
+Als je bij de kandidaten alle aantallen hebt ingevuld en je tot het totaal alleen maar lege velden ziet, ga je met `shift+pijl omlaag` direct naar het invoerveld voor het totaal.
 
 Als je klaar bent met het invoeren van de lijst, klik je op **Volgende** of druk je op `shift+enter` om naar de volgende lijst te gaan.
 

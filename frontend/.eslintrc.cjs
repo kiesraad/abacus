@@ -33,6 +33,7 @@ module.exports = {
   rules: {
     "jsx-a11y/no-autofocus": "off",
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+    "@typescript-eslint/no-unsafe-type-assertion": "error",
     "@typescript-eslint/restrict-template-expressions": [
       "error",
       {
@@ -86,12 +87,14 @@ module.exports = {
         "@typescript-eslint/no-floating-promises": "error",
         "react-hooks/rules-of-hooks": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-unsafe-type-assertion": "off",
       },
     },
     {
-      files: ["*.test.ts{,x}", "src/testing/**/*.ts"],
+      files: ["*.test.ts{,x}", "src/testing/**/*.ts{,x}"],
       rules: {
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-unsafe-type-assertion": "off",
       },
     },
     {

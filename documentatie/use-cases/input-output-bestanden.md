@@ -5,7 +5,8 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 ## Open punten
 
 - Hoe stellen we de adresgegevens van de (verkozen) kandidaten beschikbaar, makkelijker dan d.m.v. de totaallijst (EML_NL 230c)? Deze gegevens zijn nodig voor het opstellen van de benoemings- en geloofsbrieven.
-
+- Als er een hertelling gebeurt n.a.v. een verzoek van het CSB of op vraag van de Commissie voor het Onderzoek van de Geloofsbrieven, leidt dit dan op stembureau-niveau tot een corrigendum of tot een volledig nieuw tellings-PV?
+  - Wie vervult de rol van de Commissie voor het Onderzoek van de Geloofsbrieven (Tweede Kamerverkiezingen) bij gemeenteraadsverkiezingen?
 
 
 ## Genereren van modellen door Abacus

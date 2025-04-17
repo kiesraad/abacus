@@ -1,9 +1,9 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
-import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
-import { useUser } from "@/api/useUser";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { useUser } from "@/hooks/user/useUser";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
@@ -14,7 +14,7 @@ import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi
 
 import { DataEntryChoiceForm } from "./DataEntryChoiceForm";
 
-vi.mock("@/api/useUser");
+vi.mock("@/hooks/user/useUser");
 
 function renderDataEntryChoicePage() {
   return renderReturningRouter(

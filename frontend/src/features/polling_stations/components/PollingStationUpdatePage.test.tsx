@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import {
   ElectionRequestHandler,
   PollingStationDeleteHandler,

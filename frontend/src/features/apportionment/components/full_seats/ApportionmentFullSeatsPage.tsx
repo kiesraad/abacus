@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { useElection } from "@/api/election/useElection";
+import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/lib/i18n";
 import { cn } from "@/utils/classnames";
 

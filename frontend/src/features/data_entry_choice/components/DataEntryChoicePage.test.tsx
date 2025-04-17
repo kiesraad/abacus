@@ -3,11 +3,11 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
-import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
-import { useUser } from "@/api/useUser";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { useUser } from "@/hooks/user/useUser";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionListRequestHandler,
@@ -21,7 +21,7 @@ import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi
 
 import { DataEntryChoicePage } from "./DataEntryChoicePage";
 
-vi.mock("@/api/useUser");
+vi.mock("@/hooks/user/useUser");
 
 const testUser: LoginResponse = {
   username: "test-user-1",

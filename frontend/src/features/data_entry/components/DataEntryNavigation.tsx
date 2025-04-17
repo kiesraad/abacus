@@ -1,8 +1,8 @@
 import { useBlocker } from "react-router";
 
-import { useUser } from "@/api/useUser";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
+import { useUser } from "@/hooks/user/useUser";
 import { t, tx } from "@/lib/i18n";
 import { PollingStationResults } from "@/types/generated/openapi";
 

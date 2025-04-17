@@ -1,8 +1,9 @@
 import * as React from "react";
 
-import RequestStateHandler from "../RequestStateHandler";
-import { useElectionStatusRequest } from "../useElectionStatusRequest";
+import RequestStateHandler from "@/api/RequestStateHandler";
+
 import { ElectionStatusProviderContext } from "./ElectionStatusProviderContext";
+import { useElectionStatusRequest } from "./useElectionStatusRequest";
 
 export interface ElectionStatusProviderProps {
   children: React.ReactNode;

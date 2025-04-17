@@ -14,6 +14,12 @@ describe("UI component ProgressList", () => {
     const acceptIcon = within(acceptItem).getByRole("img");
     expect(acceptIcon).toHaveAccessibleName("opgeslagen");
 
+    const activeAndAcceptItem = screen.getByTestId("active-accept-item");
+    expect(activeAndAcceptItem).toBeVisible();
+    expect(activeAndAcceptItem).toHaveAttribute("aria-current", "step");
+    const activeAndAcceptIcon = within(activeAndAcceptItem).getByRole("img");
+    expect(activeAndAcceptIcon).toHaveAccessibleName("je bent hier");
+
     const errorItem = screen.getByTestId("error-item");
     expect(errorItem).toBeVisible();
     expect(errorItem).toHaveAttribute("aria-current", "false");
@@ -38,15 +44,20 @@ describe("UI component ProgressList", () => {
     const emptyIcon = within(emptyItem).getByRole("img");
     expect(emptyIcon).toHaveAccessibleName("leeg");
 
+    const idleItem = screen.getByTestId("idle-item");
+    expect(idleItem).toBeVisible();
+    expect(idleItem).toHaveAttribute("aria-current", "false");
+    expect(within(idleItem).queryByRole("img")).not.toBeInTheDocument();
+
     const activeItem = screen.getByTestId("scroll-item-1");
     expect(activeItem).toBeVisible();
     expect(activeItem).toHaveAttribute("aria-current", "step");
     const activeIcon = within(activeItem).getByRole("img");
     expect(activeIcon).toHaveAccessibleName("je bent hier");
 
-    const idleItem = screen.getByTestId("idle-item");
-    expect(idleItem).toBeVisible();
-    expect(idleItem).toHaveAttribute("aria-current", "false");
-    expect(within(idleItem).queryByRole("img")).not.toBeInTheDocument();
+    const idleDisabledItem = screen.getByTestId("idle-disabled-item");
+    expect(idleDisabledItem).toBeVisible();
+    expect(idleDisabledItem).toHaveAttribute("aria-current", "false");
+    expect(within(idleDisabledItem).queryByRole("img")).not.toBeInTheDocument();
   });
 });

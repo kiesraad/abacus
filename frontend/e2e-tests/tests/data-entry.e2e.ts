@@ -956,7 +956,7 @@ test.describe("api error responses", () => {
     const recountedPage = new RecountedPage(page);
 
     // Data entry currently returns "null" for all responses without results
-    await expect(recountedPage.next).toBeHidden();
+    await expect(recountedPage.fieldset).toBeHidden();
   });
 
   test("UI Warning: Second data entry user must be different from first entry", async ({

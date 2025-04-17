@@ -4,7 +4,7 @@ import {
   LargestRemainderAssignedSeat,
   ListExhaustionRemovedSeat,
   SeatChangeStep,
-} from "@/api/gen/openapi";
+} from "@/types/generated/openapi";
 
 export type HighestAverageAssignmentStep = SeatChangeStep & { change: HighestAverageAssignedSeat };
 export type LargestRemainderAssignmentStep = SeatChangeStep & { change: LargestRemainderAssignedSeat };

@@ -1,7 +1,7 @@
 import { Story } from "@ladle/react";
 
-import { Fraction } from "@/api/gen/openapi";
 import { IconCheckHeart } from "@/components/generated/icons";
+import { Fraction } from "@/types/generated/openapi";
 
 import { Badge } from "../Badge/Badge";
 import { Icon } from "../Icon/Icon";

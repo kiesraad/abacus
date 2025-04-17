@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { ValidationResult } from "@/api/gen/openapi";
+import { ValidationResult } from "@/types/generated/openapi";
 
 import { errorWarningMocks, getDefaultDataEntryState } from "../testing/mock-data";
 import {

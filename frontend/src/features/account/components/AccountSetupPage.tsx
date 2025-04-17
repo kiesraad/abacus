@@ -1,9 +1,9 @@
 import { Navigate, useNavigate } from "react-router";
 
-import { LoginResponse } from "@/api/gen/openapi";
 import { useApiState } from "@/api/useApiState";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { t } from "@/lib/i18n";
+import { LoginResponse } from "@/types/generated/openapi";
 
 import { AccountSetupForm } from "./AccountSetupForm";
 

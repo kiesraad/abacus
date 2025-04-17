@@ -1,6 +1,6 @@
-import { Candidate, CandidateVotes } from "@/api/gen/openapi";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
+import { Candidate, CandidateVotes } from "@/types/generated/openapi";
 import { getCandidateFullNameWithGender } from "@/utils/candidate";
 import { cn } from "@/utils/classnames";
 

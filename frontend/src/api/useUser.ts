@@ -1,7 +1,8 @@
 import { useContext } from "react";
 
+import { LoginResponse } from "@/types/generated/openapi";
+
 import { ApiProviderContext, ApiState } from "./ApiProviderContext";
-import { LoginResponse } from "./gen/openapi";
 
 export function useUser(): LoginResponse | null {
   const apiState = useContext<ApiState | null>(ApiProviderContext);

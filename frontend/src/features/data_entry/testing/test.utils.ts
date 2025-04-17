@@ -1,13 +1,13 @@
 import { expect } from "vitest";
 
+import { overrideOnce } from "@/testing/server";
+import { screen, within } from "@/testing/test-utils";
 import {
   ClaimDataEntryResponse,
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   PollingStationResults,
-} from "@/api/gen/openapi";
-import { overrideOnce } from "@/testing/server";
-import { screen, within } from "@/testing/test-utils";
+} from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 
 import { FormState } from "../types/types";

@@ -5,7 +5,7 @@ import {
   PollingStationRequest,
   PollingStationResults,
   SaveDataEntryResponse,
-} from "@/api/gen/openapi";
+} from "@/types/generated/openapi";
 
 export const electionRequest: ElectionRequest = {
   name: "Test Election",

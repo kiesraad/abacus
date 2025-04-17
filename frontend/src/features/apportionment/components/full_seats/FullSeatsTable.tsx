@@ -1,6 +1,6 @@
-import { Fraction, PoliticalGroup, PoliticalGroupSeatAssignment } from "@/api/gen/openapi";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
+import { Fraction, PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
 import cls from "../Apportionment.module.css";

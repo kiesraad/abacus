@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
-import { AUDIT_LOG_LIST_REQUEST_PATH, AuditLogEvent, AuditLogListResponse } from "@/api/gen/openapi";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
+import { AUDIT_LOG_LIST_REQUEST_PATH, AuditLogEvent, AuditLogListResponse } from "@/types/generated/openapi";
 
 import { clearEmptySince, getLogFilterOptionsFromSearchParams, hasLogFilters } from "../utils/searchParamFilter";
 import { LogFilterName } from "./useLogFilterOptions";

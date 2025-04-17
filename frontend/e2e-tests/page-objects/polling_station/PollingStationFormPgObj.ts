@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-import { PollingStation } from "@/api/gen/openapi";
+import { PollingStation } from "@/types/generated/openapi";
 
 export class PollingStationFormPgObj {
   readonly number: Locator;

@@ -1,4 +1,4 @@
-import { ValidationResult, ValidationResultCode } from "@/api/gen/openapi";
+import { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { FormState } from "../types/types";

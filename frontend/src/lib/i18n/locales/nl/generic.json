@@ -5,7 +5,6 @@
   "administrator": "Beheerder",
   "and": "en",
   "cancel": "Annuleren",
-  "candidate": "Kandidaat",
   "close": "Sluiten",
   "close_message": "Melding sluiten",
   "contains_error": "bevat een fout",
@@ -30,10 +29,6 @@
   "history_back": "Terug naar de vorige pagina",
   "list": "Lijst",
   "list_name": "Lijstnaam",
-  "list_of_candidates": {
-    "plural": "Kandidatenlijsten",
-    "singular": "Kandidatenlijst"
-  },
   "loading": "Laden...",
   "logs": "Logs",
   "manage_elections": "Beheer verkiezingen",

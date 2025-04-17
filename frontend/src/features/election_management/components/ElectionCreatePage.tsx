@@ -6,8 +6,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
-
-import { t } from "@kiesraad/i18n";
+import { t } from "@/lib/i18n";
 
 export function ElectionCreatePage() {
   const location = useLocation();
@@ -32,7 +31,7 @@ export function ElectionCreatePage() {
                 <span>{t("polling_station.role")}</span>
               </ProgressList.Item>
               <ProgressList.Item key="list_of_candidates" status="idle">
-                <span>{t("list_of_candidates.plural")}</span>
+                <span>{t("candidate.list.plural")}</span>
               </ProgressList.Item>
               <ProgressList.Item key="polling_stations" status="idle">
                 <span>{t("polling_stations")}</span>

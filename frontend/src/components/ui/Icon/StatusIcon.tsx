@@ -6,9 +6,8 @@ import {
   IconPencil,
   IconWarning,
 } from "@/components/generated/icons";
+import { t } from "@/lib/i18n";
 import { MenuStatus } from "@/types/ui";
-
-import { t } from "@kiesraad/i18n";
 
 export function StatusIcon({ status }: { status: MenuStatus }) {
   switch (status) {

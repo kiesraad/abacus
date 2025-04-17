@@ -1,4 +1,4 @@
-import { t } from "@kiesraad/i18n";
+import { t } from "@/lib/i18n";
 
 export function Footer() {
   const gitBranch = __GIT_BRANCH__;

@@ -1,4 +1,4 @@
-import { PoliticalGroupVotes } from "@/api/gen/openapi";
+import { PoliticalGroupVotes } from "@/types/generated/openapi";
 import { deformatNumber, formatNumber } from "@/utils/format";
 
 export interface CandidateVotesFormValues extends Omit<PoliticalGroupVotes, "total" | "candidate_votes"> {

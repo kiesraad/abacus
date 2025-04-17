@@ -134,17 +134,17 @@ Generate Typescript types from `/backend/openapi.json`:
 npm run gen:openapi
 ```
 
-This results in `/frontend/lib/api/gen/openapi.ts`.
+This results in `/frontend/src/types/generated/openapi.ts`.
 
 #### gen_icons
 
-Generate React components from icons located in `/frontend/lib/ui/svg`:
+Generate React components from icons located in `/frontend/src/assets/icons`:
 
 ```sh
 npm run gen:icons
 ```
 
-This results in `/frontend/lib/icon/gen.tsx`.
+This results in `/frontend/src/components/generated/icons.tsx`.
 
 #### gen_po
 

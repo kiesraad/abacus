@@ -1,5 +1,5 @@
-import { Candidate } from "@/api/gen/openapi";
 import { t } from "@/lib/i18n";
+import { Candidate } from "@/types/generated/openapi";
 
 export function getCandidateFullName(candidate: Candidate): string {
   const lastName = candidate.last_name_prefix

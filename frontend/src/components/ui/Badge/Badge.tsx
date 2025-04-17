@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 
-import { type DataEntryStatusName } from "@/api/gen/openapi";
 import { IconPencil } from "@/components/generated/icons";
+import { type DataEntryStatusName } from "@/types/generated/openapi";
 
 import { t } from "@kiesraad/i18n";
 

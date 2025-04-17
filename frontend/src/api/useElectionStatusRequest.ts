@@ -1,4 +1,5 @@
-import { ELECTION_STATUS_REQUEST_PATH, ElectionStatusResponse } from "./gen/openapi";
+import { ELECTION_STATUS_REQUEST_PATH, ElectionStatusResponse } from "@/types/generated/openapi";
+
 import { useInitialApiGetWithErrors } from "./useInitialApiGet";
 
 export function useElectionStatusRequest(electionId: number) {

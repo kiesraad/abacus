@@ -1,9 +1,9 @@
-import { ErrorReference } from "@/api/gen/openapi";
 import { Error } from "@/components/error/Error";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
 import { t, tx } from "@/lib/i18n";
+import { ErrorReference } from "@/types/generated/openapi";
 import { isDevelopment } from "@/utils/env";
 
 interface FatalErrorPageProps {

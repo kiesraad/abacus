@@ -1,4 +1,4 @@
-import { Election, PollingStationResults, ValidationResults } from "@/api/gen/openapi";
+import { Election, PollingStationResults, ValidationResults } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { ClientState, FormSection, FormState } from "../types/types";

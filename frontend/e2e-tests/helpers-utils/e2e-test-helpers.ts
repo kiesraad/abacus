@@ -6,7 +6,7 @@ import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPg
 import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 
-import { PollingStation, PollingStationResults } from "@/api/gen/openapi";
+import { PollingStation, PollingStationResults } from "@/types/generated/openapi";
 
 export async function selectPollingStationForDataEntry(page: Page, pollingStation: PollingStation) {
   await page.goto(`/elections/${pollingStation.election_id}/data-entry`);

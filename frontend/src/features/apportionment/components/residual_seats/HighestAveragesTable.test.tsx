@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
-import { PoliticalGroup } from "@/api/gen/openapi";
 import { render, screen } from "@/testing/test-utils";
+import { PoliticalGroup } from "@/types/generated/openapi";
 
 import { election, seat_assignment } from "../../testing/gte-19-seats";
 import { HighestAverageAssignmentStep } from "../../utils/seat-change";

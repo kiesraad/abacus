@@ -7,7 +7,7 @@ import {
   PoliticalGroupVotes,
   SeatAssignmentResult,
   SeatChangeStep,
-} from "@/api/gen/openapi";
+} from "@/types/generated/openapi";
 
 import { LargestRemainderAssignmentStep, UniqueHighestAverageAssignmentStep } from "../utils/seat-change";
 

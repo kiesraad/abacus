@@ -1,7 +1,7 @@
 import * as React from "react";
 import { To, useNavigate } from "react-router";
 
-import { Fraction } from "@/api/gen/openapi";
+import { Fraction } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { getFractionInteger, getFractionWithoutInteger } from "@/utils/fraction";
 

@@ -6,7 +6,7 @@ import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPg
 import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 
-import { PollingStation, VotersCounts, VotesCounts } from "@/api/gen/openapi";
+import { PollingStation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../fixtures";
 import { loginAs } from "../setup";

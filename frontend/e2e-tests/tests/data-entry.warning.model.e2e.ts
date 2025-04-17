@@ -7,7 +7,7 @@ import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj"
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { createMachine } from "xstate";
 
-import { VotersCounts, VotesCounts } from "@/api/gen/openapi";
+import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../fixtures";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "../helpers-utils/xstate-helpers";

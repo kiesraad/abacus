@@ -1,4 +1,4 @@
-import { PollingStation } from "@/api/gen/openapi";
+import { PollingStation } from "@/types/generated/openapi";
 
 export const pollingStationMockData: PollingStation[] = [
   {

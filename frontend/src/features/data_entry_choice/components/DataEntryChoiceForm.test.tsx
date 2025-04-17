@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/api/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
-import { ElectionStatusResponse, LoginResponse } from "@/api/gen/openapi";
 import { useUser } from "@/api/useUser";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
@@ -11,6 +10,7 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
+import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
 
 import { DataEntryChoiceForm } from "./DataEntryChoiceForm";
 

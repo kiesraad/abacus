@@ -163,7 +163,7 @@ languages:
         - ".*/test[.]utils[.]ts"
     generated:
       include:
-        - ".*/gen/.*[.]ts"
+        - ".*/generated/.*[.]ts"
 
 exclude:
   - ".*/backend/[.]sqlx/.*"

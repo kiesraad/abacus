@@ -1,9 +1,9 @@
 import { Link, NavLink } from "react-router";
 
 import { useElection } from "@/api/election/useElection";
-import { Election } from "@/api/gen/openapi";
 import { useUserRole } from "@/api/useUserRole";
 import { IconChevronRight } from "@/components/generated/icons";
+import { Election } from "@/types/generated/openapi";
 
 import { t } from "@kiesraad/i18n";
 

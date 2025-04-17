@@ -945,4 +945,31 @@ test.describe("api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
   });
+
+  test("UI Error: Second data entry user must be different from first entry", async ({
+    page,
+    pollingStationFirstEntryDone,
+  }) => {
+    await page.goto(
+      `/elections/${pollingStationFirstEntryDone.election_id}/data-entry/${pollingStationFirstEntryDone.id}/1/recounted`,
+    );
+    const recountedPage = new RecountedPage(page);
+
+    // Data entry currently returns "null" for all responses without results
+    await expect(recountedPage.fieldset).toBeHidden();
+  });
+
+  test("UI Warning: Second data entry user must be different from first entry", async ({
+    page,
+    pollingStationFirstEntryDone,
+  }) => {
+    await page.goto(`/elections/${pollingStationFirstEntryDone.election_id}/data-entry`);
+    const dataEntryHomePage = new DataEntryHomePage(page);
+
+    await dataEntryHomePage.pollingStationNumber.fill(pollingStationFirstEntryDone.number.toString());
+
+    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(
+      `Je mag stembureau ${pollingStationFirstEntryDone.number} niet nog een keer invoeren`,
+    );
+  });
 });

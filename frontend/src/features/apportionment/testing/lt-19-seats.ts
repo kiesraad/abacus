@@ -9,7 +9,7 @@ import {
   SeatChangeStep,
 } from "@/types/generated/openapi";
 
-import { HighestAverageAssignmentStep, LargestRemainderAssignmentStep } from "../utils/seat-change";
+import { LargestRemainderAssignmentStep, UniqueHighestAverageAssignmentStep } from "../utils/seat-change";
 
 export const largest_remainder_steps: LargestRemainderAssignmentStep[] = [
   {
@@ -318,14 +318,15 @@ export const largest_remainder_steps: LargestRemainderAssignmentStep[] = [
   },
 ];
 
-export const highest_average_steps: HighestAverageAssignmentStep[] = [
+export const highest_average_steps: UniqueHighestAverageAssignmentStep[] = [
   {
     residual_seat_number: 3,
     change: {
-      changed_by: "HighestAverageAssignment",
+      changed_by: "UniqueHighestAverageAssignment",
       selected_pg_number: 1,
       pg_options: [1],
       pg_assigned: [1],
+      pg_exhausted: [],
       votes_per_seat: {
         integer: 67,
         numerator: 4,
@@ -474,10 +475,11 @@ export const highest_average_steps: HighestAverageAssignmentStep[] = [
   {
     residual_seat_number: 4,
     change: {
-      changed_by: "HighestAverageAssignment",
+      changed_by: "UniqueHighestAverageAssignment",
       selected_pg_number: 3,
       pg_options: [3],
       pg_assigned: [3],
+      pg_exhausted: [],
       votes_per_seat: {
         integer: 58,
         numerator: 0,
@@ -626,10 +628,11 @@ export const highest_average_steps: HighestAverageAssignmentStep[] = [
   {
     residual_seat_number: 5,
     change: {
-      changed_by: "HighestAverageAssignment",
+      changed_by: "UniqueHighestAverageAssignment",
       selected_pg_number: 4,
       pg_options: [4],
       pg_assigned: [4],
+      pg_exhausted: [],
       votes_per_seat: {
         integer: 57,
         numerator: 0,

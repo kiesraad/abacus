@@ -10,7 +10,8 @@ import { overrideOnce } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
 import { ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 
-import { candidate_nomination, election, election_summary, seat_assignment } from "../../testing/less-than-19-seats";
+import * as lt19Seats from "../../testing/lt-19-seats";
+import * as lt19SeatsAndP9AndP10 from "../../testing/lt-19-seats-and-p9-and-p10";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentFullSeatsPage } from "./ApportionmentFullSeatsPage";
 
@@ -25,11 +26,11 @@ const renderApportionmentFullSeatsPage = () =>
 
 describe("ApportionmentFullSeatsPage", () => {
   test("Full seats assignment and residual seats calculation tables visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      seat_assignment: seat_assignment,
-      candidate_nomination: candidate_nomination,
-      election_summary: election_summary,
+      seat_assignment: lt19Seats.seat_assignment,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
 
     renderApportionmentFullSeatsPage();
@@ -65,9 +66,50 @@ describe("ApportionmentFullSeatsPage", () => {
     ]);
   });
 
+  test("Full seats assignment with footnotes and residual seats calculation tables visible", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19SeatsAndP9AndP10.election));
+    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+      seat_assignment: lt19SeatsAndP9AndP10.seat_assignment,
+      candidate_nomination: lt19SeatsAndP9AndP10.candidate_nomination,
+      election_summary: lt19SeatsAndP9AndP10.election_summary,
+    } satisfies ElectionApportionmentResponse);
+
+    renderApportionmentFullSeatsPage();
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Hoe vaak haalde elke partij de kiesdeler?" }));
+    const full_seats_table = await screen.findByTestId("full-seats-table");
+    expect(full_seats_table).toBeVisible();
+    expect(full_seats_table).toHaveTableContent([
+      ["Lijst", "Lijstnaam", "Aantal stemmen", ":", "Kiesdeler", "=", "Aantal volle zetels"],
+      ["1", "Political Group A", "2571", ":", "340", "4/15", "=", "7 1 , 2 5"],
+      ["2", "Political Group B", "977", ":", "340", "4/15", "=", "2"],
+      ["3", "Political Group C", "567", ":", "340", "4/15", "=", "1"],
+      ["4", "Political Group D", "536", ":", "340", "4/15", "=", "1"],
+      ["5", "Political Group E", "453", ":", "340", "4/15", "=", "1"],
+    ]);
+
+    expect(await screen.findByTestId("1-list-exhaustion-information")).toHaveTextContent(
+      "1 Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel. (Kieswet, artikel P 10 of P 13 eerste lid)",
+    );
+    expect(await screen.findByTestId("2-list-exhaustion-information")).toHaveTextContent(
+      "2 Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.",
+    );
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Hoeveel restzetels zijn er te verdelen?" }));
+    const residual_seats_calculation_table = await screen.findByTestId("residual-seats-calculation-table");
+    expect(residual_seats_calculation_table).toBeVisible();
+    expect(residual_seats_calculation_table).toHaveTableContent([
+      ["Totaal aantal zetels", "15", ""],
+      ["Totaal aantal toegewezen volle zetels", "10", "— (min)"],
+      ["Restzetels", "5", ""],
+    ]);
+  });
+
   describe("Apportionment not yet available", () => {
     test("Not available until data entry is finalised", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 412, {
         error: "Election data entry first needs to be finalised",
         fatal: false,
@@ -89,7 +131,7 @@ describe("ApportionmentFullSeatsPage", () => {
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
@@ -111,7 +153,7 @@ describe("ApportionmentFullSeatsPage", () => {
     });
 
     test("Not possible because all lists are exhausted", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "All lists are exhausted, not enough candidates to fill all seats",
         fatal: false,
@@ -135,7 +177,7 @@ describe("ApportionmentFullSeatsPage", () => {
     });
 
     test("Not possible because no votes on candidates cast", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "No votes on candidates cast",
         fatal: false,
@@ -165,7 +207,7 @@ describe("ApportionmentFullSeatsPage", () => {
       });
       const router = setupTestRouter(routes);
 
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 500, {
         error: "Internal Server Error",
         fatal: true,

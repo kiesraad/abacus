@@ -12,7 +12,7 @@ import { overrideOnce } from "@/testing/server";
 import { expectErrorPage, render, renderReturningRouter, screen, setupTestRouter, within } from "@/testing/test-utils";
 import { ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 
-import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/less-than-19-seats";
+import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/lt-19-seats";
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 
@@ -95,19 +95,19 @@ describe("ApportionmentPage", () => {
       ["Kandidaat", "Woonplaats"],
       ["Bakker, S. (Sophie) (v)", "Test Location"],
       ["Bakker, T. (Tinus) (m)", "Test Location"],
-      ["van den Berg, M. (Marijke) (v)", "Test Location"],
+      ["Van den Berg, M. (Marijke) (v)", "Test Location"],
       ["Bogaert, G. (Gerard) (m)", "Test Location"],
-      ["van Doorn, A. (Adelbert) (m)", "Test Location"],
+      ["Van Doorn, A. (Adelbert) (m)", "Test Location"],
       ["Jansen, A. (Arie) (m)", "Test Location"],
-      ["de Jong, R. (Rolf) (m)", "Test Location"],
+      ["De Jong, R. (Rolf) (m)", "Test Location"],
       ["Kok, K. (Karin) (v)", "Test Location"],
       ["Oud, L. (Lidewij) (v)", "Test Location"],
       ["Oud, J. (Johan) (m)", "Test Location"],
       ["Oud, M. (Marijke) (v)", "Test Location"],
       ["Oud, K. (Klaas) (m)", "Test Location"],
-      ["de Vries, J. (Johan) (m)", "Test Location"],
-      ["van der Weijden, H. (Henk) (m)", "Test Location"],
-      ["van der Weijden, B. (Berta) (v)", "Test Location"],
+      ["De Vries, J. (Johan) (m)", "Test Location"],
+      ["Van der Weijden, H. (Henk) (m)", "Test Location"],
+      ["Van der Weijden, B. (Berta) (v)", "Test Location"],
     ]);
 
     // Check if the link to the list details page works

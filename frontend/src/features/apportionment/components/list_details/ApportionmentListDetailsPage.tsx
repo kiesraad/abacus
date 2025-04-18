@@ -1,27 +1,15 @@
 import { NotFoundError } from "@/api/ApiResult";
-import { PageTitle } from "@/components/page_title/PageTitle";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/lib/i18n";
+import { cn } from "@/utils/classnames";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
+import { render_title_and_header } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentError } from "../ApportionmentError";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
-
-function render_title_and_header(pgName: string) {
-  return (
-    <>
-      <PageTitle title={`${t("apportionment.title")} - Abacus`} />
-      <header>
-        <section>
-          <h1>{pgName}</h1>
-        </section>
-      </header>
-    </>
-  );
-}
 
 export function ApportionmentListDetailsPage() {
   const { election } = useElection();
@@ -64,85 +52,95 @@ export function ApportionmentListDetailsPage() {
           <main>
             <article className={cls.article}>
               <>
-                <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.assigned_number_of_seats")}</h2>
-                  <span id="text-political-group-assigned-nr-seats">
-                    {tx(
-                      `apportionment.political_group_assigned_nr_seats.${pgTotalSeats === 1 ? "singular" : "plural"}`,
-                      {},
-                      {
-                        pg_name: pgName,
-                        num_seats: pgTotalSeats,
-                      },
-                    )}
-                  </span>
+                <div className={cn(cls.tableDiv, "mb-lg")}>
+                  <div>
+                    <h2 className={cls.tableTitle}>{t("apportionment.assigned_number_of_seats")}</h2>
+                    <span id="text-political-group-assigned-nr-seats">
+                      {tx(
+                        `apportionment.political_group_assigned_nr_seats.${pgTotalSeats === 1 ? "singular" : "plural"}`,
+                        {},
+                        {
+                          pg_name: pgName,
+                          num_seats: pgTotalSeats,
+                        },
+                      )}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.preferentially_chosen_candidates")}</h2>
-                  {preferentialCandidateNomination.length > 0 ? (
-                    <>
-                      <span id="text-preferentially-chosen-candidates" className={cls.tableInformation}>
-                        {t("apportionment.preferentially_chosen_candidates_info", {
+                <div className={cn(cls.tableDiv, "mb-lg")}>
+                  <div>
+                    <h2 className={cls.tableTitle}>{t("apportionment.preferentially_chosen_candidates")}</h2>
+                    {preferentialCandidateNomination.length > 0 ? (
+                      <>
+                        <span id="text-preferentially-chosen-candidates" className={cls.tableInformation}>
+                          {t("apportionment.preferentially_chosen_candidates_info", {
+                            percentage: candidateNomination.preference_threshold.percentage,
+                          })}
+                        </span>
+                        <CandidatesWithVotesTable
+                          id="preferentially-chosen-candidates-table"
+                          showNumber={false}
+                          showLocality={true}
+                          candidateList={pg.candidates}
+                          candidateVotesList={preferentialCandidateNomination}
+                        />
+                      </>
+                    ) : (
+                      <span id="text-preferentially-chosen-candidates">
+                        {t("apportionment.preferentially_chosen_candidates_empty", {
                           percentage: candidateNomination.preference_threshold.percentage,
                         })}
                       </span>
-                      <CandidatesWithVotesTable
-                        id="preferentially-chosen-candidates-table"
-                        showNumber={false}
-                        showLocality={true}
-                        candidateList={pg.candidates}
-                        candidateVotesList={preferentialCandidateNomination}
-                      />
-                    </>
-                  ) : (
-                    <span id="text-preferentially-chosen-candidates">
-                      {t("apportionment.preferentially_chosen_candidates_empty", {
-                        percentage: candidateNomination.preference_threshold.percentage,
-                      })}
-                    </span>
-                  )}
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.other_chosen_candidates")}</h2>
-                  {otherCandidateNomination.length > 0 ? (
-                    <>
-                      <span id="text-other-chosen-candidates" className={cls.tableInformation}>
-                        {t("apportionment.other_chosen_candidates_info")}
-                      </span>
-                      <CandidatesWithVotesTable
-                        id="other-chosen-candidates-table"
-                        showNumber={false}
-                        showLocality={true}
-                        candidateList={pg.candidates}
-                        candidateVotesList={otherCandidateNomination}
-                      />
-                    </>
-                  ) : (
-                    <span id="text-other-chosen-candidates">{t("apportionment.other_chosen_candidates_empty")}</span>
-                  )}
+                <div className={cn(cls.tableDiv, "mb-lg")}>
+                  <div>
+                    <h2 className={cls.tableTitle}>{t("apportionment.other_chosen_candidates")}</h2>
+                    {otherCandidateNomination.length > 0 ? (
+                      <>
+                        <span id="text-other-chosen-candidates" className={cls.tableInformation}>
+                          {t("apportionment.other_chosen_candidates_info")}
+                        </span>
+                        <CandidatesWithVotesTable
+                          id="other-chosen-candidates-table"
+                          showNumber={false}
+                          showLocality={true}
+                          candidateList={pg.candidates}
+                          candidateVotesList={otherCandidateNomination}
+                        />
+                      </>
+                    ) : (
+                      <span id="text-other-chosen-candidates">{t("apportionment.other_chosen_candidates_empty")}</span>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.ranking_candidates")}</h2>
-                  {updatedCandidateRanking.length > 0 ? (
-                    <>
-                      <span id="text-ranking-candidates" className={cls.tableInformation}>
-                        {t("apportionment.ranking_candidates_info")}
-                      </span>
-                      <CandidatesRankingTable candidateRanking={updatedCandidateRanking} />
-                    </>
-                  ) : (
-                    <span id="text-ranking-candidates">{t("apportionment.ranking_candidates_empty")}</span>
-                  )}
+                <div className={cn(cls.tableDiv, "mb-lg")}>
+                  <div>
+                    <h2 className={cls.tableTitle}>{t("apportionment.ranking_candidates")}</h2>
+                    {updatedCandidateRanking.length > 0 ? (
+                      <>
+                        <span id="text-ranking-candidates" className={cls.tableInformation}>
+                          {t("apportionment.ranking_candidates_info")}
+                        </span>
+                        <CandidatesRankingTable candidateRanking={updatedCandidateRanking} />
+                      </>
+                    ) : (
+                      <span id="text-ranking-candidates">{t("apportionment.ranking_candidates_empty")}</span>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.total_number_votes_per_candidate")}</h2>
-                  <CandidatesWithVotesTable
-                    id="total-votes-per-candidate-table"
-                    showNumber={true}
-                    showLocality={false}
-                    candidateList={pg.candidates}
-                    candidateVotesList={candidateVotesList}
-                  />
+                <div className={cn(cls.tableDiv, "mb-lg")}>
+                  <div>
+                    <h2 className={cls.tableTitle}>{t("apportionment.total_number_votes_per_candidate")}</h2>
+                    <CandidatesWithVotesTable
+                      id="total-votes-per-candidate-table"
+                      showNumber={true}
+                      showLocality={false}
+                      candidateList={pg.candidates}
+                      candidateVotesList={candidateVotesList}
+                    />
+                  </div>
                 </div>
               </>
             </article>

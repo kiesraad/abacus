@@ -3,18 +3,24 @@ import { t } from "@/lib/i18n";
 import { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
-import { LargestRemainderAssignmentStep } from "../../utils/seat-change";
+import { getFootnotes, LargestRemainderAssignmentStep, resultChange } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface LargestRemaindersTableProps {
   steps: LargestRemainderAssignmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
+  resultChanges: resultChange[];
 }
 
-export function LargestRemaindersTable({ steps, finalStanding, politicalGroups }: LargestRemaindersTableProps) {
+export function LargestRemaindersTable({
+  steps,
+  finalStanding,
+  politicalGroups,
+  resultChanges,
+}: LargestRemaindersTableProps) {
   const finalStandingPgsMeetingThreshold = finalStanding.filter(
-    (pg_seat_assignment) => pg_seat_assignment.meets_remainder_threshold,
+    (pgSeatAssignment) => pgSeatAssignment.meets_remainder_threshold,
   );
   return (
     <Table id="largest-remainders-table" className={cls.table}>
@@ -28,21 +34,32 @@ export function LargestRemaindersTable({ steps, finalStanding, politicalGroups }
         <Table.HeaderCell className="text-align-r">{t("apportionment.residual_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStandingPgsMeetingThreshold.map((pg_seat_assignment) => {
-          const residual_seats = steps.filter((step) => {
-            return step.change.selected_pg_number == pg_seat_assignment.pg_number;
+        {finalStandingPgsMeetingThreshold.map((pgSeatAssignment) => {
+          let residualSeats = steps.filter((step) => {
+            return step.change.selected_pg_number == pgSeatAssignment.pg_number;
           }).length;
+          const pgResultChanges = resultChanges.filter(
+            (change) => change.type === "residual_seat" && change.pgNumber === pgSeatAssignment.pg_number,
+          );
+          pgResultChanges.forEach((pgResultChange) => {
+            residualSeats = residualSeats + pgResultChange.increase - pgResultChange.decrease;
+          });
+          const pgFullSeatsNotes = resultChanges.filter(
+            (change) => change.type === "full_seat" && change.pgNumber === pgSeatAssignment.pg_number,
+          );
           return (
-            <Table.Row key={pg_seat_assignment.pg_number}>
+            <Table.Row key={pgSeatAssignment.pg_number}>
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
-                {pg_seat_assignment.pg_number}
+                {pgSeatAssignment.pg_number}
               </Table.Cell>
-              <Table.Cell>{politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
-              <Table.NumberCell className="font-number">{pg_seat_assignment.full_seats}</Table.NumberCell>
-              <Table.DisplayFractionCells className={residual_seats > 0 ? "bg-yellow bold" : undefined}>
-                {pg_seat_assignment.remainder_votes}
-              </Table.DisplayFractionCells>
-              <Table.NumberCell className="font-number">{residual_seats}</Table.NumberCell>
+              <Table.Cell>{politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}</Table.Cell>
+              <Table.NumberCell className="font-number">
+                {pgFullSeatsNotes.length > 0 && getFootnotes(pgFullSeatsNotes)} {pgSeatAssignment.full_seats}
+              </Table.NumberCell>
+              <Table.DisplayFractionCells>{pgSeatAssignment.remainder_votes}</Table.DisplayFractionCells>
+              <Table.NumberCell className="font-number">
+                {getFootnotes(pgResultChanges)} {residualSeats}
+              </Table.NumberCell>
             </Table.Row>
           );
         })}

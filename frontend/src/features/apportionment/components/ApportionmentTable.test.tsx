@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import { render, screen } from "@/testing/test-utils";
 import { PoliticalGroup } from "@/types/generated/openapi";
 
-import { election, seat_assignment } from "../testing/19-or-more-seats";
+import { election, seat_assignment } from "../testing/gte-19-seats";
 import { ApportionmentTable } from "./ApportionmentTable";
 
 describe("ApportionmentTable", () => {

@@ -12,7 +12,7 @@ import { overrideOnce } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
 import { ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 
-import { candidate_nomination, election, election_summary, seat_assignment } from "../../testing/less-than-19-seats";
+import { candidate_nomination, election, election_summary, seat_assignment } from "../../testing/lt-19-seats";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentListDetailsPage } from "./ApportionmentListDetailsPage";
 
@@ -56,11 +56,11 @@ describe("ApportionmentListDetailsPage", () => {
       ["Kandidaat", "Woonplaats", "Aantal stemmen"],
       ["Kok, K. (Karin) (v)", "Test Location", "200"],
       ["Oud, L. (Lidewij) (v)", "Test Location", "138"],
-      ["van der Weijden, B. (Berta) (v)", "Test Location", "100"],
+      ["Van der Weijden, B. (Berta) (v)", "Test Location", "100"],
       ["Oud, K. (Klaas) (m)", "Test Location", "60"],
       ["Oud, M. (Marijke) (v)", "Test Location", "55"],
-      ["van der Weijden, H. (Henk) (m)", "Test Location", "50"],
-      ["de Jong, R. (Rolf) (m)", "Test Location", "50"],
+      ["Van der Weijden, H. (Henk) (m)", "Test Location", "50"],
+      ["De Jong, R. (Rolf) (m)", "Test Location", "50"],
       ["Jansen, A. (Arie) (m)", "Test Location", "45"],
       ["Bakker, S. (Sophie) (v)", "Test Location", "40"],
     ]);
@@ -74,8 +74,8 @@ describe("ApportionmentListDetailsPage", () => {
     expect(other_chosen_candidates_table).toHaveTableContent([
       ["Kandidaat", "Woonplaats", "Aantal stemmen"],
       ["Oud, J. (Johan) (m)", "Test Location", "20"],
-      ["de Vries, J. (Johan) (m)", "Test Location", "30"],
-      ["van den Berg, M. (Marijke) (v)", "Test Location", "20"],
+      ["De Vries, J. (Johan) (m)", "Test Location", "30"],
+      ["Van den Berg, M. (Marijke) (v)", "Test Location", "20"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Rangschikking kandidaten" })).toBeVisible();
@@ -88,16 +88,16 @@ describe("ApportionmentListDetailsPage", () => {
       ["Kandidaat", "Woonplaats"],
       ["Kok, K. (Karin) (v)", "Test Location"],
       ["Oud, L. (Lidewij) (v)", "Test Location"],
-      ["van der Weijden, B. (Berta) (v)", "Test Location"],
+      ["Van der Weijden, B. (Berta) (v)", "Test Location"],
       ["Oud, K. (Klaas) (m)", "Test Location"],
       ["Oud, M. (Marijke) (v)", "Test Location"],
-      ["van der Weijden, H. (Henk) (m)", "Test Location"],
-      ["de Jong, R. (Rolf) (m)", "Test Location"],
+      ["Van der Weijden, H. (Henk) (m)", "Test Location"],
+      ["De Jong, R. (Rolf) (m)", "Test Location"],
       ["Jansen, A. (Arie) (m)", "Test Location"],
       ["Bakker, S. (Sophie) (v)", "Test Location"],
       ["Oud, J. (Johan) (m)", "Test Location"],
-      ["de Vries, J. (Johan) (m)", "Test Location"],
-      ["van den Berg, M. (Marijke) (v)", "Test Location"],
+      ["De Vries, J. (Johan) (m)", "Test Location"],
+      ["Van den Berg, M. (Marijke) (v)", "Test Location"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" })).toBeVisible();
@@ -109,13 +109,13 @@ describe("ApportionmentListDetailsPage", () => {
       ["2", "Oud, J. (Johan) (m)", "20"],
       ["3", "Oud, M. (Marijke) (v)", "55"],
       ["4", "Jansen, A. (Arie) (m)", "45"],
-      ["5", "van der Weijden, H. (Henk) (m)", "50"],
-      ["6", "van der Weijden, B. (Berta) (v)", "100"],
+      ["5", "Van der Weijden, H. (Henk) (m)", "50"],
+      ["6", "Van der Weijden, B. (Berta) (v)", "100"],
       ["7", "Oud, K. (Klaas) (m)", "60"],
       ["8", "Bakker, S. (Sophie) (v)", "40"],
-      ["9", "de Vries, J. (Johan) (m)", "30"],
-      ["10", "van den Berg, M. (Marijke) (v)", "20"],
-      ["11", "de Jong, R. (Rolf) (m)", "50"],
+      ["9", "De Vries, J. (Johan) (m)", "30"],
+      ["10", "Van den Berg, M. (Marijke) (v)", "20"],
+      ["11", "De Jong, R. (Rolf) (m)", "50"],
       ["12", "Kok, K. (Karin) (v)", "200"],
     ]);
   });

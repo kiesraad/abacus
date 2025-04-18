@@ -535,6 +535,8 @@ export interface Fraction {
 export interface HighestAverageAssignedSeat {
   /** The list of political groups with the same average, that have been assigned a seat */
   pg_assigned: number[];
+  /** The list of political groups that are exhausted, and will not be assigned a seat */
+  pg_exhausted: number[];
   /** The list of political groups with the same average, that have not been assigned a seat */
   pg_options: number[];
   /** The political group that was selected for this seat has this political group number */
@@ -561,6 +563,8 @@ export interface LargestRemainderAssignedSeat {
  * Contains information about the enactment of article P 10 of the Kieswet.
  */
 export interface ListExhaustionRemovedSeat {
+  /** Whether the removed seat was a full seat */
+  full_seat: boolean;
   /** Political group number which the seat is retracted from */
   pg_retracted_seat: number;
 }
@@ -763,6 +767,7 @@ export interface SeatAssignmentResult {
  */
 export type SeatChange =
   | (HighestAverageAssignedSeat & { changed_by: "HighestAverageAssignment" })
+  | (HighestAverageAssignedSeat & { changed_by: "UniqueHighestAverageAssignment" })
   | (LargestRemainderAssignedSeat & { changed_by: "LargestRemainderAssignment" })
   | (AbsoluteMajorityReassignedSeat & { changed_by: "AbsoluteMajorityReassignment" })
   | (ListExhaustionRemovedSeat & { changed_by: "ListExhaustionRemoval" });

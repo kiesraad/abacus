@@ -21,12 +21,14 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
 
   // handle error
   useEffect(() => {
-    if (
-      stateAndActions.error &&
-      stateAndActions.error instanceof ApiError &&
-      stateAndActions.error.reference === "DataEntryAlreadyClaimed"
-    ) {
-      void navigate(`/elections/${election.id}/data-entry#data-entry-claimed-${pollingStationId}`);
+    if (stateAndActions.error && stateAndActions.error instanceof ApiError) {
+      if (stateAndActions.error.reference === "DataEntryAlreadyClaimed") {
+        void navigate(`/elections/${election.id}/data-entry#data-entry-claimed-${pollingStationId}`);
+      } else if (stateAndActions.error.reference === "DataEntryAlreadyFinalised") {
+        void navigate(`/elections/${election.id}/data-entry#data-entry-finalised-${pollingStationId}`);
+      } else if (stateAndActions.error.reference === "InvalidStateTransition") {
+        void navigate(`/elections/${election.id}/data-entry#invalid-action-${pollingStationId}`);
+      }
     }
   }, [election.id, navigate, stateAndActions.error, pollingStationId]);
 

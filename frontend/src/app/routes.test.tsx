@@ -69,6 +69,6 @@ describe("routes", () => {
     const router = renderWithRouter();
     await router.navigate("/elections/1/data-entry/1/3");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/3");
-    await expectNotFound("Ongeldige invoer voor dit stembureau");
+    await expectNotFound("Het invoer nummer is ongeldig");
   });
 });

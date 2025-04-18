@@ -35,13 +35,12 @@ export function DataEntryChoicePage() {
 
   const showDataEntryClaimedAlert = location.hash.startsWith("#data-entry-claimed-") ? location.hash : null;
   const showDataEntryFinalisedAlert = location.hash.startsWith("#data-entry-finalised-") ? location.hash : null;
+  const showInvalidActionAlert = location.hash.startsWith("#invalid-action-") ? location.hash : null;
+  const dataEntryWarning =
+    showDataEntryClaimedAlert || showDataEntryFinalisedAlert || showInvalidActionAlert || undefined;
   let claimedPollingStationNumber = 0;
-  if (showDataEntryClaimedAlert) {
-    const id = parseInt(showDataEntryClaimedAlert.substring(showDataEntryClaimedAlert.lastIndexOf("-") + 1));
-    claimedPollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
-  }
-  if (showDataEntryFinalisedAlert) {
-    const id = parseInt(showDataEntryFinalisedAlert.substring(showDataEntryFinalisedAlert.lastIndexOf("-") + 1));
+  if (dataEntryWarning) {
+    const id = parseInt(dataEntryWarning.substring(dataEntryWarning.lastIndexOf("-") + 1));
     claimedPollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
   }
 
@@ -76,19 +75,24 @@ export function DataEntryChoicePage() {
         </Alert>
       )}
 
-      {claimedPollingStationNumber !== 0 && (
+      {dataEntryWarning && claimedPollingStationNumber !== 0 && (
         <Alert type="warning" onClose={closeDataEntryWarningAlert}>
           <h2 id="dataEntryWarningAlertTitle">
-            {t("data_entry.warning.data_entry_not_possible", {
+            {t("data_entry.data_entry_not_possible", {
               nr: claimedPollingStationNumber,
             })}
           </h2>
-          {showDataEntryClaimedAlert && (
-            <p id="dataEntryWarningAlertDescription">{t("data_entry.warning.data_entry_already_claimed")}</p>
-          )}
-          {showDataEntryFinalisedAlert && (
-            <p id="dataEntryWarningAlertDescription">{t("data_entry.warning.data_entry_already_finalised")}</p>
-          )}
+          <p id="dataEntryWarningAlertDescription">
+            {t(
+              `error.api_error.${
+                showDataEntryClaimedAlert
+                  ? "DataEntryAlreadyClaimed"
+                  : showDataEntryFinalisedAlert
+                    ? "DataEntryAlreadyFinalised"
+                    : "InvalidStateTransition"
+              }`,
+            )}
+          </p>
         </Alert>
       )}
 

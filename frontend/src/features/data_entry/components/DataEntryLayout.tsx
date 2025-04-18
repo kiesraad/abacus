@@ -25,7 +25,7 @@ export function DataEntryLayout() {
   }
 
   if (entryNumber !== 1 && entryNumber !== 2) {
-    throw new NotFoundError("error.api_error.EntryNumberNotSupported");
+    throw new NotFoundError("error.data_entry_not_found");
   }
 
   return (

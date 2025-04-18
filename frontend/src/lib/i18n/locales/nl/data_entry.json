@@ -13,6 +13,7 @@
     "wait_for_instructions": "Wacht op instructies van de coördinator."
   },
   "continue_after_check": "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+  "data_entry_not_possible": "Je kan stembureau {nr} niet invoeren.",
   "definitive": "Definitief",
   "entries_different": "Verschil invoer 1 en 2",
   "entry_saved": "Je invoer is opgeslagen",
@@ -25,11 +26,6 @@
   "success": {
     "return_paper": "Geef het papieren proces-verbaal terug aan de coördinator.",
     "second_entry_info": "Een andere invoerder doet straks de tweede invoer."
-  },
-  "warning": {
-    "data_entry_not_possible": "Je kan stembureau {nr} niet invoeren.",
-    "data_entry_already_claimed": "Een andere invoerder is bezig met dit stembureau.",
-    "data_entry_already_finalised": "De invoer voor dit stembureau is al gedaan."
   },
   "title": "Invoeren"
 }

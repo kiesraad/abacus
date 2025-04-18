@@ -949,7 +949,7 @@ test.describe("api error responses", () => {
       `Je kan stembureau ${pollingStation.number} niet invoeren.`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
-      "Een andere invoerder is bezig met dit stembureau.",
+      "Een andere invoerder is bezig met dit stembureau",
     );
   });
 
@@ -967,7 +967,7 @@ test.describe("api error responses", () => {
     await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
       `Je kan stembureau ${pollingStationFirstEntryDone.number} niet invoeren.`,
     );
-    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan.");
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
   });
 
   test("UI Warning: Trying to load a data entry for a polling station with status definitive", async ({
@@ -984,7 +984,33 @@ test.describe("api error responses", () => {
     await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
       `Je kan stembureau ${pollingStationDefinitive.number} niet invoeren.`,
     );
-    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan.");
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
+  });
+
+  test("UI Warning: Trying to load a second data entry when the first is in progress", async ({
+    page,
+    pollingStation,
+  }) => {
+    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/2/claim`, async (route) => {
+      await route.fulfill({
+        status: 409,
+        json: {
+          error: "Conflict",
+          fatal: false,
+          reference: "InvalidStateTransition",
+        },
+      });
+    });
+
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`);
+
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
+    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+      `Je kan stembureau ${pollingStation.number} niet invoeren.`,
+    );
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("Er is een ongeldige actie uitgevoerd");
   });
 
   test("UI Warning: Second data entry user must be different from first entry", async ({

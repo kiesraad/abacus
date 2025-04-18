@@ -946,7 +946,7 @@ test.describe("api error responses", () => {
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
     await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
-      `Je kan stembureau ${pollingStation.number} niet invoeren.`,
+      `Je kan stembureau ${pollingStation.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
       "Een andere invoerder is bezig met dit stembureau",
@@ -965,7 +965,7 @@ test.describe("api error responses", () => {
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
     await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
-      `Je kan stembureau ${pollingStationFirstEntryDone.number} niet invoeren.`,
+      `Je kan stembureau ${pollingStationFirstEntryDone.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
   });
@@ -982,7 +982,7 @@ test.describe("api error responses", () => {
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
     await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
-      `Je kan stembureau ${pollingStationDefinitive.number} niet invoeren.`,
+      `Je kan stembureau ${pollingStationDefinitive.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
   });
@@ -1008,7 +1008,7 @@ test.describe("api error responses", () => {
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
     await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
-      `Je kan stembureau ${pollingStation.number} niet invoeren.`,
+      `Je kan stembureau ${pollingStation.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("Er is een ongeldige actie uitgevoerd");
   });

@@ -158,7 +158,7 @@ describe("DataEntryHomePage", () => {
       }),
     ).toBeVisible();
 
-    const alertHeading = "Je kan stembureau 33 niet invoeren.";
+    const alertHeading = "Je kan stembureau 33 niet invoeren";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
     await router.navigate({ hash: "data-entry-claimed-1" });
@@ -186,7 +186,7 @@ describe("DataEntryHomePage", () => {
       }),
     ).toBeVisible();
 
-    const alertHeading = "Je kan stembureau 33 niet invoeren.";
+    const alertHeading = "Je kan stembureau 33 niet invoeren";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
     await router.navigate({ hash: "data-entry-finalised-1" });
@@ -214,7 +214,7 @@ describe("DataEntryHomePage", () => {
       }),
     ).toBeVisible();
 
-    const alertHeading = "Je kan stembureau 33 niet invoeren.";
+    const alertHeading = "Je kan stembureau 33 niet invoeren";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
     await router.navigate({ hash: "invalid-action-1" });

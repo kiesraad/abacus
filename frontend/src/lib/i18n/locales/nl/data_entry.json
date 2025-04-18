@@ -13,7 +13,7 @@
     "wait_for_instructions": "Wacht op instructies van de coördinator."
   },
   "continue_after_check": "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
-  "data_entry_not_possible": "Je kan stembureau {nr} niet invoeren.",
+  "data_entry_not_possible": "Je kan stembureau {nr} niet invoeren",
   "definitive": "Definitief",
   "entries_different": "Verschil invoer 1 en 2",
   "entry_saved": "Je invoer is opgeslagen",

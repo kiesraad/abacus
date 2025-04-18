@@ -38,7 +38,7 @@ export class DataEntryHomePage {
     this.resumeDataEntry = page.getByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" });
     this.dataEntryWarningAlertTitle = page.getByRole("heading", {
       level: 2,
-      name: /^Je kan stembureau \d+ niet invoeren.$/,
+      name: /^Je kan stembureau \d+ niet invoeren$/,
     });
 
     this.alertInputSaved = page.getByRole("alert").filter({ has: this.dataEntrySuccess });

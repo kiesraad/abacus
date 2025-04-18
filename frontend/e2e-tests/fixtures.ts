@@ -37,6 +37,8 @@ type Fixtures = {
   pollingStation: PollingStation;
   // First polling station of the election with first data entry done
   pollingStationFirstEntryDone: PollingStation;
+  // First polling station of the election with first and second data entries done
+  pollingStationDefinitive: PollingStation;
   // Election with polling stations and two completed data entries for each
   completedElection: Election;
   // Newly created User
@@ -95,6 +97,36 @@ export const test = base.extend<Fixtures>({
     });
     expect(saveResponse.ok()).toBeTruthy();
     const finaliseResponse = await request.post(finalise_url);
+    expect(finaliseResponse.ok()).toBeTruthy();
+
+    await use(pollingStation);
+  },
+  pollingStationDefinitive: async ({ request, pollingStation }, use) => {
+    await loginAs(request, "typist");
+    // first data entry of the existing polling station
+    let save_url: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStation.id}/data_entries/1`;
+    let claim_url: POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH = `${save_url}/claim`;
+    let finalise_url: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH = `${save_url}/finalise`;
+    let claimResponse = await request.post(claim_url);
+    expect(claimResponse.ok()).toBeTruthy();
+    let saveResponse = await request.post(save_url, {
+      data: noRecountNoDifferencesRequest,
+    });
+    expect(saveResponse.ok()).toBeTruthy();
+    let finaliseResponse = await request.post(finalise_url);
+    expect(finaliseResponse.ok()).toBeTruthy();
+
+    // second data entry of the existing polling station
+    save_url = `/api/polling_stations/${pollingStation.id}/data_entries/2`;
+    claim_url = `${save_url}/claim`;
+    finalise_url = `${save_url}/finalise`;
+    claimResponse = await request.post(claim_url);
+    expect(claimResponse.ok()).toBeTruthy();
+    saveResponse = await request.post(save_url, {
+      data: noRecountNoDifferencesRequest,
+    });
+    expect(saveResponse.ok()).toBeTruthy();
+    finaliseResponse = await request.post(finalise_url);
     expect(finaliseResponse.ok()).toBeTruthy();
 
     await use(pollingStation);

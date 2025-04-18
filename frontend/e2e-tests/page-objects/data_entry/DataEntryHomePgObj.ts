@@ -14,7 +14,6 @@ export class DataEntryHomePage {
   readonly alertDataEntryInProgress: Locator;
   readonly allDataEntriesInProgress: Locator;
   readonly dataEntryWarningAlertTitle: Locator;
-  readonly dataEntryWarningAlertDescription: Locator;
   readonly alertDataEntryWarning: Locator;
   protected readonly start: Locator; // use clickStart() instead
 
@@ -37,8 +36,10 @@ export class DataEntryHomePage {
       name: "Je invoer is opgeslagen",
     });
     this.resumeDataEntry = page.getByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" });
-    this.dataEntryWarningAlertTitle = page.getByTestId("dataEntryWarningAlertTitle");
-    this.dataEntryWarningAlertDescription = page.getByTestId("dataEntryWarningAlertDescription");
+    this.dataEntryWarningAlertTitle = page.getByRole("heading", {
+      level: 2,
+      name: /^Je kan stembureau \d+ niet invoeren.$/,
+    });
 
     this.alertInputSaved = page.getByRole("alert").filter({ has: this.dataEntrySuccess });
 

@@ -5,7 +5,6 @@
   "election_not_found": "Verkiezing niet gevonden",
   "elections_not_found": "Verkiezingen niet gevonden",
   "polling_station_not_found": "Stembureau niet gevonden",
-  "polling_station_already_definitive": "De invoer voor dit stembureau is al definitief",
   "page_not_found": "De pagina <code>{path}</code> is niet gevonden.",
   "not_found_feedback": "We kunnen de pagina die je zoekt niet vinden. Het kan zijn dat de pagina is verplaatst of verwijderd.",
   "instruction": {

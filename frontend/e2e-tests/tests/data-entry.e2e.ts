@@ -948,7 +948,7 @@ test.describe("api error responses", () => {
     await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
       `Je kan stembureau ${pollingStation.number} niet invoeren.`,
     );
-    await expect(dataEntryHomePage.dataEntryWarningAlertDescription).toContainText(
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
       "Een andere invoerder is bezig met dit stembureau.",
     );
   });
@@ -967,9 +967,24 @@ test.describe("api error responses", () => {
     await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
       `Je kan stembureau ${pollingStationFirstEntryDone.number} niet invoeren.`,
     );
-    await expect(dataEntryHomePage.dataEntryWarningAlertDescription).toContainText(
-      "De invoer voor dit stembureau is al gedaan.",
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan.");
+  });
+
+  test("UI Warning: Trying to load a data entry for a polling station with status definitive", async ({
+    page,
+    pollingStationDefinitive,
+  }) => {
+    await page.goto(
+      `/elections/${pollingStationDefinitive.election_id}/data-entry/${pollingStationDefinitive.id}/1/recounted`,
     );
+
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
+    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+      `Je kan stembureau ${pollingStationDefinitive.number} niet invoeren.`,
+    );
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan.");
   });
 
   test("UI Warning: Second data entry user must be different from first entry", async ({

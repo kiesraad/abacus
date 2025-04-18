@@ -1,7 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -65,11 +64,11 @@ describe("routes", () => {
     await expectNotFound("Stembureau niet gevonden");
   });
 
-  test("Error page when polling station is finalised", async () => {
-    overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
+  test("Non existing entry number results in not found page", async () => {
+    // Navigate to a non-existing page
     const router = renderWithRouter();
-    await router.navigate("/elections/1/data-entry/2/1");
-    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/2/1");
-    await expectErrorPage();
+    await router.navigate("/elections/1/data-entry/1/3");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/3");
+    await expectNotFound("Ongeldige invoer voor dit stembureau");
   });
 });

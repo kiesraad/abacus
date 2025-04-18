@@ -983,6 +983,62 @@ pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentResult) 
 
 #[cfg(test)]
 mod tests {
+    use crate::apportionment::{
+        Fraction, PoliticalGroupStanding, seat_assignment::political_group_numbers,
+    };
+
+    #[test]
+    fn test_political_group_numbers() {
+        let standing = [
+            &PoliticalGroupStanding {
+                pg_number: 2,
+                votes_cast: 1249,
+                remainder_votes: Fraction::new(14975, 24),
+                meets_remainder_threshold: true,
+                next_votes_per_seat: Fraction::new(1249, 2),
+                full_seats: 1,
+                residual_seats: 0,
+            },
+            &PoliticalGroupStanding {
+                pg_number: 3,
+                votes_cast: 1249,
+                remainder_votes: Fraction::new(14975, 24),
+                meets_remainder_threshold: true,
+                next_votes_per_seat: Fraction::new(1249, 2),
+                full_seats: 1,
+                residual_seats: 0,
+            },
+            &PoliticalGroupStanding {
+                pg_number: 4,
+                votes_cast: 1249,
+                remainder_votes: Fraction::new(14975, 24),
+                meets_remainder_threshold: true,
+                next_votes_per_seat: Fraction::new(1249, 2),
+                full_seats: 1,
+                residual_seats: 0,
+            },
+            &PoliticalGroupStanding {
+                pg_number: 5,
+                votes_cast: 1249,
+                remainder_votes: Fraction::new(14975, 24),
+                meets_remainder_threshold: true,
+                next_votes_per_seat: Fraction::new(1249, 2),
+                full_seats: 1,
+                residual_seats: 0,
+            },
+            &PoliticalGroupStanding {
+                pg_number: 6,
+                votes_cast: 1249,
+                remainder_votes: Fraction::new(14975, 24),
+                meets_remainder_threshold: true,
+                next_votes_per_seat: Fraction::new(1249, 2),
+                full_seats: 1,
+                residual_seats: 0,
+            },
+        ];
+        assert_eq!(political_group_numbers(&standing), vec![2, 3, 4, 5, 6]);
+    }
+
     /// Tests apportionment for councils with less than 19 seats
     mod lt_19_seats {
         use crate::apportionment::{
@@ -1000,6 +1056,8 @@ mod tests {
                 480, 160, 160, 160, 80, 80, 80,
             ]);
             let result = seat_assignment(15, &totals).unwrap();
+            assert_eq!(result.full_seats, 15);
+            assert_eq!(result.residual_seats, 0);
             assert_eq!(result.steps.len(), 0);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![6, 2, 2, 2, 1, 1, 1]);
@@ -1017,6 +1075,8 @@ mod tests {
                 540, 160, 160, 80, 80, 80, 60, 40,
             ]);
             let result = seat_assignment(15, &totals).unwrap();
+            assert_eq!(result.full_seats, 13);
+            assert_eq!(result.residual_seats, 2);
             assert_eq!(result.steps.len(), 2);
             assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
             assert_eq!(result.steps[1].change.political_group_number_assigned(), 7);
@@ -1040,6 +1100,8 @@ mod tests {
                 808, 59, 58, 57, 56, 55, 54, 53,
             ]);
             let result = seat_assignment(15, &totals).unwrap();
+            assert_eq!(result.full_seats, 10);
+            assert_eq!(result.residual_seats, 5);
             assert_eq!(result.steps.len(), 5);
             assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
             assert_eq!(result.steps[1].change.political_group_number_assigned(), 1);
@@ -1063,6 +1125,8 @@ mod tests {
                 480, 240, 240, 55, 50, 45, 45, 45,
             ]);
             let result = seat_assignment(15, &totals).unwrap();
+            assert_eq!(result.full_seats, 12);
+            assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
             assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
             assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
@@ -1085,6 +1149,8 @@ mod tests {
                 8, 7, 6, 5, 4, 3, 2, 1, 1, 1,
             ]);
             let result = seat_assignment(3, &totals).unwrap();
+            assert_eq!(result.full_seats, 0);
+            assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
             assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
             assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
@@ -1106,6 +1172,8 @@ mod tests {
             let totals =
                 election_summary_fixture_with_default_50_candidates(vec![0, 3, 5, 6, 7, 79]);
             let result = seat_assignment(10, &totals).unwrap();
+            assert_eq!(result.full_seats, 7);
+            assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
             assert_eq!(result.steps[0].change.political_group_number_assigned(), 6);
             assert_eq!(result.steps[1].change.political_group_number_assigned(), 6);
@@ -1138,6 +1206,8 @@ mod tests {
             let totals =
                 election_summary_fixture_with_default_50_candidates(vec![2571, 977, 567, 536, 453]);
             let result = seat_assignment(15, &totals).unwrap();
+            assert_eq!(result.full_seats, 12);
+            assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 4);
             assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
             assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
@@ -1233,6 +1303,8 @@ mod tests {
                     vec![200, 200],
                 ]);
                 let result = seat_assignment(15, &totals).unwrap();
+                assert_eq!(result.full_seats, 14);
+                assert_eq!(result.residual_seats, 1);
                 assert_eq!(result.steps.len(), 2);
                 assert!(
                     result.steps[0]
@@ -1276,6 +1348,8 @@ mod tests {
                     vec![221, 53, 15, 7, 27, 57],
                 ]);
                 let result = seat_assignment(17, &totals).unwrap();
+                assert_eq!(result.full_seats, 11);
+                assert_eq!(result.residual_seats, 6);
                 assert_eq!(result.steps.len(), 8);
                 assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
                 assert_eq!(result.steps[1].change.political_group_number_assigned(), 11);
@@ -1320,6 +1394,8 @@ mod tests {
                     vec![10, 10, 10, 10, 10, 10, 10, 9],
                 ]);
                 let result = seat_assignment(10, &totals).unwrap();
+                assert_eq!(result.full_seats, 7);
+                assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 5);
                 assert_eq!(result.steps[0].change.political_group_number_assigned(), 6);
                 assert_eq!(result.steps[1].change.political_group_number_assigned(), 6);
@@ -1363,6 +1439,8 @@ mod tests {
                     vec![25, 25],
                 ]);
                 let result = seat_assignment(6, &totals).unwrap();
+                assert_eq!(result.full_seats, 2);
+                assert_eq!(result.residual_seats, 4);
                 assert_eq!(result.steps.len(), 9);
                 assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
                 assert!(
@@ -1425,6 +1503,8 @@ mod tests {
                     vec![25, 25],
                 ]);
                 let result = seat_assignment(6, &totals).unwrap();
+                assert_eq!(result.full_seats, 2);
+                assert_eq!(result.residual_seats, 4);
                 assert_eq!(result.steps.len(), 9);
                 assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
                 assert!(
@@ -1481,6 +1561,8 @@ mod tests {
                     vec![453, 0],
                 ]);
                 let result = seat_assignment(15, &totals).unwrap();
+                assert_eq!(result.full_seats, 12);
+                assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 6);
                 assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
                 assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
@@ -1526,6 +1608,8 @@ mod tests {
                     vec![7],
                 ]);
                 let result = seat_assignment(8, &totals).unwrap();
+                assert_eq!(result.full_seats, 6);
+                assert_eq!(result.residual_seats, 2);
                 assert_eq!(result.steps.len(), 6);
                 assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
                 assert!(
@@ -1568,8 +1652,8 @@ mod tests {
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 6 - largest remainder: seat assigned to list 3  
             /// 1st round of highest averages method (assignment to unique political groups):  
-            /// 6 - highest average: [107 2/5, 10, 85 1/5] seat assigned to list 3  
-            /// 7 - highest average: [107 2/5, 10, 71] seat assigned to list 2
+            /// 7 - highest average: [107 2/5, 10, 85 1/5] seat assigned to list 3  
+            /// 8 - highest average: [107 2/5, 10, 71] seat assigned to list 2
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion_triggering_multiple_unique_highest_averages_assignment()
              {
@@ -1579,6 +1663,38 @@ mod tests {
                     vec![426, 0, 0, 0, 0, 0],
                 ]);
                 let result = seat_assignment(8, &totals).unwrap();
+                assert_eq!(result.full_seats, 5);
+                assert_eq!(result.residual_seats, 3);
+                assert_eq!(result.steps.len(), 8);
+                assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_absolute_majority_reassignment()
+                );
+                assert_eq!(result.steps[1].change.political_group_number_retracted(), 3);
+                assert_eq!(result.steps[1].change.political_group_number_assigned(), 1);
+                assert!(
+                    result.steps[2]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[2].change.political_group_number_retracted(), 1);
+                assert!(
+                    result.steps[3]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[3].change.political_group_number_retracted(), 1);
+                assert!(
+                    result.steps[4]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[4].change.political_group_number_retracted(), 1);
+                assert_eq!(result.steps[5].change.political_group_number_assigned(), 3);
+                assert_eq!(result.steps[6].change.political_group_number_assigned(), 3);
+                assert_eq!(result.steps[7].change.political_group_number_assigned(), 2);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [2, 1, 5]);
             }
@@ -1646,6 +1762,8 @@ mod tests {
             let totals =
                 election_summary_fixture_with_default_50_candidates(vec![576, 288, 96, 96, 96, 48]);
             let result = seat_assignment(25, &totals).unwrap();
+            assert_eq!(result.full_seats, 25);
+            assert_eq!(result.residual_seats, 0);
             assert_eq!(result.steps.len(), 0);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![12, 6, 2, 2, 2, 1]);
@@ -1663,6 +1781,8 @@ mod tests {
             let totals =
                 election_summary_fixture_with_default_50_candidates(vec![600, 302, 98, 99, 101]);
             let result = seat_assignment(23, &totals).unwrap();
+            assert_eq!(result.full_seats, 19);
+            assert_eq!(result.residual_seats, 4);
             assert_eq!(result.steps.len(), 4);
             assert_eq!(result.steps[0].change.political_group_number_assigned(), 5);
             assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
@@ -1688,6 +1808,8 @@ mod tests {
                 808, 57, 56, 55, 54, 53, 52, 51, 14,
             ]);
             let result = seat_assignment(19, &totals).unwrap();
+            assert_eq!(result.full_seats, 12);
+            assert_eq!(result.residual_seats, 7);
             assert_eq!(result.steps.len(), 7);
             assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
             assert_eq!(result.steps[1].change.political_group_number_assigned(), 1);
@@ -1727,6 +1849,8 @@ mod tests {
                 7501, 1249, 1249, 1249, 1249, 1249, 1248, 7,
             ]);
             let result = seat_assignment(24, &totals).unwrap();
+            assert_eq!(result.full_seats, 18);
+            assert_eq!(result.residual_seats, 6);
             assert_eq!(result.steps.len(), 7);
             assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
             assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
@@ -1811,6 +1935,8 @@ mod tests {
                     vec![400, 400, 0],
                 ]);
                 let result = seat_assignment(20, &totals).unwrap();
+                assert_eq!(result.full_seats, 19);
+                assert_eq!(result.residual_seats, 1);
                 assert_eq!(result.steps.len(), 2);
                 assert!(
                     result.steps[0]
@@ -1841,8 +1967,10 @@ mod tests {
                     vec![502, 502],
                 ]);
                 let result = seat_assignment(19, &totals).unwrap();
-                assert_eq!(result.steps[0].change.political_group_number_assigned(), 5);
+                assert_eq!(result.full_seats, 18);
+                assert_eq!(result.residual_seats, 1);
                 assert_eq!(result.steps.len(), 3);
+                assert_eq!(result.steps[0].change.political_group_number_assigned(), 5);
                 assert!(
                     result.steps[1]
                         .change
@@ -1881,6 +2009,8 @@ mod tests {
                     vec![7],
                 ]);
                 let result = seat_assignment(24, &totals).unwrap();
+                assert_eq!(result.full_seats, 18);
+                assert_eq!(result.residual_seats, 6);
                 assert_eq!(result.steps.len(), 9);
                 assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
                 assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);

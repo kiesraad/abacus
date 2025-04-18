@@ -19,7 +19,7 @@ export function DataEntryProgress() {
   const { formState, pollingStationResults, entryNumber } = useDataEntryContext();
 
   const menuStatusForFormSection = React.useCallback(
-    (formSection?: FormSection): MenuStatus => {
+    (formSection?: FormSection): Exclude<MenuStatus, "active"> => {
       if (!formSection) return "idle";
 
       if (!formSection.errors.isEmpty()) {
@@ -32,10 +32,10 @@ export function DataEntryProgress() {
       if (formSection.id === formState.furthest) {
         return "unsaved";
       }
-      const currentSection = formState.sections[formState.furthest];
-      if (currentSection) {
+      const furthestSection = formState.sections[formState.furthest];
+      if (furthestSection) {
         //check if section has been left empty
-        if (formSection.index < currentSection.index) {
+        if (formSection.index < furthestSection.index) {
           if (isFormSectionEmpty(formSection, pollingStationResults)) {
             return "empty";
           }
@@ -60,10 +60,10 @@ export function DataEntryProgress() {
         <ProgressList.Item
           id="list-item-recounted"
           key="recounted"
-          status="accept"
+          status="accept" // TODO: why is this hardcoded?
           active={formState.current === "recounted"}
         >
-          {formState.current !== "recounted" ? (
+          {formState.current !== "recounted" ? ( // TODO: this condition does not check the index like the others
             <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}/recounted`}>
               <span>{t("polling_station.recounted_question")}</span>
             </Link>

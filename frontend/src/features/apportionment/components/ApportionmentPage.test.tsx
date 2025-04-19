@@ -215,6 +215,31 @@ describe("ApportionmentPage", () => {
       expect(screen.queryByTestId("chosen-candidates-table")).not.toBeInTheDocument();
     });
 
+    test("Not possible because there are not enough candidates on lists with votes", async () => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+        error: "Not enough candidates on lists with votes",
+        fatal: false,
+        reference: "NotEnoughCandidatesOnListsWithVotes",
+      } satisfies ErrorResponse);
+
+      renderApportionmentPage(false);
+
+      // Wait for the page to be loaded
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
+      expect(
+        await screen.findByText(
+          "Er zijn niet genoeg kandidaten op lijsten waarop stemmen zijn uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
+        ),
+      ).toBeVisible();
+
+      expect(screen.queryByTestId("election-summary-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("apportionment-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("chosen-candidates-table")).not.toBeInTheDocument();
+    });
+
     test("Internal Server Error renders error page", async () => {
       // Since we test what happens after an error, we want vitest to ignore them
       vi.spyOn(console, "error").mockImplementation(() => {

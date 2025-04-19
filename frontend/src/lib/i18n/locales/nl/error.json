@@ -32,6 +32,7 @@
     "InvalidUsernameOrPassword": "De gebruikersnaam of het wachtwoord is onjuist",
     "InvalidVoteCandidate": "De kandidaat van de stem is niet geldig",
     "InvalidVoteGroup": "De politieke partij van de stem is niet geldig",
+    "NotEnoughCandidatesOnListsWithVotes": "Er zijn niet genoeg kandidaten op lijsten waarop stemmen zijn uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
     "PasswordRejection": "Het opgegeven wachtwoord voldoet niet aan de eisen",
     "PdfGenerationError": "Er is een fout opgetreden bij het genereren van de PDF",
     "PollingStationDataValidation": "De invoer voor dit stembureau is niet geldig",

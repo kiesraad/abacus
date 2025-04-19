@@ -497,6 +497,7 @@ export type ErrorReference =
   | "InvalidUsernameOrPassword"
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
+  | "NotEnoughCandidatesOnListsWithVotes"
   | "PasswordRejection"
   | "PdfGenerationError"
   | "PollingStationDataValidation"

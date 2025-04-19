@@ -495,6 +495,34 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
     });
 
+    test("Not possible because there are not enough candidates on lists with votes", async () => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
+      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+        error: "Not enough candidates on lists with votes",
+        fatal: false,
+        reference: "NotEnoughCandidatesOnListsWithVotes",
+      } satisfies ErrorResponse);
+
+      renderApportionmentResidualSeatsPage();
+
+      // Wait for the page to be loaded
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
+
+      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
+      expect(
+        await screen.findByText(
+          "Er zijn niet genoeg kandidaten op lijsten waarop stemmen zijn uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
+        ),
+      ).toBeVisible();
+
+      expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
+    });
+
     test("Internal Server Error renders error page", async () => {
       // Since we test what happens after an error, we want vitest to ignore them
       vi.spyOn(console, "error").mockImplementation(() => {

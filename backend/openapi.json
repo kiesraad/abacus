@@ -3099,6 +3099,7 @@
           "InvalidUsernameOrPassword",
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
+          "NotEnoughCandidatesOnListsWithVotes",
           "PasswordRejection",
           "PdfGenerationError",
           "PollingStationDataValidation",

@@ -157,13 +157,10 @@ async fn test_election_apportionment_error_all_lists_exhausted(pool: SqlitePool)
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
     let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(
-        body.error,
-        "All lists are exhausted, not enough candidates to fill all seats"
-    );
+    assert_eq!(body.error, "Not enough candidates on lists with votes");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
 async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
@@ -172,30 +169,36 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
         data: PollingStationResults {
             recounted: Some(false),
             voters_counts: VotersCounts {
-                poll_card_count: 100,
+                poll_card_count: 178,
                 proxy_certificate_count: 2,
                 voter_card_count: 2,
-                total_admitted_voters_count: 104,
+                total_admitted_voters_count: 182,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 102,
+                votes_candidates_count: 180,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
-                total_votes_cast_count: 104,
+                total_votes_cast_count: 182,
             },
             voters_recounts: None,
             differences_counts: differences_counts_zero(),
             political_group_votes: vec![
-                political_group_votes_from_test_data_auto(1, &[30, 21]),
-                political_group_votes_from_test_data_auto(2, &[30, 21]),
+                political_group_votes_from_test_data_auto(
+                    1,
+                    &[30, 21, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ),
+                political_group_votes_from_test_data_auto(2, &[30, 21, 9, 0, 0, 0]),
+                political_group_votes_from_test_data_auto(3, &[30, 21, 9, 0, 0, 0]),
+                political_group_votes_from_test_data_auto(4, &[0, 0, 0, 0, 0]),
+                political_group_votes_from_test_data_auto(5, &[0, 0, 0, 0]),
             ],
         },
         client_state: ClientState::new_from_str(None).unwrap(),
     };
 
-    create_result_with_non_example_data_entry(&addr, 3, 3, data_entry).await;
+    create_result_with_non_example_data_entry(&addr, 8, 5, data_entry).await;
 
-    let url = format!("http://{addr}/api/elections/3/apportionment");
+    let url = format!("http://{addr}/api/elections/5/apportionment");
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", coordinator_cookie)

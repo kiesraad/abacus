@@ -18,7 +18,7 @@ import { ApportionmentListDetailsPage } from "./ApportionmentListDetailsPage";
 
 vi.mock("react-router");
 
-const renderApportionmentPage = () =>
+const renderApportionmentListDetailsPage = () =>
   render(
     <ElectionProvider electionId={1}>
       <ApportionmentProvider electionId={1}>
@@ -37,7 +37,7 @@ describe("ApportionmentListDetailsPage", () => {
       election_summary: election_summary,
     } satisfies ElectionApportionmentResponse);
 
-    renderApportionmentPage();
+    renderApportionmentListDetailsPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
 
@@ -129,7 +129,7 @@ describe("ApportionmentListDetailsPage", () => {
       election_summary: election_summary,
     } satisfies ElectionApportionmentResponse);
 
-    renderApportionmentPage();
+    renderApportionmentListDetailsPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Lijst 5 - Political Group E" })).toBeVisible();
 
@@ -178,7 +178,7 @@ describe("ApportionmentListDetailsPage", () => {
         reference: "ApportionmentNotAvailableUntilDataEntryFinalised",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage();
+      renderApportionmentListDetailsPage();
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
@@ -203,7 +203,7 @@ describe("ApportionmentListDetailsPage", () => {
         reference: "DrawingOfLotsRequired",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage();
+      renderApportionmentListDetailsPage();
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
@@ -228,7 +228,7 @@ describe("ApportionmentListDetailsPage", () => {
         reference: "AllListsExhausted",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage();
+      renderApportionmentListDetailsPage();
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
@@ -237,6 +237,60 @@ describe("ApportionmentListDetailsPage", () => {
       expect(
         await screen.findByText(
           "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
+        ),
+      ).toBeVisible();
+
+      expect(screen.queryByTestId("preferentially-chosen-candidates-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("other-chosen-candidates-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("candidates-ranking-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("total-votes-per-candidate-table")).not.toBeInTheDocument();
+    });
+
+    test("Not possible because no votes on candidates cast", async () => {
+      vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+        error: "No votes on candidates cast",
+        fatal: false,
+        reference: "ZeroVotesCast",
+      } satisfies ErrorResponse);
+
+      renderApportionmentListDetailsPage();
+
+      // Wait for the page to be loaded
+      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
+
+      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
+      expect(
+        await screen.findByText(
+          "Er zijn geen stemmen op kandidaten uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
+        ),
+      ).toBeVisible();
+
+      expect(screen.queryByTestId("preferentially-chosen-candidates-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("other-chosen-candidates-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("candidates-ranking-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("total-votes-per-candidate-table")).not.toBeInTheDocument();
+    });
+
+    test("Not possible because there are not enough candidates on lists with votes", async () => {
+      vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+        error: "Not enough candidates on lists with votes",
+        fatal: false,
+        reference: "NotEnoughCandidatesOnListsWithVotes",
+      } satisfies ErrorResponse);
+
+      renderApportionmentListDetailsPage();
+
+      // Wait for the page to be loaded
+      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
+
+      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
+      expect(
+        await screen.findByText(
+          "Er zijn niet genoeg kandidaten op lijsten waarop stemmen zijn uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
         ),
       ).toBeVisible();
 

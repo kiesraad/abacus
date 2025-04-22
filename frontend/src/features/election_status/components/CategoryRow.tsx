@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
 
-import { DataEntryStatusName } from "@/api/gen/openapi";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
-import { formatDateTime } from "@/lib/util/format";
+import { DataEntryStatusName } from "@/types/generated/openapi";
+import { formatDateTime } from "@/utils/format";
 
 import { PollingStationWithStatusAndTypist, StatusCategory } from "../hooks/useElectionStatus";
 

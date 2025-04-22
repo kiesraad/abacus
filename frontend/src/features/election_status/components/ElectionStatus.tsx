@@ -1,4 +1,3 @@
-import { Election, ElectionStatusResponseEntry, PollingStation, User } from "@/api/gen/openapi";
 import { IconPlus } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
 import { Circle } from "@/components/ui/Icon/Circle";
@@ -6,6 +5,7 @@ import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
+import { Election, ElectionStatusResponseEntry, PollingStation, User } from "@/types/generated/openapi";
 
 import {
   categoryColorClass,

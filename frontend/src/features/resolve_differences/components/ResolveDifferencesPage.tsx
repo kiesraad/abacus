@@ -6,6 +6,7 @@ import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
+import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";
 
@@ -36,7 +37,22 @@ export function ResolveDifferencesPage() {
         </section>
       </header>
       <main className={cls.resolveDifferences}>
-        <aside>{/* TODO: status overview */}</aside>
+        <aside>
+          <ProgressList>
+            <ProgressList.Fixed>
+              <ProgressList.Item status="idle">
+                <span>Todo item 1</span>
+              </ProgressList.Item>
+              <ProgressList.Item status="warning">
+                <span>Todo item 2</span>
+              </ProgressList.Item>
+              <ProgressList.Item status="idle">
+                <span>Todo item 2</span>
+              </ProgressList.Item>
+              {/* TODO: etc... */}
+            </ProgressList.Fixed>
+          </ProgressList>
+        </aside>
         <article>
           <h2 className="">{t("resolve_differences.page_title")}</h2>
           <p>{t("resolve_differences.page_content")}</p>

@@ -102,7 +102,9 @@ describe("UserUpdateForm", () => {
 
     await user.type(passwordInput, "Vol");
     await user.click(save);
-    expect(passwordInput).toHaveAccessibleErrorMessage("Het opgegeven wachtwoord voldoet niet aan de eisen");
+    expect(passwordInput).toHaveAccessibleErrorMessage(
+      "Het opgegeven wachtwoord voldoet niet aan de eisen. Gebruik minimaal 13 karakters.",
+    );
 
     await user.type(passwordInput, "doendeKarakters01");
     await user.click(save);

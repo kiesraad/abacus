@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { cn } from "@/lib/util/classnames";
 import { MenuStatus } from "@/types/ui";
+import { cn } from "@/utils/classnames";
 
 import { StatusIcon } from "../Icon/StatusIcon";
 import cls from "./StatusList.module.css";

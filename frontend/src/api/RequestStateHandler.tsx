@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
-import { TranslationPath } from "@kiesraad/i18n";
-import { Loader } from "@kiesraad/ui";
+import { Loader } from "@/components/ui/Loader/Loader";
+import { TranslationPath } from "@/lib/i18n";
 
 import { ApiRequestState } from "./ApiRequestState";
 import { NotFoundError } from "./ApiResult";

@@ -1,6 +1,8 @@
 # Iconenbibliotheek
 
-De iconenbibliotheek is te vinden in `frontend/lib/icon/`. Het bevat alle iconen die in de applicatie worden gebruikt.
+De iconenbibliotheek is te vinden in `frontend/src/components/generated/icons.tsx`.
+De bronbestanden (SVG) zijn te vinden in `frontend/src/assets/icons/`.
+Het bevat alle iconen die in de applicatie worden gebruikt.
 
 ## Richtlijnen
 
@@ -28,4 +30,4 @@ Voer vanuit `frontend/` uit:
 npm run gen:icons
 ```
 
-Dit zal `lib/icon/generated.tsx` maken met alle iconen.
+Dit zal `frontend/src/components/generated/icons.tsx` maken met alle iconen.

@@ -1,7 +1,7 @@
 import { Dispatch } from "react";
 
 import { AnyApiError } from "@/api/ApiResult";
-import { ClaimDataEntryResponse, Election, PollingStationResults, ValidationResults } from "@/api/gen/openapi";
+import { ClaimDataEntryResponse, Election, PollingStationResults, ValidationResults } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { ValidationResultSet } from "../utils/ValidationResults";

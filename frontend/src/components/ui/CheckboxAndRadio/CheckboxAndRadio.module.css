@@ -83,17 +83,17 @@
 
     /* Set radio icon */
     &[type="radio"]:checked::before {
-      mask-image: url("../../../lib/icon/svg/dot.svg");
+      mask-image: url("../../../assets/icons/dot.svg");
     }
 
     /* Set checkbox icon */
     &[type="checkbox"]:checked::before {
-      mask-image: url("../../../lib/icon/svg/checkmarkSmall.svg");
+      mask-image: url("../../../assets/icons/checkmarkSmall.svg");
     }
 
     /* Set checkbox indeterminate icon */
     &[type="checkbox"]:global(.indeterminate):checked::before {
-      mask-image: url("../../../lib/icon/svg/minus.svg");
+      mask-image: url("../../../assets/icons/minus.svg");
     }
 
     /* Disabled input styling */

@@ -1,11 +1,10 @@
 import { ReactNode } from "react";
 import { useNavigate } from "react-router";
 
-import { isDevelopment } from "@/lib/util/env";
-
-import { t } from "@kiesraad/i18n";
-import { IconArrowLeft } from "@kiesraad/icon";
-import { Button } from "@kiesraad/ui";
+import { IconArrowLeft } from "@/components/generated/icons";
+import { Button } from "@/components/ui/Button/Button";
+import { t } from "@/lib/i18n";
+import { isDevelopment } from "@/utils/env";
 
 import cls from "./Error.module.css";
 import errorImage from "./error.png";

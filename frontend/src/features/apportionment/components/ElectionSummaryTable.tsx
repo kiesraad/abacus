@@ -1,8 +1,9 @@
-import { Fraction, PreferenceThreshold, VotesCounts } from "@/api/gen/openapi";
-import { DisplayFraction, Table } from "@/components/ui";
+import { DisplayFraction } from "@/components/ui/DisplayFraction/DisplayFraction";
+import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
-import { cn } from "@/lib/util/classnames";
-import { formatNumber } from "@/lib/util/format";
+import { Fraction, PreferenceThreshold, VotesCounts } from "@/types/generated/openapi";
+import { cn } from "@/utils/classnames";
+import { formatNumber } from "@/utils/format";
 
 import cls from "./Apportionment.module.css";
 

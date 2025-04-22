@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
 
 import { ApiResponseStatus } from "@/api/ApiResult";
-import { Election, PollingStationResults } from "@/api/gen/openapi";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { Election, PollingStationResults } from "@/types/generated/openapi";
 
 import { DataEntryAction, DataEntryState } from "../types/types";
 import dataEntryReducer, { getInitialState as _getInitialState } from "./reducer";

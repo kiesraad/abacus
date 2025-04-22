@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useLocation } from "react-router";
 
-import { ElectionDefinitionUploadResponse } from "@/api/gen/openapi";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { ProgressList, StickyNav } from "@/components/ui";
-import { cn } from "@/lib/util/classnames";
-
-import { t } from "@kiesraad/i18n";
+import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
+import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
+import { t } from "@/lib/i18n";
+import { ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
+import { cn } from "@/utils/classnames";
 
 import { CheckElectionDefinition } from "./CheckElectionDefinition";
 import cls from "./ElectionCreatePage.module.css";
@@ -39,7 +39,7 @@ export function ElectionCreatePage() {
                 <span>{t("polling_station.role")}</span>
               </ProgressList.Item>
               <ProgressList.Item key="list_of_candidates" status="idle">
-                <span>{t("list_of_candidates.plural")}</span>
+                <span>{t("candidate.list.plural")}</span>
               </ProgressList.Item>
               <ProgressList.Item key="polling_stations" status="idle">
                 <span>{t("polling_stations")}</span>

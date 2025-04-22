@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
-import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
-import { TestUserProvider } from "@/api/TestUserProvider";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
+import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { ElectionHomePage } from "./ElectionHomePage";
 
@@ -30,7 +30,7 @@ describe("ElectionHomePage", () => {
     );
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
     const list = await screen.findByTestId("election-pages");
     expect(list).toBeVisible();
     expect(list.childElementCount).toBe(2);

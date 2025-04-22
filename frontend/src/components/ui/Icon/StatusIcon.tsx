@@ -1,7 +1,13 @@
+import {
+  IconArrowNarrowRight,
+  IconCheckmark,
+  IconError,
+  IconMinus,
+  IconPencil,
+  IconWarning,
+} from "@/components/generated/icons";
+import { t } from "@/lib/i18n";
 import { MenuStatus } from "@/types/ui";
-
-import { t } from "@kiesraad/i18n";
-import { IconArrowNarrowRight, IconCheckmark, IconError, IconMinus, IconPencil, IconWarning } from "@kiesraad/icon";
 
 export function StatusIcon({ status }: { status: MenuStatus }) {
   switch (status) {

@@ -1,22 +1,20 @@
 import * as React from "react";
 
 import { ApiError } from "@/api/ApiResult";
-import { PoliticalGroup } from "@/api/gen/openapi";
-import { ErrorModal } from "@/components/error";
-import {
-  Alert,
-  BottomBar,
-  Button,
-  Checkbox,
-  Feedback,
-  Form,
-  InputGrid,
-  InputGridRow,
-  KeyboardKeys,
-} from "@/components/ui";
+import { ErrorModal } from "@/components/error/ErrorModal";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
+import { Button } from "@/components/ui/Button/Button";
+import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
+import { Feedback } from "@/components/ui/Feedback/Feedback";
+import { Form } from "@/components/ui/Form/Form";
+import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
+import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
+import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { t } from "@/lib/i18n";
-import { getCandidateFullName } from "@/lib/util/candidate";
+import { PoliticalGroup } from "@/types/generated/openapi";
 import { KeyboardKey } from "@/types/ui";
+import { getCandidateFullName } from "@/utils/candidate";
 
 import { DataEntryNavigation } from "../DataEntryNavigation";
 import { formValuesToValues } from "./candidatesVotesValues";

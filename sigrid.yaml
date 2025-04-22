@@ -50,10 +50,6 @@ components:
       - ".*/backend/tests/.*"
 
   # Frontend components
-  - name: "(Frontend) App Root Files"
-    include:
-      - ".*/frontend/src/app.test.ts"
-      - ".*/frontend/src/main.tsx"
   - name: "(Frontend) App"
     include:
       - ".*/frontend/src/app/.*"
@@ -124,7 +120,7 @@ components:
       - ".*/frontend/src/components/ui/.*"
   - name: "(Frontend) Lib/Util"
     include:
-      - ".*/frontend/src/lib/util/.*"
+      - ".*/frontend/src/utils/.*"
 
   - name: "(Frontend) e2e tests"
     include:
@@ -167,7 +163,7 @@ languages:
         - ".*/test[.]utils[.]ts"
     generated:
       include:
-        - ".*/gen/.*[.]ts"
+        - ".*/generated/.*[.]ts"
 
 exclude:
   - ".*/backend/[.]sqlx/.*"

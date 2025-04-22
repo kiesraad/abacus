@@ -1,7 +1,7 @@
-import { AuditLogEvent } from "@/api/gen/openapi";
-import { Table } from "@/components/ui";
+import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
-import { formatDateTime } from "@/lib/util/format";
+import { AuditLogEvent } from "@/types/generated/openapi";
+import { formatDateTime } from "@/utils/format";
 
 interface LogsTableProps {
   events: AuditLogEvent[];

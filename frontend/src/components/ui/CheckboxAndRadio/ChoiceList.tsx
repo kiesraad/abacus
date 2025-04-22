@@ -1,13 +1,12 @@
-import * as React from "react";
+import { ReactNode, RefObject } from "react";
 
-import { cn } from "@/lib/util/classnames";
+import { cn } from "@/utils/classnames";
 
-import { Checkbox, CheckboxAndRadioProps, Radio } from "@kiesraad/ui";
-
+import { Checkbox, CheckboxAndRadioProps, Radio } from "./CheckboxAndRadio";
 import cls from "./CheckboxAndRadio.module.css";
 
 export interface ChoiceListProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function ChoiceList({ children }: ChoiceListProps) {
@@ -15,12 +14,12 @@ export function ChoiceList({ children }: ChoiceListProps) {
 }
 
 interface ChoiceListOptionProps extends CheckboxAndRadioProps {
-  reference?: React.RefObject<HTMLInputElement>;
+  reference?: RefObject<HTMLInputElement>;
 }
 
-ChoiceList.Title = ({ children }: { children: React.ReactNode }) => <legend>{children}</legend>;
+ChoiceList.Title = ({ children }: { children: ReactNode }) => <legend>{children}</legend>;
 
-ChoiceList.Error = ({ children }: { children: React.ReactNode }) => <p className={cls.error}>{children}</p>;
+ChoiceList.Error = ({ children }: { children: ReactNode }) => <p className={cls.error}>{children}</p>;
 
 ChoiceList.Checkbox = ({
   id,

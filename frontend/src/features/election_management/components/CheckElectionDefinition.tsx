@@ -1,9 +1,11 @@
 import { useState } from "react";
 
-import { Election, RetractedEmlHash } from "@/api/gen/openapi";
-import { Alert, Button, InputField } from "@/components/ui";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
+import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/lib/i18n";
-import { formatDateFull } from "@/lib/util/format";
+import { Election, RetractedEmlHash } from "@/types/generated/openapi";
+import { formatDateFull } from "@/utils/format";
 
 import { RetractedHash, Stub } from "./RetractedHash";
 

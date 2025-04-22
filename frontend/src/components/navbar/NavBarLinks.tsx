@@ -1,11 +1,10 @@
 import { Link, NavLink } from "react-router";
 
-import { useElection } from "@/api/election/useElection";
-import { Election } from "@/api/gen/openapi";
-import { useUserRole } from "@/api/useUserRole";
-
-import { t } from "@kiesraad/i18n";
-import { IconChevronRight } from "@kiesraad/icon";
+import { IconChevronRight } from "@/components/generated/icons";
+import { useElection } from "@/hooks/election/useElection";
+import { useUserRole } from "@/hooks/user/useUserRole";
+import { t } from "@/lib/i18n";
+import { Election } from "@/types/generated/openapi";
 
 import { NavBarMenuButton } from "./NavBarMenu";
 

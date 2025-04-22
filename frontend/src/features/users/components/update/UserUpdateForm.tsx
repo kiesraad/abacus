@@ -1,11 +1,15 @@
 import { FormEvent, useState } from "react";
 
 import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
-import { UpdateUserRequest, User, USER_UPDATE_REQUEST_PATH } from "@/api/gen/openapi";
 import { useCrud } from "@/api/useCrud";
-import { Alert, Button, Form, FormLayout, InputField } from "@/components/ui";
+import { IconPencil } from "@/components/generated/icons";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
+import { Form } from "@/components/ui/Form/Form";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
+import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/lib/i18n";
-import { IconPencil } from "@/lib/icon";
+import { UpdateUserRequest, User, USER_UPDATE_REQUEST_PATH } from "@/types/generated/openapi";
 
 export interface UserUpdateFormProps {
   user: User;

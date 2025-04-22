@@ -1,9 +1,5 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router";
 
-import { DevHomePage } from "@/app/DevHomePage";
-import { ElectionLayout } from "@/app/ElectionLayout";
-import { NotAvailableInMock } from "@/app/NotAvailableInMock";
-import { NotFoundPage } from "@/app/NotFoundPage";
 import { AccountSetupPage } from "@/features/account/components/AccountSetupPage";
 import { LoginLayout } from "@/features/account/components/LoginLayout";
 import { LoginPage } from "@/features/account/components/LoginPage";
@@ -32,6 +28,7 @@ import { PollingStationCreatePage } from "@/features/polling_stations/components
 import { PollingStationListPage } from "@/features/polling_stations/components/PollingStationListPage";
 import { PollingStationsLayout } from "@/features/polling_stations/components/PollingStationsLayout";
 import { PollingStationUpdatePage } from "@/features/polling_stations/components/PollingStationUpdatePage";
+import { ResolveDifferencesPage } from "@/features/resolve_differences/components/ResolveDifferencesPage";
 import { UserCreateDetailsPage } from "@/features/users/components/create/UserCreateDetailsPage";
 import { UserCreateLayout } from "@/features/users/components/create/UserCreateLayout";
 import { UserCreateRolePage } from "@/features/users/components/create/UserCreateRolePage";
@@ -42,7 +39,11 @@ import { WorkstationsHomePage } from "@/features/workstations/components/Worksta
 import { t } from "@/lib/i18n";
 
 import { AdministratorLayout } from "./AdministratorLayout";
+import { DevHomePage } from "./DevHomePage";
+import { ElectionLayout } from "./ElectionLayout";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { NotAvailableInMock } from "./NotAvailableInMock";
+import { NotFoundPage } from "./NotFoundPage";
 import { RootLayout } from "./RootLayout";
 
 export const routes = createRoutesFromElements(
@@ -76,7 +77,10 @@ export const routes = createRoutesFromElements(
             )
           }
         />
-        <Route path="status" element={<ElectionStatusPage />} />
+        <Route path="status" element={null}>
+          <Route index element={<ElectionStatusPage />} />
+          <Route path=":pollingStationId/resolve-differences" element={<ResolveDifferencesPage />} />
+        </Route>
         <Route path="polling-stations" element={<PollingStationsLayout />}>
           <Route index element={<PollingStationListPage />} />
           <Route path="create" element={<PollingStationCreatePage />} />

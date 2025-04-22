@@ -1,11 +1,11 @@
 import { useReducer } from "react";
 
+import { useApiClient } from "@/api/useApiClient";
 import {
   Election,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
-} from "@/api/gen/openapi";
-import { useApiClient } from "@/api/useApiClient";
+} from "@/types/generated/openapi";
 
 import { DataEntryStateAndActions } from "../types/types";
 import {

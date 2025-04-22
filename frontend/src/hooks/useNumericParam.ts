@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 
-import { parseIntStrict } from "@/lib/util/strings";
+import { parseIntStrict } from "@/utils/strings";
 
 // Takes a parameter key, then tries to find it in the URL params.
 // When it is found, it tries to validate it as a number and returns it.

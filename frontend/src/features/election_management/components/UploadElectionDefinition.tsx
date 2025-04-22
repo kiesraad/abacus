@@ -1,10 +1,11 @@
 import { useState } from "react";
 
 import { isError, isSuccess } from "@/api/ApiResult";
-import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionUploadResponse } from "@/api/gen/openapi";
 import { useCrud } from "@/api/useCrud";
-import { Alert, FileInput } from "@/components/ui";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { t } from "@/lib/i18n";
+import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
 
 interface UploadElectionDefinitionProps {
   file: File | undefined;

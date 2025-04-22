@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Link, LinkProps } from "react-router";
 
-import { cn } from "@/lib/util/classnames";
 import { ButtonVariant, Size } from "@/types/ui";
+import { cn } from "@/utils/classnames";
 
 import cls from "./Button.module.css";
 

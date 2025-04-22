@@ -1,8 +1,8 @@
 import * as React from "react";
 import { NavLink } from "react-router";
 
-import { t } from "@kiesraad/i18n";
-import { IconCompass, IconFile, IconHamburger, IconLaptop, IconUsers } from "@kiesraad/icon";
+import { IconCompass, IconFile, IconHamburger, IconLaptop, IconUsers } from "@/components/generated/icons";
+import { t } from "@/lib/i18n";
 
 import cls from "./NavBar.module.css";
 

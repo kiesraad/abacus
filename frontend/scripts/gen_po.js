@@ -1,8 +1,8 @@
 import fs from "fs";
 
-import { translations } from "@kiesraad/i18n";
+import { translations } from "@/lib/i18n";
 
-// create a translations directory if none exsists
+// create a translations directory if none exists
 if (!fs.existsSync("./translations")) {
   fs.mkdirSync("./translations");
 }

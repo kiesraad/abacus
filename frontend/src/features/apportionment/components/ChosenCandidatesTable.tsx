@@ -1,8 +1,8 @@
-import { Candidate } from "@/api/gen/openapi";
-import { Table } from "@/components/ui";
+import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/lib/i18n";
-import { getCandidateFullNameWithGender } from "@/lib/util/candidate";
-import { cn } from "@/lib/util/classnames";
+import { Candidate } from "@/types/generated/openapi";
+import { getCandidateFullNameWithGender } from "@/utils/candidate";
+import { cn } from "@/utils/classnames";
 
 import cls from "./Apportionment.module.css";
 
@@ -18,14 +18,12 @@ export function ChosenCandidatesTable({ chosenCandidates }: ChosenCandidatesTabl
         <Table.HeaderCell>{t("candidate.locality")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {chosenCandidates.map((candidate) => {
-          return (
-            <Table.Row key={`${candidate.number}-${candidate.last_name}`}>
-              <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
-              <Table.Cell>{candidate.locality}</Table.Cell>
-            </Table.Row>
-          );
-        })}
+        {chosenCandidates.map((candidate, index) => (
+          <Table.Row key={`chosen-candidate-${index + 1}`}>
+            <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
+            <Table.Cell>{candidate.locality}</Table.Cell>
+          </Table.Row>
+        ))}
       </Table.Body>
     </Table>
   );

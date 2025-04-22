@@ -1,9 +1,11 @@
 import { Outlet } from "react-router";
 
 import { NotFoundError } from "@/api/ApiResult";
-import { useElection } from "@/api/election/useElection";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Badge, PollingStationNumber, StickyNav } from "@/components/ui";
+import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
+import { Badge } from "@/components/ui/Badge/Badge";
+import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
+import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";
 
@@ -22,8 +24,8 @@ export function DataEntryLayout() {
     throw new NotFoundError("error.polling_station_not_found");
   }
 
-  if (pollingStationStatus.status === "definitive") {
-    throw new Error("error.polling_station_already_definitive");
+  if (entryNumber !== 1 && entryNumber !== 2) {
+    throw new NotFoundError("error.data_entry_not_found");
   }
 
   return (

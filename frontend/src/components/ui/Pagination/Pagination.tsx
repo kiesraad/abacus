@@ -1,4 +1,4 @@
-import { t } from "@kiesraad/i18n";
+import { t } from "@/lib/i18n";
 
 import { Button } from "../Button/Button";
 import cls from "./Pagination.module.css";

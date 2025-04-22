@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useLocation } from "react-router";
 
-import { domtoren } from "@/lib/util/domtoren";
+import { domtoren } from "@/utils/domtoren";
 
 import cls from "./StickyNav.module.css";
 

@@ -1,9 +1,5 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router";
 
-import { DevHomePage } from "@/app/DevHomePage";
-import { ElectionLayout } from "@/app/ElectionLayout";
-import { NotAvailableInMock } from "@/app/NotAvailableInMock";
-import { NotFoundPage } from "@/app/NotFoundPage";
 import { AccountSetupPage } from "@/features/account/components/AccountSetupPage";
 import { LoginLayout } from "@/features/account/components/LoginLayout";
 import { LoginPage } from "@/features/account/components/LoginPage";
@@ -43,7 +39,11 @@ import { WorkstationsHomePage } from "@/features/workstations/components/Worksta
 import { t } from "@/lib/i18n";
 
 import { AdministratorLayout } from "./AdministratorLayout";
+import { DevHomePage } from "./DevHomePage";
+import { ElectionLayout } from "./ElectionLayout";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { NotAvailableInMock } from "./NotAvailableInMock";
+import { NotFoundPage } from "./NotFoundPage";
 import { RootLayout } from "./RootLayout";
 
 export const routes = createRoutesFromElements(

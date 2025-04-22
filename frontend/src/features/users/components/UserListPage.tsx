@@ -1,4 +1,3 @@
-import { Role } from "@/api/gen/openapi";
 import { IconPlus } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -7,7 +6,8 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/lib/i18n";
-import { formatDateTime } from "@/lib/util/format";
+import { Role } from "@/types/generated/openapi";
+import { formatDateTime } from "@/utils/format";
 
 import { useQueryParam } from "../hooks/useQueryParam";
 import { useUserListRequest } from "../hooks/useUserListRequest";

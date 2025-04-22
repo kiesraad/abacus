@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
 
-import { PoliticalGroup } from "@/api/gen/openapi";
 import { render, screen } from "@/testing/test-utils";
+import { PoliticalGroup } from "@/types/generated/openapi";
 
-import { election, largest_remainder_steps, seat_assignment } from "../../testing/less-than-19-seats";
+import { election, largest_remainder_steps, seat_assignment } from "../../testing/lt-19-seats";
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
 
 describe("LargestRemaindersTable", () => {
@@ -13,6 +13,7 @@ describe("LargestRemaindersTable", () => {
         steps={largest_remainder_steps}
         finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
+        resultChanges={[]}
       />,
     );
 

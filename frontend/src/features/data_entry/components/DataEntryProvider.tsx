@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router";
 
 import { ApiError } from "@/api/ApiResult";
-import { Election } from "@/api/gen/openapi";
+import { Election } from "@/types/generated/openapi";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
 import useDataEntry from "../hooks/useDataEntry";

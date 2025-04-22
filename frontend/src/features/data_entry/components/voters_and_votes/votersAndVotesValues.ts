@@ -1,5 +1,5 @@
-import { PollingStationResults } from "@/api/gen/openapi";
-import { deformatNumber, formatNumber } from "@/lib/util/format";
+import { PollingStationResults } from "@/types/generated/openapi";
+import { deformatNumber, formatNumber } from "@/utils/format";
 
 export type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">;
 

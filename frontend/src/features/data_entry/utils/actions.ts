@@ -1,6 +1,6 @@
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResult, isSuccess } from "@/api/ApiResult";
-import { DataEntry, PollingStationResults, SaveDataEntryResponse } from "@/api/gen/openapi";
+import { DataEntry, PollingStationResults, SaveDataEntryResponse } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import {

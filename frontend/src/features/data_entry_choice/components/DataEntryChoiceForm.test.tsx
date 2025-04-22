@@ -1,20 +1,20 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
-import { ElectionStatusProvider } from "@/api/election/ElectionStatusProvider";
-import { ElectionStatusResponse, LoginResponse } from "@/api/gen/openapi";
-import { useUser } from "@/api/useUser";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { useUser } from "@/hooks/user/useUser";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
+import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
 
 import { DataEntryChoiceForm } from "./DataEntryChoiceForm";
 
-vi.mock("@/api/useUser");
+vi.mock("@/hooks/user/useUser");
 
 function renderDataEntryChoicePage() {
   return renderReturningRouter(
@@ -46,7 +46,7 @@ describe("Test DataEntryChoiceForm", () => {
 
       renderDataEntryChoicePage();
 
-      expect(await screen.findByRole("group", { name: "Welk stembureau ga je invoeren?" }));
+      expect(await screen.findByRole("group", { name: "Welk stembureau ga je invoeren?" })).toBeVisible();
       const pollingStation = screen.getByTestId("pollingStation");
 
       // Test if the feedback field shows an error
@@ -74,7 +74,7 @@ describe("Test DataEntryChoiceForm", () => {
         </ElectionProvider>,
       );
 
-      expect(await screen.findByRole("group", { name: "Verder met een volgend stembureau?" }));
+      expect(await screen.findByRole("group", { name: "Verder met een volgend stembureau?" })).toBeVisible();
       const pollingStation = screen.getByTestId("pollingStation");
 
       // Test if the polling station name is shown

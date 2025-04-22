@@ -1,19 +1,19 @@
 import { useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-import { useElection } from "@/api/election/useElection";
-import { useElectionStatus } from "@/api/election/useElectionStatus";
-import { useUser } from "@/api/useUser";
 import { IconError } from "@/components/generated/icons";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
+import { useElection } from "@/hooks/election/useElection";
+import { useElectionStatus } from "@/hooks/election/useElectionStatus";
+import { useUser } from "@/hooks/user/useUser";
 import { t, tx } from "@/lib/i18n";
-import { cn } from "@/lib/util/classnames";
-import { parseIntUserInput } from "@/lib/util/strings";
 import { KeyboardKey } from "@/types/ui";
+import { cn } from "@/utils/classnames";
+import { parseIntUserInput } from "@/utils/strings";
 
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import {

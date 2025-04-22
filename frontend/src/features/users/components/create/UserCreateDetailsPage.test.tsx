@@ -1,9 +1,9 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { User, USER_CREATE_REQUEST_PATH } from "@/api/gen/openapi";
 import { overrideOnce } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
+import { User, USER_CREATE_REQUEST_PATH } from "@/types/generated/openapi";
 
 import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
 import { UserCreateDetailsPage } from "./UserCreateDetailsPage";

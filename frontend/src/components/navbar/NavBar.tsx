@@ -1,8 +1,7 @@
 import { Link } from "react-router";
 
 import { useApiState } from "@/api/useApiState";
-
-import { t } from "@kiesraad/i18n";
+import { t } from "@/lib/i18n";
 
 import cls from "./NavBar.module.css";
 import { NavBarLinks } from "./NavBarLinks";

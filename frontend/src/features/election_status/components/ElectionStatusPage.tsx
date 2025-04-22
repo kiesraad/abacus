@@ -1,15 +1,15 @@
 import { useNavigate } from "react-router";
 
-import { useElection } from "@/api/election/useElection";
-import { useElectionStatus } from "@/api/election/useElectionStatus";
-import { USER_LIST_REQUEST_PATH, UserListResponse } from "@/api/gen/openapi";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { HeaderElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
+import { useElection } from "@/hooks/election/useElection";
+import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/lib/i18n";
+import { USER_LIST_REQUEST_PATH, UserListResponse } from "@/types/generated/openapi";
 
 import { ElectionStatus } from "./ElectionStatus";
 

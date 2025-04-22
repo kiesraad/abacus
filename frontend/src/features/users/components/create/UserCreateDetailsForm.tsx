@@ -1,7 +1,6 @@
 import { FormEvent, useState } from "react";
 
 import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
-import { CreateUserRequest, Role, User, USER_CREATE_REQUEST_PATH } from "@/api/gen/openapi";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -9,6 +8,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/lib/i18n";
+import { CreateUserRequest, Role, User, USER_CREATE_REQUEST_PATH } from "@/types/generated/openapi";
 
 export interface UserCreateDetailsFormProps {
   role: Role;

@@ -1,6 +1,6 @@
 import type { Story } from "@ladle/react";
 
-import type { DataEntryStatusName } from "@/api/gen/openapi";
+import type { DataEntryStatusName } from "@/types/generated/openapi";
 
 import { Badge, BadgeProps } from "./Badge";
 

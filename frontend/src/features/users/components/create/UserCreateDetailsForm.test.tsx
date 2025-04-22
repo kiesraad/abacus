@@ -1,11 +1,11 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { Role, USER_CREATE_REQUEST_PATH } from "@/api/gen/openapi";
 import { UserCreateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler, within } from "@/testing/test-utils";
+import { Role, USER_CREATE_REQUEST_PATH } from "@/types/generated/openapi";
 
 import { UserCreateDetailsForm } from "./UserCreateDetailsForm";
 

@@ -11,9 +11,10 @@ use crate::eml::{EML110, EMLDocument, RetractedEmlHash};
 use crate::polling_station::PollingStation;
 use crate::polling_station::repository::PollingStations;
 use crate::{AppState, ErrorResponse};
-use axum::extract::Path;
+use axum::Json;
+use axum::extract::{Path, State};
 #[cfg(feature = "dev-database")]
-use axum::{Json, extract::State, http::StatusCode};
+use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::router::OpenApiRouter;

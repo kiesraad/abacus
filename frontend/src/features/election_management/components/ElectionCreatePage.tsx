@@ -1,42 +1,23 @@
 import { useState } from "react";
 import { useLocation } from "react-router";
 
-import { isError, isSuccess } from "@/api/ApiResult";
-import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionUploadResponse } from "@/api/gen/openapi";
-import { useCrud } from "@/api/useCrud";
+import { ElectionDefinitionUploadResponse } from "@/api/gen/openapi";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Alert, FileInput, ProgressList, StickyNav } from "@/components/ui";
+import { ProgressList, StickyNav } from "@/components/ui";
 import { cn } from "@/lib/util/classnames";
 
 import { t } from "@kiesraad/i18n";
 
 import { CheckElectionDefinition } from "./CheckElectionDefinition";
 import cls from "./ElectionCreatePage.module.css";
+import { UploadElectionDefinition } from "./UploadElectionDefinition";
 
 export function ElectionCreatePage() {
   const location = useLocation();
   const [file, setFile] = useState<File | undefined>(undefined);
   const [data, setData] = useState<ElectionDefinitionUploadResponse | undefined>(undefined);
-  const [error, setError] = useState<boolean>(false);
-  const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
-  const { create } = useCrud<ElectionDefinitionUploadResponse>({ create: path });
-
-  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const currentFile = e.target.files ? e.target.files[0] : undefined;
-    setFile(currentFile);
-    if (currentFile !== undefined) {
-      const response = await create({ data: await currentFile.text() });
-      if (isSuccess(response)) {
-        setData(response.data);
-        setError(false);
-      } else if (isError(response)) {
-        setData(undefined);
-        setError(true);
-      }
-    }
-  };
 
   return (
     <>
@@ -81,18 +62,7 @@ export function ElectionCreatePage() {
             {file && data ? (
               <CheckElectionDefinition file={file} election={data.election} hash={data.hash} />
             ) : (
-              <>
-                <h2>{t("election.import_eml")}</h2>
-                {error && (
-                  <Alert type="error" title={t("election.invalid_election_definition.title")} inline>
-                    {t("election.invalid_election_definition.description")}
-                  </Alert>
-                )}
-                <p className="mt-lg mb-lg">{t("election.use_instructions_to_import_eml")}</p>
-                <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)} file={file}>
-                  {t("select_file")}
-                </FileInput>
-              </>
+              <UploadElectionDefinition file={file} setFile={setFile} setData={setData}></UploadElectionDefinition>
             )}
           </section>
         </article>

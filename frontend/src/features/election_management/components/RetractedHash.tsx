@@ -14,7 +14,7 @@ interface RetractedHashProps {
 
 export function RetractedHash({ hash, stubs }: RetractedHashProps) {
   return (
-    <div className={cls.hash}>
+    <div id="hash" className={cls.hash}>
       {hash.map((chunk, hashIndex) => {
         const prefix = hashIndex === hash.length - 1 ? "" : "-";
         const stubIndex = stubs.findIndex((s) => s.index === hashIndex);

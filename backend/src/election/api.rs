@@ -145,7 +145,7 @@ pub struct ElectionDefinitionUploadResponse {
     ),
 )]
 pub async fn election_import_validate(
-    //_user: Admin,
+    _user: Admin,
     Json(edu): Json<ElectionDefinitionUploadRequest>,
 ) -> Result<Json<ElectionDefinitionUploadResponse>, APIError> {
     let eml = EML110::from_str(&edu.data)?;

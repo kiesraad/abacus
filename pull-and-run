@@ -24,5 +24,5 @@ echo "Building and running backend..."
 
 pushd "backend" > /dev/null 2>&1
 cargo sqlx database reset -y
-cargo run --features memory-serve -- -s
+cargo run --features memory-serve,embed-typst -- -s
 popd > /dev/null 2>&1

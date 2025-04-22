@@ -60,7 +60,7 @@ export function DataEntryProgress() {
         <ProgressList.Item
           id="list-item-recounted"
           key="recounted"
-          status="accept" // TODO: why is this hardcoded?
+          status={menuStatusForFormSection(formState.sections.recounted)}
           active={formState.current === "recounted"}
         >
           {formState.current !== "recounted" ? ( // TODO: this condition does not check the index like the others

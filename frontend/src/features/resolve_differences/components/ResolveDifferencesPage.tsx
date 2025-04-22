@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router";
+
 import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
@@ -12,9 +14,13 @@ import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 export function ResolveDifferencesPage() {
+  const navigate = useNavigate();
+  const afterSave = () => {
+    void navigate(`/elections/${election.id}/status`);
+  };
   const pollingStationId = useNumericParam("pollingStationId");
   const { pollingStation, election, loading, status, choice, setChoice, onSubmit } =
-    usePollingStationDataEntryDifferences(pollingStationId);
+    usePollingStationDataEntryDifferences(pollingStationId, afterSave);
 
   if (loading || status === null) {
     return <Loader />;

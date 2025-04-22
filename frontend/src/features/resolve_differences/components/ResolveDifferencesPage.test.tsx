@@ -1,5 +1,3 @@
-import { useParams } from "react-router";
-
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -17,7 +15,10 @@ import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { ResolveDifferencesPage } from "./ResolveDifferencesPage";
 
-vi.mock("react-router");
+vi.mock("react-router", () => ({
+  useNavigate: () => vi.fn(),
+  useParams: () => ({ pollingStationId: "3" }),
+}));
 
 const renderPage = () => {
   render(
@@ -42,7 +43,6 @@ describe("ResolveDifferencesPage", () => {
   });
 
   test("Should render a table", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "3" });
     renderPage();
 
     // Wait for the page to be loaded

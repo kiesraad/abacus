@@ -1,5 +1,4 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router";
 
 import { AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -37,8 +36,10 @@ interface PollingStationDataEntryStatus {
   onSubmit: () => Promise<void>;
 }
 
-export function usePollingStationDataEntryDifferences(pollingStationId: number): PollingStationDataEntryStatus {
-  const navigate = useNavigate();
+export function usePollingStationDataEntryDifferences(
+  pollingStationId: number,
+  afterSave: () => void,
+): PollingStationDataEntryStatus {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
@@ -108,7 +109,7 @@ export function usePollingStationDataEntryDifferences(pollingStationId: number):
     if (isSuccess(response)) {
       // reload the election status and navigate to the overview page
       await electionContext?.refetch();
-      void navigate(`/elections/${election.id}/status`);
+      afterSave();
     } else {
       setError(response);
     }

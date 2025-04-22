@@ -1,6 +1,6 @@
 # Abacus - Instructies Invoerder
 
-Welkom bij Abacus! Deze tool is ontwikkeld om de verkiezingsuitslagen per stembureau na te rekenen en te controleren op fouten en afwijkende uitslagen. In dit document leggen we uit hoe je Abacus gebruikt als invoerder.
+Welkom bij Abacus! Deze tool is ontwikkeld om de verkiezingsuitslagen per stembureau in te voeren en te controleren op fouten en afwijkende uitslagen. In dit document leggen we uit hoe je Abacus gebruikt als invoerder.
 
 Na het tellen van de stemmen wordt voor elk stembureau een proces-verbaal ingevuld. De cijfers op dit proces-verbaal neem je over in Abacus. Vervolgens controleert de applicatie of de cijfers intern kloppen, bijvoorbeeld of de optellingen goed zijn. Ook wordt gecheckt of er bijzondere afwijkingen zijn, bijvoorbeeld als het aantal ongeldige stemmen hoog is. Als er fouten of waarschuwingen zijn, volg je de instructies op of overleg je het met je coördinator.
 

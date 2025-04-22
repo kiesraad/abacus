@@ -2,9 +2,9 @@
 
 Welkom bij Abacus! Deze tool is ontwikkeld om de verkiezingsuitslagen per stembureau na te rekenen en te controleren op fouten en afwijkende uitslagen. In dit document leggen we uit hoe je Abacus gebruikt als invoerder.
 
-Na het tellen van de stemmen wordt voor elk stembureau een proces-verbaal ingevuld. De cijfers op dit proces-verbaal neem je over in Abacus. Vervolgens controleert de applicatie of de cijfers kloppen met het proces-verbaal. Ook wordt gecheckt of er bijzondere afwijkingen zijn, bijvoorbeeld als het aantal ongeldige stemmen hoog is. Als er fouten of waarschuwingen zijn, volg je de instructies op of overleg je het met je coördinator.
+Na het tellen van de stemmen wordt voor elk stembureau een proces-verbaal ingevuld. De cijfers op dit proces-verbaal neem je over in Abacus. Vervolgens controleert de applicatie of de cijfers intern kloppen, bijvoorbeeld of de optellingen goed zijn. Ook wordt gecheckt of er bijzondere afwijkingen zijn, bijvoorbeeld als het aantal ongeldige stemmen hoog is. Als er fouten of waarschuwingen zijn, volg je de instructies op of overleg je het met je coördinator.
 
-Elk stembureau wordt twee keer ingevoerd door twee verschillende invoerders. Na de tweede invoer controleert Abacus of de eerste en tweede invoer overeenkomen. Als alles klopt is de invoer van het betreffende stembureau compleet. Ook hier geldt dat je bij fouten of waarschuwingen de instructies volgt of overlegt met je coördinator.
+Elk stembureau wordt twee keer ingevoerd (door twee verschillende invoerders). De tweede invoerder krijgt een waarschuwing als diens invoer afwijkt van de eerste invoerder. Ook hier geldt dat je de instructies volgt of overlegt met je coördinator. Na de tweede invoer controleert Abacus of de eerste en tweede invoer overeenkomen. Als alles klopt is de invoer van het betreffende stembureau compleet. 
 
 ## Inloggen en account instellen
 
@@ -74,7 +74,7 @@ In rubriek 3 op het procesverbaal is aangegeven of er verschillen zijn tussen he
 
 Nu ga je invoeren hoeveel stemmen zijn geteld voor elke kandidaat op elke lijst.
 
-Neem de cijfers over zoals ze in het proces-verbaal staan. Met de tab-toets ga je naar het volgende veld. Lege velden op het proces-verbaal kun je ook leeglaten in Abacus.
+Neem de cijfers over zoals ze in het proces-verbaal staan. Lege velden en velden met een nul op het proces-verbaal kun je ook leeglaten in Abacus.
 
 **Let op:** Op het proces-verbaal staan ook velden voor het subtotaal van elke kolom. Deze kun je negeren.
 

@@ -57,12 +57,18 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
           margin="mb-md"
           onFocus={() => {
             const newStubs = [...stubs];
-            newStubs[stubIndex]!.selected = true;
+            const stub = newStubs[stubIndex];
+            if (stub) {
+              stub.selected = true;
+            }
             setStubs(newStubs);
           }}
           onBlur={() => {
             const newStubs = [...stubs];
-            newStubs[stubIndex]!.selected = false;
+            const stub = newStubs[stubIndex];
+            if (stub) {
+              stub.selected = true;
+            }
             setStubs(newStubs);
           }}
           autoFocus={stubIndex === 0}

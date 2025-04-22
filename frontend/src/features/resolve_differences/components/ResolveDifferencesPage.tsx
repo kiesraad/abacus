@@ -1,5 +1,7 @@
 import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
+import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
+import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
@@ -11,7 +13,7 @@ import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 export function ResolveDifferencesPage() {
   const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation, election, loading, status, choice, setChoice } =
+  const { pollingStation, election, loading, status, choice, setChoice, onSubmit } =
     usePollingStationDataEntryDifferences(pollingStationId);
 
   if (loading || status === null) {
@@ -28,7 +30,7 @@ export function ResolveDifferencesPage() {
         </section>
       </header>
       <main className={cls.resolveDifferences}>
-        <aside>Wololo</aside>
+        <aside>{/* TODO: status overview */}</aside>
         <article>
           <h2 className="">{t("resolve_differences.page_title")}</h2>
           <p>{t("resolve_differences.page_content")}</p>
@@ -38,7 +40,12 @@ export function ResolveDifferencesPage() {
             politicalGroups={election.political_groups}
             previewChoice={choice}
           />
-          <form action="">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void onSubmit();
+            }}
+          >
             <h2>{t("resolve_differences.form_question")}</h2>
             <p>{t("resolve_differences.form_content")}</p>
             <ChoiceList>
@@ -67,6 +74,13 @@ export function ResolveDifferencesPage() {
                 }}
               />
             </ChoiceList>
+            <BottomBar type="form">
+              <BottomBar.Row>
+                <Button size="lg" type="submit">
+                  {t("save")}
+                </Button>
+              </BottomBar.Row>
+            </BottomBar>
           </form>
         </article>
       </main>

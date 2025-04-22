@@ -20,6 +20,7 @@ export interface DifferencesRow {
   first?: number | string;
   second?: number | string;
   description?: string;
+  previewChoice?: ResolveAction | null;
 }
 
 const CELL_CLASSES = ["text-align-r", "font-number", "bold"];

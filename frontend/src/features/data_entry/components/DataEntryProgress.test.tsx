@@ -10,38 +10,13 @@ import { render, screen, waitFor, within } from "@/testing/test-utils";
 
 import { errorWarningMocks, getDefaultFormSection } from "../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../testing/test.utils";
-import { DataEntryState } from "../types/types";
+import { FormState } from "../types/types";
 import { DataEntryProgress } from "./DataEntryProgress";
 import { DataEntryProvider } from "./DataEntryProvider";
 
 // TODO: consider replacing the "idle" returned at the end of menuStatusForFormSection with something different than "idle".
 //      It's for forms that have not been visited yet.
 //      Reason: the active attribute can also set an "idle" class
-
-// What needs testing?
-// each item:
-//   status: from menuStatusForFormSection() -> class and icon
-//   disabled: depends on currentIndex -> class
-//   active: depends on formState.current -> aria-current (step or false) and icon and class (active or idle)
-//   link or not: depends on formState.current and currentIndex
-// formState is the input for all of these
-// results of status/disabled/active are covered (icon and aria-current) in ProgressList tests
-
-// determining if empty requires pollingStationResults
-
-// formsection variants (cascade down)
-// missing => only for political group and does not reach menuStatusForFormSection()
-// error
-// unaccepted warning
-// accepted warning
-// furthest
-// no furthest -> ever the case??
-// empty and not furthest
-// empty and beyond furthest
-// no error and saved
-// the rest
-// // "accept" | "active" | "empty" | "error" | "idle" | "unsaved" | "warning";
-// // active not a return value of this function
 
 vi.mock("react-router");
 
@@ -55,14 +30,8 @@ function renderForm() {
   );
 }
 
-const defaultDataEntryState: DataEntryState = {
-  // TODO: refactor similar function in defaultDataEntryState and use instead?
-  election: electionMockData,
-  pollingStationId: 1,
-  error: null,
-  pollingStationResults: null,
-  entryNumber: 1,
-  formState: {
+function getDefaultFormState(): FormState {
+  return {
     current: "differences_counts",
     furthest: "save",
     sections: {
@@ -73,10 +42,32 @@ const defaultDataEntryState: DataEntryState = {
       political_group_votes_2: getDefaultFormSection("political_group_votes_2", 5),
       save: getDefaultFormSection("save", 6),
     },
+  };
+}
+
+const pollingStationResults = {
+  recounted: false,
+  differences_counts: {
+    more_ballots_count: 5,
+    fewer_ballots_count: 0,
+    no_explanation_count: 0,
+    other_explanation_count: 0,
+    too_few_ballots_handed_out_count: 0,
+    too_many_ballots_handed_out_count: 0,
+    unreturned_ballots_count: 0,
   },
-  targetFormSectionId: "recounted", // TODO: should match with formState.current?
-  status: "idle",
-  cache: null,
+  political_group_votes: [
+    {
+      number: 1,
+      total: 0,
+      candidate_votes: [{ number: 1, votes: 0 }],
+    },
+    {
+      number: 2,
+      total: 10,
+      candidate_votes: [{ number: 1, votes: 10 }],
+    },
+  ],
 };
 
 describe("Test DataEntryProgress", () => {
@@ -85,8 +76,8 @@ describe("Test DataEntryProgress", () => {
     vi.mocked(useParams).mockReturnValue({ pollingStationId: "1" });
   });
 
-  test("DataEntryProgress shows different states", async () => {
-    const formState = defaultDataEntryState.formState;
+  test("shows different states for entries", async () => {
+    const formState = getDefaultFormState();
 
     formState.current = "political_group_votes_2";
     formState.furthest = "political_group_votes_2";
@@ -95,36 +86,7 @@ describe("Test DataEntryProgress", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: {
-        recounted: false,
-        differences_counts: {
-          more_ballots_count: 5,
-          fewer_ballots_count: 0,
-          no_explanation_count: 0,
-          other_explanation_count: 0,
-          too_few_ballots_handed_out_count: 0,
-          too_many_ballots_handed_out_count: 0,
-          unreturned_ballots_count: 0,
-        },
-        political_group_votes: [
-          {
-            number: 1,
-            total: 0,
-            candidate_votes: [
-              // TODO different number of candidates than in mock data (29)
-              { number: 1, votes: 0 },
-            ],
-          },
-          {
-            number: 2,
-            total: 10,
-            candidate_votes: [
-              // TODO different number of candidates than in mock data (29)
-              { number: 1, votes: 10 },
-            ],
-          },
-        ],
-      },
+      pollingStationResults: pollingStationResults,
       continueToNextSection: false,
       validationResults: {
         errors: [errorWarningMocks.F101],
@@ -143,8 +105,6 @@ describe("Test DataEntryProgress", () => {
     const list1 = screen.getByTestId("list-item-pg-1");
     const list2 = screen.getByTestId("list-item-pg-2");
     const checkAndSave = screen.getByTestId("list-item-save");
-
-    // TODO: idle unsaved -> navigate back from furthest
 
     expect(recounted).toHaveClass("idle error");
     expect(recounted).toHaveAttribute("aria-current", "false");
@@ -176,15 +136,15 @@ describe("Test DataEntryProgress", () => {
     expect(within(checkAndSave).queryByRole("img")).not.toBeInTheDocument();
   });
 
-  test("DataEntryProgress shows links to other pages - current saved", async () => {
-    const formState = defaultDataEntryState.formState;
+  test("shows links to other pages when on last page", async () => {
+    const formState = getDefaultFormState();
 
     formState.current = "save";
     formState.furthest = "save";
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: {},
+      pollingStationResults: pollingStationResults,
       continueToNextSection: false,
       validationResults: undefined,
     });
@@ -232,44 +192,15 @@ describe("Test DataEntryProgress", () => {
     );
   });
 
-  test("DataEntryProgress - navigate back from end", async () => {
-    const formState = defaultDataEntryState.formState;
+  test("shows links when navigating to earlier page", async () => {
+    const formState = getDefaultFormState();
 
     formState.current = "political_group_votes_1";
     formState.furthest = "save";
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: {
-        recounted: false,
-        differences_counts: {
-          more_ballots_count: 5,
-          fewer_ballots_count: 0,
-          no_explanation_count: 0,
-          other_explanation_count: 0,
-          too_few_ballots_handed_out_count: 0,
-          too_many_ballots_handed_out_count: 0,
-          unreturned_ballots_count: 0,
-        },
-        political_group_votes: [
-          {
-            number: 1,
-            total: 0,
-            candidate_votes: [
-              // TODO different number of candidates than in mock data (29)
-              { number: 1, votes: 0 },
-            ],
-          },
-          {
-            number: 2,
-            total: 10,
-            candidate_votes: [
-              // TODO different number of candidates than in mock data (29)
-              { number: 1, votes: 10 },
-            ],
-          },
-        ],
-      },
+      pollingStationResults: pollingStationResults,
       continueToNextSection: false,
       validationResults: undefined,
     });
@@ -290,7 +221,6 @@ describe("Test DataEntryProgress", () => {
     expect(list1).toHaveAttribute("aria-current", "step");
     const list1Icon = within(list1).getByRole("img");
     expect(list1Icon).toHaveAccessibleName("je bent hier");
-
     expect(within(list1).queryByRole("link", { name: "Lijst 1 - Vurige Vleugels Partij" })).not.toBeInTheDocument();
 
     expect(checkAndSave).toHaveClass("idle unsaved");
@@ -307,7 +237,7 @@ describe("Test DataEntryProgress", () => {
   });
 
   test("Mismatch between election data and formState", async () => {
-    const formState = defaultDataEntryState.formState;
+    const formState = getDefaultFormState();
     delete formState.sections.political_group_votes_2;
     formState.sections.political_group_votes_3 = getDefaultFormSection("political_group_votes_3", 6);
     formState.sections.save = getDefaultFormSection("save", 7);
@@ -316,9 +246,7 @@ describe("Test DataEntryProgress", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: {
-        recounted: true,
-      },
+      pollingStationResults: pollingStationResults,
     });
     renderForm();
 

@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import { useApiState } from "@/api/useApiState";
-import { MockTest } from "@/components/mock/MockTest";
+import { MockTest } from "@/components/dev/MockTest";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
 import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";

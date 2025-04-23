@@ -37,7 +37,7 @@ import {
   UserListResponse,
   WHOAMI_REQUEST_PARAMS,
   WHOAMI_REQUEST_PATH,
-} from "@/api/gen/openapi";
+} from "@/types/generated/openapi";
 
 import { claimDataEntryResponse, saveDataEntryResponse } from "./DataEntryMockData";
 import { electionDetailsMockResponse, electionListMockResponse } from "./ElectionMockData";

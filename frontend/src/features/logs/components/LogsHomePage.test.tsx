@@ -1,10 +1,10 @@
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { formatDateTime, formatDateTimeFull } from "@/lib/util/format";
 import { LogRequestHandler, LogUsersRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
+import { formatDateTime, formatDateTimeFull } from "@/utils/format";
 
 import { LogsHomePage } from "./LogsHomePage";
 

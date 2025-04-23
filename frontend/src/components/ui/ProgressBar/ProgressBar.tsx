@@ -1,4 +1,4 @@
-import { cn } from "@/lib/util/classnames";
+import { cn } from "@/utils/classnames";
 
 import cls from "./ProgressBar.module.css";
 

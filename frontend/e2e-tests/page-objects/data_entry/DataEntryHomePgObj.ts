@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
-import { PollingStation } from "@/api/gen/openapi";
+import { PollingStation } from "@/types/generated/openapi";
 
 export class DataEntryHomePage {
   readonly fieldset: Locator;
@@ -13,6 +13,8 @@ export class DataEntryHomePage {
   readonly resumeDataEntry: Locator;
   readonly alertDataEntryInProgress: Locator;
   readonly allDataEntriesInProgress: Locator;
+  readonly dataEntryWarningAlertTitle: Locator;
+  readonly alertDataEntryWarning: Locator;
   protected readonly start: Locator; // use clickStart() instead
 
   constructor(protected readonly page: Page) {
@@ -34,10 +36,16 @@ export class DataEntryHomePage {
       name: "Je invoer is opgeslagen",
     });
     this.resumeDataEntry = page.getByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" });
+    this.dataEntryWarningAlertTitle = page.getByRole("heading", {
+      level: 2,
+      name: /^Je kan stembureau \d+ niet invoeren$/,
+    });
 
     this.alertInputSaved = page.getByRole("alert").filter({ has: this.dataEntrySuccess });
 
     this.alertDataEntryInProgress = page.getByRole("alert").filter({ has: this.resumeDataEntry });
+
+    this.alertDataEntryWarning = page.getByRole("alert").filter({ has: this.dataEntryWarningAlertTitle });
 
     this.allDataEntriesInProgress = this.alertDataEntryInProgress.getByRole("link");
   }

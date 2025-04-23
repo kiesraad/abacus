@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Link } from "react-router";
 
-import { useElection } from "@/api/election/useElection";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
+import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";
 import { FormSectionId } from "@/types/types";

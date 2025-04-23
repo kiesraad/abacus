@@ -11,6 +11,11 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement> {
         return;
       }
 
+      // check whether the activeElement is inside the form
+      if (!innerRef.current.contains(document.activeElement)) {
+        return;
+      }
+
       const inputs: NodeListOf<HTMLInputElement> = innerRef.current.querySelectorAll("input, select, textarea");
       const submitButton: HTMLButtonElement | null = innerRef.current.querySelector("button[type=submit]");
 
@@ -19,10 +24,10 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement> {
         elements.push(submitButton);
       }
 
+      // Note that targetIndex might be -1 if the active element is not in the list
+      // (e.g. if the user is focused on a button or link outside of the input elements, but within the form)
+      // In this case, the down button will focus to the first input element
       let targetIndex = elements.findIndex((element) => document.activeElement === element);
-      if (targetIndex === -1) {
-        return;
-      }
 
       switch (dir) {
         case "up":
@@ -74,7 +79,11 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement> {
           }
           break;
         case "Enter":
-          if (event.target instanceof HTMLInputElement || event.target instanceof HTMLBodyElement) {
+          // only handle events from inside the form or the body
+          if (
+            (event.target && innerRef.current?.contains(event.target as Node)) ||
+            event.target instanceof HTMLBodyElement
+          ) {
             const submitButton: HTMLButtonElement | undefined | null =
               innerRef.current?.querySelector("button[type=submit]");
 

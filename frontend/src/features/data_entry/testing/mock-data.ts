@@ -1,10 +1,10 @@
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationResults,
   ValidationResult,
   ValidationResultCode,
-} from "@/api/gen/openapi";
-import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+} from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { DataEntryState, FormSection } from "../types/types";

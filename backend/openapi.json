@@ -3084,13 +3084,12 @@
           "ApportionmentNotAvailableUntilDataEntryFinalised",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
+          "DataEntryAlreadyFinalised",
           "DrawingOfLotsRequired",
           "EntryNotFound",
           "EntryNotUnique",
-          "EntryNumberNotSupported",
           "InternalServerError",
           "InvalidData",
-          "InvalidDataEntryNumber",
           "InvalidJson",
           "InvalidPassword",
           "InvalidPoliticalGroup",
@@ -3101,12 +3100,7 @@
           "InvalidVoteGroup",
           "PasswordRejection",
           "PdfGenerationError",
-          "PollingStationDataValidation",
-          "PollingStationFirstEntryAlreadyFinalised",
-          "PollingStationFirstEntryNotFinalised",
           "PollingStationRepeated",
-          "PollingStationResultsAlreadyFinalised",
-          "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
           "UserNotFound",
           "UsernameNotUnique",
@@ -3167,6 +3161,7 @@
           "selected_pg_number",
           "pg_options",
           "pg_assigned",
+          "pg_exhausted",
           "votes_per_seat"
         ],
         "properties": {
@@ -3178,6 +3173,15 @@
               "minimum": 0
             },
             "description": "The list of political groups with the same average, that have been assigned a seat"
+          },
+          "pg_exhausted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The list of political groups that are exhausted, and will not be assigned a seat"
           },
           "pg_options": {
             "type": "array",
@@ -3244,9 +3248,14 @@
         "type": "object",
         "description": "Contains information about the enactment of article P 10 of the Kieswet.",
         "required": [
-          "pg_retracted_seat"
+          "pg_retracted_seat",
+          "full_seat"
         ],
         "properties": {
+          "full_seat": {
+            "type": "boolean",
+            "description": "Whether the removed seat was a full seat"
+          },
           "pg_retracted_seat": {
             "type": "integer",
             "format": "int32",
@@ -3794,6 +3803,27 @@
                     "type": "string",
                     "enum": [
                       "HighestAverageAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "UniqueHighestAverageAssignment"
                     ]
                   }
                 }

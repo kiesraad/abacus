@@ -1,6 +1,6 @@
-import { useElectionStatus } from "@/api/election/useElectionStatus";
-import { DataEntryStatusName } from "@/api/gen/openapi";
-import { useUser } from "@/api/useUser";
+import { useElectionStatus } from "@/hooks/election/useElectionStatus";
+import { useUser } from "@/hooks/user/useUser";
+import { DataEntryStatusName } from "@/types/generated/openapi";
 
 export type UsePollingStationStatusReturnType = {
   status: DataEntryStatusName | undefined;

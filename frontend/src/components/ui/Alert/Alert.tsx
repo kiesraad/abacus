@@ -2,8 +2,8 @@ import * as React from "react";
 
 import { IconCross } from "@/components/generated/icons";
 import { t } from "@/lib/i18n";
-import { cn } from "@/lib/util/classnames";
 import { AlertType } from "@/types/ui";
+import { cn } from "@/utils/classnames";
 
 import { AlertIcon } from "../Icon/AlertIcon";
 import { IconButton } from "../IconButton/IconButton";

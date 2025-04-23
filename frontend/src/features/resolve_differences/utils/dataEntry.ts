@@ -1,4 +1,4 @@
-import { PollingStationResults } from "@/api/gen/openapi";
+import { PollingStationResults } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 type ObjectPath<T> = {

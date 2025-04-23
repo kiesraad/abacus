@@ -2,10 +2,10 @@ import * as React from "react";
 
 import { Story } from "@ladle/react";
 
-import { ElectionProviderContext } from "@/api/election/ElectionProviderContext";
-import { Election, Role } from "@/api/gen/openapi";
-import { TestUserProvider } from "@/api/TestUserProvider";
+import { ElectionProviderContext } from "@/hooks/election/ElectionProviderContext";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
+import { TestUserProvider } from "@/testing/TestUserProvider";
+import { Election, Role } from "@/types/generated/openapi";
 
 import { NavBar } from "./NavBar";
 import cls from "./NavBar.module.css";

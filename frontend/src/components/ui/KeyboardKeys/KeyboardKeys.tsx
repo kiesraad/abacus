@@ -6,8 +6,8 @@ import {
   IconArrowNarrowUp,
   IconCornerDownLeft,
 } from "@/components/generated/icons";
-import { cn } from "@/lib/util/classnames";
 import { KeyboardKey } from "@/types/ui";
+import { cn } from "@/utils/classnames";
 
 import cls from "./KeyboardKeys.module.css";
 

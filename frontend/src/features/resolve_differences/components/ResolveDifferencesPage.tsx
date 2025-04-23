@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router";
 
+import { PageTitle } from "@/components/page_title/PageTitle";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
@@ -29,6 +30,7 @@ export function ResolveDifferencesPage() {
 
   return (
     <>
+      <PageTitle title={`${t("data_entry.entries_different")} - Abacus`} />
       <header>
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
@@ -54,7 +56,7 @@ export function ResolveDifferencesPage() {
           </ProgressList>
         </aside>
         <article>
-          <h2 className="">{t("resolve_differences.page_title")}</h2>
+          <h2>{t("resolve_differences.page_title")}</h2>
           <p>{t("resolve_differences.page_content")}</p>
           <ResolveDifferencesTables
             first={status.state.first_entry}
@@ -68,7 +70,7 @@ export function ResolveDifferencesPage() {
               void onSubmit();
             }}
           >
-            <h2>{t("resolve_differences.form_question")}</h2>
+            <h3 className="heading-lg mb-md">{t("resolve_differences.form_question")}</h3>
             <p>{t("resolve_differences.form_content")}</p>
             <ChoiceList>
               <ChoiceList.Radio
@@ -98,7 +100,7 @@ export function ResolveDifferencesPage() {
             </ChoiceList>
             <BottomBar type="form">
               <BottomBar.Row>
-                <Button size="lg" type="submit">
+                <Button size="xl" type="submit">
                   {t("save")}
                 </Button>
               </BottomBar.Row>

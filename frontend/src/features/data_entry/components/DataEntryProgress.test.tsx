@@ -2,7 +2,7 @@ import { useParams } from "react-router";
 
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";

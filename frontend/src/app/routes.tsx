@@ -18,6 +18,7 @@ import { OverviewPage } from "@/features/election_overview/components/OverviewPa
 import { electionStatusRoutes } from "@/features/election_status/routes";
 import { logsRoutes } from "@/features/logs/routes";
 import { pollingStationsRoutes } from "@/features/polling_stations/routes";
+import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
 import { usersRoutes } from "@/features/users/routes";
 import { workstationsRoutes } from "@/features/workstations/routes";
 
@@ -47,12 +48,15 @@ export const routes: RouteObject[] = [
               { index: true, element: <ElectionHomePage /> },
               ...apportionmentRoutes,
               ...electionManagementRoutes,
-              ...electionStatusRoutes,
               ...pollingStationsRoutes,
               {
                 path: "data-entry",
                 element: null,
                 children: [...dataEntryChoiceRoutes, ...dataEntryRoutes],
+              },
+              {
+                path: "status",
+                children: [...electionStatusRoutes, ...resolveDifferencesRoutes],
               },
             ],
           },

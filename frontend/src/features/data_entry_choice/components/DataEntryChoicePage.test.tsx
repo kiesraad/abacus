@@ -175,10 +175,80 @@ describe("DataEntryHomePage", () => {
       }),
     ).toBeVisible();
 
-    const alertHeading = "Je kan stembureau 33 niet invoeren.";
+    const alertHeading = "Je kan stembureau 33 niet invoeren";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
     await router.navigate({ hash: "data-entry-claimed-1" });
+    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
+
+    // Close the alert and expect it to be hidden
+    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
+    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
+    await alertClosed;
+  });
+
+  test("Alert for entry already finalised is shown", async () => {
+    const user = userEvent.setup();
+
+    // Set up router and navigate to the data entry home page
+    const router = setupTestRouter([
+      {
+        path: "/elections/:electionId/data-entry",
+        element: <ElectionLayout />,
+        errorElement: <ErrorBoundary />,
+        children: dataEntryChoiceRoutes,
+      },
+    ]);
+    await router.navigate("/elections/1/data-entry");
+    rtlRender(<Providers router={router} />);
+
+    // Wait for the page to be loaded
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: electionDetailsMockResponse.election.name,
+      }),
+    ).toBeVisible();
+
+    const alertHeading = "Je kan stembureau 33 niet invoeren";
+    expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
+
+    await router.navigate({ hash: "data-entry-finalised-1" });
+    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
+
+    // Close the alert and expect it to be hidden
+    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
+    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
+    await alertClosed;
+  });
+
+  test("Alert for invalid action is shown", async () => {
+    const user = userEvent.setup();
+
+    // Set up router and navigate to the data entry home page
+    const router = setupTestRouter([
+      {
+        path: "/elections/:electionId/data-entry",
+        element: <ElectionLayout />,
+        errorElement: <ErrorBoundary />,
+        children: dataEntryChoiceRoutes,
+      },
+    ]);
+    await router.navigate("/elections/1/data-entry");
+    rtlRender(<Providers router={router} />);
+
+    // Wait for the page to be loaded
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: electionDetailsMockResponse.election.name,
+      }),
+    ).toBeVisible();
+
+    const alertHeading = "Je kan stembureau 33 niet invoeren";
+    expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
+
+    await router.navigate({ hash: "invalid-action-1" });
     expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
 
     // Close the alert and expect it to be hidden

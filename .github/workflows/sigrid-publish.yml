@@ -1,4 +1,8 @@
 name: Sigrid Publish
+
+permissions:
+  contents: read
+
 on:
   push:
     branches:

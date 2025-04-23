@@ -4,7 +4,11 @@ on:
   workflow_dispatch:
   # Run every Sunday at 12:00 UTC
   schedule:
-    - cron: '0 12 * * 0'
+    - cron: "0 12 * * 0"
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   build:
@@ -151,7 +155,6 @@ jobs:
           files: release/*
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Version ${{ env.TAG }}
-
 
   deploy:
     name: Deploy to abacus-test.nl

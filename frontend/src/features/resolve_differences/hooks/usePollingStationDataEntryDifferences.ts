@@ -27,8 +27,8 @@ type EntriesDifferentStatus = {
 };
 
 interface PollingStationDataEntryStatus {
-  choice: ResolveAction | null;
-  setChoice: (choice: ResolveAction | null) => void;
+  choice: ResolveAction | undefined;
+  setChoice: (choice: ResolveAction | undefined) => void;
   pollingStation: PollingStation;
   election: Election & { political_groups: PoliticalGroup[] };
   loading: boolean;
@@ -43,7 +43,7 @@ export function usePollingStationDataEntryDifferences(
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
-  const [choice, setChoice] = useState<ResolveAction | null>(null);
+  const [choice, setChoice] = useState<ResolveAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
 
@@ -98,7 +98,7 @@ export function usePollingStationDataEntryDifferences(
   }
 
   const onSubmit = async () => {
-    if (choice === null) {
+    if (choice === undefined) {
       return;
     }
 

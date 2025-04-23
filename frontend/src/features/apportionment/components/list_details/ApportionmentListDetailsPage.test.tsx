@@ -3,8 +3,7 @@ import { useParams } from "react-router";
 import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-// eslint-disable-next-line import/no-restricted-paths -- #1283
-import { routes } from "@/app/routes";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
@@ -12,6 +11,7 @@ import { overrideOnce } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
 import { ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 
+import { apportionmentRoutes } from "../../routes";
 import { candidate_nomination, election, election_summary, seat_assignment } from "../../testing/lt-19-seats";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentListDetailsPage } from "./ApportionmentListDetailsPage";
@@ -252,7 +252,13 @@ describe("ApportionmentListDetailsPage", () => {
       vi.spyOn(console, "error").mockImplementation(() => {
         /* do nothing */
       });
-      const router = setupTestRouter(routes);
+      const router = setupTestRouter([
+        {
+          element: null,
+          errorElement: <ErrorBoundary />,
+          children: apportionmentRoutes,
+        },
+      ]);
 
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 500, {

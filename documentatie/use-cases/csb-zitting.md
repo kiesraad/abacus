@@ -32,7 +32,7 @@ __Uitbreidingen:__
 4-11a. Het CSB moet nieuwe aantallen invoeren ter correctie van de eerder ingevoerde tellingen:  
 &emsp; 4-11a1. Het CSB corrigeert de eerder ingevoerde aantallen in de applicatie. Er is dus geen tweede zitting.
 
-11a. Er zijn bezwaren tijdens de zitting (kan alleen tijdens zitting):  
+11a. Er zijn bezwaren tijdens de zitting:  
 &emsp;11a1. Het CSB neemt de bezwaren op in het PV.  
 &emsp;11a2. Het CSB besluit dat geen van de bezwaren reden zijn tot een hertelling.  
 &emsp;&emsp; 11a2a. Het CSB besluit dat een aantal stembureaus herteld moet worden:  

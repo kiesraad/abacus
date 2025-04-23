@@ -14,10 +14,6 @@ import { FormState } from "../types/types";
 import { DataEntryProgress } from "./DataEntryProgress";
 import { DataEntryProvider } from "./DataEntryProvider";
 
-// TODO: consider replacing the "idle" returned at the end of menuStatusForFormSection with something different than "idle".
-//      It's for forms that have not been visited yet.
-//      Reason: the active attribute can also set an "idle" class
-
 vi.mock("react-router");
 
 function renderForm() {

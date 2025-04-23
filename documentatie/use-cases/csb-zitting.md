@@ -36,11 +36,14 @@ __Uitbreidingen:__
 &emsp;11a1. Het CSB neemt de bezwaren op in het PV.  
 &emsp;11a2. Het CSB besluit dat geen van de bezwaren reden zijn tot een hertelling.  
 &emsp;&emsp; 11a2a. Het CSB besluit dat een aantal stembureaus herteld moet worden:  
-&emsp;&emsp;&emsp;11a2a1. De hertelling wordt gedaan door het GSB.  
+&emsp;&emsp;&emsp;11a2a1. De hertelling wordt gedaan door het GSB d.m.v. de corrigendum-flow.  
 &emsp;&emsp;&emsp;11a2a2. Het CSB stelt de nieuwe uitslag vast.  
-&emsp;&emsp;&emsp;11a2a3. Het CSB neemt de nieuwe uitslag op in het PV.
+&emsp;&emsp;&emsp;11a2a3. Het CSB voegt de sectie "Hertelling" toe aan het oorspronkelijke PV.
 
-13a. De gemeenteraad besluit dat een hertelling nodig is (art V 4a):
+13a. De gemeenteraad besluit dat een hertelling nodig is (art V 4a):  
+&emsp; 13a1. De hertelling wordt gedaan door het GSB d.m.v. de corrigendum-flow.  
+&emsp; 13a2. De CSB stelt de nieuwe uitslag vast.  
+&emsp; 13a3. Het CSB maakt een nieuw PV aan met alleen de nieuwe uitslag.
 
 ### Niet in scope
 
@@ -56,7 +59,7 @@ __Uitbreidingen:__
     - Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
     - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijst importeren.
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
-- Moet de applicatie Sectie 2.11 Hertelling van de P22-2 genereren? (hertelling n.a.v. bezwaren tijdens zitting CSB)
+- Moet de applicatie Sectie 2.11 Hertelling van de P22-2 genereren, inclusief extra secties 2.3 t/m 2.5 of 2.10 o.b.v. de hertelling?
 
 
 ## Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan (vlieger)

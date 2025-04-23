@@ -113,7 +113,7 @@ describe("DataEntryHomePage", () => {
     expect(screen.queryByRole("alert")).toBeNull();
   });
 
-  test.only("Data entry saved alert works", async () => {
+  test("Data entry saved alert works", async () => {
     const user = userEvent.setup();
 
     // Set up router and navigate to the data entry home page

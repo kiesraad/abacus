@@ -204,34 +204,6 @@ export const IconCross = (props: React.SVGAttributes<SVGElement>) => (
   </svg>
 );
 
-export const IconDiscarded = (props: React.SVGAttributes<SVGElement>) => (
-  <svg
-    role="img"
-    data-icon="IconDiscarded"
-    {...props}
-    width="208"
-    height="72"
-    viewBox="0 0 208 72"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <line
-      y1="-0.5"
-      x2="219.169"
-      y2="-0.5"
-      transform="matrix(0.944499 0.328514 -0.325712 0.945469 0 0)"
-      stroke="#D0D5DD"
-    />
-    <line
-      y1="-0.5"
-      x2="220.109"
-      y2="-0.5"
-      transform="matrix(0.944986 -0.327111 0.324318 0.945948 0 72)"
-      stroke="#D0D5DD"
-    />
-  </svg>
-);
-
 export const IconDot = (props: React.SVGAttributes<SVGElement>) => (
   <svg data-icon="IconDot" {...props} xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" role="img">
     <path d="M11.9999 18.6667C15.6818 18.6667 18.6666 15.6819 18.6666 12C18.6666 8.31811 15.6818 5.33334 11.9999 5.33334C8.31802 5.33334 5.33325 8.31811 5.33325 12C5.33325 15.6819 8.31802 18.6667 11.9999 18.6667Z" />

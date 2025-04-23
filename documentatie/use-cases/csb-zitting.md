@@ -32,7 +32,15 @@ __Uitbreidingen:__
 4-11a. Het CSB moet nieuwe aantallen invoeren ter correctie van de eerder ingevoerde tellingen:  
 &emsp; 4-11a1. Het CSB corrigeert de eerder ingevoerde aantallen in de applicatie. Er is dus geen tweede zitting.
 
-11a. Er zijn bezwaren (kan alleen tijdens zitting):
+11a. Er zijn bezwaren tijdens de zitting (kan alleen tijdens zitting):  
+&emsp;11a1. Het CSB neemt de bezwaren op in het PV.  
+&emsp;11a2. Het CSB besluit dat geen van de bezwaren reden zijn tot een hertelling.  
+&emsp;&emsp; 11a2a. Het CSB besluit dat een aantal stembureaus herteld moet worden:  
+&emsp;&emsp;&emsp;11a2a1. De hertelling wordt gedaan door het GSB.  
+&emsp;&emsp;&emsp;11a2a2. Het CSB stelt de nieuwe uitslag vast.  
+&emsp;&emsp;&emsp;11a2a3. Het CSB neemt de nieuwe uitslag op in het PV.
+
+13a. De gemeenteraad besluit dat een hertelling nodig is (art V 4a):
 
 ### Niet in scope
 
@@ -48,6 +56,7 @@ __Uitbreidingen:__
     - Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
     - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijst importeren.
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
+- Moet de applicatie Sectie 2.11 Hertelling van de P22-2 genereren? (hertelling n.a.v. bezwaren tijdens zitting CSB)
 
 
 ## Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan (vlieger)

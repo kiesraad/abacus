@@ -7,14 +7,12 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 - Hoe stellen we de adresgegevens van de (verkozen) kandidaten beschikbaar, makkelijker dan d.m.v. de totaallijst (EML_NL 230c)? Deze gegevens zijn nodig voor het opstellen van de benoemings- en geloofsbrieven.
 - Als er een hertelling gebeurt n.a.v. een verzoek van het CSB of op vraag van de Commissie voor het Onderzoek van de Geloofsbrieven, leidt dit dan op stembureau-niveau tot een corrigendum of tot een volledig nieuw tellings-PV?
   - Wie vervult de rol van de Commissie voor het Onderzoek van de Geloofsbrieven (Tweede Kamerverkiezingen) bij gemeenteraadsverkiezingen?
+- Moet Abacus Sectie 2.11 Hertelling van de P22-2 genereren? Deze sectie wordt alleen gebruikt bij een hertelling n.a.v. een bezwaar tijdens de CSB-zitting.
 
 
 ## Genereren van modellen door Abacus
 
-- Abacus moet alle modellen kunnen genereren. Ofwel als 'leeg' model (in te vullen met de hand) of als ingevuld model (ingevuld door Abacus).
-- In de tabellen hieronder
-  - 'leeg' model uit Abacus
-  - output van Abacus
+- Abacus moet alle modellen kunnen genereren. Ofwel als 'leeg' model (in te vullen met de hand) of als ingevuld model (ingevuld door Abacus). In de tabellen hieronder zijn dit respectievelijk de kolommen *'leeg' model uit Abacus* en *output van Abacus*.
 - Alleen de modellen die overeenkomen met het ingestelde type stemopneming (DSO of CSO) kunnen gegenereerd worden voor een verkiezing.
 - Het is niet noodzakelijk om te beperken op welk moment bepaalde 'lege' modellen gegenereerd kunnen worden, zolang het onderscheid tussen de verschillende modellen duidelijk is voor gebruikers.
 - Het is niet noodzakelijk om onderscheid te maken tussen beheerders, coördinatoren GSB en coördinatoren CSB voor wie welke 'lege' modellen mag genereren.
@@ -131,17 +129,25 @@ EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
 
 ### Modellen
 
-| Model(onderdeel) | DSO  | CSO  | Doel                          | input voor Abacus | output van Abacus |
-| ---------------- | :--: | :--: | ----------------------------- | :---------------: | :---------------: |
-| Na 31-1          |  X   |      | PV GSB - 1ste zitting         |         X         |                   |
-| Na 31-2          |      |  X   | PV GSB - 1ste zitting         |         X         |                   |
-| Na 14-2          |  X   |  X   | Corrigendum GSB - 2de zitting |         X         |                   |
-| P 2a             |  X   |  X   | Verslag 2de zitting GSB       |                   |                   |
-| P 22-2           |  X   |  X   | PV CSB - einduitslag          |                   |         X         |
+| Model(onderdeel)   | DSO  | CSO  | Doel                               | input voor Abacus | output van Abacus |
+| ------------------ | :--: | :--: | ---------------------------------- | :---------------: | :---------------: |
+| Na 31-1            |  X   |      | PV GSB - 1ste zitting              |         X         |                   |
+| Na 31-2            |      |  X   | PV GSB - 1ste zitting              |         X         |                   |
+| Na 14-2            |  X   |  X   | Corrigendum GSB - 2de zitting      |         X         |                   |
+| P 2a               |  X   |  X   | Verslag 2de zitting GSB            |                   |                   |
+| P 22-2             |  X   |  X   | PV CSB - einduitslag               |                   |         X         |
+| P 22-2 sectie 2.11 |  X   |  X   | PV CSB - hertelling n.a.v. bezwaar |                   |        ???        |
 
 #### P 22-2: einduitslag CSB
 
 - gegenereerd  door Abacus
+
+#### P22-2 sectie 2.11 Hertelling
+
+- open punt of gegenereerd door Abacus
+- alleen relevant bij een hertelling n.a.v. bezwaar tijdens zitting CSB
+  - dus niet bij terugverwijzing door CSB vóór invoer in Abacus
+  - dus niet bij hertelling op verzoek van gemeenteraad (art V 4a)
 
 
 ### Benoemingsbrieven en geloofsbrieven

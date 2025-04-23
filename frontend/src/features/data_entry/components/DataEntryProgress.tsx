@@ -63,7 +63,7 @@ export function DataEntryProgress() {
           status={menuStatusForFormSection(formState.sections.recounted)}
           active={formState.current === "recounted"}
         >
-          {formState.current !== "recounted" ? ( // TODO: this condition does not check the index like the others
+          {formState.current !== "recounted" && formState.sections.recounted.index <= currentIndex ? (
             <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}/recounted`}>
               <span>{t("polling_station.recounted_question")}</span>
             </Link>

@@ -146,7 +146,7 @@ jobs:
       - name: Push git tag
         run: git push origin $TAG
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2
         with:
           body: This is an alpha release of Abacus, commit ${{ github.sha }} on ${{ env.BUILD_DATE }}
           tag_name: ${{ env.TAG }}

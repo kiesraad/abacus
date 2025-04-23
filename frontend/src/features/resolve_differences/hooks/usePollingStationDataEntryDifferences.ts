@@ -90,10 +90,13 @@ export function usePollingStationDataEntryDifferences(
   ) {
     const users = usersRequestState.data.users;
     const state = requestState.data.state;
+    const firstUser = users.find((u) => u.id === state.first_entry_user_id);
+    const secondUser = users.find((u) => u.id === state.second_entry_user_id);
+
     status = {
       ...requestState.data,
-      first_user: users.find((u) => u.id === state.first_entry_user_id)?.fullname || "",
-      second_user: users.find((u) => u.id === state.second_entry_user_id)?.fullname || "",
+      first_user: firstUser?.fullname || firstUser?.username || "",
+      second_user: secondUser?.fullname || secondUser?.username || "",
     };
   }
 

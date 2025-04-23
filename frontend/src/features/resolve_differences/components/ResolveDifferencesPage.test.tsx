@@ -4,13 +4,12 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import {
-  ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationDataEntryStatusHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { screen, waitFor } from "@/testing/test-utils";
+import { screen } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { ResolveDifferencesPage } from "./ResolveDifferencesPage";
@@ -45,9 +44,6 @@ describe("ResolveDifferencesPage", () => {
   test("Should render a table", async () => {
     renderPage();
 
-    // Wait for the page to be loaded
-    await waitFor(() => {
-      expect(screen.queryByRole("table")).toBeInTheDocument();
-    });
+    expect(await screen.findByRole("table")).toBeInTheDocument();
   });
 });

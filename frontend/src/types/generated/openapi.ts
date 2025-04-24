@@ -496,7 +496,6 @@ export type ErrorReference =
   | "DrawingOfLotsRequired"
   | "EntryNotFound"
   | "EntryNotUnique"
-  | "EntryNumberNotSupported"
   | "EmlImportError"
   | "InternalServerError"
   | "InvalidData"

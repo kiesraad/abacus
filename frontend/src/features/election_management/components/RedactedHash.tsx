@@ -1,18 +1,18 @@
 import { cn } from "@/utils/classnames";
 
-import cls from "./RetractedHash.module.css";
+import cls from "./RedactedHash.module.css";
 
 export interface Stub {
   selected: boolean;
   index: number;
 }
 
-interface RetractedHashProps {
+interface RedactedHashProps {
   hash: string[];
   stubs: Stub[];
 }
 
-export function RetractedHash({ hash, stubs }: RetractedHashProps) {
+export function RedactedHash({ hash, stubs }: RedactedHashProps) {
   return (
     <div id="hash" className={cls.hash}>
       {hash.map((chunk, hashIndex) => {

@@ -7,7 +7,7 @@ use crate::authentication::Admin;
 use crate::authentication::User;
 use crate::election::ElectionRequest;
 use crate::election::repository::Elections;
-use crate::eml::{EML110, EMLDocument, RetractedEmlHash};
+use crate::eml::{EML110, EMLDocument, RedactedEmlHash};
 use crate::polling_station::PollingStation;
 use crate::polling_station::repository::PollingStations;
 use crate::{AppState, ErrorResponse};
@@ -128,12 +128,12 @@ pub struct ElectionDefinitionUploadRequest {
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct ElectionDefinitionUploadResponse {
-    hash: RetractedEmlHash,
+    hash: RedactedEmlHash,
     election: Election,
 }
 
 /// Uploads election definition, validates it and returns the associated election data and
-/// a retracted hash, to be filled by the administrator
+/// a redacted hash, to be filled by the administrator
 #[utoipa::path(
     post,
     path = "/api/elections/validate",
@@ -151,7 +151,7 @@ pub async fn election_import_validate(
 ) -> Result<Json<ElectionDefinitionUploadResponse>, APIError> {
     let eml = EML110::from_str(&edu.data)?;
     Ok(Json(ElectionDefinitionUploadResponse {
-        hash: RetractedEmlHash::from(edu.data.as_bytes()),
+        hash: RedactedEmlHash::from(edu.data.as_bytes()),
         election: eml.as_crate_election()?,
     }))
 }

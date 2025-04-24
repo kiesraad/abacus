@@ -15,4 +15,4 @@ pub use eml_110::EML110;
 pub use eml_230::EML230;
 pub use eml_510::EML510;
 pub use eml_520::EML520;
-pub use hash::{EmlHash, RetractedEmlHash};
+pub use hash::{EmlHash, RedactedEmlHash};

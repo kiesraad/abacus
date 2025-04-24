@@ -36,31 +36,31 @@ impl From<EmlHash> for String {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-pub struct RetractedEmlHash {
+pub struct RedactedEmlHash {
     /// Array holding the hash chunks as text
     chunks: [String; CHUNK_COUNT],
     /// Indexes of chunks that will be empty, sorted
-    pub retracted_indexes: [usize; 2],
+    pub redacted_indexes: [usize; 2],
 }
 
-impl From<&[u8]> for RetractedEmlHash {
+impl From<&[u8]> for RedactedEmlHash {
     fn from(input: &[u8]) -> Self {
         let mut chunks = EmlHash::from(input).chunks;
-        let retracted_indexes = Self::random_chunk_indexes();
+        let redacted_indexes = Self::random_chunk_indexes();
 
         // Retract the chunks by replacing it with an empty string
-        for index in retracted_indexes {
+        for index in redacted_indexes {
             chunks[index] = String::new();
         }
 
         Self {
             chunks,
-            retracted_indexes,
+            redacted_indexes,
         }
     }
 }
 
-impl RetractedEmlHash {
+impl RedactedEmlHash {
     fn random_chunk_indexes() -> [usize; 2] {
         use rand::Rng;
         let mut rng = rand::rng();

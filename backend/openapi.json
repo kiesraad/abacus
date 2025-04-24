@@ -106,7 +106,7 @@
     },
     "/api/elections/validate": {
       "post": {
-        "summary": "Uploads election definition, validates it and returns the associated election data and\na retracted hash, to be filled by the administrator",
+        "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator",
         "operationId": "election_import_validate",
         "requestBody": {
           "content": {
@@ -2877,7 +2877,7 @@
             "$ref": "#/components/schemas/Election"
           },
           "hash": {
-            "$ref": "#/components/schemas/RetractedEmlHash"
+            "$ref": "#/components/schemas/RedactedEmlHash"
           }
         }
       },
@@ -3791,19 +3791,11 @@
           }
         }
       },
-      "ResolveAction": {
-        "type": "string",
-        "enum": [
-          "keep_first_entry",
-          "keep_second_entry",
-          "discard_both_entries"
-        ]
-      },
-      "RetractedEmlHash": {
+      "RedactedEmlHash": {
         "type": "object",
         "required": [
           "chunks",
-          "retracted_indexes"
+          "redacted_indexes"
         ],
         "properties": {
           "chunks": {
@@ -3813,7 +3805,7 @@
             },
             "description": "Array holding the hash chunks as text"
           },
-          "retracted_indexes": {
+          "redacted_indexes": {
             "type": "array",
             "items": {
               "type": "integer",
@@ -3822,6 +3814,14 @@
             "description": "Indexes of chunks that will be empty, sorted"
           }
         }
+      },
+      "ResolveAction": {
+        "type": "string",
+        "enum": [
+          "keep_first_entry",
+          "keep_second_entry",
+          "discard_both_entries"
+        ]
       },
       "Role": {
         "type": "string",

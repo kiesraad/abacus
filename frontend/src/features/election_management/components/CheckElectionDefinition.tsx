@@ -4,22 +4,22 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/lib/i18n";
-import { Election, RetractedEmlHash } from "@/types/generated/openapi";
+import { Election, RedactedEmlHash } from "@/types/generated/openapi";
 import { formatDateFull } from "@/utils/format";
 
-import { RetractedHash, Stub } from "./RetractedHash";
+import { RedactedHash, Stub } from "./RedactedHash";
 
 interface CheckElectionDefinitionProps {
   file: File;
   election: Election;
-  hash: RetractedEmlHash;
+  hash: RedactedEmlHash;
 }
 
 export function CheckElectionDefinition({ file, election, hash }: CheckElectionDefinitionProps) {
   const [stubs, setStubs] = useState<Stub[]>(
-    hash.retracted_indexes.map((retracted_index) => ({
+    hash.redacted_indexes.map((redacted_index) => ({
       selected: false,
-      index: retracted_index,
+      index: redacted_index,
     })),
   );
 
@@ -41,7 +41,7 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
         </p>
         <p>
           <strong>Digitale vingerafdruk</strong> (hashcode):
-          <RetractedHash hash={hash.chunks} stubs={stubs} />
+          <RedactedHash hash={hash.chunks} stubs={stubs} />
         </p>
       </Alert>
       <p>{t("election.check_eml.check_hash.description")}</p>

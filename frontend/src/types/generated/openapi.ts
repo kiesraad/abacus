@@ -383,7 +383,7 @@ export type ElectionCategory = "Municipal";
 
 export interface ElectionDefinitionUploadResponse {
   election: Election;
-  hash: RetractedEmlHash;
+  hash: RedactedEmlHash;
 }
 
 export interface ElectionDetails {
@@ -743,14 +743,14 @@ export interface PreferenceThreshold {
   percentage: number;
 }
 
-export type ResolveAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
-
-export interface RetractedEmlHash {
+export interface RedactedEmlHash {
   /** Array holding the hash chunks as text */
   chunks: string[];
   /** Indexes of chunks that will be empty, sorted */
-  retracted_indexes: number[];
+  redacted_indexes: number[];
 }
+
+export type ResolveAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
 
 export type Role = "administrator" | "typist" | "coordinator";
 

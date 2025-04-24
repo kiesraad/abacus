@@ -102,22 +102,22 @@ describe("Test DataEntryProgress", () => {
     const list2 = screen.getByTestId("list-item-pg-2");
     const checkAndSave = screen.getByTestId("list-item-save");
 
-    expect(recounted).toHaveClass("idle error");
+    expect(recounted).toHaveClass("error");
     expect(recounted).toHaveAttribute("aria-current", "false");
     const recountedIcon = within(recounted).getByRole("img");
     expect(recountedIcon).toHaveAccessibleName("bevat een fout");
 
-    expect(votersAndVotes).toHaveClass("idle warning");
+    expect(votersAndVotes).toHaveClass("warning");
     expect(votersAndVotes).toHaveAttribute("aria-current", "false");
     const votersAndVotesicon = within(votersAndVotes).getByRole("img");
     expect(votersAndVotesicon).toHaveAccessibleName("bevat een waarschuwing");
 
-    expect(differences).toHaveClass("idle accept");
+    expect(differences).toHaveClass("accept");
     expect(differences).toHaveAttribute("aria-current", "false");
     const differencesIcon = within(differences).getByRole("img");
     expect(differencesIcon).toHaveAccessibleName("opgeslagen");
 
-    expect(list1).toHaveClass("idle empty");
+    expect(list1).toHaveClass("empty");
     expect(list1).toHaveAttribute("aria-current", "false");
     const list1Icon = within(list1).getByRole("img");
     expect(list1Icon).toHaveAccessibleName("leeg");
@@ -127,7 +127,7 @@ describe("Test DataEntryProgress", () => {
     const list2Icon = within(list2).getByRole("img");
     expect(list2Icon).toHaveAccessibleName("je bent hier");
 
-    expect(checkAndSave).toHaveClass("idle idle disabled");
+    expect(checkAndSave).toHaveClass("idle disabled");
     expect(checkAndSave).toHaveAttribute("aria-current", "false");
     expect(within(checkAndSave).queryByRole("img")).not.toBeInTheDocument();
   });
@@ -219,7 +219,7 @@ describe("Test DataEntryProgress", () => {
     expect(list1Icon).toHaveAccessibleName("je bent hier");
     expect(within(list1).queryByRole("link", { name: "Lijst 1 - Vurige Vleugels Partij" })).not.toBeInTheDocument();
 
-    expect(checkAndSave).toHaveClass("idle unsaved");
+    expect(checkAndSave).toHaveClass("unsaved");
     expect(checkAndSave).toHaveAttribute("aria-current", "false");
     const checkAndSaveIcon = within(checkAndSave).getByRole("img");
     expect(checkAndSaveIcon).toHaveAccessibleName("nog niet afgerond");
@@ -251,11 +251,11 @@ describe("Test DataEntryProgress", () => {
     });
 
     const list1 = screen.getByTestId("list-item-pg-1");
-    expect(list1).toHaveClass("idle idle disabled");
+    expect(list1).toHaveClass("idle disabled");
     expect(list1).toHaveAttribute("aria-current", "false");
 
     const list2 = screen.getByTestId("list-item-pg-2");
-    expect(list2).toHaveClass("idle idle disabled");
+    expect(list2).toHaveClass("idle disabled");
     expect(list2).toHaveAttribute("aria-current", "false");
 
     expect(screen.queryByTestId("list-item-pg-3")).not.toBeInTheDocument();

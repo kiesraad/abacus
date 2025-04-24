@@ -3,11 +3,9 @@ use crate::APIError;
 #[cfg(feature = "dev-database")]
 use crate::audit_log::{AuditEvent, AuditService};
 use crate::authentication::{Admin, User};
-use crate::election::ElectionRequest;
-use crate::election::repository::Elections;
+use crate::election::{ElectionRequest, repository::Elections};
 use crate::eml::{EML110, EMLDocument, RedactedEmlHash};
-use crate::polling_station::PollingStation;
-use crate::polling_station::repository::PollingStations;
+use crate::polling_station::{PollingStation, repository::PollingStations};
 use crate::{AppState, ErrorResponse};
 use axum::Json;
 use axum::extract::{Path, State};
@@ -15,8 +13,7 @@ use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use utoipa_axum::router::OpenApiRouter;
-use utoipa_axum::routes;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub fn router() -> OpenApiRouter<AppState> {
     let router = OpenApiRouter::default()

@@ -33,7 +33,7 @@ export function Alert({
   const id = React.useId();
   return (
     <div
-      className={cn(inline ? cls.inlineAlert : cls.alert, cls[type], margin, variant, small ? "small" : undefined)}
+      className={cn(inline ? cls.inlineAlert : cls.alert, cls[type], margin, variant, { small })}
       role="alert"
       aria-describedby={id}
     >

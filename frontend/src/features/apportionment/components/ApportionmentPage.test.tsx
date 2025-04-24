@@ -239,8 +239,6 @@ describe("ApportionmentPage", () => {
 
       rtlRender(<Providers router={router} />);
 
-      console.log(window.location.pathname); // eslint-disable-line no-console
-
       await expectErrorPage();
     });
   });

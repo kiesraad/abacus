@@ -56,7 +56,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     ),
 )]
 async fn polling_station_data_entry_status(
-    _user: User,
+    _user: Coordinator,
     State(data_entry_repo): State<PollingStationDataEntries>,
     Path(id): Path<u32>,
 ) -> Result<Json<DataEntryStatus>, APIError> {
@@ -620,7 +620,7 @@ pub mod tests {
     async fn test_polling_station_data_entry_status(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
         let response = polling_station_data_entry_status(
-            User::test_user(Role::Administrator, 1),
+            Coordinator(User::test_user(Role::Coordinator, 1)),
             State(PollingStationDataEntries::new(pool.clone())),
             Path(1),
         )

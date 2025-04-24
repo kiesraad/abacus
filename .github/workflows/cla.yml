@@ -18,7 +18,7 @@ jobs:
         uses: kiesraad/cla-bot@1101706b8b4299832da758b53d64bd59b20b1cec # main
 
       - if: failure() && steps.check.outputs.missing
-        uses: marocchino/sticky-pull-request-comment@52423e01640425a022ef5fd42c6fb5f633a02728 #v2
+        uses: marocchino/sticky-pull-request-comment@52423e01640425a022ef5fd42c6fb5f633a02728 # v2
         with:
           message: |
             Hi ${{steps.check.outputs.missing}}!
@@ -28,6 +28,6 @@ jobs:
             Please [review the CLA](https://github.com/kiesraad/abacus/blob/main/CLA.md), and send your signed copy to abacus[@]kiesraad.nl. Thanks!
 
       - if: success()
-        uses: marocchino/sticky-pull-request-comment@52423e01640425a022ef5fd42c6fb5f633a02728 #v2
+        uses: marocchino/sticky-pull-request-comment@52423e01640425a022ef5fd42c6fb5f633a02728 # v2
         with:
           delete: true

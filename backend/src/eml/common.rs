@@ -152,17 +152,17 @@ pub struct ElectionDomain {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EMLImportError {
-    MissingRegion,
-    OnlyMunicipalSupported,
-    MissingNumberOfSeats,
-    NumberOfSeatsNotInRange,
     InvalidDateFormat,
-    MissingNominationDate,
-    MissingSubcategory,
     MismatchNumberOfSeats,
-    MissingPreferenceThreshold,
     MismatchPreferenceThreshold,
+    MissingNumberOfSeats,
+    MissingNominationDate,
+    MissingPreferenceThreshold,
+    MissingRegion,
+    MissingSubcategory,
     Needs101a,
+    NumberOfSeatsNotInRange,
+    OnlyMunicipalSupported,
     TooManyPoliticalGroups,
 }
 

@@ -50,7 +50,7 @@ export function getDefaultFormSection(id: FormSectionId, index: number): FormSec
   return {
     id,
     index,
-    title: "Toegelaten kiezers en uitgebrachte stemmen", // TODO: shouldn't this be dynamic?
+    title: "title of the form section",
     isSaved: false,
     acceptWarnings: false,
     hasChanges: false,

@@ -34,7 +34,7 @@ export const routes: RouteObject[] = [
         path: "*",
         element: <NotFoundPage message="error.not_found" path={window.location.pathname} />,
       },
-      ...accountRoutes,
+      { path: "account", children: accountRoutes },
       {
         path: "elections",
         element: <OverviewLayout />,
@@ -46,17 +46,35 @@ export const routes: RouteObject[] = [
             element: <ElectionLayout />,
             children: [
               { index: true, element: <ElectionHomePage /> },
-              ...apportionmentRoutes,
-              ...electionManagementRoutes,
-              ...pollingStationsRoutes,
+              {
+                path: "apportionment",
+                children: apportionmentRoutes,
+              },
+
+              { path: "report", children: electionManagementRoutes },
+              { path: "polling-stations", children: pollingStationsRoutes },
               {
                 path: "data-entry",
-                element: null,
-                children: [...dataEntryChoiceRoutes, ...dataEntryRoutes],
+                children: [
+                  // index
+                  ...dataEntryChoiceRoutes,
+                  {
+                    path: ":pollingStationId/:entryNumber",
+                    children: dataEntryRoutes,
+                  },
+                ],
               },
+
               {
                 path: "status",
-                children: [...electionStatusRoutes, ...resolveDifferencesRoutes],
+                children: [
+                  // index
+                  ...electionStatusRoutes,
+                  {
+                    path: ":pollingStationId/resolve-differences",
+                    children: resolveDifferencesRoutes,
+                  },
+                ],
               },
             ],
           },
@@ -64,7 +82,12 @@ export const routes: RouteObject[] = [
       },
       {
         element: <AdministratorLayout />,
-        children: [...devRoutes, ...logsRoutes, ...usersRoutes, ...workstationsRoutes],
+        children: [
+          { path: "dev", children: devRoutes },
+          { path: "logs", children: logsRoutes },
+          { path: "users", children: usersRoutes },
+          { path: "workstations", children: workstationsRoutes },
+        ],
       },
     ],
   },

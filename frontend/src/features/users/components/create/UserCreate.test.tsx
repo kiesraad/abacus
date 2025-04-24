@@ -14,7 +14,12 @@ function renderWithRouter() {
     {
       path: "/",
       element: null,
-      children: usersRoutes,
+      children: [
+        {
+          path: "users",
+          children: usersRoutes,
+        },
+      ],
     },
   ]);
   rtlRender(<Providers router={router} />);

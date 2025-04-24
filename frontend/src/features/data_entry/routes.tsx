@@ -9,7 +9,6 @@ import { VotersAndVotesPage } from "./components/voters_and_votes/VotersAndVotes
 
 export const dataEntryRoutes: RouteObject[] = [
   {
-    path: ":pollingStationId/:entryNumber",
     element: <DataEntryLayout />,
     children: [
       { index: true, element: null },

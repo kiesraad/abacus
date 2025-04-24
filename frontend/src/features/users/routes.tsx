@@ -8,23 +8,18 @@ import { UserUpdatePage } from "./components/update/UserUpdatePage";
 import { UserListPage } from "./components/UserListPage";
 
 export const usersRoutes: RouteObject[] = [
+  { index: true, element: <UserListPage /> },
   {
-    path: "users",
+    path: "create",
+    element: <UserCreateLayout />,
     children: [
-      { index: true, element: <UserListPage /> },
-      {
-        path: "create",
-        element: <UserCreateLayout />,
-        children: [
-          { index: true, element: <UserCreateRolePage /> },
-          { path: "type", element: <UserCreateTypePage /> },
-          { path: "details", element: <UserCreateDetailsPage /> },
-        ],
-      },
-      {
-        path: ":userId/update",
-        element: <UserUpdatePage />,
-      },
+      { index: true, element: <UserCreateRolePage /> },
+      { path: "type", element: <UserCreateTypePage /> },
+      { path: "details", element: <UserCreateDetailsPage /> },
     ],
+  },
+  {
+    path: ":userId/update",
+    element: <UserUpdatePage />,
   },
 ];

@@ -8,7 +8,6 @@ import { UserHomePage } from "./components/UserHomePage";
 
 export const accountRoutes: RouteObject[] = [
   {
-    path: "account",
     element: <LoginLayout />,
     children: [
       { index: true, element: <UserHomePage /> },

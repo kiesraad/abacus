@@ -7,7 +7,6 @@ import { PollingStationUpdatePage } from "./components/PollingStationUpdatePage"
 
 export const pollingStationsRoutes: RouteObject[] = [
   {
-    path: "polling-stations",
     element: <PollingStationsLayout />,
     children: [
       { index: true, element: <PollingStationListPage /> },

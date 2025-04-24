@@ -2,9 +2,7 @@ use super::structs::Election;
 use crate::APIError;
 #[cfg(feature = "dev-database")]
 use crate::audit_log::{AuditEvent, AuditService};
-#[cfg(feature = "dev-database")]
-use crate::authentication::Admin;
-use crate::authentication::User;
+use crate::authentication::{Admin, User};
 use crate::election::ElectionRequest;
 use crate::election::repository::Elections;
 use crate::eml::{EML110, EMLDocument, RedactedEmlHash};

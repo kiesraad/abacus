@@ -38,5 +38,7 @@ Deze fout treedt op wanneer de gebruiker naar een url gaat die niet bestaat in A
 Beide fouten worden afgehandeld met een "De pagina is niet gevonden" pagina.
 
 ## Air-gap fouten
-Als Abacus detecteert dat het internet bereikbaar is en Abacus dus niet air-gapped draait, wordt er een passende foutmelding getoond.
+Als Abacus detecteert dat het internet bereikbaar is en Abacus dus niet air-gapped draait, wordt er een passende foutmelding getoond. 
+
+Air-gap detectie kan zowel in de frontend en in de backend gebeuren en de afhandeling moet nog bepaald worden. 
 

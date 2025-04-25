@@ -4,14 +4,13 @@ import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-// eslint-disable-next-line import/no-restricted-paths -- #1283
-import { routes } from "@/app/routes";
 import { overrideOnce } from "@/testing/server";
 import { render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 import { AuthorizationDialog } from "./AuthorizationDialog";
+import { routes } from "./routes";
 
 describe("AuthorizationDialog", () => {
   test("Does not show dialog when session is still valid", () => {

@@ -2832,7 +2832,8 @@
         ],
         "properties": {
           "finished_at": {
-            "type": "string"
+            "type": "string",
+            "description": "When both data entries were finalised"
           },
           "first_entry_user_id": {
             "type": "integer",
@@ -3251,10 +3252,12 @@
         ],
         "properties": {
           "first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "First data entry for a polling station"
           },
           "first_entry_finished_at": {
-            "type": "string"
+            "type": "string",
+            "description": "When the first data entry was finalised"
           },
           "first_entry_user_id": {
             "type": "integer",
@@ -3263,10 +3266,12 @@
             "minimum": 0
           },
           "second_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "Second data entry for a polling station"
           },
           "second_entry_finished_at": {
-            "type": "string"
+            "type": "string",
+            "description": "When the second data entry was finalised"
           },
           "second_entry_user_id": {
             "type": "integer",
@@ -3368,7 +3373,7 @@
           },
           "first_entry": {
             "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
+            "description": "First data entry for a polling station"
           },
           "first_entry_user_id": {
             "type": "integer",
@@ -4195,15 +4200,16 @@
           },
           "finalised_first_entry": {
             "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
+            "description": "First data entry for a polling station"
           },
           "first_entry_finished_at": {
             "type": "string",
-            "description": "When the first entry was finalised"
+            "description": "When the first data entry was finalised"
           },
           "first_entry_user_id": {
             "type": "integer",
             "format": "int32",
+            "description": "User who did the first data entry",
             "minimum": 0
           },
           "progress": {
@@ -4215,7 +4221,7 @@
           },
           "second_entry": {
             "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
+            "description": "Second data entry for a polling station"
           },
           "second_entry_user_id": {
             "type": "integer",
@@ -4235,14 +4241,16 @@
         "properties": {
           "finalised_first_entry": {
             "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
+            "description": "First data entry for a polling station"
           },
           "first_entry_finished_at": {
-            "type": "string"
+            "type": "string",
+            "description": "When the first data entry was finalised"
           },
           "first_entry_user_id": {
             "type": "integer",
             "format": "int32",
+            "description": "User who did the first data entry",
             "minimum": 0
           }
         }

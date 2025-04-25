@@ -341,6 +341,7 @@ export type DataEntryStatusName =
   | "definitive";
 
 export interface Definitive {
+  /** When both data entries were finalised */
   finished_at: string;
   /** User who did the first data entry */
   first_entry_user_id: number;
@@ -491,11 +492,15 @@ export interface ElectionSummary {
 }
 
 export interface EntriesDifferent {
+  /** First data entry for a polling station */
   first_entry: PollingStationResults;
+  /** When the first data entry was finalised */
   first_entry_finished_at: string;
   /** User who did the first data entry */
   first_entry_user_id: number;
+  /** Second data entry for a polling station */
   second_entry: PollingStationResults;
+  /** When the second data entry was finalised */
   second_entry_finished_at: string;
   /** User who did the second data entry */
   second_entry_user_id: number;
@@ -556,7 +561,7 @@ export interface ErrorResponse {
 export interface FirstEntryInProgress {
   /** Client state for the data entry (arbitrary JSON) */
   client_state: unknown;
-  /** Data entry for a polling station */
+  /** First data entry for a polling station */
   first_entry: PollingStationResults;
   /** User who is doing the first data entry */
   first_entry_user_id: number;
@@ -829,23 +834,26 @@ export interface SeatChangeStep {
 export interface SecondEntryInProgress {
   /** Client state for the data entry (arbitrary JSON) */
   client_state: unknown;
-  /** Data entry for a polling station */
+  /** First data entry for a polling station */
   finalised_first_entry: PollingStationResults;
-  /** When the first entry was finalised */
+  /** When the first data entry was finalised */
   first_entry_finished_at: string;
+  /** User who did the first data entry */
   first_entry_user_id: number;
   /** Data entry progress between 0 and 100 */
   progress: number;
-  /** Data entry for a polling station */
+  /** Second data entry for a polling station */
   second_entry: PollingStationResults;
   /** User who is doing the second data entry */
   second_entry_user_id: number;
 }
 
 export interface SecondEntryNotStarted {
-  /** Data entry for a polling station */
+  /** First data entry for a polling station */
   finalised_first_entry: PollingStationResults;
+  /** When the first data entry was finalised */
   first_entry_finished_at: string;
+  /** User who did the first data entry */
   first_entry_user_id: number;
 }
 

@@ -5,10 +5,8 @@ import { Button } from "@/components/ui/Button/Button";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/lib/i18n";
 import { Election, RedactedEmlHash } from "@/types/generated/openapi";
-import { cn } from "@/utils/classnames";
 import { formatDateFull } from "@/utils/format";
 
-import cls from "./CheckElectionDefinition.module.css";
 import { RedactedHash, Stub } from "./RedactedHash";
 
 interface CheckElectionDefinitionProps {
@@ -26,7 +24,7 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
   );
 
   return (
-    <section className={cn("md", cls.container)}>
+    <section className="md">
       <h2>{t("election.check_eml.title")}</h2>
       <p>
         {tx("election.check_eml.description", {

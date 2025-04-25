@@ -71,7 +71,7 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
             const newStubs = [...stubs];
             const stub = newStubs[stubIndex];
             if (stub) {
-              stub.selected = true;
+              stub.selected = false;
             }
             setStubs(newStubs);
           }}

@@ -29,10 +29,6 @@ export const routes: RouteObject[] = [
     errorElement: <ErrorBoundary />,
     children: [
       { index: true, path: "/", element: <Navigate to="/dev" replace /> },
-      {
-        path: "*",
-        element: <NotFoundPage message="error.not_found" path={window.location.pathname} />,
-      },
       { path: "account", children: accountRoutes },
       {
         path: "elections",
@@ -87,5 +83,9 @@ export const routes: RouteObject[] = [
         ],
       },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFoundPage message="error.not_found" path={window.location.pathname} />,
   },
 ];

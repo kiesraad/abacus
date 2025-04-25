@@ -36,9 +36,9 @@ export type ProgressListItemProps = {
 };
 
 ProgressList.Item = function ProgressListItem({
-  active,
+  active = false,
   status,
-  disabled,
+  disabled = false,
   children,
   id,
   scrollIntoView,
@@ -57,7 +57,7 @@ ProgressList.Item = function ProgressListItem({
     <li
       ref={ref}
       id={id}
-      className={cn(active ? "active" : "idle", status, { disabled: !!disabled })}
+      className={cn({ active: active }, status, { disabled: disabled })}
       aria-current={active ? "step" : false}
     >
       <aside>

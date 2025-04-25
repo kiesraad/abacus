@@ -27,9 +27,9 @@ describe("ElectionCreatePage", () => {
     );
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" }));
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" }));
-    expect(await screen.findByLabelText("Bestand kiezen"));
-    expect(await screen.findByLabelText("Geen bestand gekozen"));
+    expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
+    expect(await screen.findByLabelText("Bestand kiezen")).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
   });
 });

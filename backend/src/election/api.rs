@@ -7,8 +7,7 @@ use crate::election::{ElectionRequest, repository::Elections};
 use crate::eml::{EML110, EMLDocument, RedactedEmlHash};
 use crate::polling_station::{PollingStation, repository::PollingStations};
 use crate::{AppState, ErrorResponse};
-use axum::Json;
-use axum::extract::{Path, State};
+use axum::{Json, extract::{Path, State}};
 #[cfg(feature = "dev-database")]
 use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};

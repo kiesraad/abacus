@@ -39,10 +39,12 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
           <br />
           <span className="capitalize">{formatDateFull(new Date(election.election_date))}</span>
         </p>
-        <p>
-          <strong>Digitale vingerafdruk</strong> (hashcode):
+        <div>
+          <span>
+            <strong>Digitale vingerafdruk</strong>(hashcode):
+          </span>
           <RedactedHash hash={hash.chunks} stubs={stubs} />
-        </p>
+        </div>
       </Alert>
       <p>{t("election.check_eml.check_hash.description")}</p>
       {stubs.map((stub, stubIndex) => (

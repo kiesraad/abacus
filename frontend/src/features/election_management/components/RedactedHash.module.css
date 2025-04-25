@@ -1,5 +1,9 @@
+.container {
+  width: 29rem;
+}
+
 .hash {
-  width: 27rem;
+  width: 25rem;
   margin-top: 0.25rem;
   font-family: var(--font-number);
   font-size: var(--font-size-md);
@@ -10,15 +14,14 @@
 }
 
 .chunk {
-  height: 34px;
+  width: 39px;
 }
 
 .chunkStub {
-  width: 54px;
+  width: 39px;
   font-weight: 700;
   color: var(--base-white);
   background-color: var(--gray-600);
-  padding: 0 20px 0 20px;
   text-align: center;
 }
 

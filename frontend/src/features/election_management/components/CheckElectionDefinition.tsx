@@ -41,7 +41,7 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
         </p>
         <div>
           <span>
-            <strong>Digitale vingerafdruk</strong>(hashcode):
+            <strong>{t("digital_signature")}</strong>({t("hashcode")}):
           </span>
           <RedactedHash hash={hash.chunks} stubs={stubs} />
         </div>

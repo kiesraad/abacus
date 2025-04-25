@@ -34,7 +34,7 @@ export function UploadElectionDefinition({ file, setFile, setData }: UploadElect
   };
 
   return (
-    <section className={"md"}>
+    <section className="md">
       <h2>{t("election.import_eml")}</h2>
       <div className="mt-lg mb-lg">
         {error && (

@@ -3,8 +3,8 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-// eslint-disable-next-line import/no-restricted-paths -- #1283
-import { routes } from "@/app/routes";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { useUser } from "@/hooks/user/useUser";
@@ -19,6 +19,7 @@ import { overrideOnce, server } from "@/testing/server";
 import { render, screen, setupTestRouter, within } from "@/testing/test-utils";
 import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
 
+import { dataEntryChoiceRoutes } from "../routes";
 import { DataEntryChoicePage } from "./DataEntryChoicePage";
 
 vi.mock("@/hooks/user/useUser");
@@ -116,7 +117,15 @@ describe("DataEntryHomePage", () => {
     const user = userEvent.setup();
 
     // Set up router and navigate to the data entry home page
-    const router = setupTestRouter(routes);
+    const router = setupTestRouter([
+      {
+        path: "/elections/:electionId/data-entry",
+        Component: ElectionLayout,
+        errorElement: <ErrorBoundary />,
+        children: dataEntryChoiceRoutes,
+      },
+    ]);
+
     await router.navigate("/elections/1/data-entry");
     rtlRender(<Providers router={router} />);
 
@@ -146,7 +155,15 @@ describe("DataEntryHomePage", () => {
     const user = userEvent.setup();
 
     // Set up router and navigate to the data entry home page
-    const router = setupTestRouter(routes);
+    const router = setupTestRouter([
+      {
+        path: "/elections/:electionId/data-entry",
+        Component: ElectionLayout,
+        errorElement: <ErrorBoundary />,
+        children: dataEntryChoiceRoutes,
+      },
+    ]);
+
     await router.navigate("/elections/1/data-entry");
     rtlRender(<Providers router={router} />);
 
@@ -174,7 +191,14 @@ describe("DataEntryHomePage", () => {
     const user = userEvent.setup();
 
     // Set up router and navigate to the data entry home page
-    const router = setupTestRouter(routes);
+    const router = setupTestRouter([
+      {
+        path: "/elections/:electionId/data-entry",
+        Component: ElectionLayout,
+        errorElement: <ErrorBoundary />,
+        children: dataEntryChoiceRoutes,
+      },
+    ]);
     await router.navigate("/elections/1/data-entry");
     rtlRender(<Providers router={router} />);
 
@@ -202,7 +226,14 @@ describe("DataEntryHomePage", () => {
     const user = userEvent.setup();
 
     // Set up router and navigate to the data entry home page
-    const router = setupTestRouter(routes);
+    const router = setupTestRouter([
+      {
+        path: "/elections/:electionId/data-entry",
+        Component: ElectionLayout,
+        errorElement: <ErrorBoundary />,
+        children: dataEntryChoiceRoutes,
+      },
+    ]);
     await router.navigate("/elections/1/data-entry");
     rtlRender(<Providers router={router} />);
 

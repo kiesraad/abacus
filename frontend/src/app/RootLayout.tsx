@@ -1,7 +1,8 @@
 import { Outlet, ScrollRestoration } from "react-router";
 
-import { AuthorizationDialog } from "@/components/authorization/AuthorizationDialog";
 import { AppFrame } from "@/components/ui/AppFrame/AppFrame";
+
+import { AuthorizationDialog } from "./AuthorizationDialog";
 
 export function RootLayout() {
   return (

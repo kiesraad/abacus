@@ -1,8 +1,7 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// eslint-disable-next-line import/no-restricted-paths -- #1283
-import { routes } from "@/app/routes";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -10,6 +9,7 @@ import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
 
+import { electionManagementRoutes } from "../routes";
 import { ElectionReportPage } from "./ElectionReportPage";
 
 describe("ElectionReportPage", () => {
@@ -22,7 +22,13 @@ describe("ElectionReportPage", () => {
     vi.spyOn(console, "error").mockImplementation(() => {
       /* do nothing */
     });
-    const router = setupTestRouter(routes);
+    const router = setupTestRouter([
+      {
+        Component: null,
+        errorElement: <ErrorBoundary />,
+        children: electionManagementRoutes,
+      },
+    ]);
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [

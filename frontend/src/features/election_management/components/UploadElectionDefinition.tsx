@@ -29,6 +29,7 @@ export function UploadElectionDefinition({ file, setFile, setData }: UploadElect
       } else if (isError(response)) {
         setData(undefined);
         setError(true);
+        setFile(undefined);
       }
     }
   };

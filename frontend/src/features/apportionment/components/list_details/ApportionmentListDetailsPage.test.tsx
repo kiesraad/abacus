@@ -254,7 +254,7 @@ describe("ApportionmentListDetailsPage", () => {
       });
       const router = setupTestRouter([
         {
-          element: null,
+          Component: null,
           errorElement: <ErrorBoundary />,
           children: apportionmentRoutes,
         },

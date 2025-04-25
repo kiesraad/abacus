@@ -13,7 +13,7 @@ function renderWithRouter() {
   const router = setupTestRouter([
     {
       path: "/",
-      element: null,
+      Component: null,
       children: [
         {
           path: "users",

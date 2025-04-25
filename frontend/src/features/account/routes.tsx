@@ -8,12 +8,12 @@ import { UserHomePage } from "./components/UserHomePage";
 
 export const accountRoutes: RouteObject[] = [
   {
-    element: <LoginLayout />,
+    Component: LoginLayout,
     children: [
-      { index: true, element: <UserHomePage /> },
-      { path: "login", element: <LoginPage /> },
-      { path: "logout", element: <Logout /> },
-      { path: "setup", element: <AccountSetupPage /> },
+      { index: true, Component: UserHomePage },
+      { path: "login", Component: LoginPage },
+      { path: "logout", Component: Logout },
+      { path: "setup", Component: AccountSetupPage },
     ],
   },
 ];

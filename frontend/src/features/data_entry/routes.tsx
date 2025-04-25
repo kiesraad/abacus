@@ -9,20 +9,20 @@ import { VotersAndVotesPage } from "./components/voters_and_votes/VotersAndVotes
 
 export const dataEntryRoutes: RouteObject[] = [
   {
-    element: <DataEntryLayout />,
+    Component: DataEntryLayout,
     children: [
-      { index: true, element: null },
-      { path: "recounted", element: <RecountedPage /> },
+      { index: true, Component: null },
+      { path: "recounted", Component: RecountedPage },
       {
         path: "voters-and-votes",
-        element: <VotersAndVotesPage />,
+        Component: VotersAndVotesPage,
       },
-      { path: "differences", element: <DifferencesPage /> },
+      { path: "differences", Component: DifferencesPage },
       {
         path: "list/:listNumber",
-        element: <CandidatesVotesPage />,
+        Component: CandidatesVotesPage,
       },
-      { path: "save", element: <CheckAndSavePage /> },
+      { path: "save", Component: CheckAndSavePage },
     ],
   },
 ];

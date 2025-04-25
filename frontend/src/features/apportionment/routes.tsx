@@ -8,20 +8,20 @@ import { ApportionmentResidualSeatsPage } from "./components/residual_seats/Appo
 
 export const apportionmentRoutes: RouteObject[] = [
   {
-    element: <ApportionmentLayout />,
+    Component: ApportionmentLayout,
     children: [
-      { index: true, element: <ApportionmentPage /> },
+      { index: true, Component: ApportionmentPage },
       {
         path: ":pgNumber",
-        element: <ApportionmentListDetailsPage />,
+        Component: ApportionmentListDetailsPage,
       },
       {
         path: "details-residual-seats",
-        element: <ApportionmentResidualSeatsPage />,
+        Component: ApportionmentResidualSeatsPage,
       },
       {
         path: "details-full-seats",
-        element: <ApportionmentFullSeatsPage />,
+        Component: ApportionmentFullSeatsPage,
       },
     ],
   },

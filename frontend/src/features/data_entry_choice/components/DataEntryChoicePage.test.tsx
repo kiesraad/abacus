@@ -120,7 +120,7 @@ describe("DataEntryHomePage", () => {
     const router = setupTestRouter([
       {
         path: "/elections/:electionId/data-entry",
-        element: <ElectionLayout />,
+        Component: ElectionLayout,
         errorElement: <ErrorBoundary />,
         children: dataEntryChoiceRoutes,
       },
@@ -158,7 +158,7 @@ describe("DataEntryHomePage", () => {
     const router = setupTestRouter([
       {
         path: "/elections/:electionId/data-entry",
-        element: <ElectionLayout />,
+        Component: ElectionLayout,
         errorElement: <ErrorBoundary />,
         children: dataEntryChoiceRoutes,
       },
@@ -194,7 +194,7 @@ describe("DataEntryHomePage", () => {
     const router = setupTestRouter([
       {
         path: "/elections/:electionId/data-entry",
-        element: <ElectionLayout />,
+        Component: ElectionLayout,
         errorElement: <ErrorBoundary />,
         children: dataEntryChoiceRoutes,
       },
@@ -229,7 +229,7 @@ describe("DataEntryHomePage", () => {
     const router = setupTestRouter([
       {
         path: "/elections/:electionId/data-entry",
-        element: <ElectionLayout />,
+        Component: ElectionLayout,
         errorElement: <ErrorBoundary />,
         children: dataEntryChoiceRoutes,
       },

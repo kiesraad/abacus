@@ -22,11 +22,9 @@ import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes"
 import { usersRoutes } from "@/features/users/routes";
 import { workstationsRoutes } from "@/features/workstations/routes";
 
-//TODO check if we should use Component instead of element, Component is preferred since it does not render it right away.
-
 export const routes: RouteObject[] = [
   {
-    element: <RootLayout />,
+    Component: RootLayout,
     errorElement: <ErrorBoundary />,
     children: [
       { index: true, path: "/", element: <Navigate to="/dev" replace /> },
@@ -37,15 +35,15 @@ export const routes: RouteObject[] = [
       { path: "account", children: accountRoutes },
       {
         path: "elections",
-        element: <OverviewLayout />,
+        Component: OverviewLayout,
         children: [
-          { index: true, element: <OverviewPage /> },
-          { path: "create", element: <ElectionCreatePage /> },
+          { index: true, Component: OverviewPage },
+          { path: "create", Component: ElectionCreatePage },
           {
             path: ":electionId",
-            element: <ElectionLayout />,
+            Component: ElectionLayout,
             children: [
-              { index: true, element: <ElectionHomePage /> },
+              { index: true, Component: ElectionHomePage },
               {
                 path: "apportionment",
                 children: apportionmentRoutes,
@@ -81,7 +79,7 @@ export const routes: RouteObject[] = [
         ],
       },
       {
-        element: <AdministratorLayout />,
+        Component: AdministratorLayout,
         children: [
           { path: "dev", children: devRoutes },
           { path: "logs", children: logsRoutes },

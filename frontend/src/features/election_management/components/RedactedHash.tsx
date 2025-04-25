@@ -25,10 +25,10 @@ export function RedactedHash({ hash, stubs }: RedactedHashProps) {
           if (stubIndex !== -1) {
             return (
               <Fragment key={stubIndex}>
-                <span className={cn(cls.chunkStub, stubs[stubIndex]?.selected ? cls.chunkStubFocus : undefined)}>
+                <span className={cn(cls.chunk, cls.stub, stubs[stubIndex]?.selected ? cls.stubFocus : undefined)}>
                   {stubIndex + 1}
                 </span>
-                <span>{prefix}</span>
+                <span className={cls.delimiter}>{prefix}</span>
               </Fragment>
             );
           }
@@ -36,7 +36,7 @@ export function RedactedHash({ hash, stubs }: RedactedHashProps) {
           return (
             <Fragment key={chunk}>
               <span className={cls.chunk}>{chunk}</span>
-              <span>{prefix}</span>
+              <span className={cls.delimiter}>{prefix}</span>
             </Fragment>
           );
         })}

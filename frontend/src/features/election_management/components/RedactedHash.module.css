@@ -14,17 +14,20 @@
 }
 
 .chunk {
-  width: 39px;
+  min-width: 2.5rem;
 }
 
-.chunkStub {
-  width: 39px;
+.stub {
   font-weight: 700;
   color: var(--base-white);
   background-color: var(--gray-600);
   text-align: center;
 }
 
-.chunkStubFocus {
+.delimiter {
+  color: var(--gray-400);
+}
+
+.stubFocus {
   background-color: var(--interactive-default);
 }

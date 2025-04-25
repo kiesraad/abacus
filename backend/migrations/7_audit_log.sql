@@ -12,7 +12,5 @@ CREATE TABLE audit_log
     username           TEXT            NOT NULL,
     user_fullname      TEXT            NOT NULL,
     user_role          TEXT            NOT NULL,
-    time               DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    UNIQUE(id)
+    time               DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

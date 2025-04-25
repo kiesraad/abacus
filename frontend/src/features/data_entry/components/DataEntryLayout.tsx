@@ -24,8 +24,8 @@ export function DataEntryLayout() {
     throw new NotFoundError("error.polling_station_not_found");
   }
 
-  if (pollingStationStatus.status === "definitive") {
-    throw new Error("error.polling_station_already_definitive");
+  if (entryNumber !== 1 && entryNumber !== 2) {
+    throw new NotFoundError("error.data_entry_not_found");
   }
 
   return (

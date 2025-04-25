@@ -27,13 +27,12 @@ pub enum ErrorReference {
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DatabaseError,
     DataEntryAlreadyClaimed,
+    DataEntryAlreadyFinalised,
     DrawingOfLotsRequired,
     EntryNotFound,
     EntryNotUnique,
-    EntryNumberNotSupported,
     InternalServerError,
     InvalidData,
-    InvalidDataEntryNumber,
     InvalidJson,
     InvalidPassword,
     InvalidPoliticalGroup,
@@ -44,12 +43,7 @@ pub enum ErrorReference {
     InvalidVoteGroup,
     PasswordRejection,
     PdfGenerationError,
-    PollingStationDataValidation,
-    PollingStationFirstEntryAlreadyFinalised,
-    PollingStationFirstEntryNotFinalised,
     PollingStationRepeated,
-    PollingStationResultsAlreadyFinalised,
-    PollingStationSecondEntryAlreadyFinalised,
     PollingStationValidationErrors,
     UserNotFound,
     UsernameNotUnique,
@@ -369,6 +363,10 @@ impl From<DataEntryTransitionError> for APIError {
             DataEntryTransitionError::FirstEntryAlreadyClaimed
             | DataEntryTransitionError::SecondEntryAlreadyClaimed => {
                 APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyClaimed)
+            }
+            DataEntryTransitionError::FirstEntryAlreadyFinalised
+            | DataEntryTransitionError::SecondEntryAlreadyFinalised => {
+                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyFinalised)
             }
             _ => APIError::Conflict(err.to_string(), ErrorReference::InvalidStateTransition),
         }

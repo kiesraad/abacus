@@ -2,14 +2,19 @@ use super::structs::Election;
 use crate::APIError;
 #[cfg(feature = "dev-database")]
 use crate::audit_log::{AuditEvent, AuditService};
-use crate::authentication::{Admin, User};
-use crate::election::{ElectionRequest, repository::Elections};
-use crate::eml::{EML110, EMLDocument, RedactedEmlHash};
-use crate::polling_station::{PollingStation, repository::PollingStations};
-use crate::{AppState, ErrorResponse};
-use axum::{Json, extract::{Path, State}};
+use crate::{
+    authentication::{Admin, User},
+    election::{ElectionRequest, repository::Elections},
+    eml::{EML110, EMLDocument, RedactedEmlHash},
+    polling_station::{PollingStation, repository::PollingStations},
+    {AppState, ErrorResponse},
+};
 #[cfg(feature = "dev-database")]
 use axum::http::StatusCode;
+use axum::{
+    Json,
+    extract::{Path, State},
+};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};

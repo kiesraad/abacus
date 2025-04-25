@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 
-import { Role } from "@/api/gen/openapi";
+import { Role } from "@/types/generated/openapi";
 
 import { IUserCreateContext, UserCreateContext, UserType } from "../../hooks/UserCreateContext";
 

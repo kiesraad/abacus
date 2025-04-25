@@ -10,7 +10,7 @@ describe("ElectionStatus", () => {
     render(<PollingStationStatus navigate={navigate} />);
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" })).toBeVisible();
 
     const items = [...screen.getByTestId("polling-stations-per-status").children];
     expect(items[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Stembureaus per status" }));

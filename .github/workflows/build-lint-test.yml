@@ -9,6 +9,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pull-requests: write
+
 env:
   TZ: "Europe/Amsterdam"
 
@@ -46,7 +50,7 @@ jobs:
           rustup default stable &&
           rustup target add x86_64-unknown-linux-musl
       - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2
         with:
           workspaces: "backend -> target"
       - name: Check rustfmt
@@ -111,7 +115,7 @@ jobs:
         run: npm run test:ladle
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/test-results-action@f2dba722c67b86c6caa034178c6e4d35335f6706 # v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: "Playwright Ladle ubuntu-latest"
@@ -155,7 +159,7 @@ jobs:
           retention-days: 30
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/test-results-action@f2dba722c67b86c6caa034178c6e4d35335f6706 # v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: "Playwright e2e"

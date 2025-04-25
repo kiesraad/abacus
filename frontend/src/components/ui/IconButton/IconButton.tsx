@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { cn } from "@/lib/util/classnames";
 import { ButtonVariant, Size } from "@/types/ui";
+import { cn } from "@/utils/classnames";
 
 import cls from "./IconButton.module.css";
 

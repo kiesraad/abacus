@@ -1,7 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionRequestHandler,
@@ -87,7 +87,7 @@ describe("Test CheckAndSaveForm", () => {
     renderForm();
     const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
 
-    expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
+    expect(await screen.findByRole("group", { name: "Controleren en opslaan" })).toBeVisible();
 
     const user = userEvent.setup();
 
@@ -105,7 +105,7 @@ describe("Test CheckAndSaveForm", () => {
     renderForm();
 
     // Wait for the page to be loaded and check that the save button is not visible
-    expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
+    expect(await screen.findByRole("group", { name: "Controleren en opslaan" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Opslaan" })).not.toBeInTheDocument();
 
     expect(screen.getByTestId("section-status-voters_votes_counts")).toHaveTextContent("heeft blokkerende fouten");
@@ -120,7 +120,7 @@ describe("Test CheckAndSaveForm", () => {
     renderForm();
 
     // Wait for the page to be loaded and check that the save button is not visible
-    expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
+    expect(await screen.findByRole("group", { name: "Controleren en opslaan" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Opslaan" })).not.toBeInTheDocument();
 
     expect(screen.getByTestId("section-status-voters_votes_counts")).toHaveTextContent("Controleer waarschuwingen bij");

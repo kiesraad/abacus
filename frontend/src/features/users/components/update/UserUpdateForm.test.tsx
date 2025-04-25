@@ -1,11 +1,11 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
-import { User, USER_UPDATE_REQUEST_PATH } from "@/api/gen/openapi";
 import { UserUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
+import { User, USER_UPDATE_REQUEST_PATH } from "@/types/generated/openapi";
 
 import { UserUpdateForm } from "./UserUpdateForm";
 
@@ -102,7 +102,9 @@ describe("UserUpdateForm", () => {
 
     await user.type(passwordInput, "Vol");
     await user.click(save);
-    expect(passwordInput).toHaveAccessibleErrorMessage("Het opgegeven wachtwoord voldoet niet aan de eisen");
+    expect(passwordInput).toHaveAccessibleErrorMessage(
+      "Het opgegeven wachtwoord voldoet niet aan de eisen. Gebruik minimaal 13 karakters.",
+    );
 
     await user.type(passwordInput, "doendeKarakters01");
     await user.click(save);

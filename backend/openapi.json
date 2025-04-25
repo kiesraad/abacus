@@ -844,8 +844,83 @@
     },
     "/api/log": {
       "get": {
-        "summary": "Lists all users",
+        "summary": "List audit events",
         "operationId": "audit_log_list",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number, default 1",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "Filter by log level",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "event",
+            "in": "query",
+            "description": "Filter by event type",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "user",
+            "in": "query",
+            "description": "Filter by user ID",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "description": "Only show events since the specified timestamp",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Audit log event list",
@@ -882,7 +957,7 @@
     },
     "/api/log-users": {
       "get": {
-        "summary": "Lists all users",
+        "summary": "Lists all users that appear in the audit log",
         "operationId": "audit_log_list_users",
         "responses": {
           "200": {
@@ -3009,13 +3084,12 @@
           "ApportionmentNotAvailableUntilDataEntryFinalised",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
+          "DataEntryAlreadyFinalised",
           "DrawingOfLotsRequired",
           "EntryNotFound",
           "EntryNotUnique",
-          "EntryNumberNotSupported",
           "InternalServerError",
           "InvalidData",
-          "InvalidDataEntryNumber",
           "InvalidJson",
           "InvalidPassword",
           "InvalidPoliticalGroup",
@@ -3026,12 +3100,7 @@
           "InvalidVoteGroup",
           "PasswordRejection",
           "PdfGenerationError",
-          "PollingStationDataValidation",
-          "PollingStationFirstEntryAlreadyFinalised",
-          "PollingStationFirstEntryNotFinalised",
           "PollingStationRepeated",
-          "PollingStationResultsAlreadyFinalised",
-          "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
           "UserNotFound",
           "UsernameNotUnique",
@@ -3092,6 +3161,7 @@
           "selected_pg_number",
           "pg_options",
           "pg_assigned",
+          "pg_exhausted",
           "votes_per_seat"
         ],
         "properties": {
@@ -3103,6 +3173,15 @@
               "minimum": 0
             },
             "description": "The list of political groups with the same average, that have been assigned a seat"
+          },
+          "pg_exhausted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The list of political groups that are exhausted, and will not be assigned a seat"
           },
           "pg_options": {
             "type": "array",
@@ -3169,9 +3248,14 @@
         "type": "object",
         "description": "Contains information about the enactment of article P 10 of the Kieswet.",
         "required": [
-          "pg_retracted_seat"
+          "pg_retracted_seat",
+          "full_seat"
         ],
         "properties": {
+          "full_seat": {
+            "type": "boolean",
+            "description": "Whether the removed seat was a full seat"
+          },
           "pg_retracted_seat": {
             "type": "integer",
             "format": "int32",
@@ -3719,6 +3803,27 @@
                     "type": "string",
                     "enum": [
                       "HighestAverageAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "UniqueHighestAverageAssignment"
                     ]
                   }
                 }

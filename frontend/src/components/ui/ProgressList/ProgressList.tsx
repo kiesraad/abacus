@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import { cn } from "@/lib/util/classnames";
-import { domtoren } from "@/lib/util/domtoren";
 import { MenuStatus } from "@/types/ui";
+import { cn } from "@/utils/classnames";
+import { domtoren } from "@/utils/domtoren";
 
 import { StatusIcon } from "../Icon/StatusIcon";
 import cls from "./ProgressList.module.css";

@@ -11,7 +11,7 @@ import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj"
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 
-import { VotersCounts, VotesCounts } from "@/api/gen/openapi";
+import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../fixtures";
 import {
@@ -928,7 +928,7 @@ test.describe("api error responses", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
   });
 
-  test("Already claimed polling station results in error shown", async ({ page, pollingStation }) => {
+  test("UI Warning: Trying to load a data entry that was already claimed", async ({ page, pollingStation }) => {
     await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1/claim`, async (route) => {
       await route.fulfill({
         status: 409,
@@ -944,5 +944,86 @@ test.describe("api error responses", () => {
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
+    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+      `Je kan stembureau ${pollingStation.number} niet invoeren`,
+    );
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
+      "Een andere invoerder is bezig met dit stembureau",
+    );
+  });
+
+  test("UI Warning: Trying to load the same finalised data entry again", async ({
+    page,
+    pollingStationFirstEntryDone,
+  }) => {
+    await page.goto(
+      `/elections/${pollingStationFirstEntryDone.election_id}/data-entry/${pollingStationFirstEntryDone.id}/1/recounted`,
+    );
+
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
+    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+      `Je kan stembureau ${pollingStationFirstEntryDone.number} niet invoeren`,
+    );
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
+  });
+
+  test("UI Warning: Trying to load a data entry for a polling station with status definitive", async ({
+    page,
+    pollingStationDefinitive,
+  }) => {
+    await page.goto(
+      `/elections/${pollingStationDefinitive.election_id}/data-entry/${pollingStationDefinitive.id}/1/recounted`,
+    );
+
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
+    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+      `Je kan stembureau ${pollingStationDefinitive.number} niet invoeren`,
+    );
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
+  });
+
+  test("UI Warning: Trying to load a second data entry when the first is in progress", async ({
+    page,
+    pollingStation,
+  }) => {
+    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/2/claim`, async (route) => {
+      await route.fulfill({
+        status: 409,
+        json: {
+          error: "Conflict",
+          fatal: false,
+          reference: "InvalidStateTransition",
+        },
+      });
+    });
+
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`);
+
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
+    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+      `Je kan stembureau ${pollingStation.number} niet invoeren`,
+    );
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("Er is een ongeldige actie uitgevoerd");
+  });
+
+  test("UI Warning: Second data entry user must be different from first entry", async ({
+    page,
+    pollingStationFirstEntryDone,
+  }) => {
+    await page.goto(`/elections/${pollingStationFirstEntryDone.election_id}/data-entry`);
+    const dataEntryHomePage = new DataEntryHomePage(page);
+
+    await dataEntryHomePage.pollingStationNumber.fill(pollingStationFirstEntryDone.number.toString());
+
+    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(
+      `Je mag stembureau ${pollingStationFirstEntryDone.number} niet nog een keer invoeren`,
+    );
   });
 });

@@ -12,12 +12,19 @@ import {
 export function useCandidateVotes(political_group_number: number) {
   const { onSubmit: _onSubmit, ...section } = useDataEntryFormSection<CandidateVotesFormValues>({
     section: `political_group_votes_${political_group_number}`,
-    getDefaultFormValues: (results, cache) =>
-      cache?.key === `political_group_votes_${political_group_number}`
-        ? valuesToFormValues(cache.data as CandidateVotesValues)
-        : valuesToFormValues(
-            results.political_group_votes.find((pg) => pg.number === political_group_number) as CandidateVotesValues,
-          ),
+    getDefaultFormValues: (results, cache) => {
+      let values;
+      if (cache?.key === `political_group_votes_${political_group_number}`) {
+        values = cache.data["political_group_votes"]?.find((pg) => pg.number === political_group_number);
+      }
+      values ??= results.political_group_votes.find((pg) => pg.number === political_group_number);
+      values ??= {
+        number: political_group_number,
+        total: 0,
+        candidate_votes: [],
+      };
+      return valuesToFormValues(values);
+    },
   });
 
   const [missingTotalError, setMissingTotalError] = React.useState(false);

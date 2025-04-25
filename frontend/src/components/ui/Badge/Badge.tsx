@@ -1,9 +1,8 @@
 import { ReactElement } from "react";
 
-import { type DataEntryStatusName } from "@/api/gen/openapi";
-
-import { t } from "@kiesraad/i18n";
-import { IconPencil } from "@kiesraad/icon";
+import { IconPencil } from "@/components/generated/icons";
+import { t } from "@/lib/i18n";
+import { type DataEntryStatusName } from "@/types/generated/openapi";
 
 import { Icon } from "../Icon/Icon";
 import cls from "./Badge.module.css";

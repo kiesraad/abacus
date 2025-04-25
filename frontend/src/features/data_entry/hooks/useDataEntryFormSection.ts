@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { PollingStationResults } from "@/api/gen/openapi";
+import { PollingStationResults } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { SubmitCurrentFormOptions, TemporaryCache } from "../types/types";

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "@/lib/util/classnames";
+import { cn } from "@/utils/classnames";
 
 import cls from "./Toolbar.module.css";
 

@@ -1,7 +1,6 @@
 import * as React from "react";
 
 import { isSuccess } from "@/api/ApiResult";
-import { PollingStation, PollingStationRequest } from "@/api/gen/openapi";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -10,6 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/lib/i18n";
+import { PollingStation, PollingStationRequest } from "@/types/generated/openapi";
 
 import { useForm } from "../hooks/useForm";
 import { FormFields, ValidationError } from "../utils/form";
@@ -224,7 +224,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               {pollingStation ? t("polling_station.form.save_update") : t("polling_station.form.save_create")}
             </Button>
             {pollingStation && onCancel && (
-              <Button variant="secondary" name="cancel" onClick={onCancel}>
+              <Button type="button" variant="secondary" name="cancel" onClick={onCancel}>
                 {t("cancel")}
               </Button>
             )}

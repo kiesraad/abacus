@@ -2,17 +2,17 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
-import { ElectionApportionmentResponse, ErrorResponse } from "@/api/gen/openapi";
 // eslint-disable-next-line import/no-restricted-paths -- #1283
 import { routes } from "@/app/routes";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
 import { Router } from "@/testing/router";
 import { overrideOnce } from "@/testing/server";
 import { expectErrorPage, render, renderReturningRouter, screen, setupTestRouter, within } from "@/testing/test-utils";
+import { ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 
-import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/less-than-19-seats";
+import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/lt-19-seats";
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 
@@ -43,9 +43,9 @@ describe("ApportionmentPage", () => {
 
     const router = renderApportionmentPage(true) as Router;
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" })).toBeVisible();
     const election_summary_table = await screen.findByTestId("election-summary-table");
     expect(election_summary_table).toBeVisible();
     expect(election_summary_table).toHaveTableContent([
@@ -59,7 +59,7 @@ describe("ApportionmentPage", () => {
       ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
     ]);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" })).toBeVisible();
     const apportionment_table = await screen.findByTestId("apportionment-table");
     expect(apportionment_table).toBeVisible();
     expect(apportionment_table).toHaveTableContent([
@@ -88,26 +88,26 @@ describe("ApportionmentPage", () => {
       "/details-residual-seats",
     );
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Gekozen kandidaten" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Gekozen kandidaten" })).toBeVisible();
     const chosen_candidates_table = await screen.findByTestId("chosen-candidates-table");
     expect(chosen_candidates_table).toBeVisible();
     expect(chosen_candidates_table).toHaveTableContent([
       ["Kandidaat", "Woonplaats"],
       ["Bakker, S. (Sophie) (v)", "Test Location"],
       ["Bakker, T. (Tinus) (m)", "Test Location"],
-      ["van den Berg, M. (Marijke) (v)", "Test Location"],
+      ["Van den Berg, M. (Marijke) (v)", "Test Location"],
       ["Bogaert, G. (Gerard) (m)", "Test Location"],
-      ["van Doorn, A. (Adelbert) (m)", "Test Location"],
+      ["Van Doorn, A. (Adelbert) (m)", "Test Location"],
       ["Jansen, A. (Arie) (m)", "Test Location"],
-      ["de Jong, R. (Rolf) (m)", "Test Location"],
+      ["De Jong, R. (Rolf) (m)", "Test Location"],
       ["Kok, K. (Karin) (v)", "Test Location"],
       ["Oud, L. (Lidewij) (v)", "Test Location"],
       ["Oud, J. (Johan) (m)", "Test Location"],
       ["Oud, M. (Marijke) (v)", "Test Location"],
       ["Oud, K. (Klaas) (m)", "Test Location"],
-      ["de Vries, J. (Johan) (m)", "Test Location"],
-      ["van der Weijden, H. (Henk) (m)", "Test Location"],
-      ["van der Weijden, B. (Berta) (v)", "Test Location"],
+      ["De Vries, J. (Johan) (m)", "Test Location"],
+      ["Van der Weijden, H. (Henk) (m)", "Test Location"],
+      ["Van der Weijden, B. (Berta) (v)", "Test Location"],
     ]);
 
     // Check if the link to the list details page works
@@ -130,7 +130,7 @@ describe("ApportionmentPage", () => {
       renderApportionmentPage(false);
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
@@ -153,7 +153,7 @@ describe("ApportionmentPage", () => {
       renderApportionmentPage(false);
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
@@ -176,7 +176,7 @@ describe("ApportionmentPage", () => {
       renderApportionmentPage(false);
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
@@ -201,7 +201,7 @@ describe("ApportionmentPage", () => {
       renderApportionmentPage(false);
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(

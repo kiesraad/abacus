@@ -1,14 +1,14 @@
 import { useState } from "react";
 
-import { AuditLogEvent } from "@/api/gen/openapi";
 import { ErrorModal } from "@/components/error/ErrorModal";
+import { IconFilter } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { Pagination } from "@/components/ui/Pagination/Pagination";
 import { Toolbar, ToolbarSection } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/lib/i18n";
-import { IconFilter } from "@/lib/icon";
+import { AuditLogEvent } from "@/types/generated/openapi";
 
 import { useAuditLog } from "../hooks/useAuditLog";
 import { LogDetailsModal } from "./LogDetailsModal";

@@ -1,9 +1,9 @@
 import { Story } from "@ladle/react";
 
-import { PoliticalGroup } from "@/api/gen/openapi";
+import { PoliticalGroup } from "@/types/generated/openapi";
 
-import * as gte19Seats from "../testing/19-or-more-seats";
-import * as lt19Seats from "../testing/less-than-19-seats";
+import * as gte19Seats from "../testing/gte-19-seats";
+import * as lt19Seats from "../testing/lt-19-seats";
 import { HighestAverageAssignmentStep } from "../utils/seat-change";
 import { ApportionmentTable } from "./ApportionmentTable";
 import { ChosenCandidatesTable } from "./ChosenCandidatesTable";
@@ -12,9 +12,9 @@ import { FullSeatsTable } from "./full_seats/FullSeatsTable";
 import { ResidualSeatsCalculationTable } from "./full_seats/ResidualSeatsCalculationTable";
 import { CandidatesRankingTable } from "./list_details/CandidatesRankingTable";
 import { CandidatesWithVotesTable } from "./list_details/CandidatesWithVotesTable";
-import { HighestAveragesFor19OrMoreSeatsTable } from "./residual_seats/HighestAveragesFor19OrMoreSeatsTable";
-import { HighestAveragesForLessThan19SeatsTable } from "./residual_seats/HighestAveragesForLessThan19SeatsTable";
+import { HighestAveragesTable } from "./residual_seats/HighestAveragesTable";
 import { LargestRemaindersTable } from "./residual_seats/LargestRemaindersTable";
+import { UniqueHighestAveragesTable } from "./residual_seats/UniqueHighestAveragesTable";
 
 export default {
   title: "App / Apportionment",
@@ -52,6 +52,7 @@ export const DefaultFullSeatsTable: Story = () => (
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups ?? []}
     quota={gte19Seats.seat_assignment.quota}
+    resultChanges={[]}
   />
 );
 DefaultFullSeatsTable.storyName = "FullSeatsTable";
@@ -98,29 +99,31 @@ DefaultCandidatesWithVotesTable.argTypes = {
   },
 };
 
-export const DefaultLargestAveragesFor19OrMoreSeatsTable: Story = () => (
-  <HighestAveragesFor19OrMoreSeatsTable
+export const DefaultHighestAveragesTable: Story = () => (
+  <HighestAveragesTable
     steps={gte19Seats.seat_assignment.steps as HighestAverageAssignmentStep[]}
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups as PoliticalGroup[]}
+    resultChanges={[]}
   />
 );
-DefaultLargestAveragesFor19OrMoreSeatsTable.storyName = "Largest averages for 19 or more seats table";
-
-export const DefaultLargestAveragesForLessThan19SeatsTable: Story = () => (
-  <HighestAveragesForLessThan19SeatsTable
-    steps={lt19Seats.highest_average_steps}
-    finalStanding={lt19Seats.seat_assignment.final_standing}
-    politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
-  />
-);
-DefaultLargestAveragesForLessThan19SeatsTable.storyName = "Largest averages for less than 19 seats table";
+DefaultHighestAveragesTable.storyName = "HighestAveragesTable";
 
 export const DefaultLargestRemaindersTable: Story = () => (
   <LargestRemaindersTable
     steps={lt19Seats.largest_remainder_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
     politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
+    resultChanges={[]}
   />
 );
 DefaultLargestRemaindersTable.storyName = "LargestRemaindersTable";
+
+export const DefaultUniqueHighestAveragesTable: Story = () => (
+  <UniqueHighestAveragesTable
+    steps={lt19Seats.highest_average_steps}
+    finalStanding={lt19Seats.seat_assignment.final_standing}
+    politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
+  />
+);
+DefaultUniqueHighestAveragesTable.storyName = "UniqueHighestAveragesTable";

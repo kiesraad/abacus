@@ -1,6 +1,6 @@
 import { Story } from "@ladle/react";
 
-import { IconPlus } from "@kiesraad/icon";
+import { IconPlus } from "@/components/generated/icons";
 
 import { Button } from "../Button/Button";
 import { Toolbar, ToolbarSection } from "./Toolbar";

@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ElectionProvider } from "@/api/election/ElectionProvider";
-import { PollingStationListResponse } from "@/api/gen/openapi";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionRequestHandler, PollingStationListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
+import { PollingStationListResponse } from "@/types/generated/openapi";
 
 import { PollingStationListPage } from "./PollingStationListPage";
 

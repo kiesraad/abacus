@@ -10,7 +10,7 @@ import { apportionmentRoutes } from "@/features/apportionment/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
 import { dataEntryChoiceRoutes } from "@/features/data_entry_choice/routes";
 import { devRoutes } from "@/features/dev/routes";
-import { ElectionCreatePage } from "@/features/election_management/components";
+import { ElectionCreatePage } from "@/features/election_management/components/ElectionCreatePage";
 import { ElectionHomePage } from "@/features/election_management/components/ElectionHomePage";
 import { electionManagementRoutes } from "@/features/election_management/routes";
 import { OverviewLayout } from "@/features/election_overview/components/OverviewLayout";
@@ -62,7 +62,6 @@ export const routes: RouteObject[] = [
                   },
                 ],
               },
-
               {
                 path: "status",
                 children: [

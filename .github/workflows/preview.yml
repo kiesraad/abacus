@@ -40,7 +40,7 @@ jobs:
         run: npm run build:ladle
       - name: Deploy
         id: deploy
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3
         with:
           apiToken: ${{ secrets.API_TOKEN }}
           accountId: ${{ secrets.ACCOUNT_ID }}

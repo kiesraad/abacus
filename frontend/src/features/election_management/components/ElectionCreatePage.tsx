@@ -8,10 +8,8 @@ import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { t } from "@/lib/i18n";
 import { ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
-import { cn } from "@/utils/classnames";
 
 import { CheckElectionDefinition } from "./CheckElectionDefinition";
-import cls from "./ElectionCreatePage.module.css";
 import { UploadElectionDefinition } from "./UploadElectionDefinition";
 
 export function ElectionCreatePage() {
@@ -58,13 +56,11 @@ export function ElectionCreatePage() {
           </ProgressList>
         </StickyNav>
         <article>
-          <section className={cn("md", cls.container)}>
-            {file && data ? (
-              <CheckElectionDefinition file={file} election={data.election} hash={data.hash} />
-            ) : (
-              <UploadElectionDefinition file={file} setFile={setFile} setData={setData}></UploadElectionDefinition>
-            )}
-          </section>
+          {file && data ? (
+            <CheckElectionDefinition file={file} election={data.election} hash={data.hash} />
+          ) : (
+            <UploadElectionDefinition file={file} setFile={setFile} setData={setData}></UploadElectionDefinition>
+          )}
         </article>
       </main>
       <Footer />

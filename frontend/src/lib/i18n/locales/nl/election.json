@@ -12,7 +12,7 @@
   "import_eml": "Importeer verkiezingsdefinitie",
   "invalid_election_definition": {
     "title": "Ongeldige verkiezingsdefinitie",
-    "description": "Het gekozen bestand bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie."
+    "description": "Het bestand <file>filename</file> bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie."
   },
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",

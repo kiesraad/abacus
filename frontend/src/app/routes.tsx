@@ -1,10 +1,9 @@
 import { Navigate, RouteObject } from "react-router";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { NotFoundPage } from "@/components/error/NotFoundPage";
 import { AdministratorLayout } from "@/components/layout/AdministratorLayout";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { RootLayout } from "@/components/layout/RootLayout";
-import { NotFoundPage } from "@/components/page/NotFoundPage";
 import { accountRoutes } from "@/features/account/routes";
 import { apportionmentRoutes } from "@/features/apportionment/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
@@ -21,6 +20,8 @@ import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
 import { usersRoutes } from "@/features/users/routes";
 import { workstationsRoutes } from "@/features/workstations/routes";
+
+import { RootLayout } from "./RootLayout";
 
 export const routes: RouteObject[] = [
   {
@@ -48,7 +49,6 @@ export const routes: RouteObject[] = [
                 path: "apportionment",
                 children: apportionmentRoutes,
               },
-
               { path: "report", children: electionManagementRoutes },
               { path: "polling-stations", children: pollingStationsRoutes },
               {

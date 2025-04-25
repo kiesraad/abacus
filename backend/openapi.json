@@ -996,6 +996,55 @@
         }
       }
     },
+    "/api/polling_stations/{polling_station_id}/data_entries": {
+      "get": {
+        "operationId": "polling_station_data_entry_status",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get data entries for polling station",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEntryStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/polling_stations/{polling_station_id}/data_entries/resolve": {
       "post": {
         "summary": "Resolve data entry differences by providing a `ResolveAction`",
@@ -2655,6 +2704,114 @@
           }
         }
       },
+      "DataEntryStatus": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "FirstEntryNotStarted"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/FirstEntryInProgress"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "FirstEntryInProgress"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/SecondEntryNotStarted"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "SecondEntryNotStarted"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/SecondEntryInProgress"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "SecondEntryInProgress"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/EntriesDifferent"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "EntriesDifferent"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/Definitive"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "Definitive"
+                ]
+              }
+            }
+          }
+        ]
+      },
       "DataEntryStatusName": {
         "type": "string",
         "enum": [
@@ -2665,6 +2822,32 @@
           "entries_different",
           "definitive"
         ]
+      },
+      "Definitive": {
+        "type": "object",
+        "required": [
+          "first_entry_user_id",
+          "second_entry_user_id",
+          "finished_at"
+        ],
+        "properties": {
+          "finished_at": {
+            "type": "string",
+            "description": "When both data entries were finalised"
+          },
+          "first_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User who did the first data entry",
+            "minimum": 0
+          },
+          "second_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User who did the second data entry",
+            "minimum": 0
+          }
+        }
       },
       "DifferencesCounts": {
         "type": "object",
@@ -3057,6 +3240,47 @@
           }
         }
       },
+      "EntriesDifferent": {
+        "type": "object",
+        "required": [
+          "first_entry_user_id",
+          "second_entry_user_id",
+          "first_entry",
+          "second_entry",
+          "first_entry_finished_at",
+          "second_entry_finished_at"
+        ],
+        "properties": {
+          "first_entry": {
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "First data entry for a polling station"
+          },
+          "first_entry_finished_at": {
+            "type": "string",
+            "description": "When the first data entry was finalised"
+          },
+          "first_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User who did the first data entry",
+            "minimum": 0
+          },
+          "second_entry": {
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "Second data entry for a polling station"
+          },
+          "second_entry_finished_at": {
+            "type": "string",
+            "description": "When the second data entry was finalised"
+          },
+          "second_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User who did the second data entry",
+            "minimum": 0
+          }
+        }
+      },
       "ErrorDetails": {
         "type": "object",
         "required": [
@@ -3125,6 +3349,38 @@
           },
           "reference": {
             "$ref": "#/components/schemas/ErrorReference"
+          }
+        }
+      },
+      "FirstEntryInProgress": {
+        "type": "object",
+        "required": [
+          "progress",
+          "first_entry_user_id",
+          "first_entry",
+          "client_state"
+        ],
+        "properties": {
+          "client_state": {
+            "type": "object",
+            "description": "Client state for the data entry (arbitrary JSON)"
+          },
+          "first_entry": {
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "First data entry for a polling station"
+          },
+          "first_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User who is doing the first data entry",
+            "minimum": 0
+          },
+          "progress": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Data entry progress between 0 and 100",
+            "maximum": 100,
+            "minimum": 0
           }
         }
       },
@@ -3917,6 +4173,79 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroupStanding"
             }
+          }
+        }
+      },
+      "SecondEntryInProgress": {
+        "type": "object",
+        "required": [
+          "first_entry_user_id",
+          "finalised_first_entry",
+          "first_entry_finished_at",
+          "progress",
+          "second_entry_user_id",
+          "second_entry",
+          "client_state"
+        ],
+        "properties": {
+          "client_state": {
+            "type": "object",
+            "description": "Client state for the data entry (arbitrary JSON)"
+          },
+          "finalised_first_entry": {
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "First data entry for a polling station"
+          },
+          "first_entry_finished_at": {
+            "type": "string",
+            "description": "When the first data entry was finalised"
+          },
+          "first_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User who did the first data entry",
+            "minimum": 0
+          },
+          "progress": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Data entry progress between 0 and 100",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "second_entry": {
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "Second data entry for a polling station"
+          },
+          "second_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User who is doing the second data entry",
+            "minimum": 0
+          }
+        }
+      },
+      "SecondEntryNotStarted": {
+        "type": "object",
+        "required": [
+          "first_entry_user_id",
+          "finalised_first_entry",
+          "first_entry_finished_at"
+        ],
+        "properties": {
+          "finalised_first_entry": {
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "First data entry for a polling station"
+          },
+          "first_entry_finished_at": {
+            "type": "string",
+            "description": "When the first data entry was finalised"
+          },
+          "first_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User who did the first data entry",
+            "minimum": 0
           }
         }
       },

@@ -15,7 +15,7 @@ interface UploadElectionDefinitionProps {
 
 export function UploadElectionDefinition({ file, setFile, setData }: UploadElectionDefinitionProps) {
   const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>();
   const { create } = useCrud<ElectionDefinitionUploadResponse>({ create: path });
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,10 +25,10 @@ export function UploadElectionDefinition({ file, setFile, setData }: UploadElect
       const response = await create({ data: await currentFile.text() });
       if (isSuccess(response)) {
         setData(response.data);
-        setError(false);
+        setError(undefined);
       } else if (isError(response)) {
         setData(undefined);
-        setError(true);
+        setError(currentFile.name);
         setFile(undefined);
       }
     }
@@ -43,7 +43,7 @@ export function UploadElectionDefinition({ file, setFile, setData }: UploadElect
             <p>
               {tx("election.invalid_election_definition.description", {
                 file: () => {
-                  return <strong>{file?.name}</strong>;
+                  return <strong>{error}</strong>;
                 },
               })}
             </p>

@@ -4,8 +4,6 @@
 
 _Niveau:_ hoog-over, wolk, ☁️
 
-Voor DSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting d.m.v. DSO (wolk)](#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-eerste-zitting-dmv-dso-wolk).
-
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__  

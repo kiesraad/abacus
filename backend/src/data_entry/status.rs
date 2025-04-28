@@ -5,11 +5,11 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
-use crate::{
-    data_entry::PollingStationResults, election::Election, polling_station::PollingStation,
-};
-
 use super::{DataError, ValidationResults, validate_polling_station_results};
+use crate::{
+    APIError, data_entry::PollingStationResults, election::Election, error::ErrorReference,
+    polling_station::PollingStation,
+};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DataEntryTransitionError {
@@ -35,6 +35,22 @@ impl From<DataError> for DataEntryTransitionError {
 impl From<ValidationResults> for DataEntryTransitionError {
     fn from(err: ValidationResults) -> Self {
         Self::ValidationError(err)
+    }
+}
+
+impl From<DataEntryTransitionError> for APIError {
+    fn from(err: DataEntryTransitionError) -> Self {
+        match err {
+            DataEntryTransitionError::FirstEntryAlreadyClaimed
+            | DataEntryTransitionError::SecondEntryAlreadyClaimed => {
+                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyClaimed)
+            }
+            DataEntryTransitionError::FirstEntryAlreadyFinalised
+            | DataEntryTransitionError::SecondEntryAlreadyFinalised => {
+                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyFinalised)
+            }
+            _ => APIError::Conflict(err.to_string(), ErrorReference::InvalidStateTransition),
+        }
     }
 }
 

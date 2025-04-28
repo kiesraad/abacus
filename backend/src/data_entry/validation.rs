@@ -1,4 +1,5 @@
 use crate::{
+    APIError,
     data_entry::{
         CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
         VotersCounts, VotesCounts,
@@ -153,6 +154,12 @@ impl DataError {
 impl fmt::Display for DataError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Data error: {}", self.message)
+    }
+}
+
+impl From<DataError> for APIError {
+    fn from(err: DataError) -> Self {
+        APIError::InvalidData(err)
     }
 }
 

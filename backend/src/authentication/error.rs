@@ -1,3 +1,5 @@
+use crate::APIError;
+
 #[derive(Debug)]
 pub enum AuthenticationError {
     UserNotFound,
@@ -23,5 +25,11 @@ impl From<password_hash::Error> for AuthenticationError {
 impl From<sqlx::Error> for AuthenticationError {
     fn from(err: sqlx::Error) -> Self {
         AuthenticationError::Database(err)
+    }
+}
+
+impl From<AuthenticationError> for APIError {
+    fn from(err: AuthenticationError) -> Self {
+        APIError::Authentication(err)
     }
 }

@@ -4,7 +4,7 @@ use tracing::{debug, info};
 use utoipa::ToSchema;
 
 use crate::{
-    apportionment::Fraction, data_entry::PoliticalGroupVotes, election::PGNumber,
+    APIError, apportionment::Fraction, data_entry::PoliticalGroupVotes, election::PGNumber,
     summary::ElectionSummary,
 };
 
@@ -302,6 +302,12 @@ pub enum ApportionmentError {
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DrawingOfLotsNotImplemented,
     ZeroVotesCast,
+}
+
+impl From<ApportionmentError> for APIError {
+    fn from(err: ApportionmentError) -> Self {
+        APIError::Apportionment(err)
+    }
 }
 
 /// Initial construction of the data required per political group

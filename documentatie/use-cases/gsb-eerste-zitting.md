@@ -25,8 +25,8 @@ __Uitbreidingen:__
 
 3a. (CSO) Het GSB gebruikt de applicatie om het SB PV te controleren:
 
-3b. Het GSB stelt vast dat de tellingen van het stembureau mogelijk niet kloppen:  
-&emsp; 3b1. het GSB doet een (gedeeltelijke) hertelling van het stembureau.  
+3b. (DSO) Het GSB stelt vast dat de tellingen van het stembureau mogelijk niet kloppen:  
+&emsp; 3b1. Het GSB doet een (gedeeltelijke) hertelling van het stembureau.  
 &emsp; 3b1. Het GSB noteert de wijzigingen in een corrigendum Na 14-1.
 
 7a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  

@@ -63,7 +63,7 @@ export const DefaultProgressList: Story<Props> = ({ active }) => (
   </div>
 );
 
-export const sections = ["recounted", "voters_votes_counts", "differences_counts"] as const;
+const sections = ["recounted", "voters_votes_counts", "differences_counts"] as const;
 
 export const OverviewProgressList: Story = () => (
   <ProgressList>

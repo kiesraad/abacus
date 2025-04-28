@@ -6,18 +6,25 @@ import { Election } from "@/types/generated/openapi";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
 import useDataEntry from "../hooks/useDataEntry";
-import { DataEntryStateAndActionsLoaded } from "../types/types";
+import { DataEntryState, DataEntryStateAndActionsLoaded } from "../types/types";
 
 export interface DataEntryProviderProps {
   election: Required<Election>;
   pollingStationId: number;
   entryNumber: number;
   children: ReactNode;
+  initialDataEntryState?: DataEntryState;
 }
 
-export function DataEntryProvider({ election, pollingStationId, entryNumber, children }: DataEntryProviderProps) {
+export function DataEntryProvider({
+  election,
+  pollingStationId,
+  entryNumber,
+  initialDataEntryState,
+  children,
+}: DataEntryProviderProps) {
   const navigate = useNavigate();
-  const stateAndActions = useDataEntry(election, pollingStationId, entryNumber);
+  const stateAndActions = useDataEntry(election, pollingStationId, entryNumber, initialDataEntryState);
 
   // handle error
   useEffect(() => {

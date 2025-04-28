@@ -377,7 +377,9 @@ pub struct RegisteredParty {
 
 #[cfg(test)]
 mod tests {
-    use crate::eml::{EML110, EMLDocument, eml_110::VotingMethod};
+    use quick_xml::DeError;
+
+    use crate::eml::{EML110, EMLDocument, EMLImportError, eml_110::VotingMethod};
 
     #[test]
     fn test_deserialize_eml110a() {
@@ -408,5 +410,76 @@ mod tests {
             doc.election_event.election.contest.polling_places.len(),
             420
         );
+    }
+
+    #[test]
+    fn test_election_validate_invalid_election_missing_region() {
+        let data = include_str!("./tests/eml110a_invalid_election_missing_region.eml.xml");
+        let doc = EML110::from_str(data).unwrap_err();
+        assert!(matches!(doc, DeError::Custom(_)));
+    }
+
+    #[test]
+    fn test_election_validate_invalid_election_number_of_seats() {
+        let data = include_str!("./tests/eml110a_invalid_election_number_of_seats.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MismatchNumberOfSeats));
+    }
+
+    #[test]
+    fn test_election_validate_invalid_election_subcategory() {
+        let data = include_str!("./tests/eml110a_invalid_election_subcategory.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MismatchNumberOfSeats));
+    }
+
+    #[test]
+    fn test_election_validate_invalid_election_date_format() {
+        let data = include_str!("./tests/eml110a_invalid_election_date_format.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::InvalidDateFormat));
+    }
+
+    #[test]
+    fn test_election_validate_invalid_election_missing_nomination_date() {
+        let data = include_str!("./tests/eml110a_invalid_election_missing_nomination_date.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MissingNominationDate));
+    }
+
+    #[test]
+    fn test_election_validate_invalid_election_mismatch_preference_threshold() {
+        let data =
+            include_str!("./tests/eml110a_invalid_election_mismatch_preference_threshold.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MismatchPreferenceThreshold));
+    }
+
+    #[test]
+    fn test_election_validate_invalid_election_missing_subcategory() {
+        let data = include_str!("./tests/eml110a_invalid_election_missing_subcategory.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MissingSubcategory));
+    }
+
+    #[test]
+    fn test_election_validate_invalid_election_missing_number_of_seats() {
+        let data = include_str!("./tests/eml110a_invalid_election_missing_number_of_seats.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MissingNumberOfSeats));
+    }
+
+    #[test]
+    fn test_election_with_invalid_xml() {
+        let data = include_str!("./tests/eml110a_invalid_xml.eml.xml");
+        let doc = EML110::from_str(data).unwrap_err();
+        assert!(matches!(doc, DeError::InvalidXml(_)));
     }
 }

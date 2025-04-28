@@ -7,12 +7,12 @@ import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
-import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/lib/i18n";
 
 import { usePollingStationDataEntryDifferences } from "../hooks/usePollingStationDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
+import { ResolveDifferencesOverview } from "./ResolveDifferencesOverview";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 export function ResolveDifferencesPage() {
@@ -40,20 +40,11 @@ export function ResolveDifferencesPage() {
       </header>
       <main className={cls.resolveDifferences}>
         <aside>
-          <ProgressList>
-            <ProgressList.Fixed>
-              <ProgressList.Item status="idle">
-                <span>Todo item 1</span>
-              </ProgressList.Item>
-              <ProgressList.Item status="warning">
-                <span>Todo item 2</span>
-              </ProgressList.Item>
-              <ProgressList.Item status="idle">
-                <span>Todo item 2</span>
-              </ProgressList.Item>
-              {/* TODO: etc... */}
-            </ProgressList.Fixed>
-          </ProgressList>
+          <ResolveDifferencesOverview
+            first={status.state.first_entry}
+            second={status.state.second_entry}
+            politicalGroups={election.political_groups}
+          />
         </aside>
         <article>
           <h2>{t("resolve_differences.page_title")}</h2>

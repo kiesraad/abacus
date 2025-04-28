@@ -55,15 +55,17 @@ export const sections: DataEntrySection[] = [
   },
 ];
 
+export type DataEntryValue = string | number | boolean | undefined;
+
 export function getFromResults(results: PollingStationResults, path: PollingStationResultsPath) {
   const segments = path.split(".");
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   return segments.reduce((o: unknown, k: string) => {
     if (o && typeof o === "object" && k in o) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      return o[k as keyof typeof o] as string | number | boolean | undefined;
+      return o[k as keyof typeof o] as DataEntryValue;
     } else {
       return undefined;
     }
-  }, results) as string | number | boolean | undefined;
+  }, results) as DataEntryValue;
 }

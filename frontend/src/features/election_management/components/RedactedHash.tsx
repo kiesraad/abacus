@@ -24,8 +24,11 @@ export function RedactedHash({ hash, stubs }: RedactedHashProps) {
           // Either render a stub marker, or just return the prefix and chunk text
           if (stubIndex !== -1) {
             return (
-              <Fragment key={stubIndex}>
-                <span className={cn(cls.chunk, cls.stub, stubs[stubIndex]?.selected ? cls.stubFocus : undefined)}>
+              <Fragment key={hashIndex}>
+                <span
+                  className={cn(cls.chunk, cls.stub, stubs[stubIndex]?.selected ? cls.stubFocus : undefined)}
+                  role={stubs[stubIndex]?.selected ? "mark" : undefined}
+                >
                   {stubIndex + 1}
                 </span>
                 <span className={cls.delimiter}>{prefix}</span>
@@ -34,7 +37,7 @@ export function RedactedHash({ hash, stubs }: RedactedHashProps) {
           }
 
           return (
-            <Fragment key={chunk}>
+            <Fragment key={hashIndex}>
               <span className={cls.chunk}>{chunk}</span>
               <span className={cls.delimiter}>{prefix}</span>
             </Fragment>

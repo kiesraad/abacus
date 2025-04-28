@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, configure } from "@testing-library/react";
+import "blob-polyfill";
 import { afterEach, beforeAll, expect, vi } from "vitest";
 import failOnConsole from "vitest-fail-on-console";
 

@@ -35,7 +35,7 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
       </p>
       <Alert type="notify" variant="no-icon" margin="mb-md" small>
         <p>
-          <strong>{election.category}</strong>
+          <strong>{election.name}</strong>
           <br />
           <span className="capitalize">{formatDateFull(new Date(election.election_date))}</span>
         </p>

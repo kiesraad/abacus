@@ -461,6 +461,16 @@ mod tests {
     }
 
     #[test]
+    fn test_election_validate_invalid_election_mismatch_preference_threshold_small_election() {
+        let data = include_str!(
+            "./tests/eml110a_invalid_election_mismatch_preference_threshold_small_election.eml.xml"
+        );
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MismatchPreferenceThreshold));
+    }
+
+    #[test]
     fn test_election_validate_invalid_election_missing_subcategory() {
         let data = include_str!("./tests/eml110a_invalid_election_missing_subcategory.eml.xml");
         let doc = EML110::from_str(data).unwrap();
@@ -481,5 +491,39 @@ mod tests {
         let data = include_str!("./tests/eml110a_invalid_xml.eml.xml");
         let doc = EML110::from_str(data).unwrap_err();
         assert!(matches!(doc, DeError::InvalidXml(_)));
+    }
+
+    #[test]
+    fn test_cannot_convert_eml110b_to_election() {
+        let data = include_str!("./tests/eml110b_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::Needs101a));
+    }
+
+    #[test]
+    fn test_invalid_election_number_of_seats_not_in_range() {
+        let data =
+            include_str!("./tests/eml110a_invalid_election_number_of_seats_out_of_range.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::NumberOfSeatsNotInRange));
+    }
+
+    #[test]
+    fn test_invalid_election_missing_preference_threshold() {
+        let data =
+            include_str!("./tests/eml110a_invalid_election_missing_preference_threshold.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MissingPreferenceThreshold));
+    }
+
+    #[test]
+    fn test_invalid_election_date_nomination_format() {
+        let data = include_str!("./tests/eml110a_invalid_election_date_nomination_format.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::InvalidDateFormat));
     }
 }

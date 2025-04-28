@@ -2,15 +2,26 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-// eslint-disable-next-line import/no-restricted-paths -- #1283
-import { routes } from "@/app/routes";
 import { ElectionListRequestHandler, UserListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, waitFor, within } from "@/testing/test-utils";
 
+import { usersRoutes } from "../../routes";
+
 function renderWithRouter() {
-  const router = setupTestRouter(routes);
+  const router = setupTestRouter([
+    {
+      path: "/",
+      Component: null,
+      children: [
+        {
+          path: "users",
+          children: usersRoutes,
+        },
+      ],
+    },
+  ]);
   rtlRender(<Providers router={router} />);
   return router;
 }

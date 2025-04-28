@@ -416,7 +416,21 @@ mod tests {
     fn test_election_validate_invalid_election_missing_region() {
         let data = include_str!("./tests/eml110a_invalid_election_missing_region.eml.xml");
         let doc = EML110::from_str(data).unwrap_err();
+        // currently the missing region is already captured by the parser
         assert!(matches!(doc, DeError::Custom(_)));
+
+        // modify valid eml to remove regions parsed to check that the error triggers
+        // if constructed otherwise
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let mut doc = EML110::from_str(data).unwrap();
+        doc.election_event
+            .election
+            .election_tree
+            .as_mut()
+            .unwrap()
+            .regions = vec![];
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MissingRegion));
     }
 
     #[test]
@@ -432,6 +446,8 @@ mod tests {
         let data = include_str!("./tests/eml110a_invalid_election_subcategory.eml.xml");
         let doc = EML110::from_str(data).unwrap();
         let res = doc.as_crate_election().unwrap_err();
+        // note: even though the subcategory is wrong in this file, the code is
+        // setup to show the mismatch in number of seats as the problem
         assert!(matches!(res, EMLImportError::MismatchNumberOfSeats));
     }
 
@@ -525,5 +541,14 @@ mod tests {
         let doc = EML110::from_str(data).unwrap();
         let res = doc.as_crate_election().unwrap_err();
         assert!(matches!(res, EMLImportError::InvalidDateFormat));
+    }
+
+    #[test]
+    fn test_invalid_election_only_municipal_supported() {
+        let data =
+            include_str!("./tests/eml110a_invalid_election_only_municipal_supported.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::OnlyMunicipalSupported));
     }
 }

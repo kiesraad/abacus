@@ -2,6 +2,9 @@ import * as React from "react";
 
 import type { Story } from "@ladle/react";
 
+import { t } from "@/lib/i18n";
+import { politicalGroupsMockData } from "@/testing/api-mocks/ElectionMockData";
+
 import { ProgressList } from "./ProgressList";
 
 const style: React.CSSProperties = {
@@ -58,6 +61,31 @@ export const DefaultProgressList: Story<Props> = ({ active }) => (
       </ProgressList.Fixed>
     </ProgressList>
   </div>
+);
+
+export const sections = ["recounted", "voters_votes_counts", "differences_counts"] as const;
+
+export const OverviewProgressList: Story = () => (
+  <ProgressList>
+    <ProgressList.Fixed>
+      {sections.map((section, i) => (
+        <ProgressList.OverviewItem
+          key={section}
+          status={i === 1 ? "warning" : "idle"}
+          addSpace={i === sections.length - 1}
+        >
+          <span>{t(`resolve_differences.section_short.${section}`)}</span>
+        </ProgressList.OverviewItem>
+      ))}
+      {politicalGroupsMockData.map((pg) => (
+        <ProgressList.OverviewItem key={pg.number} status={pg.number === 2 ? "warning" : "idle"}>
+          <span>
+            {t("list")} {pg.number} - {pg.name}
+          </span>
+        </ProgressList.OverviewItem>
+      ))}
+    </ProgressList.Fixed>
+  </ProgressList>
 );
 
 DefaultProgressList.argTypes = {

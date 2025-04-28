@@ -29,12 +29,20 @@
     scroll-margin-top: 0.8rem;
     scroll-margin-bottom: 0.8rem;
 
-    &:hover {
+    &.item:hover {
       background-color: var(--color-hover);
       &:has(label > a:focus),
       &:has(label > a:focus-visible) {
         background-color: transparent;
       }
+    }
+
+    &.overviewItem:global(.idle) {
+      color: var(--gray-400);
+    }
+
+    &.addSpace {
+      margin-bottom: var(--space-md);
     }
 
     &:global(.ruler) {

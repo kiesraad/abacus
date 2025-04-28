@@ -7,7 +7,7 @@ import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { accountRoutes } from "@/features/account/routes";
 import { apportionmentRoutes } from "@/features/apportionment/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
-import { dataEntryChoiceRoutes } from "@/features/data_entry_choice/routes";
+import { dataEntryHomeRoutes } from "@/features/data_entry_home/routes";
 import { devRoutes } from "@/features/dev/routes";
 import { ElectionCreatePage } from "@/features/election_management/components/ElectionCreatePage";
 import { ElectionHomePage } from "@/features/election_management/components/ElectionHomePage";
@@ -51,7 +51,7 @@ export const routes: RouteObject[] = [
                 path: "data-entry",
                 children: [
                   // index
-                  ...dataEntryChoiceRoutes,
+                  ...dataEntryHomeRoutes,
                   {
                     path: ":pollingStationId/:entryNumber",
                     children: dataEntryRoutes,

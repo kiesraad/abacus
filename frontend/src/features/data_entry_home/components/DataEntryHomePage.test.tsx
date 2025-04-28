@@ -19,8 +19,8 @@ import { overrideOnce, server } from "@/testing/server";
 import { render, screen, setupTestRouter, within } from "@/testing/test-utils";
 import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
 
-import { dataEntryChoiceRoutes } from "../routes";
-import { DataEntryChoicePage } from "./DataEntryChoicePage";
+import { dataEntryHomeRoutes } from "../routes";
+import { DataEntryHomePage } from "./DataEntryHomePage";
 
 vi.mock("@/hooks/user/useUser");
 
@@ -35,7 +35,7 @@ const renderDataEntryHomePage = () =>
   render(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
-        <DataEntryChoicePage />
+        <DataEntryHomePage />
       </ElectionStatusProvider>
     </ElectionProvider>,
   );
@@ -122,7 +122,7 @@ describe("DataEntryHomePage", () => {
         path: "/elections/:electionId/data-entry",
         Component: ElectionLayout,
         errorElement: <ErrorBoundary />,
-        children: dataEntryChoiceRoutes,
+        children: dataEntryHomeRoutes,
       },
     ]);
 
@@ -160,7 +160,7 @@ describe("DataEntryHomePage", () => {
         path: "/elections/:electionId/data-entry",
         Component: ElectionLayout,
         errorElement: <ErrorBoundary />,
-        children: dataEntryChoiceRoutes,
+        children: dataEntryHomeRoutes,
       },
     ]);
 
@@ -196,7 +196,7 @@ describe("DataEntryHomePage", () => {
         path: "/elections/:electionId/data-entry",
         Component: ElectionLayout,
         errorElement: <ErrorBoundary />,
-        children: dataEntryChoiceRoutes,
+        children: dataEntryHomeRoutes,
       },
     ]);
     await router.navigate("/elections/1/data-entry");
@@ -231,7 +231,7 @@ describe("DataEntryHomePage", () => {
         path: "/elections/:electionId/data-entry",
         Component: ElectionLayout,
         errorElement: <ErrorBoundary />,
-        children: dataEntryChoiceRoutes,
+        children: dataEntryHomeRoutes,
       },
     ]);
     await router.navigate("/elections/1/data-entry");

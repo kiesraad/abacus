@@ -9,10 +9,10 @@ import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/lib/i18n";
 
-import { DataEntryChoiceForm } from "./DataEntryChoiceForm";
 import { ElectionProgress } from "./ElectionProgress";
+import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 
-export function DataEntryChoicePage() {
+export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { election, pollingStations } = useElection();
@@ -106,7 +106,7 @@ export function DataEntryChoicePage() {
       )}
       <main>
         <article id="polling-station-choice-form">
-          <DataEntryChoiceForm anotherEntry={dataEntryDone} />
+          <PollingStationChoiceForm anotherEntry={dataEntryDone} />
         </article>
         <ElectionProgress />
       </main>

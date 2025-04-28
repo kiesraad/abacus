@@ -9,9 +9,9 @@ import { t, tx } from "@/lib/i18n";
 import { cn } from "@/utils/classnames";
 import { removeLeadingZeros } from "@/utils/strings";
 
-import { useSingleCall } from "../utils/useSingleCall";
+import { useSingleCall } from "../hooks/useSingleCall";
 import { PollingStationUserStatus, PollingStationWithStatus } from "../utils/util";
-import cls from "./DataEntryChoice.module.css";
+import cls from "./PollingStationChoice.module.css";
 
 interface FeedbackMessageProps {
   messageType: "notify" | "warning" | "error" | "success";

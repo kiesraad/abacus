@@ -7,12 +7,11 @@ use std::net::IpAddr;
 use strum::VariantNames;
 use utoipa::ToSchema;
 
+use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 use crate::{
     APIError, AppState,
     authentication::{Role, User},
 };
-
-use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 
 #[derive(
     Serialize, Deserialize, VariantNames, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type,

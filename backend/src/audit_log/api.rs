@@ -4,12 +4,11 @@ use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+use super::{AuditLog, AuditLogEvent, LogFilter};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::{AdminOrCoordinator, Role},
 };
-
-use super::{AuditLog, AuditLogEvent, LogFilter};
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()

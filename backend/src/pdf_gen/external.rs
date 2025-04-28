@@ -1,10 +1,8 @@
+use rand::{Rng, distr::Alphanumeric};
 use std::{path::PathBuf, process::Command};
 
-use rand::{Rng, distr::Alphanumeric};
-
-use crate::APIError;
-
 use super::{PdfGenResult, models::PdfModel};
+use crate::APIError;
 
 pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
     generate_pdf_internal(model).map_err(APIError::PdfGenError)

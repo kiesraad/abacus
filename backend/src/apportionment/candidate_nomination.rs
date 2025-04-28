@@ -1,12 +1,13 @@
+use serde::{Deserialize, Serialize};
+use tracing::{debug, info};
+use utoipa::ToSchema;
+
+use super::{ApportionmentError, Fraction};
 use crate::{
-    apportionment::{ApportionmentError, Fraction},
     data_entry::CandidateVotes,
     election::{Candidate, CandidateNumber, Election, PGNumber, PoliticalGroup},
     summary::ElectionSummary,
 };
-use serde::{Deserialize, Serialize};
-use tracing::{debug, info};
-use utoipa::ToSchema;
 
 /// Contains information about the chosen candidates and the candidate list ranking
 /// for a specific political group.

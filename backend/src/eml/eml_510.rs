@@ -1,18 +1,17 @@
 use chrono::Datelike;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    data_entry::{PoliticalGroupVotes, PollingStationResults},
-    polling_station::PollingStation,
-    summary::ElectionSummary,
-};
-
 use super::{
     EMLBase,
     common::{
         AffiliationIdentifier, AuthorityAddress, AuthorityIdentifier, ContestIdentifier,
         ElectionCategory, ElectionIdentifier, ElectionSubcategory, ManagingAuthority,
     },
+};
+use crate::{
+    data_entry::{PoliticalGroupVotes, PollingStationResults},
+    polling_station::PollingStation,
+    summary::ElectionSummary,
 };
 
 /// Vote count data for EML_NL 510

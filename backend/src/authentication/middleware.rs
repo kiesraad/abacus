@@ -1,7 +1,3 @@
-use crate::{
-    audit_log::{AuditEvent, AuditService},
-    authentication::{SESSION_COOKIE_NAME, User, set_default_cookie_properties},
-};
 use axum::{
     extract::{Request, State},
     http::HeaderValue,
@@ -15,6 +11,10 @@ use tracing::{debug, error, info};
 use super::{
     SESSION_MIN_LIFE_TIME, Users,
     session::{Session, Sessions},
+};
+use crate::{
+    audit_log::{AuditEvent, AuditService},
+    authentication::{SESSION_COOKIE_NAME, User, set_default_cookie_properties},
 };
 
 /// Inject user and session

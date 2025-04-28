@@ -1,17 +1,12 @@
-use crate::{
-    APIError,
-    data_entry::{
-        CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-        VotersCounts, VotesCounts,
-    },
-    election::Election,
-    polling_station::PollingStation,
-};
-
-use std::fmt;
-
 use serde::{Deserialize, Serialize};
+use std::fmt;
 use utoipa::ToSchema;
+
+use super::{
+    CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
+    VotersCounts, VotesCounts,
+};
+use crate::{election::Election, polling_station::PollingStation};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
 pub struct ValidationResults {
@@ -154,12 +149,6 @@ impl DataError {
 impl fmt::Display for DataError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Data error: {}", self.message)
-    }
-}
-
-impl From<DataError> for APIError {
-    fn from(err: DataError) -> Self {
-        APIError::InvalidData(err)
     }
 }
 

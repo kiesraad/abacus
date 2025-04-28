@@ -3,10 +3,8 @@ use std::cmp::Ordering;
 use tracing::{debug, info};
 use utoipa::ToSchema;
 
-use crate::{
-    APIError, apportionment::Fraction, data_entry::PoliticalGroupVotes, election::PGNumber,
-    summary::ElectionSummary,
-};
+use super::Fraction;
+use crate::{data_entry::PoliticalGroupVotes, election::PGNumber, summary::ElectionSummary};
 
 /// The result of the seat assignment procedure. This contains the number of seats and the quota
 /// that was used. It then contains the initial standing after full seats were assigned,
@@ -302,12 +300,6 @@ pub enum ApportionmentError {
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DrawingOfLotsNotImplemented,
     ZeroVotesCast,
-}
-
-impl From<ApportionmentError> for APIError {
-    fn from(err: ApportionmentError) -> Self {
-        APIError::Apportionment(err)
-    }
 }
 
 /// Initial construction of the data required per political group

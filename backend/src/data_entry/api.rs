@@ -1,18 +1,3 @@
-use crate::{
-    APIError, AppState,
-    audit_log::{AuditEvent, AuditService},
-    authentication::{Coordinator, Typist, User},
-    data_entry::{
-        PollingStationResults, ValidationResults,
-        entry_number::EntryNumber,
-        repository::PollingStationDataEntries,
-        status::{ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName},
-        validate_polling_station_results,
-    },
-    election::repository::Elections,
-    error::ErrorResponse,
-    polling_station::repository::PollingStations,
-};
 use axum::{
     Json,
     extract::{FromRequest, Path, State},
@@ -24,7 +9,46 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::PollingStationDataEntry;
+use super::{
+    DataError, PollingStationDataEntry, PollingStationResults, ValidationResults,
+    entry_number::EntryNumber,
+    repository::PollingStationDataEntries,
+    status::{
+        ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
+        DataEntryTransitionError,
+    },
+    validate_polling_station_results,
+};
+use crate::{
+    APIError, AppState,
+    audit_log::{AuditEvent, AuditService},
+    authentication::{Coordinator, Typist, User},
+    election::repository::Elections,
+    error::{ErrorReference, ErrorResponse},
+    polling_station::repository::PollingStations,
+};
+
+impl From<DataError> for APIError {
+    fn from(err: DataError) -> Self {
+        APIError::InvalidData(err)
+    }
+}
+
+impl From<DataEntryTransitionError> for APIError {
+    fn from(err: DataEntryTransitionError) -> Self {
+        match err {
+            DataEntryTransitionError::FirstEntryAlreadyClaimed
+            | DataEntryTransitionError::SecondEntryAlreadyClaimed => {
+                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyClaimed)
+            }
+            DataEntryTransitionError::FirstEntryAlreadyFinalised
+            | DataEntryTransitionError::SecondEntryAlreadyFinalised => {
+                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyFinalised)
+            }
+            _ => APIError::Conflict(err.to_string(), ErrorReference::InvalidStateTransition),
+        }
+    }
+}
 
 /// Response structure for getting data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]

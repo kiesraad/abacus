@@ -4,12 +4,11 @@ use axum::{
 };
 use std::net::{IpAddr, SocketAddr};
 
+use super::{AuditEvent, AuditLog, AuditLogEvent};
 use crate::{
     APIError,
     authentication::{User, Users, error::AuthenticationError},
 };
-
-use super::{AuditEvent, AuditLog, AuditLogEvent};
 
 #[derive(Clone)]
 pub struct AuditService {

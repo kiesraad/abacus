@@ -6,12 +6,11 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
-use crate::APIError;
-
 use super::{
     error::AuthenticationError,
     user::{User, Users},
 };
+use crate::APIError;
 
 #[derive(
     Serialize, Deserialize, strum::Display, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type,

@@ -375,7 +375,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(request_body.data).toEqual(expectedRequest.data);
     });
 
-    test.only("VotersAndVotesForm with cache", async () => {
+    test("VotersAndVotesForm with cache", async () => {
       const cacheData: VotersAndVotesValues = {
         voters_counts: {
           poll_card_count: 100,

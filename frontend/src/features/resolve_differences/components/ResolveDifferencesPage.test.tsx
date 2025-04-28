@@ -5,14 +5,13 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { dataEntryStatusDifferences } from "@/testing/api-mocks/DataEntryMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  WhoAmIRequestHandler,
+  PollingStationDataEntryStatusHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { overrideOnce, server } from "@/testing/server";
+import { server } from "@/testing/server";
 import { screen, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
@@ -34,12 +33,16 @@ const renderPage = () => {
 
 describe("ResolveDifferencesPage", () => {
   beforeEach(() => {
-    server.use(WhoAmIRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler, ElectionListRequestHandler);
+    server.use(
+      ElectionRequestHandler,
+      ElectionStatusRequestHandler,
+      ElectionListRequestHandler,
+      PollingStationDataEntryStatusHandler,
+    );
   });
 
   test("Should render a table", async () => {
     vi.mocked(useParams).mockReturnValue({ pollingStationId: "3" });
-    overrideOnce("get", "/api/polling_stations/3/data_entries", 200, dataEntryStatusDifferences);
     renderPage();
 
     // Wait for the page to be loaded

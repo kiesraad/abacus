@@ -5,6 +5,7 @@ import {
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_PATH,
   ClaimDataEntryResponse,
+  DataEntryStatus,
   ErrorResponse,
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PARAMS,
@@ -12,13 +13,19 @@ import {
   LoginResponse,
   POLLING_STATION_CREATE_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH,
   POLLING_STATION_DELETE_REQUEST_PARAMS,
   POLLING_STATION_GET_REQUEST_PARAMS,
   POLLING_STATION_LIST_REQUEST_PARAMS,
   POLLING_STATION_UPDATE_REQUEST_PARAMS,
   PollingStation,
+  PollingStationDataEntry,
   PollingStationListResponse,
   SaveDataEntryResponse,
   User,
@@ -39,7 +46,12 @@ import {
   WHOAMI_REQUEST_PATH,
 } from "@/types/generated/openapi";
 
-import { claimDataEntryResponse, saveDataEntryResponse } from "./DataEntryMockData";
+import {
+  claimDataEntryResponse,
+  dataEntryResolveMockResponse,
+  dataEntryStatusDifferences,
+  saveDataEntryResponse,
+} from "./DataEntryMockData";
 import { electionDetailsMockResponse, electionListMockResponse } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
 import { logMockResponse } from "./LogMockData";
@@ -102,6 +114,22 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
 export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse, LOGIN_REQUEST_PATH>(
   "/api/user/login",
   () => HttpResponse.json(loginResponseMockData, { status: 200 }),
+);
+
+export const PollingStationDataEntryStatusHandler = http.get<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PARAMS>,
+  null,
+  DataEntryStatus,
+  POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH
+>("/api/polling_stations/3/data_entries", () => HttpResponse.json(dataEntryStatusDifferences, { status: 200 }));
+
+export const PollingStationDataEntryResolveHandler = http.post<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PARAMS>,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY,
+  PollingStationDataEntry,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH
+>("/api/polling_stations/3/data_entries/resolve", () =>
+  HttpResponse.json(dataEntryResolveMockResponse, { status: 200 }),
 );
 
 // get polling stations

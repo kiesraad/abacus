@@ -710,6 +710,12 @@ export interface PollingStation {
   postal_code: string;
 }
 
+export interface PollingStationDataEntry {
+  polling_station_id: number;
+  state: DataEntryStatus;
+  updated_at: string;
+}
+
 export interface PollingStationDetails {
   pollingStationAddress: string;
   pollingStationElectionId: number;

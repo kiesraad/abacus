@@ -11,7 +11,7 @@ __Hoofdscenario:__
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. Voor elk stembureau:
     - (CSO) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na 31-2 Bijlage 1 in.
-    - (DSO) Het GSB stelt met de hand vast dat de tellingen die het stembureau heeft vastgesteld in N 10-1, kloppen.
+    - (DSO) Het GSB stelt vast dat de tellingen die het stembureau heeft vastgesteld in N 10-1, kloppen.
 4. De coördinator GSB geeft in de applicatie aan dat de zitting is geopend en voert de locatie en starttijd in.
 5. [De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in.](./gsb-invoer-eerste-zitting.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger)
 6. [De coördinator GSB maakt het PV en het digitale bestand aan.](#de-coördinator-gsb-maakt-het-pv-en-het-digitale-bestand-aan-zee)
@@ -23,7 +23,7 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__  
 
-3a. Het GSB gebruikt de applicatie om het SB PV te controleren:
+3a. (CSO) Het GSB gebruikt de applicatie om het SB PV te controleren:
 
 3b. Het GSB stelt vast dat de tellingen van het stembureau mogelijk niet kloppen:  
 &emsp; 3b1. het GSB doet een (gedeeltelijke) hertelling van het stembureau.  

@@ -1,4 +1,4 @@
-use rand::{SeedableRng, rngs::SmallRng};
+use rand::rngs::SmallRng;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -69,7 +69,7 @@ impl From<&[u8]> for RedactedEmlHash {
 
 impl RedactedEmlHash {
     fn random_chunk_indexes(digest: [u8; 32]) -> [usize; 2] {
-        use rand::Rng;
+        use rand::{Rng, SeedableRng};
 
         let mut rng = SmallRng::from_seed(digest);
         [

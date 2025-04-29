@@ -135,7 +135,9 @@ De foutmelding die wordt getoond bestaat uit dezelfde onderdelen als bij de vali
 > - Heb je iets niet goed overgenomen? Herstel de fout en ga verder.
 > - Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.
 
-### (Bij tweede invoer) Alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
+### Checks voor alle velden (reeks W.0xx)
+
+#### W.001 (Bij tweede invoer) Alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
 
 > **Verschil met eerste invoer. Extra controle nodig**  
 > Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.

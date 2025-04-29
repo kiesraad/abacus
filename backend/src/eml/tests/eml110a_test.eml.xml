@@ -7,7 +7,7 @@
         <EventIdentifier/>
         <Election>
             <ElectionIdentifier Id="GR2022_Amsterdam">
-                <ElectionName>Gemeenteraad lkmsflkgmsfdklgjbfnsklfdjnAmsterdam 2022</ElectionName>
+                <ElectionName>Gemeenteraad Amsterdam 2022</ElectionName>
                 <ElectionCategory>GR</ElectionCategory>
                 <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
                 <kr:ElectionDomain Id="0363">Amsterdam</kr:ElectionDomain>

@@ -23,6 +23,9 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
     })),
   );
 
+  let electionDate = formatDateFull(new Date(election.election_date));
+  electionDate = electionDate.charAt(0).toUpperCase() + electionDate;
+
   return (
     <section className="md">
       <h2>{t("election.check_eml.title")}</h2>
@@ -37,7 +40,7 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
         <p>
           <strong>{election.name}</strong>
           <br />
-          <span className="capitalize">{formatDateFull(new Date(election.election_date))}</span>
+          <span>{electionDate}</span>
         </p>
         <div>
           <span>

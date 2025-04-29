@@ -57,11 +57,36 @@ ProgressList.Item = function ProgressListItem({
     <li
       ref={ref}
       id={id}
-      className={cn({ active: active }, status, { disabled: disabled })}
+      className={cn(cls.item, { active: active }, status, { disabled: disabled })}
       aria-current={active ? "step" : false}
     >
       <aside>
         <StatusIcon status={active ? "active" : status} />
+      </aside>
+      <label>{children}</label>
+    </li>
+  );
+};
+
+export type ProgressListOverviewItemProps = {
+  status: "warning" | "idle";
+  addSpace?: boolean;
+  id?: string;
+  children?: React.ReactNode;
+};
+
+ProgressList.OverviewItem = function ProgressListOverviewItem({
+  status,
+  addSpace,
+  id,
+  children,
+}: ProgressListOverviewItemProps) {
+  const ref = React.useRef<HTMLLIElement>(null);
+
+  return (
+    <li ref={ref} id={id} className={cn(cls.overviewItem, status, addSpace && cls.addSpace)}>
+      <aside>
+        <StatusIcon status={status} />
       </aside>
       <label>{children}</label>
     </li>

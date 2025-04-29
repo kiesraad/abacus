@@ -1,3 +1,4 @@
+use rand::SeedableRng;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -6,6 +7,7 @@ const CHUNK_COUNT: usize = 16;
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct EmlHash {
     pub chunks: [String; CHUNK_COUNT],
+    pub digest: u8,
 }
 
 impl From<&[u8]> for EmlHash {
@@ -16,7 +18,8 @@ impl From<&[u8]> for EmlHash {
 
         let mut chunks = [const { String::new() }; CHUNK_COUNT];
         let mut chunk_counter = 0;
-        let mut iter = digest.into_iter();
+        let mut iter = digest.iter();
+
         while let (Some(b1), Some(b2)) = (iter.next(), iter.next()) {
             let mut chunk = String::new();
             write!(&mut chunk, "{:02x}", b1).expect("Writing to a string cannot fail");
@@ -25,7 +28,7 @@ impl From<&[u8]> for EmlHash {
             chunk_counter += 1;
         }
 
-        Self { chunks }
+        Self { chunks, digest }
     }
 }
 
@@ -45,8 +48,9 @@ pub struct RedactedEmlHash {
 
 impl From<&[u8]> for RedactedEmlHash {
     fn from(input: &[u8]) -> Self {
-        let mut chunks = EmlHash::from(input).chunks;
-        let redacted_indexes = Self::random_chunk_indexes();
+        let hash = EmlHash::from(input);
+        let mut chunks = hash.chunks;
+        let redacted_indexes = Self::random_chunk_indexes(hash.seed);
 
         // Retract the chunks by replacing it with an empty string
         for index in redacted_indexes {
@@ -61,9 +65,10 @@ impl From<&[u8]> for RedactedEmlHash {
 }
 
 impl RedactedEmlHash {
-    fn random_chunk_indexes() -> [usize; 2] {
+    fn random_chunk_indexes(seed: u64) -> [usize; 2] {
         use rand::Rng;
-        let mut rng = rand::rng();
+
+        let mut rng = SeedableRng::from_seed(seed);
         [
             rng.random_range(0..CHUNK_COUNT / 2),
             rng.random_range((CHUNK_COUNT / 2) + 1..CHUNK_COUNT),

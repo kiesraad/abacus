@@ -87,8 +87,9 @@ pub trait EMLDocument: Sized + DeserializeOwned + Serialize {
 }
 
 pub fn eml_document_hash(input: &str, chunked: bool) -> String {
-    use sha2::Digest;
     use std::fmt::Write;
+
+    use sha2::Digest;
     let digest = sha2::Sha256::digest(input.as_bytes());
 
     let mut res = String::new();
@@ -103,8 +104,9 @@ pub fn eml_document_hash(input: &str, chunked: bool) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     #[derive(Debug, Serialize, Deserialize)]
     struct EmptyDoc {

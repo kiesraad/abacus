@@ -90,9 +90,8 @@ impl From<String> for PollingStationType {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use crate::election::tests::election_fixture;
-
     use super::*;
+    use crate::election::tests::election_fixture;
 
     /// Create a test polling station.
     pub fn polling_station_fixture(number_of_voters: Option<i64>) -> PollingStation {

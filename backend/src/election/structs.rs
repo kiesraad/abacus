@@ -131,9 +131,8 @@ pub enum CandidateGender {
 pub(crate) mod tests {
     use chrono::NaiveDate;
 
-    use crate::election::{Candidate, CandidateGender::X, ElectionCategory, PoliticalGroup};
-
     use super::*;
+    use crate::election::{Candidate, CandidateGender::X, ElectionCategory, PoliticalGroup};
 
     /// Create a test election with some political groups and a given number of seats.
     /// The number of political groups is the length of the `political_groups_candidates` slice.

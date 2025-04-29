@@ -1,11 +1,3 @@
-use self::repository::PollingStations;
-pub use self::structs::*;
-use crate::{
-    APIError, AppState, ErrorResponse,
-    audit_log::{AuditEvent, AuditService},
-    authentication::{AdminOrCoordinator, User},
-    election::repository::Elections,
-};
 use axum::{
     Json,
     extract::{Path, State},
@@ -15,6 +7,15 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
+
+use self::repository::PollingStations;
+pub use self::structs::*;
+use crate::{
+    APIError, AppState, ErrorResponse,
+    audit_log::{AuditEvent, AuditService},
+    authentication::{AdminOrCoordinator, User},
+    election::repository::Elections,
+};
 
 pub mod repository;
 pub mod structs;

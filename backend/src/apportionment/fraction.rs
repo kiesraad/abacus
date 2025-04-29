@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
 use std::{
     cmp::Ordering,
     fmt::{Debug, Display, Formatter, Result},
     ops::{Add, Div, Mul, Sub},
 };
+
+use serde::{Deserialize, Serialize};
 use utoipa::{
     PartialSchema, ToSchema,
     openapi::{RefOr, schema::Schema},
@@ -199,11 +200,12 @@ impl From<DisplayFraction> for Fraction {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use crate::{
         apportionment::{DisplayFraction, Fraction},
         data_entry::Count,
     };
-    use test_log::test;
 
     #[test]
     fn test_from_count() {

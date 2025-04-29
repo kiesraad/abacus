@@ -1,10 +1,8 @@
 use axum::extract::FromRef;
 use sqlx::{SqlitePool, query, query_as};
 
-use crate::{
-    AppState,
-    polling_station::structs::{PollingStation, PollingStationRequest},
-};
+use super::structs::{PollingStation, PollingStationRequest};
+use crate::AppState;
 
 pub struct PollingStations(SqlitePool);
 

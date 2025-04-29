@@ -1,3 +1,5 @@
+#[cfg(feature = "dev-database")]
+use axum::http::StatusCode;
 use axum::{
     Json,
     extract::{Path, State},
@@ -5,6 +7,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use self::repository::Elections;
 pub use self::structs::*;
@@ -13,15 +16,11 @@ use crate::{
     authentication::User,
     polling_station::{repository::PollingStations, structs::PollingStation},
 };
-
 #[cfg(feature = "dev-database")]
-use crate::audit_log::{AuditEvent, AuditService};
-#[cfg(feature = "dev-database")]
-use crate::authentication::Admin;
-#[cfg(feature = "dev-database")]
-use axum::http::StatusCode;
-use utoipa_axum::{router::OpenApiRouter, routes};
-
+use crate::{
+    audit_log::{AuditEvent, AuditService},
+    authentication::Admin,
+};
 pub(crate) mod repository;
 pub mod structs;
 

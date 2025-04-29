@@ -4,12 +4,11 @@ use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+use super::{AuditLog, AuditLogEvent, LogFilter};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::{AdminOrCoordinator, Role},
 };
-
-use super::{AuditLog, AuditLogEvent, LogFilter};
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -122,6 +121,8 @@ async fn audit_log_list_users(
 
 #[cfg(test)]
 mod tests {
+    use std::net::Ipv4Addr;
+
     use axum::{
         Router,
         body::Body,
@@ -132,7 +133,6 @@ mod tests {
     use chrono::TimeDelta;
     use http_body_util::BodyExt;
     use sqlx::SqlitePool;
-    use std::net::Ipv4Addr;
     use test_log::test;
     use tower::ServiceExt;
 

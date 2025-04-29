@@ -142,6 +142,8 @@ De foutmelding die wordt getoond bestaat uit dezelfde onderdelen als bij de vali
 > **Verschil met eerste invoer. Extra controle nodig** (W.001)  
 > Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.
 
+Velden markeren: alle velden met een verschil
+
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=130-10813&t=zTY4ajWtsFkiTOYP-11)
 
 ### Checks voor hertelling GSB (reeks W.1xx)

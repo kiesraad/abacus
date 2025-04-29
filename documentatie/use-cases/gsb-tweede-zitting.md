@@ -61,7 +61,8 @@ __Hoofdscenario:__
 6. Het GSB besluit dat er een hertelling nodig is.
 7. De coördinator GSB drukt de overige bladzijdes van het 'leeg' corrigendum af.
 8. Het GSB stelt een ander resultaat vast in de hertelling.
-9. [De invoerders voeren de uitkomst van het onderzoek en de hertelling in de applicatie in.](./gsb-invoer-tweede-zitting.md#de-invoerders-voeren-de-uitkomst-van-het-onderzoek-en-de-hertelling-in-de-applicatie-in-vlieger)
+9. De coördinator voert de uitkomst van het onderzoek in de applicatie in.
+10. [De invoerders voeren de hertelling in de applicatie in.](./gsb-invoer-tweede-zitting.md#de-invoerders-voeren-de-hertelling-in-de-applicatie-in-vlieger)
 11. Het GSB voegt het corrigendum toe aan de PV's van de zitting.
 
 
@@ -85,3 +86,4 @@ __Uitbreidingen:__
 - 'leeg' corrigendum is geen heel goede term
     - Moet je kunnen selecteren welke lijsten er opgenomen moeten worden in het 'lege' corrigendum? Nee, want nieuwe modellen: corrigendum bevat aantallen modellen vorige zitting (niet: eerste zitting tenzij dat de vorige zitting is), dus handig om alle lijsten in corrigendum te hebben.
 - Hoe expliciet willen we zijn over de verschillende momenten waarop welke onderdelen van het corrigendum afgedrukt kunnen worden?
+- Als de coördinator GSB de overige bladzijdes afrdukt, vult deze dan op dat moment ook al de resultaten van het onderzoek in?

@@ -1,15 +1,23 @@
-import { politicalGroupsMockData } from "@/testing/api-mocks/ElectionMockData";
+import { Loader } from "@/components/ui/Loader/Loader";
+import { useNumericParam } from "@/hooks/useNumericParam";
 
-import { pollingStationResultsMockData } from "../testing/polling-station-results";
+import { usePollingStationDataEntryDifferences } from "../hooks/usePollingStationDataEntryDifferences";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 // TODO: Implement the actual page layout
 export function ResolveDifferencesPage() {
+  const pollingStationId = useNumericParam("pollingStationId");
+  const { election, loading, status } = usePollingStationDataEntryDifferences(pollingStationId);
+
+  if (loading || status === null) {
+    return <Loader />;
+  }
+
   return (
     <ResolveDifferencesTables
-      first={pollingStationResultsMockData(true)}
-      second={pollingStationResultsMockData(false)}
-      politicalGroups={politicalGroupsMockData}
+      first={status.state.first_entry}
+      second={status.state.second_entry}
+      politicalGroups={election.political_groups}
     />
   );
 }

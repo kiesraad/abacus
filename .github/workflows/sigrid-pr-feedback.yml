@@ -1,6 +1,11 @@
 name: Sigrid PR Feedback
+
 on:
   pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   sigridci:
@@ -14,7 +19,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Sigrid CI
-        uses: Software-Improvement-Group/sigridci@main
+        uses: Software-Improvement-Group/sigridci@1df84f0d4ac24bd66bc46a3b7f8ade6b083c0672 # main
         with:
           customer: kiesraad
           system: abacus
@@ -22,7 +27,7 @@ jobs:
         env:
           SIGRID_CI_TOKEN: "${{ secrets.SIGRID_CI_TOKEN }}"
       - name: "Sigrid PR feedback"
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2
         if: always()
         with:
           message-id: sigrid

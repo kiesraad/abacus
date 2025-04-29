@@ -68,7 +68,7 @@ pub struct FirstEntryInProgress {
     pub progress: u8,
     /// User who is doing the first data entry
     pub first_entry_user_id: u32,
-    /// Data entry for a polling station
+    /// First data entry for a polling station
     pub first_entry: PollingStationResults,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
@@ -92,21 +92,22 @@ impl ClientState {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct SecondEntryNotStarted {
-    //// User who did the first data entry
+    /// User who did the first data entry
     pub first_entry_user_id: u32,
-    /// Data entry for a polling station
+    /// First data entry for a polling station
     pub finalised_first_entry: PollingStationResults,
+    /// When the first data entry was finalised
     #[schema(value_type = String)]
     pub first_entry_finished_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct SecondEntryInProgress {
-    //// User who did the first data entry
+    /// User who did the first data entry
     pub first_entry_user_id: u32,
-    /// Data entry for a polling station
+    /// First data entry for a polling station
     pub finalised_first_entry: PollingStationResults,
-    /// When the first entry was finalised
+    /// When the first data entry was finalised
     #[schema(value_type = String)]
     pub first_entry_finished_at: DateTime<Utc>,
     /// Data entry progress between 0 and 100
@@ -114,7 +115,7 @@ pub struct SecondEntryInProgress {
     pub progress: u8,
     /// User who is doing the second data entry
     pub second_entry_user_id: u32,
-    /// Data entry for a polling station
+    /// Second data entry for a polling station
     pub second_entry: PollingStationResults,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
@@ -127,10 +128,14 @@ pub struct EntriesDifferent {
     pub first_entry_user_id: u32,
     /// User who did the second data entry
     pub second_entry_user_id: u32,
+    /// First data entry for a polling station
     pub first_entry: PollingStationResults,
+    /// Second data entry for a polling station
     pub second_entry: PollingStationResults,
+    /// When the first data entry was finalised
     #[schema(value_type = String)]
     pub first_entry_finished_at: DateTime<Utc>,
+    /// When the second data entry was finalised
     #[schema(value_type = String)]
     pub second_entry_finished_at: DateTime<Utc>,
 }
@@ -141,6 +146,7 @@ pub struct Definitive {
     pub first_entry_user_id: u32,
     /// User who did the second data entry
     pub second_entry_user_id: u32,
+    /// When both data entries were finalised
     #[schema(value_type = String)]
     pub finished_at: DateTime<Utc>,
 }

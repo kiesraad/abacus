@@ -1,4 +1,5 @@
 import { userEvent } from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
@@ -12,15 +13,15 @@ import { overrideOnce, server } from "@/testing/server";
 import { render, renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
 import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
 
-import { DataEntryChoiceForm } from "./DataEntryChoiceForm";
+import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 
 vi.mock("@/hooks/user/useUser");
 
-function renderDataEntryChoicePage() {
+function renderPollingStationChoiceForm() {
   return renderReturningRouter(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
-        <DataEntryChoiceForm />
+        <PollingStationChoiceForm />
       </ElectionStatusProvider>
     </ElectionProvider>,
   );
@@ -33,7 +34,7 @@ const testUser: LoginResponse = {
   needs_password_change: false,
 };
 
-describe("Test DataEntryChoiceForm", () => {
+describe("Test PollingStationChoiceForm", () => {
   beforeEach(() => {
     // mock a current logged in user
     (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
@@ -44,7 +45,7 @@ describe("Test DataEntryChoiceForm", () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
 
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       expect(await screen.findByRole("group", { name: "Welk stembureau ga je invoeren?" })).toBeVisible();
       const pollingStation = screen.getByTestId("pollingStation");
@@ -69,7 +70,7 @@ describe("Test DataEntryChoiceForm", () => {
       render(
         <ElectionProvider electionId={1}>
           <ElectionStatusProvider electionId={1}>
-            <DataEntryChoiceForm anotherEntry />
+            <PollingStationChoiceForm anotherEntry />
           </ElectionStatusProvider>
         </ElectionProvider>,
       );
@@ -86,7 +87,7 @@ describe("Test DataEntryChoiceForm", () => {
     test("Selecting a valid polling station with leading zeros", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       const pollingStation = await screen.findByTestId("pollingStation");
 
@@ -99,7 +100,7 @@ describe("Test DataEntryChoiceForm", () => {
     test("Selecting a non-existing polling station", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       const pollingStation = await screen.findByTestId("pollingStation");
 
@@ -119,7 +120,7 @@ describe("Test DataEntryChoiceForm", () => {
     test("Submitting an empty or invalid polling station shows alert", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       const pollingStation = await screen.findByTestId("pollingStation");
       const submitButton = screen.getByRole("button", { name: "Beginnen" });
@@ -155,7 +156,7 @@ describe("Test DataEntryChoiceForm", () => {
       render(
         <ElectionProvider electionId={1}>
           <ElectionStatusProvider electionId={1}>
-            <DataEntryChoiceForm anotherEntry />
+            <PollingStationChoiceForm anotherEntry />
           </ElectionStatusProvider>
         </ElectionProvider>,
       );
@@ -190,7 +191,7 @@ describe("Test DataEntryChoiceForm", () => {
       render(
         <ElectionProvider electionId={1}>
           <ElectionStatusProvider electionId={1}>
-            <DataEntryChoiceForm anotherEntry />
+            <PollingStationChoiceForm anotherEntry />
           </ElectionStatusProvider>
         </ElectionProvider>,
       );
@@ -221,7 +222,7 @@ describe("Test DataEntryChoiceForm", () => {
     test("Form displays message when searching", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       const pollingStation = await screen.findByTestId("pollingStation");
 
@@ -232,20 +233,28 @@ describe("Test DataEntryChoiceForm", () => {
 
     test("Selecting polling station with second data entry opens correct page", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, {
-        statuses: [
-          {
-            polling_station_id: 1,
-            status: "second_entry_not_started",
-          },
-          {
-            polling_station_id: 2,
-            status: "definitive",
-          },
-        ],
-      } satisfies ElectionStatusResponse);
 
-      const router = renderDataEntryChoicePage();
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                {
+                  polling_station_id: 1,
+                  status: "second_entry_not_started",
+                },
+                {
+                  polling_station_id: 2,
+                  status: "definitive",
+                },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
+
+      const router = renderPollingStationChoiceForm();
 
       const user = userEvent.setup();
       const pollingStation = await screen.findByTestId("pollingStation");
@@ -262,7 +271,7 @@ describe("Test DataEntryChoiceForm", () => {
       overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
 
       const user = userEvent.setup();
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       expect(await screen.findByText("Kies het stembureau")).not.toBeVisible();
       const openPollingStationList = screen.getByTestId("openPollingStationList");
@@ -283,7 +292,7 @@ describe("Test DataEntryChoiceForm", () => {
     test("Empty polling station list shows message", async () => {
       overrideOnce("get", "/api/elections/1", 200, { ...electionDetailsMockResponse, polling_stations: [] });
       const user = userEvent.setup();
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       const openPollingStationList = await screen.findByTestId("openPollingStationList");
       await user.click(openPollingStationList);
@@ -307,7 +316,7 @@ describe("Test DataEntryChoiceForm", () => {
         ],
       } satisfies ElectionStatusResponse);
 
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       const pollingStationList = await screen.findByTestId("polling_station_list");
       expect(pollingStationList).not.toHaveTextContent(testPollingStation.name);
@@ -315,29 +324,37 @@ describe("Test DataEntryChoiceForm", () => {
 
     test("All data entries of polling stations are finished, polling station list shows message", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, {
-        statuses: [
-          {
-            polling_station_id: 1,
-            status: "definitive",
-          },
-          {
-            polling_station_id: 2,
-            status: "definitive",
-          },
-          {
-            polling_station_id: 3,
-            status: "definitive",
-          },
-          {
-            polling_station_id: 4,
-            status: "entries_different",
-          },
-        ],
-      } satisfies ElectionStatusResponse);
+
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                {
+                  polling_station_id: 1,
+                  status: "definitive",
+                },
+                {
+                  polling_station_id: 2,
+                  status: "definitive",
+                },
+                {
+                  polling_station_id: 3,
+                  status: "definitive",
+                },
+                {
+                  polling_station_id: 4,
+                  status: "entries_different",
+                },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
 
       const user = userEvent.setup();
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       const openPollingStationList = await screen.findByTestId("openPollingStationList");
       await user.click(openPollingStationList);
@@ -349,20 +366,26 @@ describe("Test DataEntryChoiceForm", () => {
 
     test("Second data entry has correct link", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, {
-        statuses: [
-          {
-            polling_station_id: 1,
-            status: "second_entry_not_started",
-          },
-          {
-            polling_station_id: 2,
-            status: "definitive",
-          },
-        ],
-      } satisfies ElectionStatusResponse);
-
-      const router = renderDataEntryChoicePage();
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                {
+                  polling_station_id: 1,
+                  status: "second_entry_not_started",
+                },
+                {
+                  polling_station_id: 2,
+                  status: "definitive",
+                },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
+      const router = renderPollingStationChoiceForm();
 
       // Open the polling station list
       const user = userEvent.setup();
@@ -399,7 +422,7 @@ describe("Test DataEntryChoiceForm", () => {
         ],
       } satisfies ElectionStatusResponse);
 
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       const alert = await screen.findByRole("alert");
       expect(await within(alert).findByRole("heading", { name: "Je hebt nog een openstaande invoer" })).toBeVisible();
@@ -414,19 +437,26 @@ describe("Test DataEntryChoiceForm", () => {
       server.use(ElectionRequestHandler);
 
       // Have the server return an in progress polling station that is owned by a different user.
-      overrideOnce("get", "api/elections/1/status", 200, {
-        statuses: [
-          {
-            polling_station_id: testPollingStation.id,
-            status: "first_entry_in_progress",
-            first_entry_user_id: testUser.user_id + 1,
-            first_entry_progress: 42,
-          },
-        ],
-      } satisfies ElectionStatusResponse);
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                {
+                  polling_station_id: testPollingStation.id,
+                  status: "first_entry_in_progress",
+                  first_entry_user_id: testUser.user_id + 1,
+                  first_entry_progress: 42,
+                },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
 
       // Render the polling station choice page with the overridden server responses
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       // Search for polling station 2
       const user = userEvent.setup();
@@ -460,19 +490,26 @@ describe("Test DataEntryChoiceForm", () => {
       server.use(ElectionRequestHandler);
 
       // Have the server return an in progress polling station that is owned by a logged-in user.
-      overrideOnce("get", "api/elections/1/status", 200, {
-        statuses: [
-          {
-            polling_station_id: testPollingStation.id,
-            status: "first_entry_in_progress",
-            first_entry_user_id: testUser.user_id,
-            first_entry_progress: 42,
-          },
-        ],
-      } satisfies ElectionStatusResponse);
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                {
+                  polling_station_id: testPollingStation.id,
+                  status: "first_entry_in_progress",
+                  first_entry_user_id: testUser.user_id,
+                  first_entry_progress: 42,
+                },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
 
       // Render the polling station choice page with the overridden server responses
-      renderDataEntryChoicePage();
+      renderPollingStationChoiceForm();
 
       // Search for polling station 2
       const user = userEvent.setup();
@@ -502,11 +539,56 @@ describe("Test DataEntryChoiceForm", () => {
       ],
     } satisfies ElectionStatusResponse);
 
-    renderDataEntryChoicePage();
+    renderPollingStationChoiceForm();
 
     const list = await screen.findByTestId("unfinished-list");
     expect(list).toBeVisible();
 
     expect(within(list).getByRole("link")).toHaveTextContent(testPollingStation.name);
+  });
+
+  test("Show recent status when searching for polling station", async () => {
+    server.use(ElectionRequestHandler);
+    server.use(
+      http.get("/api/elections/1/status", () =>
+        HttpResponse.json(
+          {
+            statuses: [
+              {
+                polling_station_id: testPollingStation.id,
+                status: "first_entry_in_progress",
+                first_entry_user_id: testUser.user_id + 1,
+              },
+            ],
+          } satisfies ElectionStatusResponse,
+          { status: 200 },
+        ),
+      ),
+    );
+
+    const testPollingStation = pollingStationMockData[0]!;
+    // Have the server return an in progress polling station that is owned by a logged-in user.
+    overrideOnce("get", "api/elections/1/status", 200, {
+      statuses: [
+        {
+          polling_station_id: testPollingStation.id,
+          status: "first_entry_not_started",
+        },
+      ],
+    } satisfies ElectionStatusResponse);
+
+    renderPollingStationChoiceForm();
+
+    const user = userEvent.setup();
+    const pollingStation = await screen.findByTestId("pollingStation");
+    await user.type(pollingStation, testPollingStation.number.toString());
+
+    const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+
+    expect(
+      await within(pollingStationFeedback).findByText(
+        `Een andere invoerder is bezig met stembureau ${testPollingStation.number}`,
+      ),
+    ).toBeVisible();
   });
 });

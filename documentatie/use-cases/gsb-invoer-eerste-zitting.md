@@ -27,6 +27,10 @@ __Uitbreidingen:__
 &emsp; 2-3a1. De coördinator GSB pauzeert de invoer.  
 &emsp; 2-3a2. De applicatie blokkeert verdere invoer.
 
+2-3b. De telling van het stembureau moet worden gecorrigeerd nadat deze al twee keer was ingevoerd:  
+&emsp; 2-3b1. De coördinator GSB verwijdert de invoer van het stembureau.  
+&emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.  
+
 5a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
 
 6a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
@@ -135,11 +139,16 @@ __Uitbreidingen:__
 &emsp; &emsp; 1a2a. Het stembureau is niet aanwezig in de applicatie:  
 &emsp; &emsp; &emsp; 1a2a1. De coördinator GSB voegt het stembureau toe in de applicatie.  
 1b. De tweede invoerder heeft ook de eerste invoer gedaan:  
+&emsp; 1b1. De applicatie voorkomt dat de invoer wordt gestart.  
 1c. De invoerder selecteert een ander stembureau dan op het PV staat:  
+&emsp; 1c1. De invoerder merkt de fout op (naam en nummer stembureau komen niet overeen).  
+&emsp; 1c2. De invoerder breekt de invoer af en kiest ervoor om de invoer niet te bewaren.  
 1d. De invoerder selecteert een stembureau waar iemand anders mee bezig is:  
+&emsp; 1d1. De applicatie voorkomt dat de invoer wordt gestart.  
 1e. De invoerder selecteert een stembureau waar een andere gebruiker invoer voor heeft opgeslagen:  
+&emsp; 1e1. De applicatie voorkomt dat de invoer wordt gestart.  
 1f. De invoerder selecteert een stembureau waarvan de invoer al definitief is:  
-&emsp; 1f1. De applicatie toont een foutmelding.
+&emsp; 1f1. De applicatie voorkomt dat de invoer wordt gestart.
 
 2a. De applicatie stelt vast dat de invoerder eerdere invoer voor het stembureau heeft opgeslagen:  
 &emsp; 2a1. De applicatie laadt de eerder ingevoerde data.

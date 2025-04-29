@@ -4,7 +4,11 @@ on:
   workflow_dispatch:
   # Run every Sunday at 12:00 UTC
   schedule:
-    - cron: '0 12 * * 0'
+    - cron: "0 12 * * 0"
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   build:
@@ -142,7 +146,7 @@ jobs:
       - name: Push git tag
         run: git push origin $TAG
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2
         with:
           body: This is an alpha release of Abacus, commit ${{ github.sha }} on ${{ env.BUILD_DATE }}
           tag_name: ${{ env.TAG }}
@@ -151,7 +155,6 @@ jobs:
           files: release/*
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Version ${{ env.TAG }}
-
 
   deploy:
     name: Deploy to abacus-test.nl

@@ -2,7 +2,7 @@
 
 N.B.: Alle use cases voor de tweede zitting gelden ook voor elke latere zitting (derde, etc.).
 
-## De invoerders voeren de uitkomst van het onderzoek en de hertelling in de applicatie in (vlieger)
+## De invoerders voeren de hertelling in de applicatie in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
 
@@ -18,7 +18,7 @@ __Trigger:__ Er is een corrigendum PV opgesteld.
 __Hoofdscenario:__  
 
 1. De coördinator GSB stelt invoer open voor het stembureau met corrigendum.
-2. De invoerders vullen de uitkomst van het onderzoek en de resultaten van de gecorrigeerde tellingen (alleen gewijzigde aantallen) in.
+2. De invoerders vullen de resultaten van de gecorrigeerde tellingen (alleen de gewijzigde aantallen) in.
 
 __Uitbreidingen:__  
 2a. Er zijn verschillen tussen de eerste en de tweede invoer:  

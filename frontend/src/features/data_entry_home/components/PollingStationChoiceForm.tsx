@@ -23,21 +23,21 @@ import {
   PollingStationUserStatus,
   PollingStationWithStatus,
 } from "../utils/util";
-import cls from "./DataEntryChoice.module.css";
+import cls from "./PollingStationChoice.module.css";
 import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationSelector } from "./PollingStationSelector";
 import { PollingStationsList } from "./PollingStationsList";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
 
-export interface DataEntryChoiceFormProps {
+export interface PollingStationChoiceFormProps {
   anotherEntry?: boolean;
 }
 
 const INVALID_POLLING_STATION_ALERT: string = t("polling_station_choice.enter_a_valid_number_to_start");
 const DEFINITIVE_POLLING_STATION_ALERT: string = t("polling_station_choice.polling_station_entry_not_possible");
 
-export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) {
+export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
   const user = useUser();
 
@@ -47,6 +47,10 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPollingStation, setCurrentPollingStation] = useState<PollingStationWithStatus | undefined>(undefined);
   const electionStatus = useElectionStatus();
+
+  const refetchStatuses = () => {
+    void electionStatus.refetch();
+  };
 
   const pollingStationsWithStatus = useMemo(() => {
     return getPollingStationWithStatusList({
@@ -154,6 +158,7 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
           currentPollingStation={currentPollingStation}
           setAlert={setAlert}
           handleSubmit={handleSubmit}
+          refetchStatuses={refetchStatuses}
         />
         <p className="md">{tx("polling_station_choice.name_correct_warning")}</p>
         {alert && (
@@ -181,7 +186,7 @@ export function DataEntryChoiceForm({ anotherEntry }: DataEntryChoiceFormProps) 
       </fieldset>
       <div className={cls.dataEntryList}>
         <details>
-          <summary>
+          <summary onClick={refetchStatuses}>
             {t("polling_station_choice.unknown_number")}
             <br />
             <span id="openPollingStationList" className={cn(cls.underlined, cls.pointer)}>

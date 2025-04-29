@@ -1,14 +1,3 @@
-use super::structs::Election;
-#[cfg(feature = "dev-database")]
-use crate::audit_log::{AuditEvent, AuditService};
-use crate::{APIError, eml::EMLImportError};
-use crate::{
-    authentication::{Admin, User},
-    election::{ElectionRequest, repository::Elections},
-    eml::{EML110, EMLDocument, RedactedEmlHash},
-    polling_station::{PollingStation, repository::PollingStations},
-    {AppState, ErrorResponse},
-};
 #[cfg(feature = "dev-database")]
 use axum::http::StatusCode;
 use axum::{
@@ -19,6 +8,17 @@ use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
+
+use super::{ElectionRequest, repository::Elections, structs::Election};
+#[cfg(feature = "dev-database")]
+use crate::audit_log::{AuditEvent, AuditService};
+use crate::{APIError, eml::EMLImportError};
+use crate::{
+    AppState, ErrorResponse
+    authentication::{Admin, User},
+    eml::{EML110, EMLDocument, RedactedEmlHash},
+    polling_station::{PollingStation, repository::PollingStations},
+};
 
 pub fn router() -> OpenApiRouter<AppState> {
     let router = OpenApiRouter::default()

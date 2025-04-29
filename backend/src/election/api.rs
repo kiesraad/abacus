@@ -14,7 +14,7 @@ use super::{ElectionRequest, repository::Elections, structs::Election};
 use crate::audit_log::{AuditEvent, AuditService};
 use crate::{APIError, eml::EMLImportError};
 use crate::{
-    AppState, ErrorResponse
+    AppState, ErrorResponse,
     authentication::{Admin, User},
     eml::{EML110, EMLDocument, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},

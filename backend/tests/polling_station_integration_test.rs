@@ -1,11 +1,5 @@
 #![cfg(test)]
 
-use abacus::{
-    ErrorResponse,
-    polling_station::{
-        PollingStation, PollingStationListResponse, PollingStationRequest, PollingStationType,
-    },
-};
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
@@ -13,6 +7,12 @@ use test_log::test;
 use crate::{
     shared::{claim_data_entry, create_result, save_data_entry},
     utils::serve_api,
+};
+use abacus::{
+    ErrorResponse,
+    polling_station::{
+        PollingStation, PollingStationListResponse, PollingStationRequest, PollingStationType,
+    },
 };
 
 pub mod shared;

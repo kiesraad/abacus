@@ -1,15 +1,5 @@
 #![cfg(test)]
 
-use abacus::{
-    ErrorResponse,
-    apportionment::{
-        ElectionApportionmentResponse, Fraction, get_total_seats_from_apportionment_result,
-    },
-    data_entry::{
-        DataEntry, PollingStationResults, VotersCounts, VotesCounts, status::ClientState,
-    },
-    election::Election,
-};
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
@@ -20,6 +10,16 @@ use crate::{
         differences_counts_zero, political_group_votes_from_test_data_auto,
     },
     utils::serve_api,
+};
+use abacus::{
+    ErrorResponse,
+    apportionment::{
+        ElectionApportionmentResponse, Fraction, get_total_seats_from_apportionment_result,
+    },
+    data_entry::{
+        DataEntry, PollingStationResults, VotersCounts, VotesCounts, status::ClientState,
+    },
+    election::Election,
 };
 
 pub mod shared;

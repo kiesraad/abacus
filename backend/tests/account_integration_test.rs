@@ -4,7 +4,8 @@ use hyper::StatusCode;
 use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
-use utils::serve_api;
+
+use crate::utils::serve_api;
 
 pub mod shared;
 pub mod utils;

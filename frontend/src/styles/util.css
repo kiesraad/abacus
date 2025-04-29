@@ -44,6 +44,14 @@
   color: var(--gray-400);
 }
 
+.capitalize-first {
+  display: inline-block;
+
+  &:first-letter {
+    text-transform: capitalize;
+  }
+}
+
 /* Width */
 .w-6 {
   width: 6rem;

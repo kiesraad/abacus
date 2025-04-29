@@ -7,7 +7,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use hyper::header::InvalidHeaderValue;
-use quick_xml::SeError;
+use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use tracing::error;
@@ -16,7 +16,7 @@ use zip::result::ZipError;
 
 use crate::{
     apportionment::ApportionmentError, authentication::error::AuthenticationError,
-    data_entry::DataError, pdf_gen::PdfGenError,
+    data_entry::DataError, eml::EMLImportError, pdf_gen::PdfGenError,
 };
 
 /// Error reference used to show the corresponding error message to the end-user
@@ -30,6 +30,7 @@ pub enum ErrorReference {
     DrawingOfLotsRequired,
     EntryNotFound,
     EntryNotUnique,
+    EmlImportError,
     InternalServerError,
     InvalidData,
     InvalidJson,
@@ -40,6 +41,7 @@ pub enum ErrorReference {
     InvalidUsernameOrPassword,
     InvalidVoteCandidate,
     InvalidVoteGroup,
+    InvalidXml,
     PasswordRejection,
     PdfGenerationError,
     PollingStationRepeated,
@@ -80,6 +82,8 @@ pub enum APIError {
     StdError(Box<dyn Error>),
     AddError(String, ErrorReference),
     XmlError(SeError),
+    XmlDeError(DeError),
+    EmlImportError(EMLImportError),
     Authentication(AuthenticationError),
     ZipError(ZipError),
     Apportionment(ApportionmentError),
@@ -182,6 +186,13 @@ impl IntoResponse for APIError {
                     ),
                 )
             }
+            APIError::XmlDeError(err) => {
+                error!("Could not deserialize XML: {:?}", err);
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("Invalid XML", ErrorReference::InvalidXml, false),
+                )
+            }
             APIError::Authentication(err) => {
                 // note that we don't log the UserNotFound error, as it is triggered for every whoami call
                 if !matches!(err, AuthenticationError::UserNotFound) {
@@ -253,6 +264,13 @@ impl IntoResponse for APIError {
                         ErrorReference::InternalServerError,
                         false,
                     ),
+                )
+            }
+            APIError::EmlImportError(err) => {
+                error!("Error importing EML file: {:?}", err);
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("EML import error", ErrorReference::EmlImportError, false),
                 )
             }
             APIError::Apportionment(err) => {
@@ -341,12 +359,6 @@ impl From<sqlx::Error> for APIError {
 impl From<InvalidHeaderValue> for APIError {
     fn from(_: InvalidHeaderValue) -> Self {
         APIError::InvalidHeaderValue
-    }
-}
-
-impl From<SeError> for APIError {
-    fn from(err: SeError) -> Self {
-        APIError::XmlError(err)
     }
 }
 

@@ -140,17 +140,24 @@
     align-items: center;
     max-width: 50rem;
     width: fit-content;
+
     aside {
       display: flex;
       padding: 0;
     }
     p {
-      color: var(--base-black);
-      font-size: var(--font-size-md);
+      color: var(--color-help-text);
+    }
+    section {
+      gap: 10px;
     }
   }
 
   &:global(.no-icon) {
     padding: 2rem 2.5rem;
+
+    &:global(.small) {
+      padding: 1rem 1.5rem;
+    }
   }
 }

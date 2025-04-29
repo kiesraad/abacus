@@ -31,7 +31,7 @@
     flex: 1 1 auto;
     display: flex;
     padding: 2.5rem 5rem 0 5rem;
-    gap: 1.5rem;
+    gap: 2rem;
     background-color: var(--bg-gray);
 
     &:has(+ footer) {

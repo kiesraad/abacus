@@ -9,6 +9,11 @@ export type ELECTION_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
 export type ELECTION_CREATE_REQUEST_BODY = ElectionRequest;
 
+// /api/elections/validate
+export type ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS = Record<string, never>;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionRequest;
+
 // /api/elections/{election_id}
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
   election_id: number;
@@ -399,6 +404,11 @@ export interface ElectionApportionmentResponse {
  */
 export type ElectionCategory = "Municipal";
 
+export interface ElectionDefinitionUploadResponse {
+  election: Election;
+  hash: RedactedEmlHash;
+}
+
 export interface ElectionDetails {
   electionCategory: string;
   electionElectionDate: string;
@@ -446,7 +456,7 @@ export interface ElectionRequest {
 /**
  * Election status (limited for now)
  */
-export type ElectionStatus = "DataEntryInProgress" | "DataEntryFinished";
+export type ElectionStatus = "Created" | "DataEntryInProgress" | "DataEntryFinished";
 
 /**
  * Election polling stations data entry statuses response
@@ -524,6 +534,7 @@ export type ErrorReference =
   | "DrawingOfLotsRequired"
   | "EntryNotFound"
   | "EntryNotUnique"
+  | "EmlImportError"
   | "InternalServerError"
   | "InvalidData"
   | "InvalidJson"
@@ -534,6 +545,7 @@ export type ErrorReference =
   | "InvalidUsernameOrPassword"
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
+  | "InvalidXml"
   | "PasswordRejection"
   | "PdfGenerationError"
   | "PollingStationRepeated"
@@ -783,6 +795,13 @@ export interface PreferenceThreshold {
   number_of_votes: Fraction;
   /** Preference threshold as a percentage (0 to 100) */
   percentage: number;
+}
+
+export interface RedactedEmlHash {
+  /** Array holding the hash chunks as text */
+  chunks: string[];
+  /** Indexes of chunks that will be empty, sorted */
+  redacted_indexes: number[];
 }
 
 export type ResolveAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";

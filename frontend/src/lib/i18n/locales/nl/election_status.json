@@ -13,10 +13,12 @@
   "polling_stations_per_status": "Stembureaus per status",
   "no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
   "coordinator": {
+    "data_entry_not_started": "Klaar voor invoer",
     "data_entry_in_progress": "Steminvoer bezig",
     "data_entry_finished": "Steminvoer klaar"
   },
   "typist": {
+    "data_entry_not_started": "Klaar voor invoer",
     "data_entry_in_progress": "Steminvoer bezig",
     "data_entry_finished": "Steminvoer klaar"
   }

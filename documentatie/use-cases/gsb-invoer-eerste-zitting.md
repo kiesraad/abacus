@@ -27,6 +27,10 @@ __Uitbreidingen:__
 &emsp; 2-3a1. De coördinator GSB pauzeert de invoer.  
 &emsp; 2-3a2. De applicatie blokkeert verdere invoer.
 
+2-3b. De telling van het stembureau moet worden gecorrigeerd nadat deze al twee keer was ingevoerd:  
+&emsp; 2-3b1. De coördinator GSB verwijdert de invoer van het stembureau.  
+&emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.  
+
 5a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
 
 6a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:

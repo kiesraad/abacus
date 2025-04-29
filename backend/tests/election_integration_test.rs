@@ -1,12 +1,13 @@
 #![cfg(test)]
 
-#[cfg(feature = "dev-database")]
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{shared::create_result, utils::serve_api};
-use abacus::election::{Election, ElectionDetailsResponse, ElectionListResponse};
+#[cfg(feature = "dev-database")]
+use abacus::election::Election;
+use abacus::election::{ElectionDetailsResponse, ElectionListResponse};
 
 pub mod shared;
 pub mod utils;

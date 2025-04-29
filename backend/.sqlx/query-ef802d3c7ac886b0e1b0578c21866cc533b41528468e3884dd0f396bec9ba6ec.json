@@ -1,0 +1,68 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                id as \"id: u32\",\n                username,\n                fullname,\n                role,\n                password_hash,\n                needs_password_change,\n                last_activity_at as \"last_activity_at: _\",\n                updated_at as \"updated_at: _\",\n                created_at as \"created_at: _\"\n            FROM users WHERE id = ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "username",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "fullname",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "role",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "password_hash",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "needs_password_change",
+        "ordinal": 5,
+        "type_info": "Bool"
+      },
+      {
+        "name": "last_activity_at: _",
+        "ordinal": 6,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "updated_at: _",
+        "ordinal": 7,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "created_at: _",
+        "ordinal": 8,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "ef802d3c7ac886b0e1b0578c21866cc533b41528468e3884dd0f396bec9ba6ec"
+}

@@ -1074,7 +1074,14 @@
         },
         "responses": {
           "200": {
-            "description": "Differences resolved successfully"
+            "description": "Differences resolved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationDataEntry"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -3798,6 +3805,27 @@
             "$ref": "#/components/schemas/PollingStationType"
           },
           "postal_code": {
+            "type": "string"
+          }
+        }
+      },
+      "PollingStationDataEntry": {
+        "type": "object",
+        "required": [
+          "polling_station_id",
+          "state",
+          "updated_at"
+        ],
+        "properties": {
+          "polling_station_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "state": {
+            "$ref": "#/components/schemas/DataEntryStatus"
+          },
+          "updated_at": {
             "type": "string"
           }
         }

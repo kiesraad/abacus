@@ -363,7 +363,7 @@ async fn polling_station_data_entry_finalise(
     path = "/api/polling_stations/{polling_station_id}/data_entries/resolve",
     request_body = ResolveAction,
     responses(
-        (status = 200, description = "Differences resolved successfully"),
+        (status = 200, description = "Differences resolved successfully", body = PollingStationDataEntry),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),

@@ -1,6 +1,7 @@
-import type {
+import {
   ClaimDataEntryResponse,
   DataEntryStatus,
+  PollingStationDataEntry,
   PollingStationResults,
   SaveDataEntryResponse,
   ValidationResults,
@@ -158,5 +159,18 @@ export const dataEntryStatusDifferences: DataEntryStatus = {
     },
     first_entry_finished_at: "2025-04-14T17:17:27.536338155Z",
     second_entry_finished_at: "2025-04-14T17:18:45.433270353Z",
+  },
+};
+
+export const dataEntryResolveMockResponse: PollingStationDataEntry = {
+  polling_station_id: 3,
+  updated_at: "2025-04-14T17:19:42.133270353Z",
+  state: {
+    state: {
+      finished_at: "2025-04-14T17:19:42.133270353Z",
+      first_entry_user_id: 2,
+      second_entry_user_id: 1,
+    },
+    status: "Definitive",
   },
 };

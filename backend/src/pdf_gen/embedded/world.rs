@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use super::super::models::PdfModel;
 use typst::{
     Library, World,
     diag::{FileError, FileResult},
@@ -9,6 +8,8 @@ use typst::{
     text::{Font, FontBook},
     utils::LazyHash,
 };
+
+use super::super::models::PdfModel;
 
 /// Contains the context for rendering PDFs.
 pub struct PdfWorld {

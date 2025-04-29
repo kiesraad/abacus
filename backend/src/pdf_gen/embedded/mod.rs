@@ -2,12 +2,12 @@ mod world;
 
 use std::time::Instant;
 
-use super::{PdfGenResult, models::PdfModel};
 use tracing::{debug, info, warn};
 use typst::{diag::SourceDiagnostic, ecow::EcoVec};
-
-use crate::APIError;
 use typst_pdf::{PdfOptions, PdfStandard, PdfStandards};
+
+use super::{PdfGenResult, models::PdfModel};
+use crate::APIError;
 
 pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
     let start = Instant::now();

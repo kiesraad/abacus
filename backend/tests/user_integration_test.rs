@@ -1,11 +1,12 @@
 #![cfg(test)]
 
-use abacus::authentication::UserListResponse;
 use hyper::StatusCode;
 use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
-use utils::serve_api;
+
+use crate::utils::serve_api;
+use abacus::authentication::UserListResponse;
 
 pub mod shared;
 pub mod utils;

@@ -22,8 +22,9 @@ pub(super) fn get_expires_at(duration: TimeDelta) -> DateTime<Utc> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     #[test]
     fn test_create_new_session_key() {

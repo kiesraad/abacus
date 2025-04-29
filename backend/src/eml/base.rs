@@ -88,8 +88,9 @@ pub trait EMLDocument: Sized + DeserializeOwned + Serialize {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     #[derive(Debug, Serialize, Deserialize)]
     struct EmptyDoc {

@@ -1,18 +1,17 @@
 use chrono::Datelike;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    data_entry::{PoliticalGroupVotes, PollingStationResults},
-    polling_station::PollingStation,
-    summary::ElectionSummary,
-};
-
 use super::{
     EMLBase,
     common::{
         AffiliationIdentifier, AuthorityAddress, AuthorityIdentifier, ContestIdentifier,
         ElectionCategory, ElectionIdentifier, ElectionSubcategory, ManagingAuthority,
     },
+};
+use crate::{
+    data_entry::{PoliticalGroupVotes, PollingStationResults},
+    polling_station::PollingStation,
+    summary::ElectionSummary,
 };
 
 /// Vote count data for EML_NL 510
@@ -488,10 +487,10 @@ impl CandidateIdentifier {
 
 #[cfg(test)]
 mod tests {
-    use crate::eml::{EMLDocument, common::ElectionDomain};
+    use test_log::test;
 
     use super::*;
-    use test_log::test;
+    use crate::eml::{EMLDocument, common::ElectionDomain};
 
     #[test]
     fn test_eml510b() {

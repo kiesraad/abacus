@@ -13,5 +13,10 @@
     "recounted": "Is het selectievakje op de eerste pagina aangevinkt?",
     "voters_votes_counts": "Toegelaten kiezers en uitgebrachte stemmen"
   },
+  "section_short": {
+    "differences_counts": "Verschillen",
+    "recounted": "Is er herteld?",
+    "voters_votes_counts": "Aantal kiezers en stemmen"
+  },
   "yes": "Ja"
 }

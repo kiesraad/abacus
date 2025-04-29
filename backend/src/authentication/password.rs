@@ -94,8 +94,9 @@ pub(super) fn verify_password(password: &str, password_hash: &HashedPassword) ->
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     #[test]
     fn test_hash_password_and_verify() {

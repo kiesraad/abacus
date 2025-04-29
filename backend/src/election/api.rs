@@ -1,7 +1,7 @@
 use super::structs::Election;
-use crate::APIError;
 #[cfg(feature = "dev-database")]
 use crate::audit_log::{AuditEvent, AuditService};
+use crate::{APIError, eml::EMLImportError};
 use crate::{
     authentication::{Admin, User},
     election::{ElectionRequest, repository::Elections},
@@ -15,6 +15,7 @@ use axum::{
     Json,
     extract::{Path, State},
 };
+use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -153,4 +154,22 @@ pub async fn election_import_validate(
         hash: RedactedEmlHash::from(edu.data.as_bytes()),
         election: eml.as_crate_election()?,
     }))
+}
+
+impl From<DeError> for APIError {
+    fn from(err: DeError) -> Self {
+        APIError::XmlDeError(err)
+    }
+}
+
+impl From<SeError> for APIError {
+    fn from(err: SeError) -> Self {
+        APIError::XmlError(err)
+    }
+}
+
+impl From<EMLImportError> for APIError {
+    fn from(err: EMLImportError) -> Self {
+        APIError::EmlImportError(err)
+    }
 }

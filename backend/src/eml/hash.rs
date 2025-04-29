@@ -1,4 +1,4 @@
-use rand::SeedableRng;
+use rand::{SeedableRng, rngs::SmallRng};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -7,7 +7,7 @@ const CHUNK_COUNT: usize = 16;
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct EmlHash {
     pub chunks: [String; CHUNK_COUNT],
-    pub digest: u8,
+    pub digest: [u8; 32],
 }
 
 impl From<&[u8]> for EmlHash {
@@ -28,7 +28,10 @@ impl From<&[u8]> for EmlHash {
             chunk_counter += 1;
         }
 
-        Self { chunks, digest }
+        Self {
+            chunks,
+            digest: digest.into(),
+        }
     }
 }
 
@@ -50,7 +53,7 @@ impl From<&[u8]> for RedactedEmlHash {
     fn from(input: &[u8]) -> Self {
         let hash = EmlHash::from(input);
         let mut chunks = hash.chunks;
-        let redacted_indexes = Self::random_chunk_indexes(hash.seed);
+        let redacted_indexes = Self::random_chunk_indexes(hash.digest);
 
         // Retract the chunks by replacing it with an empty string
         for index in redacted_indexes {
@@ -65,10 +68,10 @@ impl From<&[u8]> for RedactedEmlHash {
 }
 
 impl RedactedEmlHash {
-    fn random_chunk_indexes(seed: u64) -> [usize; 2] {
+    fn random_chunk_indexes(digest: [u8; 32]) -> [usize; 2] {
         use rand::Rng;
 
-        let mut rng = SeedableRng::from_seed(seed);
+        let mut rng = SmallRng::from_seed(digest);
         [
             rng.random_range(0..CHUNK_COUNT / 2),
             rng.random_range((CHUNK_COUNT / 2) + 1..CHUNK_COUNT),

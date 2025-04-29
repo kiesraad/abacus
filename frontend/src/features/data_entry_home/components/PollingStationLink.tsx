@@ -4,7 +4,7 @@ import { IconArrowNarrowRight } from "@/components/generated/icons";
 import { DataEntryStatusName, PollingStation } from "@/types/generated/openapi";
 
 import { getUrlForDataEntry } from "../utils/util";
-import cls from "./DataEntryChoice.module.css";
+import cls from "./PollingStationChoice.module.css";
 
 interface PollingStationLinkProps {
   pollingStation: PollingStation;

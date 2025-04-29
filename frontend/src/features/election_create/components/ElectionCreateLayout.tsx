@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useLocation } from "react-router";
+import { Outlet, useLocation } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
@@ -7,15 +6,11 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { t } from "@/lib/i18n";
-import { ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
 
-import { CheckElectionDefinition } from "./CheckElectionDefinition";
-import { UploadElectionDefinition } from "./UploadElectionDefinition";
+import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 
-export function ElectionCreatePage() {
+export function ElectionCreateLayout() {
   const location = useLocation();
-  const [file, setFile] = useState<File | undefined>(undefined);
-  const [data, setData] = useState<ElectionDefinitionUploadResponse | undefined>(undefined);
 
   return (
     <>
@@ -56,11 +51,9 @@ export function ElectionCreatePage() {
           </ProgressList>
         </StickyNav>
         <article>
-          {file && data ? (
-            <CheckElectionDefinition file={file} election={data.election} hash={data.hash} />
-          ) : (
-            <UploadElectionDefinition file={file} setFile={setFile} setData={setData}></UploadElectionDefinition>
-          )}
+          <ElectionCreateContextProvider>
+            <Outlet />
+          </ElectionCreateContextProvider>
         </article>
       </main>
       <Footer />

@@ -9,7 +9,8 @@ import { apportionmentRoutes } from "@/features/apportionment/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
 import { dataEntryHomeRoutes } from "@/features/data_entry_home/routes";
 import { devRoutes } from "@/features/dev/routes";
-import { ElectionCreatePage } from "@/features/election_management/components/ElectionCreatePage";
+import { ElectionCreateLayout } from "@/features/election_create/components/ElectionCreateLayout";
+import { electionCreateRoutes } from "@/features/election_create/routes";
 import { ElectionHomePage } from "@/features/election_management/components/ElectionHomePage";
 import { electionManagementRoutes } from "@/features/election_management/routes";
 import { OverviewLayout } from "@/features/election_overview/components/OverviewLayout";
@@ -35,7 +36,7 @@ export const routes: RouteObject[] = [
         Component: OverviewLayout,
         children: [
           { index: true, Component: OverviewPage },
-          { path: "create", Component: ElectionCreatePage },
+          { path: "create", children: electionCreateRoutes },
           {
             path: ":electionId",
             Component: ElectionLayout,

@@ -4,20 +4,15 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/lib/i18n";
-import { Election, RedactedEmlHash } from "@/types/generated/openapi";
 import { formatDateFull } from "@/utils/format";
 
+import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { RedactedHash, Stub } from "./RedactedHash";
 
-interface CheckElectionDefinitionProps {
-  file: File;
-  election: Election;
-  hash: RedactedEmlHash;
-}
-
-export function CheckElectionDefinition({ file, election, hash }: CheckElectionDefinitionProps) {
+export function CheckElectionDefinition() {
+  const { file, data } = useElectionCreateContext();
   const [stubs, setStubs] = useState<Stub[]>(
-    hash.redacted_indexes.map((redacted_index) => ({
+    data.hash.redacted_indexes.map((redacted_index) => ({
       selected: false,
       index: redacted_index,
     })),
@@ -29,13 +24,13 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
       <p>
         {tx("election.check_eml.description", {
           file: () => {
-            return <strong>{file.name}</strong>;
+            return <strong>{file?.name}</strong>;
           },
         })}
       </p>
       <Alert type="notify" variant="no-icon" margin="mb-md" small>
         <p>
-          <strong>{election.name}</strong>
+          <strong>{data?.election.name}</strong>
           <br />
           <span className="capitalize-first">{formatDateFull(new Date(election.election_date))}</span>
         </p>
@@ -43,7 +38,7 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
           <span>
             <strong>{t("digital_signature")}</strong> ({t("hashcode")}):
           </span>
-          <RedactedHash hash={hash.chunks} stubs={stubs} />
+          <RedactedHash hash={data?.hash.chunks} stubs={stubs} />
         </div>
       </Alert>
       <p>{t("election.check_eml.check_hash.description")}</p>

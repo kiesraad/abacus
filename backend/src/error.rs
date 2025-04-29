@@ -350,12 +350,6 @@ impl From<SeError> for APIError {
     }
 }
 
-impl From<ZipError> for APIError {
-    fn from(err: ZipError) -> Self {
-        APIError::ZipError(err)
-    }
-}
-
 impl From<Box<dyn Error>> for APIError {
     fn from(err: Box<dyn Error>) -> Self {
         APIError::StdError(err)

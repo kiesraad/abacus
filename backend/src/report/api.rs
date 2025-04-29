@@ -17,6 +17,12 @@ use crate::{
     summary::ElectionSummary,
 };
 
+impl From<ZipError> for APIError {
+    fn from(err: ZipError) -> Self {
+        APIError::ZipError(err)
+    }
+}
+
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(election_download_zip_results))

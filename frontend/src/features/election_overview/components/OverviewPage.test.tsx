@@ -4,6 +4,7 @@ import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
+import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionListResponse } from "@/types/generated/openapi";
 
 import { OverviewPage } from "./OverviewPage";
@@ -46,5 +47,33 @@ describe("OverviewPage", () => {
       ),
     ).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();
+  });
+
+  test("Shows create button", async () => {
+    render(
+      <TestUserProvider userRole="administrator">
+        <ElectionListProvider>
+          <OverviewPage />
+        </ElectionListProvider>
+      </TestUserProvider>,
+    );
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Beheer verkiezingen" })).toBeVisible();
+    expect(await screen.findByText("Verkiezing toevoegen")).toBeVisible();
+  });
+
+  test("Shows no create button", async () => {
+    render(
+      <TestUserProvider userRole="coordinator">
+        <ElectionListProvider>
+          <OverviewPage />
+        </ElectionListProvider>
+      </TestUserProvider>,
+    );
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Beheer verkiezingen" })).toBeVisible();
+    expect(screen.queryByText("Verkiezing toevoegen")).not.toBeInTheDocument();
   });
 });

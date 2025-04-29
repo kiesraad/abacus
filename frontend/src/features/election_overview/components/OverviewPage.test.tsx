@@ -60,7 +60,7 @@ describe("OverviewPage", () => {
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Beheer verkiezingen" })).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Verkiezing toevoegen" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Verkiezing toevoegen" })).toBeVisible();
   });
 
   test("Shows no create button", async () => {
@@ -74,6 +74,6 @@ describe("OverviewPage", () => {
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Beheer verkiezingen" })).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Verkiezing toevoegen" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Verkiezing toevoegen" })).not.toBeInTheDocument();
   });
 });

@@ -49,7 +49,7 @@ describe("OverviewPage", () => {
     expect(screen.queryByRole("table")).toBeNull();
   });
 
-  test("Shows create button", async () => {
+  test("Shows create election link", async () => {
     render(
       <TestUserProvider userRole="administrator">
         <ElectionListProvider>
@@ -60,10 +60,10 @@ describe("OverviewPage", () => {
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Beheer verkiezingen" })).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Verkiezing toevoegen" })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Verkiezing toevoegen" })).toBeVisible();
   });
 
-  test("Shows no create button", async () => {
+  test("Does not show create election link", async () => {
     render(
       <TestUserProvider userRole="coordinator">
         <ElectionListProvider>
@@ -74,6 +74,6 @@ describe("OverviewPage", () => {
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Beheer verkiezingen" })).toBeVisible();
-    expect(screen.queryByRole("button", { name: "Verkiezing toevoegen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Verkiezing toevoegen" })).not.toBeInTheDocument();
   });
 });

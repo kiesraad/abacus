@@ -103,6 +103,8 @@ pub async fn extend_session(
 
 #[cfg(test)]
 mod test {
+    use std::{net::Ipv4Addr, str::FromStr};
+
     use axum::{
         body::Body,
         extract::{Request, State},
@@ -113,11 +115,9 @@ mod test {
     use cookie::Cookie;
     use hyper::header::SET_COOKIE;
     use sqlx::SqlitePool;
-    use std::{net::Ipv4Addr, str::FromStr};
     use test_log::test;
 
     use super::{extend_session, inject_user};
-
     use crate::{
         audit_log::{AuditLog, AuditService},
         authentication::{Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, Sessions, User, Users},

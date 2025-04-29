@@ -121,6 +121,8 @@ async fn audit_log_list_users(
 
 #[cfg(test)]
 mod tests {
+    use std::net::Ipv4Addr;
+
     use axum::{
         Router,
         body::Body,
@@ -131,7 +133,6 @@ mod tests {
     use chrono::TimeDelta;
     use http_body_util::BodyExt;
     use sqlx::SqlitePool;
-    use std::net::Ipv4Addr;
     use test_log::test;
     use tower::ServiceExt;
 

@@ -1,12 +1,5 @@
 #![cfg(test)]
 
-use crate::{
-    shared::{
-        create_and_finalise_data_entry, create_result, create_result_with_non_example_data_entry,
-        differences_counts_zero, political_group_votes_from_test_data_auto,
-    },
-    utils::serve_api,
-};
 use abacus::{
     ErrorResponse,
     apportionment::{
@@ -20,6 +13,14 @@ use abacus::{
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
+
+use crate::{
+    shared::{
+        create_and_finalise_data_entry, create_result, create_result_with_non_example_data_entry,
+        differences_counts_zero, political_group_votes_from_test_data_auto,
+    },
+    utils::serve_api,
+};
 
 pub mod shared;
 pub mod utils;

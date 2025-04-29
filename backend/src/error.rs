@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use axum::{
     Json,
     extract::rejection::JsonRejection,
@@ -8,7 +10,6 @@ use hyper::header::InvalidHeaderValue;
 use quick_xml::SeError;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
-use std::error::Error;
 use tracing::error;
 use utoipa::ToSchema;
 use zip::result::ZipError;

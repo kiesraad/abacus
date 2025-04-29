@@ -1,5 +1,6 @@
-use serde::{Deserialize, Serialize};
 use std::fmt;
+
+use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use super::{
@@ -892,11 +893,12 @@ impl Validate for CandidateVotes {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::{
         election::tests::election_fixture, polling_station::structs::tests::polling_station_fixture,
     };
-    use test_log::test;
 
     #[test]
     fn test_validation_result_append() {

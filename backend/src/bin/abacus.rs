@@ -1,13 +1,14 @@
-#[cfg(feature = "dev-database")]
-use abacus::fixtures;
-use abacus::start_server;
-use clap::Parser;
-use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 use std::{
     error::Error,
     net::{Ipv4Addr, SocketAddr},
     str::FromStr,
 };
+
+#[cfg(feature = "dev-database")]
+use abacus::fixtures;
+use abacus::start_server;
+use clap::Parser;
+use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 use tokio::net::TcpListener;
 #[cfg(feature = "dev-database")]
 use tracing::info;

@@ -1,10 +1,10 @@
 #![cfg(test)]
 
-use sqlx::SqlitePool;
 use std::net::SocketAddr;
-use tokio::net::TcpListener;
 
 use abacus::start_server;
+use sqlx::SqlitePool;
+use tokio::net::TcpListener;
 
 pub async fn serve_api(pool: SqlitePool) -> SocketAddr {
     let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();

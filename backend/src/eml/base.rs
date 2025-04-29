@@ -1,9 +1,10 @@
+use std::io::BufRead;
+
 use quick_xml::{
     DeError, SeError,
     se::{Serializer, WriteResult},
 };
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
-use std::io::BufRead;
 
 /// Base EML XML document that contains all the mostly irrelevant for our logic
 /// XML tags and setup.
@@ -86,8 +87,9 @@ pub trait EMLDocument: Sized + DeserializeOwned + Serialize {
 }
 
 pub fn eml_document_hash(input: &str, chunked: bool) -> String {
-    use sha2::Digest;
     use std::fmt::Write;
+
+    use sha2::Digest;
     let digest = sha2::Sha256::digest(input.as_bytes());
 
     let mut res = String::new();
@@ -102,8 +104,9 @@ pub fn eml_document_hash(input: &str, chunked: bool) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     #[derive(Debug, Serialize, Deserialize)]
     struct EmptyDoc {

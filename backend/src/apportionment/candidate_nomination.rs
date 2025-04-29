@@ -315,6 +315,8 @@ pub fn candidate_numbers(candidates: &[Candidate]) -> Vec<CandidateNumber> {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use crate::{
         apportionment::{
             ApportionmentError, Fraction, PoliticalGroupCandidateNomination, candidate_nomination,
@@ -327,7 +329,6 @@ mod tests {
             tests::election_fixture_with_given_number_of_seats,
         },
     };
-    use test_log::test;
 
     fn check_political_group_candidate_nomination(
         nomination: &PoliticalGroupCandidateNomination,

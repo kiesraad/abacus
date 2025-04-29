@@ -1,9 +1,10 @@
+use std::net::IpAddr;
+
 use axum::extract::FromRef;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{SqlitePool, Type, prelude::FromRow};
-use std::net::IpAddr;
 use strum::VariantNames;
 use utoipa::ToSchema;
 

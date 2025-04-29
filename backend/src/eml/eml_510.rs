@@ -487,10 +487,10 @@ impl CandidateIdentifier {
 
 #[cfg(test)]
 mod tests {
-    use crate::eml::{EMLDocument, common::ElectionDomain};
+    use test_log::test;
 
     use super::*;
-    use test_log::test;
+    use crate::eml::{EMLDocument, common::ElectionDomain};
 
     #[test]
     fn test_eml510b() {

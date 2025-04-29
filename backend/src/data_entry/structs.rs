@@ -1,7 +1,8 @@
+use std::ops::AddAssign;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, types::Json};
-use std::ops::AddAssign;
 use utoipa::ToSchema;
 
 use super::status::DataEntryStatus;
@@ -267,8 +268,9 @@ pub struct CandidateVotes {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     #[test]
     fn test_votes_addition() {

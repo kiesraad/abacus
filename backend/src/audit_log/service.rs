@@ -1,8 +1,9 @@
+use std::net::{IpAddr, SocketAddr};
+
 use axum::{
     extract::{ConnectInfo, FromRef, FromRequestParts},
     http::request::Parts,
 };
-use std::net::{IpAddr, SocketAddr};
 
 use super::{AuditEvent, AuditLog, AuditLogEvent};
 use crate::{
@@ -74,12 +75,13 @@ impl AuditService {
 // write some tests
 #[cfg(test)]
 mod test {
-    use crate::audit_log::{AuditEventLevel, UserLoggedInDetails};
-    use sqlx::SqlitePool;
     use std::net::Ipv4Addr;
+
+    use sqlx::SqlitePool;
     use test_log::test;
 
     use super::*;
+    use crate::audit_log::{AuditEventLevel, UserLoggedInDetails};
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_log_event(pool: SqlitePool) {

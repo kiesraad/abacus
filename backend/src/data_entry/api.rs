@@ -491,13 +491,12 @@ pub mod tests {
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
+    use super::*;
     use crate::{
         audit_log::AuditLog,
         authentication::Role,
         data_entry::{DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts},
     };
-
-    use super::*;
 
     pub fn example_data_entry() -> DataEntry {
         DataEntry {

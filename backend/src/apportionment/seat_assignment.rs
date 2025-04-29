@@ -1,5 +1,6 @@
-use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
+
+use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 use utoipa::ToSchema;
 
@@ -1039,11 +1040,12 @@ mod tests {
 
     /// Tests apportionment for councils with less than 19 seats
     mod lt_19_seats {
+        use test_log::test;
+
         use crate::apportionment::{
             ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
             test_helpers::election_summary_fixture_with_default_50_candidates,
         };
-        use test_log::test;
 
         /// Apportionment without remainder seats
         ///
@@ -1222,11 +1224,12 @@ mod tests {
         }
 
         mod drawing_of_lots {
+            use test_log::test;
+
             use crate::apportionment::{
                 ApportionmentError, seat_assignment,
                 test_helpers::election_summary_fixture_with_default_50_candidates,
             };
-            use test_log::test;
 
             /// Apportionment with residual seats assigned with largest remainders method  
             /// This test triggers Kieswet Article P 9
@@ -1277,11 +1280,12 @@ mod tests {
         }
 
         mod list_exhaustion {
+            use test_log::test;
+
             use crate::apportionment::{
                 ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
                 test_helpers::election_summary_fixture_with_given_candidate_votes,
             };
-            use test_log::test;
 
             /// Apportionment with no residual seats  
             /// This test triggers Kieswet Article P 10
@@ -1746,11 +1750,12 @@ mod tests {
 
     /// Tests apportionment for councils with 19 or more seats
     mod gte_19_seats {
+        use test_log::test;
+
         use crate::apportionment::{
             ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
             test_helpers::election_summary_fixture_with_default_50_candidates,
         };
-        use test_log::test;
 
         /// Apportionment without remainder seats
         ///
@@ -1868,11 +1873,12 @@ mod tests {
         }
 
         mod drawing_of_lots {
+            use test_log::test;
+
             use crate::apportionment::{
                 ApportionmentError, seat_assignment,
                 test_helpers::election_summary_fixture_with_default_50_candidates,
             };
-            use test_log::test;
 
             /// Apportionment with residual seats assigned with highest averages method  
             /// This test triggers Kieswet Article P 9
@@ -1910,11 +1916,12 @@ mod tests {
         }
 
         mod list_exhaustion {
+            use test_log::test;
+
             use crate::apportionment::{
                 ApportionmentError, get_total_seats_from_apportionment_result, seat_assignment,
                 test_helpers::election_summary_fixture_with_given_candidate_votes,
             };
-            use test_log::test;
 
             /// Apportionment with no residual seats  
             /// This test triggers Kieswet Article P 10

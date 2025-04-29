@@ -1,5 +1,7 @@
 #![cfg(test)]
 
+use std::net::SocketAddr;
+
 use abacus::{
     data_entry::{
         CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
@@ -13,7 +15,6 @@ use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
 use reqwest::{Body, Client};
 use serde_json::json;
-use std::net::SocketAddr;
 use tracing::trace;
 
 pub fn differences_counts_zero() -> DifferencesCounts {

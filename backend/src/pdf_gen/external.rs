@@ -1,5 +1,6 @@
-use rand::{Rng, distr::Alphanumeric};
 use std::{path::PathBuf, process::Command};
+
+use rand::{Rng, distr::Alphanumeric};
 
 use super::{PdfGenResult, models::PdfModel};
 use crate::APIError;

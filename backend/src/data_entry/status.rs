@@ -1,7 +1,8 @@
+use std::fmt::Display;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
-use std::fmt::Display;
 use utoipa::ToSchema;
 
 use super::{
@@ -622,13 +623,14 @@ impl Default for DataEntryStatus {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::{
         data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts},
         election::{Candidate, Election, ElectionCategory, ElectionStatus, PoliticalGroup},
         polling_station::{PollingStation, PollingStationType},
     };
-    use test_log::test;
 
     fn polling_station_result() -> PollingStationResults {
         PollingStationResults {

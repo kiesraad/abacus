@@ -24,6 +24,6 @@ test.describe("Election creation", () => {
     // Check that the uploaded file name is present somewhere on the page
     await expect(page.getByText("eml110a_test.eml.xml")).toBeVisible();
     // Election date
-    await expect(page.getByText("Woensdag 16 Maart 2022")).toBeVisible();
+    await expect(page.getByText("Woensdag 16 maart 2022")).toBeVisible();
   });
 });

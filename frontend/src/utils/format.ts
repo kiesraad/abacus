@@ -135,3 +135,7 @@ export function formatTimeToGo(seconds: number) {
 
   return minutesFormatted;
 }
+
+export function capitalizeFirst(input: string): string {
+  return input.charAt(0).toUpperCase() + input.slice(1);
+}

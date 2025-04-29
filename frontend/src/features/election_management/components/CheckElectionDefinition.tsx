@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/lib/i18n";
 import { Election, RedactedEmlHash } from "@/types/generated/openapi";
-import { formatDateFull } from "@/utils/format";
+import { capitalizeFirst, formatDateFull } from "@/utils/format";
 
 import { RedactedHash, Stub } from "./RedactedHash";
 
@@ -23,8 +23,7 @@ export function CheckElectionDefinition({ file, election, hash }: CheckElectionD
     })),
   );
 
-  let electionDate = formatDateFull(new Date(election.election_date));
-  electionDate = electionDate.charAt(0).toUpperCase() + electionDate;
+  const electionDate = capitalizeFirst(formatDateFull(new Date(election.election_date)));
 
   return (
     <section className="md">

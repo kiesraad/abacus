@@ -143,10 +143,6 @@ a {
   text-align: right;
 }
 
-.capitalize {
-  text-transform: capitalize;
-}
-
 /* Number styling */
 .font-number {
   font-family: var(--font-number);

@@ -40,7 +40,7 @@ flowchart TD
     fout-oplossen -- lid GSB corrigeert PV, terug naar oorspronkelijke invoerder --> eerste-invoer-bezig
 
     
-    klaar-voor-tweede-invoer -- invoerder 2 pak op --> tweede-invoer-bezig
+    klaar-voor-tweede-invoer -- invoerder 2 pakt op --> tweede-invoer-bezig
 
     subgraph sg-tweede-invoer[tweede-invoer]
     tweede-invoer-bezig -- invoer afgerond --> verschil-met-eerste-invoer

@@ -1,3 +1,13 @@
+.keep {
+  background-color: var(--color-success-bg);
+}
+
+.discard {
+  color: var(--gray-500);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cline x1='0' y1='0' x2='100' y2='100' stroke='%23D0D5DD' /%3E%3Cline x1='0' y1='100' x2='100' y2='0' stroke='%23D0D5DD' /%3E%3C/svg%3E");
+  background-size: 100% 100%;
+}
+
 .differencesTable {
   td {
     height: 4.5rem;

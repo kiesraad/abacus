@@ -1,5 +1,5 @@
 import { t } from "@/lib/i18n";
-import { PoliticalGroup, PoliticalGroupVotes, PollingStationResults } from "@/types/generated/openapi";
+import { PoliticalGroup, PoliticalGroupVotes, PollingStationResults, ResolveAction } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 
 import { DataEntrySection, getFromResults, sections } from "../utils/dataEntry";
@@ -9,13 +9,14 @@ export interface ResolveDifferencesTablesProps {
   first: PollingStationResults;
   second: PollingStationResults;
   politicalGroups: PoliticalGroup[];
+  action?: ResolveAction;
 }
 
-export function ResolveDifferencesTables({ first, second, politicalGroups }: ResolveDifferencesTablesProps) {
+export function ResolveDifferencesTables({ first, second, action, politicalGroups }: ResolveDifferencesTablesProps) {
   return (
     <>
       {sections.map((section) => (
-        <SectionTable key={section.id} section={section} first={first} second={second} />
+        <SectionTable key={section.id} section={section} first={first} second={second} action={action} />
       ))}
 
       {politicalGroups.map((politicalGroup, i) => (
@@ -24,6 +25,7 @@ export function ResolveDifferencesTables({ first, second, politicalGroups }: Res
           politicalGroup={politicalGroup}
           first={first.political_group_votes[i]}
           second={second.political_group_votes[i]}
+          action={action}
         />
       ))}
     </>
@@ -34,9 +36,10 @@ interface SectionTableProps {
   section: DataEntrySection;
   first: PollingStationResults;
   second: PollingStationResults;
+  action?: ResolveAction;
 }
 
-function SectionTable({ section, first, second }: SectionTableProps) {
+function SectionTable({ section, first, second, action }: SectionTableProps) {
   const title = t(`resolve_differences.section.${section.id}`);
 
   const headers = [
@@ -53,7 +56,7 @@ function SectionTable({ section, first, second }: SectionTableProps) {
     description: t(`polling_station_results.field.${field.path}`),
   }));
 
-  return <DifferencesTable title={title} headers={headers} rows={rows} />;
+  return <DifferencesTable title={title} headers={headers} rows={rows} action={action} />;
 }
 
 function yesno<T>(value: T) {
@@ -70,9 +73,10 @@ interface CandidatesTableProps {
   politicalGroup: PoliticalGroup;
   first?: PoliticalGroupVotes;
   second?: PoliticalGroupVotes;
+  action?: ResolveAction;
 }
 
-function CandidatesTable({ politicalGroup, first, second }: CandidatesTableProps) {
+function CandidatesTable({ politicalGroup, first, second, action }: CandidatesTableProps) {
   if (!first || !second) {
     return null;
   }
@@ -93,5 +97,5 @@ function CandidatesTable({ politicalGroup, first, second }: CandidatesTableProps
     description: getCandidateFullName(candidate),
   }));
 
-  return <DifferencesTable title={title} headers={headers} rows={rows} />;
+  return <DifferencesTable title={title} headers={headers} rows={rows} action={action} />;
 }

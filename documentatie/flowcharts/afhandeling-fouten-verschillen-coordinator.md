@@ -27,6 +27,8 @@ flowchart TD
     %% flow
     klaar-voor-eerste-invoer --invoerder 1 pakt op --> eerste-invoer-bezig
 
+    fouten -- nee --> klaar-voor-tweede-invoer
+    
     subgraph sg-eerste-invoer[eerste invoer]
     eerste-invoer-bezig -- invoer afgerond --> fouten
     fouten -- ja --> invoer-met-fouten-en-waarschuwingen-1
@@ -37,7 +39,7 @@ flowchart TD
 
     fout-oplossen -- lid GSB corrigeert PV, terug naar oorspronkelijke invoerder --> eerste-invoer-bezig
 
-    fouten -- nee --> klaar-voor-tweede-invoer
+    
     klaar-voor-tweede-invoer -- invoerder 2 pak op --> tweede-invoer-bezig
 
     subgraph sg-tweede-invoer[tweede-invoer]

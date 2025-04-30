@@ -3,10 +3,10 @@ import { RouterProvider } from "react-router";
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { useElection } from "@/hooks/election/useElection";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
-import { useElection } from "../../../hooks/election/useElection";
 import { AbortDataEntryControl } from "./AbortDataEntryControl";
 
 vi.mock("@/hooks/election/useElection");
@@ -35,6 +35,7 @@ describe("AbortDataEntryControl", () => {
       pollingStation: undefined,
     });
   });
+
   test("renders correctly", () => {
     renderComponent();
     expect(screen.getByRole("button", { name: "Invoer afbreken" })).toBeVisible();

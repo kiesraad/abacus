@@ -183,13 +183,13 @@ __Trigger:__ De applicatie stelt vast dat beide invoeren niet gelijk zijn.
 __Hoofdscenario:__
 
 1. De coördinator GSB bekijkt de verschillen tussen de twee invoeren.
-2. De coördinator GSB stelt vast dat één van de twee invoeren correct is.
+2. De coördinator GSB stelt vast dat één van de twee invoeren overeenkomt met het papier.
 3. De coördinator GSB accepteert de correcte invoer en gooit de andere invoer weg.
 4. De applicatie behandelt de geaccepteerde invoer als een eerste invoer. (Dus bij nieuwe invoer: waarschuwingen over verschillen met geaccepteerde invoer.)
 4. De coördinator GSB geeft het PV aan een invoerder om nogmaals in te voeren.
 
 __Uitbreidingen:__  
-2a. Geen van beide invoeren is correct:  
+2a. Geen van beide invoeren komt overeen met het papier:  
 &emsp; 2a1. De coördinator GSB verwijdert beide invoeren.  
 &emsp; 2a2. De coördinator GSB laat het stembureau opnieuw invoeren door twee invoerders.
 
@@ -218,25 +218,23 @@ Voor elke foutmelding:
 
 __Uitbreidingen:__  
 2a. De invoerder stelt een fout op het PV vast en kan de foutmelding niet oplossen:  
-&emsp; 2a1. De invoerder meldt de fout op het PV bij de coördinator GSB.  
-&emsp; 2a2. De coördinator GSB stuurt het PV terug in het proces.  
-&emsp; 2a3. De invoerder breekt de invoer af.  
-&emsp; 2a4. De applicatie verwijdert de ingevoerde data.  
+&emsp; 2a1. De invoerder meldt de fout op het PV bij de coördinator GSB.
+&emsp; 2a2. De invoerder kan in overleg het volledige PV invoeren.
+&emsp; 2a3. De coördinator GSB beoordeelt het PV en het overzicht van fouten. 
+&emsp; 2a4. De coördinator GSB stuurt het PV terug in het proces.
+&emsp; 2a5. De applicatie verwijdert de ingevoerde data.  
 
 ### Open punten
 
-- Moet de coördinator GSB de optie hebben om ondanks een foutmelding de invoerder het hele PV in te laten voeren, zodat een complete lijst met alle fouten kan worden gemaakt? Die lijst moet dan geprint kunnen worden, zodat die meekan met het PV.
 - Als de coördinator GSB het PV terugstuurt in het proces, naar welk punt dan precies?
 
-
-
-## De invoerder handelt de waarschuwing(en) af (vis)
+## De invoerder handelt fouten en waarschuwing(en) af (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ De controles geven een waarschuwing vanwege de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
+__Trigger:__ De controles geven een waarschuwing vanwege de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen) of vanwege optelfouten.
 
 *Waarschuwing*: De ingevoerde waardes zijn mogelijk niet correct. Bijvoorbeeld: er is een groot aantal blanco stemmen of de tweede invoer klopt niet met de eerste invoer.
 

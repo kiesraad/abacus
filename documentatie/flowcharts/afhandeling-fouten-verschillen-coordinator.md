@@ -1,8 +1,8 @@
 # Afhandeling fouten en verschillen door coördinator
 
-Deze flowchart beschrijft hoe de coördinator fouten en verschillen afhandelt.
+Deze flowchart beschrijft hoe de coördinator invoer met fouten of verschillen afhandelt.
 
-Als de eerste invoer fouten bevat, moeten die opgelost worden. Dit betekent dat de tweede invoer alleen kan starten, nadat alle fouten in de eerste invoer zijn opgelost.
+Als de eerste invoer fouten bevat, moeten die opgelost worden. Dit betekent dat de tweede invoer alleen kan starten, nadat alle fouten die gedetecteerd zijn tijdens de eerste invoer, zijn opgelost.
 
 Als de tweede invoer fouten bevat, heeft die dus per definitie verschillen met de eerste invoer. In dat geval moet de coördinator eerst de verschillen oplossen. Als de coördinator besluit de tweede invoer te behouden, dan moet als volgende stap de fouten opgelost worden.
 

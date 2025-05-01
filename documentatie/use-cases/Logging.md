@@ -1,10 +1,10 @@
 # Logging
 
-Logging van acties in de applicatie kan helpen bij het oplossen van problemen en afhandelen van incidenten. Tegelijkertijd draait de applicatie lokaal en is de logging daardoor te manipuleren door de beheerder. Er zijn minimaal drie situaties waarin gebruik wordt gemaakt van de logging: 
+Logging van acties in de applicatie kan helpen bij het oplossen van problemen en afhandelen van incidenten. Tegelijkertijd draait de applicatie lokaal en is de logging daardoor te manipuleren door de beheerder. Er zijn een aantal situaties waarin gebruik wordt gemaakt van de logging: 
 
 - het monitoren van het gebruik van abacus tijdens het invoerproces
-- het oplossen van technische problemen of vragen
-- het behandelen een incident met de software
+- het behandelen van een incident met de software
+- (mogelijk) het oplossen van problemen tijdens het gebruik van Abacus.
 
 ## De applicatie logt acties (zee)
 
@@ -22,6 +22,7 @@ De applicatie logt acties. Van elke gelogde actie is in elk geval de volgende in
 ### Open punten
 
 - welke gebeurtenissen vragen om melding aan de gebruiker en/of directe actie?
+- Is de logging nuttig en/of nodig bij het oplossen van problemen met het gebruik van de applicatie?
 
 ## De beheerder / coordinator bekijkt de logging om het gebruik te monitoren (zee)
 
@@ -32,12 +33,6 @@ De beheerder / coordinator bekijkt de gelogde acties om het gebruik te monitoren
 ### Open punten
 
 - Welke statistiek is relevant voor het monitoren van gebruik?
-
-## De helpdesk bekijkt de logging om het gebruik van Abacus te ondersteunen (zee)
-
-__Niveau:__ gebruikersdoel, zee  (🌊)
-
-De helpdesk vraagt de beheerder / coordinator om de sqlite database op te sturen indien dit bij het oplossen van problemen bij het gebruik behulpzaam kan zijn. De helpdesk bekijkt de logging om te achterhalen wat er aan de hand kan zijn.
 
 ## De Kiesraad bekijkt de logging bij het afhandelen van een incident (zee)
 

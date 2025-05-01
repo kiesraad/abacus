@@ -80,6 +80,7 @@ export class ApiClient extends EventTarget {
         return {
           status: ApiResponseStatus.Success,
           code: response.status,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           data: body as T,
         };
       }
@@ -90,6 +91,7 @@ export class ApiClient extends EventTarget {
       // We prefix it by `error.` to namespace the translation message.
 
       if (response.status === 404 && isError) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         return new NotFoundError(`error.${body.reference}` as TranslationPath);
       }
 
@@ -118,6 +120,7 @@ export class ApiClient extends EventTarget {
     } catch (e) {
       console.error("Error parsing response", e);
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       return new NetworkError((e as Error).message || "Network error");
     }
   }
@@ -149,6 +152,7 @@ export class ApiClient extends EventTarget {
       return {
         status: ApiResponseStatus.Success,
         code: response.status,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         data: body as T,
       };
     }
@@ -199,6 +203,7 @@ export class ApiClient extends EventTarget {
         return new NetworkError(e);
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const message = (e as Error).message || "Network error";
       console.error(e, method, path);
       return new NetworkError(`${message}, ${method} ${path}`);

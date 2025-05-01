@@ -62,6 +62,7 @@ function yesno<T>(value: T) {
   } else if (value === false) {
     return t("resolve_differences.no");
   } else {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     return value as Exclude<T, boolean>;
   }
 }

@@ -35,6 +35,7 @@ export function NavBarMenuButton() {
   React.useEffect(() => {
     if (isMenuVisible) {
       const handleClickOutside = (event: MouseEvent) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         if (!document.querySelector(`.${cls.navBarMenu}`)?.contains(event.target as Node)) {
           setMenuVisible(false);
         }

@@ -41,10 +41,13 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
     const formData = new FormData(event.currentTarget);
     const account: Required<AccountUpdateRequest> = {
       username: user.username,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       fullname: (formData.get("fullname") as string).trim(),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       password: formData.get("password") as string,
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     if (!validate(account, formData.get("password_repeat") as string)) {
       return;
     }

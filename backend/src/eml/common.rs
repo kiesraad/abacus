@@ -159,6 +159,7 @@ pub enum EMLImportError {
     MissingNominationDate,
     MissingPreferenceThreshold,
     MissingRegion,
+    MissingElectionTree,
     MissingSubcategory,
     Needs101a,
     NumberOfSeatsNotInRange,

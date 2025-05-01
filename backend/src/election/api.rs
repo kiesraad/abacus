@@ -150,9 +150,10 @@ pub async fn election_import_validate(
     Json(edu): Json<ElectionDefinitionUploadRequest>,
 ) -> Result<Json<ElectionDefinitionUploadResponse>, APIError> {
     let eml = EML110::from_str(&edu.data)?;
+    let (election, _regions) = eml.as_abacus_election(None, None)?;
     Ok(Json(ElectionDefinitionUploadResponse {
         hash: RedactedEmlHash::from(edu.data.as_bytes()),
-        election: eml.as_crate_election()?,
+        election,
     }))
 }
 

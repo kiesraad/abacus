@@ -27,8 +27,8 @@ type EntriesDifferentStatus = {
 };
 
 interface PollingStationDataEntryStatus {
-  choice: ResolveAction | undefined;
-  setChoice: (choice: ResolveAction | undefined) => void;
+  action: ResolveAction | undefined;
+  setAction: (action: ResolveAction | undefined) => void;
   pollingStation: PollingStation;
   election: Election & { political_groups: PoliticalGroup[] };
   loading: boolean;
@@ -43,7 +43,7 @@ export function usePollingStationDataEntryDifferences(
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
-  const [choice, setChoice] = useState<ResolveAction>();
+  const [action, setAction] = useState<ResolveAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
 
@@ -101,12 +101,12 @@ export function usePollingStationDataEntryDifferences(
   }
 
   const onSubmit = async () => {
-    if (choice === undefined) {
+    if (action === undefined) {
       return;
     }
 
     const path: POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve`;
-    const body: POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY = choice;
+    const body: POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY = action;
     const response = await client.postRequest(path, body);
 
     if (isSuccess(response)) {
@@ -119,8 +119,8 @@ export function usePollingStationDataEntryDifferences(
   };
 
   return {
-    choice,
-    setChoice,
+    action,
+    setAction,
     pollingStation,
     election,
     loading: requestState.status === "loading" || usersRequestState.status === "loading",

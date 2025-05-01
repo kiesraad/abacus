@@ -21,7 +21,7 @@ export function ResolveDifferencesPage() {
     void navigate(`/elections/${election.id}/status`);
   };
   const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation, election, loading, status, choice, setChoice, onSubmit } =
+  const { pollingStation, election, loading, status, action, setAction, onSubmit } =
     usePollingStationDataEntryDifferences(pollingStationId, afterSave);
 
   if (loading || status === null) {
@@ -53,7 +53,7 @@ export function ResolveDifferencesPage() {
             first={status.state.first_entry}
             second={status.state.second_entry}
             politicalGroups={election.political_groups}
-            previewChoice={choice}
+            action={action}
           />
           <form
             onSubmit={(e) => {
@@ -67,25 +67,25 @@ export function ResolveDifferencesPage() {
               <ChoiceList.Radio
                 id="keep_first_entry"
                 label={t("resolve_differences.options.keep_first_entry", { name: status.first_user })}
-                checked={choice === "keep_first_entry"}
+                checked={action === "keep_first_entry"}
                 onChange={() => {
-                  setChoice("keep_first_entry");
+                  setAction("keep_first_entry");
                 }}
               />
               <ChoiceList.Radio
                 id="keep_second_entry"
                 label={t("resolve_differences.options.keep_second_entry", { name: status.second_user })}
-                checked={choice === "keep_second_entry"}
+                checked={action === "keep_second_entry"}
                 onChange={() => {
-                  setChoice("keep_second_entry");
+                  setAction("keep_second_entry");
                 }}
               />
               <ChoiceList.Radio
                 id="discard_both_entries"
                 label={t("resolve_differences.options.discard_both_entries")}
-                checked={choice === "discard_both_entries"}
+                checked={action === "discard_both_entries"}
                 onChange={() => {
-                  setChoice("discard_both_entries");
+                  setAction("discard_both_entries");
                 }}
               />
             </ChoiceList>

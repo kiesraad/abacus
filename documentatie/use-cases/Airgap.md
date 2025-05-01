@@ -10,7 +10,7 @@ __Niveau:__ gebruikersdoel, zee  (🌊)
 
 __Uitbreidingen:__  
 1a. De server stelt vast dat er een internetverbinding is:  
-&emsp; 1a1. De applicatie blokkeert de toegang tot de database.  
+&emsp; 1a1. De applicatie blokkeert de invoer en aanpassingen aan de configuratie.  
 &emsp; 1a2. De applicatie geeft een melding aan alle gebruikers.  
 
 1b. De client stelt vast dat er een internetverbinding is:  

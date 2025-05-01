@@ -5,6 +5,7 @@ import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet, useInitialApiGetWithErrors } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
+import { t } from "@/lib/i18n";
 import {
   DataEntryStatus,
   Election,
@@ -34,6 +35,7 @@ interface PollingStationDataEntryStatus {
   loading: boolean;
   status: EntriesDifferentStatus | null;
   onSubmit: () => Promise<void>;
+  validationError: string | undefined;
 }
 
 export function usePollingStationDataEntryDifferences(
@@ -46,6 +48,7 @@ export function usePollingStationDataEntryDifferences(
   const [action, setAction] = useState<ResolveAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
+  const [validationError, setValidationError] = useState<string>();
 
   // fetch the current status of the polling station
   const path: POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries`;
@@ -102,7 +105,10 @@ export function usePollingStationDataEntryDifferences(
 
   const onSubmit = async () => {
     if (action === undefined) {
+      setValidationError(t("resolve_differences.required_error"));
       return;
+    } else {
+      setValidationError(undefined);
     }
 
     const path: POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve`;
@@ -126,5 +132,6 @@ export function usePollingStationDataEntryDifferences(
     loading: requestState.status === "loading" || usersRequestState.status === "loading",
     status,
     onSubmit,
+    validationError,
   };
 }

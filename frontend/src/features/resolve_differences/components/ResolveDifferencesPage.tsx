@@ -21,7 +21,7 @@ export function ResolveDifferencesPage() {
     void navigate(`/elections/${election.id}/status`);
   };
   const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation, election, loading, status, action, setAction, onSubmit } =
+  const { pollingStation, election, loading, status, action, setAction, onSubmit, validationError } =
     usePollingStationDataEntryDifferences(pollingStationId, afterSave);
 
   if (loading || status === null) {
@@ -64,6 +64,7 @@ export function ResolveDifferencesPage() {
             <h3 className="heading-lg mb-md">{t("resolve_differences.form_question")}</h3>
             <p>{t("resolve_differences.form_content")}</p>
             <ChoiceList>
+              {validationError && <ChoiceList.Error>{validationError}</ChoiceList.Error>}
               <ChoiceList.Radio
                 id="keep_first_entry"
                 label={t("resolve_differences.options.keep_first_entry", { name: status.first_user })}

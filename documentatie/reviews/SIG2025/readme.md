@@ -1,6 +1,6 @@
 # SIG-onderzoek broncode en methodiek Abacus
 
-Op verzoek van de Kiesraad heeft de Software Improvement Group (SIG) het ontwikkel- en voortbrengingsproces van Abacus geanalyseerd en advies gegeven over mogelijke verbeteringen. SIG heeft de kwaliteit van de broncode en de gekozen methodiek beoordeeld. Het advies is goed ontvangen en de aanbevelingen worden opgepakt. 
+Op verzoek van de Kiesraad heeft de Software Improvement Group (SIG) het ontwikkel- en voortbrengingsproces van Abacus geanalyseerd en advies gegeven over mogelijke verbeteringen. SIG heeft de kwaliteit van de broncode en de gekozen methodiek beoordeeld. De applicatie is in ontwikkeling, daarom is het een goed moment om een externe partij kritisch te laten meekijken en bij te sturen waar nodig. Het advies is goed ontvangen en de aanbevelingen worden opgepakt. 
 
 # Omgang met aanbevelingen uit het SIG-onderzoek
 Hieronder een overzicht van de aanbevelingen en de manier waarop we ermee omgaan. 

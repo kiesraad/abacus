@@ -1,6 +1,6 @@
 # Logging
 
-Logging van acties in de applicatie kan helpen bij het oplossen van problemen en afhandelen van incidenten. Tegelijkertijd draait de applicatie op een airgapped netwerk en is de logging daardoor toegankelijk voor de beheerder. Er zijn miniaal drie situaties waarin gebruik wordt gemaakt van de logging: 
+Logging van acties in de applicatie kan helpen bij het oplossen van problemen en afhandelen van incidenten. Tegelijkertijd draait de applicatie lokaal en is de logging daardoor te manipuleren door de beheerder. Er zijn minimaal drie situaties waarin gebruik wordt gemaakt van de logging: 
 
 - het monitoren van het gebruik van abacus tijdens het invoerproces
 - het oplossen van technische problemen of vragen

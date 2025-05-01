@@ -218,23 +218,23 @@ Voor elke foutmelding:
 
 __Uitbreidingen:__  
 2a. De invoerder stelt een fout op het PV vast en kan de foutmelding niet oplossen:  
-&emsp; 2a1. De invoerder meldt de fout op het PV bij de coördinator GSB.
-&emsp; 2a2. De invoerder kan in overleg het volledige PV invoeren.
-&emsp; 2a3. De coördinator GSB beoordeelt het PV en het overzicht van fouten. 
-&emsp; 2a4. De coördinator GSB stuurt het PV terug in het proces.
+&emsp; 2a1. De invoerder meldt de fout op het PV bij de coördinator GSB.  
+&emsp; 2a2. De invoerder kan in overleg het volledige PV invoeren.  
+&emsp; 2a3. De coördinator GSB beoordeelt het PV en het overzicht van fouten.  
+&emsp; 2a4. De coördinator GSB stuurt het PV terug in het proces.  
 &emsp; 2a5. De applicatie verwijdert de ingevoerde data.  
 
 ### Open punten
 
 - Als de coördinator GSB het PV terugstuurt in het proces, naar welk punt dan precies?
 
-## De invoerder handelt fouten en waarschuwing(en) af (vis)
+## De invoerder handelt waarschuwing(en) af (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ De controles geven een waarschuwing vanwege de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen) of vanwege optelfouten.
+__Trigger:__ De controles geven een waarschuwing vanwege de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
 
 *Waarschuwing*: De ingevoerde waardes zijn mogelijk niet correct. Bijvoorbeeld: er is een groot aantal blanco stemmen of de tweede invoer klopt niet met de eerste invoer.
 

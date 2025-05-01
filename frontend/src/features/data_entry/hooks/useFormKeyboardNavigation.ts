@@ -81,6 +81,7 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement> {
         case "Enter":
           // only handle events from inside the form or the body
           if (
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
             (event.target && innerRef.current?.contains(event.target as Node)) ||
             event.target instanceof HTMLBodyElement
           ) {

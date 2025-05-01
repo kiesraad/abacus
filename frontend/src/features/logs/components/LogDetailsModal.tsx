@@ -20,6 +20,7 @@ function formatValue(key: string, value: string) {
     return value || "-";
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   return t(`${SHOULD_TRANSLATE[key]}${value}` as TranslationPath);
 }
 
@@ -63,7 +64,12 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
             <dl className={cls.details} role="list">
               {filteredDetails.map(([key, value]: [string, string]) => (
                 <Fragment key={key}>
-                  <dt>{t(`log.field.${key}` as TranslationPath)}</dt>
+                  <dt>
+                    {
+                      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+                      t(`log.field.${key}` as TranslationPath)
+                    }
+                  </dt>
                   <dd>{formatValue(key, value)}</dd>
                 </Fragment>
               ))}

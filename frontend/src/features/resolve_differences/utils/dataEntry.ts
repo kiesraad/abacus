@@ -57,8 +57,10 @@ export const sections: DataEntrySection[] = [
 
 export function getFromResults(results: PollingStationResults, path: PollingStationResultsPath) {
   const segments = path.split(".");
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   return segments.reduce((o: unknown, k: string) => {
     if (o && typeof o === "object" && k in o) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       return o[k as keyof typeof o] as string | number | boolean | undefined;
     } else {
       return undefined;

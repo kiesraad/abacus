@@ -33,6 +33,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
     case "DATA_ENTRY_CLAIMED":
       if (action.dataEntry.client_state) {
         const { formState, targetFormSectionId } = buildFormState(
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           action.dataEntry.client_state as ClientState,
           action.dataEntry.validation_results,
           state.election,

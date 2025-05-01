@@ -9,6 +9,7 @@
 }
 
 .differencesTable {
+  table-layout: fixed;
   td {
     height: 4.5rem;
   }

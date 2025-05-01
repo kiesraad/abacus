@@ -8,8 +8,8 @@
 
 ### Documentatie
 
-- Begin hier voor meer context: [Het verkiezingsproces en Abacus](/documentatie/gebruikersdocumentatie/verkiezingsproces-en-abacus.md)
-- Begin hier als je meteen aan de slag wilt: [Installeren en starten](/documentatie/gebruikersdocumentatie/installeren-en-starten.md)
+- Begin hier voor meer context: [Het verkiezingsproces en Abacus](https://kiesraad.github.io/abacus-documentatie/verkiezingsproces-en-abacus.html)
+- Begin hier als je meteen aan de slag wilt: [Installeren en starten](https://kiesraad.github.io/abacus-documentatie/installeren-en-starten.html)
 - Functionaliteit voor de demo en voor versie 1.0: [Functionaliteit van Abacus: eisen en wensen](/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md)
 - Voor alle documentatie: [Hoofdpagina voor documentatie](/documentatie/README.md)
 
@@ -23,7 +23,7 @@
 
 De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) en zal ingezet worden bij alle verkiezingen in Nederland.
 
-Voor meer context over het gebruik van Abacus lees je [Het verkiezingsproces en Abacus](documentatie/gebruikersdocumentatie/verkiezingsproces-en-abacus.md). Je kunt hiervoor ook kijken naar de presentatie [Abacus: Software for Secure and Transparent Voting Results](https://youtu.be/qhYd_LNS2nQ) die we in november 2024 hebben gegeven op WICCON (in het Engels).
+Voor meer context over het gebruik van Abacus lees je [Het verkiezingsproces en Abacus](https://kiesraad.github.io/abacus-documentatie/verkiezingsproces-en-abacus.html). Je kunt hiervoor ook kijken naar de presentatie [Abacus: Software for Secure and Transparent Voting Results](https://youtu.be/qhYd_LNS2nQ) die we in november 2024 hebben gegeven op WICCON (in het Engels).
 
 Abacus is werk in uitvoering! Dit betekent dat de functionaliteit stapsgewijs wordt gebouwd. Kijk bij [Functionaliteit van Abacus: eisen en wensen](/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md) om te zien welke mijlpalen we hebben gesteld. 
 

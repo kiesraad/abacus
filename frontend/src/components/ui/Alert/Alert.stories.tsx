@@ -26,7 +26,7 @@ export const ClosableAlert: Story<Props> = ({ type, title, text, onClose }) => (
 );
 
 export const SmallAlert: Story<Props> = ({ type, text }) => (
-  <Alert type={type} variant="small">
+  <Alert type={type} small>
     <p>{text}</p>
   </Alert>
 );
@@ -44,7 +44,7 @@ export const InlineAlert: Story<Props> = ({ type, title, text }) => (
 );
 
 export const InlineSmall: Story<Props> = ({ type, title, text }) => (
-  <Alert type={type} inline variant="small" title={title}>
+  <Alert type={type} inline small title={title}>
     <p>{text}</p>
   </Alert>
 );

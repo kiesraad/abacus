@@ -12,18 +12,28 @@ import cls from "./Alert.module.css";
 export interface AlertProps {
   title?: string;
   type: AlertType;
-  variant?: "default" | "small" | "no-icon";
+  variant?: "default" | "no-icon";
   inline?: boolean;
+  small?: boolean;
   margin?: "mb-md" | "mb-md-lg" | "mb-lg";
   children: React.ReactNode;
   onClose?: () => void;
 }
 
-export function Alert({ type, onClose, children, margin, title, inline, variant = "default" }: AlertProps) {
+export function Alert({
+  type,
+  onClose,
+  children,
+  margin,
+  small = false,
+  title,
+  inline,
+  variant = "default",
+}: AlertProps) {
   const id = React.useId();
   return (
     <div
-      className={cn(inline ? cls.inlineAlert : cls.alert, cls[type], margin, variant)}
+      className={cn(inline ? cls.inlineAlert : cls.alert, cls[type], margin, variant, { small })}
       role="alert"
       aria-describedby={id}
     >

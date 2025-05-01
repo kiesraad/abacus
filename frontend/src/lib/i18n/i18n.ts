@@ -12,6 +12,7 @@ function getTranslation(path: string): string | undefined {
 
   const value = segments.reduce((o: unknown, k: string) => {
     if (o && typeof o === "object" && k in o) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       return o[k as keyof typeof o];
     } else {
       return undefined;

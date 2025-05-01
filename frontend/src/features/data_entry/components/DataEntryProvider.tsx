@@ -6,7 +6,6 @@ import { Election } from "@/types/generated/openapi";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
 import useDataEntry from "../hooks/useDataEntry";
-import { DataEntryStateAndActionsLoaded } from "../types/types";
 
 export interface DataEntryProviderProps {
   election: Required<Election>;
@@ -37,7 +36,12 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
   }
 
   return (
-    <DataEntryContext.Provider value={{ ...stateAndActions } as DataEntryStateAndActionsLoaded}>
+    <DataEntryContext.Provider
+      value={{
+        ...stateAndActions,
+        pollingStationResults: stateAndActions.pollingStationResults,
+      }}
+    >
       {children}
     </DataEntryContext.Provider>
   );

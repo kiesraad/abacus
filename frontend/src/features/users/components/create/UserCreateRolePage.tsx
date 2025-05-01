@@ -19,6 +19,7 @@ export function UserCreateRolePage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const roleValue = formData.get("role") as Role | null;
 
     if (!roleValue) {

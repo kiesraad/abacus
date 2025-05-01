@@ -145,7 +145,7 @@ export function DifferencesForm() {
       <BottomBar type="inputGrid">
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
-            <Alert type="error" variant="small">
+            <Alert type="error" small>
               <p>{t("data_entry.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>

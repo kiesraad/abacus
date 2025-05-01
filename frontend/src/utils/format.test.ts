@@ -4,6 +4,7 @@ import { t } from "@/lib/i18n";
 
 import {
   deformatNumber,
+  formatDateFull,
   formatDateTime,
   formatDateTimeFull,
   formatNumber,
@@ -88,6 +89,14 @@ describe("Format util", () => {
     [new Date("Sat Dec 18 2010 23:27:11 GMT+0100"), /\d+ december 2010 om \d\d:\d\d/],
   ])("Format date time %s as %s", (input: Date, expected: RegExp) => {
     expect(formatDateTimeFull(input)).toMatch(expected);
+  });
+
+  test.each([
+    [new Date("Fri Oct 17 2008 05:09:20 GMT+0200"), /\d+ oktober 2008/],
+    [new Date("Sat Jun 03 2023 14:26:13 GMT+0200"), /\d+ juni 2023/],
+    [new Date("Sat Dec 18 2010 23:27:11 GMT+0100"), /\d+ december 2010/],
+  ])("Format date %s as %s", (input: Date, expected: RegExp) => {
+    expect(formatDateFull(input)).toMatch(expected);
   });
 
   test.each([

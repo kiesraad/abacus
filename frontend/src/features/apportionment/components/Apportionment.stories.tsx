@@ -23,6 +23,7 @@ export default {
 export const DefaultApportionmentTable: Story = () => (
   <ApportionmentTable
     finalStanding={gte19Seats.seat_assignment.final_standing}
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     politicalGroups={gte19Seats.election.political_groups as PoliticalGroup[]}
     fullSeats={gte19Seats.seat_assignment.full_seats}
     residualSeats={gte19Seats.seat_assignment.residual_seats}
@@ -101,8 +102,10 @@ DefaultCandidatesWithVotesTable.argTypes = {
 
 export const DefaultHighestAveragesTable: Story = () => (
   <HighestAveragesTable
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     steps={gte19Seats.seat_assignment.steps as HighestAverageAssignmentStep[]}
     finalStanding={gte19Seats.seat_assignment.final_standing}
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     politicalGroups={gte19Seats.election.political_groups as PoliticalGroup[]}
     resultChanges={[]}
   />
@@ -113,6 +116,7 @@ export const DefaultLargestRemaindersTable: Story = () => (
   <LargestRemaindersTable
     steps={lt19Seats.largest_remainder_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
     resultChanges={[]}
   />
@@ -123,6 +127,7 @@ export const DefaultUniqueHighestAveragesTable: Story = () => (
   <UniqueHighestAveragesTable
     steps={lt19Seats.highest_average_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
   />
 );

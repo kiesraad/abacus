@@ -1,5 +1,15 @@
 import * as React from "react";
 
+interface PongResponse {
+  pong: string;
+}
+
+function isPongResponse(data: unknown): data is PongResponse {
+  return (
+    typeof data === "object" && data !== null && "pong" in data && typeof (data as { pong: unknown }).pong === "string"
+  );
+}
+
 export function MockTest() {
   const [message, setMessage] = React.useState("...");
 
@@ -13,11 +23,17 @@ export function MockTest() {
         body: JSON.stringify({ ping: "ping" }),
       });
 
-      const data = (await response.json()) as { pong: string };
-      if (data.pong === "ping") {
-        setMessage("✅");
+      const rawData: unknown = await response.json();
+
+      if (isPongResponse(rawData)) {
+        const data = rawData;
+        if (data.pong === "ping") {
+          setMessage("✅");
+        } else {
+          setMessage(`⚠️: ${JSON.stringify(data)}`);
+        }
       } else {
-        setMessage(`⚠️: ${JSON.stringify(data)}`);
+        setMessage(`❌: Invalid response format: ${JSON.stringify(rawData)}`);
       }
     };
 

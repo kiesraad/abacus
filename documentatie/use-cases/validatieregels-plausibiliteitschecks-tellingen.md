@@ -135,10 +135,14 @@ De foutmelding die wordt getoond bestaat uit dezelfde onderdelen als bij de vali
 > - Heb je iets niet goed overgenomen? Herstel de fout en ga verder.
 > - Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.
 
-### (Bij tweede invoer) Alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
+### Checks voor alle velden (reeks W.0xx)
 
-> **Verschil met eerste invoer. Extra controle nodig**  
+#### W.001 (Bij tweede invoer) Alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
+
+> **Verschil met eerste invoer. Extra controle nodig** (W.001)  
 > Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.
+
+Velden markeren: alle velden met een verschil
 
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=130-10813&t=zTY4ajWtsFkiTOYP-11)
 

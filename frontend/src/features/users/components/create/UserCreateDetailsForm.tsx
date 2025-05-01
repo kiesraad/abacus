@@ -37,8 +37,11 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
 
     const user: CreateUserRequest = {
       role: role,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       username: (formData.get("username") as string).trim(),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       fullname: (formData.get("fullname") as string | undefined)?.trim(),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       temp_password: (formData.get("temp_password") as string).trim(),
     };
 

@@ -14,6 +14,7 @@ export interface UseFormReturn<RequestObject> {
 export function useForm<RequestObject>(fields: FormFields<RequestObject>): UseFormReturn<RequestObject> {
   const [isValid, setIsValid] = React.useState(false);
   const [validationResult, setValidationResult] = React.useState<ValidationResult<RequestObject>>(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     {} as ValidationResult<RequestObject>,
   );
 

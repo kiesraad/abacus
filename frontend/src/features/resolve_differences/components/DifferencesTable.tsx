@@ -1,6 +1,8 @@
 import { Fragment, useId } from "react";
 
 import { Table } from "@/components/ui/Table/Table";
+import { ResolveAction } from "@/types/generated/openapi";
+import { cn } from "@/utils/classnames";
 
 import cls from "./ResolveDifferences.module.css";
 
@@ -8,6 +10,7 @@ interface DifferencesTableProps {
   title: string;
   headers: string[];
   rows: DifferencesRow[];
+  action?: ResolveAction;
 }
 
 const zeroDash = <span className={cls.zeroDash}>&mdash;</span>;
@@ -19,7 +22,9 @@ export interface DifferencesRow {
   description?: string;
 }
 
-export function DifferencesTable({ title, headers, rows }: DifferencesTableProps) {
+const CELL_CLASSES = ["text-align-r", "font-number", "bold"];
+
+export function DifferencesTable({ title, headers, rows, action }: DifferencesTableProps) {
   const id = useId();
   // An array of indices for rows that are different, also used to detect row gaps.
   // Two falsy values are considered equal (e.g. 0 and undefined)
@@ -32,9 +37,16 @@ export function DifferencesTable({ title, headers, rows }: DifferencesTableProps
     return null;
   }
 
+  const keepFirst = action === "keep_first_entry";
+  const keepSecond = action === "keep_second_entry";
+  const discardFirst = action === "keep_second_entry" || action === "discard_both_entries";
+  const discardSecond = action === "keep_first_entry" || action === "discard_both_entries";
+
   return (
     <section className="mt-lg mb-xl">
-      <h2 id={id}>{title}</h2>
+      <h3 className="heading-lg" id={id}>
+        {title}
+      </h3>
       <div>
         <Table className={cls.differencesTable} aria-labelledby={id}>
           <Table.Header>
@@ -60,10 +72,10 @@ export function DifferencesTable({ title, headers, rows }: DifferencesTableProps
                     <Table.HeaderCell scope="row" className="text-align-r normal">
                       {rows[rowIndex]?.code}
                     </Table.HeaderCell>
-                    <Table.Cell className="text-align-r font-number bold">
+                    <Table.Cell className={cn(...CELL_CLASSES, keepFirst && cls.keep, discardFirst && cls.discard)}>
                       {rows[rowIndex]?.first || zeroDash}
                     </Table.Cell>
-                    <Table.Cell className="text-align-r font-number bold">
+                    <Table.Cell className={cn(...CELL_CLASSES, keepSecond && cls.keep, discardSecond && cls.discard)}>
                       {rows[rowIndex]?.second || zeroDash}
                     </Table.Cell>
                     <Table.Cell>{rows[rowIndex]?.description}</Table.Cell>

@@ -8,12 +8,7 @@ pub trait Compare {
 }
 
 impl Compare for PollingStationResults {
-    fn compare(
-        &self,
-        first_entry: &PollingStationResults,
-        different_fields: &mut Vec<String>,
-        path: &FieldPath,
-    ) {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         if self.recounted != first_entry.recounted {
             different_fields.push(path.field("recounted").to_string());
         }

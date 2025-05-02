@@ -52,10 +52,6 @@ impl Compare for PollingStationResults {
                         .to_string(),
                 );
             }
-        } else {
-            // TODO: How do we show the difference if the 2nd data entry doesn't have voters_recounts,
-            //  but the first data entry does? Of course the warning will also show on
-            //  the recounted page in this case, is this sufficient?
         }
 
         self.differences_counts.compare(

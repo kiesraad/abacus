@@ -360,7 +360,8 @@ mod tests {
     }
 
     #[test]
-    fn test_polling_station_results_comparison_not_equal_recounted_voters_recounts_differences() {
+    fn test_polling_station_results_comparison_not_equal_recounted_true_voters_recounts_differences()
+     {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             recounted: Some(false),
@@ -411,6 +412,45 @@ mod tests {
             different_fields[4],
             "polling_station_results.voters_recounts.total_admitted_voters_count"
         );
+    }
+
+    #[test]
+    fn test_polling_station_results_comparison_not_equal_recounted_false_voters_recounts_differences()
+     {
+        let mut different_fields: Vec<String> = vec![];
+        let first_entry = PollingStationResults {
+            recounted: Some(true),
+            voters_counts: VotersCounts {
+                poll_card_count: 100,
+                proxy_certificate_count: 2,
+                voter_card_count: 3,
+                total_admitted_voters_count: 105,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 100,
+                blank_votes_count: 3,
+                invalid_votes_count: 2,
+                total_votes_cast_count: 105,
+            },
+            voters_recounts: Some(VotersCounts {
+                poll_card_count: 100,
+                proxy_certificate_count: 2,
+                voter_card_count: 2,
+                total_admitted_voters_count: 104,
+            }),
+            differences_counts: DifferencesCounts::zero(),
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+        };
+        let mut second_entry = first_entry.clone();
+        second_entry.recounted = Some(false);
+        second_entry.voters_recounts = None;
+        second_entry.compare(
+            &first_entry,
+            &mut different_fields,
+            &"polling_station_results".into(),
+        );
+        assert_eq!(different_fields.len(), 1);
+        assert_eq!(different_fields[0], "polling_station_results.recounted");
     }
 
     #[test]
@@ -473,7 +513,8 @@ mod tests {
     }
 
     #[test]
-    fn test_polling_station_results_comparison_not_equal_voters_and_votes_counts_differences() {
+    fn test_polling_station_results_comparison_not_equal_voters_counts_and_recounts_and_votes_counts_differences()
+     {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             recounted: Some(true),
@@ -511,12 +552,18 @@ mod tests {
             invalid_votes_count: 1,
             total_votes_cast_count: 102,
         };
+        second_entry.voters_recounts = Some(VotersCounts {
+            poll_card_count: 101,
+            proxy_certificate_count: 1,
+            voter_card_count: 2,
+            total_admitted_voters_count: 104,
+        });
         second_entry.compare(
             &first_entry,
             &mut different_fields,
             &"polling_station_results".into(),
         );
-        assert_eq!(different_fields.len(), 7);
+        assert_eq!(different_fields.len(), 9);
         assert_eq!(
             different_fields[0],
             "polling_station_results.voters_counts.poll_card_count"
@@ -544,6 +591,14 @@ mod tests {
         assert_eq!(
             different_fields[6],
             "polling_station_results.votes_counts.total_votes_cast_count"
+        );
+        assert_eq!(
+            different_fields[7],
+            "polling_station_results.voters_recounts.poll_card_count"
+        );
+        assert_eq!(
+            different_fields[8],
+            "polling_station_results.voters_recounts.proxy_certificate_count"
         );
     }
 

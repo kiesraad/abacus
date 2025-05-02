@@ -53,7 +53,7 @@ export class ApiClient extends EventTarget {
   }
 
   // encode an optional JSON body
-  setRequestBodyAndHeaders(requestBody?: object): RequestInit {
+  setRequestBodyAndHeaders(requestBody?: object | string): RequestInit {
     if (requestBody) {
       return {
         headers: {
@@ -170,7 +170,7 @@ export class ApiClient extends EventTarget {
     method: "GET" | "POST" | "PUT" | "DELETE",
     path: string,
     abort?: AbortController,
-    requestBody?: object,
+    requestBody?: object | string,
   ): Promise<ApiResult<T>> {
     try {
       const response = await fetch(path, {
@@ -213,7 +213,7 @@ export class ApiClient extends EventTarget {
   // perform a POST request
   async postRequest<RESPONSE>(
     path: string,
-    requestBody?: object,
+    requestBody?: object | string,
     abort?: AbortController,
   ): Promise<ApiResult<RESPONSE>> {
     return this.request<RESPONSE>("POST", path, abort, requestBody);

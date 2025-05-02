@@ -1,14 +1,12 @@
 import { APIRequestContext, test as base, expect } from "@playwright/test";
 
 import {
+  DataEntry,
   Election,
   ELECTION_CREATE_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PATH,
   ElectionDetailsResponse,
   POLLING_STATION_CREATE_REQUEST_PATH,
-  POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
-  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   POLLING_STATION_GET_REQUEST_PATH,
   PollingStation,
   User,
@@ -16,6 +14,7 @@ import {
   USER_CREATE_REQUEST_PATH,
 } from "@/types/generated/openapi";
 
+import { DataEntryApiClient } from "./helpers-utils/api-clients";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import { loginAs } from "./setup";
 import {
@@ -38,6 +37,8 @@ type Fixtures = {
   pollingStationFirstEntryDone: PollingStation;
   // First polling station of the election with first and second data entries done
   pollingStationDefinitive: PollingStation;
+  // First polling station of the election with differences between the first and second data entry
+  pollingStationEntriesDifferent: PollingStation;
   // Election with polling stations and two completed data entries for each
   completedElection: Election;
   // Newly created User
@@ -51,18 +52,29 @@ async function completePollingStationDataEntries(request: APIRequestContext, pol
     } else if (entryNumber === 2) {
       await loginAs(request, "typist2");
     }
-    const save_url: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
-    const claim_url: POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH = `${save_url}/claim`;
-    const claimResponse = await request.post(claim_url);
-    expect(claimResponse.ok()).toBeTruthy();
-    const saveResponse = await request.post(save_url, {
-      data: noRecountNoDifferencesRequest,
-    });
-    expect(saveResponse.ok()).toBeTruthy();
-    const finalise_url: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH = `${save_url}/finalise`;
-    const finaliseResponse = await request.post(finalise_url);
-    expect(finaliseResponse.ok()).toBeTruthy();
+
+    const dataEntry = new DataEntryApiClient(request, pollingStationId, entryNumber);
+    await dataEntry.claim();
+    await dataEntry.save(noRecountNoDifferencesRequest);
+    await dataEntry.finalise();
   }
+}
+
+async function completePollingStationDataEntriesWithDifferences(request: APIRequestContext, pollingStationId: number) {
+  await loginAs(request, "typist");
+  const firstDataEntry = new DataEntryApiClient(request, pollingStationId, 1);
+  await firstDataEntry.claim();
+  await firstDataEntry.save(noRecountNoDifferencesRequest);
+  await firstDataEntry.finalise();
+
+  await loginAs(request, "typist2");
+  const secondDataEntry = new DataEntryApiClient(request, pollingStationId, 2);
+  await secondDataEntry.claim();
+  const cloneDataEntry = JSON.parse(JSON.stringify(noRecountNoDifferencesRequest)) as DataEntry;
+  cloneDataEntry.data.political_group_votes[0]!.candidate_votes[0]!.votes -= 10;
+  cloneDataEntry.data.political_group_votes[0]!.candidate_votes[1]!.votes += 10;
+  await secondDataEntry.save(cloneDataEntry);
+  await secondDataEntry.finalise();
 }
 
 export const test = base.extend<Fixtures>({
@@ -106,24 +118,21 @@ export const test = base.extend<Fixtures>({
   },
   pollingStationFirstEntryDone: async ({ request, pollingStation }, use) => {
     await loginAs(request, "typist");
-    // first data entry of the existing polling station
-    const save_url: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStation.id}/data_entries/1`;
-    const claim_url: POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH = `${save_url}/claim`;
-    const finalise_url: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH = `${save_url}/finalise`;
-    const claimResponse = await request.post(claim_url);
-    expect(claimResponse.ok()).toBeTruthy();
-    const saveResponse = await request.post(save_url, {
-      data: noRecountNoDifferencesRequest,
-    });
-    expect(saveResponse.ok()).toBeTruthy();
-    const finaliseResponse = await request.post(finalise_url);
-    expect(finaliseResponse.ok()).toBeTruthy();
+
+    const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
+    await firstDataEntry.claim();
+    await firstDataEntry.save(noRecountNoDifferencesRequest);
+    await firstDataEntry.finalise();
 
     await use(pollingStation);
   },
   pollingStationDefinitive: async ({ request, pollingStation }, use) => {
     await completePollingStationDataEntries(request, pollingStation.id);
 
+    await use(pollingStation);
+  },
+  pollingStationEntriesDifferent: async ({ request, pollingStation }, use) => {
+    await completePollingStationDataEntriesWithDifferences(request, pollingStation.id);
     await use(pollingStation);
   },
   completedElection: async ({ request, election }, use) => {

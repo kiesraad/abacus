@@ -28,8 +28,8 @@ test.describe("resolve differences", () => {
 
     const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
     await resolveDifferencesPage.keepFirstEntry.click();
-    await expect((await resolveDifferencesPage.dataEntryValues)[0]!).toHaveClass(/keep/);
-    await expect((await resolveDifferencesPage.dataEntryValues)[1]!).toHaveClass(/discard/);
+    await expect(resolveDifferencesPage.firstValue).toHaveClass(/keep/);
+    await expect(resolveDifferencesPage.secondValue).toHaveClass(/discard/);
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.firstEntryFinished).toContainText(pollingStation.name + "Sam Kuijpers");
@@ -43,8 +43,8 @@ test.describe("resolve differences", () => {
 
     const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
     await resolveDifferencesPage.keepSecondEntry.click();
-    await expect((await resolveDifferencesPage.dataEntryValues)[0]!).toHaveClass(/discard/);
-    await expect((await resolveDifferencesPage.dataEntryValues)[1]!).toHaveClass(/keep/);
+    await expect(resolveDifferencesPage.firstValue).toHaveClass(/discard/);
+    await expect(resolveDifferencesPage.secondValue).toHaveClass(/keep/);
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.firstEntryFinished).toContainText(pollingStation.name + "Aliyah van den Berg");
@@ -58,8 +58,8 @@ test.describe("resolve differences", () => {
 
     const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
     await resolveDifferencesPage.discardBothEntries.click();
-    await expect((await resolveDifferencesPage.dataEntryValues)[0]!).toHaveClass(/discard/);
-    await expect((await resolveDifferencesPage.dataEntryValues)[1]!).toHaveClass(/discard/);
+    await expect(resolveDifferencesPage.firstValue).toHaveClass(/discard/);
+    await expect(resolveDifferencesPage.secondValue).toHaveClass(/discard/);
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.notStarted).toContainText(pollingStation.name);

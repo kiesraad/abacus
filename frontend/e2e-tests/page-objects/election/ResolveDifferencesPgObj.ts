@@ -1,7 +1,8 @@
 import { type Locator, type Page } from "@playwright/test";
 
 export class ResolveDifferencesPgObj {
-  readonly dataEntryValues: Promise<Array<Locator>>;
+  readonly firstValue: Locator;
+  readonly secondValue: Locator;
   readonly validationError: Locator;
   readonly keepFirstEntry: Locator;
   readonly keepSecondEntry: Locator;
@@ -9,7 +10,8 @@ export class ResolveDifferencesPgObj {
   readonly save: Locator;
 
   constructor(protected readonly page: Page) {
-    this.dataEntryValues = this.page.getByRole("cell").all();
+    this.firstValue = this.page.getByRole("cell").nth(0);
+    this.secondValue = this.page.getByRole("cell").nth(1);
     this.validationError = page.getByText(/Dit is een verplichte vraag/);
     this.keepFirstEntry = page.getByLabel(/De eerste invoer/);
     this.keepSecondEntry = page.getByLabel(/De tweede invoer/);

@@ -38,19 +38,6 @@ impl Compare for PollingStationResults {
                     different_fields,
                     &voters_recounts_path,
                 );
-            } else {
-                different_fields.push(voters_recounts_path.field("poll_card_count").to_string());
-                different_fields.push(
-                    voters_recounts_path
-                        .field("proxy_certificate_count")
-                        .to_string(),
-                );
-                different_fields.push(voters_recounts_path.field("voter_card_count").to_string());
-                different_fields.push(
-                    voters_recounts_path
-                        .field("total_admitted_voters_count")
-                        .to_string(),
-                );
             }
         }
 
@@ -394,24 +381,8 @@ mod tests {
             &mut different_fields,
             &"polling_station_results".into(),
         );
-        assert_eq!(different_fields.len(), 5);
+        assert_eq!(different_fields.len(), 1);
         assert_eq!(different_fields[0], "polling_station_results.recounted");
-        assert_eq!(
-            different_fields[1],
-            "polling_station_results.voters_recounts.poll_card_count"
-        );
-        assert_eq!(
-            different_fields[2],
-            "polling_station_results.voters_recounts.proxy_certificate_count"
-        );
-        assert_eq!(
-            different_fields[3],
-            "polling_station_results.voters_recounts.voter_card_count"
-        );
-        assert_eq!(
-            different_fields[4],
-            "polling_station_results.voters_recounts.total_admitted_voters_count"
-        );
     }
 
     #[test]

@@ -9,7 +9,6 @@ import { apportionmentRoutes } from "@/features/apportionment/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
 import { dataEntryHomeRoutes } from "@/features/data_entry_home/routes";
 import { devRoutes } from "@/features/dev/routes";
-import { ElectionCreateLayout } from "@/features/election_create/components/ElectionCreateLayout";
 import { electionCreateRoutes } from "@/features/election_create/routes";
 import { ElectionHomePage } from "@/features/election_management/components/ElectionHomePage";
 import { electionManagementRoutes } from "@/features/election_management/routes";

@@ -25,7 +25,7 @@ export function UploadElectionDefinition() {
       if (isSuccess(response)) {
         setData(response.data);
         setError(undefined);
-        navigate("/elections/create/check-definition");
+        await navigate("/elections/create/check-definition");
       } else if (isError(response)) {
         setData(undefined);
         setError(currentFile.name);

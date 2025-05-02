@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { NotFoundError } from "@/api/ApiResult";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { InputField } from "@/components/ui/InputField/InputField";
@@ -11,6 +12,11 @@ import { RedactedHash, Stub } from "./RedactedHash";
 
 export function CheckElectionDefinition() {
   const { file, data } = useElectionCreateContext();
+
+  if (!data) {
+    throw new NotFoundError("error.not_found_feedback");
+  }
+
   const [stubs, setStubs] = useState<Stub[]>(
     data.hash.redacted_indexes.map((redacted_index) => ({
       selected: false,
@@ -30,7 +36,7 @@ export function CheckElectionDefinition() {
       </p>
       <Alert type="notify" variant="no-icon" margin="mb-md" small>
         <p>
-          <strong>{data?.election.name}</strong>
+          <strong>{data.election.name}</strong>
           <br />
           <span className="capitalize-first">{formatDateFull(new Date(election.election_date))}</span>
         </p>
@@ -38,7 +44,7 @@ export function CheckElectionDefinition() {
           <span>
             <strong>{t("digital_signature")}</strong> ({t("hashcode")}):
           </span>
-          <RedactedHash hash={data?.hash.chunks} stubs={stubs} />
+          <RedactedHash hash={data.hash.chunks} stubs={stubs} />
         </div>
       </Alert>
       <p>{t("election.check_eml.check_hash.description")}</p>

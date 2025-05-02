@@ -1,20 +1,43 @@
+import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
-import { render as rtlRender, screen, setupTestRouter } from "@/testing/test-utils";
+import { screen, setupTestRouter } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { electionCreateRoutes } from "../routes";
-import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
-import { ElectionCreateLayout } from "./ElectionCreateLayout";
-import { UploadElectionDefinition } from "./UploadElectionDefinition";
 
-describe("ElectionCreatePage", () => {
+function renderWithRouter() {
+  const router = setupTestRouter([
+    {
+      path: "/",
+      Component: null,
+      children: [
+        {
+          path: "elections",
+          children: [
+            {
+              path: "create",
+              children: electionCreateRoutes,
+            },
+          ],
+        },
+      ],
+    },
+  ]);
+  rtlRender(
+    <TestUserProvider userRole="administrator">
+      <Providers router={router} />
+    </TestUserProvider>,
+  );
+  return router;
+}
+
+describe("Election create pages", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler);
   });
@@ -38,14 +61,6 @@ describe("ElectionCreatePage", () => {
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    render(
-      <TestUserProvider userRole="administrator">
-        <ElectionCreateContextProvider>
-          <UploadElectionDefinition />
-        </ElectionCreateContextProvider>
-      </TestUserProvider>,
-    );
-
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
@@ -58,7 +73,7 @@ describe("ElectionCreatePage", () => {
     // Expect error message, file name should be shown
     expect(screen.getByText(filename)).toBeInTheDocument();
   });
-  /*
+
   test("Shows hash when uploading valid file", async () => {
     const election = getElectionMockData().election;
     overrideOnce("post", "/api/elections/validate", 200, {
@@ -86,16 +101,12 @@ describe("ElectionCreatePage", () => {
       election,
     });
 
+    const router = renderWithRouter();
     const user = userEvent.setup();
+    await router.navigate("/elections/create");
+
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
-    render(
-      <TestUserProvider userRole="administrator">
-        <ElectionProvider electionId={1}>
-          <UploadElectionDefinition />
-        </ElectionProvider>
-      </TestUserProvider>,
-    );
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
@@ -106,8 +117,9 @@ describe("ElectionCreatePage", () => {
 
     await user.upload(input, file);
 
-    expect(screen.getByText(filename)).toBeInTheDocument();
-    expect(screen.getByText(election.name)).toBeInTheDocument();
+    // Wait for the page to be loaded and expect the election name to be present
+    expect(await screen.findByText(election.name)).toBeInTheDocument();
+
     // Expect parts of the hash to be shown
     expect(screen.getByText("asdf")).toBeInTheDocument();
     // Expect redacted chunks to be stubs
@@ -127,5 +139,4 @@ describe("ElectionCreatePage", () => {
     expect(screen.getByText("1")).not.toHaveRole("mark");
     expect(screen.getByText("2")).not.toHaveRole("mark");
   });
-   */
 });

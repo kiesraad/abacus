@@ -18,6 +18,12 @@ impl Compare for PollingStationResults {
             different_fields.push(path.field("recounted").to_string());
         }
 
+        self.voters_counts.compare(
+            &first_entry.voters_counts,
+            different_fields,
+            &path.field("voters_counts"),
+        );
+
         self.votes_counts.compare(
             &first_entry.votes_counts,
             different_fields,
@@ -51,11 +57,6 @@ impl Compare for PollingStationResults {
             //  but the first data entry does? Of course the warning will also show on
             //  the recounted page in this case, is this sufficient?
         }
-        self.voters_counts.compare(
-            &first_entry.voters_counts,
-            different_fields,
-            &path.field("voters_counts"),
-        );
 
         self.differences_counts.compare(
             &first_entry.differences_counts,
@@ -217,7 +218,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_polling_station_results_comparison_equal_recounted_false_no_differences() {
+    fn test_polling_station_results_comparison_equal_recounted_false_no_differences_counts() {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             recounted: Some(false),
@@ -247,7 +248,7 @@ mod tests {
     }
 
     #[test]
-    fn test_polling_station_results_comparison_equal_recounted_false_with_differences() {
+    fn test_polling_station_results_comparison_equal_recounted_false_with_differences_counts() {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             recounted: Some(false),
@@ -285,7 +286,7 @@ mod tests {
     }
 
     #[test]
-    fn test_polling_station_results_comparison_equal_recounted_true_no_differences() {
+    fn test_polling_station_results_comparison_equal_recounted_true_no_differences_counts() {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             recounted: Some(true),
@@ -316,12 +317,11 @@ mod tests {
             &mut different_fields,
             &"polling_station_results".into(),
         );
-        println!("{:?}", different_fields);
         assert_eq!(different_fields.len(), 0);
     }
 
     #[test]
-    fn test_polling_station_results_comparison_equal_recounted_true_with_differences() {
+    fn test_polling_station_results_comparison_equal_recounted_true_with_differences_counts() {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             recounted: Some(true),
@@ -360,7 +360,264 @@ mod tests {
             &mut different_fields,
             &"polling_station_results".into(),
         );
-        println!("{:?}", different_fields);
         assert_eq!(different_fields.len(), 0);
+    }
+
+    #[test]
+    fn test_polling_station_results_comparison_not_equal_recounted_voters_recounts_differences() {
+        let mut different_fields: Vec<String> = vec![];
+        let first_entry = PollingStationResults {
+            recounted: Some(false),
+            voters_counts: VotersCounts {
+                poll_card_count: 100,
+                proxy_certificate_count: 2,
+                voter_card_count: 3,
+                total_admitted_voters_count: 105,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 100,
+                blank_votes_count: 3,
+                invalid_votes_count: 2,
+                total_votes_cast_count: 105,
+            },
+            voters_recounts: None,
+            differences_counts: DifferencesCounts::zero(),
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+        };
+        let mut second_entry = first_entry.clone();
+        second_entry.recounted = Some(true);
+        second_entry.voters_recounts = Some(VotersCounts {
+            poll_card_count: 100,
+            proxy_certificate_count: 2,
+            voter_card_count: 2,
+            total_admitted_voters_count: 104,
+        });
+        second_entry.compare(
+            &first_entry,
+            &mut different_fields,
+            &"polling_station_results".into(),
+        );
+        assert_eq!(different_fields.len(), 5);
+        assert_eq!(different_fields[0], "polling_station_results.recounted");
+        assert_eq!(
+            different_fields[1],
+            "polling_station_results.voters_recounts.poll_card_count"
+        );
+        assert_eq!(
+            different_fields[2],
+            "polling_station_results.voters_recounts.proxy_certificate_count"
+        );
+        assert_eq!(
+            different_fields[3],
+            "polling_station_results.voters_recounts.voter_card_count"
+        );
+        assert_eq!(
+            different_fields[4],
+            "polling_station_results.voters_recounts.total_admitted_voters_count"
+        );
+    }
+
+    #[test]
+    fn test_polling_station_results_comparison_not_equal_differences_counts_differences() {
+        let mut different_fields: Vec<String> = vec![];
+        let first_entry = PollingStationResults {
+            recounted: Some(false),
+            voters_counts: VotersCounts {
+                poll_card_count: 100,
+                proxy_certificate_count: 2,
+                voter_card_count: 3,
+                total_admitted_voters_count: 105,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 100,
+                blank_votes_count: 1,
+                invalid_votes_count: 2,
+                total_votes_cast_count: 103,
+            },
+            voters_recounts: None,
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 0,
+                fewer_ballots_count: 2,
+                unreturned_ballots_count: 0,
+                too_few_ballots_handed_out_count: 0,
+                too_many_ballots_handed_out_count: 0,
+                other_explanation_count: 2,
+                no_explanation_count: 0,
+            },
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+        };
+        let mut second_entry = first_entry.clone();
+        second_entry.differences_counts = DifferencesCounts {
+            more_ballots_count: 0,
+            fewer_ballots_count: 2,
+            unreturned_ballots_count: 0,
+            too_few_ballots_handed_out_count: 1,
+            too_many_ballots_handed_out_count: 0,
+            other_explanation_count: 0,
+            no_explanation_count: 1,
+        };
+        second_entry.compare(
+            &first_entry,
+            &mut different_fields,
+            &"polling_station_results".into(),
+        );
+        assert_eq!(different_fields.len(), 3);
+        assert_eq!(
+            different_fields[0],
+            "polling_station_results.differences_counts.too_few_ballots_handed_out_count"
+        );
+        assert_eq!(
+            different_fields[1],
+            "polling_station_results.differences_counts.other_explanation_count"
+        );
+        assert_eq!(
+            different_fields[2],
+            "polling_station_results.differences_counts.no_explanation_count"
+        );
+    }
+
+    #[test]
+    fn test_polling_station_results_comparison_not_equal_voters_and_votes_counts_differences() {
+        let mut different_fields = vec![];
+        let first_entry = PollingStationResults {
+            recounted: Some(true),
+            voters_counts: VotersCounts {
+                poll_card_count: 100,
+                proxy_certificate_count: 2,
+                voter_card_count: 3,
+                total_admitted_voters_count: 105,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 100,
+                blank_votes_count: 2,
+                invalid_votes_count: 2,
+                total_votes_cast_count: 104,
+            },
+            voters_recounts: Some(VotersCounts {
+                poll_card_count: 100,
+                proxy_certificate_count: 2,
+                voter_card_count: 2,
+                total_admitted_voters_count: 104,
+            }),
+            differences_counts: DifferencesCounts::zero(),
+            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+        };
+        let mut second_entry = first_entry.clone();
+        second_entry.voters_counts = VotersCounts {
+            poll_card_count: 99,
+            proxy_certificate_count: 1,
+            voter_card_count: 2,
+            total_admitted_voters_count: 102,
+        };
+        second_entry.votes_counts = VotesCounts {
+            votes_candidates_count: 100,
+            blank_votes_count: 1,
+            invalid_votes_count: 1,
+            total_votes_cast_count: 102,
+        };
+        second_entry.compare(
+            &first_entry,
+            &mut different_fields,
+            &"polling_station_results".into(),
+        );
+        assert_eq!(different_fields.len(), 7);
+        assert_eq!(
+            different_fields[0],
+            "polling_station_results.voters_counts.poll_card_count"
+        );
+        assert_eq!(
+            different_fields[1],
+            "polling_station_results.voters_counts.proxy_certificate_count"
+        );
+        assert_eq!(
+            different_fields[2],
+            "polling_station_results.voters_counts.voter_card_count"
+        );
+        assert_eq!(
+            different_fields[3],
+            "polling_station_results.voters_counts.total_admitted_voters_count"
+        );
+        assert_eq!(
+            different_fields[4],
+            "polling_station_results.votes_counts.blank_votes_count"
+        );
+        assert_eq!(
+            different_fields[5],
+            "polling_station_results.votes_counts.invalid_votes_count"
+        );
+        assert_eq!(
+            different_fields[6],
+            "polling_station_results.votes_counts.total_votes_cast_count"
+        );
+    }
+
+    #[test]
+    fn test_polling_station_results_comparison_not_equal_political_group_votes_differences() {
+        let mut different_fields = vec![];
+        let first_entry = PollingStationResults {
+            recounted: Some(true),
+            voters_counts: VotersCounts {
+                poll_card_count: 100,
+                proxy_certificate_count: 2,
+                voter_card_count: 3,
+                total_admitted_voters_count: 105,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 100,
+                blank_votes_count: 2,
+                invalid_votes_count: 3,
+                total_votes_cast_count: 105,
+            },
+            voters_recounts: Some(VotersCounts {
+                poll_card_count: 100,
+                proxy_certificate_count: 2,
+                voter_card_count: 2,
+                total_admitted_voters_count: 104,
+            }),
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 1,
+                fewer_ballots_count: 0,
+                unreturned_ballots_count: 0,
+                too_few_ballots_handed_out_count: 0,
+                too_many_ballots_handed_out_count: 1,
+                other_explanation_count: 0,
+                no_explanation_count: 0,
+            },
+            political_group_votes: vec![
+                PoliticalGroupVotes::from_test_data_auto(1, &[100, 0]),
+                PoliticalGroupVotes::from_test_data_auto(2, &[0]),
+            ],
+        };
+        let mut second_entry = first_entry.clone();
+        second_entry.political_group_votes = vec![
+            PoliticalGroupVotes::from_test_data_auto(1, &[50, 30]),
+            PoliticalGroupVotes::from_test_data_auto(2, &[20]),
+        ];
+        second_entry.compare(
+            &first_entry,
+            &mut different_fields,
+            &"polling_station_results".into(),
+        );
+        assert_eq!(different_fields.len(), 5);
+        assert_eq!(
+            different_fields[0],
+            "polling_station_results.political_group_votes[0].candidate_votes[0].votes"
+        );
+        assert_eq!(
+            different_fields[1],
+            "polling_station_results.political_group_votes[0].candidate_votes[1].votes"
+        );
+        assert_eq!(
+            different_fields[2],
+            "polling_station_results.political_group_votes[0].total"
+        );
+        assert_eq!(
+            different_fields[3],
+            "polling_station_results.political_group_votes[1].candidate_votes[0].votes"
+        );
+        assert_eq!(
+            different_fields[4],
+            "polling_station_results.political_group_votes[1].total"
+        );
     }
 }

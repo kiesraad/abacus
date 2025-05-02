@@ -1,3 +1,5 @@
+import { vi } from "vitest";
+
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
@@ -7,7 +9,7 @@ import {
 } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
-import { DataEntryState, FormSection } from "../types/types";
+import { DataEntryState, DataEntryStateAndActionsLoaded, FormSection } from "../types/types";
 import { ValidationResultSet } from "../utils/ValidationResults";
 
 export function getInitialValues(): PollingStationResults {
@@ -236,3 +238,20 @@ export const errorWarningMocks: ErrorWarningsMap<ValidationResultCode> = {
     code: "W302",
   },
 };
+
+export function mockDataEntryStateAndActionsLoaded(
+  override: Partial<DataEntryStateAndActionsLoaded> = {},
+): DataEntryStateAndActionsLoaded {
+  return {
+    ...getDefaultDataEntryState(),
+    dispatch: vi.fn(),
+    onSubmitForm: vi.fn(() => Promise.resolve(true)),
+    onDeleteDataEntry: vi.fn(() => Promise.resolve(true)),
+    onFinaliseDataEntry: vi.fn(() => Promise.resolve(true)),
+    register: vi.fn(),
+    setCache: vi.fn(),
+    updateFormSection: vi.fn(),
+    pollingStationResults: getInitialValues(),
+    ...override,
+  };
+}

@@ -1,20 +1,18 @@
 import { userEvent, UserEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { addValidationResultsToFormState } from "@/features/data_entry/utils/ValidationResults";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { getUrlMethodAndBody, render, screen, userTypeInputs, waitFor } from "@/testing/test-utils";
-import {
-  ClaimDataEntryResponse,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationResults,
-} from "@/types/generated/openapi";
+import { render, screen, userTypeInputs, waitFor } from "@/testing/test-utils";
+import { ClaimDataEntryResponse, PollingStationResults } from "@/types/generated/openapi";
 
-import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
+import { useDataEntryContext } from "../../hooks/useDataEntryContext";
+import { errorWarningMocks, getDefaultFormSection, mockDataEntryStateAndActionsLoaded } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
@@ -24,9 +22,10 @@ import {
 } from "../../testing/test.utils";
 import { DataEntryState } from "../../types/types";
 import { getClientState } from "../../utils/dataEntryUtils";
-import { DataEntryProvider } from "../DataEntryProvider";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 import { VotersAndVotesValues } from "./votersAndVotesValues";
+
+vi.mock("../../hooks/useDataEntryContext");
 
 const initialValues: PollingStationResults = {
   recounted: undefined,
@@ -83,17 +82,8 @@ const defaultDataEntryState: DataEntryState = {
   cache: null,
 };
 
-function renderForm(initialDataEntryState?: DataEntryState) {
-  return render(
-    <DataEntryProvider
-      election={electionMockData}
-      pollingStationId={1}
-      entryNumber={1}
-      initialDataEntryState={initialDataEntryState}
-    >
-      <VotersAndVotesForm />
-    </DataEntryProvider>,
-  );
+function renderForm() {
+  return render(<VotersAndVotesForm />);
 }
 
 const votersFieldIds = {
@@ -126,24 +116,26 @@ describe("Test VotersAndVotesForm", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
 
+      const context = mockDataEntryStateAndActionsLoaded();
+      vi.mocked(useDataEntryContext).mockReturnValue(context);
+
       renderForm();
 
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       await user.type(pollCards, "12345");
       expect(pollCards).toHaveValue("12345");
 
-      const spy = vi.spyOn(global, "fetch");
-
       await user.keyboard("{enter}");
 
-      expect(spy).not.toHaveBeenCalled();
+      expect(context.onSubmitForm).not.toHaveBeenCalled();
     });
 
     test("hitting shift+enter does result in api call", async () => {
       const user = userEvent.setup();
 
+      const context = mockDataEntryStateAndActionsLoaded();
+      vi.mocked(useDataEntryContext).mockReturnValue(context);
       renderForm();
-      const spy = vi.spyOn(global, "fetch");
 
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       await user.type(pollCards, "12345");
@@ -151,13 +143,14 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.keyboard("{shift>}{enter}{/shift}");
 
-      expect(spy).toHaveBeenCalled();
+      expect(context.onSubmitForm).toHaveBeenCalled();
     });
 
     //TODO: duplicate test for other forms?
     test("Inputs show formatted numbers when blurred", async () => {
       const user = userEvent.setup();
 
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
@@ -172,12 +165,10 @@ describe("Test VotersAndVotesForm", () => {
 
     test("Form field entry and keybindings", async () => {
       const user = userEvent.setup();
-      overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
-        pollingStationResults: {
-          recounted: true,
-        },
-      });
+
+      const context = mockDataEntryStateAndActionsLoaded();
+      context.pollingStationResults.recounted = true;
+      vi.mocked(useDataEntryContext).mockReturnValue(context);
       renderForm();
 
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
@@ -271,108 +262,59 @@ describe("Test VotersAndVotesForm", () => {
     });
   });
 
-  describe("VotersAndVotesForm API request and response", () => {
-    test("VotersAndVotesForm without recount: request body is equal to the form data", async () => {
-      const expectedRequest = {
-        data: {
-          ...getEmptyDataEntryRequest().data,
-          recounted: false,
-          voters_counts: {
-            poll_card_count: 1,
-            proxy_certificate_count: 2,
-            voter_card_count: 3,
-            total_admitted_voters_count: 6,
-          },
-          votes_counts: {
-            votes_candidates_count: 4,
-            blank_votes_count: 5,
-            invalid_votes_count: 6,
-            total_votes_cast_count: 15,
-          },
-        },
-        client_state: {},
-      };
+  describe("VotersAndVotesForm submit", () => {
+    const voters_counts = {
+      poll_card_count: 1,
+      proxy_certificate_count: 2,
+      voter_card_count: 3,
+      total_admitted_voters_count: 6,
+    };
 
+    const votes_counts = {
+      votes_candidates_count: 4,
+      blank_votes_count: 5,
+      invalid_votes_count: 6,
+      total_votes_cast_count: 15,
+    };
+
+    const voters_recounts = {
+      poll_card_count: 7,
+      proxy_certificate_count: 8,
+      voter_card_count: 9,
+      total_admitted_voters_count: 24,
+    };
+
+    test("VotersAndVotesForm without recount: request body is equal to the form data", async () => {
       const user = userEvent.setup();
-      overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
-        pollingStationResults: {
-          recounted: false,
-        },
-      });
+
+      const context = mockDataEntryStateAndActionsLoaded();
+      vi.mocked(useDataEntryContext).mockReturnValue(context);
+
       renderForm();
 
-      await userTypeInputs(user, expectedRequest.data.voters_counts, "data.voters_counts.");
-      await userTypeInputs(user, expectedRequest.data.votes_counts, "data.votes_counts.");
-
-      const spy = vi.spyOn(global, "fetch");
+      await userTypeInputs(user, voters_counts, "data.voters_counts.");
+      await userTypeInputs(user, votes_counts, "data.votes_counts.");
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      expect(spy).toHaveBeenCalled();
-      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-
-      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
-      expect(method).toEqual("POST");
-      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
-      expect(request_body.data).toEqual(expectedRequest.data);
+      expect(context.onSubmitForm).toHaveBeenCalledWith({ voters_counts, votes_counts }, { showAcceptWarnings: false });
     });
 
-    //TODO: fix which mock to use, confusing via ./form/testHelperFunctions and ./test.util
     test("VotersAndVotesForm with recount: request body is equal to the form data", async () => {
-      const expectedRequest = {
-        data: {
-          ...getEmptyDataEntryRequest().data,
-          recounted: true,
-          voters_counts: {
-            poll_card_count: 1,
-            proxy_certificate_count: 2,
-            voter_card_count: 3,
-            total_admitted_voters_count: 6,
-          },
-          voters_recounts: {
-            poll_card_count: 7,
-            proxy_certificate_count: 8,
-            voter_card_count: 9,
-            total_admitted_voters_count: 24,
-          },
-          votes_counts: {
-            votes_candidates_count: 4,
-            blank_votes_count: 5,
-            invalid_votes_count: 6,
-            total_votes_cast_count: 15,
-          },
-        },
-        client_state: {},
-      };
-
       const user = userEvent.setup();
-      overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
-        pollingStationResults: {
-          recounted: true,
-        },
-      });
+      const context = mockDataEntryStateAndActionsLoaded();
+      context.pollingStationResults.recounted = true;
+      vi.mocked(useDataEntryContext).mockReturnValue(context);
 
       renderForm();
 
-      await userTypeInputs(user, expectedRequest.data.voters_counts, "data.voters_counts.");
-      await userTypeInputs(user, expectedRequest.data.votes_counts, "data.votes_counts.");
-      await userTypeInputs(user, expectedRequest.data.voters_recounts, "data.voters_recounts.");
-
-      const spy = vi.spyOn(global, "fetch");
+      await userTypeInputs(user, voters_counts, "data.voters_counts.");
+      await userTypeInputs(user, votes_counts, "data.votes_counts.");
+      await userTypeInputs(user, voters_recounts, "data.voters_recounts.");
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
-
-      expect(spy).toHaveBeenCalled();
-      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-
-      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
-      expect(method).toEqual("POST");
-      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
-      expect(request_body.data).toEqual(expectedRequest.data);
     });
 
     test("VotersAndVotesForm with cache", async () => {
@@ -390,13 +332,17 @@ describe("Test VotersAndVotesForm", () => {
           total_votes_cast_count: 150,
         },
       };
-      renderForm({
-        ...defaultDataEntryState,
-        cache: {
-          key: "voters_votes_counts",
-          data: cacheData,
-        },
-      });
+
+      vi.mocked(useDataEntryContext).mockReturnValue(
+        mockDataEntryStateAndActionsLoaded({
+          cache: {
+            key: "voters_votes_counts",
+            data: cacheData,
+          },
+        }),
+      );
+
+      renderForm();
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       expect(pollCards).toHaveValue(cacheData.voters_counts.poll_card_count.toString());
 
@@ -427,6 +373,8 @@ describe("Test VotersAndVotesForm", () => {
     test("F.201 IncorrectTotal Voters counts", async () => {
       const user = userEvent.setup();
 
+      const context = mockDataEntryStateAndActionsLoaded();
+      vi.mocked(useDataEntryContext).mockReturnValue(context);
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -475,6 +423,7 @@ describe("Test VotersAndVotesForm", () => {
     test("F.202 IncorrectTotal Votes counts", async () => {
       const user = userEvent.setup();
 
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -515,6 +464,12 @@ describe("Test VotersAndVotesForm", () => {
           recounted: true,
         },
       });
+
+      // formState.sections[formSection][errorsOrWarnings].add(validationResult);
+      const context = mockDataEntryStateAndActionsLoaded();
+      addValidationResultsToFormState([errorWarningMocks.F203], context.formState, "errors");
+      vi.mocked(useDataEntryContext).mockReturnValue(context);
+
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -560,6 +515,7 @@ describe("Test VotersAndVotesForm", () => {
     test("clicking next without accepting warning results in alert shown and then accept warning", async () => {
       const user = userEvent.setup();
 
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -644,6 +600,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.201 high number of blank votes", async () => {
       const user = userEvent.setup();
 
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -680,6 +637,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.202 high number of invalid votes", async () => {
       const user = userEvent.setup();
 
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -716,6 +674,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.203 voters counts and votes counts difference above threshold", async () => {
       const user = userEvent.setup();
 
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -753,6 +712,7 @@ describe("Test VotersAndVotesForm", () => {
           recounted: true,
         },
       });
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -790,6 +750,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.205 total votes cast should not be zero", async () => {
       const user = userEvent.setup();
 
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -823,6 +784,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.206 total admitted voters and total votes cast should not exceed polling stations number of eligible voters", async () => {
       const user = userEvent.setup();
 
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -860,6 +822,7 @@ describe("Test VotersAndVotesForm", () => {
           recounted: true,
         },
       });
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -896,6 +859,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.208 EqualInput voters counts and votes counts", async () => {
       const user = userEvent.setup();
 
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -941,6 +905,8 @@ describe("Test VotersAndVotesForm", () => {
         },
         validation_results: { errors: [], warnings: [] },
       } satisfies ClaimDataEntryResponse);
+
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
@@ -992,6 +958,7 @@ describe("Test VotersAndVotesForm", () => {
         },
       });
 
+      vi.mocked(useDataEntryContext).mockReturnValue(mockDataEntryStateAndActionsLoaded());
       renderForm();
 
       user = userEvent.setup();

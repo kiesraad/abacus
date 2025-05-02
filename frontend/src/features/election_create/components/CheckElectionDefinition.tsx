@@ -38,7 +38,7 @@ export function CheckElectionDefinition() {
         <p>
           <strong>{data.election.name}</strong>
           <br />
-          <span className="capitalize-first">{formatDateFull(new Date(election.election_date))}</span>
+          <span className="capitalize-first">{formatDateFull(new Date(data.election.election_date))}</span>
         </p>
         <div>
           <span>

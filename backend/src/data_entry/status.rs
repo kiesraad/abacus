@@ -535,6 +535,15 @@ impl DataEntryStatus {
         }
     }
 
+    pub fn get_first_entry(&self) -> Option<&PollingStationResults> {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(state) => Some(&state.first_entry),
+            DataEntryStatus::SecondEntryInProgress(state) => Some(&state.finalised_first_entry),
+            DataEntryStatus::EntriesDifferent(state) => Some(&state.first_entry),
+            _ => None,
+        }
+    }
+
     /// Get the data for the current entry if there is any
     pub fn get_data(&self) -> Option<&PollingStationResults> {
         match self {

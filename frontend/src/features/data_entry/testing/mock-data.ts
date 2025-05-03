@@ -177,6 +177,7 @@ export const errorWarningMocks: ErrorWarningsMap<ValidationResultCode> = {
     code: "F305",
   },
   F401: { fields: ["data.political_group_votes[0]"], code: "F401" },
+  W001: { fields: ["data.recounted"], code: "W001" },
   W201: { fields: ["data.votes_counts.blank_votes_count"], code: "W201" },
   W202: { fields: ["data.voters_counts.invalid_votes_count"], code: "W202" },
   W203: {

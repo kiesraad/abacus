@@ -654,7 +654,7 @@ pub mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let status: DataEntryStatus = serde_json::from_slice(&body).unwrap();
 
-        assert!(matches!(status, DataEntryStatus::EntriesDifferent(..)));
+        assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

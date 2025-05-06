@@ -1,6 +1,6 @@
 import { Navigate, RouterProvider } from "react-router";
 
-import { render } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { useUser } from "@/hooks/user/useUser";
@@ -8,7 +8,11 @@ import { setupTestRouter } from "@/testing/test-utils";
 import { PollingStationResults } from "@/types/generated/openapi";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
-import { getDefaultDataEntryStateAndActionsLoaded, getDefaultUser } from "../testing/mock-data";
+import {
+  getDefaultDataEntryState,
+  getDefaultDataEntryStateAndActionsLoaded,
+  getDefaultUser,
+} from "../testing/mock-data";
 import { DataEntryStateAndActionsLoaded, Status, SubmitCurrentFormOptions } from "../types/types";
 import { DataEntryNavigation } from "./DataEntryNavigation";
 
@@ -16,7 +20,9 @@ vi.mock("react-router");
 vi.mock("@/hooks/user/useUser");
 vi.mock("../hooks/useDataEntryContext");
 
-const testPath = "/elections/1/data-entry/2/3";
+//
+const baseMockData = getDefaultDataEntryStateAndActionsLoaded();
+const testPath = `/elections/${baseMockData.election.id}/data-entry/${baseMockData.pollingStationId}/1`;
 
 function renderComponent(
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>,
@@ -30,6 +36,7 @@ function renderComponent(
     {
       path: "/elections/:electionId/data-entry/:pollingStationId/:entryNumber",
       element: <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />,
+      children: [{ path: "differences", element: <div>Differences</div> }],
     },
     {
       path: "/test",
@@ -42,39 +49,241 @@ function renderComponent(
 }
 
 describe("DataEntryNavigation", () => {
-  test("renders without crashing", () => {
-    vi.mocked(useDataEntryContext).mockReturnValue(getDefaultDataEntryStateAndActionsLoaded());
-    vi.mocked(useUser).mockReturnValue(getDefaultUser());
-    const router = renderComponent(vi.fn());
-    expect(router.state.location.pathname).toBe("/elections/1/data-entry/2/3");
-  });
+  describe("Blocker behaviour", () => {
+    test.each<Status>(["deleted", "finalised", "finalising", "aborted"])(
+      "Doesnt block navigation for status: %s",
+      async (status) => {
+        const state: DataEntryStateAndActionsLoaded = {
+          ...getDefaultDataEntryStateAndActionsLoaded(),
+          status,
+        };
 
-  test.each<Status>(["deleted", "finalised", "finalising", "aborted"])(
-    "Doesnt block navigation for status: %s",
-    async (status) => {
+        vi.mocked(useDataEntryContext).mockReturnValue(state);
+        vi.mocked(useUser).mockReturnValue(getDefaultUser());
+        const router = renderComponent(vi.fn());
+        await router.navigate("/test");
+        expect(router.state.location.pathname).toBe("/test");
+      },
+    );
+
+    test("Blocks when navigating outside data entry flow", async () => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),
-        status,
+        status: "idle",
       };
 
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(getDefaultUser());
       const router = renderComponent(vi.fn());
       await router.navigate("/test");
-      expect(router.state.location.pathname).toBe("/test");
-    },
-  );
+      expect(router.state.location.pathname).toBe(testPath);
 
-  test("Blocks when navigating toutside data entry flow", async () => {
-    const state: DataEntryStateAndActionsLoaded = {
-      ...getDefaultDataEntryStateAndActionsLoaded(),
-      status: "idle",
-    };
+      const modal = await screen.findByRole("dialog");
+      expect(modal).toBeDefined();
+      const title = within(modal).getByText("Wat wil je doen met je invoer?");
+      expect(title).toBeDefined();
+    });
 
-    vi.mocked(useDataEntryContext).mockReturnValue(state);
-    vi.mocked(useUser).mockReturnValue(getDefaultUser());
-    const router = renderComponent(vi.fn());
-    await router.navigate("/test");
-    expect(router.state.location.pathname).toBe(testPath);
+    test("Blocks when form has changes", async () => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        formState: {
+          current: "voters_votes_counts",
+          furthest: "differences_counts",
+          sections: {
+            ...getDefaultDataEntryState().formState.sections,
+            voters_votes_counts: {
+              ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+              hasChanges: true,
+            },
+          },
+        },
+        status: "idle",
+      };
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+
+      const router = renderComponent(vi.fn());
+
+      //navigate within data entry flow
+      await router.navigate(testPath + "/differences");
+      expect(router.state.location.pathname).toBe(testPath);
+
+      const modal = await screen.findByRole("dialog");
+      expect(modal).toBeDefined();
+      const title = within(modal).getByText("Let op: niet opgeslagen wijzigingen");
+      expect(title).toBeDefined();
+    });
+
+    test("Sets cache when form has changes and section is furthest", async () => {
+      const setCache = vi.fn();
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        setCache,
+        formState: {
+          current: "voters_votes_counts",
+          furthest: "voters_votes_counts",
+          sections: {
+            ...getDefaultDataEntryState().formState.sections,
+            voters_votes_counts: {
+              ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+              hasChanges: true,
+            },
+          },
+        },
+        status: "idle",
+      };
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+
+      const router = renderComponent(vi.fn());
+
+      //navigate within data entry flow
+      await router.navigate(testPath + "/differences");
+      expect(setCache).toHaveBeenCalled();
+      expect(router.state.location.pathname).toBe(testPath + "/differences");
+    });
+  });
+
+  describe("Modal actions", () => {
+    test("Abort model save", async () => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        status: "idle",
+      };
+
+      const onSubmit = vi.fn(async () => {
+        return Promise.resolve(true);
+      });
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      const router = renderComponent(onSubmit);
+      await router.navigate("/test");
+
+      const modal = await screen.findByRole("dialog");
+
+      const saveButton = within(modal).getByText("Invoer bewaren");
+      expect(saveButton).toBeDefined();
+      saveButton.click();
+
+      expect(onSubmit).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe("/test");
+      });
+    });
+
+    test("Abort model delete", async () => {
+      const onDeleteDataEntry = vi.fn(async () => {
+        return Promise.resolve(true);
+      });
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        onDeleteDataEntry,
+        status: "idle",
+      };
+
+      const onSubmit = vi.fn(async () => {
+        return Promise.resolve(true);
+      });
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      const router = renderComponent(onSubmit);
+      await router.navigate("/test");
+
+      const modal = await screen.findByRole("dialog");
+
+      const deleteButton = within(modal).getByText("Niet bewaren");
+      expect(deleteButton).toBeDefined();
+      deleteButton.click();
+
+      expect(onDeleteDataEntry).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe("/test");
+      });
+    });
+
+    test("Data entry modal discard changes", async () => {
+      const updateFormSection = vi.fn();
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        updateFormSection,
+        formState: {
+          current: "voters_votes_counts",
+          furthest: "differences_counts",
+          sections: {
+            ...getDefaultDataEntryState().formState.sections,
+            voters_votes_counts: {
+              ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+              hasChanges: true,
+            },
+          },
+        },
+        status: "idle",
+      };
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+
+      const router = renderComponent(vi.fn());
+
+      //navigate within data entry flow
+      await router.navigate(testPath + "/differences");
+
+      const modal = await screen.findByRole("dialog");
+      const noSaveButton = within(modal).getByText("Niet bewaren");
+      expect(noSaveButton).toBeDefined();
+      noSaveButton.click();
+      expect(updateFormSection).toHaveBeenCalledWith({
+        hasChanges: false,
+      });
+
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe(testPath + "/differences");
+      });
+    });
+
+    test("Data entry modal save changes", async () => {
+      const onSubmit = vi.fn(async () => {
+        return Promise.resolve(true);
+      });
+
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        formState: {
+          current: "voters_votes_counts",
+          furthest: "differences_counts",
+          sections: {
+            ...getDefaultDataEntryState().formState.sections,
+            voters_votes_counts: {
+              ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+              hasChanges: true,
+            },
+          },
+        },
+        status: "idle",
+      };
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+
+      const router = renderComponent(onSubmit);
+
+      //navigate within data entry flow
+      await router.navigate(testPath + "/differences");
+
+      const modal = await screen.findByRole("dialog");
+      const saveButton = within(modal).getByText("Wijzigingen opslaan");
+      expect(saveButton).toBeDefined();
+      saveButton.click();
+      expect(onSubmit).toHaveBeenCalled();
+
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe(testPath + "/differences");
+      });
+    });
   });
 });

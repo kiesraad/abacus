@@ -16,7 +16,7 @@ De applicatie logt acties. Van elke gelogde actie is in elk geval de volgende in
 - object: waarop de gebeurtenis of handeling effect had (bijv. welk bestand, proces of systeem),
 - resultaat: het resultaat van de gebeurtenis of handeling,
 - oorsprong: het apparaat of de netwerklocatie van waaruit de gebeurtenis of handeling in gang is gezet,
-- actor: identificatie van de persoon die of het proces dat de gebeurtenis in gang heeft gezet
+- actor: identificatie van de persoon+rol die of het proces dat de gebeurtenis in gang heeft gezet
 - tijdstempel: datum en tijdstip waarop de gebeurtenis of handling plaatsvond.
 
 ### Open punten

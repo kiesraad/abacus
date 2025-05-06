@@ -26,9 +26,9 @@ Het extern toetsen en de wens om hierbij bovengemiddeld te scoren is onderdeel v
 
 De architectuurplaatjes zijn geactualiseerd. De aanbeveling over architectuur hebben we meegenomen in de frontend refactor en we hebben een aanvullende analyse van de backend-code gedaan. Samen met SIG wordt gewerkt aan de analyse van de code voor onze usecase. 
 
-Afbeeldingen aanpassen: https://github.com/kiesraad/abacus/issues/987
-Modulariteit backend-modules: https://github.com/kiesraad/abacus/issues/988 (met bijbehorende PR's)
-Frontend architectuurdocumentatie: https://github.com/kiesraad/abacus/issues/989
+Afbeeldingen aanpassen: https://github.com/kiesraad/abacus/issues/987  
+Modulariteit backend-modules: https://github.com/kiesraad/abacus/issues/988 (met bijbehorende PR's)  
+Frontend architectuurdocumentatie: https://github.com/kiesraad/abacus/issues/989  
 
 ## Methodiek
 

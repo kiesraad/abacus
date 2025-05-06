@@ -34,6 +34,10 @@ De beheerder / coordinator bekijkt de gelogde acties om het gebruik te monitoren
 
 - Welke statistiek is relevant voor het monitoren van gebruik?
 
+### Open punten
+
+- Welke statistiek is relevant voor het monitoren van gebruik?
+
 ## De Kiesraad bekijkt de logging bij het afhandelen van een incident (zee)
 
 __Niveau:__ gebruikersdoel, zee  (🌊)
@@ -44,3 +48,17 @@ De Kiesraad gebruikt de logging als informatiebron bij het afhandelen van een in
 
 - Is er een manier om de compleetheid van de logs te beoordelen?
 
+## Out of scope
+
+### De beheerder / coordinator bekijkt statistieken over het gebruik
+
+__Niveau:__ gebruikersdoel, zee  (🌊)
+
+De beheerder / coordinator bekijkt de statistieken over het gebruik van de applicatie met als doel o.a.:
+- het maken van de capaciteitsplanning
+- het bepalen van doorlooptijden
+- als input voor procesverbetering
+
+#### Open punten
+
+- Deze informatie kan persoonlijk zijn

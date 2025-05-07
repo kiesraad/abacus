@@ -48,7 +48,7 @@ type Fixtures = {
   // Election with polling stations and two completed data entries for each
   completedElection: Election;
   // Newly created User
-  user: User;
+  newTypist: User;
 };
 
 async function completePollingStationDataEntries(request: APIRequestContext, pollingStationId: number) {
@@ -169,7 +169,7 @@ export const test = base.extend<Fixtures>({
 
     await use(election.election);
   },
-  user: async ({ request }, use) => {
+  newTypist: async ({ request }, use) => {
     await loginAs(request, "admin");
     // create a new user
     const url: USER_CREATE_REQUEST_PATH = "/api/user";

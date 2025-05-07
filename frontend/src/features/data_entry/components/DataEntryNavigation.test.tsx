@@ -51,7 +51,7 @@ function renderComponent(
 describe("DataEntryNavigation", () => {
   describe("Blocker behaviour", () => {
     test.each<Status>(["deleted", "finalised", "finalising", "aborted"])(
-      "Doesnt block navigation for status: %s",
+      "Does not block navigation for status: %s",
       async (status) => {
         const state: DataEntryStateAndActionsLoaded = {
           ...getDefaultDataEntryStateAndActionsLoaded(),
@@ -66,10 +66,10 @@ describe("DataEntryNavigation", () => {
       },
     );
 
-    test("Blocks when navigating outside data entry flow", async () => {
+    test.each<Status>(["idle", "saving", "deleting"])("Does block navigation for status: %s", async (status) => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),
-        status: "idle",
+        status,
       };
 
       vi.mocked(useDataEntryContext).mockReturnValue(state);
@@ -79,9 +79,9 @@ describe("DataEntryNavigation", () => {
       expect(router.state.location.pathname).toBe(testPath);
 
       const modal = await screen.findByRole("dialog");
-      expect(modal).toBeDefined();
+      expect(modal).toBeVisible();
       const title = within(modal).getByText("Wat wil je doen met je invoer?");
-      expect(title).toBeDefined();
+      expect(title).toBeVisible();
     });
 
     test("Blocks when form has changes", async () => {
@@ -111,9 +111,9 @@ describe("DataEntryNavigation", () => {
       expect(router.state.location.pathname).toBe(testPath);
 
       const modal = await screen.findByRole("dialog");
-      expect(modal).toBeDefined();
+      expect(modal).toBeVisible();
       const title = within(modal).getByText("Let op: niet opgeslagen wijzigingen");
-      expect(title).toBeDefined();
+      expect(title).toBeVisible();
     });
 
     test("Sets cache when form has changes and section is furthest", async () => {
@@ -166,7 +166,7 @@ describe("DataEntryNavigation", () => {
       const modal = await screen.findByRole("dialog");
 
       const saveButton = within(modal).getByText("Invoer bewaren");
-      expect(saveButton).toBeDefined();
+      expect(saveButton).toBeVisible();
       saveButton.click();
 
       expect(onSubmit).toHaveBeenCalled();
@@ -197,7 +197,7 @@ describe("DataEntryNavigation", () => {
       const modal = await screen.findByRole("dialog");
 
       const deleteButton = within(modal).getByText("Niet bewaren");
-      expect(deleteButton).toBeDefined();
+      expect(deleteButton).toBeVisible();
       deleteButton.click();
 
       expect(onDeleteDataEntry).toHaveBeenCalled();
@@ -235,7 +235,7 @@ describe("DataEntryNavigation", () => {
 
       const modal = await screen.findByRole("dialog");
       const noSaveButton = within(modal).getByText("Niet bewaren");
-      expect(noSaveButton).toBeDefined();
+      expect(noSaveButton).toBeVisible();
       noSaveButton.click();
       expect(updateFormSection).toHaveBeenCalledWith({
         hasChanges: false,
@@ -277,7 +277,7 @@ describe("DataEntryNavigation", () => {
 
       const modal = await screen.findByRole("dialog");
       const saveButton = within(modal).getByText("Wijzigingen opslaan");
-      expect(saveButton).toBeDefined();
+      expect(saveButton).toBeVisible();
       saveButton.click();
       expect(onSubmit).toHaveBeenCalled();
 

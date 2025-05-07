@@ -84,7 +84,7 @@ describe("DataEntryNavigation", () => {
       expect(title).toBeVisible();
     });
 
-    test("Does not block navigation is user is null", async () => {
+    test("Does not block navigation if user is null", async () => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),
         status: "idle",

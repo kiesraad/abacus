@@ -192,7 +192,7 @@ describe("DataEntryNavigation", () => {
 
       const modal = await screen.findByRole("dialog");
 
-      const saveButton = within(modal).getByText("Invoer bewaren");
+      const saveButton = within(modal).getByRole("button", { name: "Invoer bewaren" });
       expect(saveButton).toBeVisible();
       saveButton.click();
 
@@ -223,7 +223,7 @@ describe("DataEntryNavigation", () => {
 
       const modal = await screen.findByRole("dialog");
 
-      const deleteButton = within(modal).getByText("Niet bewaren");
+      const deleteButton = within(modal).getByRole("button", { name: "Niet bewaren" });
       expect(deleteButton).toBeVisible();
       deleteButton.click();
 
@@ -290,7 +290,7 @@ describe("DataEntryNavigation", () => {
       await router.navigate(testPath + "/differences");
 
       const modal = await screen.findByRole("dialog");
-      const noSaveButton = within(modal).getByText("Niet bewaren");
+      const noSaveButton = within(modal).getByRole("button", { name: "Niet bewaren" });
       expect(noSaveButton).toBeVisible();
       noSaveButton.click();
       expect(updateFormSection).toHaveBeenCalledWith({
@@ -332,7 +332,7 @@ describe("DataEntryNavigation", () => {
       await router.navigate(testPath + "/differences");
 
       const modal = await screen.findByRole("dialog");
-      const saveButton = within(modal).getByText("Wijzigingen opslaan");
+      const saveButton = within(modal).getByRole("button", { name: "Wijzigingen opslaan" });
       expect(saveButton).toBeVisible();
       saveButton.click();
       expect(onSubmit).toHaveBeenCalled();

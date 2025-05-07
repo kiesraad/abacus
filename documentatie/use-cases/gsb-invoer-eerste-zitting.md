@@ -222,6 +222,7 @@ __Uitbreidingen:__
 &emsp; 2a2. De coördinator GSB besluit dat de invoer verder kan gaan.  
 &emsp;&emsp; 2a2a. De coördinator GSB besluit dat de invoer niet verder kan gaan:  
 &emsp;&emsp;&emsp; 2a2a1. De coördinator GSB stuurt het PV terug in het proces met de reden waarom invoer gestopt is.  
+&emsp;&emsp;&emsp; 2a2a2. De coördinator GSB verwijdert de ingevoerde data.  
 &emsp; 2a3. De invoerder voert het volledige PV in.  
 &emsp; 2a4. De coördinator GSB stuurt het PV met de foutmeldingen terug in het proces.  
 &emsp; 2a5. De coördinator GSB verwijdert de ingevoerde data.

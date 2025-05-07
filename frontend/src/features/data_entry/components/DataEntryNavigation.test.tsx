@@ -66,23 +66,56 @@ describe("DataEntryNavigation", () => {
       },
     );
 
-    test.each<Status>(["idle", "saving", "deleting"])("Does block navigation for status: %s", async (status) => {
-      const state: DataEntryStateAndActionsLoaded = {
-        ...getDefaultDataEntryStateAndActionsLoaded(),
-        status,
-      };
+    test.each<Status>(["idle", "saving", "deleting"])(
+      "Does not block navigation without changes for status: %s",
+      async (status) => {
+        const state: DataEntryStateAndActionsLoaded = {
+          ...getDefaultDataEntryStateAndActionsLoaded(),
+          status,
+        };
 
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getDefaultUser());
-      const router = renderComponent(vi.fn());
-      await router.navigate("/test");
-      expect(router.state.location.pathname).toBe(testPath);
+        vi.mocked(useDataEntryContext).mockReturnValue(state);
+        vi.mocked(useUser).mockReturnValue(getDefaultUser());
+        const router = renderComponent(vi.fn());
+        await router.navigate(testPath + "/differences");
+        expect(router.state.location.pathname).toBe(testPath + "/differences");
+      },
+    );
 
-      const modal = await screen.findByRole("dialog");
-      expect(modal).toBeVisible();
-      const title = within(modal).getByText("Wat wil je doen met je invoer?");
-      expect(title).toBeVisible();
-    });
+    test.each<Status>(["idle", "saving", "deleting"])(
+      "Blocks navigation when form has changes for status: %s",
+      async (status) => {
+        const state: DataEntryStateAndActionsLoaded = {
+          ...getDefaultDataEntryStateAndActionsLoaded(),
+          formState: {
+            current: "voters_votes_counts",
+            furthest: "differences_counts",
+            sections: {
+              ...getDefaultDataEntryState().formState.sections,
+              voters_votes_counts: {
+                ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+                hasChanges: true,
+              },
+            },
+          },
+          status,
+        };
+
+        vi.mocked(useDataEntryContext).mockReturnValue(state);
+        vi.mocked(useUser).mockReturnValue(getDefaultUser());
+
+        const router = renderComponent(vi.fn());
+
+        //navigate within data entry flow
+        await router.navigate(testPath + "/differences");
+        expect(router.state.location.pathname).toBe(testPath);
+
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        const title = within(modal).getByText("Let op: niet opgeslagen wijzigingen");
+        expect(title).toBeVisible();
+      },
+    );
 
     test("Does not block navigation if user is null", async () => {
       const state: DataEntryStateAndActionsLoaded = {
@@ -109,38 +142,6 @@ describe("DataEntryNavigation", () => {
       await router.navigate(testPath);
       expect(router.state.location.pathname).toBe(testPath);
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    });
-
-    test("Blocks when form has changes", async () => {
-      const state: DataEntryStateAndActionsLoaded = {
-        ...getDefaultDataEntryStateAndActionsLoaded(),
-        formState: {
-          current: "voters_votes_counts",
-          furthest: "differences_counts",
-          sections: {
-            ...getDefaultDataEntryState().formState.sections,
-            voters_votes_counts: {
-              ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
-              hasChanges: true,
-            },
-          },
-        },
-        status: "idle",
-      };
-
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getDefaultUser());
-
-      const router = renderComponent(vi.fn());
-
-      //navigate within data entry flow
-      await router.navigate(testPath + "/differences");
-      expect(router.state.location.pathname).toBe(testPath);
-
-      const modal = await screen.findByRole("dialog");
-      expect(modal).toBeVisible();
-      const title = within(modal).getByText("Let op: niet opgeslagen wijzigingen");
-      expect(title).toBeVisible();
     });
 
     test("Sets cache when form has changes and section is furthest", async () => {

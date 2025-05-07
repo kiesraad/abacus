@@ -125,7 +125,7 @@ export function getEmptyDataEntryRequest(): POLLING_STATION_DATA_ENTRY_SAVE_REQU
   };
 }
 
-export function getDefaultUser(): LoginResponse {
+export function getTypistUser(): LoginResponse {
   return {
     needs_password_change: false,
     role: "typist",

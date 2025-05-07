@@ -11,7 +11,7 @@ import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import {
   getDefaultDataEntryState,
   getDefaultDataEntryStateAndActionsLoaded,
-  getDefaultUser,
+  getTypistUser,
 } from "../testing/mock-data";
 import { DataEntryStateAndActionsLoaded, Status, SubmitCurrentFormOptions } from "../types/types";
 import { DataEntryNavigation } from "./DataEntryNavigation";
@@ -59,7 +59,7 @@ describe("DataEntryNavigation", () => {
         };
 
         vi.mocked(useDataEntryContext).mockReturnValue(state);
-        vi.mocked(useUser).mockReturnValue(getDefaultUser());
+        vi.mocked(useUser).mockReturnValue(getTypistUser());
         const router = renderComponent(vi.fn());
         await router.navigate("/test");
         expect(router.state.location.pathname).toBe("/test");
@@ -75,7 +75,7 @@ describe("DataEntryNavigation", () => {
         };
 
         vi.mocked(useDataEntryContext).mockReturnValue(state);
-        vi.mocked(useUser).mockReturnValue(getDefaultUser());
+        vi.mocked(useUser).mockReturnValue(getTypistUser());
         const router = renderComponent(vi.fn());
         await router.navigate(testPath + "/differences");
         expect(router.state.location.pathname).toBe(testPath + "/differences");
@@ -102,7 +102,7 @@ describe("DataEntryNavigation", () => {
         };
 
         vi.mocked(useDataEntryContext).mockReturnValue(state);
-        vi.mocked(useUser).mockReturnValue(getDefaultUser());
+        vi.mocked(useUser).mockReturnValue(getTypistUser());
 
         const router = renderComponent(vi.fn());
 
@@ -137,7 +137,7 @@ describe("DataEntryNavigation", () => {
       };
 
       vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
       const router = renderComponent(vi.fn());
       await router.navigate(testPath);
       expect(router.state.location.pathname).toBe(testPath);
@@ -164,7 +164,7 @@ describe("DataEntryNavigation", () => {
       };
 
       vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
 
       const router = renderComponent(vi.fn());
 
@@ -187,7 +187,7 @@ describe("DataEntryNavigation", () => {
       });
 
       vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
       const router = renderComponent(onSubmit);
       await router.navigate("/test");
 
@@ -218,7 +218,7 @@ describe("DataEntryNavigation", () => {
       });
 
       vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
       const router = renderComponent(onSubmit);
       await router.navigate("/test");
 
@@ -245,7 +245,7 @@ describe("DataEntryNavigation", () => {
       });
 
       vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
       const router = renderComponent(onSubmit);
       await router.navigate("/test");
 
@@ -283,7 +283,7 @@ describe("DataEntryNavigation", () => {
       };
 
       vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
 
       const router = renderComponent(vi.fn());
 
@@ -325,7 +325,7 @@ describe("DataEntryNavigation", () => {
       };
 
       vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
 
       const router = renderComponent(onSubmit);
 
@@ -363,7 +363,7 @@ describe("DataEntryNavigation", () => {
       };
 
       vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
 
       const router = renderComponent(vi.fn());
 

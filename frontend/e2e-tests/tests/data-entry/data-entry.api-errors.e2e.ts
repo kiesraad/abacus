@@ -103,18 +103,12 @@ test.describe("data entry - api error responses", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
   });
 
-  test("UI Warning: Trying to load a data entry that was already claimed", async ({ page, pollingStation }) => {
-    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1/claim`, async (route) => {
-      await route.fulfill({
-        status: 409,
-        json: {
-          error: "Conflict",
-          fatal: false,
-          reference: "DataEntryAlreadyClaimed",
-        },
-      });
-    });
-
+  test("UI Warning: Trying to load a data entry that was already claimed", async ({
+    typistTwo,
+    pollingStationFirstEntryClaimed,
+  }) => {
+    const { page } = typistTwo;
+    const pollingStation = pollingStationFirstEntryClaimed;
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);

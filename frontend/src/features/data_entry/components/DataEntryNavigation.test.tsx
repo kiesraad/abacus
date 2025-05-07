@@ -174,8 +174,8 @@ describe("DataEntryNavigation", () => {
     });
   });
 
-  describe("Modal actions", () => {
-    test("Abort model save", async () => {
+  describe("Abort modal actions", () => {
+    test("Abort modal save", async () => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),
         status: "idle",
@@ -202,7 +202,7 @@ describe("DataEntryNavigation", () => {
       });
     });
 
-    test("Abort model delete", async () => {
+    test("Abort modal delete", async () => {
       const onDeleteDataEntry = vi.fn(async () => {
         return Promise.resolve(true);
       });
@@ -233,6 +233,35 @@ describe("DataEntryNavigation", () => {
       });
     });
 
+    test("Abort modal close", async () => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        status: "idle",
+      };
+
+      const onSubmit = vi.fn(async () => {
+        return Promise.resolve(true);
+      });
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      const router = renderComponent(onSubmit);
+      await router.navigate("/test");
+
+      const modal = await screen.findByRole("dialog");
+
+      const closeButton = within(modal).getByRole("button", { name: "Annuleren" });
+      expect(closeButton).toBeVisible();
+      closeButton.click();
+
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe(testPath);
+      });
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Data entry modal actions", () => {
     test("Data entry modal discard changes", async () => {
       const updateFormSection = vi.fn();
       const state: DataEntryStateAndActionsLoaded = {
@@ -311,6 +340,44 @@ describe("DataEntryNavigation", () => {
       await waitFor(() => {
         expect(router.state.location.pathname).toBe(testPath + "/differences");
       });
+    });
+
+    test("Data entry modal close", async () => {
+      const updateFormSection = vi.fn();
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        updateFormSection,
+        formState: {
+          current: "voters_votes_counts",
+          furthest: "differences_counts",
+          sections: {
+            ...getDefaultDataEntryState().formState.sections,
+            voters_votes_counts: {
+              ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+              hasChanges: true,
+            },
+          },
+        },
+        status: "idle",
+      };
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+
+      const router = renderComponent(vi.fn());
+
+      //navigate within data entry flow
+      await router.navigate(testPath + "/differences");
+
+      const modal = await screen.findByRole("dialog");
+      const closeButton = within(modal).getByRole("button", { name: "Annuleren" });
+      expect(closeButton).toBeVisible();
+      closeButton.click();
+
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe(testPath);
+      });
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
   });
 });

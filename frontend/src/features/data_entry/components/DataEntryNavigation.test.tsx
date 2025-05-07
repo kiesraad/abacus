@@ -84,6 +84,19 @@ describe("DataEntryNavigation", () => {
       expect(title).toBeVisible();
     });
 
+    test("Does not block navigation is user is null", async () => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        status: "idle",
+      };
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(null);
+      const router = renderComponent(vi.fn());
+      await router.navigate("/test");
+      expect(router.state.location.pathname).toBe("/test");
+    });
+
     test("Blocks when form has changes", async () => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),

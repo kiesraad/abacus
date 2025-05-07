@@ -24,11 +24,11 @@ De applicatie logt acties. Van elke gelogde actie is in elk geval de volgende in
 - welke gebeurtenissen vragen om melding aan de gebruiker en/of directe actie?
 - Is de logging nuttig en/of nodig bij het oplossen van problemen met het gebruik van de applicatie?
 
-## De beheerder / coordinator bekijkt de logging om het gebruik te monitoren (zee)
+## De beheerder / coördinator bekijkt de logging om het gebruik te monitoren (zee)
 
 __Niveau:__ gebruikersdoel, zee  (🌊)
 
-De beheerder / coordinator bekijkt de gelogde acties om het gebruik te monitoren. Ze kunnen de logging filteren op eigenschappen van de gelogde acties.
+De beheerder / coördinator bekijkt de gelogde acties om het gebruik te monitoren. Ze kunnen de logging filteren op eigenschappen van de gelogde acties.
 
 ### Open punten
 
@@ -50,11 +50,11 @@ De Kiesraad gebruikt de logging als informatiebron bij het afhandelen van een in
 
 ## Out of scope
 
-### De beheerder / coordinator bekijkt statistieken over het gebruik
+### De beheerder / coördinator bekijkt statistieken over het gebruik
 
 __Niveau:__ gebruikersdoel, zee  (🌊)
 
-De beheerder / coordinator bekijkt de statistieken over het gebruik van de applicatie met als doel o.a.:
+De beheerder / coördinator bekijkt de statistieken over het gebruik van de applicatie met als doel o.a.:
 - het maken van de capaciteitsplanning
 - het bepalen van doorlooptijden
 - als input voor procesverbetering

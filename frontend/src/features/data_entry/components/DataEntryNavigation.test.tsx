@@ -97,6 +97,20 @@ describe("DataEntryNavigation", () => {
       expect(router.state.location.pathname).toBe("/test");
     });
 
+    test("Does not block when navigating to the same page", async () => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        status: "idle",
+      };
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getDefaultUser());
+      const router = renderComponent(vi.fn());
+      await router.navigate(testPath);
+      expect(router.state.location.pathname).toBe(testPath);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
     test("Blocks when form has changes", async () => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),

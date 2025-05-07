@@ -13,18 +13,18 @@ import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 
 import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
-import { test } from "../fixtures";
+import { test } from "../../fixtures";
 import {
   fillDataEntryPages,
   fillDataEntryPagesAndSave,
   selectPollingStationForDataEntry,
-} from "../helpers-utils/e2e-test-helpers";
-import { formatNumber } from "../helpers-utils/e2e-test-utils";
+} from "../../helpers-utils/e2e-test-helpers";
+import { formatNumber } from "../../helpers-utils/e2e-test-utils";
 import {
   noErrorsWarningsResponse,
   noRecountNoDifferencesDataEntry,
   noRecountNoDifferencesRequest,
-} from "../test-data/request-response-templates";
+} from "../../test-data/request-response-templates";
 
 test.use({
   storageState: "e2e-tests/state/typist.json",

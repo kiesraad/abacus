@@ -16,8 +16,8 @@ De applicatie logt acties. Van elke gelogde actie is in elk geval de volgende in
 - object: waarop de gebeurtenis of handeling effect had (bijv. welk bestand, proces of systeem),
 - resultaat: het resultaat van de gebeurtenis of handeling,
 - oorsprong: het apparaat of de netwerklocatie van waaruit de gebeurtenis of handeling in gang is gezet,
-- actor: identificatie van de persoon+rol die of het proces dat de gebeurtenis in gang heeft gezet
-- tijdstempel: datum en tijdstip waarop de gebeurtenis of handling plaatsvond.
+- actor: identificatie van de persoon+rol die, of het proces dat de gebeurtenis in gang heeft gezet
+- tijdstempel: datum en tijdstip waarop de gebeurtenis of handeling plaatsvond.
 
 ### Open punten
 
@@ -53,7 +53,7 @@ __Niveau:__ gebruikersdoel, zee  (🌊)
 De beheerder / coördinator bekijkt de statistieken over het gebruik van de applicatie met als doel o.a.:
 - het maken van de capaciteitsplanning
 - het bepalen van doorlooptijden
-- als input voor procesverbetering
+- het gebruiken als input voor procesverbetering
 
 #### Open punten
 

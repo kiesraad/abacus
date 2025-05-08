@@ -2,7 +2,6 @@ import { ApiError } from "@/api/ApiResult";
 import { ErrorModal } from "@/components/error/ErrorModal";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
-import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Feedback } from "@/components/ui/Feedback/Feedback";
 import { Form } from "@/components/ui/Form/Form";
@@ -14,17 +13,7 @@ import { DataEntryNavigation } from "../DataEntryNavigation";
 import { useRecounted } from "./useRecounted";
 
 export function RecountedForm() {
-  const {
-    error,
-    recounted,
-    formRef,
-    setRecounted,
-    formSection,
-    isSaving,
-    onSubmit,
-    setAcceptWarnings,
-    showAcceptWarnings,
-  } = useRecounted();
+  const { error, recounted, formRef, setRecounted, formSection, isSaving, onSubmit } = useRecounted();
 
   return (
     <Form
@@ -67,19 +56,6 @@ export function RecountedForm() {
           />
         </ChoiceList>
       </div>
-      {showAcceptWarnings && (
-        <BottomBar.Row>
-          <Checkbox
-            id="recounted_form_accept_warnings"
-            checked={formSection.acceptWarnings}
-            hasError={formSection.acceptWarningsError}
-            onChange={(e) => {
-              setAcceptWarnings(e.target.checked);
-            }}
-            label={t("data_entry.form_accept_warnings")}
-          />
-        </BottomBar.Row>
-      )}
       <BottomBar type="form">
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={isSaving}>

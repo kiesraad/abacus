@@ -9,10 +9,18 @@ export default tseslint.config({
   files: ["**/*.ts", "**/*.tsx"],
   ignores: ["dist", ".eslintrc.cjs", "!.ladle/"],
   extends: [eslint.configs.recommended, tseslint.configs.recommended, importPlugin.flatConfigs.recommended],
+  rules: {
+    "@typescript-eslint/no-unsafe-type-assertion": "error",
+  },
   settings: {
     "import/resolver": {
       typescript: true,
       node: true,
+    },
+  },
+  languageOptions: {
+    parserOptions: {
+      project: "**/tsconfig.json",
     },
   },
 });

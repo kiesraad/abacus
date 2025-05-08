@@ -263,7 +263,7 @@ export function VotersAndVotesForm() {
               onChange={(e) => {
                 setAcceptWarnings(e.target.checked);
               }}
-              label={t("voters_and_votes.form_accept_warnings")}
+              label={t("data_entry.form_accept_warnings")}
             />
           </BottomBar.Row>
         )}

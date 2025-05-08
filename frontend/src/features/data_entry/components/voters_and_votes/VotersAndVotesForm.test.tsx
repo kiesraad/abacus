@@ -538,7 +538,7 @@ describe("Test VotersAndVotesForm", () => {
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
 
       let acceptFeedbackCheckbox = screen.getByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
       expect(acceptFeedbackCheckbox).toBeInTheDocument();
       expect(acceptFeedbackCheckbox).toBeVisible();
@@ -571,7 +571,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       acceptFeedbackCheckbox = screen.getByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
       expect(acceptFeedbackCheckbox).toBeVisible();
       expect(acceptFeedbackCheckbox).not.toBeChecked();
@@ -946,7 +946,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       acceptWarningsCheckbox = await screen.findByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
     });
 

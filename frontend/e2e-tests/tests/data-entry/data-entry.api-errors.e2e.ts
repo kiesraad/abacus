@@ -158,18 +158,9 @@ test.describe("data entry - api error responses", () => {
 
   test("UI Warning: Trying to load a second data entry when the first is in progress", async ({
     page,
-    pollingStation,
+    pollingStationFirstEntryClaimed,
   }) => {
-    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/2/claim`, async (route) => {
-      await route.fulfill({
-        status: 409,
-        json: {
-          error: "Conflict",
-          fatal: false,
-          reference: "InvalidStateTransition",
-        },
-      });
-    });
+    const pollingStation = pollingStationFirstEntryClaimed;
 
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`);
 

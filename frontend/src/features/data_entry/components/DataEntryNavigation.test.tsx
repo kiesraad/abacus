@@ -233,6 +233,30 @@ describe("DataEntryNavigation", () => {
       });
     });
 
+    test("Abort modal save, onSubmit false", async () => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        status: "idle",
+      };
+
+      const onSubmit = vi.fn(async () => {
+        return Promise.resolve(false);
+      });
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      const router = renderComponent(onSubmit);
+      await router.navigate("/test");
+
+      const modal = await screen.findByRole("dialog");
+
+      const saveButton = within(modal).getByRole("button", { name: "Invoer bewaren" });
+      saveButton.click();
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe(testPath);
+      });
+    });
+
     test("Abort modal close", async () => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),

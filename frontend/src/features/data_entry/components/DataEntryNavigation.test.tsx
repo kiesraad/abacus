@@ -175,33 +175,6 @@ describe("DataEntryNavigation", () => {
   });
 
   describe("Abort modal actions", () => {
-    test("Abort modal save", async () => {
-      const state: DataEntryStateAndActionsLoaded = {
-        ...getDefaultDataEntryStateAndActionsLoaded(),
-        status: "idle",
-      };
-
-      const onSubmit = vi.fn(async () => {
-        return Promise.resolve(true);
-      });
-
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
-      const router = renderComponent(onSubmit);
-      await router.navigate("/test");
-
-      const modal = await screen.findByRole("dialog");
-
-      const saveButton = within(modal).getByRole("button", { name: "Invoer bewaren" });
-      expect(saveButton).toBeVisible();
-      saveButton.click();
-
-      expect(onSubmit).toHaveBeenCalled();
-      await waitFor(() => {
-        expect(router.state.location.pathname).toBe("/test");
-      });
-    });
-
     test("Abort modal delete", async () => {
       const onDeleteDataEntry = vi.fn(async () => {
         return Promise.resolve(true);
@@ -228,6 +201,33 @@ describe("DataEntryNavigation", () => {
       deleteButton.click();
 
       expect(onDeleteDataEntry).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe("/test");
+      });
+    });
+
+    test("Abort modal save", async () => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        status: "idle",
+      };
+
+      const onSubmit = vi.fn(async () => {
+        return Promise.resolve(true);
+      });
+
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      const router = renderComponent(onSubmit);
+      await router.navigate("/test");
+
+      const modal = await screen.findByRole("dialog");
+
+      const saveButton = within(modal).getByRole("button", { name: "Invoer bewaren" });
+      expect(saveButton).toBeVisible();
+      saveButton.click();
+
+      expect(onSubmit).toHaveBeenCalled();
       await waitFor(() => {
         expect(router.state.location.pathname).toBe("/test");
       });

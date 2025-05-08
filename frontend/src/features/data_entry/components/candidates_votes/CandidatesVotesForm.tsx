@@ -152,7 +152,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
               onChange={(e) => {
                 setAcceptWarnings(e.target.checked);
               }}
-              label={t("candidates_votes.confirm_counts")}
+              label={t("data_entry.form_accept_warnings")}
             />
           </BottomBar.Row>
         )}

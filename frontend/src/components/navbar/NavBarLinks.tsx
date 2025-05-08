@@ -92,7 +92,8 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
   const { isAdministrator, isCoordinator } = useUserRole();
 
   if (
-    (location.pathname.match(/^\/elections(\/\d+|\/create)?$/) && (isAdministrator || isCoordinator)) ||
+    (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||
+    location.pathname.startsWith("/elections/create") ||
     location.pathname.startsWith("/users") ||
     location.pathname === "/workstations" ||
     location.pathname === "/logs"

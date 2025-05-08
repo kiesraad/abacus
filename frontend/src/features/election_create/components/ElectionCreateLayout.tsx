@@ -28,22 +28,25 @@ export function ElectionCreateLayout() {
               <ProgressList.Item key="election_definition" status="idle" active>
                 <span>{t("election_definition")}</span>
               </ProgressList.Item>
-              <ProgressList.Item key="polling_station_role" status="idle">
+              <ProgressList.Item key="polling_station_role" status="idle" disabled>
                 <span>{t("polling_station.role")}</span>
               </ProgressList.Item>
-              <ProgressList.Item key="list_of_candidates" status="idle">
+              <ProgressList.Item key="list_of_candidates" status="idle" disabled>
                 <span>{t("candidate.list.plural")}</span>
               </ProgressList.Item>
-              <ProgressList.Item key="polling_stations" status="idle">
+              <ProgressList.Item key="polling_stations" status="idle" disabled>
                 <span>{t("polling_stations")}</span>
               </ProgressList.Item>
-              <ProgressList.Item key="counting_method_type" status="idle">
+              <ProgressList.Item key="counting_method_type" status="idle" disabled>
                 <span>{t("counting_method_type")}</span>
+              </ProgressList.Item>
+              <ProgressList.Item key="number_of_voters" status="idle" disabled>
+                <span>{t("polling_station.number_of_voters")}</span>
               </ProgressList.Item>
             </ProgressList.Fixed>
             <div className="mt-md">
               <ProgressList.Fixed>
-                <ProgressList.Item key="check_and_save" status="idle">
+                <ProgressList.Item key="check_and_save" status="idle" disabled>
                   <span>{t("check_and_save.title")}</span>
                 </ProgressList.Item>
               </ProgressList.Fixed>

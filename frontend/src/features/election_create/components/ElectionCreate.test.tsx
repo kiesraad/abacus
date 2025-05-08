@@ -1,15 +1,36 @@
+import { RouterProvider } from "react-router";
+
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { ApiProvider } from "@/api/ApiProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
-import { Providers } from "@/testing/Providers";
+import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { electionCreateRoutes } from "../routes";
+
+const Providers = ({
+  children,
+  router = getRouter(children),
+  fetchInitialUser = false,
+}: {
+  children?: React.ReactNode;
+  router?: Router;
+  fetchInitialUser?: boolean;
+}) => {
+  return (
+    <ApiProvider fetchInitialUser={fetchInitialUser}>
+      <TestUserProvider userRole="administrator">
+        <RouterProvider router={router} />
+      </TestUserProvider>
+    </ApiProvider>
+  );
+};
 
 function renderWithRouter() {
   const router = setupTestRouter([
@@ -29,11 +50,7 @@ function renderWithRouter() {
       ],
     },
   ]);
-  rtlRender(
-    <TestUserProvider userRole="administrator">
-      <Providers router={router} />
-    </TestUserProvider>,
-  );
+  rtlRender(<Providers router={router} />);
   return router;
 }
 

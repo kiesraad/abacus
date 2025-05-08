@@ -20,7 +20,6 @@ vi.mock("react-router");
 vi.mock("@/hooks/user/useUser");
 vi.mock("../hooks/useDataEntryContext");
 
-//
 const baseMockData = getDefaultDataEntryStateAndActionsLoaded();
 const testPath = `/elections/${baseMockData.election.id}/data-entry/${baseMockData.pollingStationId}/1`;
 

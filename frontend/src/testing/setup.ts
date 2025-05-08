@@ -1,10 +1,16 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, configure } from "@testing-library/react";
+import { Blob as BlobPolyfill, File as FilePolyfill } from "node:buffer";
 import { afterEach, beforeAll, expect, vi } from "vitest";
 import failOnConsole from "vitest-fail-on-console";
 
 import { matchers } from "./matchers";
 import { server } from "./server";
+
+// eslint-disable-next-line
+global.Blob = BlobPolyfill as any;
+// eslint-disable-next-line
+global.File = FilePolyfill as any;
 
 window.scrollTo = () => {};
 

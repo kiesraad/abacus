@@ -1,4 +1,3 @@
-use crate::AppState;
 use axum::extract::FromRef;
 #[cfg(feature = "dev-database")]
 use sqlx::types::Json;
@@ -7,6 +6,7 @@ use sqlx::{Error, SqlitePool, query_as};
 use super::Election;
 #[cfg(feature = "dev-database")]
 use super::ElectionRequest;
+use crate::AppState;
 
 pub struct Elections(SqlitePool);
 

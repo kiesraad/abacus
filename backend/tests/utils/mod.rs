@@ -1,7 +1,8 @@
 #![cfg(test)]
 
-use sqlx::SqlitePool;
 use std::net::SocketAddr;
+
+use sqlx::SqlitePool;
 use tokio::net::TcpListener;
 
 use abacus::start_server;

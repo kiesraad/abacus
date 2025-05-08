@@ -5,11 +5,10 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
-use crate::{
-    data_entry::PollingStationResults, election::Election, polling_station::PollingStation,
+use super::{
+    DataError, PollingStationResults, ValidationResults, validate_polling_station_results,
 };
-
-use super::{DataError, ValidationResults, validate_polling_station_results};
+use crate::{election::Election, polling_station::PollingStation};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DataEntryTransitionError {
@@ -624,13 +623,14 @@ impl Default for DataEntryStatus {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::{
         data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts},
         election::{Candidate, Election, ElectionCategory, ElectionStatus, PoliticalGroup},
         polling_station::{PollingStation, PollingStationType},
     };
-    use test_log::test;
 
     fn polling_station_result() -> PollingStationResults {
         PollingStationResults {

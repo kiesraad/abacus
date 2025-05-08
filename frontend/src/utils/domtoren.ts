@@ -1,14 +1,14 @@
 export class DomToren {
-  _el: HTMLElement;
+  _el: Element;
 
-  constructor(el: HTMLElement) {
+  constructor(el: Element) {
     this._el = el;
   }
 
   public closest(selector: string) {
     const nextEl = this._el.closest(selector);
     if (nextEl) {
-      this._el = nextEl as HTMLElement;
+      this._el = nextEl;
     }
     return this;
   }

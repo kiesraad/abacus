@@ -145,7 +145,7 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
   ],
 };
 
-export const noRecountNoDifferencesRequest: Record<string, unknown> = {
+export const noRecountNoDifferencesRequest: DataEntry = {
   progress: 80,
   data: noRecountNoDifferencesDataEntry,
   client_state: {
@@ -154,11 +154,11 @@ export const noRecountNoDifferencesRequest: Record<string, unknown> = {
     acceptedWarnings: [],
     continue: true,
   },
-} satisfies DataEntry;
+};
 
-export const noErrorsWarningsResponse: Record<string, unknown> = {
+export const noErrorsWarningsResponse: SaveDataEntryResponse = {
   validation_results: {
     errors: [],
     warnings: [],
   },
-} satisfies SaveDataEntryResponse;
+};

@@ -7,13 +7,12 @@ use serde::{Deserialize, Serialize};
 use sqlx::{Error, FromRow, SqlitePool, query, query_as};
 use utoipa::ToSchema;
 
-use crate::{APIError, AppState, audit_log::UserDetails};
-
 use super::{
     error::AuthenticationError,
     password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     role::Role,
 };
+use crate::{APIError, AppState, audit_log::UserDetails};
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
 

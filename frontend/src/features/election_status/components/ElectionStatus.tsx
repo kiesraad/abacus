@@ -81,7 +81,7 @@ export function ElectionStatus({ statuses, election, pollingStations, navigate, 
                       {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
                     </h3>
                   </span>
-                  <Table id={cat} key={cat}>
+                  <Table id={cat} key={cat} aria-label={t(`status.${cat}`)}>
                     <CategoryHeader category={cat} />
                     <Table.Body key={cat} className="fs-sm">
                       {pollingStationWithStatusAndTypist

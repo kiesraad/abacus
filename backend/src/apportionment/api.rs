@@ -1,9 +1,17 @@
+use axum::{
+    Json,
+    extract::{Path, State},
+};
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
+
+use super::{
+    ApportionmentError, CandidateNominationResult, SeatAssignmentResult, candidate_nomination,
+    get_total_seats_from_apportionment_result, seat_assignment,
+};
 use crate::{
     APIError, AppState, ErrorResponse,
-    apportionment::{
-        ApportionmentError, CandidateNominationResult, SeatAssignmentResult, candidate_nomination,
-        get_total_seats_from_apportionment_result, seat_assignment,
-    },
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     data_entry::{
@@ -14,14 +22,12 @@ use crate::{
     polling_station::repository::PollingStations,
     summary::ElectionSummary,
 };
-use axum::{
-    Json,
-    extract::{Path, State},
-};
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-use utoipa_axum::{router::OpenApiRouter, routes};
 
+impl From<ApportionmentError> for APIError {
+    fn from(err: ApportionmentError) -> Self {
+        APIError::Apportionment(err)
+    }
+}
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default().routes(routes!(election_apportionment))
 }

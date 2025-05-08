@@ -4,6 +4,7 @@ import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
+import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionListResponse } from "@/types/generated/openapi";
 
 import { OverviewPage } from "./OverviewPage";
@@ -46,5 +47,33 @@ describe("OverviewPage", () => {
       ),
     ).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();
+  });
+
+  test("Shows create election link", async () => {
+    render(
+      <TestUserProvider userRole="administrator">
+        <ElectionListProvider>
+          <OverviewPage />
+        </ElectionListProvider>
+      </TestUserProvider>,
+    );
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Beheer verkiezingen" })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Verkiezing toevoegen" })).toBeVisible();
+  });
+
+  test("Does not show create election link", async () => {
+    render(
+      <TestUserProvider userRole="coordinator">
+        <ElectionListProvider>
+          <OverviewPage />
+        </ElectionListProvider>
+      </TestUserProvider>,
+    );
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Beheer verkiezingen" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Verkiezing toevoegen" })).not.toBeInTheDocument();
   });
 });

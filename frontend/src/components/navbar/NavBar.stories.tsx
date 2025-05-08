@@ -45,6 +45,7 @@ const locations: { pathname: string; userRole: Role }[] = [
 export const AllRoutes: Story = () => (
   <ElectionProviderContext.Provider
     value={{
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       election: electionDetailsMockResponse.election as Required<Election>,
       pollingStations: electionDetailsMockResponse.polling_stations,
     }}

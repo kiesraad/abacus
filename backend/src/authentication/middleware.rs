@@ -1,7 +1,3 @@
-use crate::{
-    audit_log::{AuditEvent, AuditService},
-    authentication::{SESSION_COOKIE_NAME, User, set_default_cookie_properties},
-};
 use axum::{
     extract::{Request, State},
     http::HeaderValue,
@@ -15,6 +11,10 @@ use tracing::{debug, error, info};
 use super::{
     SESSION_MIN_LIFE_TIME, Users,
     session::{Session, Sessions},
+};
+use crate::{
+    audit_log::{AuditEvent, AuditService},
+    authentication::{SESSION_COOKIE_NAME, User, set_default_cookie_properties},
 };
 
 /// Inject user and session
@@ -103,6 +103,8 @@ pub async fn extend_session(
 
 #[cfg(test)]
 mod test {
+    use std::{net::Ipv4Addr, str::FromStr};
+
     use axum::{
         body::Body,
         extract::{Request, State},
@@ -113,11 +115,9 @@ mod test {
     use cookie::Cookie;
     use hyper::header::SET_COOKIE;
     use sqlx::SqlitePool;
-    use std::{net::Ipv4Addr, str::FromStr};
     use test_log::test;
 
     use super::{extend_session, inject_user};
-
     use crate::{
         audit_log::{AuditLog, AuditService},
         authentication::{Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, Sessions, User, Users},

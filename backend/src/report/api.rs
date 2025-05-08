@@ -1,9 +1,14 @@
+use axum::extract::{Path, State};
+use axum_extra::response::Attachment;
+use utoipa_axum::{router::OpenApiRouter, routes};
+use zip::{result::ZipError, write::SimpleFileOptions};
+
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::Coordinator,
     data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
     election::{Election, repository::Elections},
-    eml::{EML510, EMLDocument, axum::Eml, eml_document_hash},
+    eml::{EML510, EMLDocument, EmlHash, axum::Eml},
     pdf_gen::{
         generate_pdf,
         models::{ModelNa31_2Input, PdfModel},
@@ -11,10 +16,12 @@ use crate::{
     polling_station::{repository::PollingStations, structs::PollingStation},
     summary::ElectionSummary,
 };
-use axum::extract::{Path, State};
-use axum_extra::response::Attachment;
-use utoipa_axum::{router::OpenApiRouter, routes};
-use zip::{result::ZipError, write::SimpleFileOptions};
+
+impl From<ZipError> for APIError {
+    fn from(err: ZipError) -> Self {
+        APIError::ZipError(err)
+    }
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -145,7 +152,7 @@ async fn election_download_zip_results(
     let pdf_filename = input.pdf_filename();
     let xml_filename = input.xml_filename();
     let zip_filename = input.zip_filename();
-    let model = input.into_pdf_model(eml_document_hash(&xml_string, true));
+    let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model)?;
 
     let mut buf = vec![];
@@ -210,7 +217,7 @@ async fn election_download_pdf_results(
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
-    let model = input.into_pdf_model(eml_document_hash(&xml_string, true));
+    let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model)?;
 
     Ok(Attachment::new(content.buffer)

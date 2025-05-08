@@ -104,6 +104,64 @@
         }
       }
     },
+    "/api/elections/validate": {
+      "post": {
+        "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator",
+        "operationId": "election_import_validate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ElectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Election validated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectionDefinitionUploadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/elections/{election_id}": {
       "get": {
         "summary": "Get election details including the election's candidate list (political groups) and its polling stations",
@@ -2998,6 +3056,21 @@
           "Municipal"
         ]
       },
+      "ElectionDefinitionUploadResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "election"
+        ],
+        "properties": {
+          "election": {
+            "$ref": "#/components/schemas/Election"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/RedactedEmlHash"
+          }
+        }
+      },
       "ElectionDetails": {
         "type": "object",
         "required": [
@@ -3140,6 +3213,7 @@
         "type": "string",
         "description": "Election status (limited for now)",
         "enum": [
+          "Created",
           "DataEntryInProgress",
           "DataEntryFinished"
         ]
@@ -3319,6 +3393,7 @@
           "DrawingOfLotsRequired",
           "EntryNotFound",
           "EntryNotUnique",
+          "EmlImportError",
           "InternalServerError",
           "InvalidData",
           "InvalidJson",
@@ -3329,6 +3404,7 @@
           "InvalidUsernameOrPassword",
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
+          "InvalidXml",
           "PasswordRejection",
           "PdfGenerationError",
           "PollingStationRepeated",
@@ -3995,6 +4071,30 @@
             "format": "int64",
             "description": "Preference threshold as a percentage (0 to 100)",
             "minimum": 0
+          }
+        }
+      },
+      "RedactedEmlHash": {
+        "type": "object",
+        "required": [
+          "chunks",
+          "redacted_indexes"
+        ],
+        "properties": {
+          "chunks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array holding the hash chunks as text"
+          },
+          "redacted_indexes": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Indexes of chunks that will be empty, sorted"
           }
         }
       },

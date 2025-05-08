@@ -1,7 +1,7 @@
 # Vertalingen in Abacus
 
 In de Abacus React frontend wordt geen library gebruikt voor vertalingen.
-De code voor vertalingen is te vinden in `frontend/lib/i18n`
+De code voor vertalingen is te vinden in `frontend/src/lib/i18n`
 
 ## Ontwerp
 
@@ -62,7 +62,7 @@ Newlines worden door de `tx()` functie automatisch omgezet naar `<br>`.
 
 ### Vertalingen toevoegen
 
-Vertalingen (van key naar vertaling) zijn te vinden in `/frontend/lib/i18n/locales/<locale>/*.json`.
+Vertalingen (van key naar vertaling) zijn te vinden in `/frontend/src/lib/i18n/locales/<locale>/*.json`.
 
 Het kiezen van een goede vertaal-key en structuur is een kunst.
 
@@ -90,7 +90,7 @@ De volgende scripts moeten worden aangeroepen vanuit de "frontend/" map.
 ### JSON naar PO
 
 Gebruik dit script om `.po`-bestanden te maken (één voor elke gedefinieerde locale) die gebruikt kunnen worden in vertaalsoftware.
-Dit script genereert `.po`-vertaalbestanden van de huidige JSON-vertalingen in `/frontend/lib/i18n/locales/<locale>/*.json`:
+Dit script genereert `.po`-vertaalbestanden van de huidige JSON-vertalingen in `/frontend/src/lib/i18n/locales/<locale>/*.json`:
 
 ```sh
 npm run gen:po
@@ -107,4 +107,4 @@ Dit script genereert JSON-vertaalbestanden van `.po`-vertaalbestanden in `/front
 npm run gen:translation-json
 ```
 
-Dit resulteert in `/frontend/lib/i18n/locales/<locale>/*.json`. Deze bevatten de teksten die door de applicatie worden gebruikt.
+Dit resulteert in `/frontend/src/lib/i18n/locales/<locale>/*.json`. Deze bevatten de teksten die door de applicatie worden gebruikt.

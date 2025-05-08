@@ -8,7 +8,6 @@ mod external;
 
 #[cfg(feature = "embed-typst")]
 pub use embedded::{PdfGenError, generate_pdf};
-
 #[cfg(not(feature = "embed-typst"))]
 pub use external::{PdfGenError, generate_pdf};
 

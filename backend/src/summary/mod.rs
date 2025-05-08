@@ -225,9 +225,10 @@ impl SumCount {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::{election::tests::election_fixture, pdf_gen::tests::polling_stations_fixture};
-    use test_log::test;
 
     fn polling_station_results_fixture_a() -> PollingStationResults {
         PollingStationResults {

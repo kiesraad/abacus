@@ -1,18 +1,18 @@
+use std::net::IpAddr;
+
 use axum::extract::FromRef;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{SqlitePool, Type, prelude::FromRow};
-use std::net::IpAddr;
 use strum::VariantNames;
 use utoipa::ToSchema;
 
+use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 use crate::{
     APIError, AppState,
     authentication::{Role, User},
 };
-
-use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 
 #[derive(
     Serialize, Deserialize, VariantNames, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type,

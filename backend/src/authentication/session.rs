@@ -10,13 +10,12 @@ use cookie::CookieBuilder;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool};
 
-use crate::{APIError, AppState};
-
 use super::{
     SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
     error::AuthenticationError,
     util::{create_new_session_key, get_expires_at},
 };
+use crate::{APIError, AppState};
 
 /// A session object, corresponds to a row in the sessions table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]

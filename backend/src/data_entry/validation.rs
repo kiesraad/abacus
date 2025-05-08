@@ -1,16 +1,13 @@
-use crate::{
-    data_entry::{
-        CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-        VotersCounts, VotesCounts,
-    },
-    election::Election,
-    polling_station::PollingStation,
-};
-
 use std::fmt;
 
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+use super::{
+    CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
+    VotersCounts, VotesCounts,
+};
+use crate::{election::Election, polling_station::PollingStation};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
 pub struct ValidationResults {
@@ -896,11 +893,12 @@ impl Validate for CandidateVotes {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::{
         election::tests::election_fixture, polling_station::structs::tests::polling_station_fixture,
     };
-    use test_log::test;
 
     #[test]
     fn test_validation_result_append() {

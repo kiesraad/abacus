@@ -17,7 +17,7 @@ use super::{
         ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
         DataEntryTransitionError,
     },
-    validate_polling_station_results,
+    validate_data_entry_status,
 };
 use crate::{
     APIError, AppState,
@@ -162,11 +162,11 @@ async fn polling_station_data_entry_claim(
         EntryNumber::SecondEntry => state.claim_second_entry(new_data_entry.clone())?,
     };
 
-    // Validate the results
+    // Validate the state
     let data = new_state
         .get_data()
         .expect("data should be present because data entry is in progress");
-    let validation_results = validate_polling_station_results(data, &polling_station, &election)?;
+    let validation_results = validate_data_entry_status(&new_state, &polling_station, &election)?;
 
     // Save the new data entry state
     polling_station_data_entries.upsert(id, &new_state).await?;
@@ -257,12 +257,8 @@ async fn polling_station_data_entry_save(
         EntryNumber::SecondEntry => state.update_second_entry(current_data_entry)?,
     };
 
-    // Validate the results
-    let validation_results = validate_polling_station_results(
-        new_state.get_data().expect("data should never be None"),
-        &polling_station,
-        &election,
-    )?;
+    // Validate the state
+    let validation_results = validate_data_entry_status(&new_state, &polling_station, &election)?;
 
     // Save the new data entry state
     polling_station_data_entries.upsert(id, &new_state).await?;

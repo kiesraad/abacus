@@ -188,13 +188,28 @@ pub fn validate_data_entry_status(
 impl Validate for DataEntryStatus {
     fn validate(
         &self,
-        _election: &Election,
-        _polling_station: &PollingStation,
+        election: &Election,
+        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
         match self {
+            DataEntryStatus::FirstEntryInProgress(state) => {
+                state.first_entry.validate(
+                    election,
+                    polling_station,
+                    validation_results,
+                    &"data".into(),
+                )?;
+                Ok(())
+            }
             DataEntryStatus::SecondEntryInProgress(state) => {
+                state.second_entry.validate(
+                    election,
+                    polling_station,
+                    validation_results,
+                    &"data".into(),
+                )?;
                 let mut different_fields: Vec<String> = vec![];
                 state.second_entry.compare(
                     &state.finalised_first_entry,

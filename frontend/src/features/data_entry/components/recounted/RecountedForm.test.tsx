@@ -1,4 +1,4 @@
-import { userEvent } from "@testing-library/user-event";
+import { UserEvent, userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
@@ -14,11 +14,13 @@ import { errorWarningMocks, getEmptyDataEntryRequest } from "../../testing/mock-
 import { DataEntryProvider } from "../DataEntryProvider";
 import { RecountedForm } from "./RecountedForm";
 
-const Component = (
-  <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
-    <RecountedForm />
-  </DataEntryProvider>
-);
+function renderForm() {
+  return render(
+    <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
+      <RecountedForm />
+    </DataEntryProvider>,
+  );
+}
 
 describe("Test RecountedForm", () => {
   beforeEach(() => {
@@ -26,7 +28,7 @@ describe("Test RecountedForm", () => {
   });
   describe("RecountedForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
-      render(Component);
+      renderForm();
 
       const user = userEvent.setup();
 
@@ -42,7 +44,7 @@ describe("Test RecountedForm", () => {
     });
 
     test("hitting shift+enter does result in api call", async () => {
-      render(Component);
+      renderForm();
 
       const user = userEvent.setup();
       const spy = vi.spyOn(global, "fetch");
@@ -63,7 +65,7 @@ describe("Test RecountedForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       const yes = await screen.findByTestId("yes");
       const no = await screen.findByTestId("no");
@@ -99,7 +101,7 @@ describe("Test RecountedForm", () => {
         client_state: {},
       };
 
-      render(Component);
+      renderForm();
 
       const user = userEvent.setup();
 
@@ -137,7 +139,7 @@ describe("Test RecountedForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       const yes = await screen.findByTestId("yes");
       const no = await screen.findByTestId("no");
@@ -156,6 +158,139 @@ describe("Test RecountedForm", () => {
         "Controleer het papieren proces-verbaalF.101Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinatorGeen vinkje? Kies dan 'nee'.",
       );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
+    });
+  });
+
+  describe("RecountedForm warnings", () => {
+    test("clicking next without accepting warning results in alert shown and then accept warning", async () => {
+      const user = userEvent.setup();
+
+      renderForm();
+
+      await screen.findByTestId("recounted_form");
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [], warnings: [errorWarningMocks.W001] },
+      });
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackMessage =
+        "Verschil met eerste invoer. Extra controle nodigW.001Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      const recountedError = await screen.findByTestId("recounted-error");
+      expect(recountedError).toHaveTextContent("Controleer of je antwoord gelijk is aan het papieren proces-verbaal");
+
+      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptFeedbackCheckbox).not.toBeChecked();
+
+      await user.click(submitButton);
+      const alertText = screen.getByRole("alert");
+      expect(alertText).toHaveTextContent(
+        "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+      );
+
+      acceptFeedbackCheckbox.click();
+      await user.click(submitButton);
+
+      expect(feedbackWarning).toHaveTextContent(feedbackMessage);
+      // All fields should be considered valid now
+      expect(screen.queryByTestId("recounted-error")).toBeNull();
+    });
+
+    test("W.001 Difference with first entry", async () => {
+      const user = userEvent.setup();
+
+      renderForm();
+
+      await screen.findByTestId("recounted_form");
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [], warnings: [errorWarningMocks.W001] },
+      });
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackMessage =
+        "Verschil met eerste invoer. Extra controle nodigW.001Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      const recountedError = await screen.findByTestId("recounted-error");
+      expect(recountedError).toHaveTextContent("Controleer of je antwoord gelijk is aan het papieren proces-verbaal");
+    });
+  });
+
+  describe("RecountedForm accept warnings", () => {
+    let user: UserEvent;
+    let submitButton: HTMLButtonElement;
+    let acceptWarningsCheckbox: HTMLInputElement;
+
+    beforeEach(async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [], warnings: [errorWarningMocks.W001] },
+      });
+
+      renderForm();
+
+      user = userEvent.setup();
+      submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      acceptWarningsCheckbox = await screen.findByRole("checkbox", {
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+      });
+    });
+
+    test("checkbox should disappear when filling in any form input", async () => {
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      const yes = await screen.findByTestId("yes");
+      await user.click(yes);
+
+      expect(acceptWarningsCheckbox).not.toBeVisible();
+    });
+
+    test("checkbox with error should disappear when filling in any form input", async () => {
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      await user.click(submitButton);
+
+      expect(acceptWarningsCheckbox).toBeInvalid();
+      const acceptWarningsError = await screen.findByRole("alert", {
+        description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+      });
+      expect(acceptWarningsError).toBeVisible();
+
+      const yes = await screen.findByTestId("yes");
+      await user.click(yes);
+
+      expect(acceptWarningsCheckbox).not.toBeVisible();
+      expect(acceptWarningsError).not.toBeVisible();
+    });
+
+    test("error should not immediately disappear when checkbox is checked", async () => {
+      expect(acceptWarningsCheckbox).toBeVisible();
+      expect(acceptWarningsCheckbox).not.toBeInvalid();
+
+      await user.click(submitButton);
+
+      expect(acceptWarningsCheckbox).toBeInvalid();
+      const acceptWarningsError = screen.getByRole("alert", {
+        description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+      });
+      expect(acceptWarningsError).toBeVisible();
+
+      await user.click(acceptWarningsCheckbox);
+      expect(acceptWarningsCheckbox).toBeChecked();
+      expect(acceptWarningsCheckbox).toBeInvalid();
+      expect(acceptWarningsError).toBeVisible();
     });
   });
 });

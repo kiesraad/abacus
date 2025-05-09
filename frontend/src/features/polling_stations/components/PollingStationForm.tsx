@@ -138,7 +138,9 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               <ChoiceList>
                 <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
                 {validationResult.polling_station_type && (
-                  <ChoiceList.Error>{t(`form_errors.${validationResult.polling_station_type}`)}</ChoiceList.Error>
+                  <ChoiceList.Error id="polling-station-type-error">
+                    {t(`form_errors.${validationResult.polling_station_type}`)}
+                  </ChoiceList.Error>
                 )}
                 <ChoiceList.Radio
                   id={`polling_station_type-FixedLocation`}

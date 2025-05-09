@@ -44,6 +44,10 @@
     "title": "Controleer ingevoerde aantallen",
     "content": "De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
   },
+  "W001": {
+    "title": "Verschil met eerste invoer. Extra controle nodig",
+    "content": "Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal."
+  },
   "W201": {
     "title": "Controleer aantal blanco stemmen",
     "content": "Het aantal blanco stemmen is erg hoog.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."

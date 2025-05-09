@@ -1,7 +1,9 @@
 import { ApiError } from "@/api/ApiResult";
 import { ErrorModal } from "@/components/error/ErrorModal";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
+import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Feedback } from "@/components/ui/Feedback/Feedback";
 import { Form } from "@/components/ui/Form/Form";
@@ -13,7 +15,18 @@ import { DataEntryNavigation } from "../DataEntryNavigation";
 import { useRecounted } from "./useRecounted";
 
 export function RecountedForm() {
-  const { error, recounted, formRef, setRecounted, formSection, isSaving, onSubmit } = useRecounted();
+  const {
+    error,
+    recounted,
+    formRef,
+    setRecounted,
+    formSection,
+    isSaving,
+    onSubmit,
+    setAcceptWarnings,
+    defaultProps,
+    showAcceptWarnings,
+  } = useRecounted();
 
   return (
     <Form
@@ -23,16 +36,22 @@ export function RecountedForm() {
       }}
       ref={formRef}
       id="recounted_form"
-      title={t("recounted.recounted_form_title")}
+      title={t("recounted.form_title")}
     >
       <DataEntryNavigation onSubmit={onSubmit} currentValues={{ recounted }} />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && !formSection.errors.isEmpty() && (
         <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} />
       )}
+      {formSection.isSaved && !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && (
+        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} />
+      )}
       <p className="form-paragraph md">{t("recounted.message")}</p>
       <div className="radio-form">
         <ChoiceList>
+          {defaultProps.errorsAndWarnings?.get("data.recounted") && (
+            <ChoiceList.Error id="recounted-error">{t("recounted.error")}</ChoiceList.Error>
+          )}
           <ChoiceList.Radio
             id="yes"
             value="yes"
@@ -57,6 +76,26 @@ export function RecountedForm() {
         </ChoiceList>
       </div>
       <BottomBar type="form">
+        {formSection.acceptWarningsError && (
+          <BottomBar.Row>
+            <Alert type="error" small>
+              <p>{t("data_entry.continue_after_check")}</p>
+            </Alert>
+          </BottomBar.Row>
+        )}
+        {showAcceptWarnings && (
+          <BottomBar.Row>
+            <Checkbox
+              id="recounted_form_accept_warnings"
+              checked={formSection.acceptWarnings}
+              hasError={formSection.acceptWarningsError}
+              onChange={(e) => {
+                setAcceptWarnings(e.target.checked);
+              }}
+              label={t("data_entry.form_accept_warnings")}
+            />
+          </BottomBar.Row>
+        )}
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={isSaving}>
             {t("next")}

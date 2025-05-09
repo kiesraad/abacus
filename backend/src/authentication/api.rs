@@ -1,7 +1,6 @@
 use axum::{
     extract::{Path, State},
-    response::AppendHeaders,
-    response::{IntoResponse, Json},
+    response::{AppendHeaders, IntoResponse, Json},
 };
 use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
 use cookie::{Cookie, SameSite};

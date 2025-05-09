@@ -18,13 +18,12 @@ export function useElectionCheck(data: ElectionDefinitionUploadResponse) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     stubs.forEach((stub, i) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const value = formData.get(stub.index.toString()) as string;
+      const value = formData.get(stub.index.toString());
       const newStubs = [...stubs];
       const newStub = newStubs[i];
       if (newStub) {
         newStub.error = "";
-        if (value.length !== 4) {
+        if (typeof value !== "string" || value.length !== 4) {
           newStub.error = t("election.check_eml.check_hash.hint");
         }
         setStubs(newStubs);

@@ -101,10 +101,29 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             .index_file(Some("/index.html"))
             .fallback(Some("/index.html"))
             .fallback_status(StatusCode::OK)
-            .into_router(),
+            .into_router()
+            // Add Referrer-Policy and Permissions-Policy headers,
+            // these are only needed on HTML documents (not API requests)
+            .layer(SetResponseHeaderLayer::overriding(
+                header::REFERRER_POLICY,
+                HeaderValue::from_static("no-referrer"),
+            ))
+            .layer(SetResponseHeaderLayer::overriding(
+                HeaderName::from_static("permissions-policy"),
+                HeaderValue::from_static(
+                    "accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), \
+                     display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), \
+                     gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), \
+                     payment=(), picture-in-picture=(), publickey-credentials-get=(), \
+                     screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(), \
+                     xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), \
+                     hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()",
+                ),
+            )),
     );
 
     // Add headers for security hardening
+    // Best practices according to the OWASP Secure Headers Project, https://owasp.org/www-project-secure-headers/
     let security_headers_service = tower::ServiceBuilder::new()
         .layer(SetResponseHeaderLayer::overriding(
             header::X_FRAME_OPTIONS,
@@ -117,6 +136,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .layer(SetResponseHeaderLayer::overriding(
             header::CONTENT_SECURITY_POLICY,
             HeaderValue::from_static("default-src 'self'"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            HeaderName::from_static("x-permitted-cross-domain-policies"),
+            HeaderValue::from_static("none"),
         ))
         .layer(SetResponseHeaderLayer::overriding(
             HeaderName::from_static("cross-origin-resource-policy"),
@@ -247,6 +270,10 @@ mod test {
                 "default-src 'self'"
             );
             assert_eq!(
+                response.headers()["x-permitted-cross-domain-policies"],
+                "none"
+            );
+            assert_eq!(
                 response.headers()["cross-origin-resource-policy"],
                 "same-origin"
             );
@@ -258,6 +285,22 @@ mod test {
                 response.headers()["cross-origin-opener-policy"],
                 "same-origin"
             );
+
+            #[cfg(feature = "memory-serve")]
+            {
+                let response = reqwest::get(format!("{base_url}/")).await.unwrap();
+                assert_eq!(response.headers()["referrer-policy"], "no-referrer");
+                assert_eq!(
+                    response.headers()["permissions-policy"],
+                    "accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), \
+                        display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), \
+                        gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), \
+                        payment=(), picture-in-picture=(), publickey-credentials-get=(), \
+                        screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(), \
+                        xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), \
+                        hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()"
+                );
+            }
         })
         .await;
     }

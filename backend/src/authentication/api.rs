@@ -1,5 +1,6 @@
 use axum::{
     extract::{Path, State},
+    response::AppendHeaders,
     response::{IntoResponse, Json},
 };
 use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
@@ -233,9 +234,15 @@ async fn logout(
     audit_service: AuditService,
     jar: CookieJar,
 ) -> Result<impl IntoResponse, APIError> {
+    // Ask browser to remove all browsing data
+    // https://owasp.org/www-project-secure-headers/#clear-site-data
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Clear-Site-Data
+    const CLEAR_SITE_DATA_HEADER: (&str, &str) =
+        ("Clear-Site-Data", r#""cache","cookies","storage""#);
+
     let Some(mut cookie) = jar.get(SESSION_COOKIE_NAME).cloned() else {
         // no cookie found, return OK
-        return Ok((jar, StatusCode::OK));
+        return Ok((AppendHeaders([CLEAR_SITE_DATA_HEADER]), jar, StatusCode::OK));
     };
 
     // Get the session key from the cookie
@@ -261,7 +268,11 @@ async fn logout(
     set_default_cookie_properties(&mut cookie);
     let updated_jar = jar.remove(cookie);
 
-    Ok((updated_jar, StatusCode::OK))
+    Ok((
+        AppendHeaders([CLEAR_SITE_DATA_HEADER]),
+        updated_jar,
+        StatusCode::OK,
+    ))
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]

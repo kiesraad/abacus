@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
 import { NotFoundError } from "@/api/ApiResult";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
+import { Form } from "@/components/ui/Form/Form";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/lib/i18n";
 import { formatDateFull } from "@/utils/format";
@@ -21,8 +22,27 @@ export function CheckElectionDefinition() {
     data.hash.redacted_indexes.map((redacted_index) => ({
       selected: false,
       index: redacted_index,
+      error: "",
     })),
   );
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    stubs.forEach((stub, i) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      const value = formData.get(stub.index.toString()) as string;
+      const newStubs = [...stubs];
+      const newStub = newStubs[i];
+      if (newStub) {
+        newStub.error = "";
+        if (value.length !== 4) {
+          newStub.error = t("election.check_eml.check_hash.hint");
+        }
+        setStubs(newStubs);
+      }
+    });
+  }
 
   return (
     <section className="md">
@@ -48,38 +68,41 @@ export function CheckElectionDefinition() {
         </div>
       </Alert>
       <p>{t("election.check_eml.check_hash.description")}</p>
-      {stubs.map((stub, stubIndex) => (
-        <InputField
-          key={stub.index}
-          name={stub.index.toString()}
-          type="text"
-          label={t("election.check_eml.check_hash.label", { stub: stubIndex + 1 })}
-          hint={t("election.check_eml.check_hash.hint")}
-          fieldSize="medium"
-          fieldWidth="narrow"
-          margin="mb-md"
-          onFocus={() => {
-            const newStubs = [...stubs];
-            const stub = newStubs[stubIndex];
-            if (stub) {
-              stub.selected = true;
-            }
-            setStubs(newStubs);
-          }}
-          onBlur={() => {
-            const newStubs = [...stubs];
-            const stub = newStubs[stubIndex];
-            if (stub) {
-              stub.selected = false;
-            }
-            setStubs(newStubs);
-          }}
-          autoFocus={stubIndex === 0}
-        />
-      ))}
-      <div className="mt-lg">
-        <Button>{t("next")}</Button>
-      </div>
+      <Form onSubmit={handleSubmit}>
+        {stubs.map((stub, stubIndex) => (
+          <InputField
+            key={stub.index}
+            name={stub.index.toString()}
+            type="text"
+            label={t("election.check_eml.check_hash.label", { stub: stubIndex + 1 })}
+            hint={t("election.check_eml.check_hash.hint")}
+            error={stub.error}
+            fieldSize="medium"
+            fieldWidth="narrow"
+            margin="mb-md"
+            onFocus={() => {
+              const newStubs = [...stubs];
+              const stub = newStubs[stubIndex];
+              if (stub) {
+                stub.selected = true;
+              }
+              setStubs(newStubs);
+            }}
+            onBlur={() => {
+              const newStubs = [...stubs];
+              const stub = newStubs[stubIndex];
+              if (stub) {
+                stub.selected = false;
+              }
+              setStubs(newStubs);
+            }}
+            autoFocus={stubIndex === 0}
+          />
+        ))}
+        <div className="mt-lg">
+          <Button type="submit">{t("next")}</Button>
+        </div>
+      </Form>
     </section>
   );
 }

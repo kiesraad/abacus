@@ -196,6 +196,21 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            response.headers()["clear-site-data"],
+            r#""cache","cookies","storage""#
+        );
+        let set_cookie_header = response
+            .headers()
+            .get("set-cookie")
+            .unwrap()
+            .to_str()
+            .unwrap();
+        assert!(
+            set_cookie_header.contains("ABACUS_SESSION=")
+                && set_cookie_header.contains("Max-Age=0"),
+            "Session cookie should be removed after logout"
+        );
 
         // Logout again, should return 200
         let response = app
@@ -211,6 +226,10 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            response.headers()["clear-site-data"],
+            r#""cache","cookies","storage""#
+        );
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

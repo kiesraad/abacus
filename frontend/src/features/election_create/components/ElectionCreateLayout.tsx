@@ -9,6 +9,7 @@ import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/lib/i18n";
 
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
+import cls from "./ElectionCreateLayout.module.css";
 
 export function ElectionCreateLayout() {
   const { isAdministrator } = useUserRole();
@@ -59,7 +60,7 @@ export function ElectionCreateLayout() {
             </div>
           </ProgressList>
         </StickyNav>
-        <article>
+        <article className={cls.container}>
           <ElectionCreateContextProvider>
             <Outlet />
           </ElectionCreateContextProvider>

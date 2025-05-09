@@ -1,4 +1,4 @@
-import { APIRequestContext, test as base, expect } from "@playwright/test";
+import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
 
 import {
   DataEntry,
@@ -27,12 +27,18 @@ export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
 
 // Regular fixtures need to be passed into the test's arguments.
 type Fixtures = {
+  // page and request fixture for typist one
+  typistOne: { page: Page; request: APIRequestContext };
+  // page and request fixture for typist two
+  typistTwo: { page: Page; request: APIRequestContext };
   // Election without polling stations
   emptyElection: Election;
   // Election with two polling stations
   election: ElectionDetailsResponse;
   // First polling station of the election
   pollingStation: PollingStation;
+  // First polling station of the election with entry claimed by typist one
+  pollingStationFirstEntryClaimed: PollingStation;
   // First polling station of the election with first data entry done
   pollingStationFirstEntryDone: PollingStation;
   // First polling station of the election with first and second data entries done
@@ -42,7 +48,7 @@ type Fixtures = {
   // Election with polling stations and two completed data entries for each
   completedElection: Election;
   // Newly created User
-  user: User;
+  newTypist: User;
 };
 
 async function completePollingStationDataEntries(request: APIRequestContext, pollingStationId: number) {
@@ -78,6 +84,26 @@ async function completePollingStationDataEntriesWithDifferences(request: APIRequ
 }
 
 export const test = base.extend<Fixtures>({
+  typistOne: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/typist.json" });
+    const page = await context.newPage();
+    await use({ page: page, request: context.request });
+    await context.close();
+  },
+  typistTwo: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/typist2.json" });
+    const page = await context.newPage();
+    await use({ page: page, request: context.request });
+    await context.close();
+  },
+  pollingStationFirstEntryClaimed: async ({ typistOne, pollingStation }, use) => {
+    const { request } = typistOne;
+    await loginAs(request, "typist");
+
+    const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
+    await firstDataEntry.claim();
+    await use(pollingStation);
+  },
   emptyElection: async ({ request }, use) => {
     await loginAs(request, "admin");
     // overide the current storage state
@@ -143,7 +169,7 @@ export const test = base.extend<Fixtures>({
 
     await use(election.election);
   },
-  user: async ({ request }, use) => {
+  newTypist: async ({ request }, use) => {
     await loginAs(request, "admin");
     // create a new user
     const url: USER_CREATE_REQUEST_PATH = "/api/user";

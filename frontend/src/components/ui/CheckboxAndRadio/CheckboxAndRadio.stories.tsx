@@ -32,7 +32,7 @@ export const DefaultCheckbox: Story<Props> = ({ label }) => (
 );
 
 DefaultCheckbox.args = {
-  label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+  label: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
 };
 
 export const DefaultCheckboxIndeterminate: Story<Props> = ({ label }) => (
@@ -73,7 +73,7 @@ export const DefaultCheckboxIndeterminate: Story<Props> = ({ label }) => (
 );
 
 DefaultCheckboxIndeterminate.args = {
-  label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+  label: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
 };
 
 export const DefaultRadio: Story<Props> = ({ label }) => (
@@ -102,5 +102,5 @@ export const DefaultRadio: Story<Props> = ({ label }) => (
 );
 
 DefaultRadio.args = {
-  label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+  label: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
 };

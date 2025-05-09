@@ -53,7 +53,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     this.voterCardRecount = page.getByRole("textbox", { name: "C.2 Kiezerspassen" });
     this.totalAdmittedVotersRecount = page.getByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" });
 
-    this.acceptWarnings = page.getByLabel("Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.");
+    this.acceptWarnings = page.getByLabel("Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.");
     this.acceptWarningsReminder = page
       .getByRole("alert")
       .filter({ hasText: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd." });

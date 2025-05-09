@@ -481,7 +481,7 @@ describe("Test DifferencesForm", () => {
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
 
       const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
       expect(acceptFeedbackCheckbox).not.toBeChecked();
 
@@ -597,7 +597,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       acceptWarningsCheckbox = await screen.findByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
     });
 

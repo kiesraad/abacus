@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 import { isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
@@ -7,13 +8,11 @@ import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { t, tx } from "@/lib/i18n";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
 
-interface UploadElectionDefinitionProps {
-  file: File | undefined;
-  setFile: (file: File | undefined) => void;
-  setData: (data: ElectionDefinitionUploadResponse | undefined) => void;
-}
+import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
-export function UploadElectionDefinition({ file, setFile, setData }: UploadElectionDefinitionProps) {
+export function UploadElectionDefinition() {
+  const { file, setFile, setData } = useElectionCreateContext();
+  const navigate = useNavigate();
   const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
   const [error, setError] = useState<string | undefined>();
   const { create } = useCrud<ElectionDefinitionUploadResponse>({ create: path });
@@ -26,6 +25,7 @@ export function UploadElectionDefinition({ file, setFile, setData }: UploadElect
       if (isSuccess(response)) {
         setData(response.data);
         setError(undefined);
+        await navigate("/elections/create/check-definition");
       } else if (isError(response)) {
         setData(undefined);
         setError(currentFile.name);

@@ -572,7 +572,7 @@ describe("Test CandidatesVotesForm", () => {
       await user.click(submitButton);
 
       acceptWarningsCheckbox = await screen.findByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
     });
 

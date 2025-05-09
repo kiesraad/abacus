@@ -229,27 +229,6 @@ impl Validate for DataEntryStatus {
     }
 }
 
-pub fn validate_polling_station_results(
-    polling_station_results: &PollingStationResults,
-    polling_station: &PollingStation,
-    election: &Election,
-) -> Result<ValidationResults, DataError> {
-    let mut validation_results = ValidationResults::default();
-    polling_station_results.validate(
-        election,
-        polling_station,
-        &mut validation_results,
-        &"data".into(),
-    )?;
-    validation_results
-        .errors
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    validation_results
-        .warnings
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    Ok(validation_results)
-}
-
 impl Validate for PollingStationResults {
     fn validate(
         &self,

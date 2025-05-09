@@ -1,5 +1,3 @@
-import { FormEvent, useState } from "react";
-
 import { NotFoundError } from "@/api/ApiResult";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -8,8 +6,9 @@ import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/lib/i18n";
 import { formatDateFull } from "@/utils/format";
 
+import { useElectionCheck } from "../hooks/useElectionCheck";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import { RedactedHash, Stub } from "./RedactedHash";
+import { RedactedHash } from "./RedactedHash";
 
 export function CheckElectionDefinition() {
   const { file, data } = useElectionCreateContext();
@@ -18,31 +17,7 @@ export function CheckElectionDefinition() {
     throw new NotFoundError("error.not_found_feedback");
   }
 
-  const [stubs, setStubs] = useState<Stub[]>(
-    data.hash.redacted_indexes.map((redacted_index) => ({
-      selected: false,
-      index: redacted_index,
-      error: "",
-    })),
-  );
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    stubs.forEach((stub, i) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const value = formData.get(stub.index.toString()) as string;
-      const newStubs = [...stubs];
-      const newStub = newStubs[i];
-      if (newStub) {
-        newStub.error = "";
-        if (value.length !== 4) {
-          newStub.error = t("election.check_eml.check_hash.hint");
-        }
-        setStubs(newStubs);
-      }
-    });
-  }
+  const { stubs, highlightStub, handleSubmit } = useElectionCheck(data);
 
   return (
     <section className="md">
@@ -81,20 +56,10 @@ export function CheckElectionDefinition() {
             fieldWidth="narrow"
             margin="mb-md"
             onFocus={() => {
-              const newStubs = [...stubs];
-              const stub = newStubs[stubIndex];
-              if (stub) {
-                stub.selected = true;
-              }
-              setStubs(newStubs);
+              highlightStub(stubIndex, true);
             }}
             onBlur={() => {
-              const newStubs = [...stubs];
-              const stub = newStubs[stubIndex];
-              if (stub) {
-                stub.selected = false;
-              }
-              setStubs(newStubs);
+              highlightStub(stubIndex, false);
             }}
             autoFocus={stubIndex === 0}
           />

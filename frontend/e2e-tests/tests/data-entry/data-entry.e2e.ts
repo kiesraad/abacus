@@ -424,6 +424,100 @@ test.describe("second data entry", () => {
       "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
     );
   });
+
+  test("different second data entry after first data entry", async ({ page, pollingStationFirstEntryDone }) => {
+    const pollingStation = pollingStationFirstEntryDone;
+
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
+
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
+    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.clickStart();
+
+    await expect(page).toHaveURL(
+      `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`,
+    );
+
+    // select different answer than in first data entry
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkYesAndClickNext();
+
+    await expect(recountedPage.feedbackHeader).toBeFocused();
+    await expect(recountedPage.warning).toContainText(
+      "Verschil met eerste invoer. Extra controle nodigW.001Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
+    await expect(recountedPage.error).toBeHidden();
+    await expect(recountedPage.acceptWarnings).toBeVisible();
+
+    await recountedPage.next.click();
+
+    await expect(recountedPage.acceptWarnings).not.toBeChecked();
+    await expect(recountedPage.acceptWarningsReminder).toBeVisible();
+
+    // correct selected answer
+    await recountedPage.checkNoAndClickNext();
+
+    // fill form with data that is different from first data entry
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    const voters = {
+      poll_card_count: 1000,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 1125,
+    };
+    const votes = {
+      votes_candidates_count: 1090,
+      blank_votes_count: 15,
+      invalid_votes_count: 20,
+      total_votes_cast_count: 1125,
+    };
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+
+    await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
+    await expect(votersAndVotesPage.warning).toContainText(
+      "Verschil met eerste invoer. Extra controle nodigW.001Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
+    await expect(votersAndVotesPage.error).toBeHidden();
+    await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+
+    await votersAndVotesPage.checkAcceptWarnings();
+    await votersAndVotesPage.next.click();
+
+    // fill in remaining second data entry equal to first data entry
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.fieldset).toBeVisible();
+    await differencesPage.fillInPageAndClickNext(noRecountNoDifferencesDataEntry.differences_counts);
+
+    const candidateListNames: string[] = await differencesPage.navPanel.allListNames();
+    // make sure the form has the same number of political groups as the input data
+    expect(candidateListNames.length).toBe(noRecountNoDifferencesDataEntry.political_group_votes.length);
+
+    for (const { index, value } of noRecountNoDifferencesDataEntry.political_group_votes.map((value, index) => ({
+      index,
+      value,
+    }))) {
+      const candidatesListPage = new CandidatesListPage(page, 1, candidateListNames[index] as string);
+      await expect(candidatesListPage.fieldset).toBeVisible();
+
+      const candidateVotes: number[] = value.candidate_votes.map((candidate) => {
+        return candidate.votes;
+      });
+      const listTotal = value.total;
+      await candidatesListPage.fillCandidatesAndTotal(candidateVotes, listTotal);
+      await candidatesListPage.next.click();
+    }
+
+    const checkAndSavePage = new CheckAndSavePage(page);
+    await expect(checkAndSavePage.fieldset).toBeVisible();
+    await checkAndSavePage.save.click();
+
+    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.alertInputSaved).toHaveText(
+      ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
+    );
+  });
 });
 
 test.describe("errors and warnings", () => {

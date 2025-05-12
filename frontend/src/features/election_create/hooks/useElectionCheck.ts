@@ -33,7 +33,10 @@ export function useElectionCheck(data: ElectionDefinitionUploadResponse) {
       }
     });
 
-    void navigate("/elections/create/polling-station-role");
+    // Only submit when there a no errors
+    if (stubs.every((stub) => stub.error === "")) {
+      void navigate("/elections/create/polling-station-role");
+    }
   }
 
   function highlightStub(stubIndex: number, highlight: boolean) {

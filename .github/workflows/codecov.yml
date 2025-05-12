@@ -41,7 +41,7 @@ jobs:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@b4df017ff79591e3c86dbfa6a783025a24f0dc8d # main
+        uses: cargo-bins/cargo-binstall@277269fc8e4ebd8cf30d06174714419e0c1e438e # main
       - name: Install cargo-llvm-cov
         run: cargo binstall cargo-llvm-cov
       - name: Install Nextest

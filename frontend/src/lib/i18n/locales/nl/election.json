@@ -7,6 +7,10 @@
       "description": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van de Kiesraad ontvangen.",
       "label": "Controle deel {stub}",
       "hint": "Vul 4 karakters in"
+    },
+    "error": {
+      "title": "Controle digitale vingerafdruk niet gelukt",
+      "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen."
     }
   },
   "import_eml": "Importeer verkiezingsdefinitie",

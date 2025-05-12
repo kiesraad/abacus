@@ -95,6 +95,9 @@ describe("Election create pages", () => {
     const election = getElectionMockData().election;
     overrideOnce("post", "/api/elections/validate", 200, {
       hash: {
+        // NOTE: In actual data, the redacted version of the hash
+        // will have empty strings at the `redacted_indexes` positions.
+        // We leave them in here so we can test their absence
         chunks: [
           ["asdf"],
           ["qwer"],
@@ -146,6 +149,9 @@ describe("Election create pages", () => {
     expect(screen.getByText("1")).toHaveRole("mark");
     expect(screen.getByText("2")).not.toHaveRole("mark");
 
+    const inputPart1 = screen.getByLabelText("Controle deel 1");
+    await user.type(inputPart1, "zxcv");
+
     const inputPart2 = screen.getByLabelText("Controle deel 2");
     await user.click(inputPart2);
     expect(screen.getByText("1")).not.toHaveRole("mark");
@@ -155,5 +161,10 @@ describe("Election create pages", () => {
     await user.click(screen.getByText("Controleer verkiezingsdefinitie"));
     expect(screen.getByText("1")).not.toHaveRole("mark");
     expect(screen.getByText("2")).not.toHaveRole("mark");
+    await user.type(inputPart2, "gfsd");
+    await user.click(screen.getByText("Volgende"));
+
+    // Expect to see the next page
+    expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
   });
 });

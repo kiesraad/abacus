@@ -27,7 +27,6 @@ import { getClientState } from "../../utils/dataEntryUtils";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
-
 const initialValues: PollingStationResults = {
   recounted: undefined,
   voters_counts: {
@@ -369,6 +368,7 @@ describe("Test VotersAndVotesForm", () => {
       const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
       expect(request_body.data).toEqual(expectedRequest.data);
     });
+  });
 
   describe("VotersAndVotesForm errors", () => {
     test("F.201 IncorrectTotal Voters counts", async () => {

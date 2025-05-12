@@ -1,18 +1,26 @@
-import {describe, test, expect, vi} from "vitest";
-import { render, screen } from "@testing-library/react";
-import { VotersAndVotesValues } from "./voters_and_votes/votersAndVotesValues";
+import { describe, expect, test, vi } from "vitest";
+
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import {
+  PollingStationDataEntryClaimHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@/testing/api-mocks/RequestHandlers";
+import { server } from "@/testing/server";
+import { render, screen } from "@/testing/test-utils";
+
+import { useDataEntryContext } from "../hooks/useDataEntryContext";
+import { getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
+import { DataEntryStateAndActionsLoaded } from "../types/types";
 import { DataEntryProvider } from "./DataEntryProvider";
 import { VotersAndVotesForm } from "./voters_and_votes/VotersAndVotesForm";
-import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { getInitialState } from "../utils/reducer";
+import { VotersAndVotesValues } from "./voters_and_votes/votersAndVotesValues";
 
-
-vi.mock("../utils/reducer", () => ({
-  
+vi.mock("../hooks/useDataEntryContext");
 
 describe("Data Entry cache behavior", () => {
-
   test("VotersAndVotesForm with cache", async () => {
+    server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
+
     const cacheData: VotersAndVotesValues = {
       voters_counts: {
         poll_card_count: 100,
@@ -28,13 +36,15 @@ describe("Data Entry cache behavior", () => {
       },
     };
 
-    
-    const test = { ...defaultDataEntryState,
+    const state: DataEntryStateAndActionsLoaded = {
+      ...getDefaultDataEntryStateAndActionsLoaded(),
+      status: "idle",
       cache: {
         key: "voters_votes_counts",
         data: cacheData,
       },
     };
+    vi.mocked(useDataEntryContext).mockReturnValue(state);
 
     render(
       <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
@@ -66,5 +76,4 @@ describe("Data Entry cache behavior", () => {
     const totalVotesCast = screen.getByRole("textbox", { name: "H Totaal uitgebrachte stemmen" });
     expect(totalVotesCast).toHaveValue(cacheData.votes_counts.total_votes_cast_count.toString());
   });
-
 });

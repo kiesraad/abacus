@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation } from "react-router";
+import { Link, Navigate, Outlet, useLocation } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
@@ -11,6 +11,21 @@ import { t } from "@/lib/i18n";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 import cls from "./ElectionCreateLayout.module.css";
 
+interface ElectionCreateFormSection {
+  key: string;
+  label: string;
+  path: string;
+}
+
+const formSections: ElectionCreateFormSection[] = [
+  { key: "election_definition", label: t("election_definition"), path: "create" },
+  { key: "polling_station_role", label: t("polling_station.role"), path: "create/polling-station-role" },
+  { key: "list_of_candidates", label: t("candidate.list.plural"), path: "create/list-of-candidates" },
+  { key: "polling_stations", label: t("polling_stations"), path: "create/polling-stations" },
+  { key: "counting_method_type", label: t("counting_method_type"), path: "create/counting-method-type" },
+  { key: "number_of_voters", label: t("polling_station.number_of_voters"), path: "create/number-of-voters" },
+];
+
 export function ElectionCreateLayout() {
   const { isAdministrator } = useUserRole();
   const location = useLocation();
@@ -18,6 +33,8 @@ export function ElectionCreateLayout() {
   if (!isAdministrator) {
     return <Navigate to="/account/login" state={{ unauthorized: true }} />;
   }
+
+  const currentFormSection = formSections.findIndex((formSection) => location.pathname.endsWith(formSection.path));
 
   return (
     <>
@@ -32,28 +49,31 @@ export function ElectionCreateLayout() {
         <StickyNav>
           <ProgressList>
             <ProgressList.Fixed>
-              <ProgressList.Item key="election_definition" status="idle" active>
-                <span>{t("election_definition")}</span>
-              </ProgressList.Item>
-              <ProgressList.Item key="polling_station_role" status="idle" disabled>
-                <span>{t("polling_station.role")}</span>
-              </ProgressList.Item>
-              <ProgressList.Item key="list_of_candidates" status="idle" disabled>
-                <span>{t("candidate.list.plural")}</span>
-              </ProgressList.Item>
-              <ProgressList.Item key="polling_stations" status="idle" disabled>
-                <span>{t("polling_stations")}</span>
-              </ProgressList.Item>
-              <ProgressList.Item key="counting_method_type" status="idle" disabled>
-                <span>{t("counting_method_type")}</span>
-              </ProgressList.Item>
-              <ProgressList.Item key="number_of_voters" status="idle" disabled>
-                <span>{t("polling_station.number_of_voters")}</span>
-              </ProgressList.Item>
+              {formSections.map((formSection, index) => (
+                <ProgressList.Item
+                  key={formSection.key}
+                  status={index < currentFormSection ? "accept" : "idle"}
+                  active={index === currentFormSection}
+                  disabled={index > currentFormSection}
+                >
+                  {index >= currentFormSection ? (
+                    <span>{formSection.label}</span>
+                  ) : (
+                    <Link to={`/elections/${formSection.path}`}>
+                      <span>{formSection.label}</span>
+                    </Link>
+                  )}
+                </ProgressList.Item>
+              ))}
             </ProgressList.Fixed>
             <div className="mt-md">
               <ProgressList.Fixed>
-                <ProgressList.Item key="check_and_save" status="idle" disabled>
+                <ProgressList.Item
+                  key="check_and_save"
+                  status="idle"
+                  disabled={currentFormSection !== formSections.length}
+                  active={currentFormSection === formSections.length}
+                >
                   <span>{t("check_and_save.title")}</span>
                 </ProgressList.Item>
               </ProgressList.Fixed>

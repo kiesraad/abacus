@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 
 import { isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
@@ -9,10 +8,10 @@ import { t, tx } from "@/lib/i18n";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
+import { CheckElectionDefinition } from "./CheckElectionDefinition";
 
 export function UploadElectionDefinition() {
-  const { file, setFile, setData } = useElectionCreateContext();
-  const navigate = useNavigate();
+  const { file, setFile, data, setData } = useElectionCreateContext();
   const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
   const [error, setError] = useState<string | undefined>();
   const { create } = useCrud<ElectionDefinitionUploadResponse>({ create: path });
@@ -25,7 +24,6 @@ export function UploadElectionDefinition() {
       if (isSuccess(response)) {
         setData(response.data);
         setError(undefined);
-        await navigate("/elections/create/check-definition");
       } else if (isError(response)) {
         setData(undefined);
         setError(currentFile.name);
@@ -33,6 +31,10 @@ export function UploadElectionDefinition() {
       }
     }
   };
+
+  if (file && data) {
+    return <CheckElectionDefinition file={file} data={data} />;
+  }
 
   return (
     <section className="md">

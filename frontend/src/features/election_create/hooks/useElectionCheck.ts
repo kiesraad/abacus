@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router";
 
 import { t } from "@/lib/i18n";
 import { ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
@@ -6,6 +7,7 @@ import { ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
 import { Stub } from "../components/RedactedHash";
 
 export function useElectionCheck(data: ElectionDefinitionUploadResponse) {
+  const navigate = useNavigate();
   const [stubs, setStubs] = useState<Stub[]>(
     data.hash.redacted_indexes.map((redacted_index: number) => ({
       selected: false,
@@ -16,6 +18,7 @@ export function useElectionCheck(data: ElectionDefinitionUploadResponse) {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     const formData = new FormData(event.currentTarget);
     stubs.forEach((stub, i) => {
       const value = formData.get(stub.index.toString());
@@ -29,6 +32,8 @@ export function useElectionCheck(data: ElectionDefinitionUploadResponse) {
         setStubs(newStubs);
       }
     });
+
+    void navigate("/elections/create/polling-station-role");
   }
 
   function highlightStub(stubIndex: number, highlight: boolean) {

@@ -461,17 +461,11 @@ test.describe("second data entry", () => {
 
     // fill form with data that is different from first data entry
     const votersAndVotesPage = new VotersAndVotesPage(page);
-    const voters = {
-      poll_card_count: 1000,
-      proxy_certificate_count: 50,
-      voter_card_count: 75,
-      total_admitted_voters_count: 1125,
-    };
+    const voters = noRecountNoDifferencesDataEntry.voters_counts;
     const votes = {
-      votes_candidates_count: 1090,
-      blank_votes_count: 15,
-      invalid_votes_count: 20,
-      total_votes_cast_count: 1125,
+      ...noRecountNoDifferencesDataEntry.votes_counts,
+      blank_votes_count: noRecountNoDifferencesDataEntry.votes_counts.invalid_votes_count,
+      invalid_votes_count: noRecountNoDifferencesDataEntry.votes_counts.blank_votes_count,
     };
     await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 

@@ -4,13 +4,13 @@ import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export class RecountedPage extends DataEntryBasePage {
   readonly fieldset: Locator;
-  readonly next: Locator;
-
-  readonly acceptWarnings: Locator;
-  readonly acceptWarningsReminder: Locator;
 
   readonly no: Locator;
   readonly yes: Locator;
+
+  readonly acceptWarnings: Locator;
+  readonly acceptWarningsReminder: Locator;
+  readonly next: Locator;
 
   constructor(page: Page) {
     super(page);

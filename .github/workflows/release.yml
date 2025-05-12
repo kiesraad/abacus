@@ -175,7 +175,7 @@ jobs:
           name: abacus-ubuntu-latest
       - name: Upload binary to test server
         run: |
-          curl -s \
+          curl -s -v \
           --fail \
           -H "Authorization: Bearer ${{ secrets.ABACUS_TEST_API_KEY }}" \
           -T ./abacus \

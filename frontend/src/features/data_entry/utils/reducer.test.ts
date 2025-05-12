@@ -243,7 +243,7 @@ describe("onSubmitForm", () => {
     } satisfies DataEntryAction);
   });
 
-  test.only("Aborting", async () => {
+  test("Aborting", async () => {
     const dispatch = vi.fn();
 
     const defaultState = getDefaultDataEntryState();

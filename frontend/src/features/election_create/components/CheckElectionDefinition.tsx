@@ -22,7 +22,12 @@ export function CheckElectionDefinition() {
   return (
     <section className="md">
       <h2>{t("election.check_eml.title")}</h2>
-      <p>
+      {stubs.some((stub) => stub.error.length > 0) && (
+        <Alert type="error" title={t("election.check_eml.error.title")} inline>
+          <p> {t("election.check_eml.error.description")} </p>
+        </Alert>
+      )}
+      <p className="mt-lg">
         {tx("election.check_eml.description", {
           file: () => {
             return <strong>{file?.name}</strong>;

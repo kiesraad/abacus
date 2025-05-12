@@ -48,7 +48,7 @@ export function Alert({
               <AlertIcon type={type} />
             </aside>
           )}
-          {title && <h2>{title}</h2>}
+          {title && <h3>{title}</h3>}
         </header>
       ) : (
         variant !== "no-icon" && (

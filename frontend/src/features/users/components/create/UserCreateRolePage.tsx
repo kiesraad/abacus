@@ -51,7 +51,7 @@ export function UserCreateRolePage() {
             <FormLayout.Section>
               <ChoiceList>
                 <ChoiceList.Title>{t("users.role_title")}</ChoiceList.Title>
-                {error && <ChoiceList.Error>{error}</ChoiceList.Error>}
+                {error && <ChoiceList.Error id="role-error">{error}</ChoiceList.Error>}
                 <ChoiceList.Radio
                   id={"role-administrator"}
                   name={"role"}

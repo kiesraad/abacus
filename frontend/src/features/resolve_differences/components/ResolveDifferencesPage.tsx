@@ -64,7 +64,7 @@ export function ResolveDifferencesPage() {
             <h3 className="heading-lg mb-md">{t("resolve_differences.form_question")}</h3>
             <p>{t("resolve_differences.form_content")}</p>
             <ChoiceList>
-              {validationError && <ChoiceList.Error>{validationError}</ChoiceList.Error>}
+              {validationError && <ChoiceList.Error id="resolve-differences-error">{validationError}</ChoiceList.Error>}
               <ChoiceList.Radio
                 id="keep_first_entry"
                 label={t("resolve_differences.options.keep_first_entry", { name: status.first_user })}

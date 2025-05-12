@@ -31,3 +31,7 @@
 .stubFocus {
   background-color: var(--interactive-default);
 }
+
+.error {
+  background-color: var(--red-600);
+}

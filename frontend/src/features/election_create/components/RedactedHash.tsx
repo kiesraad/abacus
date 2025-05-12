@@ -7,6 +7,7 @@ import cls from "./RedactedHash.module.css";
 export interface Stub {
   selected: boolean;
   index: number;
+  error: string;
 }
 
 interface RedactedHashProps {
@@ -23,11 +24,21 @@ export function RedactedHash({ hash, stubs }: RedactedHashProps) {
           const stubIndex = stubs.findIndex((s) => s.index === hashIndex);
           // Either render a stub marker, or just return the prefix and chunk text
           if (stubIndex !== -1) {
+            const stub = stubs[stubIndex];
+            if (!stub) return;
+            const selected = stub.selected;
+            const error = stub.error.length > 0;
+
             return (
               <Fragment key={hashIndex}>
                 <span
-                  className={cn(cls.chunk, cls.stub, stubs[stubIndex]?.selected ? cls.stubFocus : undefined)}
-                  role={stubs[stubIndex]?.selected ? "mark" : undefined}
+                  className={cn(
+                    cls.chunk,
+                    cls.stub,
+                    error && !selected ? cls.error : undefined,
+                    selected ? cls.stubFocus : undefined,
+                  )}
+                  role={selected ? "mark" : undefined}
                 >
                   {stubIndex + 1}
                 </span>

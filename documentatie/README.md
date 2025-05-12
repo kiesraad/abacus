@@ -23,8 +23,8 @@ Hier vind je de documentatie over Abacus. De documentatie wordt telkens aangevul
 
 ## Gebruikersdocumentatie
 
-- [Verkiezingsproces en Abacus](/documentatie/gebruikersdocumentatie/verkiezingsproces-en-abacus.md)
-- [Installeren en starten](/documentatie/gebruikersdocumentatie/installeren-en-starten.md)
+- [Verkiezingsproces en Abacus](https://kiesraad.github.io/abacus-documentatie/verkiezingsproces-en-abacus.html)
+- [Installeren en starten](https://kiesraad.github.io/abacus-documentatie/installeren-en-starten.html)
 
 ## Externe documentatie
 

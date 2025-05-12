@@ -145,7 +145,7 @@ export function DifferencesForm() {
       <BottomBar type="inputGrid">
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
-            <Alert type="error" variant="small">
+            <Alert type="error" small>
               <p>{t("data_entry.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>
@@ -159,7 +159,7 @@ export function DifferencesForm() {
               onChange={(e) => {
                 setAcceptWarnings(e.target.checked);
               }}
-              label={t("differences.differences_form_accept_warnings")}
+              label={t("data_entry.form_accept_warnings")}
             />
           </BottomBar.Row>
         )}

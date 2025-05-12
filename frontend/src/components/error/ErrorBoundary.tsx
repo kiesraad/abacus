@@ -6,6 +6,7 @@ import { FatalErrorPage } from "./FatalErrorPage";
 import { NotFoundPage } from "./NotFoundPage";
 
 export function ErrorBoundary() {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const error = useRouteError() as Error;
 
   // redirect to login page if the user is not authenticated

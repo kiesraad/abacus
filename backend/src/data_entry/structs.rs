@@ -1,15 +1,17 @@
-use crate::{
-    APIError,
-    audit_log::DataEntryDetails,
-    data_entry::status::DataEntryStatus,
-    election::{CandidateNumber, PGNumber, PoliticalGroup},
-    error::ErrorReference,
-};
+use std::ops::AddAssign;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, types::Json};
-use std::ops::AddAssign;
 use utoipa::ToSchema;
+
+use super::status::DataEntryStatus;
+use crate::{
+    APIError,
+    audit_log::DataEntryDetails,
+    election::{CandidateNumber, PGNumber, PoliticalGroup},
+    error::ErrorReference,
+};
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]
 pub struct PollingStationDataEntry {
@@ -266,8 +268,9 @@ pub struct CandidateVotes {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     #[test]
     fn test_votes_addition() {

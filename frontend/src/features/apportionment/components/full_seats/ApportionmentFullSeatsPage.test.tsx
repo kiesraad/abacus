@@ -91,7 +91,7 @@ describe("ApportionmentFullSeatsPage", () => {
     ]);
 
     expect(await screen.findByTestId("1-list-exhaustion-information")).toHaveTextContent(
-      "1 Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel. (Kieswet, artikel P 10 of P 13 eerste lid)",
+      "1 Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel. (Kieswet, artikel P 10)",
     );
     expect(await screen.findByTestId("2-list-exhaustion-information")).toHaveTextContent(
       "2 Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.",

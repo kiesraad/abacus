@@ -53,9 +53,11 @@ export function OverviewPage() {
       <main>
         <article>
           <Toolbar>
-            <Button.Link variant="secondary" size="sm" to={"./create"}>
-              <IconPlus /> {t("election.create")}
-            </Button.Link>
+            {isAdministrator && (
+              <Button.Link variant="secondary" size="sm" to={"./create"}>
+                <IconPlus /> {t("election.create")}
+              </Button.Link>
+            )}
           </Toolbar>
           {!electionList.length ? (
             !isAdminOrCoordinator ? (

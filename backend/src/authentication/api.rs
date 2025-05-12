@@ -1,3 +1,15 @@
+use axum::{
+    extract::{Path, State},
+    response::{IntoResponse, Json},
+};
+use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
+use cookie::{Cookie, SameSite};
+use hyper::StatusCode;
+use serde::{Deserialize, Serialize};
+use sqlx::Error;
+use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
+
 use super::{
     Admin, AdminOrCoordinator, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
     error::AuthenticationError,
@@ -10,17 +22,12 @@ use crate::{
     audit_log::{AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails},
     error::ErrorReference,
 };
-use axum::{
-    extract::{Path, State},
-    response::{IntoResponse, Json},
-};
-use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
-use cookie::{Cookie, SameSite};
-use hyper::StatusCode;
-use serde::{Deserialize, Serialize};
-use sqlx::Error;
-use utoipa::ToSchema;
-use utoipa_axum::{router::OpenApiRouter, routes};
+
+impl From<AuthenticationError> for APIError {
+    fn from(err: AuthenticationError) -> Self {
+        APIError::Authentication(err)
+    }
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()

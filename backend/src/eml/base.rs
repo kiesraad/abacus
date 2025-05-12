@@ -86,25 +86,11 @@ pub trait EMLDocument: Sized + DeserializeOwned + Serialize {
     }
 }
 
-pub fn eml_document_hash(input: &str, chunked: bool) -> String {
-    use sha2::Digest;
-    use std::fmt::Write;
-    let digest = sha2::Sha256::digest(input.as_bytes());
-
-    let mut res = String::new();
-    for (idx, b) in digest.into_iter().enumerate() {
-        if chunked && idx > 0 && idx % 2 == 0 {
-            res.push(' ');
-        }
-        write!(&mut res, "{:02x}", b).expect("Writing to a string cannot fail");
-    }
-    res
-}
-
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     #[derive(Debug, Serialize, Deserialize)]
     struct EmptyDoc {
@@ -133,20 +119,5 @@ mod tests {
         assert_eq!(doc.base.xmlns, None);
         assert_eq!(doc.base.id, "test-id");
         assert_eq!(doc.base.schema_version, "5");
-    }
-
-    #[test]
-    fn test_eml_document_hash() {
-        let input = "test";
-        let hash = eml_document_hash(input, false);
-        assert_eq!(
-            hash,
-            "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
-        );
-        let hash = eml_document_hash(input, true);
-        assert_eq!(
-            hash,
-            "9f86 d081 884c 7d65 9a2f eaa0 c55a d015 a3bf 4f1b 2b0b 822c d15d 6c15 b0f0 0a08"
-        );
     }
 }

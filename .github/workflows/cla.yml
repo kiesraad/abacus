@@ -15,8 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: check
-        uses: kiesraad/cla-bot@1101706b8b4299832da758b53d64bd59b20b1cec # main
-
+        uses: kiesraad/cla-bot@99048d3d89305bee35b3903b124878e5864855e8 # main
+        with:
+          contributors-repository-owner: kiesraad
+          contributors-repository-name: abacus
+          contributors-file: contributors.yml
       - if: failure() && steps.check.outputs.missing
         uses: marocchino/sticky-pull-request-comment@67d0dec7b07ed060a405f9b2a64b8ab319fdd7db # v2
         with:

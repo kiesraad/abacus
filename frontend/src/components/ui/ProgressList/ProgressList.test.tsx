@@ -2,7 +2,8 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen, within } from "@/testing/test-utils";
 
-import { DefaultProgressList } from "./ProgressList.stories";
+import cls from "./ProgressList.module.css";
+import { DefaultProgressList, OverviewProgressList } from "./ProgressList.stories";
 
 describe("UI component ProgressList", () => {
   test("first test", () => {
@@ -59,5 +60,21 @@ describe("UI component ProgressList", () => {
     expect(idleDisabledItem).toBeVisible();
     expect(idleDisabledItem).toHaveAttribute("aria-current", "false");
     expect(within(idleDisabledItem).queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  test("render overview items", async () => {
+    render(<OverviewProgressList />);
+
+    const listItems = await screen.findAllByRole("listitem");
+    expect(listItems.map((item) => item.textContent)).toEqual([
+      "Is er herteld?",
+      "Aantal kiezers en stemmen",
+      "Verschillen",
+      "Lijst 1 - Vurige Vleugels Partij",
+      "Lijst 2 - Wijzen van Water en Wind",
+    ]);
+    expect(listItems[0]).toHaveClass("idle");
+    expect(listItems[1]).toHaveClass("warning");
+    expect(listItems[2]).toHaveClass(cls.addSpace!);
   });
 });

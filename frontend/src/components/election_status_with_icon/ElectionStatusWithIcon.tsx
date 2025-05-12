@@ -1,10 +1,12 @@
-import { IconCheckHeart, IconCheckVerified } from "@/components/generated/icons";
+import { IconCheckHeart, IconCheckVerified, IconCompass } from "@/components/generated/icons";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { t } from "@/lib/i18n";
 import { ElectionStatus } from "@/types/generated/openapi";
 
 function statusIcon(status: ElectionStatus) {
   switch (status) {
+    case "Created":
+      return <Icon size="md" color="not-started" icon={<IconCompass />} />;
     case "DataEntryInProgress":
       return <Icon size="md" color="accept" icon={<IconCheckHeart />} />;
     case "DataEntryFinished":
@@ -14,6 +16,8 @@ function statusIcon(status: ElectionStatus) {
 
 function statusLabel(status: ElectionStatus, role: "coordinator" | "typist"): string {
   switch (status) {
+    case "Created":
+      return t(`election_status.${role}.data_entry_not_started`);
     case "DataEntryInProgress":
       return t(`election_status.${role}.data_entry_in_progress`);
     case "DataEntryFinished":

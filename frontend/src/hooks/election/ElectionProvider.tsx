@@ -22,6 +22,7 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
       renderOnSuccess={(data) => (
         <ElectionProviderContext.Provider
           value={{
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
             election: data.election as Required<Election>,
             pollingStations: data.polling_stations,
           }}

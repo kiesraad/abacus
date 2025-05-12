@@ -1,5 +1,9 @@
 #![cfg(test)]
 
+use axum::http::StatusCode;
+use sqlx::SqlitePool;
+use test_log::test;
+
 use crate::{
     shared::{
         create_and_finalise_data_entry, create_result, create_result_with_non_example_data_entry,
@@ -17,9 +21,6 @@ use abacus::{
     },
     election::Election,
 };
-use axum::http::StatusCode;
-use sqlx::SqlitePool;
-use test_log::test;
 
 pub mod shared;
 pub mod utils;

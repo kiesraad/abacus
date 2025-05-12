@@ -1,11 +1,11 @@
 use chrono::TimeDelta;
+pub use middleware::*;
+pub use role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
+pub use user::{User, Users};
 
 pub use self::api::*;
 #[cfg(test)]
 pub use self::session::Sessions;
-pub use middleware::*;
-pub use role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
-pub use user::{User, Users};
 
 pub mod api;
 pub mod error;
@@ -31,7 +31,6 @@ pub const SECURE_COOKIES: bool = false;
 
 #[cfg(test)]
 mod tests {
-    use super::role::Role;
     use api::{AccountUpdateRequest, Credentials, UserListResponse};
     use axum::{
         Router,
@@ -45,6 +44,7 @@ mod tests {
     use test_log::test;
     use tower::ServiceExt;
 
+    use super::role::Role;
     use crate::{
         AppState,
         authentication::{middleware::extend_session, session::Sessions, *},

@@ -130,7 +130,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       </InputGrid>
       {missingTotalError && (
         <div id="missing-total-error">
-          <Alert type="error" variant="small">
+          <Alert type="error" small>
             <p>{t("candidates_votes.check_totals")}</p>
           </Alert>
         </div>
@@ -138,7 +138,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       <BottomBar type="inputGrid">
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
-            <Alert type="error" variant="small">
+            <Alert type="error" small>
               <p>{t("data_entry.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>
@@ -152,7 +152,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
               onChange={(e) => {
                 setAcceptWarnings(e.target.checked);
               }}
-              label={t("candidates_votes.confirm_counts")}
+              label={t("data_entry.form_accept_warnings")}
             />
           </BottomBar.Row>
         )}

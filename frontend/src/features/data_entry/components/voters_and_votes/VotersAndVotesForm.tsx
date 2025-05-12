@@ -249,7 +249,7 @@ export function VotersAndVotesForm() {
       <BottomBar type="inputGrid">
         {formSection.acceptWarningsError && (
           <BottomBar.Row>
-            <Alert type="error" variant="small">
+            <Alert type="error" small>
               <p>{t("data_entry.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>
@@ -263,7 +263,7 @@ export function VotersAndVotesForm() {
               onChange={(e) => {
                 setAcceptWarnings(e.target.checked);
               }}
-              label={t("voters_and_votes.form_accept_warnings")}
+              label={t("data_entry.form_accept_warnings")}
             />
           </BottomBar.Row>
         )}

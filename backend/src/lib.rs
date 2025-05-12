@@ -1,8 +1,9 @@
+use std::{error::Error, net::SocketAddr};
+
 #[cfg(feature = "memory-serve")]
 use axum::http::StatusCode;
 use axum::{Router, extract::FromRef, middleware, serve::ListenerExt};
 use sqlx::SqlitePool;
-use std::{error::Error, net::SocketAddr};
 use tokio::{net::TcpListener, signal};
 use tower_http::trace::{self, TraceLayer};
 use tracing::{Level, info, trace};

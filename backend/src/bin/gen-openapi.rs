@@ -18,8 +18,9 @@ fn get_openapi_json() -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     #[test]
     fn generated_openapi_json_is_up_to_date() {

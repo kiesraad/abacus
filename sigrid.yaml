@@ -78,9 +78,9 @@ components:
   - name: "(Frontend) Modules/data_entry"
     include:
       - ".*/frontend/src/features/data_entry/.*"
-  - name: "(Frontend) Modules/data_entry_choice"
+  - name: "(Frontend) Modules/data_entry_home"
     include:
-      - ".*/frontend/src/features/data_entry_choice/.*"
+      - ".*/frontend/src/features/data_entry_home/.*"
   - name: "(Frontend) Modules/election_management"
     include:
       - ".*/frontend/src/features/election_management/.*"

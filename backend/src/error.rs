@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use axum::{
     Json,
     extract::rejection::JsonRejection,
@@ -5,19 +7,16 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use hyper::header::InvalidHeaderValue;
-use quick_xml::SeError;
+use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
-use std::error::Error;
 use tracing::error;
 use utoipa::ToSchema;
 use zip::result::ZipError;
 
 use crate::{
-    apportionment::ApportionmentError,
-    authentication::error::AuthenticationError,
-    data_entry::{DataError, status::DataEntryTransitionError},
-    pdf_gen::PdfGenError,
+    apportionment::ApportionmentError, authentication::error::AuthenticationError,
+    data_entry::DataError, eml::EMLImportError, pdf_gen::PdfGenError,
 };
 
 /// Error reference used to show the corresponding error message to the end-user
@@ -31,6 +30,7 @@ pub enum ErrorReference {
     DrawingOfLotsRequired,
     EntryNotFound,
     EntryNotUnique,
+    EmlImportError,
     InternalServerError,
     InvalidData,
     InvalidJson,
@@ -41,6 +41,7 @@ pub enum ErrorReference {
     InvalidUsernameOrPassword,
     InvalidVoteCandidate,
     InvalidVoteGroup,
+    InvalidXml,
     PasswordRejection,
     PdfGenerationError,
     PollingStationRepeated,
@@ -81,6 +82,8 @@ pub enum APIError {
     StdError(Box<dyn Error>),
     AddError(String, ErrorReference),
     XmlError(SeError),
+    XmlDeError(DeError),
+    EmlImportError(EMLImportError),
     Authentication(AuthenticationError),
     ZipError(ZipError),
     Apportionment(ApportionmentError),
@@ -183,6 +186,13 @@ impl IntoResponse for APIError {
                     ),
                 )
             }
+            APIError::XmlDeError(err) => {
+                error!("Could not deserialize XML: {:?}", err);
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("Invalid XML", ErrorReference::InvalidXml, false),
+                )
+            }
             APIError::Authentication(err) => {
                 // note that we don't log the UserNotFound error, as it is triggered for every whoami call
                 if !matches!(err, AuthenticationError::UserNotFound) {
@@ -254,6 +264,13 @@ impl IntoResponse for APIError {
                         ErrorReference::InternalServerError,
                         false,
                     ),
+                )
+            }
+            APIError::EmlImportError(err) => {
+                error!("Error importing EML file: {:?}", err);
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("EML import error", ErrorReference::EmlImportError, false),
                 )
             }
             APIError::Apportionment(err) => {
@@ -339,55 +356,9 @@ impl From<sqlx::Error> for APIError {
     }
 }
 
-impl From<DataError> for APIError {
-    fn from(err: DataError) -> Self {
-        APIError::InvalidData(err)
-    }
-}
-
 impl From<InvalidHeaderValue> for APIError {
     fn from(_: InvalidHeaderValue) -> Self {
         APIError::InvalidHeaderValue
-    }
-}
-
-impl From<SeError> for APIError {
-    fn from(err: SeError) -> Self {
-        APIError::XmlError(err)
-    }
-}
-
-impl From<DataEntryTransitionError> for APIError {
-    fn from(err: DataEntryTransitionError) -> Self {
-        match err {
-            DataEntryTransitionError::FirstEntryAlreadyClaimed
-            | DataEntryTransitionError::SecondEntryAlreadyClaimed => {
-                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyClaimed)
-            }
-            DataEntryTransitionError::FirstEntryAlreadyFinalised
-            | DataEntryTransitionError::SecondEntryAlreadyFinalised => {
-                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyFinalised)
-            }
-            _ => APIError::Conflict(err.to_string(), ErrorReference::InvalidStateTransition),
-        }
-    }
-}
-
-impl From<AuthenticationError> for APIError {
-    fn from(err: AuthenticationError) -> Self {
-        APIError::Authentication(err)
-    }
-}
-
-impl From<ZipError> for APIError {
-    fn from(err: ZipError) -> Self {
-        APIError::ZipError(err)
-    }
-}
-
-impl From<ApportionmentError> for APIError {
-    fn from(err: ApportionmentError) -> Self {
-        APIError::Apportionment(err)
     }
 }
 

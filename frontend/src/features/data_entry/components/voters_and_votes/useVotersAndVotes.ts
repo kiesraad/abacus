@@ -12,7 +12,8 @@ export function useVotersAndVotes() {
     section: "voters_votes_counts",
     getDefaultFormValues: (results, cache) =>
       cache?.key === "voters_votes_counts"
-        ? valuesToFormValues(cache.data as VotersAndVotesValues)
+        ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          valuesToFormValues(cache.data as VotersAndVotesValues)
         : valuesToFormValues({
             voters_counts: results.voters_counts,
             votes_counts: results.votes_counts,

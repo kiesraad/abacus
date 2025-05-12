@@ -16,6 +16,7 @@ interface UnauthorizedState {
 
 export function LoginForm() {
   const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const location = useLocation() as Location<null | UnauthorizedState>;
   const { login, expiration } = useApiState();
   const [username, setUsername] = useState<string>("");

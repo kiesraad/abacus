@@ -25,6 +25,7 @@ export function UserCreateTypePage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const type = formData.get("type") as UserType;
 
     setType(type);

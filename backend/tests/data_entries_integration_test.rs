@@ -1,10 +1,11 @@
 #![cfg(test)]
 
+use std::{collections::BTreeMap, net::SocketAddr};
+
 use axum::http::HeaderValue;
 use reqwest::{Response, StatusCode};
 use serde_json::json;
 use sqlx::SqlitePool;
-use std::{collections::BTreeMap, net::SocketAddr};
 use test_log::test;
 
 use crate::{

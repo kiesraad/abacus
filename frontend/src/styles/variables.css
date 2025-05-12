@@ -144,7 +144,7 @@
 
   --shadow-color-focus: #d1e0ff;
   --border-color-default: var(--bg-gray-darkest);
-  --border-color-focus: #155eef;
+  --border-color-focus: var(--interactive-default);
 
   --color-error: #e35f77;
   --color-error-darker: #d03651;
@@ -180,7 +180,9 @@
 
   --accent-orange: #ef8050;
 
-  --link-default: var(--border-color-focus);
+  --interactive-default: #155eef;
+
+  --link-default: var(--interactive-default);
   --link-hover: #004eeb;
   --link-active: #0040c1;
   --link-visited: #6927da;

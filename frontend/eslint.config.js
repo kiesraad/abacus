@@ -1,6 +1,7 @@
 // @ts-check
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
+import globals from "globals";
 import tseslint from "typescript-eslint";
 
 // https://typescript-eslint.io/getting-started/#step-2-configuration
@@ -20,6 +21,10 @@ export default tseslint.config(
       },
     },
     languageOptions: {
+      ecmaVersion: 2020, // instead of env: { es2020: true }
+      // globals: {
+      // 	...globals.browser
+      // }, // error because of  Global "AudioWorkletGlobalScope " has leading or trailing whitespace.
       parserOptions: {
         project: "**/tsconfig.json",
       },

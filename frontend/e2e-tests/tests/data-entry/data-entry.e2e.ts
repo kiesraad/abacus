@@ -14,6 +14,7 @@ import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
 import {
+  fillCandidatesListPages,
   fillDataEntryPages,
   fillDataEntryPagesAndSave,
   selectPollingStationForDataEntry,
@@ -484,24 +485,7 @@ test.describe("second data entry", () => {
     await expect(differencesPage.fieldset).toBeVisible();
     await differencesPage.fillInPageAndClickNext(noRecountNoDifferencesDataEntry.differences_counts);
 
-    const candidateListNames: string[] = await differencesPage.navPanel.allListNames();
-    // make sure the form has the same number of political groups as the input data
-    expect(candidateListNames.length).toBe(noRecountNoDifferencesDataEntry.political_group_votes.length);
-
-    for (const { index, value } of noRecountNoDifferencesDataEntry.political_group_votes.map((value, index) => ({
-      index,
-      value,
-    }))) {
-      const candidatesListPage = new CandidatesListPage(page, 1, candidateListNames[index] as string);
-      await expect(candidatesListPage.fieldset).toBeVisible();
-
-      const candidateVotes: number[] = value.candidate_votes.map((candidate) => {
-        return candidate.votes;
-      });
-      const listTotal = value.total;
-      await candidatesListPage.fillCandidatesAndTotal(candidateVotes, listTotal);
-      await candidatesListPage.next.click();
-    }
+    await fillCandidatesListPages(page, noRecountNoDifferencesDataEntry);
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();

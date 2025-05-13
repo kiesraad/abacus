@@ -432,21 +432,21 @@ test.describe("second data entry", () => {
     coordinator,
     pollingStationFirstEntryDone: pollingStation,
   }) => {
-    const { page } = typistTwo;
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
+    const typistPage = typistTwo.page;
+    await typistPage.goto(`/elections/${pollingStation.election_id}/data-entry`);
 
-    const dataEntryHomePage = new DataEntryHomePage(page);
+    const dataEntryHomePage = new DataEntryHomePage(typistPage);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
     await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
     await dataEntryHomePage.clickStart();
 
-    await expect(page).toHaveURL(
+    await expect(typistPage).toHaveURL(
       `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`,
     );
 
     // select different answer than in first data entry
-    const recountedPage = new RecountedPage(page);
+    const recountedPage = new RecountedPage(typistPage);
     await recountedPage.checkYesAndClickNext();
 
     await expect(recountedPage.feedbackHeader).toBeFocused();
@@ -465,7 +465,7 @@ test.describe("second data entry", () => {
     await recountedPage.checkNoAndClickNext();
 
     // fill form with data that is different from first data entry
-    const votersAndVotesPage = new VotersAndVotesPage(page);
+    const votersAndVotesPage = new VotersAndVotesPage(typistPage);
     const voters = noRecountNoDifferencesDataEntry.voters_counts;
     const votes = {
       ...noRecountNoDifferencesDataEntry.votes_counts,
@@ -487,13 +487,13 @@ test.describe("second data entry", () => {
     await votersAndVotesPage.next.click();
 
     // fill in remaining second data entry equal to first data entry
-    const differencesPage = new DifferencesPage(page);
+    const differencesPage = new DifferencesPage(typistPage);
     await expect(differencesPage.fieldset).toBeVisible();
     await differencesPage.fillInPageAndClickNext(noRecountNoDifferencesDataEntry.differences_counts);
 
-    await fillCandidatesListPages(page, noRecountNoDifferencesDataEntry);
+    await fillCandidatesListPages(typistPage, noRecountNoDifferencesDataEntry);
 
-    const checkAndSavePage = new CheckAndSavePage(page);
+    const checkAndSavePage = new CheckAndSavePage(typistPage);
     await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 

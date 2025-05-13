@@ -11,7 +11,7 @@ export class ElectionStatus {
     this.finish = page.getByRole("button", { name: "Invoerfase afronden" });
     this.errorsAndWarnings = page.getByRole("table", { name: "Fouten en waarschuwingen" });
     this.firstEntryFinished = page.getByRole("table", { name: "Eerste invoer klaar" });
-    this.definitive = page.getByRole("table", { name: "1e en 2e invoer klaar" });
+    this.definitive = page.getByRole("table", { name: "Eerste en tweede invoer klaar" });
     this.notStarted = page.getByRole("table", { name: "Werkvoorraad" });
   }
 }

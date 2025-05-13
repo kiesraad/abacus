@@ -56,6 +56,20 @@ describe("DifferencesTable", () => {
     expect(table).toHaveTableContent([tableHeaders, ["A", "10", "\u2014", "Some value"]]);
   });
 
+  test("Render a string value as-is", async () => {
+    renderTable([{ code: "A", first: "Ja", second: "Nee", description: "Some value" }]);
+    const table = await screen.findByRole("table");
+    expect(table).toBeInTheDocument();
+    expect(table).toHaveTableContent([tableHeaders, ["A", "Ja", "Nee", "Some value"]]);
+  });
+
+  test("Render a big number with thousands separator", async () => {
+    renderTable([{ code: "A", first: 10_120_334, second: 9_344_042, description: "Some value" }]);
+    const table = await screen.findByRole("table");
+    expect(table).toBeInTheDocument();
+    expect(table).toHaveTableContent([tableHeaders, ["A", "10.120.334", "9.344.042", "Some value"]]);
+  });
+
   test("Render gap rows between rows with differences", async () => {
     renderTable([
       { code: "A", first: 10, second: 10, description: "Same" },

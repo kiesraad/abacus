@@ -6,7 +6,7 @@ import {
   IconPencil,
   IconWarning,
 } from "@/components/generated/icons";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { MenuStatus } from "@/types/ui";
 
 export function StatusIcon({ status }: { status: MenuStatus }) {

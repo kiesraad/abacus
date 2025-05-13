@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- this file relies on many TypeScript unsafe type assertions */
 import { Fragment, ReactElement } from "react";
 
-import { RenderCallback } from "./i18n";
+import { RenderCallback } from "./i18n.types";
 
 type AST = Array<Element | string>;
 

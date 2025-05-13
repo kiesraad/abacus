@@ -1,7 +1,7 @@
 import { NotFoundError } from "@/api/ApiResult";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t, tx } from "@/lib/i18n";
+import { t, tx } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";

@@ -1,4 +1,4 @@
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { Candidate } from "@/types/generated/openapi";
 
 export function getCandidateFullName(candidate: Candidate): string {

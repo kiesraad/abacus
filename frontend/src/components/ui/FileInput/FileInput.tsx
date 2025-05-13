@@ -1,4 +1,4 @@
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 import { Button } from "../Button/Button";
 import cls from "./FileInput.module.css";

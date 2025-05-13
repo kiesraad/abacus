@@ -1,3 +1,5 @@
+import { ReactElement } from "react";
+
 import nl from "./locales/nl/nl";
 
 export type TranslationKey = keyof Translation;
@@ -30,3 +32,5 @@ export type TranslationPath = Join<TranslationValue<Translation>>;
 
 // Dutch is our type source for translations
 export type Translation = typeof nl;
+
+export type RenderCallback = (contents: ReactElement) => ReactElement;

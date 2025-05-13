@@ -4,7 +4,7 @@ import { Link } from "react-router";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { MenuStatus } from "@/types/ui";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";

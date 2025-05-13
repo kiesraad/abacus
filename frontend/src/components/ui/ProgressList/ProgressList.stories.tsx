@@ -2,7 +2,7 @@ import * as React from "react";
 
 import type { Story } from "@ladle/react";
 
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { politicalGroupsMockData } from "@/testing/api-mocks/ElectionMockData";
 
 import { ProgressList } from "./ProgressList";

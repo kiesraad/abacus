@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router";
 
 import { NotAvailableInMock } from "@/components/error/NotAvailableInMock";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 import { ElectionReportPage } from "./components/ElectionReportPage";
 

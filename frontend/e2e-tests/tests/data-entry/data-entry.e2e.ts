@@ -1,4 +1,11 @@
 import { expect } from "@playwright/test";
+import {
+  fillCandidatesListPages,
+  fillDataEntryPages,
+  fillDataEntryPagesAndSave,
+  selectPollingStationForDataEntry,
+} from "e2e-tests/helpers-utils/e2e-test-helpers";
+import { formatNumber } from "e2e-tests/helpers-utils/e2e-test-utils";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
@@ -9,22 +16,16 @@ import {
 } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
-
-import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
-
-import { test } from "../../fixtures";
-import {
-  fillCandidatesListPages,
-  fillDataEntryPages,
-  fillDataEntryPagesAndSave,
-  selectPollingStationForDataEntry,
-} from "../../helpers-utils/e2e-test-helpers";
-import { formatNumber } from "../../helpers-utils/e2e-test-utils";
+import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import {
   noErrorsWarningsResponse,
   noRecountNoDifferencesDataEntry,
   noRecountNoDifferencesRequest,
-} from "../../test-data/request-response-templates";
+} from "e2e-tests/test-data/request-response-templates";
+
+import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
+
+import { test } from "../../fixtures";
 
 test.use({
   storageState: "e2e-tests/state/typist.json",
@@ -49,16 +50,16 @@ test.describe("full data entry flow", () => {
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.pollCardCount).toBeFocused();
     const voters: VotersCounts = {
-      poll_card_count: 1000,
+      poll_card_count: 800,
       proxy_certificate_count: 50,
       voter_card_count: 75,
-      total_admitted_voters_count: 1125,
+      total_admitted_voters_count: 925,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 1090,
+      votes_candidates_count: 890,
       blank_votes_count: 20,
       invalid_votes_count: 15,
-      total_votes_cast_count: 1125,
+      total_votes_cast_count: 925,
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     await votersAndVotesPage.inputVotesCounts(votes);
@@ -72,7 +73,7 @@ test.describe("full data entry flow", () => {
     const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     await expect(candidatesListPage_1.getCandidate(0)).toBeFocused();
 
-    await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
+    await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
     const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
     await candidatesListPage_1.next.click();
 
@@ -391,11 +392,11 @@ test.describe("full data entry flow", () => {
 });
 
 test.describe("second data entry", () => {
-  test.use({ storageState: "e2e-tests/state/typist2.json" });
-
-  test("equal second data entry after first data entry", async ({ page, pollingStationFirstEntryDone }) => {
-    const pollingStation = pollingStationFirstEntryDone;
-
+  test("equal second data entry after first data entry", async ({
+    typistTwo,
+    pollingStationFirstEntryDone: pollingStation,
+  }) => {
+    const { page } = typistTwo;
     await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
@@ -426,9 +427,12 @@ test.describe("second data entry", () => {
     );
   });
 
-  test("different second data entry after first data entry", async ({ page, pollingStationFirstEntryDone }) => {
-    const pollingStation = pollingStationFirstEntryDone;
-
+  test("different second data entry after first data entry but correct warnings", async ({
+    typistTwo,
+    coordinator,
+    pollingStationFirstEntryDone: pollingStation,
+  }) => {
+    const { page } = typistTwo;
     await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
@@ -477,7 +481,9 @@ test.describe("second data entry", () => {
     await expect(votersAndVotesPage.error).toBeHidden();
     await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
 
-    await votersAndVotesPage.checkAcceptWarnings();
+    // correct warnings
+    await votersAndVotesPage.inputVotesCounts(noRecountNoDifferencesDataEntry.votes_counts);
+
     await votersAndVotesPage.next.click();
 
     // fill in remaining second data entry equal to first data entry
@@ -495,6 +501,81 @@ test.describe("second data entry", () => {
     await expect(dataEntryHomePage.alertInputSaved).toHaveText(
       ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
+
+    // check if data entries are marked as definitive on coordinator status page
+    const coordinatorPage = coordinator.page;
+    await coordinatorPage.goto(`/elections/${pollingStation.election_id}/status`);
+
+    const electionStatusPage = new ElectionStatus(coordinatorPage);
+    await expect(electionStatusPage.definitive).toBeVisible();
+    await electionStatusPage.definitive.getByRole("row", { name: pollingStation.name }).click();
+  });
+
+  test("different second data entry after first data entry", async ({
+    typistTwo,
+    coordinator,
+    pollingStationFirstEntryDone: pollingStation,
+  }) => {
+    const typistPage = typistTwo.page;
+    await typistPage.goto(`/elections/${pollingStation.election_id}/data-entry`);
+
+    const dataEntryHomePage = new DataEntryHomePage(typistPage);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
+    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.clickStart();
+
+    await expect(typistPage).toHaveURL(
+      `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`,
+    );
+
+    const recountedPage = new RecountedPage(typistPage);
+    await recountedPage.checkNoAndClickNext();
+
+    // fill form with data that is different from first data entry
+    const votersAndVotesPage = new VotersAndVotesPage(typistPage);
+    const voters = noRecountNoDifferencesDataEntry.voters_counts;
+    const votes = {
+      ...noRecountNoDifferencesDataEntry.votes_counts,
+      blank_votes_count: noRecountNoDifferencesDataEntry.votes_counts.invalid_votes_count,
+      invalid_votes_count: noRecountNoDifferencesDataEntry.votes_counts.blank_votes_count,
+    };
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+
+    await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
+    await expect(votersAndVotesPage.warning).toContainText(
+      "Verschil met eerste invoer. Extra controle nodigW.001Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
+    await expect(votersAndVotesPage.error).toBeHidden();
+    await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+
+    // do not correct differences and accept warning
+    await votersAndVotesPage.checkAcceptWarnings();
+    await votersAndVotesPage.next.click();
+
+    // fill in remaining second data entry equal to first data entry
+    const differencesPage = new DifferencesPage(typistPage);
+    await expect(differencesPage.fieldset).toBeVisible();
+    await differencesPage.fillInPageAndClickNext(noRecountNoDifferencesDataEntry.differences_counts);
+
+    await fillCandidatesListPages(typistPage, noRecountNoDifferencesDataEntry);
+
+    const checkAndSavePage = new CheckAndSavePage(typistPage);
+    await expect(checkAndSavePage.fieldset).toBeVisible();
+    await checkAndSavePage.save.click();
+
+    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.alertInputSaved).toHaveText(
+      ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
+    );
+
+    // check if data entries are marked as different on coordinator status page
+    const coordinatorPage = coordinator.page;
+    await coordinatorPage.goto(`/elections/${pollingStation.election_id}/status`);
+
+    const electionStatusPage = new ElectionStatus(coordinatorPage);
+    await expect(electionStatusPage.errorsAndWarnings).toBeVisible();
+    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: pollingStation.name }).click();
   });
 });
 

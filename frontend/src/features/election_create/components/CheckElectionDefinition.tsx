@@ -3,7 +3,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { t, tx } from "@/lib/i18n";
+import { t, tx } from "@/i18n/translate";
 import { formatDateFull } from "@/utils/format";
 
 import { useElectionCheck } from "../hooks/useElectionCheck";

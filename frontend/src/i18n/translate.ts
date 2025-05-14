@@ -1,10 +1,8 @@
 import { ReactElement } from "react";
 
-import { DEFAULT_ALLOWED_TAGS, locale, parse, renderAst, translations } from ".";
-
-import { TranslationPath } from "./i18n.types";
-
-export type RenderCallback = (contents: ReactElement) => ReactElement;
+import { DEFAULT_ALLOWED_TAGS, parse, renderAst } from "./format";
+import { locale, translations } from "./i18n";
+import { RenderCallback, TranslationPath } from "./i18n.types";
 
 // get the translation for the given path key, return undefined if not found
 function getTranslation(path: string): string | undefined {

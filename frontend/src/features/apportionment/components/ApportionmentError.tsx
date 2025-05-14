@@ -1,7 +1,7 @@
 import { ApiError } from "@/api/ApiResult";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 interface ApportionmentErrorProps {
   error: ApiError;

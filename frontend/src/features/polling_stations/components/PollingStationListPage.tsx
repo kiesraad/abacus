@@ -8,7 +8,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 import { usePollingStationListRequest } from "../hooks/usePollingStationListRequest";
 

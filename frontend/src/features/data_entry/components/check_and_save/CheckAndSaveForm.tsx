@@ -9,7 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { StatusList } from "@/components/ui/StatusList/StatusList";
 import { useElection } from "@/hooks/election/useElection";
-import { t, tx } from "@/lib/i18n";
+import { t, tx } from "@/i18n/translate";
 import { FormSectionId } from "@/types/types";
 import { KeyboardKey, MenuStatus } from "@/types/ui";
 

@@ -1,9 +1,9 @@
 import { renderToString } from "react-dom/server";
 
-import { locale, translations } from ".";
 import { describe, expect, test } from "vitest";
 
-import { hasTranslation, t, translate, tx } from "./i18n";
+import { locale, translations } from "./i18n";
+import { hasTranslation, t, translate, tx } from "./translate";
 
 function updateTestTranslation(value: string) {
   translations[locale].test = value;

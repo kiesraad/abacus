@@ -4,7 +4,7 @@ import { Circle } from "@/components/ui/Icon/Circle";
 import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { Election, ElectionStatusResponseEntry, PollingStation, User } from "@/types/generated/openapi";
 
 import {

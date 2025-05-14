@@ -1,4 +1,4 @@
-import { TranslationPath } from "@/lib/i18n";
+import { TranslationPath } from "@/i18n/i18n.types";
 import { ErrorReference } from "@/types/generated/openapi";
 
 export class FatalError extends Error {}

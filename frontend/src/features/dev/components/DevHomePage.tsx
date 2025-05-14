@@ -7,7 +7,7 @@ import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
 import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { useElectionList } from "@/hooks/election/useElectionList";
 import { useUserRole } from "@/hooks/user/useUserRole";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 function TypistLinks() {
   const { electionList } = useElectionList();

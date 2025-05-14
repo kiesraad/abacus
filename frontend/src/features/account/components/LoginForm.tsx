@@ -8,7 +8,8 @@ import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { t, TranslationPath, tx } from "@/lib/i18n";
+import { TranslationPath } from "@/i18n/i18n.types";
+import { t, tx } from "@/i18n/translate";
 
 interface UnauthorizedState {
   unauthorized?: boolean;

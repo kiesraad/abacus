@@ -3,7 +3,7 @@ import { useBlocker } from "react-router";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUser } from "@/hooks/user/useUser";
-import { t, tx } from "@/lib/i18n";
+import { t, tx } from "@/i18n/translate";
 import { PollingStationResults } from "@/types/generated/openapi";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";

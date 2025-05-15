@@ -135,7 +135,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         ))
         .layer(SetResponseHeaderLayer::overriding(
             header::CONTENT_SECURITY_POLICY,
-            HeaderValue::from_static("default-src 'self'"),
+            HeaderValue::from_static("default-src 'self'; img-src 'self' data:"),
         ))
         .layer(SetResponseHeaderLayer::overriding(
             HeaderName::from_static("x-permitted-cross-domain-policies"),
@@ -267,7 +267,7 @@ mod test {
             assert_eq!(response.headers()["x-content-type-options"], "nosniff");
             assert_eq!(
                 response.headers()["content-security-policy"],
-                "default-src 'self'"
+                "default-src 'self'; img-src 'self' data:"
             );
             assert_eq!(
                 response.headers()["x-permitted-cross-domain-policies"],

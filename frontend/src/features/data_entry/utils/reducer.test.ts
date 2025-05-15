@@ -8,7 +8,7 @@ import { Election, PollingStationResults } from "@/types/generated/openapi";
 
 import { errorWarningMocks, getDefaultDataEntryState } from "../testing/mock-data";
 import { DataEntryAction, DataEntryState } from "../types/types";
-import { onSubmitForm } from "./actions";
+import { onDeleteDataEntry, onFinaliseDataEntry, onSubmitForm } from "./actions";
 import dataEntryReducer, { getInitialState as _getInitialState } from "./reducer";
 import { ValidationResultSet } from "./ValidationResults";
 
@@ -302,6 +302,52 @@ describe("onSubmitForm", () => {
         continueToNextSection: true,
       } satisfies DataEntryAction,
     ]);
+    expect(result).toBe(true);
+  });
+});
+
+describe("onDeleteDataEntry", () => {
+  test("should handle delete data entry", async () => {
+    const dispatch = vi.fn();
+    const client = new ApiClient();
+
+    const requestPath = "/api/polling_stations/1/data_entries/1";
+    const onDelete = onDeleteDataEntry(client, requestPath, dispatch);
+
+    overrideOnce("delete", requestPath, 200, {});
+
+    const result = await onDelete();
+
+    expect(dispatch).toHaveBeenCalledTimes(2);
+    expect(dispatch.mock.calls[0]).toStrictEqual([
+      { type: "SET_STATUS", status: "deleting" } satisfies DataEntryAction,
+    ]);
+    expect(dispatch.mock.calls[1]).toStrictEqual([{ type: "SET_STATUS", status: "deleted" } satisfies DataEntryAction]);
+
+    expect(result).toBe(true);
+  });
+});
+
+describe("onFinaliseDataEntry", () => {
+  test("should handle finalise data entry", async () => {
+    const dispatch = vi.fn();
+    const client = new ApiClient();
+
+    const requestPath = "/api/polling_stations/1/data_entries/1";
+    const onFinalise = onFinaliseDataEntry(client, requestPath, dispatch);
+
+    overrideOnce("post", requestPath + "/finalise", 200, {});
+
+    const result = await onFinalise();
+
+    expect(dispatch).toHaveBeenCalledTimes(2);
+    expect(dispatch.mock.calls[0]).toStrictEqual([
+      { type: "SET_STATUS", status: "finalising" } satisfies DataEntryAction,
+    ]);
+    expect(dispatch.mock.calls[1]).toStrictEqual([
+      { type: "SET_STATUS", status: "finalised" } satisfies DataEntryAction,
+    ]);
+
     expect(result).toBe(true);
   });
 });

@@ -3,7 +3,11 @@ import { describe, expect, test, vi } from "vitest";
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResponseStatus } from "@/api/ApiResult";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { overrideOnce } from "@/testing/server";
+import {
+  PollingStationDataEntryDeleteHandler,
+  PollingStationDataEntryFinaliseHandler,
+} from "@/testing/api-mocks/RequestHandlers";
+import { overrideOnce, server } from "@/testing/server";
 import { Election, PollingStationResults } from "@/types/generated/openapi";
 
 import { errorWarningMocks, getDefaultDataEntryState } from "../testing/mock-data";
@@ -308,13 +312,15 @@ describe("onSubmitForm", () => {
 
 describe("onDeleteDataEntry", () => {
   test("should handle delete data entry", async () => {
+    server.use(PollingStationDataEntryDeleteHandler);
+
     const dispatch = vi.fn();
     const client = new ApiClient();
 
     const requestPath = "/api/polling_stations/1/data_entries/1";
     const onDelete = onDeleteDataEntry(client, requestPath, dispatch);
 
-    overrideOnce("delete", requestPath, 200, {});
+    //overrideOnce("delete", requestPath, 200, {});
 
     const result = await onDelete();
 
@@ -330,13 +336,12 @@ describe("onDeleteDataEntry", () => {
 
 describe("onFinaliseDataEntry", () => {
   test("should handle finalise data entry", async () => {
+    server.use(PollingStationDataEntryFinaliseHandler);
     const dispatch = vi.fn();
     const client = new ApiClient();
 
     const requestPath = "/api/polling_stations/1/data_entries/1";
     const onFinalise = onFinaliseDataEntry(client, requestPath, dispatch);
-
-    overrideOnce("post", requestPath + "/finalise", 200, {});
 
     const result = await onFinalise();
 

@@ -1,9 +1,9 @@
 import { expect, Page } from "@playwright/test";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
-import { DataEntryBasePage } from "e2e-tests/page-objects/data_entry/DataEntryBasePgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { NavigationPanel } from "e2e-tests/page-objects/data_entry/NavigationPanelPgObj";
 import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 
@@ -44,7 +44,8 @@ export async function fillDataEntryPages(page: Page, results: PollingStationResu
 }
 
 export async function fillCandidatesListPages(page: Page, results: PollingStationResults) {
-  const candidateListNames: string[] = await new DataEntryBasePage(page).navPanel.allListNames();
+  const candidateListNames: string[] = await new NavigationPanel(page).allListNames();
+
   // make sure the form has the same number of political groups as the input data
   expect(candidateListNames.length).toBe(results.political_group_votes.length);
 

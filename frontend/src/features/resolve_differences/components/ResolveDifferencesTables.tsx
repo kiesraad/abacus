@@ -1,4 +1,4 @@
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { PoliticalGroup, PoliticalGroupVotes, PollingStationResults, ResolveAction } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 

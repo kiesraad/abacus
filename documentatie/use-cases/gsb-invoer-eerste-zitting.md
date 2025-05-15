@@ -178,15 +178,13 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ De applicatie stelt vast dat beide invoeren niet gelijk zijn.
-
 __Hoofdscenario:__
 
 1. De coördinator GSB bekijkt de verschillen tussen de twee invoeren.
 2. De coördinator GSB stelt vast dat één van de twee invoeren overeenkomt met het papier.
 3. De coördinator GSB accepteert de correcte invoer en gooit de andere invoer weg.
-4. De applicatie behandelt de geaccepteerde invoer als een eerste invoer. (Dus bij nieuwe invoer: waarschuwingen over verschillen met geaccepteerde invoer.)
-4. De coördinator GSB geeft het PV aan een invoerder om nogmaals in te voeren.
+4. De applicatie behandelt de geaccepteerde invoer als een eerste invoer. (Dus bij nieuwe tweede invoer: waarschuwingen over verschillen met geaccepteerde invoer.)
+5. De coördinator GSB geeft het PV aan een invoerder om nogmaals in te voeren.
 
 __Uitbreidingen:__  
 2a. Geen van beide invoeren komt overeen met het papier:  

@@ -8,7 +8,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { User, USER_GET_REQUEST_PATH } from "@/types/generated/openapi";
 
 import { UserDelete } from "./UserDelete";

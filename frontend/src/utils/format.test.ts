@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 import {
   deformatNumber,

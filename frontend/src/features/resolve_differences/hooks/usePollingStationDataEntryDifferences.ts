@@ -5,7 +5,7 @@ import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet, useInitialApiGetWithErrors } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import {
   DataEntryStatus,
   Election,

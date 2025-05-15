@@ -60,6 +60,13 @@ function expandObject(object) {
   return result;
 }
 
+function countNested(object) {
+  return Object.values(object).reduce(
+    (count, value) => (typeof value == "string" ? count + 1 : count + countNested(value)),
+    0,
+  );
+}
+
 function importPoFiles() {
   // loop over translation directory and read .po files to a string
   const translations = fs.readdirSync("./translations").reduce((acc, file) => {
@@ -72,7 +79,9 @@ function importPoFiles() {
     return acc;
   }, {});
 
-  // write the translations to a json file, based on the root keys
+  // write the translations to json files, based on the root keys
+  const localesDir = "./src/i18n/locales";
+  let totalCount = 0;
   for (const locale in translations) {
     const generic = {};
 
@@ -81,14 +90,20 @@ function importPoFiles() {
         generic[key] = translations[locale][key];
       } else {
         fs.writeFileSync(
-          `./src/lib/i18n/locales/${locale}/${key}.json`,
+          `${localesDir}/${locale}/${key}.json`,
           JSON.stringify(translations[locale][key], null, 2) + "\n",
         );
-        console.log(`Wrote ${translations[locale][key].length} entries to ${locale}/${key}.json`);
+        const count = countNested(translations[locale][key]);
+        totalCount += count;
+        console.log(`Wrote ${count} entries to ${locale}/${key}.json`);
       }
     }
 
-    fs.writeFileSync(`./src/lib/i18n/locales/${locale}/generic.json`, JSON.stringify(generic, null, 2) + "\n");
-    console.log(`Wrote ${generic.length} entries to ${locale}/generic.json`);
+    fs.writeFileSync(`${localesDir}/${locale}/generic.json`, JSON.stringify(generic, null, 2) + "\n");
+    const count = Object.keys(generic).length;
+    totalCount += count;
+    console.log(`Wrote ${count} entries to ${locale}/generic.json`);
   }
+
+  console.log(`Wrote in total ${totalCount} entries to ${localesDir}`);
 }

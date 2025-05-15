@@ -1,8 +1,9 @@
-import { Fragment, useId } from "react";
+import { Fragment, ReactElement, useId } from "react";
 
 import { Table } from "@/components/ui/Table/Table";
 import { ResolveAction } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
+import { formatNumber } from "@/utils/format";
 
 import cls from "./ResolveDifferences.module.css";
 
@@ -13,7 +14,15 @@ interface DifferencesTableProps {
   action?: ResolveAction;
 }
 
-const zeroDash = <span className={cls.zeroDash}>&mdash;</span>;
+function formatValue(value: string | number | undefined): string | ReactElement {
+  if (!value) {
+    return <span className={cls.zeroDash}>&mdash;</span>;
+  } else if (typeof value === "string") {
+    return value;
+  } else {
+    return formatNumber(value);
+  }
+}
 
 export interface DifferencesRow {
   code?: number | string;
@@ -73,10 +82,10 @@ export function DifferencesTable({ title, headers, rows, action }: DifferencesTa
                       {rows[rowIndex]?.code}
                     </Table.HeaderCell>
                     <Table.Cell className={cn(...CELL_CLASSES, keepFirst && cls.keep, discardFirst && cls.discard)}>
-                      {rows[rowIndex]?.first || zeroDash}
+                      {formatValue(rows[rowIndex]?.first)}
                     </Table.Cell>
                     <Table.Cell className={cn(...CELL_CLASSES, keepSecond && cls.keep, discardSecond && cls.discard)}>
-                      {rows[rowIndex]?.second || zeroDash}
+                      {formatValue(rows[rowIndex]?.second)}
                     </Table.Cell>
                     <Table.Cell>{rows[rowIndex]?.description}</Table.Cell>
                   </Table.Row>

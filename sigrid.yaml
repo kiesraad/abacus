@@ -111,7 +111,7 @@ components:
       - ".*/frontend/src/testing/api-mocks/.*"
   - name: "(Frontend) Lib/i18n"
     include:
-      - ".*/frontend/src/lib/i18n/.*"
+      - ".*/frontend/src/i18n/.*"
   - name: "(Frontend) Unit tests"
     include:
       - ".*/frontend/src/testing/.*"

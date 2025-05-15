@@ -149,7 +149,7 @@ This results in `/frontend/src/components/generated/icons.tsx`.
 #### gen_po
 
 Use this script to create `.po` files (one for every defined locale) that can de used in translation software.
-This script generates `.po` translation files from the current json translations in `/frontend/lib/i18n/loclales/<locale>/*.json`:
+This script generates `.po` translation files from the current json translations in `/frontend/src/i18n/locales/<locale>/*.json`:
 
 ```sh
 npm run gen:po
@@ -166,4 +166,4 @@ This script generates json translation files from `.po` translation files in `/f
 npm run gen:translation-json
 ```
 
-This results in `/frontend/lib/i18n/loclales/<locale>/*.json`. These contain the texts used by the application.
+This results in `/frontend/src/i18n/locales/<locale>/*.json`. These contain the texts used by the application.

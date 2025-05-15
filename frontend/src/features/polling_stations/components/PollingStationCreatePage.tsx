@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { PollingStation } from "@/types/generated/openapi";
 
 import { PollingStationForm } from "./PollingStationForm";

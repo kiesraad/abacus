@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 
 import { useApportionmentContext } from "../hooks/useApportionmentContext";

@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { DataEntryStatusName } from "@/types/generated/openapi";
 
 type Stat = {

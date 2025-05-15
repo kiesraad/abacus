@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 import { usePollingStationGet } from "../hooks/usePollingStationGet";
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";

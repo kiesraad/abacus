@@ -1,7 +1,7 @@
 # Vertalingen in Abacus
 
 In de Abacus React frontend wordt geen library gebruikt voor vertalingen.
-De code voor vertalingen is te vinden in `frontend/src/lib/i18n`
+De code voor vertalingen is te vinden in `frontend/src/i18n`
 
 ## Ontwerp
 
@@ -62,7 +62,7 @@ Newlines worden door de `tx()` functie automatisch omgezet naar `<br>`.
 
 ### Vertalingen toevoegen
 
-Vertalingen (van key naar vertaling) zijn te vinden in `/frontend/src/lib/i18n/locales/<locale>/*.json`.
+Vertalingen (van key naar vertaling) zijn te vinden in `/frontend/src/i18n/locales/<locale>/*.json`.
 
 Het kiezen van een goede vertaal-key en structuur is een kunst.
 
@@ -76,7 +76,7 @@ Ze volgende zaken kunnen helpen bij het kiezen van een goede key structuur:
 - Zorg dat keys kort maar uniek zijn.
 
 Merk op dat een segment van een key niet als losse key gebruikt kan worden. Als bijvoorbeeld "differences.more_ballots_count"
-bestaat mag "differences" niet als losse key worden gedefinieerd. Een oplossing hioervoor is om de prefix "title" te gebruiken.
+bestaat mag "differences" niet als losse key worden gedefinieerd. Een oplossing hiervoor is om de prefix "title" te gebruiken.
 Bijvoorbeeld `differences.title`: `Verschillen`.
 
 Zie ook [deze link](https://lokalise.com/blog/translation-keys-naming-and-organizing/) voor tips.
@@ -90,7 +90,7 @@ De volgende scripts moeten worden aangeroepen vanuit de "frontend/" map.
 ### JSON naar PO
 
 Gebruik dit script om `.po`-bestanden te maken (één voor elke gedefinieerde locale) die gebruikt kunnen worden in vertaalsoftware.
-Dit script genereert `.po`-vertaalbestanden van de huidige JSON-vertalingen in `/frontend/src/lib/i18n/locales/<locale>/*.json`:
+Dit script genereert `.po`-vertaalbestanden van de huidige JSON-vertalingen in `/frontend/src/i18n/locales/<locale>/*.json`:
 
 ```sh
 npm run gen:po
@@ -107,4 +107,4 @@ Dit script genereert JSON-vertaalbestanden van `.po`-vertaalbestanden in `/front
 npm run gen:translation-json
 ```
 
-Dit resulteert in `/frontend/src/lib/i18n/locales/<locale>/*.json`. Deze bevatten de teksten die door de applicatie worden gebruikt.
+Dit resulteert in `/frontend/src/i18n/locales/<locale>/*.json`. Deze bevatten de teksten die door de applicatie worden gebruikt.

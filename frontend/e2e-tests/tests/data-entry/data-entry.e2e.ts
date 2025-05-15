@@ -507,8 +507,7 @@ test.describe("second data entry", () => {
     await coordinatorPage.goto(`/elections/${pollingStation.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(coordinatorPage);
-    await expect(electionStatusPage.definitive).toBeVisible();
-    await electionStatusPage.definitive.getByRole("row", { name: pollingStation.name }).click();
+    await expect(electionStatusPage.definitive).toContainText(pollingStation.name);
   });
 
   test("different second data entry after first data entry", async ({
@@ -574,8 +573,7 @@ test.describe("second data entry", () => {
     await coordinatorPage.goto(`/elections/${pollingStation.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(coordinatorPage);
-    await expect(electionStatusPage.errorsAndWarnings).toBeVisible();
-    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: pollingStation.name }).click();
+    await expect(electionStatusPage.errorsAndWarnings).toContainText(pollingStation.name);
   });
 });
 

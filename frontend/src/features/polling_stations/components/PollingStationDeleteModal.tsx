@@ -2,7 +2,7 @@ import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 export interface PollingStationDeleteModalProps {
   electionId: number;

@@ -21,12 +21,23 @@ required-features = ["openapi"]
 
 [dependencies]
 axum = { version = "0.8", features = ["macros", "tracing", "tokio"] }
-axum-extra = { version = "0.10", default-features = false, features = ["attachment", "cookie", "typed-header", "query"] }
+axum-extra = { version = "0.10", default-features = false, features = [
+    "attachment",
+    "cookie",
+    "typed-header",
+    "query",
+] }
 chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
-clap = { version = "4.5", default-features = false, features = ["derive", "std", "help"] }
+clap = { version = "4.5", default-features = false, features = [
+    "derive",
+    "std",
+    "help",
+] }
 hyper = { version = "1", features = ["full"] }
 tokio = { version = "1", features = ["full"] }
-memory-serve = { version = "1.2.1", features = ["force-embed"], optional = true }
+memory-serve = { version = "1.2.1", optional = true, features = [
+    "force-embed",
+] }
 utoipa = { version = "5.3.1", features = ["axum_extras"] }
 utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.1", features = ["axum"], optional = true }
@@ -36,7 +47,7 @@ sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "chrono"] }
 tower = "0.5"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 tracing = "0.1.41"
-tower-http = { version = "0.6.4", features = ["trace"] }
+tower-http = { version = "0.6", features = ["set-header", "trace"] }
 typst = { version = "0.13.1", optional = true }
 typst-pdf = { version = "0.13.1", optional = true }
 quick-xml = { version = "0.37.5", features = ["serialize"] }
@@ -45,7 +56,10 @@ argon2 = "0.5.3"
 password-hash = { version = "0.5.0", features = ["getrandom"] }
 rand = "0.9.0"
 cookie = { version = "0.18.1", features = ["percent-encode"] }
-zip = { version = "2.3.0", default-features = false, features = ["deflate", "chrono"] }
+zip = { version = "2.3.0", default-features = false, features = [
+    "deflate",
+    "chrono",
+] }
 strum = { version = "0.27", features = ["derive"] }
 
 [dev-dependencies]

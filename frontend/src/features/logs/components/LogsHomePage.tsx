@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { Pagination } from "@/components/ui/Pagination/Pagination";
 import { Toolbar, ToolbarSection } from "@/components/ui/Toolbar/Toolbar";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { AuditLogEvent } from "@/types/generated/openapi";
 
 import { useAuditLog } from "../hooks/useAuditLog";

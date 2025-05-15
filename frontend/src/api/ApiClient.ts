@@ -1,4 +1,4 @@
-import { TranslationPath } from "@/lib/i18n";
+import { TranslationPath } from "@/i18n/i18n.types";
 import { ErrorResponse } from "@/types/generated/openapi";
 
 import { ApiErrorEvent, SessionExpirationEvent } from "./ApiEvents";

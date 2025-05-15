@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
 
 import { Stub } from "../components/RedactedHash";

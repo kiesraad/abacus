@@ -1,7 +1,7 @@
 import { Navigate, useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { User } from "@/types/generated/openapi";
 
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";

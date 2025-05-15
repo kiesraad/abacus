@@ -7,7 +7,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 import { ElectionProgress } from "./ElectionProgress";
 import { PollingStationChoiceForm } from "./PollingStationChoiceForm";

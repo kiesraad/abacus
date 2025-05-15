@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { Role } from "@/types/generated/openapi";
 
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";

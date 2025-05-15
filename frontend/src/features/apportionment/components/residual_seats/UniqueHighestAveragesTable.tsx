@@ -1,5 +1,5 @@
 import { Table } from "@/components/ui/Table/Table";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 

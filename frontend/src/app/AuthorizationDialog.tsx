@@ -4,7 +4,7 @@ import { Navigate, useLocation } from "react-router";
 import { useApiState } from "@/api/useApiState";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
-import { t, tx } from "@/lib/i18n";
+import { t, tx } from "@/i18n/translate";
 import { formatTimeToGo } from "@/utils/format";
 
 import { ALLOW_UNAUTHORIZED, EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";

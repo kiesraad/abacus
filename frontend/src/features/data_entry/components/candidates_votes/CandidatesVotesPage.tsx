@@ -1,6 +1,6 @@
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 

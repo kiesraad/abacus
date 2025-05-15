@@ -6,7 +6,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useUserRole } from "@/hooks/user/useUserRole";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 import cls from "./ElectionCreateLayout.module.css";

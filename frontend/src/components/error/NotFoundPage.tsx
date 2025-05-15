@@ -1,7 +1,8 @@
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
-import { t, TranslationPath, tx } from "@/lib/i18n";
+import { TranslationPath } from "@/i18n/i18n.types";
+import { t, tx } from "@/i18n/translate";
 
 import { Error } from "./Error";
 

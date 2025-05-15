@@ -33,11 +33,11 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     setValues,
     formSection,
     status,
-    setAcceptWarnings,
+    setAcceptErrorsAndWarnings,
     defaultProps,
     pollingStationResults,
     missingTotalError,
-    showAcceptWarnings,
+    showAcceptErrorsAndWarnings,
   } = useCandidateVotes(group.number);
 
   const totalFieldId = `data.political_group_votes[${group.number - 1}].total`;
@@ -136,21 +136,21 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         </div>
       )}
       <BottomBar type="inputGrid">
-        {formSection.acceptWarningsError && (
+        {formSection.acceptErrorsAndWarningsError && (
           <BottomBar.Row>
             <Alert type="error" small>
               <p>{t("data_entry.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>
         )}
-        {showAcceptWarnings && (
+        {showAcceptErrorsAndWarnings && (
           <BottomBar.Row>
             <Checkbox
               id={`candidates_votes_form_accept_warnings_${group.number}`}
-              checked={formSection.acceptWarnings}
-              hasError={formSection.acceptWarningsError}
+              checked={formSection.acceptErrorsAndWarnings}
+              hasError={formSection.acceptErrorsAndWarningsError}
               onChange={(e) => {
-                setAcceptWarnings(e.target.checked);
+                setAcceptErrorsAndWarnings(e.target.checked);
               }}
               label={t("data_entry.form_accept_warnings")}
             />

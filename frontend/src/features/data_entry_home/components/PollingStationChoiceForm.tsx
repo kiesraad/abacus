@@ -200,7 +200,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
             </Alert>
           ) : !available.length ? (
             <Alert type="notify" small>
-              <p>{t("polling_station_choice.all_polling_stations_filled_in_twice")}</p>
+              <p>{t("polling_station_choice.there_are_no_polling_stations_left_to_fill_in")}</p>
             </Alert>
           ) : (
             <PollingStationsList pollingStations={availableCurrentUser} />

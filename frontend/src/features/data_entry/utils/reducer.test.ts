@@ -320,8 +320,6 @@ describe("onDeleteDataEntry", () => {
     const requestPath = "/api/polling_stations/1/data_entries/1";
     const onDelete = onDeleteDataEntry(client, requestPath, dispatch);
 
-    //overrideOnce("delete", requestPath, 200, {});
-
     const result = await onDelete();
 
     expect(dispatch).toHaveBeenCalledTimes(2);

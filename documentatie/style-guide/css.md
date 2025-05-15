@@ -7,7 +7,7 @@ We hebben op dit moment twee soorten CSS-bestanden: globale CSS-bestanden en CSS
 De globale CSS-bestanden zijn te vinden in `frontend/src/styles`. Deze bestanden zijn bedoeld voor CSS reset, generieke variabelen, typografie en styling en utility klassen.
 
 ## CSS Modules
-Voor component of feature specifieke CSS-regels, gebruiken wij CSS Modules. 
+Voor component- of feature-specifieke CSS-regels gebruiken wij CSS Modules. 
 
 ## Guidelines
 - Specifieke styling voor componenten of features zoveel mogelijk in CSS Modules, hergebruik middels UI-componenten.

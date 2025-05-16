@@ -14,7 +14,6 @@ import tseslint from "typescript-eslint";
 
 // TODO: parser: "@typescript-eslint/parser",
 // TODO. *.js files
-// TODO more extends for e2e tests
 // TODO more extends for ladle e2e tests
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
@@ -116,12 +115,20 @@ export default tseslint.config(
   },
   {
     files: ["*.e2e.ts", "e2e-tests/**/*"],
-    extends: [playwright.configs["flat/recommended"]],
+    extends: [
+      playwright.configs["flat/recommended"],
+      eslint.configs.recommended,
+      tseslint.configs.strictTypeChecked,
+      importPlugin.flatConfigs.recommended,
+      importPlugin.flatConfigs.typescript,
+      eslintPluginPrettierRecommended,
+    ],
     rules: {
       "@typescript-eslint/no-floating-promises": "error",
       "react-hooks/rules-of-hooks": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
     },
   },
   {

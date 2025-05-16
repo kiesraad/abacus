@@ -1,4 +1,5 @@
 import fs, { readdirSync } from "fs";
+// eslint-disable-next-line import/default
 import prettier from "prettier";
 
 async function run() {

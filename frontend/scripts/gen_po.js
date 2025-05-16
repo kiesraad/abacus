@@ -1,5 +1,6 @@
 import fs from "fs";
 
+// eslint-disable-next-line import/no-unresolved
 import { translations } from "@/lib/i18n";
 
 // create a translations directory if none exists

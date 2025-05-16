@@ -3,17 +3,18 @@ import eslint from "@eslint/js";
 // @ts-ignore
 import importPlugin from "eslint-plugin-import";
 import jsxA11y from "eslint-plugin-jsx-a11y";
-// import globals from "globals";
 import playwright from "eslint-plugin-playwright";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import { readdirSync } from "fs";
+import globals from "globals";
 import tseslint from "typescript-eslint";
 
 // TODO: parser: "@typescript-eslint/parser",
 // TODO: *.js files
 // TODO: globals has error because of Global "AudioWorkletGlobalScope " has leading or trailing whitespace.
+// TODO: see if we can remove public/mockServiceWorker.js
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
   .filter((file) => file.isDirectory())
@@ -28,7 +29,7 @@ const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: tr
 export default tseslint.config(
   {
     // global ignores
-    ignores: ["dist/**", ".eslintrc.cjs"],
+    ignores: ["dist/**", ".eslintrc.cjs", "eslint.config.js"],
   },
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -89,14 +90,26 @@ export default tseslint.config(
     },
     languageOptions: {
       ecmaVersion: 2020, // instead of env: { es2020: true }
-      // globals: {
-      // 	...globals.browser
-      // },
       parserOptions: {
         project: "**/tsconfig.json",
       },
     },
   },
+  // {
+  //   files: ["**/*.js"],
+  //   ignores: ["mockServiceWorker.js", "public/mockServiceWorker.js", "!.ladle/**"],
+  //   extends: [
+  //     eslint.configs.recommended,
+  //     importPlugin.flatConfigs.recommended,
+  //     eslintPluginPrettierRecommended,
+  //   ],
+  //   languageOptions: {
+  //     ecmaVersion: 2020, // instead of env: { es2020: true }
+  //     // globals: {
+  //     // 	...globals.browser
+  //     // },
+  //   }
+  // },
   {
     files: ["**/*.test.ts{,x}", "src/testing/**/*.ts{,x}"],
     rules: {

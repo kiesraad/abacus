@@ -7,6 +7,7 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 // import globals from "globals";
 import playwright from "eslint-plugin-playwright";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import { readdirSync } from "fs";
 import tseslint from "typescript-eslint";
@@ -37,6 +38,7 @@ export default tseslint.config(
       reactRefresh.configs.recommended,
       jsxA11y.flatConfigs.recommended,
       eslintPluginPrettierRecommended,
+      reactHooks.configs["recommended-latest"],
     ],
     rules: {
       "jsx-a11y/no-autofocus": "off",
@@ -115,6 +117,7 @@ export default tseslint.config(
     rules: {
       // Needed for Ladle, page.waitForSelector("[data-storyloaded]")
       "playwright/no-wait-for-selector": "off",
+      "react-hooks/rules-of-hooks": "off",
     },
   },
 );

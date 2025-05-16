@@ -29,7 +29,7 @@ const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: tr
 export default tseslint.config(
   {
     // global ignores
-    ignores: ["dist/**", ".eslintrc.cjs", "eslint.config.js"],
+    ignores: ["dist/**", ".eslintrc.cjs", "eslint.config.js", "mockServiceWorker.js", "public/mockServiceWorker.js"],
   },
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -96,21 +96,21 @@ export default tseslint.config(
       },
     },
   },
-  // {
-  //   files: ["**/*.js"],
-  //   ignores: ["mockServiceWorker.js", "public/mockServiceWorker.js", "!.ladle/**"],
-  //   extends: [
-  //     eslint.configs.recommended,
-  //     importPlugin.flatConfigs.recommended,
-  //     eslintPluginPrettierRecommended,
-  //   ],
-  //   languageOptions: {
-  //     ecmaVersion: 2020, // instead of env: { es2020: true }
-  //     // globals: {
-  //     // 	...globals.browser
-  //     // },
-  //   }
-  // },
+  {
+    files: ["**/*.js"],
+    ignores: ["!.ladle/**"],
+    extends: [
+      eslint.configs.recommended,
+      // importPlugin.flatConfigs.recommended,
+      eslintPluginPrettierRecommended,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020, // instead of env: { es2020: true }
+      // globals: {
+      // 	...globals.browser
+      // },
+    },
+  },
   {
     files: ["**/*.test.ts{,x}", "src/testing/**/*.ts{,x}"],
     rules: {

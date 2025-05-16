@@ -13,7 +13,6 @@ import tseslint from "typescript-eslint";
 
 // TODO: parser: "@typescript-eslint/parser",
 // TODO: *.js files
-// TODO: root: true
 // TODO: globals has error because of Global "AudioWorkletGlobalScope " has leading or trailing whitespace.
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })

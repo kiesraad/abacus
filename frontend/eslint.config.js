@@ -13,8 +13,8 @@ import { readdirSync } from "fs";
 import tseslint from "typescript-eslint";
 
 // TODO: parser: "@typescript-eslint/parser",
-// TODO. *.js files
-// TODO figure out how later sections override others
+// TODO: *.js files
+// TODO: root: true
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
   .filter((file) => file.isDirectory())
@@ -92,7 +92,7 @@ export default tseslint.config(
       ecmaVersion: 2020, // instead of env: { es2020: true }
       // globals: {
       // 	...globals.browser
-      // }, // error because of  Global "AudioWorkletGlobalScope " has leading or trailing whitespace.
+      // }, // TODO: error because of  Global "AudioWorkletGlobalScope " has leading or trailing whitespace.
       parserOptions: {
         project: "**/tsconfig.json",
       },

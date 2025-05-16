@@ -51,12 +51,13 @@ describe("ResolveDifferencesTables", () => {
     expect(fieryWingsPartyTable).toBeVisible();
     expect(fieryWingsPartyTable).toHaveTableContent([
       ["Nummer", "Eerste invoer", "Tweede invoer", "Kandidaat"],
+      ["1", "1.256", "1.258", "Zilverlicht, E. (Eldor)"],
+      [""],
       ["3", "65", "63", "Fluisterwind, S. (Seraphina)"],
       ["4", "26", "28", "Nachtschaduw, V. (Vesper)"],
       [""],
       ["12", "4", "—", "Groenhart, T. (Timo)"],
       ["13", "2", "4", "Veldbloem, N. (Naima)"],
-      ["14", "—", "2", "IJzeren, V. (Vincent)"],
     ]);
 
     const wiseOfWaterAndWindTable = screen.queryByRole("table", {

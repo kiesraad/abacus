@@ -107,16 +107,16 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
 export const noRecountNoDifferencesDataEntry: PollingStationResults = {
   recounted: false,
   voters_counts: {
-    poll_card_count: 1000,
+    poll_card_count: 800,
     proxy_certificate_count: 50,
     voter_card_count: 75,
-    total_admitted_voters_count: 1125,
+    total_admitted_voters_count: 925,
   },
   votes_counts: {
-    votes_candidates_count: 1090,
+    votes_candidates_count: 890,
     blank_votes_count: 20,
     invalid_votes_count: 15,
-    total_votes_cast_count: 1125,
+    total_votes_cast_count: 925,
   },
   differences_counts: {
     more_ballots_count: 0,
@@ -130,15 +130,15 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
   political_group_votes: [
     {
       number: 1,
-      total: 1090,
+      total: 890,
       candidate_votes: [
         {
           number: 1,
-          votes: 837,
+          votes: 737,
         },
         {
           number: 2,
-          votes: 253,
+          votes: 153,
         },
       ],
     },

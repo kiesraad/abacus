@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router";
 import { IconChevronRight } from "@/components/generated/icons";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { Election } from "@/types/generated/openapi";
 
 import { NavBarMenuButton } from "./NavBarMenu";
@@ -92,7 +92,8 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
   const { isAdministrator, isCoordinator } = useUserRole();
 
   if (
-    (location.pathname.match(/^\/elections(\/\d+|\/create)?$/) && (isAdministrator || isCoordinator)) ||
+    (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||
+    location.pathname.startsWith("/elections/create") ||
     location.pathname.startsWith("/users") ||
     location.pathname === "/workstations" ||
     location.pathname === "/logs"

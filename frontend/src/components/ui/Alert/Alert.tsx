@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { IconCross } from "@/components/generated/icons";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { AlertType } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 
@@ -48,7 +48,7 @@ export function Alert({
               <AlertIcon type={type} />
             </aside>
           )}
-          {title && <h2>{title}</h2>}
+          {title && <h3>{title}</h3>}
         </header>
       ) : (
         variant !== "no-icon" && (

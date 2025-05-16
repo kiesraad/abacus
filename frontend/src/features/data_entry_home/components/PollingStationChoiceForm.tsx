@@ -10,7 +10,7 @@ import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useUser } from "@/hooks/user/useUser";
-import { t, tx } from "@/lib/i18n";
+import { t, tx } from "@/i18n/translate";
 import { KeyboardKey } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { parseIntUserInput } from "@/utils/strings";
@@ -200,7 +200,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
             </Alert>
           ) : !available.length ? (
             <Alert type="notify" small>
-              <p>{t("polling_station_choice.all_polling_stations_filled_in_twice")}</p>
+              <p>{t("polling_station_choice.there_are_no_polling_stations_left_to_fill_in")}</p>
             </Alert>
           ) : (
             <PollingStationsList pollingStations={availableCurrentUser} />

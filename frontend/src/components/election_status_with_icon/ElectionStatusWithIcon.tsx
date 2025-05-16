@@ -1,6 +1,6 @@
 import { IconCheckHeart, IconCheckVerified, IconCompass } from "@/components/generated/icons";
 import { Icon } from "@/components/ui/Icon/Icon";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { ElectionStatus } from "@/types/generated/openapi";
 
 function statusIcon(status: ElectionStatus) {

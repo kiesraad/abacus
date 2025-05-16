@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 
 use super::{
     CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-    VotersCounts, VotesCounts,
+    VotersCounts, VotesCounts, comparison::Compare, status::DataEntryStatus,
 };
 use crate::{election::Election, polling_station::PollingStation};
 
@@ -49,6 +49,7 @@ pub enum ValidationResultCode {
     F304,
     F305,
     F401,
+    W001,
     W201,
     W202,
     W203,
@@ -163,13 +164,13 @@ pub trait Validate {
     ) -> Result<(), DataError>;
 }
 
-pub fn validate_polling_station_results(
-    polling_station_results: &PollingStationResults,
+pub fn validate_data_entry_status(
+    data_entry_status: &DataEntryStatus,
     polling_station: &PollingStation,
     election: &Election,
 ) -> Result<ValidationResults, DataError> {
     let mut validation_results = ValidationResults::default();
-    polling_station_results.validate(
+    data_entry_status.validate(
         election,
         polling_station,
         &mut validation_results,
@@ -182,6 +183,50 @@ pub fn validate_polling_station_results(
         .warnings
         .sort_by(|a, b| a.code.cmp(&b.code));
     Ok(validation_results)
+}
+
+impl Validate for DataEntryStatus {
+    fn validate(
+        &self,
+        election: &Election,
+        polling_station: &PollingStation,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) -> Result<(), DataError> {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(state) => {
+                state.first_entry.validate(
+                    election,
+                    polling_station,
+                    validation_results,
+                    &"data".into(),
+                )?;
+                Ok(())
+            }
+            DataEntryStatus::SecondEntryInProgress(state) => {
+                state.second_entry.validate(
+                    election,
+                    polling_station,
+                    validation_results,
+                    &"data".into(),
+                )?;
+                let mut different_fields: Vec<String> = vec![];
+                state.second_entry.compare(
+                    &state.finalised_first_entry,
+                    &mut different_fields,
+                    path,
+                );
+                if !different_fields.is_empty() {
+                    validation_results.warnings.push(ValidationResult {
+                        fields: different_fields.clone(),
+                        code: ValidationResultCode::W001,
+                    });
+                }
+                Ok(())
+            }
+            _ => Ok(()),
+        }
+    }
 }
 
 impl Validate for PollingStationResults {

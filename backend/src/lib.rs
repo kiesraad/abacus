@@ -3,9 +3,13 @@ use std::{error::Error, net::SocketAddr};
 #[cfg(feature = "memory-serve")]
 use axum::http::StatusCode;
 use axum::{Router, extract::FromRef, middleware, serve::ListenerExt};
+use hyper::http::{HeaderName, HeaderValue, header};
 use sqlx::SqlitePool;
 use tokio::{net::TcpListener, signal};
-use tower_http::trace::{self, TraceLayer};
+use tower_http::{
+    set_header::SetResponseHeaderLayer,
+    trace::{self, TraceLayer},
+};
 use tracing::{Level, info, trace};
 use utoipa::OpenApi;
 use utoipa_axum::router::OpenApiRouter;
@@ -83,15 +87,73 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             authentication::inject_user,
         ));
 
+    // Set Cache-Control header to prevent caching of API responses
+    let router = router.layer(SetResponseHeaderLayer::overriding(
+        header::CACHE_CONTROL,
+        HeaderValue::from_static("no-store"),
+    ));
+
     // Add the memory-serve router to serve the frontend (if the memory-serve feature is enabled)
+    // Note that memory-serve includes its own Cache-Control header.
     #[cfg(feature = "memory-serve")]
     let router = router.merge(
         memory_serve::from_local_build!()
             .index_file(Some("/index.html"))
             .fallback(Some("/index.html"))
             .fallback_status(StatusCode::OK)
-            .into_router(),
+            .into_router()
+            // Add Referrer-Policy and Permissions-Policy headers,
+            // these are only needed on HTML documents (not API requests)
+            .layer(SetResponseHeaderLayer::overriding(
+                header::REFERRER_POLICY,
+                HeaderValue::from_static("no-referrer"),
+            ))
+            .layer(SetResponseHeaderLayer::overriding(
+                HeaderName::from_static("permissions-policy"),
+                HeaderValue::from_static(
+                    "accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), \
+                     display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), \
+                     gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), \
+                     payment=(), picture-in-picture=(), publickey-credentials-get=(), \
+                     screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(), \
+                     xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), \
+                     hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()",
+                ),
+            )),
     );
+
+    // Add headers for security hardening
+    // Best practices according to the OWASP Secure Headers Project, https://owasp.org/www-project-secure-headers/
+    let security_headers_service = tower::ServiceBuilder::new()
+        .layer(SetResponseHeaderLayer::overriding(
+            header::X_FRAME_OPTIONS,
+            HeaderValue::from_static("deny"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            header::X_CONTENT_TYPE_OPTIONS,
+            HeaderValue::from_static("nosniff"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            header::CONTENT_SECURITY_POLICY,
+            HeaderValue::from_static("default-src 'self'; img-src 'self' data:"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            HeaderName::from_static("x-permitted-cross-domain-policies"),
+            HeaderValue::from_static("none"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            HeaderName::from_static("cross-origin-resource-policy"),
+            HeaderValue::from_static("same-origin"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            HeaderName::from_static("cross-origin-embedder-policy"),
+            HeaderValue::from_static("require-corp"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            HeaderName::from_static("cross-origin-opener-policy"),
+            HeaderValue::from_static("same-origin"),
+        ));
+    let router = router.layer(security_headers_service);
 
     // Add the state to the app
     let router = router.with_state(state);
@@ -157,22 +219,107 @@ mod test {
 
     use super::start_server;
 
-    #[test(sqlx::test)]
-    async fn test_abacus_starts(pool: SqlitePool) {
+    async fn run_server_test<F, Fut>(pool: SqlitePool, test_fn: F)
+    where
+        F: FnOnce(String) -> Fut,
+        Fut: Future<Output = ()>,
+    {
+        // Setup: create server on random port
         let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
         let addr = listener.local_addr().unwrap();
+        let base_url = format!("http://{addr}");
 
-        let task = tokio::spawn(async move {
+        // Start server in background task
+        let server_task = tokio::spawn(async move {
             start_server(pool, listener).await.unwrap();
         });
 
-        let result = reqwest::get(format!("http://{addr}/api/user/whoami"))
-            .await
-            .unwrap();
+        // Run the test
+        test_fn(base_url).await;
 
-        assert_eq!(result.status(), 401);
+        // Cleanup
+        server_task.abort();
+        let _ = server_task.await;
+    }
 
-        task.abort();
-        let _ = task.await;
+    /// Test that Abacus server starts and the whoami endpoint returns 401 Unauthorized
+    #[test(sqlx::test)]
+    async fn test_abacus_starts(pool: SqlitePool) {
+        run_server_test(pool, |base_url| async move {
+            let result = reqwest::get(format!("{base_url}/api/user/whoami"))
+                .await
+                .unwrap();
+
+            assert_eq!(result.status(), 401);
+        })
+        .await;
+    }
+
+    /// Check all security headers are present with expected values
+    #[test(sqlx::test)]
+    async fn test_security_headers(pool: SqlitePool) {
+        run_server_test(pool, |base_url| async move {
+            let response = reqwest::get(format!("{base_url}/api/user/whoami"))
+                .await
+                .unwrap();
+
+            assert_eq!(response.headers()["x-frame-options"], "deny");
+            assert_eq!(response.headers()["x-content-type-options"], "nosniff");
+            assert_eq!(
+                response.headers()["content-security-policy"],
+                "default-src 'self'; img-src 'self' data:"
+            );
+            assert_eq!(
+                response.headers()["x-permitted-cross-domain-policies"],
+                "none"
+            );
+            assert_eq!(
+                response.headers()["cross-origin-resource-policy"],
+                "same-origin"
+            );
+            assert_eq!(
+                response.headers()["cross-origin-embedder-policy"],
+                "require-corp"
+            );
+            assert_eq!(
+                response.headers()["cross-origin-opener-policy"],
+                "same-origin"
+            );
+
+            #[cfg(feature = "memory-serve")]
+            {
+                let response = reqwest::get(format!("{base_url}/")).await.unwrap();
+                assert_eq!(response.headers()["referrer-policy"], "no-referrer");
+                assert_eq!(
+                    response.headers()["permissions-policy"],
+                    "accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), \
+                        display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), \
+                        gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), \
+                        payment=(), picture-in-picture=(), publickey-credentials-get=(), \
+                        screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(), \
+                        xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), \
+                        hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()"
+                );
+            }
+        })
+        .await;
+    }
+
+    /// Check that the Cache-Control header is present with expected value
+    #[test(sqlx::test)]
+    async fn test_cache_headers(pool: SqlitePool) {
+        run_server_test(pool, |base_url| async move {
+            let response = reqwest::get(format!("{base_url}/api/user/whoami"))
+                .await
+                .unwrap();
+            assert_eq!(response.headers()["cache-control"], "no-store");
+
+            #[cfg(feature = "memory-serve")]
+            {
+                let response = reqwest::get(format!("{base_url}/")).await.unwrap();
+                assert_eq!(response.headers()["cache-control"], "max-age:300, private");
+            }
+        })
+        .await;
     }
 }

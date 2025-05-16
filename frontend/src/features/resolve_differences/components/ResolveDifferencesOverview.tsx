@@ -1,5 +1,5 @@
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { PoliticalGroup, PollingStationResults } from "@/types/generated/openapi";
 
 import { sections } from "../utils/dataEntry";

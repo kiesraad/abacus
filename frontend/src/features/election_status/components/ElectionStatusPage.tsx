@@ -8,7 +8,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { USER_LIST_REQUEST_PATH, UserListResponse } from "@/types/generated/openapi";
 
 import { ElectionStatus } from "./ElectionStatus";

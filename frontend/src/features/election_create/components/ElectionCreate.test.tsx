@@ -1,16 +1,60 @@
+import { RouterProvider } from "react-router";
+
+import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ApiProvider } from "@/api/ApiProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen } from "@/testing/test-utils";
+import { screen, setupTestRouter } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
-import { ElectionCreatePage } from "./ElectionCreatePage";
+import { electionCreateRoutes } from "../routes";
 
-describe("ElectionCreatePage", () => {
+const Providers = ({
+  children,
+  router = getRouter(children),
+  fetchInitialUser = false,
+}: {
+  children?: React.ReactNode;
+  router?: Router;
+  fetchInitialUser?: boolean;
+}) => {
+  return (
+    <ApiProvider fetchInitialUser={fetchInitialUser}>
+      <TestUserProvider userRole="administrator">
+        <RouterProvider router={router} />
+      </TestUserProvider>
+    </ApiProvider>
+  );
+};
+
+function renderWithRouter() {
+  const router = setupTestRouter([
+    {
+      path: "/",
+      Component: null,
+      children: [
+        {
+          path: "elections",
+          children: [
+            {
+              path: "create",
+              children: electionCreateRoutes,
+            },
+          ],
+        },
+      ],
+    },
+  ]);
+  rtlRender(<Providers router={router} />);
+  return router;
+}
+
+describe("Election create pages", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler);
   });
@@ -27,16 +71,12 @@ describe("ElectionCreatePage", () => {
       reference: "InvalidXml",
     });
 
+    const router = renderWithRouter();
     const user = userEvent.setup();
+    await router.navigate("/elections/create");
+
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
-    render(
-      <TestUserProvider userRole="administrator">
-        <ElectionProvider electionId={1}>
-          <ElectionCreatePage />
-        </ElectionProvider>
-      </TestUserProvider>,
-    );
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
@@ -78,16 +118,12 @@ describe("ElectionCreatePage", () => {
       election,
     });
 
+    const router = renderWithRouter();
     const user = userEvent.setup();
+    await router.navigate("/elections/create");
+
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
-    render(
-      <TestUserProvider userRole="administrator">
-        <ElectionProvider electionId={1}>
-          <ElectionCreatePage />
-        </ElectionProvider>
-      </TestUserProvider>,
-    );
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
@@ -98,8 +134,9 @@ describe("ElectionCreatePage", () => {
 
     await user.upload(input, file);
 
-    expect(screen.getByText(filename)).toBeInTheDocument();
-    expect(screen.getByText(election.name)).toBeInTheDocument();
+    // Wait for the page to be loaded and expect the election name to be present
+    expect(await screen.findByText(election.name)).toBeInTheDocument();
+
     // Expect parts of the hash to be shown
     expect(screen.getByText("asdf")).toBeInTheDocument();
     // Expect redacted chunks to be stubs

@@ -1,7 +1,7 @@
 import { ReactElement, useEffect, useRef } from "react";
 import { Link } from "react-router";
 
-import { t, tx } from "@/lib/i18n";
+import { t, tx } from "@/i18n/translate";
 import { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 

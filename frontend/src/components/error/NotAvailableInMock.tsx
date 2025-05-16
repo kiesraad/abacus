@@ -1,5 +1,5 @@
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { tx } from "@/lib/i18n";
+import { tx } from "@/i18n/translate";
 
 interface NotAvailableInMockProps {
   title?: string;

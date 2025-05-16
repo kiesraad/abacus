@@ -1,7 +1,8 @@
 import { Fragment } from "react";
 
 import { Modal } from "@/components/ui/Modal/Modal";
-import { hasTranslation, t, TranslationPath } from "@/lib/i18n";
+import { TranslationPath } from "@/i18n/i18n.types";
+import { hasTranslation, t } from "@/i18n/translate";
 import { AuditLogEvent } from "@/types/generated/openapi";
 import { formatDateTimeFull } from "@/utils/format";
 

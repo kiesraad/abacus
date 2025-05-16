@@ -2,6 +2,7 @@
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
 // import globals from "globals";
+import playwright from "eslint-plugin-playwright";
 import tseslint from "typescript-eslint";
 
 // https://typescript-eslint.io/getting-started/#step-2-configuration
@@ -40,6 +41,18 @@ export default tseslint.config(
     rules: {
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "off",
+    },
+  },
+  {
+    files: ["e2e-tests/**/*.e2e.ts"],
+    extends: [playwright.configs["flat/recommended"]],
+  },
+  {
+    files: ["src/components/ui/**/*.e2e.ts"],
+    extends: [playwright.configs["flat/recommended"]],
+    rules: {
+      // Needed for Ladle, page.waitForSelector("[data-storyloaded]")
+      "playwright/no-wait-for-selector": "off",
     },
   },
 );

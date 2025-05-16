@@ -31,7 +31,6 @@ pub const SECURE_COOKIES: bool = false;
 
 #[cfg(test)]
 mod tests {
-    use api::{AccountUpdateRequest, Credentials, UserListResponse};
     use axum::{
         Router,
         body::Body,
@@ -44,16 +43,21 @@ mod tests {
     use test_log::test;
     use tower::ServiceExt;
 
-    use super::role::Role;
     use crate::{
         AppState,
-        authentication::{middleware::extend_session, session::Sessions, *},
+        authentication::{
+            api::{AccountUpdateRequest, Credentials, UserListResponse},
+            middleware::extend_session,
+            role::Role,
+            session::Sessions,
+            *,
+        },
     };
 
     fn create_app(pool: SqlitePool) -> Router {
         let state = AppState { pool: pool.clone() };
 
-        Router::from(api::router())
+        Router::from(router())
             .layer(middleware::map_response_with_state(
                 state.clone(),
                 extend_session,
@@ -85,6 +89,16 @@ mod tests {
             .unwrap();
 
         response.headers().get("set-cookie").unwrap().clone()
+    }
+
+    #[test]
+    fn test_session_life_time() {
+        assert_eq!(SESSION_LIFE_TIME, TimeDelta::seconds(60 * 30));
+    }
+
+    #[test]
+    fn test_session_min_life_time() {
+        assert_eq!(SESSION_MIN_LIFE_TIME, TimeDelta::seconds(60 * 15));
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -590,7 +604,7 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::CREATED);
         let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: user::User = serde_json::from_slice(&body).unwrap();
+        let result: User = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.username(), "test_user");
         assert!(result.fullname().is_none());
         assert_eq!(result.role(), Role::Administrator);
@@ -622,7 +636,7 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: user::User = serde_json::from_slice(&body).unwrap();
+        let result: User = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.username(), "admin");
         assert_eq!(result.fullname().unwrap(), "Test Full Name".to_string());
         assert_eq!(result.role(), Role::Administrator);

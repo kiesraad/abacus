@@ -462,9 +462,10 @@ async fn user_delete(
 
 #[cfg(test)]
 mod tests {
-    use crate::authentication::{SECURE_COOKIES, api::set_default_cookie_properties};
     use cookie::{Cookie, SameSite};
     use test_log::test;
+
+    use crate::authentication::{SECURE_COOKIES, api::set_default_cookie_properties};
 
     #[test(sqlx::test)]
     async fn test_set_default_cookie_properties() {

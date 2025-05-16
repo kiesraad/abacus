@@ -12,7 +12,6 @@ import { readdirSync } from "fs";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-// TODO: see if we can remove public/mockServiceWorker.js
 // TODO: switch to new config file
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })

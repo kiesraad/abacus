@@ -6,6 +6,7 @@ import importPlugin from "eslint-plugin-import";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 // import globals from "globals";
 import playwright from "eslint-plugin-playwright";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import reactRefresh from "eslint-plugin-react-refresh";
 import { readdirSync } from "fs";
 import tseslint from "typescript-eslint";
@@ -35,6 +36,7 @@ export default tseslint.config(
       importPlugin.flatConfigs.typescript,
       reactRefresh.configs.recommended,
       jsxA11y.flatConfigs.recommended,
+      eslintPluginPrettierRecommended,
     ],
     rules: {
       "jsx-a11y/no-autofocus": "off",

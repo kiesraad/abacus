@@ -36,6 +36,8 @@ export default function useDataEntry(
   // navigate to the correct section
   useDataEntryNavigation(state, dispatch, election, pollingStationId, entryNumber);
 
+  console.log("STATE", state);
+
   return {
     ...state,
     dispatch,

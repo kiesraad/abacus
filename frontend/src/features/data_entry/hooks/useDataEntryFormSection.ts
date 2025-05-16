@@ -30,24 +30,24 @@ export function useDataEntryFormSection<FORM_VALUES>({
   if (!formSection) {
     throw new Error(`Form section ${section} not found in form state`);
   }
-  const { errors, warnings, isSaved, acceptWarnings, hasChanges } = formSection;
+  const { errors, warnings, isSaved, acceptErrorsAndWarnings, hasChanges } = formSection;
   const defaultProps = {
     errorsAndWarnings: isSaved ? mapValidationResultsToFields(errors, warnings) : undefined,
-    warningsAccepted: acceptWarnings,
+    errorsAndWarningsAccepted: acceptErrorsAndWarnings,
   };
 
-  const showAcceptWarnings = !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && !hasChanges;
+  const showAcceptErrorsAndWarnings = (!formSection.warnings.isEmpty() || !formSection.errors.isEmpty()) && !hasChanges;
 
   // register changes when fields change
   const setValues = (values: FORM_VALUES) => {
     if (!hasChanges) {
-      updateFormSection({ hasChanges: true, acceptWarnings: false, acceptWarningsError: false });
+      updateFormSection({ hasChanges: true, acceptErrorsAndWarnings: false, acceptErrorsAndWarningsError: false });
     }
     setCurrentValues(values);
   };
 
-  const setAcceptWarnings = (acceptWarnings: boolean) => {
-    updateFormSection({ acceptWarnings });
+  const setAcceptErrorsAndWarnings = (acceptErrorsAndWarnings: boolean) => {
+    updateFormSection({ acceptErrorsAndWarnings });
   };
 
   // form keyboard navigation
@@ -58,11 +58,11 @@ export function useDataEntryFormSection<FORM_VALUES>({
     data: Partial<PollingStationResults>,
     options?: SubmitCurrentFormOptions,
   ): Promise<boolean> => {
-    const result = await onSubmitForm(data, { ...options, showAcceptWarnings });
-    if (!formSection.errors.isEmpty()) {
-      // scroll to top when there are errors, this is mainly necessary when users click "volgende" a second time without changing anything
-      window.scrollTo(0, 0);
-    }
+    const result = await onSubmitForm(data, { ...options, showAcceptErrorsAndWarnings });
+    // if (!formSection.errors.isEmpty()) {
+    //   // scroll to top when there are errors, this is mainly necessary when users click "volgende" a second time without changing anything
+    //   window.scrollTo(0, 0);
+    // }
     return result;
   };
 
@@ -82,9 +82,9 @@ export function useDataEntryFormSection<FORM_VALUES>({
     formSection,
     setValues,
     status,
-    setAcceptWarnings,
+    setAcceptErrorsAndWarnings,
     defaultProps,
-    showAcceptWarnings,
+    showAcceptErrorsAndWarnings,
     isSaving: status === "saving",
   };
 }

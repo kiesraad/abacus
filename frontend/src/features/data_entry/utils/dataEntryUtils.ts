@@ -15,10 +15,11 @@ export function objectHasOnlyEmptyValues(obj: Record<string, "" | number>): bool
 }
 
 export function formSectionComplete(section: FormSection): boolean {
+  console.log("X", "SAVED:", section.isSaved, "err", section.acceptErrorsAndWarnings);
   return (
     section.isSaved &&
-    (section.errors.isEmpty() || section.errors.hasOnlyGlobalValidationResults()) &&
-    (section.warnings.isEmpty() || section.acceptWarnings)
+    (section.errors.isEmpty() || section.errors.hasOnlyGlobalValidationResults() || section.acceptErrorsAndWarnings) &&
+    (section.warnings.isEmpty() || section.acceptErrorsAndWarnings)
   );
 }
 
@@ -28,21 +29,25 @@ export function resetFormSectionState(formState: FormState) {
     section.errors = new ValidationResultSet();
     section.warnings = new ValidationResultSet();
     section.isSubmitted = undefined;
-    section.acceptWarningsError = false;
+    section.acceptErrorsAndWarningsError = false;
   });
 }
 
 export function getNextSectionID(formState: FormState) {
   const currentSection = formState.sections[formState.current];
+  if (currentSection) {
+    console.log("A", currentSection.id, currentSection.isSubmitted, formSectionComplete(currentSection));
+  }
 
   if (currentSection && currentSection.isSubmitted && formSectionComplete(currentSection)) {
     for (const section of Object.values(formState.sections)) {
-      if ((formState.furthest === "save" && !section.errors.isEmpty()) || section.index === currentSection.index + 1) {
+      if (formState.furthest === "save" || section.index === currentSection.index + 1) {
+        console.log("B", section.index);
         return section.id;
       }
     }
   }
-
+  console.log("D, returning null");
   return null;
 }
 
@@ -94,6 +99,7 @@ export function getDataEntrySummary(formState: FormState): DataEntrySummary {
     notableFormSections: [],
   };
 
+  //TODO: errors are "acceptable now"
   Object.values(formState.sections)
     .filter((section) => section.id !== "save")
     .sort(sortFormSections)
@@ -105,7 +111,7 @@ export function getDataEntrySummary(formState: FormState): DataEntrySummary {
         result.hasErrors = true;
       } else if (!section.warnings.isEmpty()) {
         result.hasWarnings = true;
-        if (section.acceptWarnings) {
+        if (section.acceptErrorsAndWarnings) {
           result.notableFormSections.push({ status: "accepted-warnings", formSection: section });
         } else {
           result.notableFormSections.push({ status: "unaccepted-warnings", formSection: section });
@@ -133,9 +139,9 @@ export function getInitialFormState(election: Required<Election>): FormState {
         id: "recounted",
         title: "Is er herteld?",
         isSaved: false,
-        acceptWarnings: false,
+        acceptErrorsAndWarnings: false,
         hasChanges: false,
-        acceptWarningsError: false,
+        acceptErrorsAndWarningsError: false,
         errors: new ValidationResultSet(),
         warnings: new ValidationResultSet(),
       },
@@ -144,9 +150,9 @@ export function getInitialFormState(election: Required<Election>): FormState {
         id: "voters_votes_counts",
         title: "Toegelaten kiezers en uitgebrachte stemmen",
         isSaved: false,
-        acceptWarnings: false,
+        acceptErrorsAndWarnings: false,
         hasChanges: false,
-        acceptWarningsError: false,
+        acceptErrorsAndWarningsError: false,
         errors: new ValidationResultSet(),
         warnings: new ValidationResultSet(),
       },
@@ -155,9 +161,9 @@ export function getInitialFormState(election: Required<Election>): FormState {
         id: "differences_counts",
         title: "Verschillen",
         isSaved: false,
-        acceptWarnings: false,
+        acceptErrorsAndWarnings: false,
         hasChanges: false,
-        acceptWarningsError: false,
+        acceptErrorsAndWarningsError: false,
         errors: new ValidationResultSet(),
         warnings: new ValidationResultSet(),
       },
@@ -166,9 +172,9 @@ export function getInitialFormState(election: Required<Election>): FormState {
         id: "save",
         title: "Controleren en opslaan",
         isSaved: false,
-        acceptWarnings: false,
+        acceptErrorsAndWarnings: false,
         hasChanges: false,
-        acceptWarningsError: false,
+        acceptErrorsAndWarningsError: false,
         errors: new ValidationResultSet(),
         warnings: new ValidationResultSet(),
       },
@@ -181,9 +187,9 @@ export function getInitialFormState(election: Required<Election>): FormState {
       id: `political_group_votes_${pg.number}`,
       title: pg.name,
       isSaved: false,
-      acceptWarnings: false,
+      acceptErrorsAndWarnings: false,
       hasChanges: false,
-      acceptWarningsError: false,
+      acceptErrorsAndWarningsError: false,
       errors: new ValidationResultSet(),
       warnings: new ValidationResultSet(),
     };
@@ -192,20 +198,20 @@ export function getInitialFormState(election: Required<Election>): FormState {
   return result;
 }
 
-export function getClientState(formState: FormState, acceptWarnings: boolean, continueToNextSection: boolean) {
+export function getClientState(formState: FormState, acceptErrorsAndWarnings: boolean, continueToNextSection: boolean) {
   const clientState: ClientState = {
     furthest: formState.furthest,
     current: formState.current,
-    acceptedWarnings: Object.values(formState.sections)
-      .filter((s: FormSection) => s.acceptWarnings)
+    acceptedErrorsAndWarnings: Object.values(formState.sections)
+      .filter((s: FormSection) => s.acceptErrorsAndWarnings)
       .filter((s: FormSection) => s.id !== formState.current)
       .map((s: FormSection) => s.id),
     continue: continueToNextSection,
   };
   // the form state is not updated for the current submission,
   // so add the current section to the accepted warnings if needed
-  if (acceptWarnings) {
-    clientState.acceptedWarnings.push(formState.current);
+  if (acceptErrorsAndWarnings) {
+    clientState.acceptedErrorsAndWarnings.push(formState.current);
   }
   return clientState;
 }
@@ -235,10 +241,10 @@ export function buildFormState(
   newFormState.current = clientState.current;
 
   // set accepted warnings
-  clientState.acceptedWarnings.forEach((sectionID: FormSectionId) => {
+  clientState.acceptedErrorsAndWarnings.forEach((sectionID: FormSectionId) => {
     const section = newFormState.sections[sectionID];
     if (section) {
-      section.acceptWarnings = true;
+      section.acceptErrorsAndWarnings = true;
     }
   });
 
@@ -251,11 +257,11 @@ export function buildFormState(
   }
 
   // set accepted warnings for the current section
-  const acceptWarnings = clientState.acceptedWarnings.some(
+  const acceptErrorsAndWarnings = clientState.acceptedErrorsAndWarnings.some(
     (sectionID: FormSectionId) => sectionID === newFormState.current,
   );
 
-  updateFormStateAfterSubmit(newFormState, validationResults, acceptWarnings);
+  updateFormStateAfterSubmit(newFormState, validationResults, acceptErrorsAndWarnings);
 
   let targetFormSectionId: FormSectionId;
   if (clientState.continue) {
@@ -303,11 +309,12 @@ export function updateFormStateAfterSubmit(
   }
 
   // Reset acceptWarnings when a page gets an error or has no warnings anymore
-  Object.values(formState.sections).forEach((section) => {
-    if (section.acceptWarnings && (!section.errors.isEmpty() || section.warnings.isEmpty())) {
-      section.acceptWarnings = false;
-    }
-  });
+  //TODO: check if this is still needed in some form
+  // Object.values(formState.sections).forEach((section) => {
+  //   if (section.acceptErrorsAndWarnings && (!section.errors.isEmpty() || section.warnings.isEmpty())) {
+  //     section.acceptErrorsAndWarnings = false;
+  //   }
+  // });
 
   return formState;
 }

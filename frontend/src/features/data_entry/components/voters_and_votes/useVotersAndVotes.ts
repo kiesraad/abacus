@@ -28,7 +28,7 @@ export function useVotersAndVotes() {
       section.pollingStationResults.recounted || false,
     );
 
-    return await _onSubmit(data, { ...options, showAcceptWarnings: section.showAcceptWarnings });
+    return await _onSubmit(data, { ...options, showAcceptErrorsAndWarnings: section.showAcceptErrorsAndWarnings });
   };
 
   return {

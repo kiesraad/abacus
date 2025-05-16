@@ -20,7 +20,7 @@ export function useDifferences() {
       {
         differences_counts: data,
       },
-      { ...options, showAcceptWarnings: section.showAcceptWarnings },
+      { ...options, showAcceptErrorsAndWarnings: section.showAcceptErrorsAndWarnings },
     );
   };
 

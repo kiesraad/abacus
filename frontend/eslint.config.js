@@ -1,8 +1,6 @@
 // @ts-check
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
-// https://typescript-eslint.io/getting-started/#step-2-configuration
-// https://typescript-eslint.io/packages/typescript-eslint#config
 import jsxA11y from "eslint-plugin-jsx-a11y";
 // import globals from "globals";
 import playwright from "eslint-plugin-playwright";
@@ -15,6 +13,7 @@ import tseslint from "typescript-eslint";
 // TODO: parser: "@typescript-eslint/parser",
 // TODO: *.js files
 // TODO: root: true
+// TODO: globals has error because of Global "AudioWorkletGlobalScope " has leading or trailing whitespace.
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
   .filter((file) => file.isDirectory())
@@ -92,7 +91,7 @@ export default tseslint.config(
       ecmaVersion: 2020, // instead of env: { es2020: true }
       // globals: {
       // 	...globals.browser
-      // }, // TODO: error because of  Global "AudioWorkletGlobalScope " has leading or trailing whitespace.
+      // },
       parserOptions: {
         project: "**/tsconfig.json",
       },

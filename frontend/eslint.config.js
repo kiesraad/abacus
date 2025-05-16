@@ -12,6 +12,12 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import { readdirSync } from "fs";
 import tseslint from "typescript-eslint";
 
+// TODO: parser: "@typescript-eslint/parser",
+// TODO. *.js files
+// TODO more extends for e2e tests
+// TODO more extends for ladle e2e tests
+// TODO more extends for tests
+
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
   .filter((file) => file.isDirectory())
   .map((dir) => dir.name)
@@ -96,9 +102,17 @@ export default tseslint.config(
   },
   {
     files: ["**/*.test.ts{,x}", "src/testing/**/*.ts{,x}"],
+    extends: [
+      eslint.configs.recommended,
+      tseslint.configs.strictTypeChecked,
+      importPlugin.flatConfigs.recommended,
+      importPlugin.flatConfigs.typescript,
+      eslintPluginPrettierRecommended,
+    ],
     rules: {
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
     },
   },
   {

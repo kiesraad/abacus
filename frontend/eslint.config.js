@@ -13,7 +13,6 @@ import tseslint from "typescript-eslint";
 
 // TODO: parser: "@typescript-eslint/parser",
 // TODO: *.js files
-// TODO: globals has error because of Global "AudioWorkletGlobalScope " has leading or trailing whitespace.
 // TODO: see if we can remove public/mockServiceWorker.js
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
@@ -106,9 +105,10 @@ export default tseslint.config(
     ],
     languageOptions: {
       ecmaVersion: 2020, // instead of env: { es2020: true }
-      // globals: {
-      // 	...globals.browser
-      // },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
     },
   },
   {

@@ -25,7 +25,7 @@ const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: tr
 export default tseslint.config(
   {
     // global ignores
-    ignores: ["dist/**", ".eslintrc.cjs", "eslint.config.js", "mockServiceWorker.js", "public/mockServiceWorker.js"],
+    ignores: ["dist/**", ".eslintrc.cjs", "eslint.config.js", "mockServiceWorker.js"],
   },
   {
     files: ["**/*.ts", "**/*.tsx"],

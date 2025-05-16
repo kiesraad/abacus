@@ -27,7 +27,12 @@ export default tseslint.config(
   {
     files: ["**/*.ts", "**/*.tsx"],
     ignores: ["!.ladle/**"],
-    extends: [eslint.configs.recommended, tseslint.configs.recommended, importPlugin.flatConfigs.recommended],
+    extends: [
+      eslint.configs.recommended,
+      tseslint.configs.recommended,
+      importPlugin.flatConfigs.recommended,
+      importPlugin.flatConfigs.typescript,
+    ],
     rules: {
       "@typescript-eslint/no-unsafe-type-assertion": "error",
       "@typescript-eslint/restrict-template-expressions": [

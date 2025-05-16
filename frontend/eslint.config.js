@@ -3,10 +3,21 @@ import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
 // import globals from "globals";
 import playwright from "eslint-plugin-playwright";
-import tseslint from "typescript-eslint";
-
 // https://typescript-eslint.io/getting-started/#step-2-configuration
 // https://typescript-eslint.io/packages/typescript-eslint#config
+
+import { readdirSync } from "fs";
+import tseslint from "typescript-eslint";
+
+const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
+  .filter((file) => file.isDirectory())
+  .map((dir) => dir.name)
+  .map((feature) => ({
+    target: `./src/features/${feature}`,
+    from: "./src/features",
+    except: [feature],
+    message: "Cross-feature imports are not allowed.",
+  }));
 
 export default tseslint.config(
   {
@@ -19,6 +30,39 @@ export default tseslint.config(
     extends: [eslint.configs.recommended, tseslint.configs.recommended, importPlugin.flatConfigs.recommended],
     rules: {
       "@typescript-eslint/no-unsafe-type-assertion": "error",
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        {
+          allowNumber: true,
+          allowBoolean: true,
+        },
+      ],
+      "no-console": process.env.ESLINT_ENV === "production" ? ["error", { allow: ["warn", "error"] }] : "off",
+      "import/no-restricted-paths": [
+        "error",
+        {
+          zones: [
+            // disables cross-feature imports:
+            // eg. src/features/abc should not import from src/features/xyz, etc.
+            ...restrictFeatureImports,
+
+            // enforce unidirectional codebase:
+            // e.g. src/app can import from src/features but not the other way around
+            {
+              target: "./src/features",
+              from: "./src/app",
+              message: "Imports from app are not allowed in features.",
+            },
+
+            // e.g src/features and src/app can import from these shared modules but not the other way around
+            {
+              target: ["./src/components", "./src/hooks", "./src/lib", "./src/types", "./src/utils"],
+              from: ["./src/features", "./src/app"],
+              message: "Imports from shared folders are not allowed in features and app.",
+            },
+          ],
+        },
+      ],
     },
     settings: {
       "import/resolver": {

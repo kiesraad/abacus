@@ -44,8 +44,14 @@ export default tseslint.config(
     },
   },
   {
-    files: ["e2e-tests/**/*.e2e.ts"],
+    files: ["*.e2e.ts", "e2e-tests/**/*"],
     extends: [playwright.configs["flat/recommended"]],
+    rules: {
+      "@typescript-eslint/no-floating-promises": "error",
+      "react-hooks/rules-of-hooks": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-unsafe-type-assertion": "off",
+    },
   },
   {
     files: ["src/components/ui/**/*.e2e.ts"],

@@ -38,6 +38,7 @@ export default tseslint.config(
     ],
     rules: {
       "jsx-a11y/no-autofocus": "off",
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unsafe-type-assertion": "error",
       "@typescript-eslint/restrict-template-expressions": [
         "error",

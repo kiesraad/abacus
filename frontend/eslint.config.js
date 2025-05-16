@@ -100,13 +100,6 @@ export default tseslint.config(
   },
   {
     files: ["**/*.test.ts{,x}", "src/testing/**/*.ts{,x}"],
-    extends: [
-      eslint.configs.recommended,
-      tseslint.configs.strictTypeChecked,
-      importPlugin.flatConfigs.recommended,
-      importPlugin.flatConfigs.typescript,
-      eslintPluginPrettierRecommended,
-    ],
     rules: {
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "off",
@@ -115,14 +108,7 @@ export default tseslint.config(
   },
   {
     files: ["*.e2e.ts", "e2e-tests/**/*"],
-    extends: [
-      playwright.configs["flat/recommended"],
-      eslint.configs.recommended,
-      tseslint.configs.strictTypeChecked,
-      importPlugin.flatConfigs.recommended,
-      importPlugin.flatConfigs.typescript,
-      eslintPluginPrettierRecommended,
-    ],
+    extends: [playwright.configs["flat/recommended"]],
     rules: {
       "@typescript-eslint/no-floating-promises": "error",
       "react-hooks/rules-of-hooks": "off",
@@ -133,14 +119,7 @@ export default tseslint.config(
   },
   {
     files: ["src/components/ui/**/*.e2e.ts"],
-    extends: [
-      playwright.configs["flat/recommended"],
-      eslint.configs.recommended,
-      tseslint.configs.strictTypeChecked,
-      importPlugin.flatConfigs.recommended,
-      importPlugin.flatConfigs.typescript,
-      eslintPluginPrettierRecommended,
-    ],
+    extends: [playwright.configs["flat/recommended"]],
     rules: {
       // Needed for Ladle, page.waitForSelector("[data-storyloaded]")
       "playwright/no-wait-for-selector": "off",

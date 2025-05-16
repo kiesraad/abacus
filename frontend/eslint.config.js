@@ -14,7 +14,7 @@ import tseslint from "typescript-eslint";
 
 // TODO: parser: "@typescript-eslint/parser",
 // TODO. *.js files
-// TODO more extends for ladle e2e tests
+// TODO figure out how later sections override others
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
   .filter((file) => file.isDirectory())
@@ -133,11 +133,22 @@ export default tseslint.config(
   },
   {
     files: ["src/components/ui/**/*.e2e.ts"],
-    extends: [playwright.configs["flat/recommended"]],
+    extends: [
+      playwright.configs["flat/recommended"],
+      eslint.configs.recommended,
+      tseslint.configs.strictTypeChecked,
+      importPlugin.flatConfigs.recommended,
+      importPlugin.flatConfigs.typescript,
+      eslintPluginPrettierRecommended,
+    ],
     rules: {
       // Needed for Ladle, page.waitForSelector("[data-storyloaded]")
       "playwright/no-wait-for-selector": "off",
+      "@typescript-eslint/no-floating-promises": "error",
       "react-hooks/rules-of-hooks": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-unsafe-type-assertion": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
     },
   },
 );

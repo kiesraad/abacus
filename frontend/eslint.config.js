@@ -32,7 +32,7 @@ export default tseslint.config(
     ignores: ["!.ladle/**"],
     extends: [
       eslint.configs.recommended,
-      tseslint.configs.recommended,
+      tseslint.configs.strictTypeChecked,
       importPlugin.flatConfigs.recommended,
       importPlugin.flatConfigs.typescript,
       reactRefresh.configs.recommended,

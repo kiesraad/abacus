@@ -87,7 +87,7 @@ export default tseslint.config(
     },
     languageOptions: {
       parser: tsParser,
-      ecmaVersion: 2020, // instead of env: { es2020: true }
+      ecmaVersion: 2020,
       parserOptions: {
         project: "**/tsconfig.json",
       },
@@ -98,7 +98,7 @@ export default tseslint.config(
     ignores: ["!.ladle/**"],
     extends: [eslint.configs.recommended, importPlugin.flatConfigs.recommended, eslintPluginPrettierRecommended],
     languageOptions: {
-      ecmaVersion: 2020, // instead of env: { es2020: true }
+      ecmaVersion: 2020,
       globals: {
         ...globals.browser,
         ...globals.node,

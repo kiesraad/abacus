@@ -12,8 +12,6 @@ import { readdirSync } from "fs";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-// TODO: switch to new config file
-
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
   .filter((file) => file.isDirectory())
   .map((dir) => dir.name)

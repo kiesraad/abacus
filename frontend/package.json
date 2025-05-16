@@ -11,7 +11,7 @@
     "dev": "npm run check-server && vite",
     "build": "vite build --config vite-prod.config.ts",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
-    "lint": "tsc && cross-env ESLINT_ENV=production ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "tsc && cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettier": "prettier --ignore-unknown --write .",
     "preview": "vite preview",
     "test": "vitest",

@@ -1,5 +1,6 @@
 // @ts-check
 import eslint from "@eslint/js";
+// @ts-ignore
 import importPlugin from "eslint-plugin-import";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 // import globals from "globals";

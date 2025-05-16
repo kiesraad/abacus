@@ -1,12 +1,12 @@
 // @ts-check
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
+// https://typescript-eslint.io/getting-started/#step-2-configuration
+// https://typescript-eslint.io/packages/typescript-eslint#config
+import jsxA11y from "eslint-plugin-jsx-a11y";
 // import globals from "globals";
 import playwright from "eslint-plugin-playwright";
 import reactRefresh from "eslint-plugin-react-refresh";
-// https://typescript-eslint.io/getting-started/#step-2-configuration
-// https://typescript-eslint.io/packages/typescript-eslint#config
-
 import { readdirSync } from "fs";
 import tseslint from "typescript-eslint";
 
@@ -34,8 +34,10 @@ export default tseslint.config(
       importPlugin.flatConfigs.recommended,
       importPlugin.flatConfigs.typescript,
       reactRefresh.configs.recommended,
+      jsxA11y.flatConfigs.recommended,
     ],
     rules: {
+      "jsx-a11y/no-autofocus": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "error",
       "@typescript-eslint/restrict-template-expressions": [
         "error",

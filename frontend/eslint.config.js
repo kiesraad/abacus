@@ -1,5 +1,6 @@
 // @ts-check
 import eslint from "@eslint/js";
+import tsParser from "@typescript-eslint/parser";
 // @ts-ignore
 import importPlugin from "eslint-plugin-import";
 import jsxA11y from "eslint-plugin-jsx-a11y";
@@ -11,8 +12,8 @@ import { readdirSync } from "fs";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-// TODO: parser: "@typescript-eslint/parser",
 // TODO: see if we can remove public/mockServiceWorker.js
+// TODO: switch to new config file
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
   .filter((file) => file.isDirectory())
@@ -88,6 +89,7 @@ export default tseslint.config(
       },
     },
     languageOptions: {
+      parser: tsParser,
       ecmaVersion: 2020, // instead of env: { es2020: true }
       parserOptions: {
         project: "**/tsconfig.json",

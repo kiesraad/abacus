@@ -551,7 +551,7 @@ mod tests {
             .unwrap();
 
         // User should need password change
-        assert!(user.needs_password_change);
+        assert!(user.needs_password_change());
 
         users
             .update_password(user.id(), "test_user", "temp_password")
@@ -561,7 +561,7 @@ mod tests {
         let user = users.get_by_id(user.id()).await.unwrap().unwrap();
 
         // User now shouldn't need to change their password
-        assert!(!user.needs_password_change);
+        assert!(!user.needs_password_change());
 
         // Set a temporary password via update
         users
@@ -572,7 +572,7 @@ mod tests {
         let user = users.get_by_id(user.id()).await.unwrap().unwrap();
 
         // User needs to change their password again
-        assert!(user.needs_password_change);
+        assert!(user.needs_password_change());
     }
 
     #[test(sqlx::test)]

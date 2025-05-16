@@ -3,6 +3,7 @@ import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
 // import globals from "globals";
 import playwright from "eslint-plugin-playwright";
+import reactRefresh from "eslint-plugin-react-refresh";
 // https://typescript-eslint.io/getting-started/#step-2-configuration
 // https://typescript-eslint.io/packages/typescript-eslint#config
 
@@ -32,6 +33,7 @@ export default tseslint.config(
       tseslint.configs.recommended,
       importPlugin.flatConfigs.recommended,
       importPlugin.flatConfigs.typescript,
+      reactRefresh.configs.recommended,
     ],
     rules: {
       "@typescript-eslint/no-unsafe-type-assertion": "error",

@@ -16,7 +16,6 @@ import tseslint from "typescript-eslint";
 // TODO. *.js files
 // TODO more extends for e2e tests
 // TODO more extends for ladle e2e tests
-// TODO more extends for tests
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
   .filter((file) => file.isDirectory())

@@ -77,8 +77,8 @@ describe("Test DataEntryProgress", () => {
 
     formState.current = "political_group_votes_2";
     formState.furthest = "political_group_votes_2";
-    formState.sections.voters_votes_counts.acceptWarnings = false;
-    formState.sections.differences_counts.acceptWarnings = true;
+    formState.sections.voters_votes_counts.acceptErrorsAndWarnings = false;
+    formState.sections.differences_counts.acceptErrorsAndWarnings = true;
 
     overrideServerClaimDataEntryResponse({
       formState: formState,

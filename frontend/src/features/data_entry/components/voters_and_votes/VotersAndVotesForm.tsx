@@ -34,7 +34,6 @@ export function VotersAndVotesForm() {
   return (
     <Form
       onSubmit={(e) => {
-        console.log("================================================");
         e.preventDefault();
         void onSubmit();
       }}

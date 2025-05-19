@@ -56,7 +56,6 @@ export function onSubmitForm(
       showAcceptErrorsAndWarnings &&
       !currentSection.acceptErrorsAndWarnings
     ) {
-      console.log("Does it reach this?????");
       dispatch({ type: "UPDATE_FORM_SECTION", partialFormSection: { acceptErrorsAndWarningsError: true } });
       return false;
     }

@@ -15,7 +15,6 @@ export function objectHasOnlyEmptyValues(obj: Record<string, "" | number>): bool
 }
 
 export function formSectionComplete(section: FormSection): boolean {
-  console.log("X", "SAVED:", section.isSaved, "err", section.acceptErrorsAndWarnings);
   return (
     section.isSaved &&
     (section.errors.isEmpty() || section.errors.hasOnlyGlobalValidationResults() || section.acceptErrorsAndWarnings) &&
@@ -35,19 +34,14 @@ export function resetFormSectionState(formState: FormState) {
 
 export function getNextSectionID(formState: FormState) {
   const currentSection = formState.sections[formState.current];
-  if (currentSection) {
-    console.log("A", currentSection.id, currentSection.isSubmitted, formSectionComplete(currentSection));
-  }
 
   if (currentSection && currentSection.isSubmitted && formSectionComplete(currentSection)) {
     for (const section of Object.values(formState.sections)) {
       if (formState.furthest === "save" || section.index === currentSection.index + 1) {
-        console.log("B", section.index);
         return section.id;
       }
     }
   }
-  console.log("D, returning null");
   return null;
 }
 

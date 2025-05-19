@@ -27,6 +27,8 @@ export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
 
 // Regular fixtures need to be passed into the test's arguments.
 type Fixtures = {
+  // page and request fixture for coordinator
+  coordinator: { page: Page; request: APIRequestContext };
   // page and request fixture for typist one
   typistOne: { page: Page; request: APIRequestContext };
   // page and request fixture for typist two
@@ -84,6 +86,12 @@ async function completePollingStationDataEntriesWithDifferences(request: APIRequ
 }
 
 export const test = base.extend<Fixtures>({
+  coordinator: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/coordinator.json" });
+    const page = await context.newPage();
+    await use({ page: page, request: context.request });
+    await context.close();
+  },
   typistOne: async ({ browser }, use) => {
     const context = await browser.newContext({ storageState: "e2e-tests/state/typist.json" });
     const page = await context.newPage();
@@ -106,7 +114,7 @@ export const test = base.extend<Fixtures>({
   },
   emptyElection: async ({ request }, use) => {
     await loginAs(request, "admin");
-    // overide the current storage state
+    // override the current storage state
     // create an election with no polling stations
     const url: ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
     const electionResponse = await request.post(url, { data: electionRequest });

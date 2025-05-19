@@ -33,7 +33,7 @@ OSV2020 is de huidige software die bij verkiezingen wordt gebruikt. Het ontwikke
 
 De eerste versie van Abacus wordt voor de gemeenteraadsverkiezingen gebouwd als een stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in de programmeertaal Rust, de frontend in TypeScript/React.
 
-Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/Overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, Typescript en React](</documentatie/softwarearchitectuur/overwegingen-talen-en-frameworks.md>).
+Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/Overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, TypeScript en React](</documentatie/softwarearchitectuur/overwegingen-talen-en-frameworks.md>).
 
 ### Beveiligingsmaatregelen
 
@@ -89,8 +89,8 @@ Meer informatie over de Kiesraad en de verkiezingen is te vinden op onze [GitHub
 Auteursrecht © 2024 Kiesraad.
 Gelicentieerd onder EUPL-1.2 of hoger, tenzij anders aangegeven:
 
-- Fonts in `frontend/static/font` en `backend/templates/fonts` zijn gelicentieerd onder de SIL Open Font License versie 1.1 (OFL v1.1).
-- De bestanden `frontend/app/msw-mock-api.ts` en `frontend/lib/test/server.ts`
+- Fonts in `frontend/src/assets/font` en `backend/templates/fonts` zijn gelicentieerd onder de SIL Open Font License versie 1.1 (OFL v1.1).
+- De bestanden `frontend/src/testing/msw-mock-api.ts` en `frontend/src/testing/server.ts`
   zijn gelicentieerd onder de Mozilla Public License v2.0 (MPL 2.0).
 - Dependencies uit npm en Cargo zijn gelicentieerd onder hun eigen respectievelijke licenties.
 

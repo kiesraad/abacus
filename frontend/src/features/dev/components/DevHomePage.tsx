@@ -105,10 +105,30 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
+              void login("admin2", "Admin2Password01");
+            }}
+          >
+            {t("administrator")} 2
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
               void login("coordinator", "CoordinatorPassword01");
             }}
           >
             {t("coordinator")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("coordinator2", "Coordinator2Password01");
+            }}
+          >
+            {t("coordinator")} 2
           </Link>
         </li>
         <li>

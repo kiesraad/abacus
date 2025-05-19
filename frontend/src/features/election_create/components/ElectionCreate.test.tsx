@@ -11,6 +11,7 @@ import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { Election, ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
 
 import { electionCreateRoutes } from "../routes";
 
@@ -54,6 +55,36 @@ function renderWithRouter() {
   return router;
 }
 
+function electionValidateResponse(election: Election): ElectionDefinitionUploadResponse {
+  return {
+    hash: {
+      // NOTE: In actual data, the redacted version of the hash
+      // will have empty strings at the `redacted_indexes` positions.
+      // We leave them in here so we can test their absence
+      chunks: [
+        "asdf",
+        "qwer",
+        "zxcv",
+        "tyui",
+        "ghjk",
+        "bnml",
+        "1234",
+        "5678",
+        "8765",
+        "gfsd",
+        "a345",
+        "qwer",
+        "lgmg",
+        "thnr",
+        "nytf",
+        "sdfr",
+      ],
+      redacted_indexes: [2, 9],
+    },
+    election,
+  };
+}
+
 describe("Election create pages", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler);
@@ -91,32 +122,9 @@ describe("Election create pages", () => {
     expect(screen.getByText(filename)).toBeInTheDocument();
   });
 
-  test("Shows hash when uploading valid file", async () => {
+  test("Shows and validates hash when uploading valid file", async () => {
     const election = getElectionMockData().election;
-    overrideOnce("post", "/api/elections/validate", 200, {
-      hash: {
-        chunks: [
-          ["asdf"],
-          ["qwer"],
-          ["zxcv"],
-          ["tyui"],
-          ["ghjk"],
-          ["bnml"],
-          ["1234"],
-          ["5678"],
-          ["8765"],
-          ["gfsd"],
-          ["a345"],
-          ["qwer"],
-          ["lgmg"],
-          ["thnr"],
-          ["nytf"],
-          ["sdfr"],
-        ],
-        redacted_indexes: [2, 9],
-      },
-      election,
-    });
+    overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(election));
 
     const router = renderWithRouter();
     const user = userEvent.setup();
@@ -146,6 +154,9 @@ describe("Election create pages", () => {
     expect(screen.getByText("1")).toHaveRole("mark");
     expect(screen.getByText("2")).not.toHaveRole("mark");
 
+    const inputPart1 = screen.getByLabelText("Controle deel 1");
+    await user.type(inputPart1, "zxcv");
+
     const inputPart2 = screen.getByLabelText("Controle deel 2");
     await user.click(inputPart2);
     expect(screen.getByText("1")).not.toHaveRole("mark");
@@ -155,5 +166,38 @@ describe("Election create pages", () => {
     await user.click(screen.getByText("Controleer verkiezingsdefinitie"));
     expect(screen.getByText("1")).not.toHaveRole("mark");
     expect(screen.getByText("2")).not.toHaveRole("mark");
+    await user.type(inputPart2, "gfsd");
+    await user.click(screen.getByText("Volgende"));
+
+    // Expect to see the next page
+    expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
+  });
+
+  test("Shows error on invalid input", async () => {
+    const election = getElectionMockData().election;
+    overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(election));
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    await router.navigate("/elections/create");
+
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    await user.upload(input, file);
+
+    // Wait for the page to be loaded and expect the election name to be present
+    expect(await screen.findByText(election.name)).toBeInTheDocument();
+    const inputPart1 = screen.getByLabelText("Controle deel 1");
+    await user.type(inputPart1, "zxcv");
+    const inputPart2 = screen.getByLabelText("Controle deel 2");
+    await user.type(inputPart2, "123");
+    await user.click(screen.getByText("Volgende"));
+
+    // Expect error to be shown
+    expect(await screen.findByText("Controle digitale vingerafdruk niet gelukt")).toBeInTheDocument();
   });
 });

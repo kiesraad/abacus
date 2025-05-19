@@ -1,22 +1,20 @@
-import { NotFoundError } from "@/api/ApiResult";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/i18n/translate";
+import { ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
 import { formatDateFull } from "@/utils/format";
 
 import { useElectionCheck } from "../hooks/useElectionCheck";
-import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { RedactedHash } from "./RedactedHash";
 
-export function CheckElectionDefinition() {
-  const { file, data } = useElectionCreateContext();
+interface CheckElectionDefinitionProps {
+  file: File;
+  data: ElectionDefinitionUploadResponse;
+}
 
-  if (!data) {
-    throw new NotFoundError("error.not_found_feedback");
-  }
-
+export function CheckElectionDefinition({ file, data }: CheckElectionDefinitionProps) {
   const { stubs, highlightStub, handleSubmit } = useElectionCheck(data);
 
   return (
@@ -30,7 +28,7 @@ export function CheckElectionDefinition() {
       <p className="mt-lg">
         {tx("election.check_eml.description", {
           file: () => {
-            return <strong>{file?.name}</strong>;
+            return <strong>{file.name}</strong>;
           },
         })}
       </p>

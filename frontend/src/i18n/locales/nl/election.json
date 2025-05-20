@@ -1,5 +1,9 @@
 {
   "create": "Verkiezing toevoegen",
+  "check_and_save": {
+    "title": "Controleren en opslaan",
+    "description": "Je gaat de volgende verkiezing toevoegen:"
+  },
   "check_eml": {
     "title": "Controleer verkiezingsdefinitie",
     "description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
@@ -24,6 +28,7 @@
   "no_elections_added": "Nog geen verkiezingen ingesteld",
   "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",
   "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
+  "singular": "verkiezing",
   "start_when_count_list_received": "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.",
   "status": "Status",
   "title": {

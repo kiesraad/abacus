@@ -367,9 +367,9 @@ async fn get_statuses(
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
-    let typist_user_id = 3;
+    let typist_user_id = 5;
     let typist2_cookie = shared::typist2_login(&addr).await;
-    let typist2_user_id = 4;
+    let typist2_user_id = 6;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
 
     // Ensure the statuses are "NotStarted"

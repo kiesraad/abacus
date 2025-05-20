@@ -6,7 +6,7 @@ use crate::election::PoliticalGroup;
 use super::{
     EMLBase,
     common::{
-        ContestIdentifier, EMLImportError, ElectionCategory, ElectionIdentifier,
+        ContestIdentifier, EMLImportError, ElectionCategory, ElectionDomain, ElectionIdentifier,
         ElectionSubcategory, ManagingAuthority,
     },
 };
@@ -48,20 +48,34 @@ impl EML110 {
         self.election_tree().and_then(|t| t.regions.first())
     }
 
+    fn election_domain(&self) -> Option<&ElectionDomain> {
+        self.election_identifier().election_domain.as_ref()
+    }
+
     pub fn as_crate_election(&self) -> Result<crate::election::Election, EMLImportError> {
         // we need to be importing from a 110a file
         if self.base.id != "110a" {
             return Err(EMLImportError::Needs101a);
         }
 
+        // check that the election tree is specified
+        if self.election_tree().is_none() {
+            return Err(EMLImportError::MissingElectionTree);
+        }
+
         // we need a region
-        let Some(region) = self.first_region() else {
+        if self.first_region().is_none() {
             return Err(EMLImportError::MissingRegion);
-        };
+        }
 
         // we currently only support GR elections
         let ElectionCategory::GR = self.election_identifier().election_category else {
             return Err(EMLImportError::OnlyMunicipalSupported);
+        };
+
+        // we need the election domain
+        let Some(election_domain) = self.election_domain() else {
+            return Err(EMLImportError::MissingElectionDomain);
         };
 
         // extract number of seats, if not available: error
@@ -146,7 +160,7 @@ impl EML110 {
         let election = crate::election::Election {
             id: u32::MAX, // automatically generated once inserted in the database
             name: self.election_identifier().election_name.clone(),
-            location: region.region_name.clone(),
+            location: election_domain.name.clone(),
             number_of_voters: 0, // max votes is in 110b, so nothing for now
             category: crate::election::ElectionCategory::Municipal,
             number_of_seats,
@@ -500,6 +514,22 @@ mod tests {
         let doc = EML110::from_str(data).unwrap();
         let res = doc.as_crate_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MissingNumberOfSeats));
+    }
+
+    #[test]
+    fn test_election_validate_missing_election_tree() {
+        let data = include_str!("./tests/eml110a_invalid_election_missing_election_tree.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MissingElectionTree))
+    }
+
+    #[test]
+    fn test_election_validate_missing_election_domain() {
+        let data = include_str!("./tests/eml110a_invalid_election_missing_election_domain.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_crate_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::MissingElectionDomain))
     }
 
     #[test]

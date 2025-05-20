@@ -122,6 +122,34 @@ describe("Election create pages", () => {
     expect(screen.getByText(filename)).toBeInTheDocument();
   });
 
+  test("Shows error when uploading too large file", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
+
+    overrideOnce("post", "/api/elections/validate", 413, {
+      error: "12",
+      fatal: false,
+      reference: "RequestPayloadTooLarge",
+    });
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    await router.navigate("/elections/create");
+
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+
+    await user.upload(input, file);
+
+    const message = screen.getByText(/Kies een bestand van maximaal 12 Megabyte./i);
+    expect(message).toBeVisible();
+  });
+
   test("Shows and validates hash when uploading valid file", async () => {
     const election = getElectionMockData().election;
     overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(election));

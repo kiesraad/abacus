@@ -10,8 +10,8 @@ test.describe("authentication", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.username.fill("admin");
-    await loginPage.password.fill("AdminPassword01");
+    await loginPage.username.fill("admin1");
+    await loginPage.password.fill("Admin1Password01");
     await loginPage.loginBtn.click();
 
     await page.waitForURL("/elections");

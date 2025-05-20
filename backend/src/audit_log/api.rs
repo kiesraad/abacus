@@ -156,7 +156,7 @@ mod tests {
 
     async fn create_log_entries(pool: SqlitePool) {
         let user = Users::new(pool.clone())
-            .get_by_username("admin")
+            .get_by_username("admin1")
             .await
             .unwrap()
             .unwrap();
@@ -265,6 +265,6 @@ mod tests {
         let result: Vec<AuditLogUser> = serde_json::from_slice(&body).unwrap();
 
         assert_eq!(result.len(), 1);
-        assert_eq!(result[0].username, "admin");
+        assert_eq!(result[0].username, "admin1");
     }
 }

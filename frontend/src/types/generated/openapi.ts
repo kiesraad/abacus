@@ -532,9 +532,9 @@ export type ErrorReference =
   | "DataEntryAlreadyClaimed"
   | "DataEntryAlreadyFinalised"
   | "DrawingOfLotsRequired"
+  | "EmlImportError"
   | "EntryNotFound"
   | "EntryNotUnique"
-  | "EmlImportError"
   | "InternalServerError"
   | "InvalidData"
   | "InvalidJson"
@@ -550,9 +550,10 @@ export type ErrorReference =
   | "PdfGenerationError"
   | "PollingStationRepeated"
   | "PollingStationValidationErrors"
-  | "UserNotFound"
-  | "UsernameNotUnique"
+  | "RequestPayloadTooLarge"
   | "Unauthorized"
+  | "UsernameNotUnique"
+  | "UserNotFound"
   | "ZeroVotesCast";
 
 /**

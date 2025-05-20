@@ -16,7 +16,8 @@
   "import_eml": "Importeer verkiezingsdefinitie",
   "invalid_election_definition": {
     "title": "Ongeldige verkiezingsdefinitie",
-    "description": "Het bestand <file>filename</file> bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie."
+    "description": "Het bestand <file>filename</file> bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
+    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte."
   },
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",

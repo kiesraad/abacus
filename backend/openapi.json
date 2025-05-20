@@ -3391,9 +3391,9 @@
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
           "DrawingOfLotsRequired",
+          "EmlImportError",
           "EntryNotFound",
           "EntryNotUnique",
-          "EmlImportError",
           "InternalServerError",
           "InvalidData",
           "InvalidJson",
@@ -3409,9 +3409,10 @@
           "PdfGenerationError",
           "PollingStationRepeated",
           "PollingStationValidationErrors",
-          "UserNotFound",
-          "UsernameNotUnique",
+          "RequestPayloadTooLarge",
           "Unauthorized",
+          "UsernameNotUnique",
+          "UserNotFound",
           "ZeroVotesCast"
         ]
       },

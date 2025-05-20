@@ -3,7 +3,7 @@ INSERT INTO users (id, username, fullname, role, password_hash, needs_password_c
 -- admin: 'AdminPassword01'
 -- admin2: 'Admin2Password01'
 -- coordinator: 'CoordinatorPassword01'
--- coordinator: 'Coordinator2Password01'
+-- coordinator2: 'Coordinator2Password01'
 -- typist: 'TypistPassword01'
 -- typist2: 'Typist2Password01'
 VALUES (1, 'admin1', 'Sanne Molenaar', 'administrator', '$argon2id$v=19$m=19456,t=2,p=1$trZGY1jE5OSpt+NG9NvY1w$vofrcEyML5A70ZR6EhwdqfLsv81DjkYMJvgXeKFLqQ4', false),

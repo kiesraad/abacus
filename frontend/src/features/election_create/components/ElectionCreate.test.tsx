@@ -5,13 +5,13 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ApiProvider } from "@/api/ApiProvider";
-import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { Election, ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
+import { ElectionDefinitionUploadResponse, NewElection } from "@/types/generated/openapi";
 
 import { electionCreateRoutes } from "../routes";
 
@@ -55,7 +55,7 @@ function renderWithRouter() {
   return router;
 }
 
-function electionValidateResponse(election: Election): ElectionDefinitionUploadResponse {
+function electionValidateResponse(election: NewElection): ElectionDefinitionUploadResponse {
   return {
     hash: {
       // NOTE: In actual data, the redacted version of the hash
@@ -123,8 +123,7 @@ describe("Election create pages", () => {
   });
 
   test("Shows and validates hash when uploading valid file", async () => {
-    const election = getElectionMockData().election;
-    overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(election));
+    overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(newElectionMockData));
 
     const router = renderWithRouter();
     const user = userEvent.setup();
@@ -143,7 +142,7 @@ describe("Election create pages", () => {
     await user.upload(input, file);
 
     // Wait for the page to be loaded and expect the election name to be present
-    expect(await screen.findByText(election.name)).toBeInTheDocument();
+    expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
 
     // Expect parts of the hash to be shown
     expect(screen.getByText("asdf")).toBeInTheDocument();
@@ -174,8 +173,7 @@ describe("Election create pages", () => {
   });
 
   test("Shows error on invalid input", async () => {
-    const election = getElectionMockData().election;
-    overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(election));
+    overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(newElectionMockData));
 
     const router = renderWithRouter();
     const user = userEvent.setup();
@@ -190,7 +188,7 @@ describe("Election create pages", () => {
     await user.upload(input, file);
 
     // Wait for the page to be loaded and expect the election name to be present
-    expect(await screen.findByText(election.name)).toBeInTheDocument();
+    expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
     const inputPart1 = screen.getByLabelText("Controle deel 1");
     await user.type(inputPart1, "zxcv");
     const inputPart2 = screen.getByLabelText("Controle deel 2");

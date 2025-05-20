@@ -1,4 +1,10 @@
-import { Election, ElectionDetailsResponse, ElectionListResponse, PoliticalGroup } from "@/types/generated/openapi";
+import {
+  Election,
+  ElectionDetailsResponse,
+  ElectionListResponse,
+  NewElection,
+  PoliticalGroup,
+} from "@/types/generated/openapi";
 
 import { pollingStationMockData } from "./PollingStationMockData";
 
@@ -242,7 +248,9 @@ export const electionListMockResponse: ElectionListResponse = {
     {
       id: 1,
       name: "Gemeenteraadsverkiezingen 2026",
+      election_id: "Heemdamseburg_2024",
       location: "Heemdamseburg",
+      domain_id: "0000",
       number_of_voters: 100,
       category: "Municipal",
       number_of_seats: 29,
@@ -266,3 +274,7 @@ export const getElectionMockData = (election: Partial<Election> = {}): Required<
 
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election as Required<Election>;
+export const newElectionMockData = {
+  ...electionDetailsMockResponse.election,
+  polling_stations: pollingStationMockData,
+} as Required<NewElection>;

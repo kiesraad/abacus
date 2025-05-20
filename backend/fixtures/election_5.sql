@@ -1,6 +1,6 @@
-INSERT INTO elections (id, name, location, number_of_voters, category, number_of_seats, election_date, nomination_date,
+INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date,
                        status, political_groups)
-VALUES (5, 'Test Election >= 19 seats', 'Grote Stad', 2000, 'Municipal', 23, '2026-03-18', '2026-02-02',
+VALUES (5, 'Test Election >= 19 seats', 'GroteStad_2026', 'Grote Stad', '0000', 2000, 'Municipal', 23, '2026-03-18', '2026-02-02',
         'DataEntryInProgress',
         '[
           {
@@ -306,6 +306,6 @@ VALUES (5, 'Test Election >= 19 seats', 'Grote Stad', 2000, 'Municipal', 23, '20
           }
         ]');
 
-INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, 
+INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
 VALUES (8, 5, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad');

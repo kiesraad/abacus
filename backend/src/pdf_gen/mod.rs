@@ -61,7 +61,9 @@ pub(crate) mod tests {
             election: Election {
                 id: 1,
                 name: "Municipal Election".to_string(),
+                election_id: "MunicipalElection_2025".to_string(),
                 location: "Heemdamseburg".to_string(),
+                domain_id: "0000".to_string(),
                 number_of_voters: 100,
                 category: ElectionCategory::Municipal,
                 number_of_seats: 29,

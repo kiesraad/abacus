@@ -52,7 +52,7 @@ impl EML110 {
         self.election_identifier().election_domain.as_ref()
     }
 
-    pub fn as_crate_election(&self) -> Result<crate::election::Election, EMLImportError> {
+    pub fn as_abacus_election(&self) -> Result<crate::election::NewElection, EMLImportError> {
         // we need to be importing from a 110a file
         if self.base.id != "110a" {
             return Err(EMLImportError::Needs101a);
@@ -157,17 +157,18 @@ impl EML110 {
             .collect::<Result<Vec<PoliticalGroup>, EMLImportError>>()?;
 
         // construct the election
-        let election = crate::election::Election {
-            id: u32::MAX, // automatically generated once inserted in the database
+        let election = crate::election::NewElection {
             name: self.election_identifier().election_name.clone(),
+            election_id: self.election_identifier().id.clone(),
             location: election_domain.name.clone(),
+            domain_id: election_domain.id.clone(),
             number_of_voters: 0, // max votes is in 110b, so nothing for now
             category: crate::election::ElectionCategory::Municipal,
             number_of_seats,
             election_date,
             nomination_date,
             status: crate::election::ElectionStatus::Created,
-            political_groups: Some(political_groups),
+            political_groups,
         };
 
         Ok(election)
@@ -443,7 +444,7 @@ mod tests {
             .as_mut()
             .unwrap()
             .regions = vec![];
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MissingRegion));
     }
 
@@ -451,7 +452,7 @@ mod tests {
     fn test_election_validate_invalid_election_number_of_seats() {
         let data = include_str!("./tests/eml110a_invalid_election_number_of_seats.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MismatchNumberOfSeats));
     }
 
@@ -459,7 +460,7 @@ mod tests {
     fn test_election_validate_invalid_election_subcategory() {
         let data = include_str!("./tests/eml110a_invalid_election_subcategory.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         // note: even though the subcategory is wrong in this file, the code is
         // setup to show the mismatch in number of seats as the problem
         assert!(matches!(res, EMLImportError::MismatchNumberOfSeats));
@@ -469,7 +470,7 @@ mod tests {
     fn test_election_validate_invalid_election_date_format() {
         let data = include_str!("./tests/eml110a_invalid_election_date_format.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::InvalidDateFormat));
     }
 
@@ -477,7 +478,7 @@ mod tests {
     fn test_election_validate_invalid_election_missing_nomination_date() {
         let data = include_str!("./tests/eml110a_invalid_election_missing_nomination_date.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MissingNominationDate));
     }
 
@@ -486,7 +487,7 @@ mod tests {
         let data =
             include_str!("./tests/eml110a_invalid_election_mismatch_preference_threshold.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MismatchPreferenceThreshold));
     }
 
@@ -496,7 +497,7 @@ mod tests {
             "./tests/eml110a_invalid_election_mismatch_preference_threshold_small_election.eml.xml"
         );
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MismatchPreferenceThreshold));
     }
 
@@ -504,7 +505,7 @@ mod tests {
     fn test_election_validate_invalid_election_missing_subcategory() {
         let data = include_str!("./tests/eml110a_invalid_election_missing_subcategory.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MissingSubcategory));
     }
 
@@ -512,7 +513,7 @@ mod tests {
     fn test_election_validate_invalid_election_missing_number_of_seats() {
         let data = include_str!("./tests/eml110a_invalid_election_missing_number_of_seats.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MissingNumberOfSeats));
     }
 
@@ -520,7 +521,7 @@ mod tests {
     fn test_election_validate_missing_election_tree() {
         let data = include_str!("./tests/eml110a_invalid_election_missing_election_tree.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MissingElectionTree))
     }
 
@@ -528,7 +529,7 @@ mod tests {
     fn test_election_validate_missing_election_domain() {
         let data = include_str!("./tests/eml110a_invalid_election_missing_election_domain.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MissingElectionDomain))
     }
 
@@ -543,7 +544,7 @@ mod tests {
     fn test_cannot_convert_eml110b_to_election() {
         let data = include_str!("./tests/eml110b_test.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::Needs101a));
     }
 
@@ -552,7 +553,7 @@ mod tests {
         let data =
             include_str!("./tests/eml110a_invalid_election_number_of_seats_out_of_range.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::NumberOfSeatsNotInRange));
     }
 
@@ -561,7 +562,7 @@ mod tests {
         let data =
             include_str!("./tests/eml110a_invalid_election_missing_preference_threshold.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MissingPreferenceThreshold));
     }
 
@@ -569,7 +570,7 @@ mod tests {
     fn test_invalid_election_date_nomination_format() {
         let data = include_str!("./tests/eml110a_invalid_election_date_nomination_format.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::InvalidDateFormat));
     }
 
@@ -578,7 +579,7 @@ mod tests {
         let data =
             include_str!("./tests/eml110a_invalid_election_only_municipal_supported.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_crate_election().unwrap_err();
+        let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::OnlyMunicipalSupported));
     }
 }

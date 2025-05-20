@@ -15,17 +15,15 @@ export function CheckAndSave() {
   return (
     <section className="md">
       <h2>{t("election.check_and_save.title")}</h2>
-      <p className="mt-lg mb-xl">
-        {t("election.check_and_save.description")}
-        <ul>
-          <li>
-            <strong>{t("election.singular")}:</strong> {data.election.name}
-          </li>
-          <li>
-            <strong>{t("area_designation")}:</strong> {data.election.location}
-          </li>
-        </ul>
-      </p>
+      <p className="mt-lg mb-xl">{t("election.check_and_save.description")}</p>
+      <ul>
+        <li>
+          <strong>{t("election.singular")}:</strong> {data.election.name}
+        </li>
+        <li>
+          <strong>{t("area_designation")}:</strong> {data.election.location}
+        </li>
+      </ul>
       <div className="mt-lg">
         <Button>{t("save")}</Button>
       </div>

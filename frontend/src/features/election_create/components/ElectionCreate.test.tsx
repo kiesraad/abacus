@@ -170,7 +170,7 @@ describe("Election create pages", () => {
     await user.click(screen.getByText("Volgende"));
 
     // Expect to see the next page
-    expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" })).toBeVisible();
   });
 
   test("Shows error on invalid input", async () => {

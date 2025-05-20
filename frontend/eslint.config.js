@@ -114,7 +114,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["*.e2e.ts", "e2e-tests/**/*"],
+    files: ["**/*.e2e.ts", "e2e-tests/**/*"],
     extends: [playwright.configs["flat/recommended"]],
     rules: {
       "@typescript-eslint/no-floating-promises": "error",
@@ -130,11 +130,6 @@ export default tseslint.config(
     rules: {
       // Needed for Ladle, page.waitForSelector("[data-storyloaded]")
       "playwright/no-wait-for-selector": "off",
-      "@typescript-eslint/no-floating-promises": "error",
-      "react-hooks/rules-of-hooks": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-unsafe-type-assertion": "off",
-      "@typescript-eslint/restrict-template-expressions": "off",
     },
   },
 );

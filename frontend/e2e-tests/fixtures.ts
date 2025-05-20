@@ -27,6 +27,8 @@ export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
 
 // Regular fixtures need to be passed into the test's arguments.
 type Fixtures = {
+  // page and request fixture for coordinator
+  coordinator: { page: Page; request: APIRequestContext };
   // page and request fixture for typist one
   typistOne: { page: Page; request: APIRequestContext };
   // page and request fixture for typist two
@@ -54,7 +56,7 @@ type Fixtures = {
 async function completePollingStationDataEntries(request: APIRequestContext, pollingStationId: number) {
   for (const entryNumber of [1, 2]) {
     if (entryNumber === 1) {
-      await loginAs(request, "typist");
+      await loginAs(request, "typist1");
     } else if (entryNumber === 2) {
       await loginAs(request, "typist2");
     }
@@ -67,7 +69,7 @@ async function completePollingStationDataEntries(request: APIRequestContext, pol
 }
 
 async function completePollingStationDataEntriesWithDifferences(request: APIRequestContext, pollingStationId: number) {
-  await loginAs(request, "typist");
+  await loginAs(request, "typist1");
   const firstDataEntry = new DataEntryApiClient(request, pollingStationId, 1);
   await firstDataEntry.claim();
   await firstDataEntry.save(noRecountNoDifferencesRequest);
@@ -84,6 +86,12 @@ async function completePollingStationDataEntriesWithDifferences(request: APIRequ
 }
 
 export const test = base.extend<Fixtures>({
+  coordinator: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/coordinator.json" });
+    const page = await context.newPage();
+    await use({ page: page, request: context.request });
+    await context.close();
+  },
   typistOne: async ({ browser }, use) => {
     const context = await browser.newContext({ storageState: "e2e-tests/state/typist.json" });
     const page = await context.newPage();
@@ -98,15 +106,15 @@ export const test = base.extend<Fixtures>({
   },
   pollingStationFirstEntryClaimed: async ({ typistOne, pollingStation }, use) => {
     const { request } = typistOne;
-    await loginAs(request, "typist");
+    await loginAs(request, "typist1");
 
     const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
     await firstDataEntry.claim();
     await use(pollingStation);
   },
   emptyElection: async ({ request }, use) => {
-    await loginAs(request, "admin");
-    // overide the current storage state
+    await loginAs(request, "admin1");
+    // override the current storage state
     // create an election with no polling stations
     const url: ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
     const electionResponse = await request.post(url, { data: electionRequest });
@@ -116,7 +124,7 @@ export const test = base.extend<Fixtures>({
     await use(election);
   },
   election: async ({ request, emptyElection }, use) => {
-    await loginAs(request, "admin");
+    await loginAs(request, "admin1");
     // create polling stations in the existing emptyElection
     const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElection.id}/polling_stations`;
     for (const pollingStationRequest of pollingStationRequests) {
@@ -133,7 +141,7 @@ export const test = base.extend<Fixtures>({
     await use(election);
   },
   pollingStation: async ({ request, election }, use) => {
-    await loginAs(request, "admin");
+    await loginAs(request, "admin1");
     // get the first polling station of the existing election
     const url: POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${election.election.id}/polling_stations/${election.polling_stations[0]?.id ?? 0}`;
     const response = await request.get(url);
@@ -143,7 +151,7 @@ export const test = base.extend<Fixtures>({
     await use(pollingStation);
   },
   pollingStationFirstEntryDone: async ({ request, pollingStation }, use) => {
-    await loginAs(request, "typist");
+    await loginAs(request, "typist1");
 
     const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
     await firstDataEntry.claim();
@@ -170,7 +178,7 @@ export const test = base.extend<Fixtures>({
     await use(election.election);
   },
   newTypist: async ({ request }, use) => {
-    await loginAs(request, "admin");
+    await loginAs(request, "admin1");
     // create a new user
     const url: USER_CREATE_REQUEST_PATH = "/api/user";
     const data: USER_CREATE_REQUEST_BODY = {

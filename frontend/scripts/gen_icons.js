@@ -1,5 +1,5 @@
 import fs, { readdirSync } from "fs";
-import prettier from "prettier";
+import { format, resolveConfig, resolveConfigFile } from "prettier";
 
 async function run() {
   let path = "./src/assets/icons";
@@ -25,7 +25,13 @@ async function run() {
   });
 
   let s = result.join("\n");
-  s = await prettier.format(s, { parser: "typescript" });
+
+  const configPath = await resolveConfigFile();
+  const localOptions = await resolveConfig(configPath || "./");
+  const options = localOptions ?? {};
+
+  s = await format(s, { parser: "typescript", ...options });
+
   fs.writeFileSync("./src/components/generated/icons.tsx", s);
 }
 

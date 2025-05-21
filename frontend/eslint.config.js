@@ -3,7 +3,6 @@ import tsParser from "@typescript-eslint/parser";
 import importPlugin from "eslint-plugin-import";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import playwright from "eslint-plugin-playwright";
-import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import { readdirSync } from "fs";
@@ -35,7 +34,6 @@ export default tseslint.config(
       importPlugin.flatConfigs.typescript,
       reactRefresh.configs.recommended,
       jsxA11y.flatConfigs.recommended,
-      eslintPluginPrettierRecommended,
       reactHooks.configs["recommended-latest"],
     ],
     rules: {
@@ -93,7 +91,7 @@ export default tseslint.config(
   {
     files: ["**/*.js"],
     ignores: ["!.ladle/**"],
-    extends: [eslint.configs.recommended, importPlugin.flatConfigs.recommended, eslintPluginPrettierRecommended],
+    extends: [eslint.configs.recommended, importPlugin.flatConfigs.recommended],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {

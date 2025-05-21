@@ -41,7 +41,6 @@ export default tseslint.config(
       reactHooks.configs["recommended-latest"],
     ],
     rules: {
-      "no-undef": "off",
       "jsx-a11y/no-autofocus": "off",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unsafe-type-assertion": "error",

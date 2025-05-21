@@ -1,7 +1,5 @@
-// @ts-check
 import eslint from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
-// @ts-ignore
 import importPlugin from "eslint-plugin-import";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import playwright from "eslint-plugin-playwright";

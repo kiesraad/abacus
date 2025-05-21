@@ -27,7 +27,7 @@ export function getInitialState(
 export default function dataEntryReducer(state: DataEntryState, action: DataEntryAction): DataEntryState {
   // uncomment the following line to see the action in the console
   /// eslint-disable-next-line
-  // console.log("ACTION", action, "OLD", state);
+  //console.log("ACTION", action, "OLD", state);
 
   switch (action.type) {
     case "DATA_ENTRY_CLAIMED":

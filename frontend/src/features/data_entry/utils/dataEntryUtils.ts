@@ -37,11 +37,15 @@ export function getNextSectionID(formState: FormState) {
 
   if (currentSection && currentSection.isSubmitted && formSectionComplete(currentSection)) {
     for (const section of Object.values(formState.sections)) {
-      if (formState.furthest === "save" || section.index === currentSection.index + 1) {
+      if (
+        (formState.furthest === "save" && !section.errors.isEmpty() && !section.acceptErrorsAndWarnings) ||
+        section.index === currentSection.index + 1
+      ) {
         return section.id;
       }
     }
   }
+
   return null;
 }
 

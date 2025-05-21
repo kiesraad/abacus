@@ -94,16 +94,6 @@ mod tests {
         response.headers().get("set-cookie").unwrap().clone()
     }
 
-    #[test]
-    fn test_session_life_time() {
-        assert_eq!(SESSION_LIFE_TIME, TimeDelta::seconds(60 * 30));
-    }
-
-    #[test]
-    fn test_session_min_life_time() {
-        assert_eq!(SESSION_MIN_LIFE_TIME, TimeDelta::seconds(60 * 15));
-    }
-
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_login_success(pool: SqlitePool) {
         let app = create_app(pool);

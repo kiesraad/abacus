@@ -791,6 +791,36 @@ test.describe("errors and warnings", () => {
 
     await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
   });
+
+  test("User can accept errors", async ({ page, pollingStation }) => {
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkNoAndClickNext();
+
+    // fill form with data that results in a warning
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    const voters = {
+      poll_card_count: 100,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
+    };
+    const votes = {
+      votes_candidates_count: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 10,
+    };
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
+    await votersAndVotesPage.acceptWarnings.click();
+    await expect(votersAndVotesPage.acceptWarnings).toBeChecked();
+    await votersAndVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.fieldset).toBeVisible();
+  });
 });
 
 test.describe("navigation", () => {

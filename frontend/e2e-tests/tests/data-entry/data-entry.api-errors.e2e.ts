@@ -32,7 +32,7 @@ test.describe("data entry - api error responses", () => {
     );
   });
 
-  test("UI Warning: Trying to load the same finalized data entry again", async ({
+  test("UI Warning: Trying to load the same finalised data entry again", async ({
     page,
     pollingStationFirstEntryDone,
   }) => {

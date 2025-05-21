@@ -210,7 +210,7 @@ export type AuditEvent =
   | (DataEntryDetails & { eventType: "DataEntryClaimed" })
   | (DataEntryDetails & { eventType: "DataEntrySaved" })
   | (DataEntryDetails & { eventType: "DataEntryDeleted" })
-  | (DataEntryDetails & { eventType: "DataEntryFinalized" })
+  | (DataEntryDetails & { eventType: "DataEntryFinalised" })
   | (DataEntryDetails & { eventType: "DataEntryKeptFirst" })
   | (DataEntryDetails & { eventType: "DataEntryKeptSecond" })
   | (DataEntryDetails & { eventType: "DataEntryDiscardedBoth" })

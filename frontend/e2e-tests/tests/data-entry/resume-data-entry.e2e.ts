@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test";
+import { loginAs } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
@@ -9,7 +10,6 @@ import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndV
 import { PollingStation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
-import { loginAs } from "../../setup";
 import { emptyDataEntryResponse } from "../../test-data/request-response-templates";
 
 test.use({

@@ -40,6 +40,7 @@ impl From<ValidationResults> for DataEntryTransitionError {
 pub enum DataEntryStatus {
     FirstEntryNotStarted, // First entry has not started yet
     FirstEntryInProgress(FirstEntryInProgress),
+    FirstEntryHasErrors(FirstEntryHasErrors),
     SecondEntryNotStarted(SecondEntryNotStarted),
     SecondEntryInProgress(SecondEntryInProgress),
     EntriesDifferent(EntriesDifferent),
@@ -52,6 +53,7 @@ pub enum DataEntryStatus {
 pub enum DataEntryStatusName {
     FirstEntryNotStarted,
     FirstEntryInProgress,
+    FirstEntryHasErrors,
     SecondEntryNotStarted,
     SecondEntryInProgress,
     EntriesDifferent,
@@ -85,6 +87,17 @@ impl ClientState {
         let res = s.map(serde_json::from_str).transpose()?;
         Ok(ClientState(res))
     }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+pub struct FirstEntryHasErrors {
+    /// User who did the first data entry
+    pub first_entry_user_id: u32,
+    /// First data entry for a polling station
+    pub finalised_first_entry: PollingStationResults,
+    /// When the first data entry was finalised
+    #[schema(value_type = String)]
+    pub first_entry_finished_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
@@ -302,14 +315,18 @@ impl DataEntryStatus {
                     validate_data_entry_status(&self, polling_station, election)?;
 
                 if validation_results.has_errors() {
-                    return Err(validation_results.into());
+                    Ok(Self::FirstEntryHasErrors(FirstEntryHasErrors {
+                        first_entry_user_id: state.first_entry_user_id,
+                        finalised_first_entry: state.first_entry.clone(),
+                        first_entry_finished_at: Utc::now(),
+                    }))
+                } else {
+                    Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
+                        first_entry_user_id: state.first_entry_user_id,
+                        finalised_first_entry: state.first_entry.clone(),
+                        first_entry_finished_at: Utc::now(),
+                    }))
                 }
-
-                Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
-                    first_entry_user_id: state.first_entry_user_id,
-                    finalised_first_entry: state.first_entry.clone(),
-                    first_entry_finished_at: Utc::now(),
-                }))
             }
             DataEntryStatus::SecondEntryNotStarted(_)
             | DataEntryStatus::SecondEntryInProgress(_) => {
@@ -498,6 +515,7 @@ impl DataEntryStatus {
         match self {
             DataEntryStatus::FirstEntryNotStarted => 0,
             DataEntryStatus::FirstEntryInProgress(state) => state.progress,
+            DataEntryStatus::FirstEntryHasErrors(_) => 100,
             DataEntryStatus::SecondEntryNotStarted(_) => 0,
             DataEntryStatus::SecondEntryInProgress(state) => state.progress,
             DataEntryStatus::EntriesDifferent(_) => 100,
@@ -550,6 +568,7 @@ impl DataEntryStatus {
         match self {
             DataEntryStatus::FirstEntryNotStarted => DataEntryStatusName::FirstEntryNotStarted,
             DataEntryStatus::FirstEntryInProgress(_) => DataEntryStatusName::FirstEntryInProgress,
+            DataEntryStatus::FirstEntryHasErrors(_) => DataEntryStatusName::FirstEntryHasErrors,
             DataEntryStatus::SecondEntryNotStarted(_) => DataEntryStatusName::SecondEntryNotStarted,
             DataEntryStatus::SecondEntryInProgress(_) => DataEntryStatusName::SecondEntryInProgress,
             DataEntryStatus::EntriesDifferent(_) => DataEntryStatusName::EntriesDifferent,
@@ -843,16 +862,20 @@ mod tests {
             progress: 0,
             first_entry_user_id: 0,
             first_entry: PollingStationResults {
-                recounted: Some(true),
+                // F.101
+                recounted: None,
                 ..polling_station_result()
             },
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
         });
-        let next = initial.finalise_first_entry(&polling_station(), &election(), 0);
-        assert!(matches!(
-            next,
-            Err(DataEntryTransitionError::ValidatorError(_))
-        ));
+        let next = initial
+            .finalise_first_entry(&polling_station(), &election(), 0)
+            .expect("should be Ok");
+        assert!(
+            matches!(next, DataEntryStatus::FirstEntryHasErrors(_)),
+            "actual: {:?}",
+            next
+        );
     }
 
     /// FirstEntryInProgress --> FirstEntryNotStarted: delete

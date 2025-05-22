@@ -332,6 +332,7 @@ export interface DataEntryDetails {
 export type DataEntryStatus =
   | { status: "FirstEntryNotStarted" }
   | { state: FirstEntryInProgress; status: "FirstEntryInProgress" }
+  | { state: FirstEntryHasErrors; status: "FirstEntryHasErrors" }
   | { state: SecondEntryNotStarted; status: "SecondEntryNotStarted" }
   | { state: SecondEntryInProgress; status: "SecondEntryInProgress" }
   | { state: EntriesDifferent; status: "EntriesDifferent" }
@@ -340,6 +341,7 @@ export type DataEntryStatus =
 export type DataEntryStatusName =
   | "first_entry_not_started"
   | "first_entry_in_progress"
+  | "first_entry_has_errors"
   | "second_entry_not_started"
   | "second_entry_in_progress"
   | "entries_different"
@@ -562,6 +564,15 @@ export interface ErrorResponse {
   error: string;
   fatal: boolean;
   reference: ErrorReference;
+}
+
+export interface FirstEntryHasErrors {
+  /** First data entry for a polling station */
+  finalised_first_entry: PollingStationResults;
+  /** When the first data entry was finalised */
+  first_entry_finished_at: string;
+  /** User who did the first data entry */
+  first_entry_user_id: number;
 }
 
 export interface FirstEntryInProgress {

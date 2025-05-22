@@ -1471,7 +1471,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Data entry finalised successfully"
+            "description": "Data entry finalised successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEntryStatus"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -2811,6 +2818,24 @@
             ],
             "properties": {
               "state": {
+                "$ref": "#/components/schemas/FirstEntryHasErrors"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "FirstEntryHasErrors"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
                 "$ref": "#/components/schemas/SecondEntryNotStarted"
               },
               "status": {
@@ -2882,6 +2907,7 @@
         "enum": [
           "first_entry_not_started",
           "first_entry_in_progress",
+          "first_entry_has_errors",
           "second_entry_not_started",
           "second_entry_in_progress",
           "entries_different",
@@ -3432,6 +3458,30 @@
           },
           "reference": {
             "$ref": "#/components/schemas/ErrorReference"
+          }
+        }
+      },
+      "FirstEntryHasErrors": {
+        "type": "object",
+        "required": [
+          "first_entry_user_id",
+          "finalised_first_entry",
+          "first_entry_finished_at"
+        ],
+        "properties": {
+          "finalised_first_entry": {
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "First data entry for a polling station"
+          },
+          "first_entry_finished_at": {
+            "type": "string",
+            "description": "When the first data entry was finalised"
+          },
+          "first_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User who did the first data entry",
+            "minimum": 0
           }
         }
       },

@@ -316,7 +316,7 @@ async fn polling_station_data_entry_delete(
     post,
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
     responses(
-        (status = 200, description = "Data entry finalised successfully"),
+        (status = 200, description = "Data entry finalised successfully", body = DataEntryStatus),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
@@ -335,7 +335,7 @@ async fn polling_station_data_entry_finalise(
     State(polling_stations_repo): State<PollingStations>,
     audit_service: AuditService,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
-) -> Result<(), APIError> {
+) -> Result<Json<DataEntryStatus>, APIError> {
     let state = polling_station_data_entries.get_or_default(id).await?;
 
     let polling_station = polling_stations_repo.get(id).await?;
@@ -371,10 +371,13 @@ async fn polling_station_data_entry_finalise(
     let data_entry = polling_station_data_entries.get_row(id).await?;
 
     audit_service
-        .log(&AuditEvent::DataEntryFinalised(data_entry.into()), None)
+        .log(
+            &AuditEvent::DataEntryFinalised(data_entry.clone().into()),
+            None,
+        )
         .await?;
 
-    Ok(())
+    Ok(Json(data_entry.state.0))
 }
 
 /// Resolve data entry differences by providing a `ResolveAction`
@@ -672,7 +675,7 @@ pub mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_cannot_finalise_with_errors(pool: SqlitePool) {
+    async fn test_first_entry_finalise_with_errors(pool: SqlitePool) {
         let mut request_body = example_data_entry();
         request_body.data.voters_counts.poll_card_count = 100; // incorrect value
 
@@ -681,9 +684,24 @@ pub mod tests {
         let response = save(pool.clone(), request_body.clone(), EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check that we cannot finalise with errors
+        // Check that finalise with errors results in FirstEntryHasErrors
         let response = finalise(pool.clone(), EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::CONFLICT);
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let status: DataEntryStatus = serde_json::from_slice(&body).unwrap();
+
+        assert!(matches!(status, DataEntryStatus::FirstEntryHasErrors(_)));
+
+        // Check that it has been logged in the audit log
+        let audit_log_row = query!("SELECT * FROM audit_log ORDER BY id DESC LIMIT 1")
+            .fetch_one(&pool)
+            .await
+            .expect("should have audit log row");
+        assert_eq!(audit_log_row.event_name, "DataEntryFinalised");
+
+        let event: serde_json::Value = serde_json::from_str(&audit_log_row.event).unwrap();
+        assert_eq!(event["dataEntryStatus"], "first_entry_has_errors");
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

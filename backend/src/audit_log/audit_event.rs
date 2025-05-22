@@ -36,7 +36,9 @@ pub struct UserDetails {
 pub struct ElectionDetails {
     pub election_id: u32,
     pub election_name: String,
+    pub election_election_id: String,
     pub election_location: String,
+    pub election_domain_id: String,
     pub election_number_of_voters: u32,
     pub election_category: String,
     pub election_number_of_seats: u32,
@@ -126,7 +128,7 @@ pub enum AuditEvent {
     DataEntryClaimed(DataEntryDetails),
     DataEntrySaved(DataEntryDetails),
     DataEntryDeleted(DataEntryDetails),
-    DataEntryFinalized(DataEntryDetails),
+    DataEntryFinalised(DataEntryDetails),
     // data entry resolving events
     DataEntryKeptFirst(DataEntryDetails),
     DataEntryKeptSecond(DataEntryDetails),
@@ -161,7 +163,7 @@ impl AuditEvent {
             AuditEvent::DataEntryClaimed(_) => AuditEventLevel::Success,
             AuditEvent::DataEntrySaved(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,
-            AuditEvent::DataEntryFinalized(_) => AuditEventLevel::Success,
+            AuditEvent::DataEntryFinalised(_) => AuditEventLevel::Success,
             AuditEvent::Error(ErrorDetails { level, .. }) => *level,
             AuditEvent::UnknownEvent => AuditEventLevel::Warning,
             AuditEvent::DataEntryKeptFirst(_) => AuditEventLevel::Info,

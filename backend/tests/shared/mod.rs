@@ -268,17 +268,17 @@ pub async fn create_result_with_non_example_data_entry(
 
 /// Calls the login endpoint for an Admin user and returns the session cookie
 pub async fn admin_login(addr: &SocketAddr) -> HeaderValue {
-    login(addr, "admin", "AdminPassword01").await
+    login(addr, "admin1", "Admin1Password01").await
 }
 
 /// Calls the login endpoint for a Coordinator user and returns the session cookie
 pub async fn coordinator_login(addr: &SocketAddr) -> HeaderValue {
-    login(addr, "coordinator", "CoordinatorPassword01").await
+    login(addr, "coordinator1", "Coordinator1Password01").await
 }
 
 /// Calls the login endpoint for a Typist user and returns the session cookie
 pub async fn typist_login(addr: &SocketAddr) -> HeaderValue {
-    login(addr, "typist", "TypistPassword01").await
+    login(addr, "typist1", "Typist1Password01").await
 }
 
 /// Calls the login endpoint for a Typist user and returns the session cookie

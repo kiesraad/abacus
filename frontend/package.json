@@ -11,7 +11,7 @@
     "dev": "npm run check-server && vite",
     "build": "vite build --config vite-prod.config.ts",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
-    "lint": "tsc && cross-env ESLINT_ENV=production ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "tsc && cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettier": "prettier --ignore-unknown --write .",
     "preview": "vite preview",
     "test": "vitest",
@@ -19,6 +19,7 @@
     "test:e2e-dev": "cross-env RUST_LOG=tower_http-warning playwright test -c playwright.e2e.config.ts",
     "test:e2e-ui": "cross-env LOCAL_CI=true playwright test -c playwright.e2e.config.ts --ui",
     "test:ladle": "playwright test -c playwright.ladle.config.ts",
+    "test:ladle-ui": "playwright test -c playwright.ladle.config.ts --ui",
     "ladle": "ladle serve",
     "build:ladle": "ladle build",
     "start:msw": "cross-env API_MODE=mock vite",
@@ -31,7 +32,7 @@
   },
   "dependencies": {
     "browserslist": "^4.24.5",
-    "lightningcss": "^1.30.0",
+    "lightningcss": "^1.30.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^7.6.0",
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.0",
+    "@eslint/js": "^9.26.0",
     "@ladle/react": "^5.0.3",
     "@playwright/test": "^1.52.0",
     "@testing-library/dom": "^10.4.0",
@@ -46,34 +48,45 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
-    "@types/node": "^22.15.17",
+    "@types/node": "^22.15.19",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@typescript-eslint/eslint-plugin": "^8.32.0",
-    "@typescript-eslint/parser": "^8.32.0",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react-swc": "^3.9.0",
     "@vitest/coverage-v8": "^3.1.3",
-    "@xstate/graph": "^3.0.2",
+    "@xstate/graph": "^3.0.3",
     "cross-env": "^7.0.3",
-    "eslint": "^9.26.0",
+    "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
-    "eslint-import-resolver-typescript": "^4.3.4",
+    "eslint-import-resolver-typescript": "^4.3.5",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-playwright": "^2.2.0",
-    "eslint-plugin-prettier": "^5.4.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "jsdom": "^26.1.0",
-    "lefthook": "^1.11.12",
-    "msw": "^2.8.2",
+    "lefthook": "^1.11.13",
+    "msw": "^2.8.4",
     "prettier": "^3.5.3",
-    "typescript": "^5.8.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.0",
     "vite-node": "^3.0.4",
     "vitest": "^3.0.4",
     "vitest-fail-on-console": "^0.7.1",
     "xstate": "^5.19.2"
+  },
+  "overrides": {
+    "eslint-plugin-playwright": {
+      "globals": ">=14"
+    },
+    "@eslint/eslintrc": {
+      "globals": ">=14"
+    },
+    "@babel/traverse": {
+      "globals": ">=14"
+    }
   },
   "msw": {
     "workerDirectory": [

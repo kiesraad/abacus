@@ -25,6 +25,7 @@ To let the API server serve the frontend, first compile the frontend using
 
 ```shell
 cd frontend
+npm install
 npm run build
 cd ../backend
 sqlx database setup
@@ -125,3 +126,25 @@ The OpenAPI JSON specification is available in the repository at `openapi.json` 
 The Swagger UI is available at [/api-docs](http://localhost:8080/api-docs).
 
 To update `openapi.json` in the repository, run the command `cargo run --bin gen-openapi`.
+
+### Building for various platforms
+
+You can use [cross](https://github.com/cross-rs/cross) to compile for different architectures.
+
+For example:
+
+```shell
+# build the frontend
+cd frontend
+npm install
+npm run build
+cd ..
+
+# build for Armv6 Linux (like the Raspberry PI 1/2/zero)
+rustup target add arm-unknown-linux-gnueabihf
+cross build --release --features memory-serve,embed-typst --manifest-path backend/Cargo.toml --target arm-unknown-linux-gnueabihf
+
+# build for Armv7-A Linux (like the Raspberry PI 3/4/5)
+rustup target add armv7-unknown-linux-gnueabihf
+cross build --release --features memory-serve,embed-typst --manifest-path backend/Cargo.toml --target armv7-unknown-linux-gnueabihf
+```

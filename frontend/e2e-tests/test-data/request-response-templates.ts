@@ -1,15 +1,17 @@
 import {
   ClaimDataEntryResponse,
   DataEntry,
-  ElectionRequest,
+  NewElection,
   PollingStationRequest,
   PollingStationResults,
   SaveDataEntryResponse,
 } from "@/types/generated/openapi";
 
-export const electionRequest: ElectionRequest = {
+export const electionRequest: NewElection = {
   name: "Test Election",
+  election_id: "TestLocation_2026",
   location: "Test Location",
+  domain_id: "0000",
   number_of_voters: 100,
   category: "Municipal",
   number_of_seats: 29,

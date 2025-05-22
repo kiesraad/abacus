@@ -19,7 +19,7 @@ async fn test_account_update(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .put(&url)
         .json(&json!({
-            "username": "admin",
+            "username": "admin1",
             "fullname": "Saartje Molenaar",
             "password": "MyLongPassword13"
         }))
@@ -35,7 +35,7 @@ async fn test_account_update(pool: SqlitePool) {
     );
 
     let body: Value = response.json().await.unwrap();
-    assert_eq!(body["username"], "admin");
+    assert_eq!(body["username"], "admin1");
     assert_eq!(body["fullname"], "Saartje Molenaar");
     assert_eq!(body["needs_password_change"], false);
 }

@@ -798,7 +798,7 @@ test.describe("errors and warnings", () => {
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
 
-    // fill form with data that results in a warning
+    // fill form with data that results in an error
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
       poll_card_count: 100,
@@ -814,6 +814,11 @@ test.describe("errors and warnings", () => {
     };
     await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
+
+    await expect(votersAndVotesPage.error).toContainText(
+      "Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.",
+    );
+
     await votersAndVotesPage.acceptErrorsAndWarnings.click();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeChecked();
     await votersAndVotesPage.next.click();

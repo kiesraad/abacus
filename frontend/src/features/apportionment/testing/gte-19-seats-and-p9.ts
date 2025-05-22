@@ -2007,7 +2007,9 @@ export const election_summary: ElectionSummary = {
 export const election: Election = {
   id: 5,
   name: "Test Election >= 19 seats & Absolute Majority Change",
+  election_id: "TestLocation_2026",
   location: "Test Location",
+  domain_id: "0000",
   number_of_voters: 20000,
   category: "Municipal",
   number_of_seats: 24,

@@ -371,7 +371,7 @@ async fn polling_station_data_entry_finalise(
     let data_entry = polling_station_data_entries.get_row(id).await?;
 
     audit_service
-        .log(&AuditEvent::DataEntryFinalized(data_entry.into()), None)
+        .log(&AuditEvent::DataEntryFinalised(data_entry.into()), None)
         .await?;
 
     Ok(())

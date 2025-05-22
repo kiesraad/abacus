@@ -124,9 +124,13 @@ jobs:
           fail_ci_if_error: true
 
   playwright-e2e:
-    name: Playwright e2e tests
+    name: Playwright e2e tests (${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
     needs:
       - backend
+    strategy:
+      matrix:
+        shardIndex: [1, 2, 3]
+        shardTotal: [3]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -149,12 +153,12 @@ jobs:
       - name: Make Abacus executable
         run: chmod a+x ../builds/backend/abacus
       - name: Run e2e playwright tests
-        run: npm run test:e2e
+        run: npm run test:e2e -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report-ubuntu-latest
+          name: playwright-report-ubuntu-latest-${{ matrix.shardIndex }}
           path: frontend/playwright-report/
           retention-days: 30
       - name: Upload test results to Codecov

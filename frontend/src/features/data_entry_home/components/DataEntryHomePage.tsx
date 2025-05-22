@@ -29,15 +29,20 @@ export function DataEntryHomePage() {
     };
   }, [refetch]);
 
-  const showFirstDataEntrySavedAlert = location.hash === "#data-entry-saved-1";
-  const showSecondDataEntrySavedAlert = location.hash === "#data-entry-saved-2";
-  const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
+  const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved-") ? location.hash : null;
+  const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved-") ? location.hash : null;
+  const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert || undefined;
+
+  const showDifferenceWithFirstEntryAlert = location.hash.startsWith("#data-entry-different-") ? location.hash : null;
+  const showFirstEntryHasErrorsAlert = location.hash.startsWith("#data-entry-errors-") ? location.hash : null;
+  const dataEntryNotification = showDifferenceWithFirstEntryAlert || showFirstEntryHasErrorsAlert || undefined;
 
   const showDataEntryClaimedAlert = location.hash.startsWith("#data-entry-claimed-") ? location.hash : null;
   const showDataEntryFinalisedAlert = location.hash.startsWith("#data-entry-finalised-") ? location.hash : null;
   const showInvalidActionAlert = location.hash.startsWith("#invalid-action-") ? location.hash : null;
   const dataEntryWarning =
     showDataEntryClaimedAlert || showDataEntryFinalisedAlert || showInvalidActionAlert || undefined;
+
   let claimedPollingStationNumber = 0;
   if (dataEntryWarning) {
     const id = parseInt(dataEntryWarning.substring(dataEntryWarning.lastIndexOf("-") + 1));
@@ -45,6 +50,10 @@ export function DataEntryHomePage() {
   }
 
   function closeDataEntrySavedAlert() {
+    void navigate(location.pathname);
+  }
+
+  function closeDataEntryNotifyAlert() {
     void navigate(location.pathname);
   }
 
@@ -72,6 +81,13 @@ export function DataEntryHomePage() {
               </>
             )}
           </p>
+        </Alert>
+      )}
+
+      {dataEntryNotification && (
+        <Alert type="notify" onClose={closeDataEntryNotifyAlert}>
+          <h2>{t("data_entry.entry_saved")}</h2>
+          <p>{t("data_entry.success.return_paper")}</p>
         </Alert>
       )}
 
@@ -106,7 +122,7 @@ export function DataEntryHomePage() {
       )}
       <main>
         <article id="polling-station-choice-form">
-          <PollingStationChoiceForm anotherEntry={dataEntryDone} />
+          <PollingStationChoiceForm anotherEntry={!!dataEntryDone} />
         </article>
         <ElectionProgress />
       </main>

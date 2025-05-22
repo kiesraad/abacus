@@ -1,6 +1,6 @@
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResult, isSuccess } from "@/api/ApiResult";
-import { DataEntry, PollingStationResults, SaveDataEntryResponse } from "@/types/generated/openapi";
+import { DataEntry, DataEntryStatus, PollingStationResults, SaveDataEntryResponse } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import {
@@ -123,18 +123,19 @@ export function onDeleteDataEntry(client: ApiClient, requestPath: string, dispat
 }
 
 export function onFinaliseDataEntry(client: ApiClient, requestPath: string, dispatch: DataEntryDispatch) {
-  return async (): Promise<boolean> => {
+  return async (): Promise<DataEntryStatus | undefined> => {
     dispatch({ type: "SET_STATUS", status: "finalising" });
 
-    const response = await client.postRequest(requestPath + "/finalise");
+    const response = await client.postRequest(requestPath);
 
     if (!isSuccess(response)) {
       dispatch({ type: "SET_STATUS", status: "idle" });
       dispatch({ type: "FORM_SAVE_FAILED", error: response });
-      return false;
+      return undefined;
     }
 
     dispatch({ type: "SET_STATUS", status: "finalised" });
-    return true;
+    // TODO: Fix this "as" error
+    return response.data as DataEntryStatus;
   };
 }

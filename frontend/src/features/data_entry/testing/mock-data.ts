@@ -140,7 +140,7 @@ export function getDefaultDataEntryStateAndActionsLoaded(): DataEntryStateAndAct
     dispatch: () => null,
     onSubmitForm: () => Promise.resolve(true),
     onDeleteDataEntry: () => Promise.resolve(true),
-    onFinaliseDataEntry: () => Promise.resolve(true),
+    onFinaliseDataEntry: () => Promise.resolve(undefined),
     register: () => null,
     setCache: () => null,
     updateFormSection: () => null,

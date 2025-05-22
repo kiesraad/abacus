@@ -7,12 +7,12 @@ export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
 export type ELECTION_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
-export type ELECTION_CREATE_REQUEST_BODY = ElectionRequest;
+export type ELECTION_CREATE_REQUEST_BODY = NewElection;
 
 // /api/elections/validate
 export type ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
-export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionRequest;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = NewElection;
 
 // /api/elections/{election_id}
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
@@ -381,7 +381,9 @@ export interface DifferencesCounts {
  */
 export interface Election {
   category: ElectionCategory;
+  domain_id: string;
   election_date: string;
+  election_id: string;
   id: number;
   location: string;
   name: string;
@@ -407,13 +409,15 @@ export interface ElectionApportionmentResponse {
 export type ElectionCategory = "Municipal";
 
 export interface ElectionDefinitionUploadResponse {
-  election: Election;
+  election: NewElection;
   hash: RedactedEmlHash;
 }
 
 export interface ElectionDetails {
   electionCategory: string;
+  electionDomainId: string;
   electionElectionDate: string;
+  electionElectionId: string;
   electionId: number;
   electionLocation: string;
   electionName: string;
@@ -438,21 +442,6 @@ export interface ElectionDetailsResponse {
  */
 export interface ElectionListResponse {
   elections: Election[];
-}
-
-/**
- * Election request
- */
-export interface ElectionRequest {
-  category: ElectionCategory;
-  election_date: string;
-  location: string;
-  name: string;
-  nomination_date: string;
-  number_of_seats: number;
-  number_of_voters: number;
-  political_groups: PoliticalGroup[];
-  status: ElectionStatus;
 }
 
 /**
@@ -534,9 +523,9 @@ export type ErrorReference =
   | "DataEntryAlreadyClaimed"
   | "DataEntryAlreadyFinalised"
   | "DrawingOfLotsRequired"
+  | "EmlImportError"
   | "EntryNotFound"
   | "EntryNotUnique"
-  | "EmlImportError"
   | "InternalServerError"
   | "InvalidData"
   | "InvalidJson"
@@ -552,9 +541,10 @@ export type ErrorReference =
   | "PdfGenerationError"
   | "PollingStationRepeated"
   | "PollingStationValidationErrors"
-  | "UserNotFound"
-  | "UsernameNotUnique"
+  | "RequestPayloadTooLarge"
   | "Unauthorized"
+  | "UsernameNotUnique"
+  | "UserNotFound"
   | "ZeroVotesCast";
 
 /**
@@ -641,6 +631,23 @@ export interface LoginResponse {
   role: Role;
   user_id: number;
   username: string;
+}
+
+/**
+ * Election request
+ */
+export interface NewElection {
+  category: ElectionCategory;
+  domain_id: string;
+  election_date: string;
+  election_id: string;
+  location: string;
+  name: string;
+  nomination_date: string;
+  number_of_seats: number;
+  number_of_voters: number;
+  political_groups: PoliticalGroup[];
+  status: ElectionStatus;
 }
 
 /**

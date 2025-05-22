@@ -68,7 +68,9 @@ async fn test_election_create_works(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "name": "Test Election",
+            "election_id": "TestElection_2026",
             "location": "Test Location",
+            "domain_id": "0000",
             "number_of_voters": 100,
             "category": "Municipal",
             "number_of_seats": 29,
@@ -108,6 +110,58 @@ async fn test_election_create_works(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::CREATED);
     let body: Election = response.json().await.unwrap();
     assert_eq!(body.name, "Test Election");
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[cfg(feature = "dev-database")]
+async fn test_election_create_payload_too_large(pool: SqlitePool) {
+    use abacus::MAX_BODY_SIZE_MB;
+    use reqwest::Body;
+
+    let addr = serve_api(pool).await;
+
+    // Create a payload that is larger than MAX_BODY_SIZE_MB
+    let body = Vec::from_iter((0..MAX_BODY_SIZE_MB * 1024 * 1024 + 1).map(|_| b'a'));
+
+    let url = format!("http://{addr}/api/elections");
+    let admin_cookie = shared::admin_login(&addr).await;
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", admin_cookie)
+        .header("Content-Type", "application/json")
+        .body(Body::from(body))
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::PAYLOAD_TOO_LARGE);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[cfg(feature = "dev-database")]
+async fn test_election_create_payload_not_too_large(pool: SqlitePool) {
+    use abacus::MAX_BODY_SIZE_MB;
+    use reqwest::Body;
+
+    let addr = serve_api(pool).await;
+
+    // Create a MAX_BODY_SIZE_MB payload (should return a 400 instead of a 413)
+    let body = Vec::from_iter((0..MAX_BODY_SIZE_MB * 1024 * 1024).map(|_| b'a'));
+
+    let url = format!("http://{addr}/api/elections");
+    let admin_cookie = shared::admin_login(&addr).await;
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", admin_cookie)
+        .header("Content-Type", "application/json")
+        .body(Body::from(body))
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

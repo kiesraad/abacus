@@ -35,7 +35,7 @@ export function useElectionCheck(data: ElectionDefinitionUploadResponse) {
 
     // Only submit when there a no errors
     if (stubs.every((stub) => stub.error === "")) {
-      void navigate("/elections/create/polling-station-role");
+      void navigate("/elections/create/check-and-save");
     }
   }
 

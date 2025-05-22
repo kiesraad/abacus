@@ -14,7 +14,9 @@ use crate::audit_log::ElectionDetails;
 pub struct Election {
     pub id: u32,
     pub name: String,
+    pub election_id: String,
     pub location: String,
+    pub domain_id: String,
     pub number_of_voters: u32,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
@@ -34,7 +36,9 @@ impl From<Election> for ElectionDetails {
         Self {
             election_id: value.id,
             election_name: value.name,
+            election_election_id: value.election_id,
             election_location: value.location,
+            election_domain_id: value.domain_id,
             election_number_of_voters: value.number_of_voters,
             election_category: value.category.to_string(),
             election_number_of_seats: value.number_of_seats,
@@ -53,9 +57,11 @@ impl IntoResponse for Election {
 
 /// Election request
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
-pub struct ElectionRequest {
+pub struct NewElection {
     pub name: String,
+    pub election_id: String,
     pub location: String,
+    pub domain_id: String,
     pub number_of_voters: u32,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
@@ -176,7 +182,9 @@ pub(crate) mod tests {
         Election {
             id: 1,
             name: "Test".to_string(),
+            election_id: "Test_2023".to_string(),
             location: "Test".to_string(),
+            domain_id: "0000".to_string(),
             number_of_voters: 100,
             category: ElectionCategory::Municipal,
             number_of_seats,

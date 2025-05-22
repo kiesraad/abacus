@@ -1659,7 +1659,9 @@ export const political_group_1: PoliticalGroup = {
 export const election: Election = {
   id: 3,
   name: "Test Election < 19 seats",
+  election_id: "TestLocation_2026",
   location: "Test Location",
+  domain_id: "0000",
   number_of_voters: 2000,
   category: "Municipal",
   number_of_seats: 15,

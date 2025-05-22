@@ -1,11 +1,11 @@
-use chrono::Datelike;
 use serde::{Deserialize, Serialize};
 
 use super::{
     EMLBase,
     common::{
         AffiliationIdentifier, AuthorityAddress, AuthorityIdentifier, ContestIdentifier,
-        ElectionCategory, ElectionIdentifier, ElectionSubcategory, ManagingAuthority,
+        ElectionCategory, ElectionDomain, ElectionIdentifier, ElectionSubcategory,
+        ManagingAuthority,
     },
 };
 use crate::{
@@ -36,7 +36,7 @@ impl EML510 {
         summary: &ElectionSummary,
         creation_date_time: &chrono::DateTime<chrono::Local>,
     ) -> EML510 {
-        let authority_id = "0000".to_string(); // TODO: replace with actual authority id from election definition (i.e. data from election tree)
+        let authority_id = election.domain_id.clone(); // TODO: replace with election tree when that is available
         let total_votes = TotalVotes::from_summary(election, summary);
         let reporting_unit_votes = results
             .iter()
@@ -45,24 +45,20 @@ impl EML510 {
             })
             .collect();
         let contest = Contest {
-            contest_identifier: ContestIdentifier::new(
-                election.id.to_string(),     // TODO: set contest id from election definition
-                Some(election.name.clone()), // TODO: set contest name in contest id from election definition (optional value)
-            ),
+            contest_identifier: ContestIdentifier::new("geen".to_string(), None),
             total_votes,
             reporting_unit_votes,
         };
         let election_eml = Election {
             election_identifier: ElectionIdentifier {
-                id: format!(
-                    "{}{}",
-                    election.category.to_eml_code(),
-                    election.election_date.year()
-                ), // TODO: set election id from election definition instead of this generated id
+                id: election.election_id.clone(),
                 election_name: election.name.clone(),
                 election_category: ElectionCategory::from(election.category),
                 election_subcategory: election_subcategory(election),
-                election_domain: None, // TODO: set election domain from election definition
+                election_domain: Some(ElectionDomain {
+                    id: election.domain_id.clone(),
+                    name: election.location.clone(),
+                }),
                 election_date: election.election_date.format("%Y-%m-%d").to_string(),
                 nomination_date: None,
             },

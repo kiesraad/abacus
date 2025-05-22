@@ -9,14 +9,13 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{ElectionRequest, repository::Elections, structs::Election};
+use super::{NewElection, repository::Elections, structs::Election};
 #[cfg(feature = "dev-database")]
 use crate::audit_log::{AuditEvent, AuditService};
-use crate::{APIError, eml::EMLImportError};
 use crate::{
-    AppState, ErrorResponse,
+    APIError, AppState, ErrorResponse,
     authentication::{Admin, User},
-    eml::{EML110, EMLDocument, RedactedEmlHash},
+    eml::{EML110, EMLDocument, EMLImportError, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},
 };
 
@@ -97,7 +96,7 @@ pub async fn election_details(
 #[utoipa::path(
     post,
     path = "/api/elections",
-    request_body = ElectionRequest,
+    request_body = NewElection,
     responses(
         (status = 201, description = "Election created", body = Election),
         (status = 400, description = "Bad request", body = ErrorResponse),
@@ -110,7 +109,7 @@ pub async fn election_create(
     _user: Admin,
     State(elections_repo): State<Elections>,
     audit_service: AuditService,
-    Json(new_election): Json<ElectionRequest>,
+    Json(new_election): Json<NewElection>,
 ) -> Result<(StatusCode, Election), APIError> {
     let election = elections_repo.create(new_election).await?;
 
@@ -129,7 +128,7 @@ pub struct ElectionDefinitionUploadRequest {
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct ElectionDefinitionUploadResponse {
     hash: RedactedEmlHash,
-    election: Election,
+    election: NewElection,
 }
 
 /// Uploads election definition, validates it and returns the associated election data and
@@ -137,7 +136,7 @@ pub struct ElectionDefinitionUploadResponse {
 #[utoipa::path(
     post,
     path = "/api/elections/validate",
-    request_body = ElectionRequest,
+    request_body = NewElection,
     responses(
         (status = 201, description = "Election validated", body = ElectionDefinitionUploadResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
@@ -152,7 +151,7 @@ pub async fn election_import_validate(
     let eml = EML110::from_str(&edu.data)?;
     Ok(Json(ElectionDefinitionUploadResponse {
         hash: RedactedEmlHash::from(edu.data.as_bytes()),
-        election: eml.as_crate_election()?,
+        election: eml.as_abacus_election()?,
     }))
 }
 

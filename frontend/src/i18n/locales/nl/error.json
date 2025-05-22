@@ -37,6 +37,7 @@
     "PdfGenerationError": "Er is een fout opgetreden bij het genereren van de PDF",
     "PollingStationRepeated": "Het stembureau is al ingevoerd",
     "PollingStationValidationErrors": "Er zijn fouten opgetreden bij het valideren van het stembureau",
+    "RequestPayloadTooLarge": "Het bestand is groter dan toegestaan",
     "Unauthorized": "Je hebt geen toestemming om deze actie uit te voeren",
     "UserNotFound": "De gebruiker is niet gevonden",
     "UsernameNotUnique": "De gebruikersnaam is al in gebruik",

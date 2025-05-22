@@ -2,7 +2,12 @@ use std::{error::Error, net::SocketAddr};
 
 #[cfg(feature = "memory-serve")]
 use axum::http::StatusCode;
-use axum::{Router, extract::FromRef, middleware, serve::ListenerExt};
+use axum::{
+    Router,
+    extract::{DefaultBodyLimit, FromRef},
+    middleware,
+    serve::ListenerExt,
+};
 use hyper::http::{HeaderName, HeaderValue, header};
 use sqlx::SqlitePool;
 use tokio::{net::TcpListener, signal};
@@ -31,6 +36,9 @@ pub mod report;
 pub mod summary;
 
 pub use error::{APIError, ErrorResponse};
+
+/// Maximum size of the request body in megabytes.
+pub const MAX_BODY_SIZE_MB: usize = 12;
 
 #[derive(FromRef, Clone)]
 pub struct AppState {
@@ -69,6 +77,8 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     // Add middleware to trace all HTTP requests and extend the user's session lifetime if needed
     // Caution: make sure "inject_user" is added after "extend_session"
     let router = router
+        .layer(middleware::map_response(error::map_error_response))
+        .layer(DefaultBodyLimit::max(1024 * 1024 * MAX_BODY_SIZE_MB))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))

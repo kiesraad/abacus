@@ -706,7 +706,9 @@ mod tests {
         Election {
             id: 1,
             name: "Test election".to_string(),
+            election_id: "Test_2025".to_string(),
             location: "Test location".to_string(),
+            domain_id: "0000".to_string(),
             number_of_voters: 100,
             category: ElectionCategory::Municipal,
             number_of_seats: 18,

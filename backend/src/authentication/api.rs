@@ -459,3 +459,23 @@ async fn user_delete(
         ))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use cookie::{Cookie, SameSite};
+    use test_log::test;
+
+    use crate::authentication::{SECURE_COOKIES, api::set_default_cookie_properties};
+
+    #[test(sqlx::test)]
+    async fn test_set_default_cookie_properties() {
+        let mut cookie = Cookie::new("test-cookie", "");
+
+        set_default_cookie_properties(&mut cookie);
+
+        assert_eq!(cookie.path().unwrap(), "/");
+        assert!(cookie.http_only().unwrap());
+        assert_eq!(cookie.secure().unwrap(), SECURE_COOKIES);
+        assert_eq!(cookie.same_site().unwrap(), SameSite::Strict);
+    }
+}

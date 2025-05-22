@@ -4,7 +4,7 @@ import {
   fillDataEntryPages,
   fillDataEntryPagesAndSave,
   selectPollingStationForDataEntry,
-} from "e2e-tests/helpers-utils/e2e-test-helpers";
+} from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
 import { formatNumber } from "e2e-tests/helpers-utils/e2e-test-utils";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";

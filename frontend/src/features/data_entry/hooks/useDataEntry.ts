@@ -4,6 +4,8 @@ import { useApiClient } from "@/api/useApiClient";
 import {
   Election,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
 } from "@/types/generated/openapi";
 
@@ -30,6 +32,8 @@ export default function useDataEntry(
 
   // initial request to get the current data entry from the backend
   const saveRequestPath: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const deleteRequestPath: POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const finaliseRequestPath: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}/finalise`;
   const claimRequestPath: POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH = `${saveRequestPath}/claim`;
   useInitialDataEntryState(client, dispatch, election, saveRequestPath, claimRequestPath);
 
@@ -40,8 +44,8 @@ export default function useDataEntry(
     ...state,
     dispatch,
     onSubmitForm: onSubmitForm(client, saveRequestPath, dispatch, state),
-    onDeleteDataEntry: onDeleteDataEntry(client, saveRequestPath, dispatch),
-    onFinaliseDataEntry: onFinaliseDataEntry(client, saveRequestPath, dispatch),
+    onDeleteDataEntry: onDeleteDataEntry(client, deleteRequestPath, dispatch),
+    onFinaliseDataEntry: onFinaliseDataEntry(client, finaliseRequestPath, dispatch),
     register: registerForm(dispatch),
     setCache: setCache(dispatch),
     updateFormSection: updateFormSection(dispatch),

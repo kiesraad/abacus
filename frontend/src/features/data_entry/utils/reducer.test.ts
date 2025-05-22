@@ -2,13 +2,18 @@ import { describe, expect, test, vi } from "vitest";
 
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResponseStatus } from "@/api/ApiResult";
+import { secondEntryNotStartedStatus } from "@/testing/api-mocks/DataEntryMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { Election, PollingStationResults } from "@/types/generated/openapi";
+import {
+  Election,
+  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
+  PollingStationResults,
+} from "@/types/generated/openapi";
 
 import { errorWarningMocks, getDefaultDataEntryState } from "../testing/mock-data";
 import { DataEntryAction, DataEntryState } from "../types/types";
@@ -338,8 +343,9 @@ describe("onFinaliseDataEntry", () => {
     const dispatch = vi.fn();
     const client = new ApiClient();
 
-    const requestPath = "/api/polling_stations/1/data_entries/1";
-    const onFinalise = onFinaliseDataEntry(client, requestPath, dispatch);
+    const finaliseUrl: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
+      "/api/polling_stations/1/data_entries/1/finalise";
+    const onFinalise = onFinaliseDataEntry(client, finaliseUrl, dispatch);
 
     const result = await onFinalise();
 
@@ -351,6 +357,6 @@ describe("onFinaliseDataEntry", () => {
       { type: "SET_STATUS", status: "finalised" } satisfies DataEntryAction,
     ]);
 
-    expect(result).toBe(true);
+    expect(result).toStrictEqual(secondEntryNotStartedStatus);
   });
 });

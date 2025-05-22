@@ -1,7 +1,13 @@
 import { Dispatch } from "react";
 
 import { AnyApiError } from "@/api/ApiResult";
-import { ClaimDataEntryResponse, Election, PollingStationResults, ValidationResults } from "@/types/generated/openapi";
+import {
+  ClaimDataEntryResponse,
+  DataEntryStatus,
+  Election,
+  PollingStationResults,
+  ValidationResults,
+} from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { ValidationResultSet } from "../utils/ValidationResults";
@@ -30,7 +36,7 @@ export interface DataEntryStateAndActions extends DataEntryState {
   dispatch: DataEntryDispatch;
   onSubmitForm: (data: Partial<PollingStationResults>, options?: SubmitCurrentFormOptions) => Promise<boolean>;
   onDeleteDataEntry: () => Promise<boolean>;
-  onFinaliseDataEntry: () => Promise<boolean>;
+  onFinaliseDataEntry: () => Promise<DataEntryStatus | undefined>;
   register: (formSectionId: FormSectionId) => void;
   setCache: (cache: TemporaryCache) => void;
   updateFormSection: (partialFormSection: Partial<FormSection>) => void;

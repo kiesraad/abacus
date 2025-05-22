@@ -24,7 +24,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+    await expect(dataEntryHomePage.dataEntryWarning).toContainText(
       `Je kan stembureau ${pollingStation.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
@@ -43,7 +43,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+    await expect(dataEntryHomePage.dataEntryWarning).toContainText(
       `Je kan stembureau ${pollingStationFirstEntryDone.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
@@ -60,7 +60,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+    await expect(dataEntryHomePage.dataEntryWarning).toContainText(
       `Je kan stembureau ${pollingStationDefinitive.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
@@ -77,7 +77,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+    await expect(dataEntryHomePage.dataEntryWarning).toContainText(
       `Je kan stembureau ${pollingStation.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("Er is een ongeldige actie uitgevoerd");

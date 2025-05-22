@@ -54,8 +54,15 @@ export function CheckAndSaveForm() {
       return false;
     }
 
-    if (await onFinaliseDataEntry()) {
-      await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
+    const dataEntryStatus = await onFinaliseDataEntry();
+    if (dataEntryStatus !== undefined) {
+      if (dataEntryStatus.status === "EntriesDifferent") {
+        await navigate(`/elections/${election.id}/data-entry#data-entry-different`);
+      } else if (dataEntryStatus.status === "FirstEntryHasErrors") {
+        await navigate(`/elections/${election.id}/data-entry#data-entry-errors`);
+      } else {
+        await navigate(`/elections/${election.id}/data-entry#data-entry-${entryNumber}-saved`);
+      }
       return true;
     }
 

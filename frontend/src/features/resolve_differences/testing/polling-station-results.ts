@@ -39,9 +39,9 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
     political_group_votes: [
       {
         number: 1,
-        total: first ? 512 : 481,
+        total: first ? 1512 : 1481,
         candidate_votes: [
-          { number: 1, votes: 256 },
+          { number: 1, votes: first ? 1256 : 1258 },
           { number: 2, votes: 128 },
           { number: 3, votes: first ? 65 : 63 },
           { number: 4, votes: first ? 26 : 28 },
@@ -54,7 +54,7 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
           { number: 9, votes: 0 },
           { number: 10, votes: first ? 4 : 0 },
           { number: 11, votes: first ? 2 : 4 },
-          { number: 12, votes: first ? 0 : 2 },
+          { number: 12, votes: 0 },
         ],
       },
       {

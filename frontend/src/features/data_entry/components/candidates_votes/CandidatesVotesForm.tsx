@@ -11,7 +11,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { PoliticalGroup } from "@/types/generated/openapi";
 import { KeyboardKey } from "@/types/ui";
 import { getCandidateFullName } from "@/utils/candidate";
@@ -152,7 +152,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
               onChange={(e) => {
                 setAcceptWarnings(e.target.checked);
               }}
-              label={t("candidates_votes.confirm_counts")}
+              label={t("data_entry.form_accept_warnings")}
             />
           </BottomBar.Row>
         )}

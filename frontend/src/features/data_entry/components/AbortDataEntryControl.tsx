@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 
 import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 export function AbortDataEntryControl() {
   const navigate = useNavigate();

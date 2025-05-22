@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { UpdateUserRequest, User, USER_UPDATE_REQUEST_PATH } from "@/types/generated/openapi";
 
 export interface UserUpdateFormProps {
@@ -37,6 +37,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
     const errors: ValidationErrors = {};
 
     if (user.fullname) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       userUpdate.fullname = (formData.get("fullname") as string).trim();
       if (userUpdate.fullname.length === 0) {
         errors.fullname = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
@@ -44,6 +45,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
     }
 
     if (editPassword) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       userUpdate.temp_password = formData.get("temp_password") as string;
       if (userUpdate.temp_password.length === 0) {
         errors.temp_password = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");

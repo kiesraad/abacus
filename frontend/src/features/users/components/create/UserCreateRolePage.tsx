@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { Role } from "@/types/generated/openapi";
 
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
@@ -19,6 +19,7 @@ export function UserCreateRolePage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const roleValue = formData.get("role") as Role | null;
 
     if (!roleValue) {
@@ -50,7 +51,7 @@ export function UserCreateRolePage() {
             <FormLayout.Section>
               <ChoiceList>
                 <ChoiceList.Title>{t("users.role_title")}</ChoiceList.Title>
-                {error && <ChoiceList.Error>{error}</ChoiceList.Error>}
+                {error && <ChoiceList.Error id="role-error">{error}</ChoiceList.Error>}
                 <ChoiceList.Radio
                   id={"role-administrator"}
                   name={"role"}

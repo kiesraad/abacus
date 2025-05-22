@@ -1,0 +1,37 @@
+.container {
+  width: 29rem;
+}
+
+.hash {
+  width: 25rem;
+  margin-top: 0.25rem;
+  font-family: var(--font-number);
+  font-size: var(--font-size-md);
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
+  align-items: flex-start;
+}
+
+.chunk {
+  min-width: 2.5rem;
+}
+
+.stub {
+  font-weight: 700;
+  color: var(--base-white);
+  background-color: var(--gray-600);
+  text-align: center;
+}
+
+.delimiter {
+  color: var(--gray-400);
+}
+
+.stubFocus {
+  background-color: var(--interactive-default);
+}
+
+.error {
+  background-color: var(--red-600);
+}

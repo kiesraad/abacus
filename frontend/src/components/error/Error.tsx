@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 
 import { IconArrowLeft } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { isDevelopment } from "@/utils/env";
 
 import cls from "./Error.module.css";

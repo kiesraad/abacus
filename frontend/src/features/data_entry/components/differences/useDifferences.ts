@@ -7,7 +7,8 @@ export function useDifferences() {
     section: "differences_counts",
     getDefaultFormValues: (results, cache) =>
       cache?.key === "differences_counts"
-        ? valuesToFormValues(cache.data as DifferencesValues)
+        ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          valuesToFormValues(cache.data as DifferencesValues)
         : valuesToFormValues(results.differences_counts),
   });
 

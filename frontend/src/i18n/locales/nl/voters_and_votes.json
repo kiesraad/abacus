@@ -1,0 +1,16 @@
+{
+  "admitted_voters_after_recount": "Toegelaten kiezers na hertelling door Gemeentelijk Stembureau",
+  "blank_votes_count": "Blanco stemmen",
+  "form_title": "Toegelaten kiezers en uitgebrachte stemmen",
+  "invalid_votes_count": "Ongeldige stemmen",
+  "poll_card_count": "Stempassen",
+  "poll_card_recount": "Stempassen",
+  "proxy_certificate_count": "Volmachtbewijzen",
+  "proxy_certificate_recount": "Volmachtbewijzen",
+  "total_admitted_voters_count": "Totaal toegelaten kiezers",
+  "total_admitted_voters_recount": "Totaal toegelaten kiezers",
+  "total_votes_cast_count": "Totaal uitgebrachte stemmen",
+  "voter_card_count": "Kiezerspassen",
+  "voter_card_recount": "Kiezerspassen",
+  "votes_candidates_count": "Stemmen op kandidaten"
+}

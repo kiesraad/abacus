@@ -1,7 +1,8 @@
 import { Fragment } from "react";
 
 import { Modal } from "@/components/ui/Modal/Modal";
-import { hasTranslation, t, TranslationPath } from "@/lib/i18n";
+import { TranslationPath } from "@/i18n/i18n.types";
+import { hasTranslation, t } from "@/i18n/translate";
 import { AuditLogEvent } from "@/types/generated/openapi";
 import { formatDateTimeFull } from "@/utils/format";
 
@@ -20,6 +21,7 @@ function formatValue(key: string, value: string) {
     return value || "-";
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   return t(`${SHOULD_TRANSLATE[key]}${value}` as TranslationPath);
 }
 
@@ -63,7 +65,12 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
             <dl className={cls.details} role="list">
               {filteredDetails.map(([key, value]: [string, string]) => (
                 <Fragment key={key}>
-                  <dt>{t(`log.field.${key}` as TranslationPath)}</dt>
+                  <dt>
+                    {
+                      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+                      t(`log.field.${key}` as TranslationPath)
+                    }
+                  </dt>
                   <dd>{formatValue(key, value)}</dd>
                 </Fragment>
               ))}

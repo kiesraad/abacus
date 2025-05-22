@@ -7,7 +7,7 @@ import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
 import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { useElectionList } from "@/hooks/election/useElectionList";
 import { useUserRole } from "@/hooks/user/useUserRole";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 function TypistLinks() {
   const { electionList } = useElectionList();
@@ -95,30 +95,50 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("admin", "AdminPassword01");
+              void login("admin1", "Admin1Password01");
             }}
           >
-            {t("administrator")}
+            {t("administrator")} 1
           </Link>
         </li>
         <li>
           <Link
             to="/dev"
             onClick={() => {
-              void login("coordinator", "CoordinatorPassword01");
+              void login("admin2", "Admin2Password01");
             }}
           >
-            {t("coordinator")}
+            {t("administrator")} 2
           </Link>
         </li>
         <li>
           <Link
             to="/dev"
             onClick={() => {
-              void login("typist", "TypistPassword01");
+              void login("coordinator1", "Coordinator1Password01");
             }}
           >
-            {t("typist")}
+            {t("coordinator")} 1
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("coordinator2", "Coordinator2Password01");
+            }}
+          >
+            {t("coordinator")} 2
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("typist1", "Typist1Password01");
+            }}
+          >
+            {t("typist")} 1
           </Link>
         </li>
         <li>

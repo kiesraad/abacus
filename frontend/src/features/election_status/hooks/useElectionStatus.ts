@@ -78,6 +78,7 @@ export function useElectionStatus(
 ): ElectionStatusData {
   const categoryCounts: Record<StatusCategory, number> = useMemo(
     () =>
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       Object.fromEntries(statusCategories.map((cat) => [cat, statusCount(statuses, cat)])) as Record<
         StatusCategory,
         number

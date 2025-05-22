@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useRef } from "react";
 
 import { IconCross } from "@/components/generated/icons";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 import { IconButton } from "../IconButton/IconButton";
 import cls from "./Modal.module.css";
@@ -29,6 +29,7 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
   // open the modal when the component is mounted and focus on the title element
   useEffect(() => {
     if (dialogRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       lastActiveElement.current = document.activeElement as HTMLElement;
       dialogRef.current.showModal();
       document.getElementById("modal-title")?.focus();

@@ -1,6 +1,7 @@
 import fs from "fs";
 
-import { translations } from "@/lib/i18n";
+// eslint-disable-next-line import/no-unresolved -- the @ alias is resolved by Vite, which ESLint doesn't know about
+import { translations } from "@/i18n/i18n";
 
 // create a translations directory if none exists
 if (!fs.existsSync("./translations")) {
@@ -46,4 +47,5 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\\n"\n\n`;
 
   fs.writeFileSync(`./translations/${locale}.po`, `${poHeader}${po}`);
+  console.log(`Wrote ${Object.keys(flatTranslations).length} entries to ./translations/${locale}.po`);
 });

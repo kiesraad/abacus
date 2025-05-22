@@ -288,7 +288,9 @@ describe("Test CandidatesVotesForm", () => {
       const electionMockData: Required<Election> = {
         id: 1,
         name: "Gemeenteraadsverkiezingen 2026",
+        election_id: "Heemdamseburg_2024",
         location: "Heemdamseburg",
+        domain_id: "0000",
         number_of_voters: 100,
         category: "Municipal",
         number_of_seats: 29,
@@ -572,7 +574,7 @@ describe("Test CandidatesVotesForm", () => {
       await user.click(submitButton);
 
       acceptWarningsCheckbox = await screen.findByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
     });
 

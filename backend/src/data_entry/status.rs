@@ -5,9 +5,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
-use super::{
-    DataError, PollingStationResults, ValidationResults, validate_polling_station_results,
-};
+use super::{DataError, PollingStationResults, ValidationResults, validate_data_entry_status};
 use crate::{election::Election, polling_station::PollingStation};
 
 #[derive(Debug, PartialEq, Eq)]
@@ -294,17 +292,14 @@ impl DataEntryStatus {
         election: &Election,
         user_id: u32,
     ) -> Result<Self, DataEntryTransitionError> {
-        match self {
+        match &self {
             DataEntryStatus::FirstEntryInProgress(state) => {
                 if state.first_entry_user_id != user_id {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
-                let validation_results = validate_polling_station_results(
-                    &state.first_entry,
-                    polling_station,
-                    election,
-                )?;
+                let validation_results =
+                    validate_data_entry_status(&self, polling_station, election)?;
 
                 if validation_results.has_errors() {
                     return Err(validation_results.into());
@@ -312,7 +307,7 @@ impl DataEntryStatus {
 
                 Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
                     first_entry_user_id: state.first_entry_user_id,
-                    finalised_first_entry: state.first_entry,
+                    finalised_first_entry: state.first_entry.clone(),
                     first_entry_finished_at: Utc::now(),
                 }))
             }
@@ -335,17 +330,14 @@ impl DataEntryStatus {
         election: &Election,
         user_id: u32,
     ) -> Result<(Self, Option<PollingStationResults>), DataEntryTransitionError> {
-        match self {
+        match &self {
             DataEntryStatus::SecondEntryInProgress(state) => {
                 if state.second_entry_user_id != user_id {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
-                let validation_results = validate_polling_station_results(
-                    &state.second_entry,
-                    polling_station,
-                    election,
-                )?;
+                let validation_results =
+                    validate_data_entry_status(&self, polling_station, election)?;
 
                 if validation_results.has_errors() {
                     return Err(validation_results.into());
@@ -358,15 +350,15 @@ impl DataEntryStatus {
                             second_entry_user_id: state.second_entry_user_id,
                             finished_at: Utc::now(),
                         }),
-                        Some(state.second_entry),
+                        Some(state.second_entry.clone()),
                     ))
                 } else {
                     Ok((
                         Self::EntriesDifferent(EntriesDifferent {
                             first_entry_user_id: state.first_entry_user_id,
                             second_entry_user_id: state.second_entry_user_id,
-                            first_entry: state.finalised_first_entry,
-                            second_entry: state.second_entry,
+                            first_entry: state.finalised_first_entry.clone(),
+                            second_entry: state.second_entry.clone(),
                             first_entry_finished_at: state.first_entry_finished_at,
                             second_entry_finished_at: Utc::now(),
                         }),
@@ -679,7 +671,9 @@ mod tests {
         Election {
             id: 1,
             name: "Test election".to_string(),
+            election_id: "Test_2025".to_string(),
             location: "Test location".to_string(),
+            domain_id: "0000".to_string(),
             number_of_voters: 100,
             category: ElectionCategory::Municipal,
             number_of_seats: 18,
@@ -1064,7 +1058,29 @@ mod tests {
     fn second_entry_in_progress_finalise_not_equal() {
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
             first_entry_user_id: 0,
-            finalised_first_entry: polling_station_result(),
+            finalised_first_entry: PollingStationResults {
+                voters_counts: VotersCounts {
+                    poll_card_count: 1,
+                    proxy_certificate_count: 0,
+                    voter_card_count: 0,
+                    total_admitted_voters_count: 1,
+                },
+                votes_counts: VotesCounts {
+                    votes_candidates_count: 0,
+                    blank_votes_count: 1,
+                    invalid_votes_count: 0,
+                    total_votes_cast_count: 1,
+                },
+                political_group_votes: vec![PoliticalGroupVotes {
+                    number: 1,
+                    total: 0,
+                    candidate_votes: vec![CandidateVotes {
+                        number: 1,
+                        votes: 0,
+                    }],
+                }],
+                ..polling_station_result()
+            },
             first_entry_finished_at: Utc::now(),
             progress: 0,
             second_entry_user_id: 0,

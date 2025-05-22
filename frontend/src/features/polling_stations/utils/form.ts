@@ -53,7 +53,9 @@ export function processForm<RequestObject>(
   fields: FormFields<RequestObject>,
   elements: { [key in keyof RequestObject]: HTMLInputElement },
 ): { requestObject: RequestObject; validationResult: ValidationResult<RequestObject>; isValid: boolean } {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const requestObject: RequestObject = {} as RequestObject;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const validationResult: ValidationResult<RequestObject> = {} as ValidationResult<RequestObject>;
 
   for (const fieldName in fields) {
@@ -95,6 +97,7 @@ export function processForm<RequestObject>(
     if (error) {
       validationResult[fieldName] = error;
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       requestObject[fieldName] = value as RequestObject[typeof fieldName];
     }
   }

@@ -1,11 +1,9 @@
 use axum::extract::FromRef;
-#[cfg(feature = "dev-database")]
 use sqlx::types::Json;
 use sqlx::{Error, SqlitePool, query_as};
 
 use super::Election;
-#[cfg(feature = "dev-database")]
-use super::ElectionRequest;
+use super::NewElection;
 use crate::AppState;
 
 pub struct Elections(SqlitePool);
@@ -18,7 +16,7 @@ impl Elections {
 
     pub async fn list(&self) -> Result<Vec<Election>, Error> {
         let elections: Vec<Election> = query_as(
-            "SELECT id, name, location, number_of_voters, category, number_of_seats, election_date, nomination_date, status FROM elections",
+            "SELECT id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date, status FROM elections",
         )
         .fetch_all(&self.0)
         .await?;
@@ -33,13 +31,14 @@ impl Elections {
         Ok(election)
     }
 
-    #[cfg(feature = "dev-database")]
-    pub async fn create(&self, election: ElectionRequest) -> Result<Election, Error> {
+    pub async fn create(&self, election: NewElection) -> Result<Election, Error> {
         query_as(
             r#"
             INSERT INTO elections (
               name,
+              election_id,
               location,
+              domain_id,
               number_of_voters,
               category,
               number_of_seats,
@@ -47,11 +46,13 @@ impl Elections {
               nomination_date,
               status,
               political_groups
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
               id,
               name,
+              election_id,
               location,
+              domain_id,
               number_of_voters,
               category,
               number_of_seats,
@@ -62,7 +63,9 @@ impl Elections {
             "#,
         )
         .bind(election.name)
+        .bind(election.election_id)
         .bind(election.location)
+        .bind(election.domain_id)
         .bind(election.number_of_voters)
         .bind(election.category)
         .bind(election.number_of_seats)

@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 
 import { IconPencil } from "@/components/generated/icons";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { type DataEntryStatusName } from "@/types/generated/openapi";
 
 import { Icon } from "../Icon/Icon";

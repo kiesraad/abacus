@@ -4,7 +4,7 @@ import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 
 export function ElectionHomePage() {
   const { isTypist } = useUserRole();

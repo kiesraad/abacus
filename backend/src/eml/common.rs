@@ -160,6 +160,8 @@ pub enum EMLImportError {
     MissingPreferenceThreshold,
     MissingRegion,
     MissingSubcategory,
+    MissingElectionTree,
+    MissingElectionDomain,
     Needs101a,
     NumberOfSeatsNotInRange,
     OnlyMunicipalSupported,

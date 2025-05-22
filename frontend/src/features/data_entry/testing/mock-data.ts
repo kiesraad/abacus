@@ -1,5 +1,6 @@
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
+  LoginResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationResults,
   ValidationResult,
@@ -7,7 +8,7 @@ import {
 } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
-import { DataEntryState, FormSection } from "../types/types";
+import { DataEntryState, DataEntryStateAndActionsLoaded, FormSection } from "../types/types";
 import { ValidationResultSet } from "../utils/ValidationResults";
 
 export function getInitialValues(): PollingStationResults {
@@ -124,6 +125,29 @@ export function getEmptyDataEntryRequest(): POLLING_STATION_DATA_ENTRY_SAVE_REQU
   };
 }
 
+export function getTypistUser(): LoginResponse {
+  return {
+    needs_password_change: false,
+    role: "typist",
+    user_id: 1,
+    username: "testuser",
+  };
+}
+
+export function getDefaultDataEntryStateAndActionsLoaded(): DataEntryStateAndActionsLoaded {
+  return {
+    ...getDefaultDataEntryState(),
+    dispatch: () => null,
+    onSubmitForm: () => Promise.resolve(true),
+    onDeleteDataEntry: () => Promise.resolve(true),
+    onFinaliseDataEntry: () => Promise.resolve(true),
+    register: () => null,
+    setCache: () => null,
+    updateFormSection: () => null,
+    pollingStationResults: getInitialValues(),
+  };
+}
+
 type ErrorWarningsMap<Code extends ValidationResultCode> = {
   [C in Code]: ValidationResult & { code: C };
 };
@@ -177,6 +201,7 @@ export const errorWarningMocks: ErrorWarningsMap<ValidationResultCode> = {
     code: "F305",
   },
   F401: { fields: ["data.political_group_votes[0]"], code: "F401" },
+  W001: { fields: ["data.recounted"], code: "W001" },
   W201: { fields: ["data.votes_counts.blank_votes_count"], code: "W201" },
   W202: { fields: ["data.voters_counts.invalid_votes_count"], code: "W202" },
   W203: {

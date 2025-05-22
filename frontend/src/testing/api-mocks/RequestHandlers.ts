@@ -250,6 +250,7 @@ export const handlers: HttpHandler[] = [
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
+  PollingStationDataEntryStatusHandler,
   PollingStationCreateHandler,
   PollingStationDeleteHandler,
   PollingStationGetHandler,

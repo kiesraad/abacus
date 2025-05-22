@@ -8,7 +8,7 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { PollingStation, PollingStationRequest } from "@/types/generated/openapi";
 
 import { useForm } from "../hooks/useForm";
@@ -138,7 +138,9 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               <ChoiceList>
                 <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
                 {validationResult.polling_station_type && (
-                  <ChoiceList.Error>{t(`form_errors.${validationResult.polling_station_type}`)}</ChoiceList.Error>
+                  <ChoiceList.Error id="polling-station-type-error">
+                    {t(`form_errors.${validationResult.polling_station_type}`)}
+                  </ChoiceList.Error>
                 )}
                 <ChoiceList.Radio
                   id={`polling_station_type-FixedLocation`}

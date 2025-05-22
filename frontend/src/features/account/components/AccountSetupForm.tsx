@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { ACCOUNT_UPDATE_REQUEST_PATH, AccountUpdateRequest, LoginResponse } from "@/types/generated/openapi";
 
 type ValidationErrors = {
@@ -41,10 +41,13 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
     const formData = new FormData(event.currentTarget);
     const account: Required<AccountUpdateRequest> = {
       username: user.username,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       fullname: (formData.get("fullname") as string).trim(),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       password: formData.get("password") as string,
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     if (!validate(account, formData.get("password_repeat") as string)) {
       return;
     }

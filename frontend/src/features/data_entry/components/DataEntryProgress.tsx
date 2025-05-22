@@ -4,8 +4,7 @@ import { Link } from "react-router";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/lib/i18n";
-import { FormSectionId } from "@/types/types";
+import { t } from "@/i18n/translate";
 import { MenuStatus } from "@/types/ui";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
@@ -106,8 +105,8 @@ export function DataEntryProgress() {
 
       <ProgressList.Scroll>
         {lists.map((list, index) => {
-          const listId = `${index + 1}`;
-          const formSection = formState.sections[`political_group_votes_${listId}` as FormSectionId];
+          const listId = index + 1;
+          const formSection = formState.sections[`political_group_votes_${listId}`];
           if (!formSection) return null;
           return (
             <ProgressList.Item

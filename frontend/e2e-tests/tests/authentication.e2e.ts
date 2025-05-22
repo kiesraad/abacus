@@ -10,8 +10,8 @@ test.describe("authentication", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.username.fill("admin");
-    await loginPage.password.fill("AdminPassword01");
+    await loginPage.username.fill("admin1");
+    await loginPage.password.fill("Admin1Password01");
     await loginPage.loginBtn.click();
 
     await page.waitForURL("/elections");
@@ -31,9 +31,9 @@ test.describe("authentication", () => {
     await expect(loginPage.alert).toContainText("De gebruikersnaam of het wachtwoord is onjuist");
   });
 
-  test("first login", async ({ user, page }) => {
+  test("first login", async ({ newTypist, page }) => {
     // Login as a newly created user
-    const username = user.username;
+    const username = newTypist.username;
 
     const loginPage = new LoginPgObj(page);
     await page.goto("/account/login");
@@ -44,14 +44,14 @@ test.describe("authentication", () => {
     // Fill out the account setup page
     const password = "Sterk wachtwoord";
     const accountSetupPage = new AccountSetupPgObj(page);
-    await accountSetupPage.fullname.fill(user.fullname!);
+    await accountSetupPage.fullname.fill(newTypist.fullname!);
     await accountSetupPage.password.fill(password);
     await accountSetupPage.passwordRepeat.fill(password);
     await accountSetupPage.nextBtn.click();
-    await expect(accountSetupPage.navBar.username).toHaveText(user.fullname!);
+    await expect(accountSetupPage.navBar.username).toHaveText(newTypist.fullname!);
 
     const overviewPage = new OverviewPgObj(page);
-    await expect(overviewPage.navBar.username).toHaveText(user.fullname!);
+    await expect(overviewPage.navBar.username).toHaveText(newTypist.fullname!);
     await expect(overviewPage.alert).toBeVisible();
   });
 });

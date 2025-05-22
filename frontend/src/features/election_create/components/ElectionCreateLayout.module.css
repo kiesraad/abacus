@@ -1,0 +1,7 @@
+.container {
+  width: 32rem;
+
+  p {
+    font-size: var(--font-size-md);
+  }
+}

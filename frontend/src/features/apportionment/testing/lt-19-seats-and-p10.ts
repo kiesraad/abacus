@@ -839,7 +839,9 @@ export const election_summary: ElectionSummary = {
 export const election: Election = {
   id: 6,
   name: "Test Election < 19 seats & List Exhaustion",
+  election_id: "TestLocation_2026",
   location: "Test Location",
+  domain_id: "0000",
   number_of_voters: 100,
   category: "Municipal",
   number_of_seats: 6,

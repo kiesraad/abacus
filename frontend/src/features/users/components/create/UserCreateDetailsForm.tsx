@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { CreateUserRequest, Role, User, USER_CREATE_REQUEST_PATH } from "@/types/generated/openapi";
 
 export interface UserCreateDetailsFormProps {
@@ -37,8 +37,11 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
 
     const user: CreateUserRequest = {
       role: role,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       username: (formData.get("username") as string).trim(),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       fullname: (formData.get("fullname") as string | undefined)?.trim(),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       temp_password: (formData.get("temp_password") as string).trim(),
     };
 

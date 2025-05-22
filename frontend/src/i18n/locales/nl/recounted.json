@@ -1,0 +1,7 @@
+{
+  "error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+  "form_title": "Is het selectievakje op de eerste pagina aangevinkt?",
+  "message": "Was er een onverklaard verschil tussen het aantal toegelaten kiezers en het aantal uitgebrachte stemmen? Is er op basis daarvan herteld door het Gemeentelijk Stembureau? Dan is het selectievakje op de eerste pagina van het papieren formulier aangevinkt.",
+  "recounted_yes": "Ja, er was een hertelling",
+  "recounted_no": "Nee, er was geen hertelling"
+}

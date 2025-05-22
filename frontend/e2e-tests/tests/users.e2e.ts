@@ -70,12 +70,12 @@ test.describe("Users", () => {
     await expect(userListPgObj.table).toContainText(username);
   });
 
-  test("update user", async ({ user, page }) => {
+  test("update user", async ({ newTypist, page }) => {
     await page.goto(`/users`);
 
     const userListPgObj = new UserListPgObj(page);
 
-    await userListPgObj.row(user.username).click();
+    await userListPgObj.row(newTypist.username).click();
 
     const userUpdatePgObj = new UserUpdatePgObj(page);
     await expect(userUpdatePgObj.fullname).toHaveValue("Gebruiker met Achternaam");
@@ -86,15 +86,15 @@ test.describe("Users", () => {
     await expect(userListPgObj.alert).toContainText(
       "De wijzigingen in het account van Gebruiker met Wijzigingen zijn opgeslagen",
     );
-    await expect(userListPgObj.row(user.username)).toContainText("Gebruiker met Wijzigingen");
+    await expect(userListPgObj.row(newTypist.username)).toContainText("Gebruiker met Wijzigingen");
   });
 
-  test("delete user", async ({ user, page }) => {
+  test("delete user", async ({ newTypist, page }) => {
     await page.goto(`/users`);
 
     const userListPgObj = new UserListPgObj(page);
 
-    await userListPgObj.row(user.username).click();
+    await userListPgObj.row(newTypist.username).click();
 
     const userUpdatePgObj = new UserUpdatePgObj(page);
     await expect(userUpdatePgObj.fullname).toHaveValue("Gebruiker met Achternaam");
@@ -105,6 +105,6 @@ test.describe("Users", () => {
 
     await expect(userListPgObj.alert).toContainText("Gebruiker verwijderd");
     await expect(userListPgObj.alert).toContainText("Het account van Gebruiker met Achternaam is verwijderd");
-    await expect(userListPgObj.row(user.username)).toHaveCount(0);
+    await expect(userListPgObj.row(newTypist.username)).toHaveCount(0);
   });
 });

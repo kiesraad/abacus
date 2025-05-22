@@ -83,11 +83,18 @@ async fn test_user_listing(pool: SqlitePool) {
         "Unexpected response status"
     );
     let body: UserListResponse = response.json().await.unwrap();
-    assert_eq!(body.users.len(), 4);
+    assert_eq!(body.users.len(), 6);
     assert!(body.users.iter().any(|ps| {
-        ["admin", "coordinator", "typist"]
-            .iter()
-            .any(|u| ps.username() == *u)
+        [
+            "admin1",
+            "admin2",
+            "coordinator1",
+            "coordinator2",
+            "typist1",
+            "typist2",
+        ]
+        .iter()
+        .any(|u| ps.username() == *u)
     }))
 }
 
@@ -250,8 +257,8 @@ async fn test_user_change_to_same_password_fails(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .put(&url)
         .json(&json!({
-            "username": "typist",
-            "password": "TypistPassword01",
+            "username": "typist1",
+            "password": "Typist1Password01",
         }))
         .header("cookie", typist_cookie)
         .send()
@@ -280,7 +287,7 @@ async fn test_user_get(pool: SqlitePool) {
 
     assert_eq!(body["id"], 1);
     assert_eq!(body["role"], "administrator");
-    assert_eq!(body["username"], "admin");
+    assert_eq!(body["username"], "admin1");
     assert_eq!(body["fullname"], "Sanne Molenaar");
 }
 
@@ -342,7 +349,7 @@ async fn test_can_delete_logged_in_user(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_1", "users"))))]
 async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/user/3");
+    let url = format!("http://{addr}/api/user/5");
     let admin_cookie = shared::admin_login(&addr).await;
     let typist_cookie = shared::typist_login(&addr).await;
 
@@ -368,15 +375,15 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 
     // Login again with the temporary password
-    let typist_cookie = shared::login(&addr, "typist", "TotallyValidTempP4ssW0rd").await;
+    let typist_cookie = shared::login(&addr, "typist1", "TotallyValidTempP4ssW0rd").await;
 
     // User sets password
     let url = format!("http://{addr}/api/user/account");
     let response = reqwest::Client::new()
         .put(&url)
         .json(&json!({
-            "username": "typist",
-            "password": "TypistPassword02",
+            "username": "typist1",
+            "password": "Typist1Password02",
         }))
         .header("cookie", &typist_cookie)
         .send()

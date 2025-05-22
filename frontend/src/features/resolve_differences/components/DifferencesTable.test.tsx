@@ -1,13 +1,15 @@
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
+import { ResolveAction } from "@/types/generated/openapi";
 
 import { DifferencesRow, DifferencesTable } from "./DifferencesTable";
+import cls from "./ResolveDifferences.module.css";
 
 const tableHeaders = ["Code", "First", "Second", "Description"];
 
-function renderTable(rows: DifferencesRow[]) {
-  render(<DifferencesTable title={"Differences"} headers={tableHeaders} rows={rows} />);
+function renderTable(rows: DifferencesRow[], action: ResolveAction | undefined = undefined) {
+  render(<DifferencesTable title={"Differences"} headers={tableHeaders} rows={rows} action={action} />);
 }
 
 describe("DifferencesTable", () => {
@@ -54,6 +56,20 @@ describe("DifferencesTable", () => {
     expect(table).toHaveTableContent([tableHeaders, ["A", "10", "\u2014", "Some value"]]);
   });
 
+  test("Render a string value as-is", async () => {
+    renderTable([{ code: "A", first: "Ja", second: "Nee", description: "Some value" }]);
+    const table = await screen.findByRole("table");
+    expect(table).toBeInTheDocument();
+    expect(table).toHaveTableContent([tableHeaders, ["A", "Ja", "Nee", "Some value"]]);
+  });
+
+  test("Render a big number with thousands separator", async () => {
+    renderTable([{ code: "A", first: 10_120_334, second: 9_344_042, description: "Some value" }]);
+    const table = await screen.findByRole("table");
+    expect(table).toBeInTheDocument();
+    expect(table).toHaveTableContent([tableHeaders, ["A", "10.120.334", "9.344.042", "Some value"]]);
+  });
+
   test("Render gap rows between rows with differences", async () => {
     renderTable([
       { code: "A", first: 10, second: 10, description: "Same" },
@@ -76,5 +92,49 @@ describe("DifferencesTable", () => {
       [""],
       ["H", "80", "88", "Skip two"],
     ]);
+  });
+
+  describe("show result of action in differences tables", () => {
+    const rows = [{ first: 10, second: 11 }];
+
+    test("keep_first_entry", async () => {
+      renderTable(rows, "keep_first_entry");
+      const [first, second] = await screen.findAllByRole("cell");
+
+      expect(first).toHaveClass(cls.keep!);
+      expect(first).not.toHaveClass(cls.discard!);
+      expect(second).toHaveClass(cls.discard!);
+      expect(second).not.toHaveClass(cls.keep!);
+    });
+
+    test("keep_second_entry", async () => {
+      renderTable(rows, "keep_second_entry");
+      const [first, second] = await screen.findAllByRole("cell");
+
+      expect(first).toHaveClass(cls.discard!);
+      expect(first).not.toHaveClass(cls.keep!);
+      expect(second).toHaveClass(cls.keep!);
+      expect(second).not.toHaveClass(cls.discard!);
+    });
+
+    test("discard_both_entries", async () => {
+      renderTable(rows, "discard_both_entries");
+      const [first, second] = await screen.findAllByRole("cell");
+
+      expect(first).toHaveClass(cls.discard!);
+      expect(first).not.toHaveClass(cls.keep!);
+      expect(second).toHaveClass(cls.discard!);
+      expect(second).not.toHaveClass(cls.keep!);
+    });
+
+    test("no action chosen", async () => {
+      renderTable(rows, undefined);
+      const [first, second] = await screen.findAllByRole("cell");
+
+      expect(first).not.toHaveClass(cls.keep!);
+      expect(first).not.toHaveClass(cls.discard!);
+      expect(second).not.toHaveClass(cls.discard!);
+      expect(second).not.toHaveClass(cls.keep!);
+    });
   });
 });

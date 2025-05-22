@@ -8,7 +8,8 @@ import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { t, TranslationPath, tx } from "@/lib/i18n";
+import { TranslationPath } from "@/i18n/i18n.types";
+import { t, tx } from "@/i18n/translate";
 
 interface UnauthorizedState {
   unauthorized?: boolean;
@@ -16,6 +17,7 @@ interface UnauthorizedState {
 
 export function LoginForm() {
   const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const location = useLocation() as Location<null | UnauthorizedState>;
   const { login, expiration } = useApiState();
   const [username, setUsername] = useState<string>("");

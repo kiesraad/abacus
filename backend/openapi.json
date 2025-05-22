@@ -54,7 +54,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ElectionRequest"
+                "$ref": "#/components/schemas/NewElection"
               }
             }
           },
@@ -112,7 +112,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ElectionRequest"
+                "$ref": "#/components/schemas/NewElection"
               }
             }
           },
@@ -2312,7 +2312,7 @@
                   "eventType": {
                     "type": "string",
                     "enum": [
-                      "DataEntryFinalized"
+                      "DataEntryFinalised"
                     ]
                   }
                 }
@@ -2977,7 +2977,9 @@
         "required": [
           "id",
           "name",
+          "election_id",
           "location",
+          "domain_id",
           "number_of_voters",
           "category",
           "number_of_seats",
@@ -2989,9 +2991,15 @@
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
           },
+          "domain_id": {
+            "type": "string"
+          },
           "election_date": {
             "type": "string",
             "format": "date"
+          },
+          "election_id": {
+            "type": "string"
           },
           "id": {
             "type": "integer",
@@ -3064,7 +3072,7 @@
         ],
         "properties": {
           "election": {
-            "$ref": "#/components/schemas/Election"
+            "$ref": "#/components/schemas/NewElection"
           },
           "hash": {
             "$ref": "#/components/schemas/RedactedEmlHash"
@@ -3076,7 +3084,9 @@
         "required": [
           "electionId",
           "electionName",
+          "electionElectionId",
           "electionLocation",
+          "electionDomainId",
           "electionNumberOfVoters",
           "electionCategory",
           "electionNumberOfSeats",
@@ -3088,9 +3098,15 @@
           "electionCategory": {
             "type": "string"
           },
+          "electionDomainId": {
+            "type": "string"
+          },
           "electionElectionDate": {
             "type": "string",
             "format": "date"
+          },
+          "electionElectionId": {
+            "type": "string"
           },
           "electionId": {
             "type": "integer",
@@ -3153,59 +3169,6 @@
             "items": {
               "$ref": "#/components/schemas/Election"
             }
-          }
-        }
-      },
-      "ElectionRequest": {
-        "type": "object",
-        "description": "Election request",
-        "required": [
-          "name",
-          "location",
-          "number_of_voters",
-          "category",
-          "number_of_seats",
-          "election_date",
-          "nomination_date",
-          "status",
-          "political_groups"
-        ],
-        "properties": {
-          "category": {
-            "$ref": "#/components/schemas/ElectionCategory"
-          },
-          "election_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "location": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "nomination_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "number_of_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "political_groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroup"
-            }
-          },
-          "status": {
-            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },
@@ -3391,9 +3354,9 @@
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
           "DrawingOfLotsRequired",
+          "EmlImportError",
           "EntryNotFound",
           "EntryNotUnique",
-          "EmlImportError",
           "InternalServerError",
           "InvalidData",
           "InvalidJson",
@@ -3409,9 +3372,10 @@
           "PdfGenerationError",
           "PollingStationRepeated",
           "PollingStationValidationErrors",
-          "UserNotFound",
-          "UsernameNotUnique",
+          "RequestPayloadTooLarge",
           "Unauthorized",
+          "UsernameNotUnique",
+          "UserNotFound",
           "ZeroVotesCast"
         ]
       },
@@ -3628,6 +3592,67 @@
           },
           "username": {
             "type": "string"
+          }
+        }
+      },
+      "NewElection": {
+        "type": "object",
+        "description": "Election request",
+        "required": [
+          "name",
+          "election_id",
+          "location",
+          "domain_id",
+          "number_of_voters",
+          "category",
+          "number_of_seats",
+          "election_date",
+          "nomination_date",
+          "status",
+          "political_groups"
+        ],
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "domain_id": {
+            "type": "string"
+          },
+          "election_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "election_id": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nomination_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "political_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroup"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },
@@ -4583,6 +4608,7 @@
           "F304",
           "F305",
           "F401",
+          "W001",
           "W201",
           "W202",
           "W203",

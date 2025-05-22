@@ -9,7 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
-import { t } from "@/lib/i18n";
+import { t } from "@/i18n/translate";
 import { KeyboardKey } from "@/types/ui";
 
 import { DataEntryNavigation } from "../DataEntryNavigation";
@@ -159,7 +159,7 @@ export function DifferencesForm() {
               onChange={(e) => {
                 setAcceptWarnings(e.target.checked);
               }}
-              label={t("differences.differences_form_accept_warnings")}
+              label={t("data_entry.form_accept_warnings")}
             />
           </BottomBar.Row>
         )}

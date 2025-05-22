@@ -3,6 +3,7 @@ import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/Candidates
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { NavigationPanel } from "e2e-tests/page-objects/data_entry/NavigationPanelPgObj";
 import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 
@@ -35,12 +36,21 @@ export async function fillDataEntryPages(page: Page, results: PollingStationResu
   await expect(differencesPage.fieldset).toBeVisible();
   await differencesPage.fillInPageAndClickNext(results.differences_counts);
 
-  const candidateListNames: string[] = await differencesPage.navPanel.allListNames();
+  await fillCandidatesListPages(page, results);
+
+  const checkAndSavePage = new CheckAndSavePage(page);
+  await expect(checkAndSavePage.fieldset).toBeVisible();
+  return checkAndSavePage;
+}
+
+export async function fillCandidatesListPages(page: Page, results: PollingStationResults) {
+  const candidateListNames: string[] = await new NavigationPanel(page).allListNames();
+
   // make sure the form has the same number of political groups as the input data
   expect(candidateListNames.length).toBe(results.political_group_votes.length);
 
   for (const { index, value } of results.political_group_votes.map((value, index) => ({ index, value }))) {
-    const candidatesListPage = new CandidatesListPage(page, 1, candidateListNames[index] as string);
+    const candidatesListPage = new CandidatesListPage(page, index + 1, candidateListNames[index]!);
     await expect(candidatesListPage.fieldset).toBeVisible();
 
     const candidateVotes: number[] = value.candidate_votes.map((candidate) => {
@@ -50,10 +60,6 @@ export async function fillDataEntryPages(page: Page, results: PollingStationResu
     await candidatesListPage.fillCandidatesAndTotal(candidateVotes, listTotal);
     await candidatesListPage.next.click();
   }
-
-  const checkAndSavePage = new CheckAndSavePage(page);
-  await expect(checkAndSavePage.fieldset).toBeVisible();
-  return checkAndSavePage;
 }
 
 export async function fillDataEntryPagesAndSave(page: Page, results: PollingStationResults) {

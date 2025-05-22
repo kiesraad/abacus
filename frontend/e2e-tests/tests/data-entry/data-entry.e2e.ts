@@ -107,9 +107,9 @@ test.describe("full data entry flow", () => {
     await checkAndSavePage.save.click();
 
     await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
 
-    await expect(dataEntryHomePage.alertInputSaved).toHaveText(
+    await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       [
         "Je invoer is opgeslagen",
         "Geef het papieren proces-verbaal terug aan de coördinator.",
@@ -172,7 +172,7 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 
   test("no recount, difference of more ballots counted", async ({ page, pollingStation }) => {
@@ -237,7 +237,7 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 
   test("recount, difference of fewer ballots counted", async ({ page, pollingStation }) => {
@@ -312,7 +312,7 @@ test.describe("full data entry flow", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 
   test("submit with accepted warning on voters and votes page", async ({ page, pollingStation }) => {
@@ -387,7 +387,7 @@ test.describe("full data entry flow", () => {
     await checkAndSavePage.save.click();
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 });
 
@@ -411,8 +411,8 @@ test.describe("second data entry", () => {
 
     await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
-    await expect(dataEntryHomePage.alertInputSaved).toHaveText(
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
 
@@ -497,8 +497,8 @@ test.describe("second data entry", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
-    await expect(dataEntryHomePage.alertInputSaved).toHaveText(
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
 
@@ -563,9 +563,14 @@ test.describe("second data entry", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
-    await expect(dataEntryHomePage.alertInputSaved).toHaveText(
-      ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
+    await expect(dataEntryHomePage.dataEntryDifferent).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryDifferent).toHaveText(
+      [
+        "Let op: Verschil met eerste invoer",
+        "Je invoer is opgeslagen.",
+        "Geef het papieren proces-verbaal terug aan de coördinator,",
+        "en geef aan dat er een verschil is met de eerste invoer.",
+      ].join(""),
     );
 
     // check if data entries are marked as different on coordinator status page
@@ -674,7 +679,7 @@ test.describe("errors and warnings", () => {
     await checkAndSavePage.save.click();
 
     const dataEntryHomePage = new DataEntryHomePage(page);
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 
   test("Changing recounted to yes results in error on differences page", async ({ page, pollingStation }) => {

@@ -76,6 +76,7 @@ import {
   dataEntryResolveMockResponse,
   dataEntryStatusDifferences,
   saveDataEntryResponse,
+  secondEntryNotStartedStatus,
 } from "./DataEntryMockData";
 import { electionDetailsMockResponse, electionListMockResponse } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
@@ -223,7 +224,6 @@ export const PollingStationDataEntryDeleteHandler = http.delete<
   () => new HttpResponse(null, { status: 204 }),
 );
 
-// TODO: Add default response here
 // finalise data entry handler
 export const PollingStationDataEntryFinaliseHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS>,
@@ -232,7 +232,7 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH
 >(
   "/api/polling_stations/:election_id/data_entries/:entry_number/finalise" as POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
-  () => HttpResponse.json(undefined, { status: 200 }),
+  () => HttpResponse.json(secondEntryNotStartedStatus, { status: 200 }),
 );
 
 export const PollingStationCreateHandler = http.post<

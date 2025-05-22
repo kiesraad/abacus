@@ -57,11 +57,11 @@ export function CheckAndSaveForm() {
     const dataEntryStatus = await onFinaliseDataEntry();
     if (dataEntryStatus !== undefined) {
       if (dataEntryStatus.status === "EntriesDifferent") {
-        await navigate(`/elections/${election.id}/data-entry#data-entry-different-${pollingStationId}`);
+        await navigate(`/elections/${election.id}/data-entry#data-entry-different`);
       } else if (dataEntryStatus.status === "FirstEntryHasErrors") {
-        await navigate(`/elections/${election.id}/data-entry#data-entry-errors-${pollingStationId}`);
+        await navigate(`/elections/${election.id}/data-entry#data-entry-errors`);
       } else {
-        await navigate(`/elections/${election.id}/data-entry#data-entry-${entryNumber}-saved-${pollingStationId}`);
+        await navigate(`/elections/${election.id}/data-entry#data-entry-${entryNumber}-saved`);
       }
       return true;
     }

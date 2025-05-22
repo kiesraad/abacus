@@ -126,7 +126,7 @@ export function onFinaliseDataEntry(client: ApiClient, requestPath: string, disp
   return async (): Promise<DataEntryStatus | undefined> => {
     dispatch({ type: "SET_STATUS", status: "finalising" });
 
-    const response = await client.postRequest(requestPath);
+    const response = await client.postRequest<DataEntryStatus>(requestPath);
 
     if (!isSuccess(response)) {
       dispatch({ type: "SET_STATUS", status: "idle" });
@@ -135,7 +135,6 @@ export function onFinaliseDataEntry(client: ApiClient, requestPath: string, disp
     }
 
     dispatch({ type: "SET_STATUS", status: "finalised" });
-    // TODO: Fix this "as" error
-    return response.data as DataEntryStatus;
+    return response.data;
   };
 }

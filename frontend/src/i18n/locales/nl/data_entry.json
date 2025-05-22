@@ -16,6 +16,8 @@
   "data_entry_not_possible": "Je kan stembureau {nr} niet invoeren",
   "definitive": "Definitief",
   "entries_different": "Verschil invoer 1 en 2",
+  "entry_different": "Let op: Verschil met eerste invoer",
+  "entry_errors": "Let op: fouten in het proces-verbaal",
   "entry_saved": "Je invoer is opgeslagen",
   "first_entry": "1e invoer",
   "form_accept_warnings": "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
@@ -25,7 +27,9 @@
   "pick_polling_station": "Kies een stembureau",
   "second_entry": "2e invoer",
   "success": {
-    "return_paper": "Geef het papieren proces-verbaal terug aan de coördinator.",
+    "different_entry_info": "en geef aan dat er een verschil is met de eerste invoer.",
+    "errors_entry_info": "en geef aan dat je daarin fouten hebt gevonden.",
+    "return_paper": "Geef het papieren proces-verbaal terug aan de coördinator",
     "second_entry_info": "Een andere invoerder doet straks de tweede invoer."
   },
   "title": "Invoeren"

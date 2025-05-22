@@ -80,7 +80,7 @@ describe("Test CheckAndSaveForm", () => {
 
     // check that the user is navigated back to the data entry page
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
-    expect(router.state.location.hash).toEqual("#data-entry-saved-1");
+    expect(router.state.location.hash).toEqual("#data-entry-1-saved");
   });
 
   test("Shift+Enter submits form", async () => {
@@ -93,7 +93,7 @@ describe("Test CheckAndSaveForm", () => {
 
     await user.keyboard("{shift>}{enter}{/shift}");
 
-    expect(finalise).toHaveBeenCalled();
+    expect(finalise).toHaveBeenCalledOnce();
   });
 
   test("Data entry does not show finalise button with errors", async () => {

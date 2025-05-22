@@ -29,12 +29,12 @@ export function DataEntryHomePage() {
     };
   }, [refetch]);
 
-  const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved-") ? location.hash : null;
-  const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved-") ? location.hash : null;
+  const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved") ? location.hash : null;
+  const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved") ? location.hash : null;
   const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert || undefined;
 
-  const showDifferenceWithFirstEntryAlert = location.hash.startsWith("#data-entry-different-") ? location.hash : null;
-  const showFirstEntryHasErrorsAlert = location.hash.startsWith("#data-entry-errors-") ? location.hash : null;
+  const showDifferenceWithFirstEntryAlert = location.hash.startsWith("#data-entry-different") ? location.hash : null;
+  const showFirstEntryHasErrorsAlert = location.hash.startsWith("#data-entry-errors") ? location.hash : null;
   const dataEntryNotification = showDifferenceWithFirstEntryAlert || showFirstEntryHasErrorsAlert || undefined;
 
   const showDataEntryClaimedAlert = location.hash.startsWith("#data-entry-claimed-") ? location.hash : null;
@@ -73,7 +73,7 @@ export function DataEntryHomePage() {
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
           <h2>{t("data_entry.entry_saved")}</h2>
           <p>
-            {t("data_entry.success.return_paper")}
+            {t("data_entry.success.return_paper")}.
             {showFirstDataEntrySavedAlert && (
               <>
                 <br />
@@ -86,8 +86,13 @@ export function DataEntryHomePage() {
 
       {dataEntryNotification && (
         <Alert type="notify" onClose={closeDataEntryNotifyAlert}>
-          <h2>{t("data_entry.entry_saved")}</h2>
-          <p>{t("data_entry.success.return_paper")}</p>
+          <h2>{showDifferenceWithFirstEntryAlert ? t("data_entry.entry_different") : t("data_entry.entry_errors")}</h2>
+          <p>
+            {t("data_entry.entry_saved")}.{t("data_entry.success.return_paper")},
+            {showDifferenceWithFirstEntryAlert
+              ? t("data_entry.success.different_entry_info")
+              : t("data_entry.success.errors_entry_info")}
+          </p>
         </Alert>
       )}
 

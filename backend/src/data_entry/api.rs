@@ -400,17 +400,21 @@ async fn polling_station_data_entry_finalise(
 async fn polling_station_data_entry_resolve(
     _user: Coordinator,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(polling_stations): State<PollingStations>,
+    State(elections): State<Elections>,
     Path(polling_station_id): Path<u32>,
     audit_service: AuditService,
     resolve_action: ResolveAction,
 ) -> Result<Json<PollingStationDataEntry>, APIError> {
+    let polling_station = polling_stations.get(polling_station_id).await?;
+    let election = elections.get(polling_station.election_id).await?;
     let state = polling_station_data_entries
         .get_or_default(polling_station_id)
         .await?;
 
     let new_state = match resolve_action {
         ResolveAction::KeepFirstEntry => state.keep_first_entry()?,
-        ResolveAction::KeepSecondEntry => state.keep_second_entry()?,
+        ResolveAction::KeepSecondEntry => state.keep_second_entry(&polling_station, &election)?,
         ResolveAction::DiscardBothEntries => state.delete_entries()?,
     };
 
@@ -608,6 +612,8 @@ pub mod tests {
         polling_station_data_entry_resolve(
             Coordinator(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
+            State(PollingStations::new(pool.clone())),
+            State(Elections::new(pool.clone())),
             Path(1),
             AuditService::new(AuditLog(pool), user, None),
             resolve_action,

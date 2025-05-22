@@ -448,6 +448,7 @@ impl DataEntryStatus {
         }
     }
 
+    /// Keep first entry while resolving differences
     pub fn keep_first_entry(self) -> Result<Self, DataEntryTransitionError> {
         let DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry,
@@ -468,26 +469,41 @@ impl DataEntryStatus {
         }))
     }
 
-    /// Resolve a conflicted data entry process to either the first or the
-    /// second entry
-    pub fn keep_second_entry(self) -> Result<Self, DataEntryTransitionError> {
-        let DataEntryStatus::EntriesDifferent(EntriesDifferent {
-            second_entry,
-            second_entry_user_id,
-            second_entry_finished_at,
-            ..
-        }) = self
-        else {
-            return Err(DataEntryTransitionError::Invalid);
-        };
+    /// Keep second entry while resolving differences; it becomes the first entry
+    pub fn keep_second_entry(
+        self,
+        polling_station: &PollingStation,
+        election: &Election,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match &self {
+            DataEntryStatus::EntriesDifferent(state) => {
+                let validation_results = validate_data_entry_status(
+                    &Self::FirstEntryInProgress(FirstEntryInProgress {
+                        progress: 100,
+                        first_entry_user_id: state.second_entry_user_id,
+                        first_entry: state.second_entry.clone(),
+                        client_state: Default::default(),
+                    }),
+                    polling_station,
+                    election,
+                )?;
 
-        Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
-            // Note that by setting the second entry to the first
-            // entry, we keep the second entry and discard the first entry
-            first_entry_user_id: second_entry_user_id,
-            finalised_first_entry: second_entry.clone(),
-            first_entry_finished_at: second_entry_finished_at,
-        }))
+                if validation_results.has_errors() {
+                    Ok(Self::FirstEntryHasErrors(FirstEntryHasErrors {
+                        first_entry_user_id: state.second_entry_user_id,
+                        finalised_first_entry: state.second_entry.clone(),
+                        first_entry_finished_at: state.second_entry_finished_at,
+                    }))
+                } else {
+                    Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
+                        first_entry_user_id: state.second_entry_user_id,
+                        finalised_first_entry: state.second_entry.clone(),
+                        first_entry_finished_at: state.second_entry_finished_at,
+                    }))
+                }
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
     }
 
     /// Get the progress of the first entry (if there is a first entry), from 0 to 100
@@ -1219,10 +1235,11 @@ mod tests {
 
     #[test]
     fn entries_different_to_second_entry_not_started_keep_second_entry() {
-        // Create a difference, so we can check that we keep the right entry
+        // Create a difference without errors, so we can check that we keep the right entry
         let first_entry = polling_station_result();
         let mut second_entry = polling_station_result();
         second_entry.recounted = Some(true);
+        second_entry.voters_recounts = Some(Default::default());
 
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: first_entry.clone(),
@@ -1232,20 +1249,47 @@ mod tests {
             first_entry_finished_at: Utc::now(),
             second_entry_finished_at: Utc::now(),
         });
-        let next = initial.keep_second_entry().unwrap();
+        let next = initial
+            .keep_second_entry(&polling_station(), &election())
+            .unwrap();
 
         if let DataEntryStatus::SecondEntryNotStarted(kept_entry) = next {
             assert_eq!(kept_entry.finalised_first_entry, second_entry);
-            assert_ne!(kept_entry.finalised_first_entry, first_entry);
         } else {
-            panic!()
+            panic!("{:?}", next)
+        };
+    }
+
+    #[test]
+    fn entries_different_to_second_entry_not_started_keep_second_entry_which_has_errors() {
+        let first_entry = polling_station_result();
+        // Second entry is different and has error F.101
+        let mut second_entry = polling_station_result();
+        second_entry.recounted = None;
+
+        let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry: first_entry.clone(),
+            first_entry_user_id: 0,
+            second_entry: second_entry.clone(),
+            second_entry_user_id: 0,
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
+        });
+        let next = initial
+            .keep_second_entry(&polling_station(), &election())
+            .unwrap();
+
+        if let DataEntryStatus::FirstEntryHasErrors(kept_entry) = next {
+            assert_eq!(kept_entry.finalised_first_entry, second_entry);
+        } else {
+            panic!("{:?}", next)
         };
     }
 
     #[test]
     fn definitive_keep_second_entry_error() {
         assert_eq!(
-            definitive().keep_second_entry(),
+            definitive().keep_second_entry(&polling_station(), &election()),
             Err(DataEntryTransitionError::Invalid)
         );
     }

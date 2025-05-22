@@ -12,11 +12,10 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::{NewElection, repository::Elections, structs::Election};
 #[cfg(feature = "dev-database")]
 use crate::audit_log::{AuditEvent, AuditService};
-use crate::{APIError, eml::EMLImportError};
 use crate::{
-    AppState, ErrorResponse,
+    APIError, AppState, ErrorResponse,
     authentication::{Admin, User},
-    eml::{EML110, EMLDocument, RedactedEmlHash},
+    eml::{EML110, EMLDocument, EMLImportError, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},
 };
 

@@ -251,14 +251,14 @@ test.describe("Data entry model test - warnings", () => {
           votersVotesPageWarningFilled: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toBeHidden();
-            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },
           votersVotesPageChangedToWarning: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toBeHidden();
-            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },
@@ -267,66 +267,67 @@ test.describe("Data entry model test - warnings", () => {
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
           },
           votersVotesPageChangedToWarningSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
           },
           voterVotesPageWarningAccepted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).toBeChecked();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeChecked();
           },
           votersVotesPageWarningUnaccepted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
           },
           votersVotesPageWarningReminder: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
-            await expect(votersAndVotesPage.acceptWarningsReminder).toBeVisible();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
+            await expect(votersAndVotesPage.acceptErrorsAndWarningsReminder).toBeVisible();
           },
           voterVotesPageWarningCorrected: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesValid });
           },
           votersVotesPageValidSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toBeHidden();
-            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesValid });
           },
           votersVotesPageError: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.error).toBeVisible();
+            await expect(votersAndVotesPage.warning).toBeHidden();
+
             //TODO: check if this is correct
-            //await expect(votersAndVotesPage.warning).toBeHidden();
-            //await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+            //await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes: votesWarning });
           },
           votersVotesPageAfterResumeWarning: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toBeHidden();
-            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },
@@ -335,7 +336,7 @@ test.describe("Data entry model test - warnings", () => {
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
             );
-            await expect(votersAndVotesPage.acceptWarnings).not.toBeChecked();
+            await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
           },
@@ -364,7 +365,7 @@ test.describe("Data entry model test - warnings", () => {
             await votersAndVotesPage.next.click();
           },
           ACCEPT_WARNING: async () => {
-            await votersAndVotesPage.acceptWarnings.check();
+            await votersAndVotesPage.acceptErrorsAndWarnings.check();
           },
           CORRECT_WARNING: async () => {
             await votersAndVotesPage.inputVotesCounts(votesValid);
@@ -372,7 +373,7 @@ test.describe("Data entry model test - warnings", () => {
             await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
           },
           UNACCEPT_WARNING: async () => {
-            await votersAndVotesPage.acceptWarnings.uncheck();
+            await votersAndVotesPage.acceptErrorsAndWarnings.uncheck();
           },
           CHANGE_TO_ERROR_AND_SUBMIT: async () => {
             await votersAndVotesPage.inputVotersCounts(votersError);

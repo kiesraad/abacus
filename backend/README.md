@@ -129,7 +129,7 @@ To update `openapi.json` in the repository, run the command `cargo run --bin gen
 
 ### Building for various platforms
 
-You can use [cross](https://github.com/cross-rs/cross) to compile for different architectures.
+You can use [`cross`](https://github.com/cross-rs/cross) to compile for different architectures.
 
 For example:
 
@@ -140,11 +140,14 @@ npm install
 npm run build
 cd ..
 
-# build for Armv6 Linux (like the Raspberry PI 1/2/zero)
-rustup target add arm-unknown-linux-gnueabihf
+# build for ARMv6 32-bit Linux (like the Raspberry Pi 1/2/Zero)
 cross build --release --features memory-serve,embed-typst --manifest-path backend/Cargo.toml --target arm-unknown-linux-gnueabihf
 
-# build for Armv7-A Linux (like the Raspberry PI 3/4/5)
-rustup target add armv7-unknown-linux-gnueabihf
+# build for ARMv7-A 32-bit Linux (like the Raspberry Pi 3/4/5)
 cross build --release --features memory-serve,embed-typst --manifest-path backend/Cargo.toml --target armv7-unknown-linux-gnueabihf
+
+# build for AArch64 64-bit Linux (like the Raspberry Pi 3/4/5)
+cross build --release --features memory-serve,embed-typst --manifest-path backend/Cargo.toml --target aarch64-unknown-linux-gnu
 ```
+
+To use `cross` on Apple Silicon, set the `CROSS_CONTAINER_OPTS` environment variable to `--platform linux/amd64` when running the command.

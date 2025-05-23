@@ -318,11 +318,9 @@ test.describe("Data entry model test - warnings", () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.error).toBeVisible();
 
-            //TODO: check, this is not hidden currently.
+            // With the current mockData a warning is also triggered.
             //await expect(votersAndVotesPage.warning).toBeHidden();
 
-            //TODO: check if this is correct
-            //await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes: votesWarning });
           },

@@ -306,13 +306,5 @@ export function updateFormStateAfterSubmit(
     });
   }
 
-  // Reset acceptWarnings when a page gets an error or has no warnings anymore
-  //TODO: check if this is still needed in some form
-  // Object.values(formState.sections).forEach((section) => {
-  //   if (section.acceptErrorsAndWarnings && (!section.errors.isEmpty() || section.warnings.isEmpty())) {
-  //     section.acceptErrorsAndWarnings = false;
-  //   }
-  // });
-
   return formState;
 }

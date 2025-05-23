@@ -59,10 +59,6 @@ export function useDataEntryFormSection<FORM_VALUES>({
     options?: SubmitCurrentFormOptions,
   ): Promise<boolean> => {
     const result = await onSubmitForm(data, { ...options, showAcceptErrorsAndWarnings });
-    // if (!formSection.errors.isEmpty()) {
-    //   // scroll to top when there are errors, this is mainly necessary when users click "volgende" a second time without changing anything
-    //   window.scrollTo(0, 0);
-    // }
     return result;
   };
 

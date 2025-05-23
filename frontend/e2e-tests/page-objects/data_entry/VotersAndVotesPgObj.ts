@@ -15,8 +15,8 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   readonly blankVotesCount: Locator;
   readonly invalidVotesCount: Locator;
   readonly totalVotesCastCount: Locator;
-  readonly acceptWarnings: Locator;
-  readonly acceptWarningsReminder: Locator;
+  readonly acceptErrorsAndWarnings: Locator;
+  readonly acceptErrorsAndWarningsReminder: Locator;
   readonly next: Locator;
   readonly pollCardRecount: Locator;
   readonly proxyCertificateRecount: Locator;
@@ -53,8 +53,10 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     this.voterCardRecount = page.getByRole("textbox", { name: "C.2 Kiezerspassen" });
     this.totalAdmittedVotersRecount = page.getByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" });
 
-    this.acceptWarnings = page.getByLabel("Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.");
-    this.acceptWarningsReminder = page
+    this.acceptErrorsAndWarnings = page.getByLabel(
+      "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+    );
+    this.acceptErrorsAndWarningsReminder = page
       .getByRole("alert")
       .filter({ hasText: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd." });
 
@@ -118,8 +120,8 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     await this.next.click();
   }
 
-  async checkAcceptWarnings() {
-    await this.acceptWarnings.waitFor();
-    await this.acceptWarnings.check();
+  async checkAcceptErrorsAndWarnings() {
+    await this.acceptErrorsAndWarnings.waitFor();
+    await this.acceptErrorsAndWarnings.check();
   }
 }

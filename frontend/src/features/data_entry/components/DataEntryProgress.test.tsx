@@ -11,6 +11,7 @@ import { render, screen, waitFor, within } from "@/testing/test-utils";
 import { errorWarningMocks, getDefaultFormSection } from "../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../testing/test.utils";
 import { FormState } from "../types/types";
+import { ValidationResultSet } from "../utils/ValidationResults";
 import { DataEntryProgress } from "./DataEntryProgress";
 import { DataEntryProvider } from "./DataEntryProvider";
 
@@ -77,8 +78,8 @@ describe("Test DataEntryProgress", () => {
 
     formState.current = "political_group_votes_2";
     formState.furthest = "political_group_votes_2";
-    formState.sections.voters_votes_counts.acceptWarnings = false;
-    formState.sections.differences_counts.acceptWarnings = true;
+    formState.sections.voters_votes_counts.acceptErrorsAndWarnings = false;
+    formState.sections.differences_counts.acceptErrorsAndWarnings = true;
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
@@ -130,6 +131,38 @@ describe("Test DataEntryProgress", () => {
     expect(checkAndSave).toHaveClass("idle disabled");
     expect(checkAndSave).toHaveAttribute("aria-current", "false");
     expect(within(checkAndSave).queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  test("Prioritise errors over warnings", async () => {
+    const formState = getDefaultFormState();
+
+    formState.current = "political_group_votes_2";
+    formState.furthest = "political_group_votes_2";
+
+    formState.sections.voters_votes_counts.errors = new ValidationResultSet([errorWarningMocks.F201]);
+    formState.sections.voters_votes_counts.warnings = new ValidationResultSet([errorWarningMocks.W201]);
+
+    overrideServerClaimDataEntryResponse({
+      formState: formState,
+      pollingStationResults: pollingStationResults,
+      continueToNextSection: false,
+      validationResults: {
+        errors: [errorWarningMocks.F201],
+        warnings: [errorWarningMocks.W201],
+      },
+    });
+    renderForm();
+
+    await waitFor(() => {
+      expect(screen.getByText("Is er herteld?")).toBeVisible();
+    });
+
+    const votersAndVotes = screen.getByTestId("list-item-voters-and-votes");
+
+    expect(votersAndVotes).toHaveClass("error");
+    expect(votersAndVotes).toHaveAttribute("aria-current", "false");
+    const votersAndVotesIcon = within(votersAndVotes).getByRole("img");
+    expect(votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
   });
 
   test("shows links to other pages when on last page", async () => {

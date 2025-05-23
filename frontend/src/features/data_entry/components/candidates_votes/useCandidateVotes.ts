@@ -43,7 +43,7 @@ export function useCandidateVotes(political_group_number: number) {
           pg.number === political_group_number ? data : pg,
         ),
       },
-      { ...options, showAcceptWarnings: section.showAcceptWarnings },
+      { ...options, showAcceptErrorsAndWarnings: section.showAcceptErrorsAndWarnings },
     );
   };
 

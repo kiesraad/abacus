@@ -153,7 +153,7 @@ export const noRecountNoDifferencesRequest: DataEntry = {
   client_state: {
     furthest: "political_group_votes_1",
     current: "political_group_votes_1",
-    acceptedWarnings: [],
+    acceptedErrorsAndWarnings: [],
     continue: true,
   },
 };

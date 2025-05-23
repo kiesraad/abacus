@@ -53,9 +53,9 @@ export function getDefaultFormSection(id: FormSectionId, index: number): FormSec
     index,
     title: "title of the form section",
     isSaved: false,
-    acceptWarnings: false,
+    acceptErrorsAndWarnings: false,
     hasChanges: false,
-    acceptWarningsError: false,
+    acceptErrorsAndWarningsError: false,
     errors: new ValidationResultSet(),
     warnings: new ValidationResultSet(),
   };

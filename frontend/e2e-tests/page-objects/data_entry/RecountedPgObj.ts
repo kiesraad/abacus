@@ -8,8 +8,8 @@ export class RecountedPage extends DataEntryBasePage {
   readonly no: Locator;
   readonly yes: Locator;
 
-  readonly acceptWarnings: Locator;
-  readonly acceptWarningsReminder: Locator;
+  readonly acceptErrorsAndWarnings: Locator;
+  readonly acceptErrorsAndWarningsReminder: Locator;
   readonly next: Locator;
 
   constructor(page: Page) {
@@ -22,8 +22,10 @@ export class RecountedPage extends DataEntryBasePage {
     this.yes = page.getByRole("radio", { name: "Ja, er was een hertelling" });
     this.no = page.getByRole("radio", { name: "Nee, er was geen hertelling" });
 
-    this.acceptWarnings = page.getByLabel("Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.");
-    this.acceptWarningsReminder = page
+    this.acceptErrorsAndWarnings = page.getByLabel(
+      "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+    );
+    this.acceptErrorsAndWarningsReminder = page
       .getByRole("alert")
       .filter({ hasText: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd." });
     this.next = page.getByRole("button", { name: "Volgende" });

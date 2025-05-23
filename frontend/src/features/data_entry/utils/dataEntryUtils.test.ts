@@ -32,11 +32,11 @@ describe("formSectionComplete", () => {
         index: 0,
         id: "recounted",
         isSaved: false,
-        acceptWarnings: false,
+        acceptErrorsAndWarnings: false,
         errors: new ValidationResultSet(),
         warnings: new ValidationResultSet(),
         hasChanges: false,
-        acceptWarningsError: false,
+        acceptErrorsAndWarningsError: false,
       }),
     ).toBe(false);
 
@@ -45,11 +45,11 @@ describe("formSectionComplete", () => {
         index: 0,
         id: "recounted",
         isSaved: true,
-        acceptWarnings: false,
+        acceptErrorsAndWarnings: false,
         errors: new ValidationResultSet(),
         warnings: new ValidationResultSet(),
         hasChanges: false,
-        acceptWarningsError: false,
+        acceptErrorsAndWarningsError: false,
       }),
     ).toBe(true);
   });
@@ -183,7 +183,7 @@ describe("getPollingStationSummary", () => {
     expect(summary.hasWarnings).toBe(false);
     expect(summary.notableFormSections.length).toBe(0);
 
-    state.sections.differences_counts.acceptWarnings = true;
+    state.sections.differences_counts.acceptErrorsAndWarnings = true;
     state.sections.differences_counts.warnings = new ValidationResultSet([errorWarningMocks.W301]);
 
     summary = getDataEntrySummary(state);
@@ -211,7 +211,7 @@ describe("getPollingStationSummary", () => {
       ),
     ).toBeTruthy();
 
-    state.sections.differences_counts.acceptWarnings = false;
+    state.sections.differences_counts.acceptErrorsAndWarnings = false;
 
     summary = getDataEntrySummary(state);
 

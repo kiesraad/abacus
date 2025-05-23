@@ -24,7 +24,7 @@ export function DataEntryProgress() {
       if (!formSection.errors.isEmpty()) {
         return "error";
       }
-      if (!formSection.warnings.isEmpty() && !formSection.acceptWarnings) {
+      if (!formSection.warnings.isEmpty() && !formSection.acceptErrorsAndWarnings) {
         return "warning";
       }
 

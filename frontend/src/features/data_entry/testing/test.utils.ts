@@ -17,7 +17,7 @@ import { getInitialValues } from "./mock-data";
 export interface OverrideServerClaimDataEntryResponseProps {
   formState: FormState;
   pollingStationResults: Partial<PollingStationResults>;
-  acceptWarnings?: boolean;
+  acceptErrorsAndWarnings?: boolean;
   continueToNextSection?: boolean;
   progress?: number;
   validationResults?: ClaimDataEntryResponse["validation_results"];

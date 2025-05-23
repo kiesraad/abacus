@@ -87,10 +87,10 @@ export type DataEntryAction =
     };
 
 export interface SubmitCurrentFormOptions {
-  acceptWarnings?: boolean;
+  acceptErrorsAndWarnings?: boolean;
   aborting?: boolean;
   continueToNextSection?: boolean;
-  showAcceptWarnings?: boolean;
+  showAcceptErrorsAndWarnings?: boolean;
 }
 
 //store unvalidated data
@@ -106,7 +106,7 @@ export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" |
 export interface ClientState {
   furthest: FormSectionId;
   current: FormSectionId;
-  acceptedWarnings: FormSectionId[];
+  acceptedErrorsAndWarnings: FormSectionId[];
   continue: boolean;
 }
 
@@ -125,8 +125,8 @@ export type FormSection = {
   hasChanges: boolean;
   isSaved: boolean; //whether this section has been sent to the server
   isSubmitted?: boolean; //whether this section has been submitted in the latest request
-  acceptWarnings: boolean;
-  acceptWarningsError: boolean;
+  acceptErrorsAndWarnings: boolean;
+  acceptErrorsAndWarningsError: boolean;
   errors: ValidationResultSet;
   warnings: ValidationResultSet;
 };

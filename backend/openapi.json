@@ -112,7 +112,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewElection"
+                "$ref": "#/components/schemas/ElectionDefinitionUploadRequest"
               }
             }
           },
@@ -3090,6 +3090,32 @@
           "Municipal"
         ]
       },
+      "ElectionDefinitionUploadRequest": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "hash": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "save": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      },
       "ElectionDefinitionUploadResponse": {
         "type": "object",
         "required": [
@@ -3385,6 +3411,7 @@
           "EntryNotUnique",
           "InternalServerError",
           "InvalidData",
+          "InvalidHash",
           "InvalidJson",
           "InvalidPassword",
           "InvalidPoliticalGroup",

@@ -15,7 +15,7 @@ use crate::audit_log::{AuditEvent, AuditService};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::{Admin, User},
-    eml::{EML110, EMLDocument, EMLImportError, RedactedEmlHash},
+    eml::{EML110, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},
 };
 
@@ -120,8 +120,10 @@ pub async fn election_create(
     Ok((StatusCode::CREATED, election))
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct ElectionDefinitionUploadRequest {
+    save: Option<bool>,
+    hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
     data: String,
 }
 
@@ -136,7 +138,7 @@ pub struct ElectionDefinitionUploadResponse {
 #[utoipa::path(
     post,
     path = "/api/elections/validate",
-    request_body = NewElection,
+    request_body = ElectionDefinitionUploadRequest,
     responses(
         (status = 201, description = "Election validated", body = ElectionDefinitionUploadResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
@@ -148,6 +150,12 @@ pub async fn election_import_validate(
     _user: Admin,
     Json(edu): Json<ElectionDefinitionUploadRequest>,
 ) -> Result<Json<ElectionDefinitionUploadResponse>, APIError> {
+    if let Some(user_hash) = edu.hash {
+        if user_hash != EmlHash::from(edu.data.as_bytes()).chunks {
+            return Err(APIError::InvalidHashError);
+        }
+    }
+
     let eml = EML110::from_str(&edu.data)?;
     Ok(Json(ElectionDefinitionUploadResponse {
         hash: RedactedEmlHash::from(edu.data.as_bytes()),

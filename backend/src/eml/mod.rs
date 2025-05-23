@@ -7,7 +7,7 @@ mod eml_110;
 mod eml_230;
 mod eml_510;
 mod eml_520;
-mod hash;
+pub mod hash;
 mod util;
 
 pub use common::EMLImportError;

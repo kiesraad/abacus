@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
@@ -15,12 +17,13 @@ interface CheckElectionDefinitionProps {
 }
 
 export function CheckElectionDefinition({ file, data }: CheckElectionDefinitionProps) {
-  const { stubs, highlightStub, handleSubmit } = useElectionCheck(data);
+  const [error, setError] = useState<string | undefined>();
+  const { stubs, highlightStub, handleSubmit } = useElectionCheck(file, data, setError);
 
   return (
     <section className="md">
       <h2>{t("election.check_eml.title")}</h2>
-      {stubs.some((stub) => stub.error.length > 0) && (
+      {(stubs.some((stub) => stub.error.length > 0) || error) && (
         <Alert type="error" title={t("election.check_eml.error.title")} inline>
           <p> {t("election.check_eml.error.description")} </p>
         </Alert>

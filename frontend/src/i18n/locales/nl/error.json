@@ -25,6 +25,7 @@
     "InternalServerError": "Er is een interne fout opgetreden",
     "InvalidData": "De invoer is niet geldig",
     "InvalidJson": "De JSON is niet geldig",
+    "InvalidHash": "De hash is niet geldig",
     "InvalidXml": "De XML is niet geldig",
     "InvalidPassword": "Het opgegeven wachtwoord is onjuist",
     "InvalidPoliticalGroup": "De politieke partij is niet geldig",

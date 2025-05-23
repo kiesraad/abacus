@@ -12,7 +12,7 @@ export type ELECTION_CREATE_REQUEST_BODY = NewElection;
 // /api/elections/validate
 export type ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
-export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = NewElection;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionDefinitionUploadRequest;
 
 // /api/elections/{election_id}
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
@@ -408,6 +408,12 @@ export interface ElectionApportionmentResponse {
  */
 export type ElectionCategory = "Municipal";
 
+export interface ElectionDefinitionUploadRequest {
+  data: string;
+  hash?: unknown[] | null;
+  save?: boolean | null;
+}
+
 export interface ElectionDefinitionUploadResponse {
   election: NewElection;
   hash: RedactedEmlHash;
@@ -528,6 +534,7 @@ export type ErrorReference =
   | "EntryNotUnique"
   | "InternalServerError"
   | "InvalidData"
+  | "InvalidHash"
   | "InvalidJson"
   | "InvalidPassword"
   | "InvalidPoliticalGroup"

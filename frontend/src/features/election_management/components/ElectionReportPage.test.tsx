@@ -26,7 +26,12 @@ describe("ElectionReportPage", () => {
       {
         Component: null,
         errorElement: <ErrorBoundary />,
-        children: electionManagementRoutes,
+        children: [
+          {
+            path: "elections/:electionId/report",
+            children: electionManagementRoutes,
+          },
+        ],
       },
     ]);
 

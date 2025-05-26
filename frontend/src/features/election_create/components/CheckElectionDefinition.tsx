@@ -49,7 +49,7 @@ export function CheckElectionDefinition({ file, data }: CheckElectionDefinitionP
         </div>
       </Alert>
       <p>{t("election.check_eml.check_hash.description")}</p>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={(e) => void handleSubmit(e)}>
         {stubs.map((stub, stubIndex) => (
           <InputField
             key={stub.index}

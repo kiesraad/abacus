@@ -12,7 +12,11 @@ import {
 
 import { Stub } from "../components/RedactedHash";
 
-export function useElectionCheck(file: File, data: ElectionDefinitionValidateResponse, setError: any) {
+export function useElectionCheck(
+  file: File,
+  data: ElectionDefinitionValidateResponse,
+  setError: (error: string) => void,
+) {
   const navigate = useNavigate();
   const url: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = "/api/elections/import/validate";
   const { create } = useCrud<ElectionDefinitionValidateRequest>(url);
@@ -27,10 +31,10 @@ export function useElectionCheck(file: File, data: ElectionDefinitionValidateRes
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(undefined);
+    setError("");
 
     const formData = new FormData(event.currentTarget);
-    let completeHash = data.hash.chunks;
+    const completeHash = data.hash.chunks;
     stubs.forEach((stub, i) => {
       const value = formData.get(stub.index.toString());
       const newStubs = [...stubs];

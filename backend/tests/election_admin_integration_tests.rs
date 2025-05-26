@@ -131,7 +131,7 @@ async fn test_election_import_save(pool: SqlitePool) {
         .await
         .unwrap();
 
-    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::CREATED);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

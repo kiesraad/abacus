@@ -124,7 +124,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ElectionDefinitionImportResponse"
+                  "$ref": "#/components/schemas/Election"
                 }
               }
             }
@@ -177,7 +177,7 @@
           "required": true
         },
         "responses": {
-          "201": {
+          "200": {
             "description": "Election validated",
             "content": {
               "application/json": {
@@ -3163,17 +3163,6 @@
             "items": {
               "type": "string"
             }
-          }
-        }
-      },
-      "ElectionDefinitionImportResponse": {
-        "type": "object",
-        "required": [
-          "election"
-        ],
-        "properties": {
-          "election": {
-            "$ref": "#/components/schemas/Election"
           }
         }
       },

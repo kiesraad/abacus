@@ -418,10 +418,6 @@ export interface ElectionDefinitionImportRequest {
   hash: string[];
 }
 
-export interface ElectionDefinitionImportResponse {
-  election: Election;
-}
-
 export interface ElectionDefinitionValidateRequest {
   data: string;
   hash?: unknown[] | null;

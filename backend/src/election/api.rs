@@ -140,7 +140,7 @@ pub struct ElectionDefinitionValidateResponse {
     path = "/api/elections/import/validate",
     request_body = ElectionDefinitionValidateRequest,
     responses(
-        (status = 201, description = "Election validated", body = ElectionDefinitionValidateResponse),
+        (status = 200, description = "Election validated", body = ElectionDefinitionValidateResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -169,11 +169,6 @@ pub struct ElectionDefinitionImportRequest {
     data: String,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-pub struct ElectionDefinitionImportResponse {
-    election: Election,
-}
-
 /// Uploads election definition, validates it and returns the associated election data and
 /// a redacted hash, to be filled by the administrator
 #[utoipa::path(
@@ -181,7 +176,7 @@ pub struct ElectionDefinitionImportResponse {
     path = "/api/elections/import",
     request_body = ElectionDefinitionImportRequest,
     responses(
-        (status = 201, description = "Election imported", body = ElectionDefinitionImportResponse),
+        (status = 201, description = "Election imported", body = Election),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -191,14 +186,14 @@ pub async fn election_import(
     _user: Admin,
     State(elections_repo): State<Elections>,
     Json(edu): Json<ElectionDefinitionImportRequest>,
-) -> Result<Json<ElectionDefinitionImportResponse>, APIError> {
+) -> Result<(StatusCode, Json<Election>), APIError> {
     if edu.hash != EmlHash::from(edu.data.as_bytes()).chunks {
         return Err(APIError::InvalidHashError);
     }
 
     let new_election = EML110::from_str(&edu.data)?.as_abacus_election()?;
     let election = elections_repo.create(new_election).await?;
-    Ok(Json(ElectionDefinitionImportResponse { election }))
+    Ok((StatusCode::CREATED, Json(election)))
 }
 
 impl From<DeError> for APIError {

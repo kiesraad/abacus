@@ -12,7 +12,7 @@ __Uitbreidingen:__
 1a. De server stelt vast dat er een internetverbinding is:  
 &emsp; 1a1. De server blokkeert de invoer en aanpassingen aan de configuratie.  
 &emsp; 1a2. De server logt alle details met betrekking tot de geconstateerde internetverbinding.  
-&emsp; 1a3. De applicatie toont ingelogde coördinatoren en beheerders een foutmelding met vermelding van de bron van het het probleem.  
+&emsp; 1a3. De applicatie toont ingelogde coördinatoren en beheerders een foutmelding met vermelding van de bron van het probleem.  
 &emsp; 1a4. De applicatie toont op alle andere clients een paginavullende foutmelding.  
 &emsp; 1a5. De foutmeldingen verdwijnen zodra het probleem is verholpen.  
 

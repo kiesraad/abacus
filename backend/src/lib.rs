@@ -1,5 +1,6 @@
 use std::{error::Error, net::SocketAddr};
 
+use airgap::AirgapDetection;
 #[cfg(feature = "memory-serve")]
 use axum::http::StatusCode;
 use axum::{
@@ -21,6 +22,7 @@ use utoipa_axum::router::OpenApiRouter;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
+pub mod airgap;
 pub mod apportionment;
 pub mod audit_log;
 pub mod authentication;
@@ -43,6 +45,7 @@ pub const MAX_BODY_SIZE_MB: usize = 12;
 #[derive(FromRef, Clone)]
 pub struct AppState {
     pool: SqlitePool,
+    airgap_detection: AirgapDetection,
 }
 
 pub fn openapi_router() -> OpenApiRouter<AppState> {
@@ -60,8 +63,14 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
 }
 
 /// Axum router for the application
-pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
-    let state = AppState { pool };
+pub fn router(
+    pool: SqlitePool,
+    airgap_detection: AirgapDetection,
+) -> Result<Router, Box<dyn Error>> {
+    let state = AppState {
+        pool,
+        airgap_detection,
+    };
 
     // Serve the OpenAPI documentation at /api-docs (if the openapi feature is enabled)
     #[cfg(feature = "openapi")]
@@ -173,7 +182,8 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
 
 /// Start the API server on the given port, using the given database pool.
 pub async fn start_server(pool: SqlitePool, listener: TcpListener) -> Result<(), Box<dyn Error>> {
-    let app = router(pool)?;
+    let airgap_detection = AirgapDetection::start().await;
+    let app = router(pool, airgap_detection)?;
 
     info!("Starting API server on http://{}", listener.local_addr()?);
     let listener = listener.tap_io(|tcp_stream| {

@@ -371,6 +371,44 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   describe("VotersAndVotesForm errors", () => {
+    test("clicking next without accepting error results in alert shown and then accept error", async () => {
+      const user = userEvent.setup();
+
+      renderForm();
+
+      await screen.findByTestId("voters_and_votes_form");
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: [
+                "data.voters_counts.total_admitted_voters_count",
+                "data.voters_counts.poll_card_count",
+                "data.voters_counts.proxy_certificate_count",
+                "data.voters_counts.voter_card_count",
+              ],
+              code: "F201",
+            },
+          ],
+          warnings: [],
+        },
+      });
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+      });
+
+      expect(acceptFeedbackCheckbox).toBeVisible();
+      expect(acceptFeedbackCheckbox).not.toBeChecked();
+      acceptFeedbackCheckbox.click();
+      expect(acceptFeedbackCheckbox).toBeChecked();
+
+      await user.click(submitButton);
+    });
+
     test("F.201 IncorrectTotal Voters counts", async () => {
       const user = userEvent.setup();
 
@@ -929,7 +967,7 @@ describe("Test VotersAndVotesForm", () => {
   describe("VotersAndVotesForm accept warnings", () => {
     let user: UserEvent;
     let submitButton: HTMLButtonElement;
-    let acceptWarningsCheckbox: HTMLInputElement;
+    let acceptErrorsAndWarningsCheckbox: HTMLInputElement;
 
     beforeEach(async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -945,56 +983,84 @@ describe("Test VotersAndVotesForm", () => {
       submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      acceptWarningsCheckbox = await screen.findByRole("checkbox", {
+      acceptErrorsAndWarningsCheckbox = await screen.findByRole("checkbox", {
         name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
     });
 
     test("checkbox should disappear when filling in any form input", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
       const input = await screen.findByLabelText("H Totaal uitgebrachte stemmen");
       await user.type(input, "1");
 
-      expect(acceptWarningsCheckbox).not.toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
     });
 
     test("checkbox with error should disappear when filling in any form input", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
       await user.click(submitButton);
 
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      const acceptWarningsError = screen.getByRole("alert", {
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      const acceptErrorsAndWarningsError = screen.getByRole("alert", {
         description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       });
-      expect(acceptWarningsError).toBeVisible();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
 
       const input = await screen.findByLabelText("H Totaal uitgebrachte stemmen");
       await user.type(input, "1");
 
-      expect(acceptWarningsCheckbox).not.toBeVisible();
-      expect(acceptWarningsError).not.toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
+      expect(acceptErrorsAndWarningsError).not.toBeVisible();
     });
 
     test("error should not immediately disappear when checkbox is checked", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
       await user.click(submitButton);
 
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      const acceptWarningsError = screen.getByRole("alert", {
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      const acceptErrorsAndWarningsError = screen.getByRole("alert", {
         description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       });
-      expect(acceptWarningsError).toBeVisible();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
 
-      await user.click(acceptWarningsCheckbox);
-      expect(acceptWarningsCheckbox).toBeChecked();
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      expect(acceptWarningsError).toBeVisible();
+      await user.click(acceptErrorsAndWarningsCheckbox);
+      expect(acceptErrorsAndWarningsCheckbox).toBeChecked();
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
+    });
+  });
+
+  describe("VotersAndVotesForm errors AND warnings", () => {
+    test("Both errors and warning feedback should be shown", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: ["data.votes_counts.blank_votes_count"],
+              code: "F201",
+            },
+          ],
+          warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
+        },
+      });
+
+      renderForm();
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await userEvent.click(submitButton);
+
+      const errorFeedbackMessage =
+        "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+      const warningFeedbackMessage =
+        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(errorFeedbackMessage);
+      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(warningFeedbackMessage);
     });
   });
 });

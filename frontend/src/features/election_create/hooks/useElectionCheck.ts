@@ -6,16 +6,16 @@ import { useCrud } from "@/api/useCrud";
 import { t } from "@/i18n/translate";
 import {
   ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
-  ElectionDefinitionUploadRequest,
-  ElectionDefinitionUploadResponse,
+  ElectionDefinitionValidateRequest,
+  ElectionDefinitionValidateResponse,
 } from "@/types/generated/openapi";
 
 import { Stub } from "../components/RedactedHash";
 
-export function useElectionCheck(file: File, data: ElectionDefinitionUploadResponse, setError: any) {
+export function useElectionCheck(file: File, data: ElectionDefinitionValidateResponse, setError: any) {
   const navigate = useNavigate();
-  const url: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = "/api/elections/validate";
-  const { create } = useCrud<ElectionDefinitionUploadRequest>(url);
+  const url: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = "/api/elections/import/validate";
+  const { create } = useCrud<ElectionDefinitionValidateRequest>(url);
 
   const [stubs, setStubs] = useState<Stub[]>(
     data.hash.redacted_indexes.map((redacted_index: number) => ({

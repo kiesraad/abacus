@@ -11,7 +11,7 @@ import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { ElectionDefinitionUploadResponse, NewElection } from "@/types/generated/openapi";
+import { ElectionDefinitionValidateResponse, NewElection } from "@/types/generated/openapi";
 
 import { electionCreateRoutes } from "../routes";
 
@@ -55,7 +55,7 @@ function renderWithRouter() {
   return router;
 }
 
-function electionValidateResponse(election: NewElection): ElectionDefinitionUploadResponse {
+function electionValidateResponse(election: NewElection): ElectionDefinitionValidateResponse {
   return {
     hash: {
       // NOTE: In actual data, the redacted version of the hash

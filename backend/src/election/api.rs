@@ -22,6 +22,7 @@ use crate::{
 pub fn router() -> OpenApiRouter<AppState> {
     let router = OpenApiRouter::default()
         .routes(routes!(election_import_validate))
+        .routes(routes!(election_import))
         .routes(routes!(election_list))
         .routes(routes!(election_details));
 
@@ -121,26 +122,25 @@ pub async fn election_create(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-pub struct ElectionDefinitionUploadRequest {
-    save: Option<bool>,
+pub struct ElectionDefinitionValidateRequest {
     hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
     data: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-pub struct ElectionDefinitionUploadResponse {
+pub struct ElectionDefinitionValidateResponse {
     hash: RedactedEmlHash,
     election: NewElection,
 }
 
 /// Uploads election definition, validates it and returns the associated election data and
-/// a redacted hash, to be filled by the administrator
+/// a redacted hash, to be filled by the administrator.
 #[utoipa::path(
     post,
-    path = "/api/elections/validate",
-    request_body = ElectionDefinitionUploadRequest,
+    path = "/api/elections/import/validate",
+    request_body = ElectionDefinitionValidateRequest,
     responses(
-        (status = 201, description = "Election validated", body = ElectionDefinitionUploadResponse),
+        (status = 201, description = "Election validated", body = ElectionDefinitionValidateResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -148,8 +148,8 @@ pub struct ElectionDefinitionUploadResponse {
 )]
 pub async fn election_import_validate(
     _user: Admin,
-    Json(edu): Json<ElectionDefinitionUploadRequest>,
-) -> Result<Json<ElectionDefinitionUploadResponse>, APIError> {
+    Json(edu): Json<ElectionDefinitionValidateRequest>,
+) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     if let Some(user_hash) = edu.hash {
         if user_hash != EmlHash::from(edu.data.as_bytes()).chunks {
             return Err(APIError::InvalidHashError);
@@ -157,10 +157,49 @@ pub async fn election_import_validate(
     }
 
     let eml = EML110::from_str(&edu.data)?;
-    Ok(Json(ElectionDefinitionUploadResponse {
+    Ok(Json(ElectionDefinitionValidateResponse {
         hash: RedactedEmlHash::from(edu.data.as_bytes()),
         election: eml.as_abacus_election()?,
     }))
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+pub struct ElectionDefinitionImportRequest {
+    hash: [String; crate::eml::hash::CHUNK_COUNT],
+    data: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+pub struct ElectionDefinitionImportResponse {
+    election: Election,
+}
+
+/// Uploads election definition, validates it and returns the associated election data and
+/// a redacted hash, to be filled by the administrator
+#[utoipa::path(
+    post,
+    path = "/api/elections/import",
+    request_body = ElectionDefinitionImportRequest,
+    responses(
+        (status = 201, description = "Election imported", body = ElectionDefinitionImportResponse),
+        (status = 400, description = "Bad request", body = ErrorResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+pub async fn election_import(
+    _user: Admin,
+    State(elections_repo): State<Elections>,
+    Json(edu): Json<ElectionDefinitionImportRequest>,
+) -> Result<Json<ElectionDefinitionImportResponse>, APIError> {
+    if edu.hash != EmlHash::from(edu.data.as_bytes()).chunks {
+        return Err(APIError::InvalidHashError);
+    }
+
+    let new_election = EML110::from_str(&edu.data)?.as_abacus_election()?;
+    let election = elections_repo.create(new_election).await?;
+
+    Ok(Json(ElectionDefinitionImportResponse { election }))
 }
 
 impl From<DeError> for APIError {

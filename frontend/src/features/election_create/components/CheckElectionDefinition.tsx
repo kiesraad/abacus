@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/i18n/translate";
-import { ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
+import { ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 import { formatDateFull } from "@/utils/format";
 
 import { useElectionCheck } from "../hooks/useElectionCheck";
@@ -13,7 +13,7 @@ import { RedactedHash } from "./RedactedHash";
 
 interface CheckElectionDefinitionProps {
   file: File;
-  data: ElectionDefinitionUploadResponse;
+  data: ElectionDefinitionValidateResponse;
 }
 
 export function CheckElectionDefinition({ file, data }: CheckElectionDefinitionProps) {

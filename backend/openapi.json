@@ -104,15 +104,73 @@
         }
       }
     },
-    "/api/elections/validate": {
+    "/api/elections/import": {
       "post": {
         "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator",
+        "operationId": "election_import",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ElectionDefinitionImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Election imported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectionDefinitionImportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/elections/import/validate": {
+      "post": {
+        "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator.",
         "operationId": "election_import_validate",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ElectionDefinitionUploadRequest"
+                "$ref": "#/components/schemas/ElectionDefinitionValidateRequest"
               }
             }
           },
@@ -124,7 +182,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ElectionDefinitionUploadResponse"
+                  "$ref": "#/components/schemas/ElectionDefinitionValidateResponse"
                 }
               }
             }
@@ -3090,7 +3148,36 @@
           "Municipal"
         ]
       },
-      "ElectionDefinitionUploadRequest": {
+      "ElectionDefinitionImportRequest": {
+        "type": "object",
+        "required": [
+          "hash",
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ElectionDefinitionImportResponse": {
+        "type": "object",
+        "required": [
+          "election"
+        ],
+        "properties": {
+          "election": {
+            "$ref": "#/components/schemas/Election"
+          }
+        }
+      },
+      "ElectionDefinitionValidateRequest": {
         "type": "object",
         "required": [
           "data"
@@ -3107,16 +3194,10 @@
             "items": {
               "type": "string"
             }
-          },
-          "save": {
-            "type": [
-              "boolean",
-              "null"
-            ]
           }
         }
       },
-      "ElectionDefinitionUploadResponse": {
+      "ElectionDefinitionValidateResponse": {
         "type": "object",
         "required": [
           "hash",

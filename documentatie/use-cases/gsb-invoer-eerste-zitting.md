@@ -210,13 +210,14 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 __Hoofdscenario:__
 
 1. De coördinator GSB bekijkt de geaccepteerde fouten en eventuele waarschuwingen.
-2. De coördinator GSB stelt vast het PV fouten bevat die kunnen worden opgelost.
-3. De coördinator laat de fouten in het PV corrigeren en laat de invoerder verder gaan met diens invoer.
+2. Het PV wordt onderzocht om te bepalen of er fouten hersteld kunnen worden.
+3. De coördinator GSB stelt vast het PV fouten bevat die kunnen worden opgelost.
+4. De coördinator laat de fouten in het PV corrigeren en laat de invoerder verder gaan met diens invoer.
 
 __Uitbreidingen:__  
-2a. Het PV bevat fouten die niet opgelost kunnen worden:  
-&emsp; 2a1. De coördinator GSB verwijdert de invoer.  
-&emsp; 2a2. De coördinator GSB laat het stembureau opnieuw invoeren.
+3a. Het PV bevat fouten die niet opgelost kunnen worden:  
+&emsp; 3a1. De coördinator GSB verwijdert de invoer.  
+&emsp; 3a2. De coördinator GSB laat het stembureau opnieuw invoeren.
 
 
 ## De invoerder handelt de fout(en) en/of waarschuwing(en) af (vis)

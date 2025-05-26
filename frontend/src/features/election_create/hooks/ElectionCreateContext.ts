@@ -1,12 +1,10 @@
-import { createContext } from "react";
+import { createContext, Dispatch } from "react";
 
-import { ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
+import { ElectionCreateAction, ElectionCreateState } from "../components/ElectionCreateContextProvider";
 
 export interface IElectionCreateContext {
-  file: File | undefined;
-  setFile: (role: File | undefined) => void;
-  data: ElectionDefinitionValidateResponse | undefined;
-  setData: (data: ElectionDefinitionValidateResponse | undefined) => void;
+  state: ElectionCreateState;
+  dispatch: Dispatch<ElectionCreateAction>;
 }
 
 export const ElectionCreateContext = createContext<IElectionCreateContext | undefined>(undefined);

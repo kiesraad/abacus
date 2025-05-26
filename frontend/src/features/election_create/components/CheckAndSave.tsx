@@ -6,9 +6,9 @@ import { t } from "@/i18n/translate";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
 export function CheckAndSave() {
-  const { data } = useElectionCreateContext();
+  const { state } = useElectionCreateContext();
 
-  if (!data) {
+  if (!state.election) {
     return <Navigate to="/elections/create" />;
   }
 
@@ -18,10 +18,10 @@ export function CheckAndSave() {
       <p className="mt-lg">{t("election.check_and_save.description")}</p>
       <ul>
         <li>
-          <strong>{t("election.singular")}:</strong> {data.election.name}
+          <strong>{t("election.singular")}:</strong> {state.election.name}
         </li>
         <li>
-          <strong>{t("area_designation")}:</strong> {data.election.location}
+          <strong>{t("area_designation")}:</strong> {state.election.location}
         </li>
       </ul>
       <div className="mt-xl">

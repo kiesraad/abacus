@@ -46,7 +46,7 @@ export class DataEntryHomePage {
     });
     this.dataEntryErrors = page.getByRole("heading", {
       level: 2,
-      name: "Let op: fouten in het proces-verbaal",
+      name: "Let op: Fouten in het proces-verbaal",
     });
     this.dataEntryWarning = page.getByRole("heading", {
       level: 2,

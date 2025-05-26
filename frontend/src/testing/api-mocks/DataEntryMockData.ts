@@ -163,6 +163,15 @@ export const dataEntryStatusDifferences: DataEntryStatus = {
   },
 };
 
+export const firstEntryHasErrorsStatus: DataEntryStatus = {
+  state: {
+    finalised_first_entry: getEmptyDataEntryRequest().data,
+    first_entry_finished_at: "",
+    first_entry_user_id: 0,
+  },
+  status: "FirstEntryHasErrors",
+};
+
 export const secondEntryNotStartedStatus: DataEntryStatus = {
   state: {
     finalised_first_entry: getEmptyDataEntryRequest().data,

@@ -65,7 +65,6 @@ export function CheckAndSaveForm() {
       }
       return true;
     }
-
     return false;
   };
 

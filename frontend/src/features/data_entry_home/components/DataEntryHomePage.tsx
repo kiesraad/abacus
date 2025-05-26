@@ -88,7 +88,7 @@ export function DataEntryHomePage() {
         <Alert type="notify" onClose={closeDataEntryNotifyAlert}>
           <h2>{showDifferenceWithFirstEntryAlert ? t("data_entry.entry_different") : t("data_entry.entry_errors")}</h2>
           <p>
-            {t("data_entry.entry_saved")}.{t("data_entry.success.return_paper")},
+            {t("data_entry.entry_saved")}. {t("data_entry.success.return_paper")},<br />
             {showDifferenceWithFirstEntryAlert
               ? t("data_entry.success.different_entry_info")
               : t("data_entry.success.errors_entry_info")}

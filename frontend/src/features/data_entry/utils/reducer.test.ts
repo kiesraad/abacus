@@ -216,7 +216,7 @@ describe("onSubmitForm", () => {
 
     const submit = onSubmitForm(client, "", dispatch, getDefaultDataEntryState());
 
-    const result = await submit({}, { showAcceptWarnings: true });
+    const result = await submit({}, { showAcceptErrorsAndWarnings: true });
     expect(result).toBe(false);
     expect(dispatch).toHaveBeenCalledTimes(0);
   });
@@ -235,7 +235,7 @@ describe("onSubmitForm", () => {
           ...defaultState.formState.sections,
           voters_votes_counts: {
             ...defaultState.formState.sections.voters_votes_counts,
-            acceptWarnings: false,
+            acceptErrorsAndWarnings: false,
             warnings: new ValidationResultSet([errorWarningMocks.W201]),
           },
         },
@@ -244,11 +244,11 @@ describe("onSubmitForm", () => {
 
     const submit = onSubmitForm(client, "", dispatch, state);
 
-    const result = await submit({}, { showAcceptWarnings: true });
+    const result = await submit({}, { showAcceptErrorsAndWarnings: true });
     expect(result).toBe(false);
     expect(dispatch).toHaveBeenCalledWith({
       type: "UPDATE_FORM_SECTION",
-      partialFormSection: { acceptWarningsError: true },
+      partialFormSection: { acceptErrorsAndWarningsError: true },
     } satisfies DataEntryAction);
   });
 

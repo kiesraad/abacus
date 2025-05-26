@@ -167,7 +167,7 @@ describe("Test CheckAndSaveForm", () => {
 
   test("Data entry shows finalise button with accepted warnings", async () => {
     const dataEntryState = getDefaultDataEntryState();
-    dataEntryState.formState.sections.voters_votes_counts.acceptWarnings = true;
+    dataEntryState.formState.sections.voters_votes_counts.acceptErrorsAndWarnings = true;
 
     overrideServerClaimDataEntryResponse({
       formState: dataEntryState.formState,
@@ -214,7 +214,7 @@ describe("Test CheckAndSaveForm summary", () => {
 
   test("Accepted with warnings", async () => {
     const dataEntryState = getDefaultDataEntryState();
-    dataEntryState.formState.sections.differences_counts.acceptWarnings = true;
+    dataEntryState.formState.sections.differences_counts.acceptErrorsAndWarnings = true;
     overrideServerClaimDataEntryResponse({
       formState: dataEntryState.formState,
       pollingStationResults: getDefaultValues(),

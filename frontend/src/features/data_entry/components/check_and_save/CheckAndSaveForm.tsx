@@ -40,7 +40,7 @@ export function CheckAndSaveForm() {
   }, [formState]);
 
   const finalisationAllowed = Object.values(formState.sections).every(
-    (section) => section.errors.isEmpty() && (section.warnings.isEmpty() || section.acceptWarnings),
+    (section) => section.errors.isEmpty() && (section.warnings.isEmpty() || section.acceptErrorsAndWarnings),
   );
 
   // save the current state, without finalising (for the abort dialog)

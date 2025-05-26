@@ -23,9 +23,9 @@ export function RecountedForm() {
     formSection,
     isSaving,
     onSubmit,
-    setAcceptWarnings,
+    setAcceptErrorsAndWarnings,
     defaultProps,
-    showAcceptWarnings,
+    showAcceptErrorsAndWarnings,
   } = useRecounted();
 
   return (
@@ -76,21 +76,21 @@ export function RecountedForm() {
         </ChoiceList>
       </div>
       <BottomBar type="form">
-        {formSection.acceptWarningsError && (
+        {formSection.acceptErrorsAndWarningsError && (
           <BottomBar.Row>
             <Alert type="error" small>
               <p>{t("data_entry.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>
         )}
-        {showAcceptWarnings && (
+        {showAcceptErrorsAndWarnings && (
           <BottomBar.Row>
             <Checkbox
               id="recounted_form_accept_warnings"
-              checked={formSection.acceptWarnings}
-              hasError={formSection.acceptWarningsError}
+              checked={formSection.acceptErrorsAndWarnings}
+              hasError={formSection.acceptErrorsAndWarningsError}
               onChange={(e) => {
-                setAcceptWarnings(e.target.checked);
+                setAcceptErrorsAndWarnings(e.target.checked);
               }}
               label={t("data_entry.form_accept_warnings")}
             />

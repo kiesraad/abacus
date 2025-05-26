@@ -38,7 +38,11 @@ export function onSubmitForm(
 ) {
   return async (
     partialPollingStationResults: Partial<PollingStationResults>,
-    { aborting = false, continueToNextSection = true, showAcceptWarnings = true }: SubmitCurrentFormOptions = {},
+    {
+      aborting = false,
+      continueToNextSection = true,
+      showAcceptErrorsAndWarnings = true,
+    }: SubmitCurrentFormOptions = {},
   ): Promise<boolean> => {
     const currentSection = state.formState.sections[state.formState.current];
 
@@ -48,12 +52,11 @@ export function onSubmitForm(
 
     if (
       !aborting &&
-      currentSection.errors.isEmpty() &&
-      !currentSection.warnings.isEmpty() &&
-      showAcceptWarnings &&
-      !currentSection.acceptWarnings
+      (!currentSection.errors.isEmpty() || !currentSection.warnings.isEmpty()) &&
+      showAcceptErrorsAndWarnings &&
+      !currentSection.acceptErrorsAndWarnings
     ) {
-      dispatch({ type: "UPDATE_FORM_SECTION", partialFormSection: { acceptWarningsError: true } });
+      dispatch({ type: "UPDATE_FORM_SECTION", partialFormSection: { acceptErrorsAndWarningsError: true } });
       return false;
     }
 
@@ -73,7 +76,7 @@ export function onSubmitForm(
       data.voters_recounts = undefined;
     }
     // prepare data to send to server
-    const clientState = getClientState(state.formState, currentSection.acceptWarnings, continueToNextSection);
+    const clientState = getClientState(state.formState, currentSection.acceptErrorsAndWarnings, continueToNextSection);
     const progress = calculateDataEntryProgress(state.formState);
 
     // send data to server

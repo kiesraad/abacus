@@ -1,7 +1,7 @@
 import type { Story } from "@ladle/react";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
+import { extendedPollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 
 import { ElectionStatus } from "./ElectionStatus";
@@ -41,9 +41,38 @@ export const PollingStationStatus: Story<StoryProps> = ({ navigate }) => {
           first_entry_progress: 100,
           second_entry_progress: 20,
         },
+        {
+          polling_station_id: 5,
+          status: "definitive",
+          first_entry_user_id: 1,
+          second_entry_user_id: 2,
+          first_entry_progress: 100,
+          second_entry_progress: 100,
+          finished_at: today.toISOString(),
+        },
+        {
+          polling_station_id: 6,
+          status: "first_entry_in_progress",
+          first_entry_user_id: 1,
+          first_entry_progress: 25,
+        },
+        {
+          polling_station_id: 7,
+          status: "entries_different",
+          first_entry_user_id: 1,
+          second_entry_user_id: 2,
+          first_entry_progress: 100,
+          second_entry_progress: 100,
+        },
+        {
+          polling_station_id: 8,
+          status: "first_entry_has_errors",
+          first_entry_user_id: 1,
+          first_entry_progress: 100,
+        },
       ]}
       election={electionMockData}
-      pollingStations={pollingStationMockData}
+      pollingStations={extendedPollingStationMockData}
       users={userMockData}
       navigate={navigate}
     />

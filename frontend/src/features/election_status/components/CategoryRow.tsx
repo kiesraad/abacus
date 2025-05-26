@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
+import { t } from "@/i18n/translate";
 import { DataEntryStatusName } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/format";
 
@@ -13,12 +14,23 @@ interface CategoryRowProps {
   pollingStation: PollingStationWithStatusAndTypist;
 }
 
-const SHOW_BADGE: DataEntryStatusName[] = ["first_entry_in_progress", "second_entry_in_progress", "entries_different"];
+const SHOW_BADGE: DataEntryStatusName[] = [
+  "first_entry_in_progress",
+  "second_entry_in_progress",
+  "entries_different",
+  "first_entry_has_errors",
+];
 
 export function CategoryRow({ category, pollingStation }: CategoryRowProps): ReactNode {
-  if (pollingStation.status === "entries_different") {
+  if (pollingStation.status === "entries_different" || pollingStation.status === "first_entry_has_errors") {
     return (
-      <Table.LinkRow to={`./${pollingStation.id}/resolve-differences`}>
+      <Table.LinkRow
+        to={
+          pollingStation.status === "entries_different"
+            ? `./${pollingStation.id}/resolve-differences`
+            : `./${pollingStation.id}/resolve-errors`
+        }
+      >
         <CategoryRowContent category={category} pollingStation={pollingStation} />
       </Table.LinkRow>
     );
@@ -41,6 +53,9 @@ function CategoryRowContent({ category, pollingStation }: CategoryRowProps): Rea
       </Table.Cell>
       {(category === "in_progress" || category === "first_entry_finished") && (
         <Table.Cell key={`${pollingStation.id}-typist`}>{pollingStation.typist}</Table.Cell>
+      )}
+      {category === "errors_and_warnings" && pollingStation.status !== undefined && (
+        <Table.Cell key={`${pollingStation.id}-to-check`}>{t(`status.${pollingStation.status}`)}</Table.Cell>
       )}
       {category === "in_progress" && (
         <Table.Cell key={`${pollingStation.id}-progress`}>

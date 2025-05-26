@@ -14,10 +14,10 @@ describe("ElectionStatus", () => {
 
     const items = [...screen.getByTestId("polling-stations-per-status").children];
     expect(items[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Stembureaus per status" }));
-    expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (0)");
-    expect(items[2]).toHaveTextContent("Invoer bezig (2)");
+    expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (2)");
+    expect(items[2]).toHaveTextContent("Invoer bezig (3)");
     expect(items[3]).toHaveTextContent("Eerste invoer klaar (1)");
-    expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
+    expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (1)");
     expect(items[5]).toHaveTextContent("Werkvoorraad (1)");
 
     const progress = [...screen.getByTestId("progress").children];
@@ -25,11 +25,11 @@ describe("ElectionStatus", () => {
     expect(screen.getByTestId("progressbar-all")).toBeInTheDocument();
     const bars = [...screen.getByTestId("multi-outer-bar").children];
     const expectedData = [
-      { percentage: 0, class: "definitive" },
-      { percentage: 25, class: "first-entry-finished" },
-      { percentage: 50, class: "in-progress" },
-      { percentage: 0, class: "errors-and-warnings" },
-      { percentage: 25, class: "not-started" },
+      { percentage: 13, class: "definitive" },
+      { percentage: 13, class: "first-entry-finished" },
+      { percentage: 38, class: "in-progress" },
+      { percentage: 25, class: "errors-and-warnings" },
+      { percentage: 13, class: "not-started" },
     ];
     bars.forEach((bar, index) => {
       expect(bar.classList, `class for index ${index}`).toContain(`${expectedData[index]?.class}`);
@@ -42,28 +42,42 @@ describe("ElectionStatus", () => {
     const headings = within(tablesRoot).getAllByRole("heading", { level: 3 });
     const tables = within(tablesRoot).getAllByRole("table");
 
-    expect(headings.length).toBe(3);
-    expect(tables.length).toBe(3);
+    expect(headings.length).toBe(5);
+    expect(tables.length).toBe(5);
 
-    expect(headings[0]).toHaveTextContent("Invoer bezig (2)");
+    expect(headings[0]).toHaveTextContent("Fouten en waarschuwingen (2)");
     expect(tables[0]).toHaveTableContent([
+      ["Nummer", "Stembureau", "Te controleren"],
+      ["39", "Test gemeentehuis Verschil invoer 1 en 2", "Verschil 1e en 2e invoer"],
+      ["40", "Test kerk 1e invoer", "Fouten in proces-verbaal"],
+    ]);
+
+    expect(headings[1]).toHaveTextContent("Invoer bezig (3)");
+    expect(tables[1]).toHaveTableContent([
       ["Nummer", "Stembureau", "Invoerder", "Voortgang"],
       ["35", "Testschool 1e invoer", "Sanne Molenaar", "60%"],
       ["36", "Testbuurthuis 2e invoer", "Jayden Ahmen", "20%"],
+      ["38", "Testmuseum 1e invoer", "Sanne Molenaar", "25%"],
     ]);
 
-    const inProgressRows = within(tables[0]!).getAllByRole("row");
+    const inProgressRows = within(tables[1]!).getAllByRole("row");
     expect(within(inProgressRows[1]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "60");
     expect(within(inProgressRows[2]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "20");
 
-    expect(headings[1]).toHaveTextContent("Eerste invoer klaar (1)");
-    expect(tables[1]).toHaveTableContent([
+    expect(headings[2]).toHaveTextContent("Eerste invoer klaar (1)");
+    expect(tables[2]).toHaveTableContent([
       ["Nummer", "Stembureau", "Invoerder", "Afgerond op"],
       ["34", "Testplek", "Sanne Molenaar", "vandaag 10:20"],
     ]);
 
-    expect(headings[2]).toHaveTextContent("Werkvoorraad (1)");
-    expect(tables[2]).toHaveTableContent([
+    expect(headings[3]).toHaveTextContent("Eerste en tweede invoer klaar (1)");
+    expect(tables[3]).toHaveTableContent([
+      ["Nummer", "Stembureau", "Afgerond op"],
+      ["37", "Testbus", "vandaag 10:20"],
+    ]);
+
+    expect(headings[4]).toHaveTextContent("Werkvoorraad (1)");
+    expect(tables[4]).toHaveTableContent([
       ["Nummer", "Stembureau"],
       ["33", "Op Rolletjes"],
     ]);

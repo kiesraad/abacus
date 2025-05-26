@@ -24,7 +24,7 @@ const navigate = vi.fn();
 
 vi.mock("react-router", () => ({
   useNavigate: () => navigate,
-  useParams: () => ({ pollingStationId: "3" }),
+  useParams: () => ({ pollingStationId: "1" }),
   useLocation: () => ({ pathname: "/" }),
 }));
 

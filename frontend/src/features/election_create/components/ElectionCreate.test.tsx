@@ -96,7 +96,7 @@ describe("Election create pages", () => {
       /* do nothing */
     });
 
-    overrideOnce("post", "/api/elections/validate", 400, {
+    overrideOnce("post", "/api/elections/import/validate", 400, {
       error: "Invalid XML",
       fatal: false,
       reference: "InvalidXml",
@@ -128,7 +128,7 @@ describe("Election create pages", () => {
       /* do nothing */
     });
 
-    overrideOnce("post", "/api/elections/validate", 413, {
+    overrideOnce("post", "/api/elections/import/validate", 413, {
       error: "12",
       fatal: false,
       reference: "RequestPayloadTooLarge",
@@ -151,7 +151,7 @@ describe("Election create pages", () => {
   });
 
   test("Shows and validates hash when uploading valid file", async () => {
-    overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
     const router = renderWithRouter();
     const user = userEvent.setup();
@@ -181,6 +181,9 @@ describe("Election create pages", () => {
     expect(screen.getByText("1")).toHaveRole("mark");
     expect(screen.getByText("2")).not.toHaveRole("mark");
 
+    // Override again
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
     const inputPart1 = screen.getByLabelText("Controle deel 1");
     await user.type(inputPart1, "zxcv");
 
@@ -201,7 +204,7 @@ describe("Election create pages", () => {
   });
 
   test("Shows error on invalid input", async () => {
-    overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
     const router = renderWithRouter();
     const user = userEvent.setup();

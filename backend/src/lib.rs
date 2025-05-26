@@ -104,6 +104,10 @@ pub fn router(
         .layer(middleware::map_request_with_state(
             state.clone(),
             authentication::inject_user,
+        ))
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            airgap::block_request_on_airgap_violation,
         ));
 
     // Set Cache-Control header to prevent caching of API responses

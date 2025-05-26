@@ -3467,6 +3467,7 @@
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
+          "AirgapViolation",
           "AllListsExhausted",
           "ApportionmentNotAvailableUntilDataEntryFinalised",
           "DatabaseError",

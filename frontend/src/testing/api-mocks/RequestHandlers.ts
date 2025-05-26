@@ -163,14 +163,14 @@ export const PollingStationDataEntryStatusHandler = http.get<
   null,
   DataEntryStatus,
   POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH
->("/api/polling_stations/1/data_entries", () => HttpResponse.json(dataEntryStatusDifferences, { status: 200 }));
+>("/api/polling_stations/3/data_entries", () => HttpResponse.json(dataEntryStatusDifferences, { status: 200 }));
 
 export const PollingStationDataEntryResolveHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY,
   PollingStationDataEntry,
   POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH
->("/api/polling_stations/1/data_entries/resolve", () =>
+>("/api/polling_stations/3/data_entries/resolve", () =>
   HttpResponse.json(dataEntryResolveMockResponse, { status: 200 }),
 );
 

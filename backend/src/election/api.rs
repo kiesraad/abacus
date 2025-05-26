@@ -198,7 +198,6 @@ pub async fn election_import(
 
     let new_election = EML110::from_str(&edu.data)?.as_abacus_election()?;
     let election = elections_repo.create(new_election).await?;
-
     Ok(Json(ElectionDefinitionImportResponse { election }))
 }
 

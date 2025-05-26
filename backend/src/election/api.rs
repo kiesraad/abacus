@@ -122,6 +122,8 @@ pub async fn election_create(
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct ElectionDefinitionValidateRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = Option<Vec<String>>, nullable = false)]
     hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
     data: String,
 }

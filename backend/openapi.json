@@ -3176,10 +3176,7 @@
             "type": "string"
           },
           "hash": {
-            "type": [
-              "array",
-              "null"
-            ],
+            "type": "array",
             "items": {
               "type": "string"
             }

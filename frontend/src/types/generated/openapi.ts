@@ -420,7 +420,7 @@ export interface ElectionDefinitionImportRequest {
 
 export interface ElectionDefinitionValidateRequest {
   data: string;
-  hash?: unknown[] | null;
+  hash?: string[];
 }
 
 export interface ElectionDefinitionValidateResponse {

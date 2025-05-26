@@ -1,4 +1,3 @@
-#[cfg(feature = "dev-database")]
 use axum::http::StatusCode;
 use axum::{
     Json,

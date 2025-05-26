@@ -2,7 +2,7 @@
 
 ## Validatieregels geven fouten
 
-Aan validatieregels moet voldaan worden. Als de fout optreedt, kan de gebruiker niet verder naar de volgende stap. De invoer wordt wel opgeslagen, maar is nog niet afgerond. De foutmelding wordt getoond als de regel evalueert naar `FALSE`.
+Validatieregels vragen de gebruiker de invoer extra te controleren. Ze resulteren in een niet-blokkerende foutmelding. De foutmelding wordt getoond als de regel evalueert naar `FALSE`.
 
 De foutmelding die wordt getoond bestaat uit vier onderdelen:
 
@@ -14,7 +14,7 @@ De foutmelding die wordt getoond bestaat uit vier onderdelen:
 Titel, nummer en toelichting zijn uniek voor iedere foutmelding. Het handelingsperspectief is voor alle foutmeldingen gelijk, en is als volgt:
 
 > - Heb je iets niet goed overgenomen? Herstel de fout en ga verder.
-> - Heb je alles goed overgenomen en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.
+> - Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.
 
 ### Regels voor alle numerieke invoervelden (reeks F.0xx)
 
@@ -31,7 +31,7 @@ Er zijn geen regels omdat het niet mogelijk is om foute aantallen in te vullen i
 > - Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator.
 > - Geen vinkje? Kies dan 'nee'.
 
-Velden markeren: geen (laat alleen error zien op de pagina)
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 Bij deze foutmelding wordt het standaard handelingsperspectief niet getoond.
 
@@ -122,7 +122,7 @@ Velden markeren: velden uit set (I, J, K, L, M, N, O) die zijn ingevuld
 > De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
-Velden markeren: geen (laat alleen error zien op de pagina)
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=1635-58277&t=zTY4ajWtsFkiTOYP-4)
 
@@ -222,7 +222,7 @@ Veld markeren: H en D.2
 > De getallen bij A t/m D zijn precies hetzelfde als E t/m H.  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
-Velden markeren: geen (laat alleen error zien op de pagina)
+Velden markeren: geen (laat alleen waarschuwing zien op de pagina)
 
 #### W.209 Getallen in blok uitgebrachte stemmen (E t/m H) zijn niet allemaal gelijk aan getallen in blok hertelde toegelaten kiezers (A.2 t/m D.2)
 
@@ -260,12 +260,9 @@ Een request naar de backend kan meerdere fouten en waarschuwingen teruggeven.
 
 In de user interface behandelen we die als volgt:
 
-- Als er waarschuwingen zijn in stappen **vóór** de hoogste stap waar de gebruiker invoer voor heeft gedaan, dan tonen we bij die stap in de navigatiebalk een waarschuwings-icoon ([voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=137-4359&t=6BRGJQMHbKwihTCh-4)).
-- **Fouten** in stappen vóór de hoogste stap waar de gebruiker invoer voor heeft gedaan kunnen in principe niet voorkomen (want een fout is blokkerend, je kan niet verder). Is dit toch het geval, dan redirecten we naar de eerste stap met een fout.
+- Voor de stappen **vóór** de hoogste stap waar de gebruiker invoer voor heeft gedaan: als er fouten zijn dan tonen we bij die stap in de navigatiebalk een fout-icoon, anders als er waarschuwingen zijn dan tonen we bij die stap in de navigatiebalk een waarschuwings-icoon ([voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=137-4359&t=6BRGJQMHbKwihTCh-4)).
 - Fouten of waarschuwingen **voorbij** de hoogste stap waar de gebruiker invoer voor heeft gedaan, tonen we niet.
-- Zijn er fouten in de stap waar de gebruiker is, dan tonen we alleen de fouten en negeren we eventuele waarschuwingen in die stap.
-- Zijn er geen fouten in de huidige stap, dan tonen we de waarschuwingen.
-- Zijn er meerdere fouten of waarschuwingen in de huidige stap, dan tonen we alle waarschuwingen of fouten ([voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=2871-9169&t=FtsIfhKtOeDxlo9v-4)).
+- Zijn er fouten of waarschuwingen in de huidige stap, dan tonen we alle waarschuwingen of fouten ([voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=2871-9169&t=FtsIfhKtOeDxlo9v-4)).
   - We tonen van elke melding de titel, het nummer en de toelichting.
   - Omdat het handelingsperspectief voor alle meldingen hetzelfde is, tonen we deze maar één keer.
-  - We markeren alle invoervelden waar een foutmelding of waarschuwing op is. Gaat melding 1 over veld A, B en C, en melding 2 over veld C en D, dan markeren we dus A, B, C en D.
+  - We markeren alle invoervelden waar een foutmelding of waarschuwing op is. Gaat melding 1 over veld A, B en C, en melding 2 over veld C en D, dan markeren we dus A, B, C en D. Mocht er voor een invoerveld zowel een foutmelding als een waarschuwing zijn, dan wordt alleen het foutmelding markering getoond. 

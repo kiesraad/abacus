@@ -1,15 +1,34 @@
-import { Navigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
+import { isError, isSuccess } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { t } from "@/i18n/translate";
+import { ELECTION_IMPORT_REQUEST_PATH, ElectionDefinitionImportRequest } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
 export function CheckAndSave() {
+  const navigate = useNavigate();
   const { state } = useElectionCreateContext();
+  const path: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
+  const { create } = useCrud<ElectionDefinitionImportRequest>({ create: path });
 
   if (!state.election) {
     return <Navigate to="/elections/create" />;
+  }
+
+  async function handleSubmit() {
+    const response = await create({
+      data: state.electionDefinitionData,
+      hash: state.electionDefinitionHash,
+    });
+
+    if (isSuccess(response)) {
+      await navigate("/elections");
+    } else if (isError(response)) {
+      throw new Error();
+    }
   }
 
   return (
@@ -25,7 +44,7 @@ export function CheckAndSave() {
         </li>
       </ul>
       <div className="mt-xl">
-        <Button>{t("save")}</Button>
+        <Button onClick={() => void handleSubmit()}>{t("save")}</Button>
       </div>
     </section>
   );

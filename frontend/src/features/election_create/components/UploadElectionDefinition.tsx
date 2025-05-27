@@ -9,7 +9,7 @@ import { t, tx } from "@/i18n/translate";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import { CheckElectionDefinition } from "./CheckElectionDefinition";
+import { CheckHash } from "./CheckHash";
 
 export function UploadElectionDefinition() {
   const { state, dispatch } = useElectionCreateContext();
@@ -66,6 +66,10 @@ export function UploadElectionDefinition() {
     async function onSubmit(chunks: string[]) {
       const response = await create({ data: state.electionDefinitionData, hash: chunks });
       if (isSuccess(response)) {
+        dispatch({
+          type: "SET_ELECTION_DEFINITION_HASH",
+          electionDefinitionHash: chunks,
+        });
         await navigate("/elections/create/check-and-save");
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
         setError(response.message);
@@ -73,7 +77,7 @@ export function UploadElectionDefinition() {
     }
 
     return (
-      <CheckElectionDefinition
+      <CheckHash
         date={state.election.election_date}
         title={state.election.name}
         fileName={state.electionDefinitionFileName}

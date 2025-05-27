@@ -10,7 +10,7 @@ import { formatDateFull } from "@/utils/format";
 
 import { RedactedHash, Stub } from "./RedactedHash";
 
-interface CheckElectionDefinitionProps {
+interface CheckHashProps {
   date: string;
   title: string;
   fileName: string;
@@ -19,14 +19,7 @@ interface CheckElectionDefinitionProps {
   onSubmit: (chunks: string[]) => void;
 }
 
-export function CheckElectionDefinition({
-  date,
-  title,
-  fileName,
-  redactedHash,
-  error,
-  onSubmit,
-}: CheckElectionDefinitionProps) {
+export function CheckHash({ date, title, fileName, redactedHash, error, onSubmit }: CheckHashProps) {
   const [stubs, setStubs] = useState<Stub[]>(
     redactedHash.redacted_indexes.map((redacted_index: number) => ({
       selected: false,

@@ -19,6 +19,7 @@ import polling_station_choice from "./polling_station_choice.json";
 import polling_station_results from "./polling_station_results.json";
 import recounted from "./recounted.json";
 import resolve_differences from "./resolve_differences.json";
+import resolve_errors from "./resolve_errors.json";
 import status from "./status.json";
 import users from "./users.json";
 import voters_votes_counts from "./voters_votes_counts.json";
@@ -46,6 +47,7 @@ const nl = {
   polling_station_results,
   recounted,
   resolve_differences,
+  resolve_errors,
   status,
   users,
   voters_votes_counts,

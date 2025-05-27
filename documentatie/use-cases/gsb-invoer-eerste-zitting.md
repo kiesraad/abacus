@@ -90,18 +90,29 @@ __Hoofdscenario:__
 1. De coördinator GSB geeft het SB PV (eventueel met corrigendum) aan de eerste invoerder.
 2. (tijdens invoer) De coördinator GSB monitort de voortgang op het statusoverzicht van de steminvoer.
 3. [De eerste invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in-zee)
-4. De coördinator GSB geeft het SB PV evt. met corrigendum aan de tweede invoerder.
-5. [De tweede invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in-zee)
-6. (na eerste en/of tweede invoer) De applicatie stelt vast dat de invoer geen waarschuwingen bevat.
-7. De applicatie stelt vast dat beide invoeren gelijk zijn.
-8. De applicatie slaat het definitieve resultaat van het stembureau op.
+4. De applicatie stelt vast dat de eerste invoer geen geaccepteerde fouten bevat.
+5. De applicatie stelt vast dat de eerste invoer geen geaccepteerde waarschuwingen bevat.
+6. De coördinator GSB geeft het SB PV evt. met corrigendum aan de tweede invoerder.
+7. [De tweede invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in-zee)
+8. De applicatie stelt vast dat beide invoeren gelijk zijn.
+9. De applicatie stelt vast dat de tweede invoer geen geaccepteerde waarschuwingen bevat.
+10. De applicatie slaat het definitieve resultaat van het stembureau op.
 
 __Uitbreidingen:__  
-6a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
-&emsp; 6a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
+4a. De applicatie stelt vast dat een invoerder fouten heeft geaccepteerd:  
+&emsp; 4a1. [De coördinator GSB beoordeelt de geaccepteerde fouten.](#de-coördinator-gsb-beoordeelt-de-geaccepteerde-fouten-zee)
 
-7a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
-&emsp; 7a1. [De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.](#de-coördinator-gsb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-zee)
+5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
+&emsp; 5a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
+
+8a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
+&emsp; 8a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
+
+8a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
+&emsp; 8a1. [De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.](#de-coördinator-gsb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-zee)
+
+9a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
+&emsp; 9a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
 
 ### Open punten
 - Waar in het scenario kan de coördinator GSB verklaringen maken over de waarschuwingen, zodat het CSB deze beter kan beoordelen? Na de eerste of tweede invoer? Of pas nadat het resultaat van een stembureau definitief is?
@@ -127,10 +138,8 @@ __Hoofdscenario:__
 3. De invoerder voert in of er herteld is.
 4. De invoerder vult de resultaten van de telling in.
 5. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
-   de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten)
-6. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
-   de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
-7. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
+   de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten) en de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
+6. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
 
 __Uitbreidingen:__  
 1a. De invoerder kan het stembureau op het PV niet in de applicatie vinden:  
@@ -153,20 +162,16 @@ __Uitbreidingen:__
 2a. De applicatie stelt vast dat de invoerder eerdere invoer voor het stembureau heeft opgeslagen:  
 &emsp; 2a1. De applicatie laadt de eerder ingevoerde data.
 
-5a. De invoer voldoet niet aan de validatieregels voor fouten:  
-&emsp; 5a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
-&emsp; 5a2. [De invoerder handelt de fout(en) af.](#de-invoerder-handelt-de-fouten-af-vis)  
+5a. De invoer voldoet niet aan de validatieregels voor fouten of aan de plausibiliteitschecks:  
+&emsp; 5a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel en een waarschuwing voor elke gefaalde plausibiliteitscheck. 
+&emsp; 5a2. [De invoerder handelt de fout(en) en/of waarschuwing(en) af.](#de-invoerder-handelt-de-fouten-en-of-waarschuwingen-af-vis)
 
-6a. De invoer voldoet niet aan de plausibiliteitschecks:  
-&emsp; 6a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
-&emsp; 6a2. [De invoerder handelt de waarschuwing(en) af.](#de-invoerder-handelt-de-waarschuwingen-af-vis)
-
-7a. De invoerder breekt de invoer af en bewaart de invoer:  
-&emsp; 7a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  
-&emsp; 7a2. De applicatie laadt de pagina voor het selecteren van een stembureau.  
-7b. De invoerder breekt de invoer af en bewaart de invoer niet:  
-&emsp; 7b1. De applicatie verwijdert de invoer voor het stembureau.  
-&emsp; 7b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
+6a. De invoerder breekt de invoer af en bewaart de invoer:  
+&emsp; 6a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  
+&emsp; 6a2. De applicatie laadt de pagina voor het selecteren van een stembureau.  
+6b. De invoerder breekt de invoer af en bewaart de invoer niet:  
+&emsp; 6b1. De applicatie verwijdert de invoer voor het stembureau.  
+&emsp; 6b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
 
 ### Open punten
 - De use case beschrijft de oude modellen, met daarin alleen de vraag "Is er herteld?" In de nieuwe modellen zijn er drie vragen.
@@ -196,55 +201,43 @@ __Uitbreidingen:__
 - Gebruiksvriendelijker alternatief is om afhankelijk van het aantal verschillen drie opties te geven: (1) coördinator GSB kiest één invoer en voegt een verklaring toe aan "Bijzonderheden"; (2) coördinator GSB laat alleen de afwijkende lijst(en) opnieuw invoeren; (3) coördinator GSB laat de volledige invoer opnieuw doen.
 
 
+## De coördinator GSB beoordeelt de geaccepteerde fouten (zee).
 
-## De invoerder handelt de fout(en) af (vis)
-
-__Niveau:__ subfunctie, vis, 🐟
+__Niveau:__ gebruikersdoel, zee, 🌊
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ De controles geven een foutmelding vanwege de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten).
+__Hoofdscenario:__
 
-*Foutmelding*: De ingevoerde waardes kunnen niet correct zijn. Bijvoorbeeld: het totaal van de stemmen op een lijst komt niet overeen met de som van de stemmen van de kandidaten op die lijst.
-
-__Hoofdscenario:__  
-Voor elke foutmelding:  
-
-1. De invoerder controleert de foutmelding.
-2. De invoerder constateert dat hij/zij een fout heeft gemaakt in de invoer.
-3. De invoerder corrigeert de fout in de invoer.
+1. De coördinator GSB bekijkt de geaccepteerde fouten en eventuele waarschuwingen.
+2. Het PV wordt onderzocht om te bepalen of er fouten hersteld kunnen worden.
+3. De coördinator GSB stelt vast het PV fouten bevat die kunnen worden opgelost.
+4. De coördinator laat de fouten in het PV corrigeren en laat de invoerder verder gaan met diens invoer.
 
 __Uitbreidingen:__  
-2a. De invoerder stelt een fout op het PV vast en kan de foutmelding niet oplossen:  
-&emsp; 2a1. De invoerder meldt de fout op het PV bij de coördinator GSB.  
-&emsp; 2a2. De coördinator GSB besluit dat de invoer verder kan gaan.  
-&emsp;&emsp; 2a2a. De coördinator GSB besluit dat de invoer niet verder kan gaan:  
-&emsp;&emsp;&emsp; 2a2a1. De coördinator GSB stuurt het PV terug in het proces met de reden waarom invoer gestopt is.  
-&emsp;&emsp;&emsp; 2a2a2. De coördinator GSB verwijdert de ingevoerde data.  
-&emsp; 2a3. De invoerder voert het volledige PV in.  
-&emsp; 2a4. De coördinator GSB stuurt het PV met de foutmeldingen terug in het proces.  
-&emsp; 2a5. De coördinator GSB verwijdert de ingevoerde data.
+3a. Het PV bevat fouten die niet opgelost kunnen worden:  
+&emsp; 3a1. De coördinator GSB verwijdert de invoer.  
+&emsp; 3a2. De coördinator GSB laat het stembureau opnieuw invoeren.
 
-### Open punten
 
-- Als de coördinator GSB het PV terugstuurt in het proces, naar welk punt dan precies?
-
-## De invoerder handelt de waarschuwing(en) af (vis)
+## De invoerder handelt de fout(en) en/of waarschuwing(en) af (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ De controles geven een waarschuwing vanwege de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
+__Trigger:__ De controles geven een of meerdere foutmeldingen vanwege de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten) en/of een of meerdere waarschuwingen vanwege de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
+
+*Foutmelding*: De ingevoerde waardes kunnen niet correct zijn. Bijvoorbeeld: het totaal van de stemmen op een lijst komt niet overeen met de som van de stemmen van de kandidaten op die lijst.
 
 *Waarschuwing*: De ingevoerde waardes zijn mogelijk niet correct. Bijvoorbeeld: er is een groot aantal blanco stemmen of de tweede invoer klopt niet met de eerste invoer.
 
 __Hoofdscenario:__  
-Voor elke waarschuwing:  
+Voor elke fout of waarschuwing:  
 
-1. De invoerder controleert de waarschuwing.
+1. De invoerder controleert de fout of waarschuwing.
 2. De invoerder constateert dat de invoer klopt met het PV.
-3. De invoerder accepteert de waarschuwing in de applicatie.
+3. De invoerder accepteert de fouten en waarschuwingen in de applicatie.
 
 __Uitbreidingen:__  
 2a. De invoerder constateert dat hij/zij een fout heeft gemaakt in de invoer.  

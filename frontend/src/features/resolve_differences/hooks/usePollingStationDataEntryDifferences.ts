@@ -11,11 +11,11 @@ import {
   Election,
   EntriesDifferent,
   PoliticalGroup,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH,
   PollingStation,
-  ResolveAction,
+  ResolveDifferencesAction,
   USER_LIST_REQUEST_PATH,
   UserListResponse,
 } from "@/types/generated/openapi";
@@ -28,8 +28,8 @@ type EntriesDifferentStatus = {
 };
 
 interface PollingStationDataEntryStatus {
-  action: ResolveAction | undefined;
-  setAction: (action: ResolveAction | undefined) => void;
+  action: ResolveDifferencesAction | undefined;
+  setAction: (action: ResolveDifferencesAction | undefined) => void;
   pollingStation: PollingStation;
   election: Election & { political_groups: PoliticalGroup[] };
   loading: boolean;
@@ -45,7 +45,7 @@ export function usePollingStationDataEntryDifferences(
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
-  const [action, setAction] = useState<ResolveAction>();
+  const [action, setAction] = useState<ResolveDifferencesAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
   const [validationError, setValidationError] = useState<string>();
@@ -111,8 +111,8 @@ export function usePollingStationDataEntryDifferences(
       setValidationError(undefined);
     }
 
-    const path: POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve`;
-    const body: POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY = action;
+    const path: POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_differences`;
+    const body: POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = action;
     const response = await client.postRequest(path, body);
 
     if (isSuccess(response)) {

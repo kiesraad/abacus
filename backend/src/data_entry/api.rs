@@ -66,7 +66,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_data_entry_save))
         .routes(routes!(polling_station_data_entry_delete))
         .routes(routes!(polling_station_data_entry_finalise))
-        .routes(routes!(polling_station_data_entry_resolve))
+        .routes(routes!(polling_station_data_entry_resolve_differences))
         .routes(routes!(election_status))
 }
 
@@ -92,18 +92,22 @@ async fn polling_station_data_entry_status(
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 #[serde(rename_all = "snake_case")]
-pub enum ResolveAction {
+pub enum ResolveDifferencesAction {
     KeepFirstEntry,
     KeepSecondEntry,
     DiscardBothEntries,
 }
 
-impl ResolveAction {
+impl ResolveDifferencesAction {
     pub fn audit_event(&self, data_entry: PollingStationDataEntry) -> AuditEvent {
         match self {
-            ResolveAction::KeepFirstEntry => AuditEvent::DataEntryKeptFirst(data_entry.into()),
-            ResolveAction::KeepSecondEntry => AuditEvent::DataEntryKeptSecond(data_entry.into()),
-            ResolveAction::DiscardBothEntries => {
+            ResolveDifferencesAction::KeepFirstEntry => {
+                AuditEvent::DataEntryKeptFirst(data_entry.into())
+            }
+            ResolveDifferencesAction::KeepSecondEntry => {
+                AuditEvent::DataEntryKeptSecond(data_entry.into())
+            }
+            ResolveDifferencesAction::DiscardBothEntries => {
                 AuditEvent::DataEntryDiscardedBoth(data_entry.into())
             }
         }
@@ -380,11 +384,11 @@ async fn polling_station_data_entry_finalise(
     Ok(Json(data_entry.state.0))
 }
 
-/// Resolve data entry differences by providing a `ResolveAction`
+/// Resolve data entry differences by providing a `ResolveDifferencesAction`
 #[utoipa::path(
     post,
-    path = "/api/polling_stations/{polling_station_id}/data_entries/resolve",
-    request_body = ResolveAction,
+    path = "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences",
+    request_body = ResolveDifferencesAction,
     responses(
         (status = 200, description = "Differences resolved successfully", body = PollingStationDataEntry),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -397,14 +401,14 @@ async fn polling_station_data_entry_finalise(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-async fn polling_station_data_entry_resolve(
+async fn polling_station_data_entry_resolve_differences(
     _user: Coordinator,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
     Path(polling_station_id): Path<u32>,
     audit_service: AuditService,
-    resolve_action: ResolveAction,
+    action: ResolveDifferencesAction,
 ) -> Result<Json<PollingStationDataEntry>, APIError> {
     let polling_station = polling_stations.get(polling_station_id).await?;
     let election = elections.get(polling_station.election_id).await?;
@@ -412,10 +416,12 @@ async fn polling_station_data_entry_resolve(
         .get_or_default(polling_station_id)
         .await?;
 
-    let new_state = match resolve_action {
-        ResolveAction::KeepFirstEntry => state.keep_first_entry()?,
-        ResolveAction::KeepSecondEntry => state.keep_second_entry(&polling_station, &election)?,
-        ResolveAction::DiscardBothEntries => state.delete_entries()?,
+    let new_state = match action {
+        ResolveDifferencesAction::KeepFirstEntry => state.keep_first_entry()?,
+        ResolveDifferencesAction::KeepSecondEntry => {
+            state.keep_second_entry(&polling_station, &election)?
+        }
+        ResolveDifferencesAction::DiscardBothEntries => state.delete_entries()?,
     };
 
     let data_entry = polling_station_data_entries
@@ -423,7 +429,7 @@ async fn polling_station_data_entry_resolve(
         .await?;
 
     audit_service
-        .log(&resolve_action.audit_event(data_entry.clone()), None)
+        .log(&action.audit_event(data_entry.clone()), None)
         .await?;
 
     Ok(Json(data_entry))
@@ -607,16 +613,16 @@ pub mod tests {
         .into_response()
     }
 
-    async fn resolve(pool: SqlitePool, resolve_action: ResolveAction) -> Response {
+    async fn resolve_differences(pool: SqlitePool, action: ResolveDifferencesAction) -> Response {
         let user = User::test_user(Role::Coordinator, 1);
-        polling_station_data_entry_resolve(
+        polling_station_data_entry_resolve_differences(
             Coordinator(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
             State(Elections::new(pool.clone())),
             Path(1),
             AuditService::new(AuditLog(pool), user, None),
-            resolve_action,
+            action,
         )
         .await
         .into_response()
@@ -912,9 +918,9 @@ pub mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entry_resolve_keep_first(pool: SqlitePool) {
+    async fn test_data_entry_resolve_differences_keep_first(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
-        resolve(pool.clone(), ResolveAction::KeepFirstEntry).await;
+        resolve_differences(pool.clone(), ResolveDifferencesAction::KeepFirstEntry).await;
 
         let data = query!("SELECT state FROM polling_station_data_entries")
             .fetch_one(&pool)
@@ -932,9 +938,9 @@ pub mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entry_resolve_keep_second(pool: SqlitePool) {
+    async fn test_data_entry_resolve_differences_keep_second(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
-        resolve(pool.clone(), ResolveAction::KeepSecondEntry).await;
+        resolve_differences(pool.clone(), ResolveDifferencesAction::KeepSecondEntry).await;
 
         let data = query!("SELECT state FROM polling_station_data_entries")
             .fetch_one(&pool)
@@ -952,9 +958,9 @@ pub mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entry_resolve_discard_both(pool: SqlitePool) {
+    async fn test_data_entry_resolve_differences_discard_both(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
-        resolve(pool.clone(), ResolveAction::DiscardBothEntries).await;
+        resolve_differences(pool.clone(), ResolveDifferencesAction::DiscardBothEntries).await;
 
         let data = query!("SELECT state FROM polling_station_data_entries")
             .fetch_one(&pool)

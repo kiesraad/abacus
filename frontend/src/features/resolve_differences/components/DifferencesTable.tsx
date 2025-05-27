@@ -1,7 +1,7 @@
 import { Fragment, ReactElement, useId } from "react";
 
 import { Table } from "@/components/ui/Table/Table";
-import { ResolveAction } from "@/types/generated/openapi";
+import { ResolveDifferencesAction } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/format";
 
@@ -11,7 +11,7 @@ interface DifferencesTableProps {
   title: string;
   headers: string[];
   rows: DifferencesRow[];
-  action?: ResolveAction;
+  action?: ResolveDifferencesAction;
 }
 
 function formatValue(value: string | number | undefined): string | ReactElement {

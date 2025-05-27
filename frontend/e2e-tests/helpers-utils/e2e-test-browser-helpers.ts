@@ -70,6 +70,6 @@ export async function fillDataEntryPagesAndSave(page: Page, results: PollingStat
   await checkAndSavePage.save.click();
 
   const dataEntryHomePage = new DataEntryHomePage(page);
-  await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+  await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   return dataEntryHomePage;
 }

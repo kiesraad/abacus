@@ -8,10 +8,12 @@
 
 ### Documentatie
 
-- Begin hier voor meer context: [Het verkiezingsproces en Abacus](https://kiesraad.github.io/abacus-documentatie/verkiezingsproces-en-abacus.html)
-- Begin hier als je meteen aan de slag wilt: [Installeren en starten](https://kiesraad.github.io/abacus-documentatie/installeren-en-starten.html)
-- Functionaliteit voor de demo en voor versie 1.0: [Functionaliteit van Abacus: eisen en wensen](/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md)
-- Voor alle documentatie: [Hoofdpagina voor documentatie](/documentatie/README.md)
+- Voor informatie over het installeren, starten en gebruiken van Abacus ga je naar de website [Abacus Documentatie](https://kiesraad.github.io/abacus-documentatie/). Hier vind je niet alleen alle beschikbare gebruikersdocumentatie, maar bieden we ook uitleg over het verkiezingsproces.
+- Alle documentatie met betrekking tot de ontwikkeling van Abacus vind je op de [Hoofdpagina voor documentatie](/documentatie/README.md) in deze repository. Hier staat documentatie over de functionaliteit, de softwarearchitectuur, ons ontwikkelproces en specifieke facetten van het verkiezingsproces.
+
+### Functionaliteit
+
+- De functionele eisen en wensen voor versie 1.0 zijn te vinden via [Functionaliteit van Abacus: eisen en wensen](/documentatie./functionaliteit/functionaliteit-eisen-en-wensen.md).
 
 ### Projectstructuur
 

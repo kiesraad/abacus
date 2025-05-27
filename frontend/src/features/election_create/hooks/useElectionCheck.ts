@@ -1,13 +1,26 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
+import { ApiError, isError, isSuccess } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { t } from "@/i18n/translate";
-import { ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
+import {
+  ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
+  ElectionDefinitionValidateRequest,
+  ElectionDefinitionValidateResponse,
+} from "@/types/generated/openapi";
 
 import { Stub } from "../components/RedactedHash";
 
-export function useElectionCheck(data: ElectionDefinitionUploadResponse) {
+export function useElectionCheck(
+  file: File,
+  data: ElectionDefinitionValidateResponse,
+  setError: (error: string) => void,
+) {
   const navigate = useNavigate();
+  const url: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = "/api/elections/import/validate";
+  const { create } = useCrud<ElectionDefinitionValidateRequest>(url);
+
   const [stubs, setStubs] = useState<Stub[]>(
     data.hash.redacted_indexes.map((redacted_index: number) => ({
       selected: false,
@@ -16,10 +29,12 @@ export function useElectionCheck(data: ElectionDefinitionUploadResponse) {
     })),
   );
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError("");
 
     const formData = new FormData(event.currentTarget);
+    const completeHash = data.hash.chunks;
     stubs.forEach((stub, i) => {
       const value = formData.get(stub.index.toString());
       const newStubs = [...stubs];
@@ -28,6 +43,8 @@ export function useElectionCheck(data: ElectionDefinitionUploadResponse) {
         newStub.error = "";
         if (typeof value !== "string" || value.length !== 4) {
           newStub.error = t("election.check_eml.check_hash.hint");
+        } else {
+          completeHash[stub.index] = value;
         }
         setStubs(newStubs);
       }
@@ -35,7 +52,13 @@ export function useElectionCheck(data: ElectionDefinitionUploadResponse) {
 
     // Only submit when there a no errors
     if (stubs.every((stub) => stub.error === "")) {
-      void navigate("/elections/create/check-and-save");
+      void create({ data: await file.text(), hash: completeHash }).then((response) => {
+        if (isSuccess(response)) {
+          void navigate("/elections/create/check-and-save");
+        } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
+          setError(response.message);
+        }
+      });
     }
   }
 

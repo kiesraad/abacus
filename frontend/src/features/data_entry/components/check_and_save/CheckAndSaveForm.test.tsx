@@ -2,6 +2,7 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { dataEntryStatusDifferences, firstEntryHasErrorsStatus } from "@/testing/api-mocks/DataEntryMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionRequestHandler,
@@ -9,7 +10,7 @@ import {
   PollingStationDataEntryFinaliseHandler,
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
+import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, spyOnHandler, within } from "@/testing/test-utils";
 
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
@@ -65,7 +66,7 @@ describe("Test CheckAndSaveForm", () => {
     );
   });
 
-  test("Data entry can be finalised", async () => {
+  test("Data entry can be finalised and check redirect", async () => {
     const router = renderForm();
     const user = userEvent.setup();
 
@@ -80,7 +81,45 @@ describe("Test CheckAndSaveForm", () => {
 
     // check that the user is navigated back to the data entry page
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
-    expect(router.state.location.hash).toEqual("#data-entry-saved-1");
+    expect(router.state.location.hash).toEqual("#data-entry-1-saved");
+  });
+
+  test("Check redirect when finalising data entry that is different", async () => {
+    const router = renderForm();
+    const user = userEvent.setup();
+
+    // set up a listener to check if the finalisation request is made
+    const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, dataEntryStatusDifferences);
+
+    // click the save button
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    // check that the finalisation request was made
+    expect(finalise).toHaveBeenCalledOnce();
+
+    // check that the user is navigated back to the data entry page
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
+    expect(router.state.location.hash).toEqual("#data-entry-different");
+  });
+
+  test("Check redirect when finalising data entry with errors", async () => {
+    const router = renderForm();
+    const user = userEvent.setup();
+
+    // set up a listener to check if the finalisation request is made
+    const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, firstEntryHasErrorsStatus);
+
+    // click the save button
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    // check that the finalisation request was made
+    expect(finalise).toHaveBeenCalledOnce();
+
+    // check that the user is navigated back to the data entry page
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
+    expect(router.state.location.hash).toEqual("#data-entry-errors");
   });
 
   test("Shift+Enter submits form", async () => {
@@ -93,7 +132,7 @@ describe("Test CheckAndSaveForm", () => {
 
     await user.keyboard("{shift>}{enter}{/shift}");
 
-    expect(finalise).toHaveBeenCalled();
+    expect(finalise).toHaveBeenCalledOnce();
   });
 
   test("Data entry does not show finalise button with errors", async () => {

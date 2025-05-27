@@ -105,6 +105,17 @@ describe("NavBar", () => {
     expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
   });
 
+  test.each([{ pathname: "/elections/1/status/1/resolve-differences" }])(
+    "election status links for $pathname",
+    async (location) => {
+      await renderNavBar(location, "coordinator");
+
+      expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+      expect(screen.queryByRole("link", { name: "Statusoverzicht" })).toBeVisible();
+    },
+  );
+
   test.each([
     { pathname: "/elections/1/polling-stations/create" },
     { pathname: "/elections/1/polling-stations/1/update" },

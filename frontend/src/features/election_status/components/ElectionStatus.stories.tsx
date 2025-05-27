@@ -10,7 +10,7 @@ interface StoryProps {
   navigate: (path: string) => void;
 }
 
-export const PollingStationStatus: Story<StoryProps> = ({ navigate }) => {
+export const DefaultElectionStatus: Story<StoryProps> = ({ navigate }) => {
   const today = new Date();
   today.setHours(10, 20);
 

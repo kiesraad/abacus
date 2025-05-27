@@ -2,12 +2,17 @@ import { describe, expect, test, vi } from "vitest";
 
 import { render, screen, within } from "@/testing/test-utils";
 
-import { Empty, PollingStationStatus } from "./ElectionStatus.stories";
+import { DefaultElectionStatus, Empty } from "./ElectionStatus.stories";
+
+const navigate = vi.fn();
+vi.mock(import("react-router"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  useNavigate: () => navigate,
+}));
 
 describe("ElectionStatus", () => {
   test("Render status of polling station data entries correctly", async () => {
-    const navigate = vi.fn();
-    render(<PollingStationStatus navigate={navigate} />);
+    render(<DefaultElectionStatus navigate={navigate} />);
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" })).toBeVisible();
@@ -52,6 +57,14 @@ describe("ElectionStatus", () => {
       ["40", "Test kerk 1e invoer", "Fouten in proces-verbaal"],
     ]);
 
+    const errorsAndWarningsRows = within(tables[0]!).getAllByRole("row");
+    // Click on row of polling station with data entries with differences
+    errorsAndWarningsRows[1]!.click();
+    expect(navigate).toHaveBeenCalledWith("./7/resolve-differences");
+    // Click on row of polling station with data entry with errors
+    errorsAndWarningsRows[2]!.click();
+    expect(navigate).toHaveBeenCalledWith("./8/resolve-errors");
+
     expect(headings[1]).toHaveTextContent("Invoer bezig (3)");
     expect(tables[1]).toHaveTableContent([
       ["Nummer", "Stembureau", "Invoerder", "Voortgang"],
@@ -84,7 +97,6 @@ describe("ElectionStatus", () => {
   });
 
   test("Show no polling stations text instead of tables", async () => {
-    const navigate = vi.fn();
     render(<Empty navigate={navigate} />);
 
     expect(await screen.findByText("Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.")).toBeVisible();

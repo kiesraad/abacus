@@ -18,6 +18,7 @@ import { electionStatusRoutes } from "@/features/election_status/routes";
 import { logsRoutes } from "@/features/logs/routes";
 import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
+import { resolveErrorsRoutes } from "@/features/resolve_errors/routes";
 import { usersRoutes } from "@/features/users/routes";
 import { workstationsRoutes } from "@/features/workstations/routes";
 
@@ -66,6 +67,10 @@ export const routes: RouteObject[] = [
                   {
                     path: ":pollingStationId/resolve-differences",
                     children: resolveDifferencesRoutes,
+                  },
+                  {
+                    path: ":pollingStationId/resolve-errors",
+                    children: resolveErrorsRoutes,
                   },
                 ],
               },

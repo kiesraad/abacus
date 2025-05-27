@@ -160,9 +160,7 @@ mod tests {
         let airgap_detection = AirgapDetection {
             enabled: true,
             airgap_violation_detected: Arc::new(AtomicBool::new(false)),
-            last_check: Arc::new(RwLock::new(
-                Instant::now().checked_sub(Duration::from_secs(AIRGAP_DETECTION_INTERVAL * 3)),
-            )),
+            last_check: Arc::new(RwLock::new(Some(Instant::now()))),
         };
 
         async fn handle() -> String {
@@ -190,12 +188,14 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::OK);
 
-        let mut last_check = airgap_detection.last_check.write().unwrap();
-        *last_check = Some(
-            Instant::now()
-                .checked_sub(Duration::from_secs(AIRGAP_DETECTION_INTERVAL * 3))
-                .unwrap(),
-        );
+        {
+            let mut last_check = airgap_detection.last_check.write().unwrap();
+            *last_check = Some(
+                Instant::now()
+                    .checked_sub(Duration::from_secs(AIRGAP_DETECTION_INTERVAL * 3))
+                    .unwrap(),
+            );
+        }
 
         let res = app
             .oneshot(

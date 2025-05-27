@@ -162,7 +162,7 @@ export const dataEntryStatusDifferences: DataEntryStatus = {
   },
 };
 
-export const dataEntryResolveMockResponse: PollingStationDataEntry = {
+export const dataEntryResolveDifferencesMockResponse: PollingStationDataEntry = {
   polling_station_id: 3,
   updated_at: "2025-04-14T17:19:42.133270353Z",
   state: {

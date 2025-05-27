@@ -1103,10 +1103,10 @@
         }
       }
     },
-    "/api/polling_stations/{polling_station_id}/data_entries/resolve": {
+    "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
       "post": {
-        "summary": "Resolve data entry differences by providing a `ResolveAction`",
-        "operationId": "polling_station_data_entry_resolve",
+        "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction`",
+        "operationId": "polling_station_data_entry_resolve_differences",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -1124,7 +1124,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResolveAction"
+                "$ref": "#/components/schemas/ResolveDifferencesAction"
               }
             }
           },
@@ -4173,7 +4173,7 @@
           }
         }
       },
-      "ResolveAction": {
+      "ResolveDifferencesAction": {
         "type": "string",
         "enum": [
           "keep_first_entry",

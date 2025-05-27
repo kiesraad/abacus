@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT event_name, event as \"event: String\" FROM audit_log ORDER BY id DESC LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "name": "event_name",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "event: String",
+        "ordinal": 1,
+        "type_info": "Null"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "4230011a3e5444568224ed0cc903d21bfe9e64e9a46fd1549908a326a2e62e4a"
+}

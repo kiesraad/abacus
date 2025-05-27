@@ -706,10 +706,12 @@ pub mod tests {
         assert!(matches!(status, DataEntryStatus::FirstEntryHasErrors(_)));
 
         // Check that it has been logged in the audit log
-        let audit_log_row = query!("SELECT * FROM audit_log ORDER BY id DESC LIMIT 1")
-            .fetch_one(&pool)
-            .await
-            .expect("should have audit log row");
+        let audit_log_row = query!(
+            r#"SELECT event_name, event as "event: String" FROM audit_log ORDER BY id DESC LIMIT 1"#
+        )
+        .fetch_one(&pool)
+        .await
+        .expect("should have audit log row");
         assert_eq!(audit_log_row.event_name, "DataEntryFinalised");
 
         let event: serde_json::Value = serde_json::from_str(&audit_log_row.event).unwrap();

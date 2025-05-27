@@ -211,7 +211,7 @@ pub async fn start_server(pool: SqlitePool, listener: TcpListener) -> Result<(),
 /// Copied from the
 /// [axum graceful-shutdown example](https://github.com/tokio-rs/axum/blob/6318b57fda6b524b4d3c7909e07946e2b246ebd2/examples/graceful-shutdown/src/main.rs)
 /// (under the MIT license).
-async fn shutdown_signal() {
+pub async fn shutdown_signal() {
     let ctrl_c = async {
         signal::ctrl_c()
             .await

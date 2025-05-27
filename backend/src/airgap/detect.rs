@@ -61,9 +61,7 @@ impl AirgapDetection {
 
                 self.set_airgap_violation_detected(true);
             }
-            Err(e) => {
-                error!("No DNS resolution for, assuming airgap is intact: {e:?}");
-
+            Err(_) => {
                 self.set_airgap_violation_detected(false);
             }
         }
@@ -96,5 +94,102 @@ impl AirgapDetection {
     pub fn violation_detected(&self) -> bool {
         self.airgap_violation_detected
             .load(std::sync::atomic::Ordering::Relaxed)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::airgap::block_request_on_airgap_violation;
+
+    use super::*;
+    use axum::body::Body;
+    use axum::http::Request;
+    use axum::routing::get;
+    use axum::{Router, middleware};
+    use hyper::StatusCode;
+    use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn test_block_request_on_airgap_violation() {
+        let airgap_detection = AirgapDetection {
+            enabled: true,
+            airgap_violation_detected: Arc::new(AtomicBool::new(false)),
+            last_check: Arc::new(RwLock::new(None)),
+        };
+
+        async fn handle() -> String {
+            "test".to_string()
+        }
+
+        let app =
+            Router::new()
+                .route("/api/test", get(handle))
+                .layer(middleware::from_fn_with_state(
+                    airgap_detection.clone(),
+                    block_request_on_airgap_violation,
+                ));
+
+        let res = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri("/api/test")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(res.status(), StatusCode::OK);
+
+        airgap_detection.set_airgap_violation_detected(true);
+        airgap_detection.set_last_check();
+
+        let res = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/test")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(res.status(), StatusCode::SERVICE_UNAVAILABLE);
+    }
+
+    #[tokio::test]
+    async fn test_block_request_on_airgap_detection_outdated() {
+        let airgap_detection = AirgapDetection {
+            enabled: true,
+            airgap_violation_detected: Arc::new(AtomicBool::new(false)),
+            last_check: Arc::new(RwLock::new(
+                Instant::now().checked_sub(Duration::from_secs(AIRGAP_DETECTION_INTERVAL * 3)),
+            )),
+        };
+
+        async fn handle() -> String {
+            "test".to_string()
+        }
+
+        let app =
+            Router::new()
+                .route("/api/test", get(handle))
+                .layer(middleware::from_fn_with_state(
+                    airgap_detection,
+                    block_request_on_airgap_violation,
+                ));
+
+        let res = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/test")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(res.status(), StatusCode::SERVICE_UNAVAILABLE);
     }
 }

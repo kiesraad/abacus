@@ -13,7 +13,7 @@
 
 ### Functionaliteit
 
-- Als je direct wilt zien welke functionele eisen en wensen we hebben gesteld voor de demo en voor versie 1.0, ga dan naar [Functionaliteit van Abacus: eisen en wensen](/documentatie./functionaliteit/functionaliteit-eisen-en-wensen.md).
+- De functionele eisen en wensen voor versie 1.0 zijn te vinden via [Functionaliteit van Abacus: eisen en wensen](/documentatie./functionaliteit/functionaliteit-eisen-en-wensen.md).
 
 ### Projectstructuur
 

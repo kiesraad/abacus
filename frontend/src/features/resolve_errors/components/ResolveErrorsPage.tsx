@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
-import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
@@ -72,13 +71,9 @@ export function ResolveErrorsPage() {
                 {t("resolve_errors.options.discard_entry_description")}
               </ChoiceList.Radio>
             </ChoiceList>
-            <BottomBar type="form">
-              <BottomBar.Row>
-                <Button size="xl" type="submit">
-                  {t("save")}
-                </Button>
-              </BottomBar.Row>
-            </BottomBar>
+            <Button size="xl" type="submit">
+              {t("save")}
+            </Button>
           </form>
         </article>
       </main>

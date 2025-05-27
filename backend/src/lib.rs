@@ -16,7 +16,7 @@ use tower_http::{
     set_header::SetResponseHeaderLayer,
     trace::{self, TraceLayer},
 };
-use tracing::{Level, info, trace};
+use tracing::{Level, info, trace, warn};
 use utoipa::OpenApi;
 use utoipa_axum::router::OpenApiRouter;
 #[cfg(feature = "openapi")]
@@ -185,8 +185,21 @@ pub fn router(
 }
 
 /// Start the API server on the given port, using the given database pool.
-pub async fn start_server(pool: SqlitePool, listener: TcpListener) -> Result<(), Box<dyn Error>> {
-    let airgap_detection = AirgapDetection::start().await;
+pub async fn start_server(
+    pool: SqlitePool,
+    listener: TcpListener,
+    enable_airgap_detection: bool,
+) -> Result<(), Box<dyn Error>> {
+    let airgap_detection = if enable_airgap_detection {
+        info!("Airgap detection is enabled, starting airgap detection task...");
+
+        AirgapDetection::start().await
+    } else {
+        warn!("Airgap detection is disabled, this is not allowed in production.");
+
+        AirgapDetection::nop()
+    };
+
     let app = router(pool, airgap_detection)?;
 
     info!("Starting API server on http://{}", listener.local_addr()?);
@@ -255,7 +268,7 @@ mod test {
 
         // Start server in background task
         let server_task = tokio::spawn(async move {
-            start_server(pool, listener).await.unwrap();
+            start_server(pool, listener, false).await.unwrap();
         });
 
         // Run the test

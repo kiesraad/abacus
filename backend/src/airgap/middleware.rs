@@ -1,12 +1,13 @@
+use std::time::Instant;
+
 use crate::APIError;
 use axum::{
     extract::{Request, State},
-    http::HeaderValue,
     middleware::Next,
     response::Response,
 };
 
-use super::AirgapDetection;
+use super::{AirgapDetection, detect::AIRGAP_DETECTION_INTERVAL};
 
 const API_PREFIX: &str = "/api/";
 
@@ -19,33 +20,40 @@ pub async fn block_request_on_airgap_violation(
     request: Request,
     next: Next,
 ) -> Result<Response, APIError> {
-    let is_api_request = request.uri().path().starts_with(API_PREFIX);
+    if airgap_detection.is_enabled() {
+        let is_api_request = request.uri().path().starts_with(API_PREFIX);
 
-    if is_api_request {
-        if airgap_detection.violation_detected() {
-            if airgap_detection.block_requests_on_violation {
-                tracing::error!("Blocking request due to airgap violation");
+        if is_api_request {
+            if let Some(last_check) = airgap_detection.get_last_check() {
+                let elapsed = Instant::now().duration_since(last_check);
 
-                Err(APIError::AirgapViolation(
-                    "Blocking request due to airgap violation".to_string(),
-                ))
+                if elapsed.as_secs() > AIRGAP_DETECTION_INTERVAL * 2 {
+                    tracing::error!(
+                        "Airgap detection last check was more than {} seconds ago!",
+                        AIRGAP_DETECTION_INTERVAL * 2
+                    );
+
+                    return Err(APIError::AirgapViolation(
+                        "Airgap detection is not running. Please restart the application."
+                            .to_string(),
+                    ));
+                }
             } else {
-                let mut response = next.run(request).await;
-                response
-                    .headers_mut()
-                    .insert("X-Airgap-Violation", HeaderValue::from_static("true"));
-
-                Ok(response)
+                tracing::warn!("No last check time available for airgap detection");
             }
-        } else {
-            let mut response = next.run(request).await;
-            response
-                .headers_mut()
-                .insert("X-Airgap-Violation", HeaderValue::from_static("false"));
 
-            Ok(response)
+            if airgap_detection.violation_detected() {
+                tracing::error!(
+                    "Blocking request due to airgap violation: {}",
+                    request.uri()
+                );
+
+                return Err(APIError::AirgapViolation(
+                    "Blocking request due to airgap violation".to_string(),
+                ));
+            }
         }
-    } else {
-        Ok(next.run(request).await)
     }
+
+    Ok(next.run(request).await)
 }

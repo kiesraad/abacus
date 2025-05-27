@@ -1,5 +1,5 @@
 #![cfg(test)]
-#![cfg(all(feature = "openapi", feature = "force-airgap-detection"))]
+#![cfg(all(feature = "openapi", feature = "airgap-detection"))]
 
 use hyper::Method;
 use sqlx::SqlitePool;

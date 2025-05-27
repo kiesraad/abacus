@@ -11,7 +11,7 @@
       {
         "name": "event: String",
         "ordinal": 1,
-        "type_info": "Null"
+        "type_info": "Text"
       }
     ],
     "parameters": {

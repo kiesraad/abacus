@@ -1,0 +1,86 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM audit_log ORDER BY id DESC LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "event",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "event_name",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "event_level",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "message",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "workstation",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "ip",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_id",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "username",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_fullname",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_role",
+        "ordinal": 10,
+        "type_info": "Text"
+      },
+      {
+        "name": "time",
+        "ordinal": 11,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1f17b6083878ff250d57a8843412bd1fd83fe9c1effc346af769d63bdd69dc86"
+}

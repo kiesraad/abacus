@@ -440,6 +440,29 @@ impl DataEntryStatus {
         }
     }
 
+    /// Resume first data entry while resolving accepted errors
+    pub fn resume_first_entry(&self) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::FirstEntryHasErrors(state) => {
+                Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
+                    progress: 0,
+                    first_entry_user_id: state.first_entry_user_id,
+                    first_entry: state.finalised_first_entry.clone(),
+                    client_state: Default::default(),
+                }))
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Discard first data entry while resolving accepted errors
+    pub fn discard_first_entry(&self) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::FirstEntryHasErrors(_) => Ok(Self::FirstEntryNotStarted),
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
     /// Delete both entries while resolving differences
     pub fn delete_entries(self) -> Result<Self, DataEntryTransitionError> {
         match self {
@@ -722,9 +745,17 @@ mod tests {
     fn first_entry_in_progress() -> DataEntryStatus {
         DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
             progress: 0,
-            first_entry_user_id: 0, // Add the appropriate user ID here
+            first_entry_user_id: 0,
             first_entry: polling_station_result(),
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+        })
+    }
+
+    fn first_entry_has_errors() -> DataEntryStatus {
+        DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+            first_entry_user_id: 0,
+            finalised_first_entry: polling_station_result(),
+            first_entry_finished_at: Utc::now(),
         })
     }
 
@@ -1191,6 +1222,27 @@ mod tests {
             second_entry_in_progress().delete_second_entry(1),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
+    }
+
+    #[test]
+    fn has_errors_discard_first() {
+        assert!(matches!(
+            first_entry_has_errors().discard_first_entry(),
+            Ok(DataEntryStatus::FirstEntryNotStarted)
+        ));
+    }
+
+    #[test]
+    fn has_errors_resume_first() {
+        assert!(matches!(
+            first_entry_has_errors().resume_first_entry(),
+            Ok(DataEntryStatus::FirstEntryInProgress(
+                FirstEntryInProgress {
+                    first_entry_user_id: 0,
+                    ..
+                }
+            ))
+        ));
     }
 
     #[test]

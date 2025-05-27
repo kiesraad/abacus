@@ -1,3 +1,4 @@
+import { getEmptyDataEntryRequest } from "@/features/data_entry/testing/mock-data";
 import {
   ClaimDataEntryResponse,
   DataEntryStatus,
@@ -160,6 +161,24 @@ export const dataEntryStatusDifferences: DataEntryStatus = {
     first_entry_finished_at: "2025-04-14T17:17:27.536338155Z",
     second_entry_finished_at: "2025-04-14T17:18:45.433270353Z",
   },
+};
+
+export const firstEntryHasErrorsStatus: DataEntryStatus = {
+  state: {
+    finalised_first_entry: getEmptyDataEntryRequest().data,
+    first_entry_finished_at: "",
+    first_entry_user_id: 0,
+  },
+  status: "FirstEntryHasErrors",
+};
+
+export const secondEntryNotStartedStatus: DataEntryStatus = {
+  state: {
+    finalised_first_entry: getEmptyDataEntryRequest().data,
+    first_entry_finished_at: "",
+    first_entry_user_id: 0,
+  },
+  status: "SecondEntryNotStarted",
 };
 
 export const dataEntryResolveDifferencesMockResponse: PollingStationDataEntry = {

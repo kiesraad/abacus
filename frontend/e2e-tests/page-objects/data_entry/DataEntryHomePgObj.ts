@@ -42,11 +42,11 @@ export class DataEntryHomePage {
     });
     this.dataEntryDifferent = page.getByRole("heading", {
       level: 2,
-      name: "Let op: Verschil met eerste invoer",
+      name: "Let op: verschil met eerste invoer",
     });
     this.dataEntryErrors = page.getByRole("heading", {
       level: 2,
-      name: "Let op: Fouten in het proces-verbaal",
+      name: "Let op: fouten in het proces-verbaal",
     });
     this.dataEntryWarning = page.getByRole("heading", {
       level: 2,

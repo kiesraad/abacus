@@ -566,7 +566,7 @@ test.describe("second data entry", () => {
     await expect(dataEntryHomePage.dataEntryDifferent).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryDifferent).toHaveText(
       [
-        "Let op: Verschil met eerste invoer",
+        "Let op: verschil met eerste invoer",
         "Je invoer is opgeslagen. ",
         "Geef het papieren proces-verbaal terug aan de coördinator,",
         "en geef aan dat er een verschil is met de eerste invoer.",

@@ -176,7 +176,7 @@ describe("DataEntryHomePage", () => {
     ).toBeVisible();
 
     // Expect the alert to not be visible
-    const alertHeading = "Let op: Verschil met eerste invoer";
+    const alertHeading = "Let op: verschil met eerste invoer";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
     // Set the hash to show the alert and expect it to be visible
@@ -214,7 +214,7 @@ describe("DataEntryHomePage", () => {
     ).toBeVisible();
 
     // Expect the alert to not be visible
-    const alertHeading = "Let op: Fouten in het proces-verbaal";
+    const alertHeading = "Let op: fouten in het proces-verbaal";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
     // Set the hash to show the alert and expect it to be visible

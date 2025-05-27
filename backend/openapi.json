@@ -104,15 +104,15 @@
         }
       }
     },
-    "/api/elections/validate": {
+    "/api/elections/import": {
       "post": {
         "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator",
-        "operationId": "election_import_validate",
+        "operationId": "election_import",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewElection"
+                "$ref": "#/components/schemas/ElectionDefinitionImportRequest"
               }
             }
           },
@@ -120,11 +120,69 @@
         },
         "responses": {
           "201": {
+            "description": "Election imported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Election"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/elections/import/validate": {
+      "post": {
+        "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator.",
+        "operationId": "election_import_validate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ElectionDefinitionValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
             "description": "Election validated",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ElectionDefinitionUploadResponse"
+                  "$ref": "#/components/schemas/ElectionDefinitionValidateResponse"
                 }
               }
             }
@@ -3090,7 +3148,42 @@
           "Municipal"
         ]
       },
-      "ElectionDefinitionUploadResponse": {
+      "ElectionDefinitionImportRequest": {
+        "type": "object",
+        "required": [
+          "hash",
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ElectionDefinitionValidateRequest": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ElectionDefinitionValidateResponse": {
         "type": "object",
         "required": [
           "hash",
@@ -3385,6 +3478,7 @@
           "EntryNotUnique",
           "InternalServerError",
           "InvalidData",
+          "InvalidHash",
           "InvalidJson",
           "InvalidPassword",
           "InvalidPoliticalGroup",

@@ -5,16 +5,16 @@ import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { t, tx } from "@/i18n/translate";
-import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
+import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { CheckElectionDefinition } from "./CheckElectionDefinition";
 
 export function UploadElectionDefinition() {
   const { file, setFile, data, setData } = useElectionCreateContext();
-  const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
+  const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const [error, setError] = useState<ReactElement | undefined>();
-  const { create } = useCrud<ElectionDefinitionUploadResponse>({ create: path });
+  const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const currentFile = e.target.files ? e.target.files[0] : undefined;

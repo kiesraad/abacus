@@ -34,6 +34,7 @@ pub enum ErrorReference {
     EntryNotUnique,
     InternalServerError,
     InvalidData,
+    InvalidHash,
     InvalidJson,
     InvalidPassword,
     InvalidPoliticalGroup,
@@ -81,6 +82,7 @@ pub enum APIError {
     EmlImportError(EMLImportError),
     InvalidData(DataError),
     InvalidHeaderValue,
+    InvalidHashError,
     JsonRejection(JsonRejection),
     NotFound(String, ErrorReference),
     PdfGenError(PdfGenError),
@@ -180,6 +182,13 @@ impl IntoResponse for APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error", reference, false),
+                )
+            }
+            APIError::InvalidHashError => {
+                error!("Invalid hash");
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("Invalid hash", ErrorReference::InvalidHash, false),
                 )
             }
             APIError::XmlError(err) => {

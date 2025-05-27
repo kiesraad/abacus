@@ -1,9 +1,11 @@
+import { useState } from "react";
+
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/i18n/translate";
-import { ElectionDefinitionUploadResponse } from "@/types/generated/openapi";
+import { ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 import { formatDateFull } from "@/utils/format";
 
 import { useElectionCheck } from "../hooks/useElectionCheck";
@@ -11,16 +13,17 @@ import { RedactedHash } from "./RedactedHash";
 
 interface CheckElectionDefinitionProps {
   file: File;
-  data: ElectionDefinitionUploadResponse;
+  data: ElectionDefinitionValidateResponse;
 }
 
 export function CheckElectionDefinition({ file, data }: CheckElectionDefinitionProps) {
-  const { stubs, highlightStub, handleSubmit } = useElectionCheck(data);
+  const [error, setError] = useState<string | undefined>();
+  const { stubs, highlightStub, handleSubmit } = useElectionCheck(file, data, setError);
 
   return (
     <section className="md">
       <h2>{t("election.check_eml.title")}</h2>
-      {stubs.some((stub) => stub.error.length > 0) && (
+      {(stubs.some((stub) => stub.error.length > 0) || error) && (
         <Alert type="error" title={t("election.check_eml.error.title")} inline>
           <p> {t("election.check_eml.error.description")} </p>
         </Alert>
@@ -46,7 +49,7 @@ export function CheckElectionDefinition({ file, data }: CheckElectionDefinitionP
         </div>
       </Alert>
       <p>{t("election.check_eml.check_hash.description")}</p>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={(e) => void handleSubmit(e)}>
         {stubs.map((stub, stubIndex) => (
           <InputField
             key={stub.index}

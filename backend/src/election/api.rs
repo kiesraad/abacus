@@ -1,4 +1,3 @@
-#[cfg(feature = "dev-database")]
 use axum::http::StatusCode;
 use axum::{
     Json,
@@ -15,13 +14,14 @@ use crate::audit_log::{AuditEvent, AuditService};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::{Admin, User},
-    eml::{EML110, EMLDocument, EMLImportError, RedactedEmlHash},
+    eml::{EML110, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
     let router = OpenApiRouter::default()
         .routes(routes!(election_import_validate))
+        .routes(routes!(election_import))
         .routes(routes!(election_list))
         .routes(routes!(election_details));
 
@@ -120,25 +120,28 @@ pub async fn election_create(
     Ok((StatusCode::CREATED, election))
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct ElectionDefinitionUploadRequest {
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+pub struct ElectionDefinitionValidateRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = Option<Vec<String>>, nullable = false)]
+    hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
     data: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-pub struct ElectionDefinitionUploadResponse {
+pub struct ElectionDefinitionValidateResponse {
     hash: RedactedEmlHash,
     election: NewElection,
 }
 
 /// Uploads election definition, validates it and returns the associated election data and
-/// a redacted hash, to be filled by the administrator
+/// a redacted hash, to be filled by the administrator.
 #[utoipa::path(
     post,
-    path = "/api/elections/validate",
-    request_body = NewElection,
+    path = "/api/elections/import/validate",
+    request_body = ElectionDefinitionValidateRequest,
     responses(
-        (status = 201, description = "Election validated", body = ElectionDefinitionUploadResponse),
+        (status = 200, description = "Election validated", body = ElectionDefinitionValidateResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -146,13 +149,52 @@ pub struct ElectionDefinitionUploadResponse {
 )]
 pub async fn election_import_validate(
     _user: Admin,
-    Json(edu): Json<ElectionDefinitionUploadRequest>,
-) -> Result<Json<ElectionDefinitionUploadResponse>, APIError> {
+    Json(edu): Json<ElectionDefinitionValidateRequest>,
+) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
+    if let Some(user_hash) = edu.hash {
+        if user_hash != EmlHash::from(edu.data.as_bytes()).chunks {
+            return Err(APIError::InvalidHashError);
+        }
+    }
+
     let eml = EML110::from_str(&edu.data)?;
-    Ok(Json(ElectionDefinitionUploadResponse {
+    Ok(Json(ElectionDefinitionValidateResponse {
         hash: RedactedEmlHash::from(edu.data.as_bytes()),
         election: eml.as_abacus_election()?,
     }))
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+pub struct ElectionDefinitionImportRequest {
+    hash: [String; crate::eml::hash::CHUNK_COUNT],
+    data: String,
+}
+
+/// Uploads election definition, validates it and returns the associated election data and
+/// a redacted hash, to be filled by the administrator
+#[utoipa::path(
+    post,
+    path = "/api/elections/import",
+    request_body = ElectionDefinitionImportRequest,
+    responses(
+        (status = 201, description = "Election imported", body = Election),
+        (status = 400, description = "Bad request", body = ErrorResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+pub async fn election_import(
+    _user: Admin,
+    State(elections_repo): State<Elections>,
+    Json(edu): Json<ElectionDefinitionImportRequest>,
+) -> Result<(StatusCode, Json<Election>), APIError> {
+    if edu.hash != EmlHash::from(edu.data.as_bytes()).chunks {
+        return Err(APIError::InvalidHashError);
+    }
+
+    let new_election = EML110::from_str(&edu.data)?.as_abacus_election()?;
+    let election = elections_repo.create(new_election).await?;
+    Ok((StatusCode::CREATED, Json(election)))
 }
 
 impl From<DeError> for APIError {

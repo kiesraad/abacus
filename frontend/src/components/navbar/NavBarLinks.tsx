@@ -69,7 +69,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
           <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
         </>
       )}
-      {location.pathname.match(/^\/elections\/\d+\/status\/\d+\/resolve-differences$/) && (
+      {location.pathname.match(/^\/elections\/\d+\/status\/\d+\/(resolve-differences|resolve-errors)$/) && (
         <>
           <IconChevronRight />
           <Link to={`/elections/${election.id}/status`}>{t("election_status.title")}</Link>

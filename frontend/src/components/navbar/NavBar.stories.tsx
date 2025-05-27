@@ -34,6 +34,7 @@ const locations: { pathname: string; userRole: Role }[] = [
   { pathname: "/elections/1", userRole: "coordinator" },
   { pathname: "/elections/1/report", userRole: "coordinator" },
   { pathname: "/elections/1/status", userRole: "coordinator" },
+  { pathname: "/elections/1/status/1/resolve-differences", userRole: "coordinator" },
   { pathname: "/elections/1/polling-stations", userRole: "coordinator" },
   { pathname: "/elections/1/polling-stations/create", userRole: "coordinator" },
   { pathname: "/elections/1/polling-stations/1/update", userRole: "coordinator" },
@@ -54,8 +55,7 @@ export const AllRoutes: Story = () => (
       <React.Fragment key={location.pathname + location.userRole}>
         <TestUserProvider userRole={location.userRole}>
           <code>
-            {location.pathname}
-            {location.userRole}
+            {location.pathname} ({location.userRole})
           </code>
           <NavBar location={location} />
           <br />

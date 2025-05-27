@@ -102,10 +102,7 @@ mod tests {
     use crate::airgap::block_request_on_airgap_violation;
 
     use super::*;
-    use axum::body::Body;
-    use axum::http::Request;
-    use axum::routing::get;
-    use axum::{Router, middleware};
+    use axum::{Router, body::Body, http::Request, middleware, routing::get};
     use hyper::StatusCode;
     use tower::ServiceExt;
 
@@ -176,9 +173,29 @@ mod tests {
             Router::new()
                 .route("/api/test", get(handle))
                 .layer(middleware::from_fn_with_state(
-                    airgap_detection,
+                    airgap_detection.clone(),
                     block_request_on_airgap_violation,
                 ));
+
+        let res = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri("/api/test")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(res.status(), StatusCode::OK);
+
+        let mut last_check = airgap_detection.last_check.write().unwrap();
+        *last_check = Some(
+            Instant::now()
+                .checked_sub(Duration::from_secs(AIRGAP_DETECTION_INTERVAL * 3))
+                .unwrap(),
+        );
 
         let res = app
             .oneshot(

@@ -353,14 +353,14 @@ impl DataEntryStatus {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
-                let validation_results =
-                    validate_data_entry_status(&self, polling_station, election)?;
-
-                if validation_results.has_errors() {
-                    return Err(validation_results.into());
-                }
-
                 if state.finalised_first_entry == state.second_entry {
+                    let validation_results =
+                        validate_data_entry_status(&self, polling_station, election)?;
+
+                    if validation_results.has_errors() {
+                        return Err(validation_results.into());
+                    }
+
                     Ok((
                         Self::Definitive(Definitive {
                             first_entry_user_id: state.first_entry_user_id,
@@ -436,6 +436,29 @@ impl DataEntryStatus {
             DataEntryStatus::Definitive(_) => {
                 Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
             }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Resume first data entry while resolving accepted errors
+    pub fn resume_first_entry(&self) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::FirstEntryHasErrors(state) => {
+                Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
+                    progress: 0,
+                    first_entry_user_id: state.first_entry_user_id,
+                    first_entry: state.finalised_first_entry.clone(),
+                    client_state: Default::default(),
+                }))
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Discard first data entry while resolving accepted errors
+    pub fn discard_first_entry(&self) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::FirstEntryHasErrors(_) => Ok(Self::FirstEntryNotStarted),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -722,9 +745,17 @@ mod tests {
     fn first_entry_in_progress() -> DataEntryStatus {
         DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
             progress: 0,
-            first_entry_user_id: 0, // Add the appropriate user ID here
+            first_entry_user_id: 0,
             first_entry: polling_station_result(),
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+        })
+    }
+
+    fn first_entry_has_errors() -> DataEntryStatus {
+        DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+            first_entry_user_id: 0,
+            finalised_first_entry: polling_station_result(),
+            first_entry_finished_at: Utc::now(),
         })
     }
 
@@ -1053,7 +1084,7 @@ mod tests {
     }
 
     #[test]
-    fn second_entry_in_progress_finalise_validation_error() {
+    fn second_entry_in_progress_finalise_not_equal_and_has_error() {
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
             progress: 0,
             second_entry_user_id: 0,
@@ -1061,16 +1092,15 @@ mod tests {
                 recounted: Some(true),
                 ..polling_station_result()
             },
-            client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+            client_state: Default::default(),
             first_entry_user_id: 0,
             finalised_first_entry: polling_station_result(),
             first_entry_finished_at: Utc::now(),
         });
-        let next = initial.finalise_second_entry(&polling_station(), &election(), 0);
-        assert!(matches!(
-            next,
-            Err(DataEntryTransitionError::ValidatorError(_))
-        ));
+        let next = initial
+            .finalise_second_entry(&polling_station(), &election(), 0)
+            .unwrap();
+        assert!(matches!(next.0, DataEntryStatus::EntriesDifferent(_)));
     }
 
     /// FirstEntryInProgress --> SecondEntryNotStarted: error when finalising as a different user
@@ -1191,6 +1221,27 @@ mod tests {
             second_entry_in_progress().delete_second_entry(1),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
+    }
+
+    #[test]
+    fn has_errors_discard_first() {
+        assert!(matches!(
+            first_entry_has_errors().discard_first_entry(),
+            Ok(DataEntryStatus::FirstEntryNotStarted)
+        ));
+    }
+
+    #[test]
+    fn has_errors_resume_first() {
+        assert!(matches!(
+            first_entry_has_errors().resume_first_entry(),
+            Ok(DataEntryStatus::FirstEntryInProgress(
+                FirstEntryInProgress {
+                    first_entry_user_id: 0,
+                    ..
+                }
+            ))
+        ));
     }
 
     #[test]

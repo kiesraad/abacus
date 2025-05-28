@@ -4,9 +4,8 @@ use std::net::SocketAddr;
 
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
-use reqwest::{Body, Client};
+use reqwest::{Body, Client, Response};
 use serde_json::json;
-use tracing::trace;
 
 use abacus::{
     data_entry::{
@@ -87,17 +86,14 @@ pub async fn claim_data_entry(
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim"
     );
-    let response = Client::new()
+    let res = Client::new()
         .post(&url)
         .header("cookie", cookie)
         .send()
         .await
         .unwrap();
 
-    // Ensure the response is what we expect
-    let status_code = response.status();
-    trace!("Claim data entry response: {:?}", response.text().await);
-    assert_eq!(status_code, StatusCode::OK);
+    assert_eq!(res.status(), StatusCode::OK, "{:?}", res.text().await);
 }
 
 async fn post_data_entry(
@@ -152,25 +148,25 @@ pub async fn save_non_example_data_entry(
     post_data_entry(addr, cookie, polling_station_id, entry_number, data_entry).await;
 }
 
-async fn finalise_data_entry(
+/// Finalise the data entry
+pub async fn finalise_data_entry(
     addr: &SocketAddr,
     cookie: HeaderValue,
     polling_station_id: u32,
     entry_number: u32,
-) {
-    // Finalise the data entry
+) -> Response {
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise"
     );
-    let response = Client::new()
+    let res = Client::new()
         .post(&url)
         .header("cookie", cookie)
         .send()
         .await
         .unwrap();
 
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(res.status(), StatusCode::OK, "{:?}", res.text().await);
+    res
 }
 
 pub async fn create_and_finalise_data_entry(

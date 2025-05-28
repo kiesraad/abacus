@@ -10,7 +10,7 @@ use test_log::test;
 
 use crate::{
     shared::{
-        claim_data_entry, create_and_finalise_data_entry, example_data_entry, finalise_data_entry,
+        claim_data_entry, complete_data_entry, example_data_entry, finalise_data_entry,
         save_data_entry,
     },
     utils::serve_api,
@@ -293,7 +293,7 @@ async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
 async fn test_polling_station_data_entry_claim_finalised(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::typist_login(&addr).await;
-    create_and_finalise_data_entry(&addr, cookie.clone(), 1, 1).await;
+    complete_data_entry(&addr, cookie.clone(), 1, 1, example_data_entry(None)).await;
 
     // claim the data entry and expect 409 Conflict
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
@@ -398,7 +398,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_entry_progress, None);
 
     // Finalise the first data entry for polling station 1
-    create_and_finalise_data_entry(&addr, typist_cookie.clone(), 1, 1).await;
+    complete_data_entry(&addr, typist_cookie.clone(), 1, 1, example_data_entry(None)).await;
 
     // Set polling station 2 first entry to in progress
     claim_data_entry(&addr, typist_cookie.clone(), 2, 1).await;
@@ -461,7 +461,14 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_entry_progress, None);
 
     // finalise second data entry for polling station 1
-    create_and_finalise_data_entry(&addr, typist2_cookie.clone(), 1, 2).await;
+    complete_data_entry(
+        &addr,
+        typist2_cookie.clone(),
+        1,
+        2,
+        example_data_entry(None),
+    )
+    .await;
 
     // polling station 1 should now be definitive
     let statuses = get_statuses(&addr, coordinator_cookie).await;

@@ -137,32 +137,15 @@ pub async fn finalise_data_entry(
     res
 }
 
-pub async fn create_and_finalise_data_entry(
-    addr: &SocketAddr,
-    cookie: HeaderValue,
-    polling_station_id: u32,
-    entry_number: u32,
-) {
-    claim_data_entry(addr, cookie.clone(), polling_station_id, entry_number).await;
-    save_data_entry(
-        addr,
-        cookie.clone(),
-        polling_station_id,
-        entry_number,
-        example_data_entry(None),
-    )
-    .await;
-    finalise_data_entry(addr, cookie, polling_station_id, entry_number).await;
-}
-
-pub async fn create_and_finalise_non_example_data_entry(
+pub async fn complete_data_entry(
     addr: &SocketAddr,
     cookie: HeaderValue,
     polling_station_id: u32,
     entry_number: u32,
     data_entry: DataEntry,
-) {
+) -> Response {
     claim_data_entry(addr, cookie.clone(), polling_station_id, entry_number).await;
+
     save_data_entry(
         addr,
         cookie.clone(),
@@ -171,7 +154,8 @@ pub async fn create_and_finalise_non_example_data_entry(
         data_entry,
     )
     .await;
-    finalise_data_entry(addr, cookie, polling_station_id, entry_number).await;
+
+    finalise_data_entry(addr, cookie, polling_station_id, entry_number).await
 }
 
 async fn check_data_entry_status_is_definitive(
@@ -202,9 +186,23 @@ async fn check_data_entry_status_is_definitive(
 
 pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: u32) {
     let typist_cookie = typist_login(addr).await;
-    create_and_finalise_data_entry(addr, typist_cookie, polling_station_id, 1).await;
+    complete_data_entry(
+        addr,
+        typist_cookie,
+        polling_station_id,
+        1,
+        example_data_entry(None),
+    )
+    .await;
     let typist2_cookie = typist2_login(addr).await;
-    create_and_finalise_data_entry(addr, typist2_cookie.clone(), polling_station_id, 2).await;
+    complete_data_entry(
+        addr,
+        typist2_cookie.clone(),
+        polling_station_id,
+        2,
+        example_data_entry(None),
+    )
+    .await;
     check_data_entry_status_is_definitive(addr, typist2_cookie, polling_station_id, election_id)
         .await;
 }
@@ -216,7 +214,7 @@ pub async fn create_result_with_non_example_data_entry(
     data_entry: DataEntry,
 ) {
     let typist_cookie = typist_login(addr).await;
-    create_and_finalise_non_example_data_entry(
+    complete_data_entry(
         addr,
         typist_cookie,
         polling_station_id,
@@ -225,7 +223,7 @@ pub async fn create_result_with_non_example_data_entry(
     )
     .await;
     let typist2_cookie = typist2_login(addr).await;
-    create_and_finalise_non_example_data_entry(
+    complete_data_entry(
         addr,
         typist2_cookie.clone(),
         polling_station_id,

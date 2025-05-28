@@ -6,8 +6,8 @@ use test_log::test;
 
 use crate::{
     shared::{
-        create_and_finalise_data_entry, create_result, create_result_with_non_example_data_entry,
-        differences_counts_zero, political_group_votes_from_test_data_auto,
+        complete_data_entry, create_result, create_result_with_non_example_data_entry,
+        differences_counts_zero, example_data_entry, political_group_votes_from_test_data_auto,
     },
     utils::serve_api,
 };
@@ -293,7 +293,7 @@ async fn test_election_apportionment_error_apportionment_not_available_until_dat
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
 
     // Add and finalise first data entry
-    create_and_finalise_data_entry(&addr, typist_cookie, 3, 1).await;
+    complete_data_entry(&addr, typist_cookie, 3, 1, example_data_entry(None)).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
     let response = reqwest::Client::new()

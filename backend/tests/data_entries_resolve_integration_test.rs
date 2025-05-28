@@ -12,27 +12,6 @@ use test_log::test;
 pub mod shared;
 pub mod utils;
 
-async fn complete_data_entry(
-    addr: &SocketAddr,
-    cookie: HeaderValue,
-    polling_station_id: u32,
-    entry_number: u32,
-    data_entry: DataEntry,
-) -> Response {
-    shared::claim_data_entry(addr, cookie.clone(), polling_station_id, entry_number).await;
-
-    shared::save_data_entry(
-        addr,
-        cookie.clone(),
-        polling_station_id,
-        entry_number,
-        data_entry,
-    )
-    .await;
-
-    shared::finalise_data_entry(addr, cookie, polling_station_id, entry_number).await
-}
-
 fn data_entry_with_error() -> DataEntry {
     let mut data_entry = shared::example_data_entry(None);
     // Introduce error F.101
@@ -81,7 +60,7 @@ async fn test_polling_station_data_entry_resolve_errors_discard(pool: SqlitePool
     let addr = utils::serve_api(pool.clone()).await;
 
     let typist = shared::typist_login(&addr).await;
-    let res = complete_data_entry(&addr, typist, 1, 1, data_entry_with_error()).await;
+    let res = shared::complete_data_entry(&addr, typist, 1, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "FirstEntryHasErrors");
 
@@ -100,7 +79,7 @@ async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool)
     let addr = utils::serve_api(pool.clone()).await;
 
     let typist = shared::typist_login(&addr).await;
-    let res = complete_data_entry(&addr, typist, 1, 1, data_entry_with_error()).await;
+    let res = shared::complete_data_entry(&addr, typist, 1, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "FirstEntryHasErrors");
 
@@ -131,7 +110,7 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: Sqlit
     let addr = utils::serve_api(pool.clone()).await;
 
     let typist = shared::typist_login(&addr).await;
-    let res = complete_data_entry(&addr, typist, 1, 1, data_entry_with_error()).await;
+    let res = shared::complete_data_entry(&addr, typist, 1, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "FirstEntryHasErrors");
 
@@ -152,12 +131,12 @@ async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
         first_data_entry.data.voters_counts.poll_card_count + 2;
 
     let typist = shared::typist_login(&addr).await;
-    let res = complete_data_entry(&addr, typist, 1, 1, first_data_entry).await;
+    let res = shared::complete_data_entry(&addr, typist, 1, 1, first_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "SecondEntryNotStarted");
 
     let typist2 = shared::typist2_login(&addr).await;
-    let res = complete_data_entry(&addr, typist2, 1, 2, second_data_entry).await;
+    let res = shared::complete_data_entry(&addr, typist2, 1, 2, second_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "EntriesDifferent");
 
@@ -177,12 +156,12 @@ async fn test_polling_station_data_entry_resolve_differences_then_resolve_errors
     second_data_entry.data.voters_counts.poll_card_count = 0;
 
     let typist = shared::typist_login(&addr).await;
-    let res = complete_data_entry(&addr, typist, 1, 1, first_data_entry).await;
+    let res = shared::complete_data_entry(&addr, typist, 1, 1, first_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "SecondEntryNotStarted");
 
     let typist2 = shared::typist2_login(&addr).await;
-    let res = complete_data_entry(&addr, typist2, 1, 2, second_data_entry).await;
+    let res = shared::complete_data_entry(&addr, typist2, 1, 2, second_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "EntriesDifferent");
 

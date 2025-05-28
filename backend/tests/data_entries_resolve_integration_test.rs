@@ -57,10 +57,10 @@ async fn resolve_differences(
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_errors_discard(pool: SqlitePool) {
-    let addr = utils::serve_api(pool.clone()).await;
+    let addr = utils::serve_api(pool).await;
 
     let typist = shared::typist_login(&addr).await;
-    let res = shared::complete_data_entry(&addr, typist, 1, 1, data_entry_with_error()).await;
+    let res = shared::complete_data_entry(&addr, &typist, 1, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "FirstEntryHasErrors");
 
@@ -76,10 +76,10 @@ async fn test_polling_station_data_entry_resolve_errors_discard(pool: SqlitePool
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool) {
-    let addr = utils::serve_api(pool.clone()).await;
+    let addr = utils::serve_api(pool).await;
 
     let typist = shared::typist_login(&addr).await;
-    let res = shared::complete_data_entry(&addr, typist, 1, 1, data_entry_with_error()).await;
+    let res = shared::complete_data_entry(&addr, &typist, 1, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "FirstEntryHasErrors");
 
@@ -95,10 +95,10 @@ async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool)
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_errors_wrong_state(pool: SqlitePool) {
-    let addr = utils::serve_api(pool.clone()).await;
+    let addr = utils::serve_api(pool).await;
 
     let typist = shared::typist_login(&addr).await;
-    shared::claim_data_entry(&addr, typist, 1, 1).await;
+    shared::claim_data_entry(&addr, &typist, 1, 1).await;
 
     let coordinator = shared::coordinator_login(&addr).await;
     let response = resolve_errors(&addr, &coordinator, 1, "discard_first_entry").await;
@@ -107,10 +107,10 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_state(pool: Sqlite
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: SqlitePool) {
-    let addr = utils::serve_api(pool.clone()).await;
+    let addr = utils::serve_api(pool).await;
 
     let typist = shared::typist_login(&addr).await;
-    let res = shared::complete_data_entry(&addr, typist, 1, 1, data_entry_with_error()).await;
+    let res = shared::complete_data_entry(&addr, &typist, 1, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "FirstEntryHasErrors");
 
@@ -121,7 +121,7 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: Sqlit
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
-    let addr = utils::serve_api(pool.clone()).await;
+    let addr = utils::serve_api(pool).await;
 
     let first_data_entry = example_data_entry(None);
     let mut second_data_entry = first_data_entry.clone();
@@ -131,12 +131,12 @@ async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
         first_data_entry.data.voters_counts.poll_card_count + 2;
 
     let typist = shared::typist_login(&addr).await;
-    let res = shared::complete_data_entry(&addr, typist, 1, 1, first_data_entry).await;
+    let res = shared::complete_data_entry(&addr, &typist, 1, 1, first_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "SecondEntryNotStarted");
 
     let typist2 = shared::typist2_login(&addr).await;
-    let res = shared::complete_data_entry(&addr, typist2, 1, 2, second_data_entry).await;
+    let res = shared::complete_data_entry(&addr, &typist2, 1, 2, second_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "EntriesDifferent");
 
@@ -149,19 +149,19 @@ async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePool) {
-    let addr = utils::serve_api(pool.clone()).await;
+    let addr = utils::serve_api(pool).await;
 
     let first_data_entry = example_data_entry(None);
     let mut second_data_entry = first_data_entry.clone();
     second_data_entry.data.voters_counts.poll_card_count = 0;
 
     let typist = shared::typist_login(&addr).await;
-    let res = shared::complete_data_entry(&addr, typist, 1, 1, first_data_entry).await;
+    let res = shared::complete_data_entry(&addr, &typist, 1, 1, first_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "SecondEntryNotStarted");
 
     let typist2 = shared::typist2_login(&addr).await;
-    let res = shared::complete_data_entry(&addr, typist2, 1, 2, second_data_entry).await;
+    let res = shared::complete_data_entry(&addr, &typist2, 1, 2, second_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "EntriesDifferent");
 

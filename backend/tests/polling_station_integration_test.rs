@@ -123,7 +123,7 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
             postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         })
-        .header("cookie", cookie.clone())
+        .header("cookie", &cookie)
         .send()
         .await
         .unwrap();
@@ -169,7 +169,7 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
             postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         })
-        .header("cookie", cookie.clone())
+        .header("cookie", &cookie)
         .send()
         .await
         .unwrap();
@@ -235,7 +235,7 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
 
     let response = reqwest::Client::new()
         .delete(&url)
-        .header("cookie", cookie.clone())
+        .header("cookie", &cookie)
         .send()
         .await
         .unwrap();
@@ -264,8 +264,8 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
 async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
-    claim_data_entry(&addr, typist_cookie.clone(), 2, 1).await;
-    save_data_entry(&addr, typist_cookie, 2, 1, example_data_entry(None)).await;
+    claim_data_entry(&addr, &typist_cookie, 2, 1).await;
+    save_data_entry(&addr, &typist_cookie, 2, 1, example_data_entry(None)).await;
 
     let admin_cookie = shared::admin_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");

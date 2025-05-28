@@ -220,7 +220,7 @@ async fn test_election_apportionment_error_apportionment_not_available_no_pollin
     // Create election without polling stations
     let response = reqwest::Client::new()
         .post(format!("http://{addr}/api/elections"))
-        .header("cookie", cookie.clone())
+        .header("cookie", cookie)
         .json(&serde_json::json!({
             "name": "Test Election",
             "election_id": "TestElection_2026",
@@ -293,7 +293,7 @@ async fn test_election_apportionment_error_apportionment_not_available_until_dat
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
 
     // Add and finalise first data entry
-    complete_data_entry(&addr, typist_cookie, 3, 1, example_data_entry(None)).await;
+    complete_data_entry(&addr, &typist_cookie, 3, 1, example_data_entry(None)).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
     let response = reqwest::Client::new()

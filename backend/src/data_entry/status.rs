@@ -353,14 +353,14 @@ impl DataEntryStatus {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
-                let validation_results =
-                    validate_data_entry_status(&self, polling_station, election)?;
-
-                if validation_results.has_errors() {
-                    return Err(validation_results.into());
-                }
-
                 if state.finalised_first_entry == state.second_entry {
+                    let validation_results =
+                        validate_data_entry_status(&self, polling_station, election)?;
+
+                    if validation_results.has_errors() {
+                        return Err(validation_results.into());
+                    }
+
                     Ok((
                         Self::Definitive(Definitive {
                             first_entry_user_id: state.first_entry_user_id,
@@ -1084,7 +1084,7 @@ mod tests {
     }
 
     #[test]
-    fn second_entry_in_progress_finalise_validation_error() {
+    fn second_entry_in_progress_finalise_not_equal_and_has_error() {
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
             progress: 0,
             second_entry_user_id: 0,
@@ -1092,16 +1092,15 @@ mod tests {
                 recounted: Some(true),
                 ..polling_station_result()
             },
-            client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+            client_state: Default::default(),
             first_entry_user_id: 0,
             finalised_first_entry: polling_station_result(),
             first_entry_finished_at: Utc::now(),
         });
-        let next = initial.finalise_second_entry(&polling_station(), &election(), 0);
-        assert!(matches!(
-            next,
-            Err(DataEntryTransitionError::ValidatorError(_))
-        ));
+        let next = initial
+            .finalise_second_entry(&polling_station(), &election(), 0)
+            .unwrap();
+        assert!(matches!(next.0, DataEntryStatus::EntriesDifferent(_)));
     }
 
     /// FirstEntryInProgress --> SecondEntryNotStarted: error when finalising as a different user

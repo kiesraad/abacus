@@ -45,4 +45,15 @@ export const pollingStationMockData: PollingStation[] = [
     postal_code: "1234 WZ",
     locality: "Testplaats",
   },
+  {
+    id: 5,
+    election_id: 1,
+    name: "Dansschool Oeps nou deed ik het weer",
+    number: 37,
+    number_of_voters: 1000,
+    polling_station_type: "Special",
+    address: "Laan van Murphy 13",
+    postal_code: "4444 JP",
+    locality: "Twaalfsteden",
+  },
 ];

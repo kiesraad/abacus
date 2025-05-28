@@ -10,8 +10,7 @@ use serde_json::json;
 use abacus::{
     data_entry::{
         CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
-        PoliticalGroupVotes, PollingStationResults, SaveDataEntryResponse, VotersCounts,
-        VotesCounts,
+        PoliticalGroupVotes, PollingStationResults, VotersCounts, VotesCounts,
         status::{ClientState, DataEntryStatusName},
     },
     election::{CandidateNumber, PGNumber},
@@ -96,56 +95,25 @@ pub async fn claim_data_entry(
     assert_eq!(res.status(), StatusCode::OK, "{:?}", res.text().await);
 }
 
-async fn post_data_entry(
+pub async fn save_data_entry(
     addr: &SocketAddr,
     cookie: HeaderValue,
     polling_station_id: u32,
     entry_number: u32,
     data_entry: DataEntry,
-) {
+) -> Response {
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}"
     );
-    let response = Client::new()
+    let res = Client::new()
         .post(&url)
         .header("cookie", cookie)
         .json(&data_entry)
         .send()
         .await
         .unwrap();
-
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::OK);
-    let validation_results: SaveDataEntryResponse = response.json().await.unwrap();
-    assert_eq!(validation_results.validation_results.errors.len(), 0);
-    assert_eq!(validation_results.validation_results.warnings.len(), 0);
-}
-
-pub async fn save_data_entry(
-    addr: &SocketAddr,
-    cookie: HeaderValue,
-    polling_station_id: u32,
-    entry_number: u32,
-    client_state: Option<&str>,
-) {
-    post_data_entry(
-        addr,
-        cookie,
-        polling_station_id,
-        entry_number,
-        example_data_entry(client_state),
-    )
-    .await;
-}
-
-pub async fn save_non_example_data_entry(
-    addr: &SocketAddr,
-    cookie: HeaderValue,
-    polling_station_id: u32,
-    entry_number: u32,
-    data_entry: DataEntry,
-) {
-    post_data_entry(addr, cookie, polling_station_id, entry_number, data_entry).await;
+    assert_eq!(res.status(), StatusCode::OK, "{:?}", res.text().await);
+    res
 }
 
 /// Finalise the data entry
@@ -176,7 +144,14 @@ pub async fn create_and_finalise_data_entry(
     entry_number: u32,
 ) {
     claim_data_entry(addr, cookie.clone(), polling_station_id, entry_number).await;
-    save_data_entry(addr, cookie.clone(), polling_station_id, entry_number, None).await;
+    save_data_entry(
+        addr,
+        cookie.clone(),
+        polling_station_id,
+        entry_number,
+        example_data_entry(None),
+    )
+    .await;
     finalise_data_entry(addr, cookie, polling_station_id, entry_number).await;
 }
 
@@ -188,7 +163,7 @@ pub async fn create_and_finalise_non_example_data_entry(
     data_entry: DataEntry,
 ) {
     claim_data_entry(addr, cookie.clone(), polling_station_id, entry_number).await;
-    save_non_example_data_entry(
+    save_data_entry(
         addr,
         cookie.clone(),
         polling_station_id,

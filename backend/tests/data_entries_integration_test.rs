@@ -9,7 +9,10 @@ use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
-    shared::{claim_data_entry, create_and_finalise_data_entry, save_data_entry},
+    shared::{
+        claim_data_entry, create_and_finalise_data_entry, example_data_entry, finalise_data_entry,
+        save_data_entry,
+    },
     utils::serve_api,
 };
 use abacus::{
@@ -25,9 +28,17 @@ pub mod utils;
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
+    let addr = serve_api(pool).await;
     let cookie = shared::typist_login(&addr).await;
-    create_and_finalise_data_entry(&addr, cookie, 1, 1).await;
+
+    claim_data_entry(&addr, cookie.clone(), 1, 1).await;
+
+    let res = save_data_entry(&addr, cookie.clone(), 1, 1, example_data_entry(None)).await;
+    let validation_results: SaveDataEntryResponse = res.json().await.unwrap();
+    assert_eq!(validation_results.validation_results.errors.len(), 0);
+    assert_eq!(validation_results.validation_results.warnings.len(), 0);
+
+    finalise_data_entry(&addr, cookie, 1, 1).await;
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -396,7 +407,7 @@ async fn test_election_details_status(pool: SqlitePool) {
         typist_cookie.clone(),
         2,
         1,
-        Some(r#"{"continue": true}"#),
+        example_data_entry(Some(r#"{"continue": true}"#)),
     )
     .await;
 
@@ -422,7 +433,7 @@ async fn test_election_details_status(pool: SqlitePool) {
         typist2_cookie.clone(),
         1,
         2,
-        Some(r#"{"continue": true}"#),
+        example_data_entry(Some(r#"{"continue": true}"#)),
     )
     .await;
     save_data_entry(
@@ -430,7 +441,7 @@ async fn test_election_details_status(pool: SqlitePool) {
         typist_cookie.clone(),
         2,
         1,
-        Some(r#"{"continue": false}"#),
+        example_data_entry(Some(r#"{"continue": false}"#)),
     )
     .await;
 
@@ -481,7 +492,7 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
         typist_cookie.clone(),
         1,
         1,
-        Some(r#"{"continue": true}"#),
+        example_data_entry(Some(r#"{"continue": true}"#)),
     )
     .await;
 
@@ -492,7 +503,7 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
         typist_cookie.clone(),
         3,
         1,
-        Some(r#"{"continue": true}"#),
+        example_data_entry(Some(r#"{"continue": true}"#)),
     )
     .await;
 

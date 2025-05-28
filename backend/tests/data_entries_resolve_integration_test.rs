@@ -12,27 +12,6 @@ use test_log::test;
 pub mod shared;
 pub mod utils;
 
-async fn save_data_entry(
-    addr: &SocketAddr,
-    cookie: HeaderValue,
-    polling_station_id: u32,
-    entry_number: u32,
-    data_entry: DataEntry,
-) -> Response {
-    let url = format!(
-        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}"
-    );
-    let res = Client::new()
-        .post(&url)
-        .header("cookie", cookie)
-        .json(&data_entry)
-        .send()
-        .await
-        .unwrap();
-    assert_eq!(res.status(), StatusCode::OK, "{:?}", res.text().await);
-    res
-}
-
 async fn complete_data_entry(
     addr: &SocketAddr,
     cookie: HeaderValue,
@@ -42,7 +21,7 @@ async fn complete_data_entry(
 ) -> Response {
     shared::claim_data_entry(addr, cookie.clone(), polling_station_id, entry_number).await;
 
-    save_data_entry(
+    shared::save_data_entry(
         addr,
         cookie.clone(),
         polling_station_id,

@@ -113,6 +113,14 @@ export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/resolve_differences`;
 export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
 
+// /api/polling_stations/{polling_station_id}/data_entries/resolve_errors
+export interface POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH =
+  `/api/polling_stations/${number}/data_entries/resolve_errors`;
+export type POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = ResolveErrorsAction;
+
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;
@@ -217,6 +225,8 @@ export type AuditEvent =
   | (DataEntryDetails & { eventType: "DataEntrySaved" })
   | (DataEntryDetails & { eventType: "DataEntryDeleted" })
   | (DataEntryDetails & { eventType: "DataEntryFinalised" })
+  | (DataEntryDetails & { eventType: "DataEntryDiscardedFirst" })
+  | (DataEntryDetails & { eventType: "DataEntryResumedFirst" })
   | (DataEntryDetails & { eventType: "DataEntryKeptFirst" })
   | (DataEntryDetails & { eventType: "DataEntryKeptSecond" })
   | (DataEntryDetails & { eventType: "DataEntryDiscardedBoth" })
@@ -840,6 +850,8 @@ export interface RedactedEmlHash {
 }
 
 export type ResolveDifferencesAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
+
+export type ResolveErrorsAction = "discard_first_entry" | "resume_first_entry";
 
 export type Role = "administrator" | "typist" | "coordinator";
 

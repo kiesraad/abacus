@@ -88,6 +88,12 @@ export function PollingStationSelector({
               nr: currentPollingStation.number,
             }),
           );
+        case PollingStationUserStatus.HasErrors:
+          return renderWarningMessage(
+            tx("polling_station_choice.has_errors", undefined, {
+              nr: currentPollingStation.number,
+            }),
+          );
         case PollingStationUserStatus.Finished:
           return renderWarningMessage(
             tx("polling_station_choice.has_already_been_filled_twice", undefined, {

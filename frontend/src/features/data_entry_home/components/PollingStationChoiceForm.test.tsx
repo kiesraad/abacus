@@ -532,6 +532,45 @@ describe("Test PollingStationChoiceForm", () => {
     });
   });
 
+  describe("Polling station with data entry that has errors", () => {
+    const testPollingStation = pollingStationMockData[0]!;
+
+    beforeEach(() => {
+      server.use(
+        ElectionRequestHandler,
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [{ polling_station_id: testPollingStation.id, status: "first_entry_has_errors" }],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
+    });
+
+    test("Show message when searching", async () => {
+      await renderPollingStationChoiceForm();
+      const user = userEvent.setup();
+      await user.type(await screen.findByLabelText("Voer het nummer in:"), String(testPollingStation.number));
+
+      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      await waitFor(() => {
+        expect(pollingStationFeedback).toHaveTextContent("Stembureau 33 ligt ter beoordeling bij de coördinator");
+      });
+    });
+
+    test("Do not show in the list with available polling stations", async () => {
+      await renderPollingStationChoiceForm();
+
+      const pollingStationList = screen.queryByTestId("polling_station_list");
+      expect(pollingStationList).not.toBeInTheDocument();
+
+      const alert = await screen.findByRole("alert");
+      expect(alert).toHaveTextContent("Er zijn voor jou geen stembureaus meer om in te voeren");
+    });
+  });
+
   test("Show unfinished data entries for current user", async () => {
     server.use(ElectionRequestHandler);
     const testPollingStation = pollingStationMockData[0]!;

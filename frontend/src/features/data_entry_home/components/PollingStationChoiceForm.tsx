@@ -17,7 +17,6 @@ import { parseIntUserInput } from "@/utils/strings";
 
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import {
-  finishedStatuses,
   getPollingStationWithStatusList,
   getUrlForDataEntry,
   PollingStationUserStatus,
@@ -108,10 +107,13 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStation.statusEntry.status));
   };
 
+  const notAvailable = [
+    PollingStationUserStatus.Finished,
+    PollingStationUserStatus.SecondEntryNotAllowed,
+    PollingStationUserStatus.HasErrors,
+  ];
   const available = pollingStationsWithStatus.filter(
-    (pollingStation) =>
-      !finishedStatuses.includes(pollingStation.statusEntry.status) &&
-      pollingStation.userStatus !== PollingStationUserStatus.SecondEntryNotAllowed,
+    (pollingStation) => !notAvailable.includes(pollingStation.userStatus),
   );
   const availableCurrentUser = available.filter(
     (pollingStation) => pollingStation.userStatus !== PollingStationUserStatus.InProgressOtherUser,

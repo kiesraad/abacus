@@ -26,7 +26,7 @@ export const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> =
 };
 
 export const statusesForCategory: Record<StatusCategory, DataEntryStatusName[]> = {
-  errors_and_warnings: ["entries_different"],
+  errors_and_warnings: ["entries_different", "first_entry_has_errors"],
   in_progress: ["first_entry_in_progress", "second_entry_in_progress"],
   first_entry_finished: ["second_entry_not_started"],
   definitive: ["definitive"],

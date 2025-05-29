@@ -6,7 +6,7 @@ use sqlx::Type;
 use utoipa::ToSchema;
 
 use super::{DataError, PollingStationResults, ValidationResults, validate_data_entry_status};
-use crate::{election::Election, polling_station::PollingStation};
+use crate::{election::ElectionWithPoliticalGroups, polling_station::PollingStation};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DataEntryTransitionError {
@@ -302,7 +302,7 @@ impl DataEntryStatus {
     pub fn finalise_first_entry(
         self,
         polling_station: &PollingStation,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         user_id: u32,
     ) -> Result<Self, DataEntryTransitionError> {
         match &self {
@@ -344,7 +344,7 @@ impl DataEntryStatus {
     pub fn finalise_second_entry(
         self,
         polling_station: &PollingStation,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         user_id: u32,
     ) -> Result<(Self, Option<PollingStationResults>), DataEntryTransitionError> {
         match &self {
@@ -496,7 +496,7 @@ impl DataEntryStatus {
     pub fn keep_second_entry(
         self,
         polling_station: &PollingStation,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
     ) -> Result<Self, DataEntryTransitionError> {
         match &self {
             DataEntryStatus::EntriesDifferent(state) => {
@@ -678,7 +678,10 @@ mod tests {
     use super::*;
     use crate::{
         data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts},
-        election::{Candidate, Election, ElectionCategory, ElectionStatus, PoliticalGroup},
+        election::{
+            Candidate, ElectionCategory, ElectionStatus, ElectionWithPoliticalGroups,
+            PoliticalGroup,
+        },
         polling_station::{PollingStation, PollingStationType},
     };
 
@@ -725,8 +728,8 @@ mod tests {
         }
     }
 
-    fn election() -> Election {
-        Election {
+    fn election() -> ElectionWithPoliticalGroups {
+        ElectionWithPoliticalGroups {
             id: 1,
             name: "Test election".to_string(),
             election_id: "Test_2025".to_string(),
@@ -738,7 +741,7 @@ mod tests {
             election_date: Utc::now().date_naive(),
             nomination_date: Utc::now().date_naive(),
             status: ElectionStatus::DataEntryInProgress,
-            political_groups: Some(vec![]),
+            political_groups: vec![],
         }
     }
 
@@ -1182,8 +1185,8 @@ mod tests {
         let next = initial
             .finalise_second_entry(
                 &polling_station(),
-                &Election {
-                    political_groups: Some(vec![PoliticalGroup {
+                &ElectionWithPoliticalGroups {
+                    political_groups: vec![PoliticalGroup {
                         number: 1,
                         name: "Test group".to_string(),
                         candidates: vec![Candidate {
@@ -1196,7 +1199,7 @@ mod tests {
                             country_code: None,
                             gender: None,
                         }],
-                    }]),
+                    }],
                     ..election()
                 },
                 0,

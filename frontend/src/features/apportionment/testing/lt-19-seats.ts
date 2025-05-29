@@ -1,7 +1,7 @@
 import {
   CandidateNominationResult,
-  Election,
   ElectionSummary,
+  ElectionWithPoliticalGroups,
   PoliticalGroup,
   PoliticalGroupCandidateNomination,
   PoliticalGroupVotes,
@@ -1656,7 +1656,7 @@ export const political_group_1: PoliticalGroup = {
   ],
 };
 
-export const election: Election = {
+export const election: ElectionWithPoliticalGroups = {
   id: 3,
   name: "Test Election < 19 seats",
   election_id: "TestLocation_2026",

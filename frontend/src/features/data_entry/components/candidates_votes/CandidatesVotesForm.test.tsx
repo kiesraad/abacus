@@ -8,7 +8,11 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, within } from "@/testing/test-utils";
-import { Election, PoliticalGroup, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import {
+  ElectionWithPoliticalGroups,
+  PoliticalGroup,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+} from "@/types/generated/openapi";
 
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
@@ -46,7 +50,7 @@ const defaultDataEntryState: DataEntryState = {
 
 const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
-function renderForm({ group, election }: { group?: PoliticalGroup; election?: Required<Election> } = {}) {
+function renderForm({ group, election }: { group?: PoliticalGroup; election?: ElectionWithPoliticalGroups } = {}) {
   return render(
     <DataEntryProvider election={election || electionMockData} pollingStationId={1} entryNumber={1}>
       <CandidatesVotesForm group={group || politicalGroupMockData} />
@@ -285,7 +289,7 @@ describe("Test CandidatesVotesForm", () => {
         ],
       };
 
-      const electionMockData: Required<Election> = {
+      const electionMockData: ElectionWithPoliticalGroups = {
         id: 1,
         name: "Gemeenteraadsverkiezingen 2026",
         election_id: "Heemdamseburg_2024",

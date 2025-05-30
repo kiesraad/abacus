@@ -68,7 +68,7 @@ Meer informatie over het proces en de uitvoering van de verkiezingen in Nederlan
 
 ## Bijdragen
 
-Je kunt op verschillende manieren bijdragen leveren aan Abacus. Kijk hiervoor in de sectie [Bijdragen](contributing.md).
+Je kunt op verschillende manieren bijdragen leveren aan Abacus. Kijk hiervoor in de sectie [Bijdragen](CONTRIBUTING.md).
 
 ## Meldingen en security-issues
 

@@ -1,4 +1,5 @@
-import { ReactElement, useState } from "react";
+import { ReactNode, useState } from "react";
+import { useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
@@ -8,27 +9,30 @@ import { t, tx } from "@/i18n/translate";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import { CheckElectionDefinition } from "./CheckElectionDefinition";
+import { CheckHash } from "./CheckHash";
 
 export function UploadElectionDefinition() {
-  const { file, setFile, data, setData } = useElectionCreateContext();
+  const { state, dispatch } = useElectionCreateContext();
+  const navigate = useNavigate();
   const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
-  const [error, setError] = useState<ReactElement | undefined>();
+  const [error, setError] = useState<ReactNode | undefined>();
   const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
 
-  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
-    setFile(currentFile);
     if (currentFile !== undefined) {
-      const response = await create({ data: await currentFile.text() });
+      const data = await currentFile.text();
+      const response = await create({ data });
 
       if (isSuccess(response)) {
-        setData(response.data);
+        dispatch({
+          type: "SELECT_ELECTION_DEFINITION",
+          response: response.data,
+          electionDefinitionData: data,
+          electionDefinitionFileName: currentFile.name,
+        });
         setError(undefined);
       } else if (isError(response)) {
-        setData(undefined);
-        setFile(undefined);
-
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
           setError(
@@ -51,10 +55,37 @@ export function UploadElectionDefinition() {
         }
       }
     }
-  };
+  }
 
-  if (file && data) {
-    return <CheckElectionDefinition file={file} data={data} />;
+  if (
+    state.election &&
+    state.electionDefinitionFileName &&
+    state.electionDefinitionRedactedHash &&
+    state.electionDefinitionData
+  ) {
+    async function onSubmit(chunks: string[]) {
+      const response = await create({ data: state.electionDefinitionData, hash: chunks });
+      if (isSuccess(response)) {
+        dispatch({
+          type: "SET_ELECTION_DEFINITION_HASH",
+          electionDefinitionHash: chunks,
+        });
+        await navigate("/elections/create/check-and-save");
+      } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
+        setError(response.message);
+      }
+    }
+
+    return (
+      <CheckHash
+        date={state.election.election_date}
+        title={state.election.name}
+        fileName={state.electionDefinitionFileName}
+        redactedHash={state.electionDefinitionRedactedHash}
+        error={error}
+        onSubmit={(chunks) => void onSubmit(chunks)}
+      />
+    );
   }
 
   return (
@@ -68,7 +99,7 @@ export function UploadElectionDefinition() {
         )}
       </div>
       <p className="mb-lg">{t("election.use_instructions_to_import_eml")}</p>
-      <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)} file={file}>
+      <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
         {t("select_file")}
       </FileInput>
     </section>

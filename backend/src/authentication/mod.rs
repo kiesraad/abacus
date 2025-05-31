@@ -45,6 +45,7 @@ mod tests {
 
     use crate::{
         AppState,
+        airgap::AirgapDetection,
         authentication::{
             api::{AccountUpdateRequest, Credentials, UserListResponse},
             middleware::extend_session,
@@ -55,7 +56,10 @@ mod tests {
     };
 
     fn create_app(pool: SqlitePool) -> Router {
-        let state = AppState { pool: pool.clone() };
+        let state = AppState {
+            pool: pool.clone(),
+            airgap_detection: AirgapDetection::nop(),
+        };
 
         Router::from(router())
             .layer(middleware::map_response_with_state(

@@ -12,6 +12,7 @@ openapi = ["dep:utoipa-swagger-ui"]
 memory-serve = ["dep:memory-serve"]
 embed-typst = ["dep:typst", "dep:typst-pdf"]
 dev-database = []
+airgap-detection = []
 
 [[bin]]
 name = "gen-openapi"

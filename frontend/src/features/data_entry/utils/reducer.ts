@@ -1,4 +1,4 @@
-import { Election } from "@/types/generated/openapi";
+import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { ClientState, DataEntryAction, DataEntryState } from "../types/types";
@@ -7,7 +7,7 @@ import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateA
 export const INITIAL_FORM_SECTION_ID: FormSectionId = "recounted";
 
 export function getInitialState(
-  election: Required<Election>,
+  election: ElectionWithPoliticalGroups,
   pollingStationId: number,
   entryNumber: number,
 ): DataEntryState {

@@ -7,7 +7,7 @@ use crate::{
     APIError, AppState, ErrorResponse,
     authentication::Coordinator,
     data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
-    election::{Election, repository::Elections},
+    election::{ElectionWithPoliticalGroups, repository::Elections},
     eml::{EML510, EMLDocument, EmlHash, axum::Eml},
     pdf_gen::{
         generate_pdf,
@@ -31,7 +31,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 }
 
 struct ResultsInput {
-    election: Election,
+    election: ElectionWithPoliticalGroups,
     polling_stations: Vec<PollingStation>,
     results: Vec<(PollingStation, PollingStationResults)>,
     summary: ElectionSummary,

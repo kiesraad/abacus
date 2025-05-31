@@ -152,10 +152,7 @@ async fn polling_station_data_entry_claim(
             voters_recounts: None,
             differences_counts: Default::default(),
             political_group_votes: PollingStationResults::default_political_group_votes(
-                election
-                    .political_groups
-                    .as_ref()
-                    .expect("political groups should be present"),
+                &election.political_groups,
             ),
         },
         client_state: None,

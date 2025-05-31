@@ -8,9 +8,8 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
   DataEntryStatus,
-  Election,
+  ElectionWithPoliticalGroups,
   EntriesDifferent,
-  PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH,
@@ -31,7 +30,7 @@ interface PollingStationDataEntryStatus {
   action: ResolveDifferencesAction | undefined;
   setAction: (action: ResolveDifferencesAction | undefined) => void;
   pollingStation: PollingStation;
-  election: Election & { political_groups: PoliticalGroup[] };
+  election: ElectionWithPoliticalGroups;
   loading: boolean;
   status: EntriesDifferentStatus | null;
   onSubmit: () => Promise<void>;

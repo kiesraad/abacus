@@ -31,7 +31,7 @@ pub struct EML510 {
 
 impl EML510 {
     pub fn from_results(
-        election: &crate::election::Election,
+        election: &crate::election::ElectionWithPoliticalGroups,
         results: &[(PollingStation, PollingStationResults)],
         summary: &ElectionSummary,
         creation_date_time: &chrono::DateTime<chrono::Local>,
@@ -88,7 +88,9 @@ impl EML510 {
 
 impl super::base::EMLDocument for EML510 {}
 
-fn election_subcategory(election: &crate::election::Election) -> Option<ElectionSubcategory> {
+fn election_subcategory(
+    election: &crate::election::ElectionWithPoliticalGroups,
+) -> Option<ElectionSubcategory> {
     match (&election.category, election.number_of_seats) {
         (crate::election::ElectionCategory::Municipal, ..19) => Some(ElectionSubcategory::GR1),
         (crate::election::ElectionCategory::Municipal, 19..) => Some(ElectionSubcategory::GR2),
@@ -143,7 +145,7 @@ pub struct TotalVotes {
 
 impl TotalVotes {
     pub fn from_summary(
-        election: &crate::election::Election,
+        election: &crate::election::ElectionWithPoliticalGroups,
         summary: &ElectionSummary,
     ) -> TotalVotes {
         TotalVotes {
@@ -235,7 +237,7 @@ pub struct ReportingUnitVotes {
 
 impl ReportingUnitVotes {
     pub fn from_polling_station(
-        election: &crate::election::Election,
+        election: &crate::election::ElectionWithPoliticalGroups,
         authority_id: &str,
         polling_station: &PollingStation,
         results: &PollingStationResults,
@@ -420,15 +422,15 @@ pub struct Selection {
 
 impl Selection {
     pub fn from_political_group_votes(
-        election: &crate::election::Election,
+        election: &crate::election::ElectionWithPoliticalGroups,
         votes: &[PoliticalGroupVotes],
     ) -> Vec<Selection> {
         let mut selections = vec![];
         for pg in votes {
             let epg = election
                 .political_groups
-                .as_ref()
-                .and_then(|pgs| pgs.iter().find(|p| p.number == pg.number));
+                .iter()
+                .find(|p| p.number == pg.number);
 
             selections.push(Selection {
                 selector: Selector::AffiliationIdentifier(AffiliationIdentifier {

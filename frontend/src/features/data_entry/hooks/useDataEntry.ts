@@ -2,7 +2,7 @@ import { useReducer } from "react";
 
 import { useApiClient } from "@/api/useApiClient";
 import {
-  Election,
+  ElectionWithPoliticalGroups,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
@@ -23,7 +23,7 @@ import useDataEntryNavigation from "./useDataEntryNavigation";
 import { useInitialDataEntryState } from "./useInitialDataEntryState";
 
 export default function useDataEntry(
-  election: Required<Election>,
+  election: ElectionWithPoliticalGroups,
   pollingStationId: number,
   entryNumber: number,
 ): DataEntryStateAndActions {

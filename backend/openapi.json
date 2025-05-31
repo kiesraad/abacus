@@ -66,7 +66,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Election"
+                  "$ref": "#/components/schemas/ElectionWithPoliticalGroups"
                 }
               }
             }
@@ -124,7 +124,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Election"
+                  "$ref": "#/components/schemas/ElectionWithPoliticalGroups"
                 }
               }
             }
@@ -3190,7 +3190,7 @@
       },
       "Election": {
         "type": "object",
-        "description": "Election, optionally with its political groups",
+        "description": "Election without political groups",
         "required": [
           "id",
           "name",
@@ -3242,12 +3242,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "political_groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroup"
-            }
           },
           "status": {
             "$ref": "#/components/schemas/ElectionStatus"
@@ -3399,7 +3393,7 @@
         ],
         "properties": {
           "election": {
-            "$ref": "#/components/schemas/Election"
+            "$ref": "#/components/schemas/ElectionWithPoliticalGroups"
           },
           "polling_stations": {
             "type": "array",
@@ -3533,6 +3527,73 @@
           "votes_counts": {
             "$ref": "#/components/schemas/VotesCounts",
             "description": "The total number of votes"
+          }
+        }
+      },
+      "ElectionWithPoliticalGroups": {
+        "type": "object",
+        "description": "Election with political groups",
+        "required": [
+          "id",
+          "name",
+          "election_id",
+          "location",
+          "domain_id",
+          "number_of_voters",
+          "category",
+          "number_of_seats",
+          "election_date",
+          "nomination_date",
+          "status",
+          "political_groups"
+        ],
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "domain_id": {
+            "type": "string"
+          },
+          "election_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "election_id": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "location": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nomination_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "political_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroup"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },

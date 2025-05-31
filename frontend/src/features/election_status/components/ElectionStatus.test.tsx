@@ -86,7 +86,7 @@ describe("ElectionStatus", () => {
     expect(headings[3]).toHaveTextContent("Eerste en tweede invoer klaar (1)");
     expect(tables[3]).toHaveTableContent([
       ["Nummer", "Stembureau", "Afgerond op"],
-      ["37", "Testbus", "vandaag 10:20"],
+      ["37", "Dansschool Oeps nou deed ik het weer", "vandaag 10:20"],
     ]);
 
     expect(headings[4]).toHaveTextContent("Werkvoorraad (1)");

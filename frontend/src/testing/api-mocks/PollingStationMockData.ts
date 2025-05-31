@@ -61,17 +61,6 @@ export const pollingStationMockData: PollingStation[] = [
 export const extendedPollingStationMockData: PollingStation[] = [
   ...pollingStationMockData,
   {
-    id: 5,
-    election_id: 1,
-    name: "Testbus",
-    number: 37,
-    number_of_voters: undefined,
-    polling_station_type: "Mobile",
-    address: "Rijksweg A12 1a",
-    postal_code: "1234 YQ",
-    locality: "Den Haag",
-  },
-  {
     id: 6,
     election_id: 1,
     name: "Testmuseum",

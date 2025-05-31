@@ -28,7 +28,7 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     let url = format!("http://{addr}/api/user");
     let response = reqwest::Client::new()
         .get(&url)
-        .header("cookie", admin_cookie.clone())
+        .header("cookie", &admin_cookie)
         .send()
         .await
         .unwrap();
@@ -145,7 +145,7 @@ async fn test_user_creation_duplicate_username(pool: SqlitePool) {
             "fullname": "fullname",
             "temp_password": "MyLongPassword13"
         }))
-        .header("cookie", admin_cookie.clone())
+        .header("cookie", &admin_cookie)
         .send()
         .await
         .unwrap();

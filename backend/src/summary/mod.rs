@@ -7,7 +7,7 @@ use crate::{
         CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
         Validate, ValidationResults, VotersCounts, VotesCounts,
     },
-    election::Election,
+    election::ElectionWithPoliticalGroups,
     error::ErrorReference,
     polling_station::PollingStation,
 };
@@ -52,28 +52,26 @@ impl ElectionSummary {
     /// Add all the votes from the given polling stations together, using the
     /// data from the election for candidates and political groups.
     pub fn from_results(
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         results: &[(PollingStation, PollingStationResults)],
     ) -> Result<ElectionSummary, APIError> {
         // running totals
         let mut totals = ElectionSummary::zero();
 
         // initialize political group votes to zero
-        if let Some(pgs) = &election.political_groups {
-            for group in pgs.iter() {
-                totals.political_group_votes.push(PoliticalGroupVotes {
-                    number: group.number,
-                    total: 0,
-                    candidate_votes: group
-                        .candidates
-                        .iter()
-                        .map(|c| CandidateVotes {
-                            number: c.number,
-                            votes: 0,
-                        })
-                        .collect(),
-                });
-            }
+        for group in election.political_groups.iter() {
+            totals.political_group_votes.push(PoliticalGroupVotes {
+                number: group.number,
+                total: 0,
+                candidate_votes: group
+                    .candidates
+                    .iter()
+                    .map(|c| CandidateVotes {
+                        number: c.number,
+                        votes: 0,
+                    })
+                    .collect(),
+            });
         }
 
         // list of polling stations for which we processed results

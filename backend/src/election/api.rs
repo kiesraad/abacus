@@ -1,14 +1,18 @@
-use axum::http::StatusCode;
 use axum::{
     Json,
     extract::{Path, State},
+    http::StatusCode,
 };
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{NewElection, repository::Elections, structs::Election};
+use super::{
+    NewElection,
+    repository::Elections,
+    structs::{Election, ElectionWithPoliticalGroups},
+};
 #[cfg(feature = "dev-database")]
 use crate::audit_log::{AuditEvent, AuditService};
 use crate::{
@@ -42,7 +46,7 @@ pub struct ElectionListResponse {
 /// Election details response, including the election's candidate list (political groups) and its polling stations
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionDetailsResponse {
-    pub election: Election,
+    pub election: ElectionWithPoliticalGroups,
     pub polling_stations: Vec<PollingStation>,
 }
 
@@ -98,7 +102,7 @@ pub async fn election_details(
     path = "/api/elections",
     request_body = NewElection,
     responses(
-        (status = 201, description = "Election created", body = Election),
+        (status = 201, description = "Election created", body = ElectionWithPoliticalGroups),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -110,7 +114,7 @@ pub async fn election_create(
     State(elections_repo): State<Elections>,
     audit_service: AuditService,
     Json(new_election): Json<NewElection>,
-) -> Result<(StatusCode, Election), APIError> {
+) -> Result<(StatusCode, ElectionWithPoliticalGroups), APIError> {
     let election = elections_repo.create(new_election).await?;
 
     audit_service
@@ -177,7 +181,7 @@ pub struct ElectionDefinitionImportRequest {
     path = "/api/elections/import",
     request_body = ElectionDefinitionImportRequest,
     responses(
-        (status = 201, description = "Election imported", body = Election),
+        (status = 201, description = "Election imported", body = ElectionWithPoliticalGroups),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -187,7 +191,7 @@ pub async fn election_import(
     _user: Admin,
     State(elections_repo): State<Elections>,
     Json(edu): Json<ElectionDefinitionImportRequest>,
-) -> Result<(StatusCode, Json<Election>), APIError> {
+) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
     if edu.hash != EmlHash::from(edu.data.as_bytes()).chunks {
         return Err(APIError::InvalidHashError);
     }

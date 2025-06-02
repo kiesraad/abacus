@@ -28,6 +28,12 @@ export const statusResponseMock: ElectionStatusResponse = {
       first_entry_progress: 100,
       second_entry_progress: 20,
     },
+    {
+      polling_station_id: 5,
+      status: "first_entry_has_errors",
+      first_entry_user_id: 1,
+      first_entry_progress: 100,
+    },
   ],
 };
 

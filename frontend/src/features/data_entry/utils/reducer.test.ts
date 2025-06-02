@@ -10,7 +10,7 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import {
-  Election,
+  ElectionWithPoliticalGroups,
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
   PollingStationResults,
 } from "@/types/generated/openapi";
@@ -26,7 +26,7 @@ function getInitialState(): DataEntryState {
 }
 
 export function _getInitialValues(
-  election: Required<Election>,
+  election: ElectionWithPoliticalGroups,
   defaultValues?: Partial<PollingStationResults>,
 ): PollingStationResults {
   return {

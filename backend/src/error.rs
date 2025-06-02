@@ -23,6 +23,7 @@ use crate::{
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, Clone, Copy, ToSchema, PartialEq, Eq, Debug)]
 pub enum ErrorReference {
+    AirgapViolation,
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DatabaseError,
@@ -74,6 +75,7 @@ impl IntoResponse for ErrorResponse {
 #[derive(Debug)]
 pub enum APIError {
     AddError(String, ErrorReference),
+    AirgapViolation(String),
     Apportionment(ApportionmentError),
     Authentication(AuthenticationError),
     BadRequest(String, ErrorReference),
@@ -105,6 +107,10 @@ impl IntoResponse for APIError {
         }
 
         let (status, error_response) = match self {
+            APIError::AirgapViolation(message) => (
+                StatusCode::SERVICE_UNAVAILABLE,
+                to_error(&message, ErrorReference::AirgapViolation, true),
+            ),
             APIError::BadRequest(message, reference) => {
                 (StatusCode::BAD_REQUEST, to_error(&message, reference, true))
             }

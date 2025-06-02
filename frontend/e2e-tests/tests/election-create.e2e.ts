@@ -14,6 +14,9 @@ test.describe("Election creation", () => {
   test("it uploads a file", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
+    const initialElectionCount = await overviewPage.electionCount();
+    const initialReadyStateCount = await page.getByText("Klaar voor invoer").count();
+
     await overviewPage.create.click();
 
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
@@ -36,12 +39,12 @@ test.describe("Election creation", () => {
     await expect(checkAndSavePage.header).toBeVisible();
     await checkAndSavePage.save.click();
 
-    //await page.goto("/elections");
-
     // Redefine the Overview page, so we can locate the newly
     // added objects
     await expect(overviewPage.header).toBeVisible();
-    await expect(page.getByText("Gemeenteraad Amsterdam 2022")).toBeVisible();
-    await expect(page.getByText("Klaar voor invoer")).toBeVisible();
+    // Check if the amount of elections by this title is one more than before the import
+    expect(await overviewPage.electionCount()).toBe(initialElectionCount + 1);
+    // Check if the amount of "Klaar voor invoer states" is one more than before the import
+    expect(await overviewPage.readyStateCount()).toBe(initialReadyStateCount + 1);
   });
 });

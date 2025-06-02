@@ -138,6 +138,7 @@ mod tests {
 
     use crate::{
         AppState,
+        airgap::AirgapDetection,
         audit_log::{
             AuditEvent, AuditLog, AuditLogListResponse, AuditLogUser, AuditService,
             UserLoggedInDetails,
@@ -172,7 +173,10 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list(pool: SqlitePool) {
-        let state = AppState { pool: pool.clone() };
+        let state = AppState {
+            pool: pool.clone(),
+            airgap_detection: AirgapDetection::nop(),
+        };
 
         let session = Sessions::new(pool.clone())
             .create(1, TimeDelta::seconds(60 * 30))
@@ -231,7 +235,10 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list_users(pool: SqlitePool) {
-        let state = AppState { pool: pool.clone() };
+        let state = AppState {
+            pool: pool.clone(),
+            airgap_detection: AirgapDetection::nop(),
+        };
 
         let session = Sessions::new(pool.clone())
             .create(1, TimeDelta::seconds(60 * 30))

@@ -106,7 +106,7 @@
     },
     "/api/elections/import": {
       "post": {
-        "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator",
+        "summary": "Uploads election definition, validates it, saves it to the database, and returns the created election",
         "operationId": "election_import",
         "requestBody": {
           "content": {

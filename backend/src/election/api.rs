@@ -170,8 +170,7 @@ pub struct ElectionDefinitionImportRequest {
     data: String,
 }
 
-/// Uploads election definition, validates it and returns the associated election data and
-/// a redacted hash, to be filled by the administrator
+/// Uploads election definition, validates it, saves it to the database, and returns the created election
 #[utoipa::path(
     post,
     path = "/api/elections/import",

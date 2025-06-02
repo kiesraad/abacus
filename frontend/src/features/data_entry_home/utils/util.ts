@@ -10,6 +10,7 @@ export enum PollingStationUserStatus {
   InProgressCurrentUser,
   InProgressOtherUser,
   SecondEntryNotAllowed,
+  HasErrors,
   Finished,
 }
 
@@ -18,7 +19,7 @@ export type PollingStationWithStatus = PollingStation & {
   userStatus: PollingStationUserStatus;
 };
 
-export const finishedStatuses: DataEntryStatusName[] = ["entries_different", "definitive"];
+const finishedStatuses: DataEntryStatusName[] = ["entries_different", "definitive"];
 
 export function getPollingStationWithStatusList({
   pollingStations,
@@ -57,6 +58,8 @@ export function getPollingStationWithStatusList({
       }
     } else if (statusEntry.status === "second_entry_not_started" && statusEntry.first_entry_user_id === user?.user_id) {
       result.userStatus = PollingStationUserStatus.SecondEntryNotAllowed;
+    } else if (statusEntry.status === "first_entry_has_errors") {
+      result.userStatus = PollingStationUserStatus.HasErrors;
     }
 
     return result;

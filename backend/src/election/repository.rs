@@ -1,9 +1,8 @@
 use axum::extract::FromRef;
-use sqlx::types::Json;
-use sqlx::{Error, SqlitePool, query_as};
+use sqlx::{Error, SqlitePool, query_as, types::Json};
 
-use super::NewElection;
-use super::{Election, ElectionWithPoliticalGroups};
+use super::{Election, ElectionWithPoliticalGroups, NewElection};
+
 use crate::AppState;
 
 pub struct Elections(SqlitePool);

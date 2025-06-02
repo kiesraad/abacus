@@ -1,7 +1,6 @@
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
-import { PoliticalGroup } from "@/types/generated/openapi";
 
 import { election, seat_assignment } from "../testing/gte-19-seats";
 import { ApportionmentTable } from "./ApportionmentTable";
@@ -11,7 +10,7 @@ describe("ApportionmentTable", () => {
     render(
       <ApportionmentTable
         finalStanding={seat_assignment.final_standing}
-        politicalGroups={election.political_groups as PoliticalGroup[]}
+        politicalGroups={election.political_groups}
         fullSeats={seat_assignment.full_seats}
         residualSeats={seat_assignment.residual_seats}
         seats={seat_assignment.seats}

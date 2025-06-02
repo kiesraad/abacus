@@ -2,13 +2,13 @@ import { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router";
 
 import { ApiError } from "@/api/ApiResult";
-import { Election } from "@/types/generated/openapi";
+import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
 import useDataEntry from "../hooks/useDataEntry";
 
 export interface DataEntryProviderProps {
-  election: Required<Election>;
+  election: ElectionWithPoliticalGroups;
   pollingStationId: number;
   entryNumber: number;
   children: ReactNode;

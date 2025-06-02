@@ -9,6 +9,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
 
+import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
 import cls from "./ResolveErrors.module.css";
 
 export function ResolveErrorsPage() {
@@ -17,7 +18,6 @@ export function ResolveErrorsPage() {
     void navigate(`/elections/${election.id}/status`);
   };
   const pollingStationId = useNumericParam("pollingStationId");
-  // TODO: Add hook
   const { pollingStation, election, loading, status, action, setAction, onSubmit, validationError } =
     usePollingStationDataEntryErrors(pollingStationId, afterSave);
 
@@ -52,23 +52,23 @@ export function ResolveErrorsPage() {
               {validationError && <ChoiceList.Error id="resolve-errors-error">{validationError}</ChoiceList.Error>}
               <ChoiceList.Radio
                 id="keep_entry"
-                label={tx("resolve_errors.options.keep_entry", undefined, { name: status.first_user })}
-                checked={action === "keep_entry"}
+                label={tx("resolve_errors.options.resume_first_entry", undefined, { name: status.first_user })}
+                checked={action === "resume_first_entry"}
                 onChange={() => {
-                  setAction("keep_entry");
+                  setAction("resume_first_entry");
                 }}
               >
-                {t("resolve_errors.options.keep_entry_description")}
+                {t("resolve_errors.options.resume_first_entry_description")}
               </ChoiceList.Radio>
               <ChoiceList.Radio
                 id="discard_entry"
-                label={tx("resolve_errors.options.discard_entry")}
-                checked={action === "discard_entry"}
+                label={tx("resolve_errors.options.discard_first_entry")}
+                checked={action === "discard_first_entry"}
                 onChange={() => {
-                  setAction("discard_entry");
+                  setAction("discard_first_entry");
                 }}
               >
-                {t("resolve_errors.options.discard_entry_description")}
+                {t("resolve_errors.options.discard_first_entry_description")}
               </ChoiceList.Radio>
             </ChoiceList>
             <Button size="xl" type="submit">

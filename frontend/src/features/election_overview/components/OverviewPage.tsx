@@ -7,10 +7,9 @@ import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
-import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
-import { useElectionListRequest } from "@/hooks/election/useElectionListRequest";
+import { useElectionList } from "@/hooks/election/useElectionList";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { Election } from "@/types/generated/openapi";
@@ -18,18 +17,8 @@ import { Election } from "@/types/generated/openapi";
 export function OverviewPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { requestState } = useElectionListRequest();
+  const { electionList } = useElectionList();
   const { isAdministrator, isCoordinator } = useUserRole();
-
-  if (requestState.status === "loading") {
-    return <Loader />;
-  }
-
-  if ("error" in requestState) {
-    throw requestState.error;
-  }
-
-  const electionList = requestState.data.elections;
 
   const isNewAccount = location.hash === "#new-account";
   const isAdminOrCoordinator = isAdministrator || isCoordinator;

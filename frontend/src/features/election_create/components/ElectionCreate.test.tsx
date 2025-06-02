@@ -5,8 +5,9 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ApiProvider } from "@/api/ApiProvider";
+import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
@@ -27,7 +28,9 @@ const Providers = ({
   return (
     <ApiProvider fetchInitialUser={fetchInitialUser}>
       <TestUserProvider userRole="administrator">
-        <RouterProvider router={router} />
+        <ElectionListProvider>
+          <RouterProvider router={router} />
+        </ElectionListProvider>
       </TestUserProvider>
     </ApiProvider>
   );
@@ -87,6 +90,7 @@ function electionValidateResponse(election: NewElection): ElectionDefinitionVali
 
 describe("Election create pages", () => {
   beforeEach(() => {
+    server.use(ElectionListRequestHandler);
     server.use(ElectionRequestHandler);
   });
 

@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from "react-router";
 import { isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
+import { useElectionList } from "@/hooks/election/useElectionList";
 import { t } from "@/i18n/translate";
 import { ELECTION_IMPORT_REQUEST_PATH, ElectionDefinitionImportRequest } from "@/types/generated/openapi";
 
@@ -11,6 +12,7 @@ import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 export function CheckAndSave() {
   const navigate = useNavigate();
   const { state } = useElectionCreateContext();
+  const { refetch } = useElectionList();
   const path: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
   const { create } = useCrud<ElectionDefinitionImportRequest>({ create: path });
 
@@ -25,6 +27,7 @@ export function CheckAndSave() {
     });
 
     if (isSuccess(response)) {
+      await refetch();
       await navigate("/elections");
     } else if (isError(response)) {
       throw new Error();

@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { ApiError } from "@/api/ApiResult";
+import { ApiError, FatalApiError } from "@/api/ApiResult";
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
@@ -18,7 +18,7 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
   const navigate = useNavigate();
   const stateAndActions = useDataEntry(election, pollingStationId, entryNumber);
 
-  // handle error
+  // handle non-fatal error navigation
   useEffect(() => {
     if (stateAndActions.error && stateAndActions.error instanceof ApiError) {
       if (stateAndActions.error.reference === "DataEntryAlreadyClaimed") {
@@ -30,6 +30,11 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
       }
     }
   }, [election.id, navigate, stateAndActions.error, pollingStationId]);
+
+  // throw fatal errors, so the error boundary can catch them and show the full page error
+  if (stateAndActions.error instanceof FatalApiError) {
+    throw stateAndActions.error;
+  }
 
   if (!stateAndActions.pollingStationResults) {
     return null;

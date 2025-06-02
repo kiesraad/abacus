@@ -47,4 +47,33 @@ test.describe("Election creation", () => {
     // Check if the amount of "Klaar voor invoer states" is one more than before the import
     expect(await overviewPage.readyStateCount()).toBe(initialReadyStateCount + 1);
   });
+
+  test("it fails on incorrect hash", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new OverviewPgObj(page);
+    await overviewPage.create.click();
+
+    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
+    await expect(uploadDefinitionPage.header).toBeVisible();
+    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+
+    const checkDefinitionPage = new CheckDefinitionPgObj(page);
+    await expect(checkDefinitionPage.hashInput1).toBeFocused();
+    // Wrong hash
+    await checkDefinitionPage.hashInput1.fill("1234");
+    await checkDefinitionPage.hashInput2.fill("asdf");
+    await checkDefinitionPage.next.click();
+    await expect(checkDefinitionPage.error).toBeVisible();
+  });
+
+  test("it fails on valid, but incorrect file", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new OverviewPgObj(page);
+    await overviewPage.create.click();
+
+    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
+    await expect(uploadDefinitionPage.header).toBeVisible();
+    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110b_test.eml.xml");
+    await expect(uploadDefinitionPage.error).toBeVisible();
+  });
 });

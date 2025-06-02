@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 use super::{ApportionmentError, Fraction};
 use crate::{
     data_entry::CandidateVotes,
-    election::{Candidate, CandidateNumber, Election, PGNumber, PoliticalGroup},
+    election::{Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup},
     summary::ElectionSummary,
 };
 
@@ -150,13 +150,13 @@ fn update_candidate_ranking(
 /// The candidate nomination is first done based on preferential votes and then the other
 /// candidates are nominated.
 fn candidate_nomination_per_political_group(
-    election: &Election,
+    election: &ElectionWithPoliticalGroups,
     totals: &ElectionSummary,
     preference_threshold: Fraction,
     total_seats: &[u32],
 ) -> Result<Vec<PoliticalGroupCandidateNomination>, ApportionmentError> {
     let mut political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination> = vec![];
-    for pg in election.political_groups.clone().unwrap_or_default() {
+    for pg in election.political_groups.clone() {
         let pg_index = pg.number as usize - 1;
         let pg_seats = total_seats[pg_index];
         let candidate_votes = &totals.political_group_votes[pg_index].candidate_votes;
@@ -245,7 +245,7 @@ fn all_sorted_chosen_candidates(
 
 /// Candidate nomination
 pub fn candidate_nomination(
-    election: &Election,
+    election: &ElectionWithPoliticalGroups,
     quota: Fraction,
     totals: &ElectionSummary,
     total_seats: Vec<u32>,
@@ -279,7 +279,7 @@ pub fn candidate_nomination(
 
     // Create alphabetically ordered chosen candidates list
     let chosen_candidates = all_sorted_chosen_candidates(
-        election.political_groups.clone().unwrap_or_default(),
+        election.political_groups.clone(),
         &political_group_candidate_nomination,
     );
     debug!(
@@ -447,7 +447,7 @@ mod tests {
             &[],
         );
 
-        let pgs = election.political_groups.unwrap_or_default();
+        let pgs = &election.political_groups;
         check_chosen_candidates(
             &result.chosen_candidates,
             &pgs[0].candidates[..8],
@@ -531,7 +531,7 @@ mod tests {
             &[],
         );
 
-        let pgs = election.political_groups.unwrap_or_default();
+        let pgs = &election.political_groups;
         check_chosen_candidates(
             &result.chosen_candidates,
             &pgs[0].candidates[..1],
@@ -599,7 +599,7 @@ mod tests {
             &[5, 1, 2, 3, 4],
         );
 
-        let pgs = election.political_groups.unwrap_or_default();
+        let pgs = &election.political_groups;
         check_chosen_candidates(
             &result.chosen_candidates,
             &pgs[0].candidates[..11],
@@ -665,7 +665,7 @@ mod tests {
             &[],
         );
 
-        let pgs = election.political_groups.unwrap_or_default();
+        let pgs = &election.political_groups;
         check_chosen_candidates(&result.chosen_candidates, &pgs[0].candidates, &[]);
         check_chosen_candidates(&result.chosen_candidates, &pgs[1].candidates, &[]);
         check_chosen_candidates(
@@ -755,7 +755,7 @@ mod tests {
             &[],
         );
 
-        let pgs = election.political_groups.clone().unwrap_or_default();
+        let pgs = &election.political_groups;
         let (pg_0_chosen_candidates, pg_0_not_chosen_candidates) =
             get_chosen_and_not_chosen_candidates_for_a_pg(
                 &pgs[0].candidates,

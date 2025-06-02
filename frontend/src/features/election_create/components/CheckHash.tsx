@@ -57,7 +57,7 @@ export function CheckHash({ date, title, fileName, redactedHash, error, onSubmit
       }
     });
 
-    // Only submit when there a no errors
+    // Only submit when there are no errors
     if (stubs.every((stub) => stub.error === "")) {
       onSubmit(completeHash);
     }

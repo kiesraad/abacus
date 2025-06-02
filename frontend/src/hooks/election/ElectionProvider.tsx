@@ -1,7 +1,6 @@
 import * as React from "react";
 
 import RequestStateHandler from "@/api/RequestStateHandler";
-import { Election } from "@/types/generated/openapi";
 
 import { ElectionProviderContext } from "./ElectionProviderContext";
 import { useElectionDataRequest } from "./useElectionDataRequest";
@@ -22,8 +21,7 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
       renderOnSuccess={(data) => (
         <ElectionProviderContext.Provider
           value={{
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-            election: data.election as Required<Election>,
+            election: data.election,
             pollingStations: data.polling_stations,
           }}
         >

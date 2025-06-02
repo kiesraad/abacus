@@ -4,7 +4,7 @@ import { AnyApiError } from "@/api/ApiResult";
 import {
   ClaimDataEntryResponse,
   DataEntryStatus,
-  Election,
+  ElectionWithPoliticalGroups,
   PollingStationResults,
   ValidationResults,
 } from "@/types/generated/openapi";
@@ -14,7 +14,7 @@ import { ValidationResultSet } from "../utils/ValidationResults";
 
 export interface DataEntryState {
   // state from providers
-  election: Required<Election>;
+  election: ElectionWithPoliticalGroups;
   pollingStationId: number;
   entryNumber: number;
 

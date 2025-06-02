@@ -393,7 +393,7 @@ export interface DifferencesCounts {
 }
 
 /**
- * Election, optionally with its political groups
+ * Election without political groups
  */
 export interface Election {
   category: ElectionCategory;
@@ -406,7 +406,6 @@ export interface Election {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
-  political_groups?: PoliticalGroup[];
   status: ElectionStatus;
 }
 
@@ -457,7 +456,7 @@ export interface ElectionDetails {
  * Election details response, including the election's candidate list (political groups) and its polling stations
  */
 export interface ElectionDetailsResponse {
-  election: Election;
+  election: ElectionWithPoliticalGroups;
   polling_stations: PollingStation[];
 }
 
@@ -518,6 +517,24 @@ export interface ElectionSummary {
   votes_counts: VotesCounts;
 }
 
+/**
+ * Election with political groups
+ */
+export interface ElectionWithPoliticalGroups {
+  category: ElectionCategory;
+  domain_id: string;
+  election_date: string;
+  election_id: string;
+  id: number;
+  location: string;
+  name: string;
+  nomination_date: string;
+  number_of_seats: number;
+  number_of_voters: number;
+  political_groups: PoliticalGroup[];
+  status: ElectionStatus;
+}
+
 export interface EntriesDifferent {
   /** First data entry for a polling station */
   first_entry: PollingStationResults;
@@ -543,6 +560,7 @@ export interface ErrorDetails {
  * Error reference used to show the corresponding error message to the end-user
  */
 export type ErrorReference =
+  | "AirgapViolation"
   | "AllListsExhausted"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "DatabaseError"

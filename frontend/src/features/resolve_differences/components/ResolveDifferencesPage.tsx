@@ -9,6 +9,7 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
+import { ResolveDifferencesAction } from "@/types/generated/openapi";
 
 import { usePollingStationDataEntryDifferences } from "../hooks/usePollingStationDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
@@ -17,8 +18,20 @@ import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 export function ResolveDifferencesPage() {
   const navigate = useNavigate();
-  const afterSave = () => {
-    void navigate(`/elections/${election.id}/status`);
+  const afterSave = (action: ResolveDifferencesAction) => {
+    let url = `/elections/${election.id}/status`;
+    switch (action) {
+      case "keep_first_entry":
+        url += "#data-entry-1-kept";
+        break;
+      case "keep_second_entry":
+        url += "#data-entry-2-kept";
+        break;
+      case "discard_both_entries":
+        url += "#data-entries-discarded";
+        break;
+    }
+    void navigate(url);
   };
   const pollingStationId = useNumericParam("pollingStationId");
   const { pollingStation, election, loading, status, action, setAction, onSubmit, validationError } =

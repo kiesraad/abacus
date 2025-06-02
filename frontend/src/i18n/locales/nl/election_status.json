@@ -1,22 +1,27 @@
 {
-  "label": "Status",
-  "title": "Statusoverzicht",
-  "first_session": "Eerste zitting",
-  "finish_data_entry_first_session": "Steminvoer eerste zitting afronden",
-  "definitive": {
-    "title": "Alle stembureaus zijn twee keer ingevoerd",
-    "message": "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
-    "finish_button": "Invoerfase afronden"
-  },
-  "main_title": "Statusoverzicht steminvoer",
   "add_polling_station": "Stembureau toevoegen",
-  "polling_stations_per_status": "Stembureaus per status",
-  "no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
   "coordinator": {
     "data_entry_not_started": "Klaar voor invoer",
     "data_entry_in_progress": "Steminvoer bezig",
     "data_entry_finished": "Steminvoer klaar"
   },
+  "definitive": {
+    "title": "Alle stembureaus zijn twee keer ingevoerd",
+    "message": "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
+    "finish_button": "Invoerfase afronden"
+  },
+  "finish_data_entry_first_session": "Steminvoer eerste zitting afronden",
+  "first_session": "Eerste zitting",
+  "label": "Status",
+  "main_title": "Statusoverzicht steminvoer",
+  "no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
+  "polling_stations_per_status": "Stembureaus per status",
+  "success": {
+    "first-data-entry-kept": "Verschil opgelost door eerste invoer te bewaren",
+    "second-data-entry-kept": "Verschil opgelost door tweede invoer te bewaren",
+    "data-entries-discarded": "Verschil opgelost door beide invoeren te verwijderen"
+  },
+  "title": "Statusoverzicht",
   "typist": {
     "data_entry_not_started": "Klaar voor invoer",
     "data_entry_in_progress": "Steminvoer bezig",

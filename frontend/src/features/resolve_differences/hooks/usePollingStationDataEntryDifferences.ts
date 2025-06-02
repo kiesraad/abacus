@@ -40,7 +40,7 @@ interface PollingStationDataEntryStatus {
 
 export function usePollingStationDataEntryDifferences(
   pollingStationId: number,
-  afterSave: () => void,
+  afterSave: (action: ResolveDifferencesAction) => void,
 ): PollingStationDataEntryStatus {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
@@ -118,7 +118,7 @@ export function usePollingStationDataEntryDifferences(
     if (isSuccess(response)) {
       // reload the election status and navigate to the overview page
       await electionContext?.refetch();
-      afterSave();
+      afterSave(action);
     } else {
       setError(response);
     }

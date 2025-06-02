@@ -120,6 +120,6 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-1-kept");
   });
 });

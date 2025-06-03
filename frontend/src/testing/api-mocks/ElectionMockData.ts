@@ -1,7 +1,7 @@
 import {
-  Election,
   ElectionDetailsResponse,
   ElectionListResponse,
+  ElectionWithPoliticalGroups,
   NewElection,
   PoliticalGroup,
 } from "@/types/generated/openapi";
@@ -261,7 +261,9 @@ export const electionListMockResponse: ElectionListResponse = {
   ],
 };
 
-export const getElectionMockData = (election: Partial<Election> = {}): Required<ElectionDetailsResponse> => {
+export const getElectionMockData = (
+  election: Partial<ElectionWithPoliticalGroups> = {},
+): Required<ElectionDetailsResponse> => {
   return {
     election: {
       ...electionListMockResponse.elections[0]!,
@@ -273,7 +275,7 @@ export const getElectionMockData = (election: Partial<Election> = {}): Required<
 };
 
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
-export const electionMockData = electionDetailsMockResponse.election as Required<Election>;
+export const electionMockData = electionDetailsMockResponse.election;
 export const newElectionMockData = {
   ...electionDetailsMockResponse.election,
   polling_stations: pollingStationMockData,

@@ -102,7 +102,7 @@ impl AirgapDetection {
             return;
         }
 
-        // persorm a DNS lookup using the default resolver
+        // perform a DNS lookup using the default resolver
         let dns_lookup_success = DOMAINS
             .iter()
             .map(|d| format!("{d}:{SECURE_PORT}").to_socket_addrs())

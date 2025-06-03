@@ -1,5 +1,5 @@
 import { render as rtlRender, waitFor } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { ApiProvider } from "@/api/ApiProvider";
 import { overrideOnce } from "@/testing/server";
@@ -9,14 +9,6 @@ import { AirGapViolationDialog } from "./AirGapviolationDialog";
 
 describe("AirGapViolationDialog", () => {
   test("Error dialog when air-gap violation is detected", async () => {
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "warn").mockImplementation(() => {
-      /* do nothing */
-    });
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
-
     overrideOnce("get", "/api/user/whoami", 503, {
       error: "Blocking request due to airgap violation",
       fatal: true,

@@ -58,7 +58,7 @@ impl AirgapDetection {
 
             move || {
                 loop {
-                    airgap_detection.detect_airgap();
+                    airgap_detection.perform_detection();
 
                     std::thread::sleep(Duration::from_secs(AIRGAP_DETECTION_INTERVAL));
                 }
@@ -68,8 +68,20 @@ impl AirgapDetection {
         airgap_detection
     }
 
-    /// Detects if the system is in an airgap by attempting to connect to a known server.
-    fn detect_airgap(&self) {
+    fn perform_detection(&self) {
+        if self.is_connected() {
+            error!("Airgap violation detected, abacus is connected to the internet!");
+            self.set_airgap_violation_detected(true);
+        } else {
+            trace!("No airgap violation detected.");
+            self.set_airgap_violation_detected(false);
+        }
+
+        self.set_last_check();
+    }
+
+    /// Detects if the system is in an airgap by attempting to connect to IPv3, IPv6 addresses and performing DNS lookups
+    fn is_connected(&self) -> bool {
         // attempt to connect to known IPv4 addresses over TCP
         let tcp_ipv4_connection_success = IPV4
             .iter()
@@ -79,11 +91,9 @@ impl AirgapDetection {
             .count();
 
         if tcp_ipv4_connection_success > 0 {
-            error!("Airgap violation detected, abacus is connected to the internet!");
             trace!("TCP IPv4 connections: {tcp_ipv4_connection_success}");
-            self.set_airgap_violation_detected(true);
-            self.set_last_check();
-            return;
+
+            return true;
         }
 
         // attempt to connect to known IPv6 addresses over TCP
@@ -95,11 +105,9 @@ impl AirgapDetection {
             .count();
 
         if tcp_ipv6_connection_success > 0 {
-            error!("Airgap violation detected, abacus is connected to the internet!");
             trace!("TCP IPv6 connections: {tcp_ipv6_connection_success}");
-            self.set_airgap_violation_detected(true);
-            self.set_last_check();
-            return;
+
+            return true;
         }
 
         // perform a DNS lookup using the default resolver
@@ -110,16 +118,12 @@ impl AirgapDetection {
             .count();
 
         if dns_lookup_success > 0 {
-            error!("Airgap violation detected, abacus is connected to the internet!");
             trace!("DNS lookup success: {dns_lookup_success}");
-            self.set_airgap_violation_detected(true);
-            self.set_last_check();
-            return;
+
+            return true;
         }
 
-        trace!("No airgap violation detected.");
-        self.set_airgap_violation_detected(false);
-        self.set_last_check();
+        false
     }
 
     fn set_airgap_violation_detected(&self, status: bool) {

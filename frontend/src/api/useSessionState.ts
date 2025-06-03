@@ -20,8 +20,6 @@ export interface SessionState {
   expiration: Date | null;
   setExpiration: (expiration: Date | null) => void;
   extendSession: () => Promise<void>;
-  airGapError: boolean;
-  setAirGapError: (error: boolean) => void;
 }
 
 // Keep track of the currently logged-in user
@@ -31,7 +29,6 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
   const [user, setUser] = useState<LoginResponse | null>(null);
   const [expiration, setExpiration] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
-  const [airGapError, setAirGapError] = useState<boolean>(false);
 
   // Log out the current user
   const logout = async () => {
@@ -102,7 +99,5 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
     setUser,
     user,
     extendSession,
-    airGapError,
-    setAirGapError,
   };
 }

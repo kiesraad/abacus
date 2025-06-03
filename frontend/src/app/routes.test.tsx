@@ -14,7 +14,7 @@ import { routes } from "./routes";
 
 const renderWithRouter = () => {
   const router = setupTestRouter(routes);
-  rtlRender(<Providers router={createTestRouter(router)} />);
+  rtlRender(<Providers router={router} />);
   return router;
 };
 

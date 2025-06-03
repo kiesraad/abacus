@@ -48,7 +48,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::builder()
-                .with_default_directive(LevelFilter::TRACE.into())
+                .with_default_directive(LevelFilter::INFO.into())
                 .from_env()?,
         )
         .init();

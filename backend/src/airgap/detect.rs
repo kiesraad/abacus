@@ -70,13 +70,6 @@ impl AirgapDetection {
 
     /// Detects if the system is in an airgap by attempting to connect to a known server.
     fn detect_airgap(&self) {
-        // persorm a DNS lookup using the default resolver
-        let dns_lookup_success = DOMAINS
-            .iter()
-            .map(|d| format!("{d}:{SECURE_PORT}").to_socket_addrs())
-            .filter_map(Result::ok)
-            .count();
-
         // attempt to connect to known IPv4 addresses over TCP
         let tcp_ipv4_connection_success = IPV4
             .iter()
@@ -84,6 +77,14 @@ impl AirgapDetection {
             .map(|addr| TcpStream::connect_timeout(&addr, TCP_CONNECT_TIMEOUT))
             .filter_map(Result::ok)
             .count();
+
+        if tcp_ipv4_connection_success > 0 {
+            error!("Airgap violation detected, abacus is connected to the internet!");
+            trace!("TCP IPv4 connections: {tcp_ipv4_connection_success}");
+            self.set_airgap_violation_detected(true);
+            self.set_last_check();
+            return;
+        }
 
         // attempt to connect to known IPv6 addresses over TCP
         let tcp_ipv6_connection_success = IPV6
@@ -93,24 +94,31 @@ impl AirgapDetection {
             .filter_map(Result::ok)
             .count();
 
-        if dns_lookup_success > 0
-            || tcp_ipv6_connection_success > 0
-            || tcp_ipv4_connection_success > 0
-        {
+        if tcp_ipv6_connection_success > 0 {
             error!("Airgap violation detected, abacus is connected to the internet!");
-
-            trace!(
-                "DNS lookup success: {}, TCP IPv4 connections: {}, TCP IPv6 connections: {}",
-                dns_lookup_success, tcp_ipv4_connection_success, tcp_ipv6_connection_success
-            );
-
+            trace!("TCP IPv6 connections: {tcp_ipv6_connection_success}");
             self.set_airgap_violation_detected(true);
-        } else {
-            trace!("No airgap violation detected.");
-
-            self.set_airgap_violation_detected(false);
+            self.set_last_check();
+            return;
         }
 
+        // persorm a DNS lookup using the default resolver
+        let dns_lookup_success = DOMAINS
+            .iter()
+            .map(|d| format!("{d}:{SECURE_PORT}").to_socket_addrs())
+            .filter_map(Result::ok)
+            .count();
+
+        if dns_lookup_success > 0 {
+            error!("Airgap violation detected, abacus is connected to the internet!");
+            trace!("DNS lookup success: {dns_lookup_success}");
+            self.set_airgap_violation_detected(true);
+            self.set_last_check();
+            return;
+        }
+
+        trace!("No airgap violation detected.");
+        self.set_airgap_violation_detected(false);
         self.set_last_check();
     }
 

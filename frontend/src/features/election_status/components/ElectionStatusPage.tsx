@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { HeaderElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
@@ -15,6 +15,7 @@ import { ElectionStatus } from "./ElectionStatus";
 
 export function ElectionStatusPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { election, pollingStations } = useElection();
   const { statuses } = useElectionStatus();
   const { requestState } = useInitialApiGet<UserListResponse>("/api/user" satisfies USER_LIST_REQUEST_PATH);

@@ -39,7 +39,7 @@ interface PollingStationDataEntryStatus {
 
 export function usePollingStationDataEntryErrors(
   pollingStationId: number,
-  afterSave: () => void,
+  afterSave: (action: ResolveErrorsAction) => void,
 ): PollingStationDataEntryStatus {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
@@ -77,14 +77,14 @@ export function usePollingStationDataEntryErrors(
     throw usersRequestState.error;
   }
 
-  // only allow polling stations with status "EntriesDifferent" to be resolved
+  // only allow polling stations with status "FirstEntryHasErrors" to be resolved
   if (requestState.status === "success" && requestState.data.status !== "FirstEntryHasErrors") {
     throw new NotFoundError("error.polling_station_not_found");
   }
 
   let status: FirstEntryHasErrorsStatus | null = null;
 
-  // if the request was successful and the status is "EntriesDifferent", we can show the details
+  // if the request was successful and the status is "FirstEntryHasErrors", we can show the details
   if (
     requestState.status === "success" &&
     usersRequestState.status === "success" &&
@@ -115,7 +115,7 @@ export function usePollingStationDataEntryErrors(
     if (isSuccess(response)) {
       // reload the election status and navigate to the overview page
       await electionContext?.refetch();
-      afterSave();
+      afterSave(action);
     } else {
       setError(response);
     }

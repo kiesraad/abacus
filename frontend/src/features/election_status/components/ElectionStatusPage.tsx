@@ -24,12 +24,19 @@ export function ElectionStatusPage() {
 
   const showDataEntryKeptAlert = location.hash.startsWith("#data-entry-kept-") ? location.hash : null;
   const showDataEntriesDiscardedAlert = location.hash.startsWith("#data-entries-discarded-") ? location.hash : null;
-  const differencesResolvedAlert = showDataEntryKeptAlert || showDataEntriesDiscardedAlert || undefined;
+  const showFirstEntryResumedAlert = location.hash.startsWith("#data-entry-resumed-") ? location.hash : null;
+  const showFirstEntryDiscardedAlert = location.hash.startsWith("#data-entry-discarded-") ? location.hash : null;
+  const successAlert =
+    showDataEntryKeptAlert ||
+    showDataEntriesDiscardedAlert ||
+    showFirstEntryResumedAlert ||
+    showFirstEntryDiscardedAlert ||
+    undefined;
 
   let pollingStationNumber = 0;
   let typist = "";
-  if (differencesResolvedAlert) {
-    const id = parseInt(differencesResolvedAlert.substring(differencesResolvedAlert.lastIndexOf("-") + 1));
+  if (successAlert) {
+    const id = parseInt(successAlert.substring(successAlert.lastIndexOf("-") + 1));
     pollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
     const typistId = statuses.find((status) => status.polling_station_id === id)?.first_entry_user_id;
     typist = users.find((user) => user.id === typistId)?.fullname || "";
@@ -56,13 +63,23 @@ export function ElectionStatusPage() {
           </div>
         </section>
       </header>
-      {differencesResolvedAlert && (
+      {successAlert && (
         <Alert type="success" onClose={closeSuccessAlert}>
-          <h2>{t("election_status.success.differences_resolved", { nr: pollingStationNumber })}</h2>
+          <h2>
+            {showFirstEntryDiscardedAlert
+              ? t("election_status.success.data_entry_discarded", { nr: pollingStationNumber })
+              : showFirstEntryResumedAlert
+                ? t("election_status.success.data_entry_resumed", { nr: pollingStationNumber, typist: typist })
+                : t("election_status.success.differences_resolved", { nr: pollingStationNumber })}
+          </h2>
           <p>
-            {showDataEntryKeptAlert
-              ? t("election_status.success.data_entry_kept", { typist: typist })
-              : t("election_status.success.data_entries_discarded", { nr: pollingStationNumber })}
+            {showFirstEntryDiscardedAlert
+              ? t("election_status.success.polling_station_can_be_filled_again")
+              : showFirstEntryResumedAlert
+                ? t("election_status.success.typist_can_continue_data_entry")
+                : showDataEntryKeptAlert
+                  ? t("election_status.success.data_entry_kept", { typist: typist })
+                  : t("election_status.success.data_entries_discarded", { nr: pollingStationNumber })}
           </p>
         </Alert>
       )}

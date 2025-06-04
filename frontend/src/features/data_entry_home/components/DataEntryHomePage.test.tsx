@@ -74,14 +74,14 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Alert visible when finished", async () => {
-    renderDataEntryHomePage();
-
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { polling_station_id: 1, status: "definitive" },
         { polling_station_id: 2, status: "definitive" },
       ],
     });
+
+    renderDataEntryHomePage();
 
     expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
   });
@@ -93,7 +93,9 @@ describe("DataEntryHomePage", () => {
         { polling_station_id: 2, status: "first_entry_not_started" },
       ],
     } satisfies ElectionStatusResponse);
+
     renderDataEntryHomePage();
+
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText("Je hebt nog een openstaande invoer")).toBeVisible();
     expect(within(alert).getByText("Op Rolletjes")).toBeVisible();
@@ -107,7 +109,9 @@ describe("DataEntryHomePage", () => {
         { polling_station_id: 2, status: "definitive" },
       ],
     });
+
     renderDataEntryHomePage();
+
     // Ensure the page is rendered before testing
     await screen.findByText("Gemeenteraadsverkiezingen 2026");
     expect(screen.queryByRole("alert")).toBeNull();

@@ -22,6 +22,7 @@ import {
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import {
   electionRequest,
+  emptyRequest,
   noRecountNoDifferencesRequest,
   pollingStationRequests,
 } from "./test-data/request-response-templates";
@@ -46,6 +47,8 @@ type Fixtures = {
   pollingStationFirstEntryClaimed: PollingStation;
   // First polling station of the election with first data entry done
   pollingStationFirstEntryDone: PollingStation;
+  // First polling station of the election with first data entry with errors
+  pollingStationFirstEntryHasErrors: PollingStation;
   // First polling station of the election with first and second data entries done
   pollingStationDefinitive: PollingStation;
   // First polling station of the election with differences between the first and second data entry
@@ -127,6 +130,16 @@ export const test = base.extend<Fixtures>({
     const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
     await firstDataEntry.claim();
     await firstDataEntry.save(noRecountNoDifferencesRequest);
+    await firstDataEntry.finalise();
+
+    await use(pollingStation);
+  },
+  pollingStationFirstEntryHasErrors: async ({ request, pollingStation }, use) => {
+    await loginAs(request, "typist1");
+
+    const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
+    await firstDataEntry.claim();
+    await firstDataEntry.save(emptyRequest);
     await firstDataEntry.finalise();
 
     await use(pollingStation);

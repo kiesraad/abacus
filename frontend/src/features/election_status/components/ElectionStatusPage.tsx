@@ -25,8 +25,25 @@ export function ElectionStatusPage() {
   const showFirstDataEntryKeptAlert = location.hash.startsWith("#data-entry-1-kept") ? location.hash : null;
   const showSecondDataEntryKeptAlert = location.hash.startsWith("#data-entry-2-kept") ? location.hash : null;
   const showDataEntriesDiscardedAlert = location.hash.startsWith("#data-entries-discarded") ? location.hash : null;
+  const showFirstEntryResumedAlert = location.hash.startsWith("#data-entry-resumed-") ? location.hash : null;
+  const showFirstEntryDiscardedAlert = location.hash.startsWith("#data-entry-discarded-") ? location.hash : null;
+  const includesPollingStationId = showFirstEntryResumedAlert || showFirstEntryDiscardedAlert || undefined;
   const successAlert =
-    showFirstDataEntryKeptAlert || showSecondDataEntryKeptAlert || showDataEntriesDiscardedAlert || undefined;
+    showFirstDataEntryKeptAlert ||
+    showSecondDataEntryKeptAlert ||
+    showDataEntriesDiscardedAlert ||
+    showFirstEntryResumedAlert ||
+    showFirstEntryDiscardedAlert ||
+    undefined;
+
+  let pollingStationNumber = 0;
+  let typist = "";
+  if (includesPollingStationId) {
+    const id = parseInt(includesPollingStationId.substring(includesPollingStationId.lastIndexOf("-") + 1));
+    pollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
+    const typistId = statuses.find((status) => status.polling_station_id === id)?.first_entry_user_id;
+    typist = users.find((user) => user.id === typistId)?.fullname || "";
+  }
 
   function finishInput() {
     void navigate("../report");
@@ -53,11 +70,22 @@ export function ElectionStatusPage() {
         <Alert type="success" onClose={closeSuccessAlert}>
           <h2>
             {showFirstDataEntryKeptAlert
-              ? t("election_status.success.first-data-entry-kept")
+              ? t("election_status.success.first_data_entry_kept")
               : showSecondDataEntryKeptAlert
-                ? t("election_status.success.second-data-entry-kept")
-                : t("election_status.success.data-entries-discarded")}
+                ? t("election_status.success.second_data_entry_kept")
+                : showDataEntriesDiscardedAlert
+                  ? t("election_status.success.data_entries_discarded")
+                  : showFirstEntryDiscardedAlert
+                    ? t("election_status.success.data_entry_discarded", { nr: pollingStationNumber })
+                    : t("election_status.success.data_entry_resumed", { nr: pollingStationNumber, typist: typist })}
           </h2>
+          <p>
+            {showFirstEntryDiscardedAlert
+              ? t("election_status.success.polling_station_can_be_filled_again")
+              : showFirstEntryResumedAlert
+                ? t("election_status.success.typist_can_continue_data_entry")
+                : ""}
+          </p>
         </Alert>
       )}
       {election.status !== "DataEntryFinished" &&

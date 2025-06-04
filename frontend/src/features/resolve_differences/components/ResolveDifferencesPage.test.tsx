@@ -11,7 +11,7 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationDataEntryResolveDifferencesHandler,
-  PollingStationDataEntryStatusHandler,
+  PollingStationDataEntryStatusEntriesDifferentHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
@@ -48,7 +48,7 @@ describe("ResolveDifferencesPage", () => {
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
       PollingStationDataEntryResolveDifferencesHandler,
-      PollingStationDataEntryStatusHandler,
+      PollingStationDataEntryStatusEntriesDifferentHandler,
       UserListRequestHandler,
     );
   });
@@ -74,6 +74,11 @@ describe("ResolveDifferencesPage", () => {
       ["1", "2", mdash, "Foo, A. (Alice)"],
       ["2", mdash, "2", "Doe, C. (Charlie)"],
     ]);
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Welke invoer moet bewaard blijven?" })).toBeVisible();
+    expect(await screen.findByLabelText(/De eerste invoer/)).toBeVisible();
+    expect(await screen.findByLabelText(/De tweede invoer/)).toBeVisible();
+    expect(await screen.findByLabelText(/Geen van beide/)).toBeVisible();
   });
 
   test("should show the selection in the table", async () => {

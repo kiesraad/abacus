@@ -1,4 +1,4 @@
-import { ElectionStatusResponse, ElectionStatusResponseEntry } from "@/types/generated/openapi";
+import { ElectionStatusResponse } from "@/types/generated/openapi";
 
 const today = new Date();
 today.setHours(10, 20);
@@ -36,22 +36,3 @@ export const statusResponseMock: ElectionStatusResponse = {
     },
   ],
 };
-
-export const statusResponseEntriesMock: ElectionStatusResponseEntry[] = [
-  {
-    polling_station_id: 1,
-    status: "first_entry_not_started",
-  },
-  {
-    polling_station_id: 2,
-    status: "first_entry_not_started",
-  },
-  {
-    polling_station_id: 3,
-    status: "first_entry_not_started",
-  },
-  {
-    polling_station_id: 4,
-    status: "first_entry_not_started",
-  },
-];

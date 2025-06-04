@@ -8,14 +8,24 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
+import { ResolveErrorsAction } from "@/types/generated/openapi";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
 import cls from "./ResolveErrors.module.css";
 
 export function ResolveErrorsPage() {
   const navigate = useNavigate();
-  const afterSave = () => {
-    void navigate(`/elections/${election.id}/status`);
+  const afterSave = (action: ResolveErrorsAction) => {
+    let url = `/elections/${election.id}/status`;
+    switch (action) {
+      case "resume_first_entry":
+        url += `#data-entry-resumed-${pollingStation.id}`;
+        break;
+      case "discard_first_entry":
+        url += `#data-entry-discarded-${pollingStation.id}`;
+        break;
+    }
+    void navigate(url);
   };
   const pollingStationId = useNumericParam("pollingStationId");
   const { pollingStation, election, loading, status, action, setAction, onSubmit, validationError } =

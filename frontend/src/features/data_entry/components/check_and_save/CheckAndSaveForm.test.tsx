@@ -142,7 +142,7 @@ describe("Test CheckAndSaveForm", () => {
     expect(await screen.findByRole("button", { name: "Opslaan" })).toBeInTheDocument();
   });
 
-  test.only("Save Form renders errors and warnings list when accepted errors", async () => {
+  test("Save Form renders errors and warnings list when accepted errors", async () => {
     const defaultState = getDefaultDataEntryState().formState;
     const mockFormState: FormState = {
       ...defaultState,

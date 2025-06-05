@@ -14,7 +14,8 @@ import { renderReturningRouter, screen, spyOnHandler, within } from "@/testing/t
 
 import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../../testing/test.utils";
-import { DataEntryState } from "../../types/types";
+import { DataEntryState, FormState } from "../../types/types";
+import { ValidationResultSet } from "../../utils/ValidationResults";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
@@ -139,6 +140,31 @@ describe("Test CheckAndSaveForm", () => {
 
     // Check that the save button is visible
     expect(await screen.findByRole("button", { name: "Opslaan" })).toBeInTheDocument();
+  });
+
+  test.only("Save Form renders errors and warnings list when accepted errors", async () => {
+    const defaultState = getDefaultDataEntryState().formState;
+    const mockFormState: FormState = {
+      ...defaultState,
+      sections: {
+        ...defaultState.sections,
+        voters_votes_counts: {
+          ...defaultState.sections.voters_votes_counts,
+          errors: new ValidationResultSet([errorWarningMocks.F201]),
+          warnings: new ValidationResultSet([errorWarningMocks.W203]),
+          acceptErrorsAndWarnings: true,
+        },
+      },
+    };
+
+    overrideServerClaimDataEntryResponse({
+      formState: mockFormState,
+      pollingStationResults: getDefaultValues(),
+      validationResults: { errors: [errorWarningMocks.F201], warnings: [] },
+    });
+    renderForm();
+
+    expect(await screen.findByRole("button", { name: "Afronden" })).toBeInTheDocument();
   });
 });
 

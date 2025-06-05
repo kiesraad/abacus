@@ -200,7 +200,7 @@ export function CheckAndSaveForm() {
               const content = tx(
                 `check_and_save.notable_form_sections.${status}`,
                 { link },
-                { link_title: section.title || section.title || "" },
+                { link_title: section.title || "" },
               );
 
               return (

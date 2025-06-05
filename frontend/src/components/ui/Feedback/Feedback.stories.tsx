@@ -55,9 +55,9 @@ export const CustomizableWarnings: Story<Props> = ({ id = "feedback-warning", ty
 
 CustomizableWarnings.argTypes = {
   data: {
-    options: ["W201", "W202", "W203", "W204", "W205", "W206", "W207", "W208", "W209", "W301", "W302"],
+    options: ["W001", "W201", "W202", "W203", "W204", "W205", "W206", "W207", "W208", "W209", "W301", "W302"],
     control: { type: "multi-select" },
-    defaultValue: ["W201", "W202", "W203", "W204", "W205", "W206", "W207", "W208", "W209", "W301", "W302"],
+    defaultValue: ["W001", "W201", "W202", "W203", "W204", "W205", "W206", "W207", "W208", "W209", "W301", "W302"],
   },
   userRole: {
     options: ["typist", "coordinator"],

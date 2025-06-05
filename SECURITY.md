@@ -1,6 +1,6 @@
 # Beveiliging
 
-Bij de Kiesraad nemen we de beveiliging van onze software heel serieus. Alle meldingen met betrekking tot beveiliging zijn daarom uiteraard welkom.
+Bij de Kiesraad vinden we beveiliging belangrijk. Alle meldingen met betrekking tot beveiliging zijn daarom uiteraard welkom.
 
 ## Vragen of opmerkingen
 
@@ -8,7 +8,7 @@ Als je een vraag of opmerking over security hebt, kun je het team bereiken via a
 
 ## Een beveiligingsprobleem melden
 
-We waarderen het als je (ernstige) beveiligingsproblemen op een verantwoorde manier (dus niet openbaar) meldt volgens het *responsible disclosure*-principe. Voor het melden van een beveiligingsprobleem kun je direct contact opnemen met onze CISO Fleur van Leusden via security[@]kiesraad.nl.
+We waarderen het als je (ernstige) beveiligingsproblemen op een verantwoorde manier (dus niet openbaar) meldt volgens het *responsible disclosure*-principe. Voor het melden van een beveiligingsprobleem kun je direct contact opnemen met onze CISO via security[@]kiesraad.nl.
 
 ## Meer informatie
 

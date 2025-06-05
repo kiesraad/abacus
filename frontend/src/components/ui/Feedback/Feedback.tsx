@@ -13,19 +13,20 @@ interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
   data?: ClientValidationResultCode[];
+  userRole: "typist" | "coordinator";
 }
 
-export function Feedback({ id, type, data }: FeedbackProps) {
+export function Feedback({ id, type, data, userRole }: FeedbackProps) {
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
   const link = (children: ReactElement) => <Link to={`../voters-and-votes`}>{children}</Link>;
 
   const feedbackList: FeedbackItem[] =
     data?.map(
       (code: ClientValidationResultCode): FeedbackItem => ({
-        title: t(`feedback.${code}.title`),
+        title: t(`feedback.${code}.${userRole}.title`),
         code: `${code[0]}.${code.slice(1)}`,
-        content: tx(`feedback.${code}.content`, { link }),
-        action: code == "F101" ? tx(`feedback.F101.action`, {}) : undefined,
+        content: tx(`feedback.${code}.${userRole}.content`, { link }),
+        action: userRole === "typist" && code === "F101" ? tx(`feedback.F101.${userRole}.action`, {}) : undefined,
       }),
     ) || [];
 
@@ -47,7 +48,7 @@ export function Feedback({ id, type, data }: FeedbackProps) {
           <div className="content">{feedback.content}</div>
         </div>
       ))}
-      {feedbackList.length > 0 && (
+      {userRole === "typist" && feedbackList.length > 0 && (
         <div className="feedback-action">
           {feedbackList.length > 1 ? (
             <h3>

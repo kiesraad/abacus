@@ -11,6 +11,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { PoliticalGroup } from "@/types/generated/openapi";
 import { KeyboardKey } from "@/types/ui";
@@ -25,6 +26,7 @@ export interface CandidatesVotesFormProps {
 }
 
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
+  const userRole = useUserRole();
   const {
     error,
     formRef,
@@ -70,10 +72,20 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         }}
       />
       {formSection.isSaved && !formSection.errors.isEmpty() && (
-        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} />
+        <Feedback
+          id="feedback-error"
+          type="error"
+          data={formSection.errors.getCodes()}
+          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
+        />
       )}
       {formSection.isSaved && !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && (
-        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} />
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={formSection.warnings.getCodes()}
+          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
+        />
       )}
       <InputGrid key={`list${group.number}`} zebra>
         <InputGrid.Header>

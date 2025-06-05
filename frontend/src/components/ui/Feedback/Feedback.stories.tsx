@@ -9,30 +9,31 @@ type Props = {
   id: FeedbackId;
   type: AlertType;
   data: ClientValidationResultCode[];
+  userRole: "typist" | "coordinator";
 };
 
 export const SingleError: Story = () => {
-  return <Feedback id="feedback-error" type="error" data={["F202"]} />;
+  return <Feedback id="feedback-error" type="error" data={["F202"]} userRole="typist" />;
 };
 
 export const SingleErrorCustomAction: Story = () => {
-  return <Feedback id="feedback-error" type="error" data={["F101"]} />;
+  return <Feedback id="feedback-error" type="error" data={["F101"]} userRole="typist" />;
 };
 
 export const MultipleErrors: Story = () => {
-  return <Feedback id="feedback-error" type="error" data={["F201", "F202"]} />;
+  return <Feedback id="feedback-error" type="error" data={["F201", "F202"]} userRole="typist" />;
 };
 
 export const SingleWarning: Story = () => {
-  return <Feedback id="feedback-warning" type="warning" data={["W203"]} />;
+  return <Feedback id="feedback-warning" type="warning" data={["W203"]} userRole="typist" />;
 };
 
 export const MultipleWarnings: Story = () => {
-  return <Feedback id="feedback-warning" type="warning" data={["W201", "W202"]} />;
+  return <Feedback id="feedback-warning" type="warning" data={["W201", "W202"]} userRole="typist" />;
 };
 
-export const CustomizableErrors: Story<Props> = ({ id = "feedback-error", type = "error", data }) => (
-  <Feedback id={id} type={type} data={data} />
+export const CustomizableErrors: Story<Props> = ({ id = "feedback-error", type = "error", data, userRole }) => (
+  <Feedback id={id} type={type} data={data} userRole={userRole} />
 );
 
 CustomizableErrors.argTypes = {
@@ -41,10 +42,15 @@ CustomizableErrors.argTypes = {
     control: { type: "multi-select" },
     defaultValue: ["F101", "F201", "F202", "F203", "F204", "F301", "F302", "F303", "F304", "F305", "F401"],
   },
+  userRole: {
+    options: ["typist", "coordinator"],
+    control: { type: "select" },
+    defaultValue: "typist",
+  },
 };
 
-export const CustomizableWarnings: Story<Props> = ({ id = "feedback-warning", type = "warning", data }) => (
-  <Feedback id={id} type={type} data={data} />
+export const CustomizableWarnings: Story<Props> = ({ id = "feedback-warning", type = "warning", data, userRole }) => (
+  <Feedback id={id} type={type} data={data} userRole={userRole} />
 );
 
 CustomizableWarnings.argTypes = {
@@ -52,5 +58,10 @@ CustomizableWarnings.argTypes = {
     options: ["W201", "W202", "W203", "W204", "W205", "W206", "W207", "W208", "W209", "W301", "W302"],
     control: { type: "multi-select" },
     defaultValue: ["W201", "W202", "W203", "W204", "W205", "W206", "W207", "W208", "W209", "W301", "W302"],
+  },
+  userRole: {
+    options: ["typist", "coordinator"],
+    control: { type: "select" },
+    defaultValue: "typist",
   },
 };

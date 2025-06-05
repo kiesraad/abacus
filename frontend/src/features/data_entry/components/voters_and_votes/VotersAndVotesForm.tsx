@@ -9,6 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { KeyboardKey } from "@/types/ui";
 
@@ -17,6 +18,7 @@ import { useVotersAndVotes } from "./useVotersAndVotes";
 import { formValuesToValues } from "./votersAndVotesValues";
 
 export function VotersAndVotesForm() {
+  const userRole = useUserRole();
   const {
     error,
     formRef,
@@ -47,10 +49,20 @@ export function VotersAndVotesForm() {
       />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && !formSection.errors.isEmpty() && (
-        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} />
+        <Feedback
+          id="feedback-error"
+          type="error"
+          data={formSection.errors.getCodes()}
+          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
+        />
       )}
       {formSection.isSaved && !formSection.warnings.isEmpty() && (
-        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} />
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={formSection.warnings.getCodes()}
+          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
+        />
       )}
       <InputGrid key="voters-and-votes">
         <InputGrid.Header>

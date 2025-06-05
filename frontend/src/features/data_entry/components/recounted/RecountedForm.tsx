@@ -8,6 +8,7 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Feedback } from "@/components/ui/Feedback/Feedback";
 import { Form } from "@/components/ui/Form/Form";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { KeyboardKey } from "@/types/ui";
 
@@ -15,6 +16,7 @@ import { DataEntryNavigation } from "../DataEntryNavigation";
 import { useRecounted } from "./useRecounted";
 
 export function RecountedForm() {
+  const userRole = useUserRole();
   const {
     error,
     recounted,
@@ -41,10 +43,20 @@ export function RecountedForm() {
       <DataEntryNavigation onSubmit={onSubmit} currentValues={{ recounted }} />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && !formSection.errors.isEmpty() && (
-        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} />
+        <Feedback
+          id="feedback-error"
+          type="error"
+          data={formSection.errors.getCodes()}
+          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
+        />
       )}
       {formSection.isSaved && !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && (
-        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} />
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={formSection.warnings.getCodes()}
+          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
+        />
       )}
       <p className="form-paragraph md">{t("recounted.message")}</p>
       <div className="radio-form">

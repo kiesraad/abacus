@@ -72,9 +72,9 @@ Meer informatie over het proces en de uitvoering van de verkiezingen in Nederlan
 
 Je kunt op verschillende manieren bijdragen leveren aan Abacus. Kijk hiervoor in de sectie [Bijdragen](CONTRIBUTING.md).
 
-## Meldingen en security-issues
+## Beveiliging
 
-Alle meldingen over onze software zijn welkom. Voor meldingen kun je het team direct bereiken via abacus[@]kiesraad.nl, voor security-issues kun je direct contact opnemen met onze CISO Fleur van Leusden via security[@]kiesraad.nl.
+Alle beveiligingsmeldingen over onze software zijn welkom. Kijk hiervoor in de sectie [Beveiliging](/SECURITY.md).
 
 ## Over de Kiesraad
 

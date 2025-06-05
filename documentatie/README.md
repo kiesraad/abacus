@@ -16,6 +16,10 @@ Hier vind je de documentatie over Abacus. De documentatie wordt telkens aangevul
 - Softwarearchitectuur:
   - [Overwegingen van talen en frameworks](/documentatie/softwarearchitectuur/overwegingen-talen-en-frameworks.md)
   - [Overzicht van de softwarearchitectuur](/documentatie/softwarearchitectuur/Overzicht.md)
+- Use cases:
+  - [Readme usecases](/documentatie/use-cases/README.md)
+  - [Autorisatiematrix Gemeenteraadsverkiezingen](/documentatie/use-cases/autorisatiematrix.md)
+  - [Validatieregels en plausibiliteitschecks voor invoer tellingen](/documentatie/use-cases/validatieregels-plausibiliteitschecks-tellingen.md)
 - Verkiezingsproces:
   - [Verloop van verkiezingen](/documentatie/verkiezingsproces/verloop-verkiezingen.md)
   - [Wie doet welke stembureaus](/documentatie/verkiezingsproces/wie-doet-welke-stembureaus.md)
@@ -23,8 +27,7 @@ Hier vind je de documentatie over Abacus. De documentatie wordt telkens aangevul
 
 ## Gebruikersdocumentatie
 
-- [Verkiezingsproces en Abacus](https://kiesraad.github.io/abacus-documentatie/verkiezingsproces-en-abacus.html)
-- [Installeren en starten](https://kiesraad.github.io/abacus-documentatie/installeren-en-starten.html)
+Voor informatie over het installeren, starten en gebruiken van Abacus ga je naar de website [Abacus Documentatie](https://kiesraad.github.io/abacus-documentatie/). Hier vind je niet alleen alle beschikbare gebruikersdocumentatie, maar bieden we ook uitleg over het verkiezingsproces.
 
 ## Externe documentatie
 

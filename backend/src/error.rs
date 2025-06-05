@@ -23,6 +23,7 @@ use crate::{
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, Clone, Copy, ToSchema, PartialEq, Eq, Debug)]
 pub enum ErrorReference {
+    AirgapViolation,
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DatabaseError,
@@ -34,6 +35,7 @@ pub enum ErrorReference {
     EntryNotUnique,
     InternalServerError,
     InvalidData,
+    InvalidHash,
     InvalidJson,
     InvalidPassword,
     InvalidPoliticalGroup,
@@ -73,6 +75,7 @@ impl IntoResponse for ErrorResponse {
 #[derive(Debug)]
 pub enum APIError {
     AddError(String, ErrorReference),
+    AirgapViolation(String),
     Apportionment(ApportionmentError),
     Authentication(AuthenticationError),
     BadRequest(String, ErrorReference),
@@ -81,6 +84,7 @@ pub enum APIError {
     EmlImportError(EMLImportError),
     InvalidData(DataError),
     InvalidHeaderValue,
+    InvalidHashError,
     JsonRejection(JsonRejection),
     NotFound(String, ErrorReference),
     PdfGenError(PdfGenError),
@@ -103,6 +107,10 @@ impl IntoResponse for APIError {
         }
 
         let (status, error_response) = match self {
+            APIError::AirgapViolation(message) => (
+                StatusCode::SERVICE_UNAVAILABLE,
+                to_error(&message, ErrorReference::AirgapViolation, true),
+            ),
             APIError::BadRequest(message, reference) => {
                 (StatusCode::BAD_REQUEST, to_error(&message, reference, true))
             }
@@ -180,6 +188,13 @@ impl IntoResponse for APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error", reference, false),
+                )
+            }
+            APIError::InvalidHashError => {
+                error!("Invalid hash");
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("Invalid hash", ErrorReference::InvalidHash, false),
                 )
             }
             APIError::XmlError(err) => {

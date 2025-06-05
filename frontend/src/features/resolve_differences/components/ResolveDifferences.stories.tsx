@@ -2,16 +2,16 @@ import { Story } from "@ladle/react";
 
 import { Alert } from "@/components/ui/Alert/Alert";
 import { politicalGroupsMockData } from "@/testing/api-mocks/ElectionMockData";
-import { ResolveAction } from "@/types/generated/openapi";
+import { ResolveDifferencesAction } from "@/types/generated/openapi";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 type Props = {
-  action: ResolveAction;
+  action: ResolveDifferencesAction;
 };
 
-const actions: ResolveAction[] = ["keep_first_entry", "keep_second_entry", "discard_both_entries"];
+const actions: ResolveDifferencesAction[] = ["keep_first_entry", "keep_second_entry", "discard_both_entries"];
 
 export default {
   title: "App / Resolve Differences",

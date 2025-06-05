@@ -1,5 +1,10 @@
 import { t } from "@/i18n/translate";
-import { PoliticalGroup, PoliticalGroupVotes, PollingStationResults, ResolveAction } from "@/types/generated/openapi";
+import {
+  PoliticalGroup,
+  PoliticalGroupVotes,
+  PollingStationResults,
+  ResolveDifferencesAction,
+} from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 
 import { DataEntrySection, getFromResults, sections } from "../utils/dataEntry";
@@ -9,7 +14,7 @@ export interface ResolveDifferencesTablesProps {
   first: PollingStationResults;
   second: PollingStationResults;
   politicalGroups: PoliticalGroup[];
-  action?: ResolveAction;
+  action?: ResolveDifferencesAction;
 }
 
 export function ResolveDifferencesTables({ first, second, action, politicalGroups }: ResolveDifferencesTablesProps) {
@@ -36,7 +41,7 @@ interface SectionTableProps {
   section: DataEntrySection;
   first: PollingStationResults;
   second: PollingStationResults;
-  action?: ResolveAction;
+  action?: ResolveDifferencesAction;
 }
 
 function SectionTable({ section, first, second, action }: SectionTableProps) {
@@ -74,7 +79,7 @@ interface CandidatesTableProps {
   politicalGroup: PoliticalGroup;
   first?: PoliticalGroupVotes;
   second?: PoliticalGroupVotes;
-  action?: ResolveAction;
+  action?: ResolveDifferencesAction;
 }
 
 function CandidatesTable({ politicalGroup, first, second, action }: CandidatesTableProps) {

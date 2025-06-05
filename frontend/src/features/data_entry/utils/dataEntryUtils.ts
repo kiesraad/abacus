@@ -1,4 +1,4 @@
-import { Election, PollingStationResults, ValidationResults } from "@/types/generated/openapi";
+import { ElectionWithPoliticalGroups, PollingStationResults, ValidationResults } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { ClientState, FormSection, FormState } from "../types/types";
@@ -127,7 +127,7 @@ function sortFormSections(a: FormSection, b: FormSection): number {
   return 0;
 }
 
-export function getInitialFormState(election: Required<Election>): FormState {
+export function getInitialFormState(election: ElectionWithPoliticalGroups): FormState {
   const result: FormState = {
     current: INITIAL_FORM_SECTION_ID,
     furthest: INITIAL_FORM_SECTION_ID,
@@ -230,7 +230,7 @@ export function calculateDataEntryProgress(formState: FormState) {
 export function buildFormState(
   clientState: ClientState,
   validationResults: ValidationResults,
-  election: Required<Election>,
+  election: ElectionWithPoliticalGroups,
 ) {
   const newFormState = getInitialFormState(election);
 

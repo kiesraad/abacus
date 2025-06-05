@@ -1,7 +1,5 @@
 import { Story } from "@ladle/react";
 
-import { PoliticalGroup } from "@/types/generated/openapi";
-
 import * as gte19Seats from "../testing/gte-19-seats";
 import * as lt19Seats from "../testing/lt-19-seats";
 import { HighestAverageAssignmentStep } from "../utils/seat-change";
@@ -23,8 +21,7 @@ export default {
 export const DefaultApportionmentTable: Story = () => (
   <ApportionmentTable
     finalStanding={gte19Seats.seat_assignment.final_standing}
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    politicalGroups={gte19Seats.election.political_groups as PoliticalGroup[]}
+    politicalGroups={gte19Seats.election.political_groups}
     fullSeats={gte19Seats.seat_assignment.full_seats}
     residualSeats={gte19Seats.seat_assignment.residual_seats}
     seats={gte19Seats.seat_assignment.seats}
@@ -51,7 +48,7 @@ DefaultElectionSummaryTable.storyName = "ElectionSummaryTable";
 export const DefaultFullSeatsTable: Story = () => (
   <FullSeatsTable
     finalStanding={gte19Seats.seat_assignment.final_standing}
-    politicalGroups={gte19Seats.election.political_groups ?? []}
+    politicalGroups={gte19Seats.election.political_groups}
     quota={gte19Seats.seat_assignment.quota}
     resultChanges={[]}
   />
@@ -105,8 +102,7 @@ export const DefaultHighestAveragesTable: Story = () => (
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     steps={gte19Seats.seat_assignment.steps as HighestAverageAssignmentStep[]}
     finalStanding={gte19Seats.seat_assignment.final_standing}
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    politicalGroups={gte19Seats.election.political_groups as PoliticalGroup[]}
+    politicalGroups={gte19Seats.election.political_groups}
     resultChanges={[]}
   />
 );
@@ -116,8 +112,7 @@ export const DefaultLargestRemaindersTable: Story = () => (
   <LargestRemaindersTable
     steps={lt19Seats.largest_remainder_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
+    politicalGroups={lt19Seats.election.political_groups}
     resultChanges={[]}
   />
 );
@@ -127,8 +122,7 @@ export const DefaultUniqueHighestAveragesTable: Story = () => (
   <UniqueHighestAveragesTable
     steps={lt19Seats.highest_average_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    politicalGroups={lt19Seats.election.political_groups as PoliticalGroup[]}
+    politicalGroups={lt19Seats.election.political_groups}
   />
 );
 DefaultUniqueHighestAveragesTable.storyName = "UniqueHighestAveragesTable";

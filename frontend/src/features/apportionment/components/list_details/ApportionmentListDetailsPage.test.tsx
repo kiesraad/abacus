@@ -256,7 +256,12 @@ describe("ApportionmentListDetailsPage", () => {
         {
           Component: null,
           errorElement: <ErrorBoundary />,
-          children: apportionmentRoutes,
+          children: [
+            {
+              path: "elections/:electionId/apportionment",
+              children: apportionmentRoutes,
+            },
+          ],
         },
       ]);
 

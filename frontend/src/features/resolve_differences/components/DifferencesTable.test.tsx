@@ -1,14 +1,14 @@
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
-import { ResolveAction } from "@/types/generated/openapi";
+import { ResolveDifferencesAction } from "@/types/generated/openapi";
 
 import { DifferencesRow, DifferencesTable } from "./DifferencesTable";
 import cls from "./ResolveDifferences.module.css";
 
 const tableHeaders = ["Code", "First", "Second", "Description"];
 
-function renderTable(rows: DifferencesRow[], action: ResolveAction | undefined = undefined) {
+function renderTable(rows: DifferencesRow[], action: ResolveDifferencesAction | undefined = undefined) {
   render(<DifferencesTable title={"Differences"} headers={tableHeaders} rows={rows} action={action} />);
 }
 

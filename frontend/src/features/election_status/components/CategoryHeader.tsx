@@ -21,6 +21,9 @@ export function CategoryHeader({ category }: CategoryHeaderProps): ReactNode {
           {t("typist")}
         </Table.HeaderCell>
       )}
+      {category === "errors_and_warnings" && (
+        <Table.HeaderCell key={`${category}-to-check`}>{t("to_check")}</Table.HeaderCell>
+      )}
       {category === "in_progress" && (
         <Table.HeaderCell key={`${category}-progress`} className="w-14">
           {t("progress")}

@@ -5,13 +5,14 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ApiProvider } from "@/api/ApiProvider";
+import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { ElectionDefinitionUploadResponse, NewElection } from "@/types/generated/openapi";
+import { ElectionDefinitionValidateResponse, NewElection } from "@/types/generated/openapi";
 
 import { electionCreateRoutes } from "../routes";
 
@@ -27,7 +28,9 @@ const Providers = ({
   return (
     <ApiProvider fetchInitialUser={fetchInitialUser}>
       <TestUserProvider userRole="administrator">
-        <RouterProvider router={router} />
+        <ElectionListProvider>
+          <RouterProvider router={router} />
+        </ElectionListProvider>
       </TestUserProvider>
     </ApiProvider>
   );
@@ -55,7 +58,7 @@ function renderWithRouter() {
   return router;
 }
 
-function electionValidateResponse(election: NewElection): ElectionDefinitionUploadResponse {
+function electionValidateResponse(election: NewElection): ElectionDefinitionValidateResponse {
   return {
     hash: {
       // NOTE: In actual data, the redacted version of the hash
@@ -87,6 +90,7 @@ function electionValidateResponse(election: NewElection): ElectionDefinitionUplo
 
 describe("Election create pages", () => {
   beforeEach(() => {
+    server.use(ElectionListRequestHandler);
     server.use(ElectionRequestHandler);
   });
 
@@ -96,7 +100,7 @@ describe("Election create pages", () => {
       /* do nothing */
     });
 
-    overrideOnce("post", "/api/elections/validate", 400, {
+    overrideOnce("post", "/api/elections/import/validate", 400, {
       error: "Invalid XML",
       fatal: false,
       reference: "InvalidXml",
@@ -128,7 +132,7 @@ describe("Election create pages", () => {
       /* do nothing */
     });
 
-    overrideOnce("post", "/api/elections/validate", 413, {
+    overrideOnce("post", "/api/elections/import/validate", 413, {
       error: "12",
       fatal: false,
       reference: "RequestPayloadTooLarge",
@@ -151,7 +155,7 @@ describe("Election create pages", () => {
   });
 
   test("Shows and validates hash when uploading valid file", async () => {
-    overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
     const router = renderWithRouter();
     const user = userEvent.setup();
@@ -181,6 +185,9 @@ describe("Election create pages", () => {
     expect(screen.getByText("1")).toHaveRole("mark");
     expect(screen.getByText("2")).not.toHaveRole("mark");
 
+    // Override again
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
     const inputPart1 = screen.getByLabelText("Controle deel 1");
     await user.type(inputPart1, "zxcv");
 
@@ -201,7 +208,7 @@ describe("Election create pages", () => {
   });
 
   test("Shows error on invalid input", async () => {
-    overrideOnce("post", "/api/elections/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
     const router = renderWithRouter();
     const user = userEvent.setup();

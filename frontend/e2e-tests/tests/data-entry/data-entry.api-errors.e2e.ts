@@ -24,7 +24,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+    await expect(dataEntryHomePage.dataEntryWarning).toContainText(
       `Je kan stembureau ${pollingStation.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
@@ -43,7 +43,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+    await expect(dataEntryHomePage.dataEntryWarning).toContainText(
       `Je kan stembureau ${pollingStationFirstEntryDone.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
@@ -60,7 +60,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+    await expect(dataEntryHomePage.dataEntryWarning).toContainText(
       `Je kan stembureau ${pollingStationDefinitive.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
@@ -77,7 +77,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.dataEntryWarningAlertTitle).toContainText(
+    await expect(dataEntryHomePage.dataEntryWarning).toContainText(
       `Je kan stembureau ${pollingStation.number} niet invoeren`,
     );
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("Er is een ongeldige actie uitgevoerd");
@@ -97,7 +97,7 @@ test.describe("data entry - api error responses", () => {
     );
   });
 
-  test("4xx response results in error shown", async ({ page, pollingStation }) => {
+  test("4xx non-fatal response results in error shown", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
     const recountedPage = new RecountedPage(page);
@@ -142,7 +142,7 @@ test.describe("data entry - api error responses", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
   });
 
-  test("5xx response results in error shown", async ({ page, pollingStation }) => {
+  test("5xx fatal response results in error shown", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
     const recountedPage = new RecountedPage(page);
@@ -170,20 +170,18 @@ test.describe("data entry - api error responses", () => {
         status: 500,
         json: {
           error: "Internal server error",
-          fatal: false,
+          fatal: true,
           reference: "InternalServerError",
         },
       });
     });
     await votersAndVotesPage.next.click();
 
-    const errorModal = new ErrorModalPgObj(page);
-    await expect(errorModal.dialog).toBeVisible();
-    await expect(errorModal.title).toHaveText("Sorry, er ging iets mis");
-    await expect(errorModal.text).toHaveText("Er is een interne fout opgetreden");
-
-    await errorModal.close.click();
-    await expect(errorModal.dialog).toBeHidden();
-    await expect(votersAndVotesPage.fieldset).toBeVisible();
+    const message = page.getByRole("heading", {
+      level: 1,
+      name: "Abacus is stuk",
+    });
+    await expect(votersAndVotesPage.fieldset).toBeHidden();
+    await expect(message).toBeVisible();
   });
 });

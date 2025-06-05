@@ -1,7 +1,6 @@
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
-import { PoliticalGroup } from "@/types/generated/openapi";
 
 import { election, seat_assignment } from "../../testing/gte-19-seats";
 import { HighestAverageAssignmentStep } from "../../utils/seat-change";
@@ -13,7 +12,7 @@ describe("HighestAveragesTable", () => {
       <HighestAveragesTable
         steps={seat_assignment.steps as HighestAverageAssignmentStep[]}
         finalStanding={seat_assignment.final_standing}
-        politicalGroups={election.political_groups as PoliticalGroup[]}
+        politicalGroups={election.political_groups}
         resultChanges={[]}
       />,
     );

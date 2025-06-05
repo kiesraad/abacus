@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { Election } from "@/types/generated/openapi";
+import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 
 import { DataEntryDispatch, DataEntryState } from "../types/types";
 import { getBaseUrl, getUrlForFormSectionID } from "../utils/utils";
@@ -9,7 +9,7 @@ import { getBaseUrl, getUrlForFormSectionID } from "../utils/utils";
 export default function useDataEntryNavigation(
   state: DataEntryState,
   dispatch: DataEntryDispatch,
-  election: Required<Election>,
+  election: ElectionWithPoliticalGroups,
   pollingStationId: number,
   entryNumber: number,
 ) {

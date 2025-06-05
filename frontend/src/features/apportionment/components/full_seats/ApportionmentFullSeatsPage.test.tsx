@@ -209,7 +209,12 @@ describe("ApportionmentFullSeatsPage", () => {
         {
           Component: null,
           errorElement: <ErrorBoundary />,
-          children: apportionmentRoutes,
+          children: [
+            {
+              path: "elections/:electionId/apportionment",
+              children: apportionmentRoutes,
+            },
+          ],
         },
       ]);
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));

@@ -10,13 +10,13 @@ export interface ElectionListProviderProps {
 }
 
 export function ElectionListProvider({ children }: ElectionListProviderProps) {
-  const { requestState } = useElectionListRequest();
+  const { requestState, refetch } = useElectionListRequest();
 
   return (
     <RequestStateHandler
       requestState={requestState}
       renderOnSuccess={(data) => (
-        <ElectionListProviderContext.Provider value={{ electionList: data.elections }}>
+        <ElectionListProviderContext.Provider value={{ electionList: data.elections, refetch }}>
           {children}
         </ElectionListProviderContext.Provider>
       )}

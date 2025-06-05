@@ -2,7 +2,7 @@ use rand::rngs::SmallRng;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-const CHUNK_COUNT: usize = 16;
+pub const CHUNK_COUNT: usize = 16;
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct EmlHash {

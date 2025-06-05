@@ -10,7 +10,7 @@ import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntryResolveHandler,
+  PollingStationDataEntryResolveDifferencesHandler,
   PollingStationDataEntryStatusHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
@@ -47,7 +47,7 @@ describe("ResolveDifferencesPage", () => {
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
-      PollingStationDataEntryResolveHandler,
+      PollingStationDataEntryResolveDifferencesHandler,
       PollingStationDataEntryStatusHandler,
       UserListRequestHandler,
     );
@@ -96,7 +96,7 @@ describe("ResolveDifferencesPage", () => {
 
   test("should only submit after making a selection", async () => {
     const user = userEvent.setup();
-    const resolve = spyOnHandler(PollingStationDataEntryResolveHandler);
+    const resolve = spyOnHandler(PollingStationDataEntryResolveDifferencesHandler);
 
     await renderPage();
     const submit = await screen.findByRole("button", { name: "Opslaan" });

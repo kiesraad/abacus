@@ -8,13 +8,18 @@ export class DataEntryHomePage {
   readonly pollingStationNumber: Locator;
   readonly pollingStationFeedback: Locator;
   readonly pollingStationSubmitFeedback: Locator;
-  readonly alertInputSaved: Locator;
-  readonly dataEntrySuccess: Locator;
+  readonly dataEntrySaved: Locator;
+  readonly dataEntryDifferent: Locator;
+  readonly dataEntryErrors: Locator;
+  readonly dataEntryWarning: Locator;
   readonly resumeDataEntry: Locator;
+  readonly alertDataEntrySaved: Locator;
+  readonly alertDataEntryDifferent: Locator;
+  readonly alertDataEntryErrors: Locator;
+  readonly alertDataEntryWarning: Locator;
   readonly alertDataEntryInProgress: Locator;
   readonly allDataEntriesInProgress: Locator;
-  readonly dataEntryWarningAlertTitle: Locator;
-  readonly alertDataEntryWarning: Locator;
+
   protected readonly start: Locator; // use clickStart() instead
 
   constructor(protected readonly page: Page) {
@@ -31,21 +36,33 @@ export class DataEntryHomePage {
     this.pollingStationSubmitFeedback = page.getByTestId("pollingStationSubmitFeedback");
     this.start = page.getByRole("button", { name: "Beginnen" });
 
-    this.dataEntrySuccess = page.getByRole("heading", {
+    this.dataEntrySaved = page.getByRole("heading", {
       level: 2,
       name: "Je invoer is opgeslagen",
     });
-    this.resumeDataEntry = page.getByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" });
-    this.dataEntryWarningAlertTitle = page.getByRole("heading", {
+    this.dataEntryDifferent = page.getByRole("heading", {
+      level: 2,
+      name: "Let op: verschil met eerste invoer",
+    });
+    this.dataEntryErrors = page.getByRole("heading", {
+      level: 2,
+      name: "Let op: fouten in het proces-verbaal",
+    });
+    this.dataEntryWarning = page.getByRole("heading", {
       level: 2,
       name: /^Je kan stembureau \d+ niet invoeren$/,
     });
+    this.resumeDataEntry = page.getByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" });
 
-    this.alertInputSaved = page.getByRole("alert").filter({ has: this.dataEntrySuccess });
+    this.alertDataEntrySaved = page.getByRole("alert").filter({ has: this.dataEntrySaved });
+
+    this.alertDataEntryDifferent = page.getByRole("alert").filter({ has: this.dataEntryDifferent });
+
+    this.alertDataEntryErrors = page.getByRole("alert").filter({ has: this.dataEntryErrors });
+
+    this.alertDataEntryWarning = page.getByRole("alert").filter({ has: this.dataEntryWarning });
 
     this.alertDataEntryInProgress = page.getByRole("alert").filter({ has: this.resumeDataEntry });
-
-    this.alertDataEntryWarning = page.getByRole("alert").filter({ has: this.dataEntryWarningAlertTitle });
 
     this.allDataEntriesInProgress = this.alertDataEntryInProgress.getByRole("link");
   }

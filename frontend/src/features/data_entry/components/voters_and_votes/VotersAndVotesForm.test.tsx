@@ -1,6 +1,7 @@
 import { userEvent, UserEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
+import { useUser } from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -10,6 +11,7 @@ import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, userTypeInputs, waitFor } from "@/testing/test-utils";
 import {
   ClaimDataEntryResponse,
+  LoginResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationResults,
 } from "@/types/generated/openapi";
@@ -26,6 +28,15 @@ import { DataEntryState } from "../../types/types";
 import { getClientState } from "../../utils/dataEntryUtils";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
+
+vi.mock("@/hooks/user/useUser");
+
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
+};
 
 const initialValues: PollingStationResults = {
   recounted: undefined,
@@ -113,6 +124,7 @@ const recountFieldIds = {
 
 describe("Test VotersAndVotesForm", () => {
   beforeEach(() => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 

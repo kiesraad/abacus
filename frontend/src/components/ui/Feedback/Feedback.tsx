@@ -13,20 +13,20 @@ interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
   data?: ClientValidationResultCode[];
-  userRole: "typist" | "coordinator";
+  isTypist: boolean;
 }
 
-export function Feedback({ id, type, data, userRole }: FeedbackProps) {
+export function Feedback({ id, type, data, isTypist }: FeedbackProps) {
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
   const link = (children: ReactElement) => <Link to={`../voters-and-votes`}>{children}</Link>;
-
+  const role = isTypist ? "typist" : "coordinator";
   const feedbackList: FeedbackItem[] =
     data?.map(
       (code: ClientValidationResultCode): FeedbackItem => ({
-        title: t(`feedback.${code}.${userRole}.title`),
+        title: t(`feedback.${code}.${role}.title`),
         code: `${code[0]}.${code.slice(1)}`,
-        content: tx(`feedback.${code}.${userRole}.content`, { link }),
-        action: userRole === "typist" && code === "F101" ? tx(`feedback.F101.${userRole}.action`, {}) : undefined,
+        content: tx(`feedback.${code}.${role}.content`, { link }),
+        action: isTypist && code === "F101" ? tx(`feedback.F101.typist.action`, {}) : undefined,
       }),
     ) || [];
 
@@ -48,7 +48,7 @@ export function Feedback({ id, type, data, userRole }: FeedbackProps) {
           <div className="content">{feedback.content}</div>
         </div>
       ))}
-      {userRole === "typist" && feedbackList.length > 0 && (
+      {isTypist && feedbackList.length > 0 && (
         <div className="feedback-action">
           {feedbackList.length > 1 ? (
             <h3>

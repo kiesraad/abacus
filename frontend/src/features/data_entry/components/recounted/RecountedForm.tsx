@@ -16,7 +16,7 @@ import { DataEntryNavigation } from "../DataEntryNavigation";
 import { useRecounted } from "./useRecounted";
 
 export function RecountedForm() {
-  const userRole = useUserRole();
+  const { isTypist } = useUserRole();
   const {
     error,
     recounted,
@@ -43,20 +43,10 @@ export function RecountedForm() {
       <DataEntryNavigation onSubmit={onSubmit} currentValues={{ recounted }} />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && !formSection.errors.isEmpty() && (
-        <Feedback
-          id="feedback-error"
-          type="error"
-          data={formSection.errors.getCodes()}
-          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
-        />
+        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} isTypist={isTypist} />
       )}
       {formSection.isSaved && !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && (
-        <Feedback
-          id="feedback-warning"
-          type="warning"
-          data={formSection.warnings.getCodes()}
-          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
-        />
+        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} isTypist={isTypist} />
       )}
       <p className="form-paragraph md">{t("recounted.message")}</p>
       <div className="radio-form">

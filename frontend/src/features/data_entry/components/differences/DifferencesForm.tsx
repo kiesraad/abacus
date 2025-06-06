@@ -18,7 +18,7 @@ import { formValuesToValues } from "./differencesValues";
 import { useDifferences } from "./useDifferences";
 
 export function DifferencesForm() {
-  const userRole = useUserRole();
+  const { isTypist } = useUserRole();
   const {
     error,
     formRef,
@@ -48,20 +48,10 @@ export function DifferencesForm() {
       />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && !formSection.errors.isEmpty() && (
-        <Feedback
-          id="feedback-error"
-          type="error"
-          data={formSection.errors.getCodes()}
-          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
-        />
+        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} isTypist={isTypist} />
       )}
       {formSection.isSaved && !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && (
-        <Feedback
-          id="feedback-warning"
-          type="warning"
-          data={formSection.warnings.getCodes()}
-          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
-        />
+        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} isTypist={isTypist} />
       )}
       <InputGrid key="differences">
         <InputGrid.Header>

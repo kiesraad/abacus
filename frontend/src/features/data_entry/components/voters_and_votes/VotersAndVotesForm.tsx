@@ -18,7 +18,7 @@ import { useVotersAndVotes } from "./useVotersAndVotes";
 import { formValuesToValues } from "./votersAndVotesValues";
 
 export function VotersAndVotesForm() {
-  const userRole = useUserRole();
+  const { isTypist } = useUserRole();
   const {
     error,
     formRef,
@@ -49,20 +49,10 @@ export function VotersAndVotesForm() {
       />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && !formSection.errors.isEmpty() && (
-        <Feedback
-          id="feedback-error"
-          type="error"
-          data={formSection.errors.getCodes()}
-          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
-        />
+        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} isTypist={isTypist} />
       )}
       {formSection.isSaved && !formSection.warnings.isEmpty() && (
-        <Feedback
-          id="feedback-warning"
-          type="warning"
-          data={formSection.warnings.getCodes()}
-          userRole={userRole.isCoordinator ? "coordinator" : "typist"}
-        />
+        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} isTypist={isTypist} />
       )}
       <InputGrid key="voters-and-votes">
         <InputGrid.Header>

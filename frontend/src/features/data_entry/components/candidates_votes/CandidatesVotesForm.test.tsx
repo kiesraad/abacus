@@ -1,6 +1,7 @@
 import { UserEvent, userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
+import { useUser } from "@/hooks/user/useUser";
 import { electionMockData, politicalGroupMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -10,6 +11,7 @@ import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, within } from "@/testing/test-utils";
 import {
   ElectionWithPoliticalGroups,
+  LoginResponse,
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
 } from "@/types/generated/openapi";
@@ -26,6 +28,15 @@ import {
 import { DataEntryState } from "../../types/types";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
+
+vi.mock("@/hooks/user/useUser");
+
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
+};
 
 const defaultDataEntryState: DataEntryState = {
   election: electionMockData,
@@ -66,6 +77,7 @@ const candidatesFieldIds = {
 
 describe("Test CandidatesVotesForm", () => {
   beforeEach(() => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 

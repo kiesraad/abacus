@@ -1,34 +1,45 @@
 import * as React from "react";
 
-import { PollingStationResults } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
-import { SubmitCurrentFormOptions, TemporaryCache } from "../types/types";
+import { SectionValues, SubmitCurrentFormOptions } from "../types/types";
+import { mapResultsToSectionValues } from "../utils/mapping";
 import { mapValidationResultsToFields } from "../utils/ValidationResults";
 import { useDataEntryContext } from "./useDataEntryContext";
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
-export interface UseDataEntryFormSectionParams<FORM_VALUES> {
-  getDefaultFormValues: (results: PollingStationResults, cache?: TemporaryCache | null) => FORM_VALUES;
-  section: FormSectionId;
-}
+export function useDataEntryFormSection({ section: sectionId }: { section: FormSectionId }) {
+  const {
+    error,
+    cache,
+    status,
+    pollingStationResults,
+    dataEntryStructure,
+    formState,
+    onSubmitForm,
+    updateFormSection,
+    election,
+  } = useDataEntryContext(sectionId);
 
-export function useDataEntryFormSection<FORM_VALUES>({
-  getDefaultFormValues,
-  section,
-}: UseDataEntryFormSectionParams<FORM_VALUES>) {
-  const { error, cache, status, pollingStationResults, formState, onSubmitForm, updateFormSection } =
-    useDataEntryContext(section);
+  const section = dataEntryStructure.find((s) => s.id === sectionId);
+
+  if (!section) {
+    throw new Error(`Form section ${sectionId} not found in data entry structure`);
+  }
 
   //local form state
-  const [currentValues, setCurrentValues] = React.useState<FORM_VALUES>(
-    getDefaultFormValues(pollingStationResults, cache),
-  );
+  const [currentValues, setCurrentValues] = React.useState<SectionValues>(() => {
+    if (cache?.key === sectionId) {
+      return cache.data;
+    } else {
+      return mapResultsToSectionValues(section, pollingStationResults);
+    }
+  });
 
   // derived state
-  const formSection = formState.sections[section];
+  const formSection = formState.sections[sectionId];
   if (!formSection) {
-    throw new Error(`Form section ${section} not found in form state`);
+    throw new Error(`Form section ${sectionId} not found in form state`);
   }
   const { errors, warnings, isSaved, acceptErrorsAndWarnings, hasChanges } = formSection;
   const defaultProps = {
@@ -39,11 +50,15 @@ export function useDataEntryFormSection<FORM_VALUES>({
   const showAcceptErrorsAndWarnings = (!formSection.warnings.isEmpty() || !formSection.errors.isEmpty()) && !hasChanges;
 
   // register changes when fields change
-  const setValues = (values: FORM_VALUES) => {
+  const setValues = (path: string, value: string) => {
     if (!hasChanges) {
       updateFormSection({ hasChanges: true, acceptErrorsAndWarnings: false, acceptErrorsAndWarningsError: false });
     }
-    setCurrentValues(values);
+    setCurrentValues((cv) => {
+      cv = structuredClone(cv);
+      cv[path] = value;
+      return cv;
+    });
   };
 
   const setAcceptErrorsAndWarnings = (acceptErrorsAndWarnings: boolean) => {
@@ -54,12 +69,8 @@ export function useDataEntryFormSection<FORM_VALUES>({
   const formRef = useFormKeyboardNavigation();
 
   // submit and save to form contents
-  const onSubmit = async (
-    data: Partial<PollingStationResults>,
-    options?: SubmitCurrentFormOptions,
-  ): Promise<boolean> => {
-    const result = await onSubmitForm(data, { ...options, showAcceptErrorsAndWarnings });
-    return result;
+  const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
+    return await onSubmitForm(currentValues, { ...options, showAcceptErrorsAndWarnings });
   };
 
   // scroll to top when saved
@@ -75,6 +86,7 @@ export function useDataEntryFormSection<FORM_VALUES>({
     onSubmit,
     pollingStationResults,
     currentValues,
+    dataEntryStructure,
     formSection,
     setValues,
     status,
@@ -82,5 +94,6 @@ export function useDataEntryFormSection<FORM_VALUES>({
     defaultProps,
     showAcceptErrorsAndWarnings,
     isSaving: status === "saving",
+    election,
   };
 }

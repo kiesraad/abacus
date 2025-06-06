@@ -17,9 +17,8 @@ function renderPage() {
   return render(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
       <ElectionProvider electionId={1}>
-        <CandidatesVotesPage></CandidatesVotesPage>
+        <CandidatesVotesPage />
       </ElectionProvider>
-      )
     </DataEntryProvider>,
   );
 }
@@ -30,16 +29,22 @@ describe("Test CandidatesVotesPage", () => {
   });
 
   test("list not found shows error", async () => {
-    vi.mocked(useParams).mockReturnValue({ listNumber: "123" });
+    vi.mocked(useParams).mockReturnValue({ groupNumber: "123" });
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
     renderPage();
 
     await waitFor(() => {
-      expect(screen.getByText("Geen lijst gevonden voor 123")).toBeVisible();
+      expect(
+        screen.getByText(
+          "Error thrown during render: Form section political_group_votes_123 not found in data entry structure",
+        ),
+      ).toBeVisible();
     });
   });
 
   test("list found shows form", async () => {
-    vi.mocked(useParams).mockReturnValue({ listNumber: "1" });
+    vi.mocked(useParams).mockReturnValue({ groupNumber: "1" });
     renderPage();
 
     await waitFor(() => {

@@ -1,16 +1,18 @@
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResult, isSuccess } from "@/api/ApiResult";
-import { DataEntry, DataEntryStatus, PollingStationResults, SaveDataEntryResponse } from "@/types/generated/openapi";
+import { DataEntry, DataEntryStatus, SaveDataEntryResponse } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import {
   DataEntryDispatch,
   DataEntryState,
   FormSection,
+  SectionValues,
   SubmitCurrentFormOptions,
   TemporaryCache,
 } from "../types/types";
 import { calculateDataEntryProgress, getClientState } from "./dataEntryUtils";
+import { mapSectionValues } from "./mapping";
 
 export function registerForm(dispatch: DataEntryDispatch) {
   return (formSectionId: FormSectionId) => {
@@ -37,7 +39,7 @@ export function onSubmitForm(
   state: DataEntryState,
 ) {
   return async (
-    partialPollingStationResults: Partial<PollingStationResults>,
+    currentValues: SectionValues,
     {
       aborting = false,
       continueToNextSection = true,
@@ -60,21 +62,32 @@ export function onSubmitForm(
       return false;
     }
 
-    const data: PollingStationResults = aborting
-      ? {
-          ...state.pollingStationResults,
-          ...partialPollingStationResults,
-          ...state.cache?.data,
-        }
-      : {
-          ...state.pollingStationResults,
-          ...partialPollingStationResults,
-        };
+    const dataEntrySection = state.dataEntryStructure.find((s) => s.id === currentSection.id);
+    if (!dataEntrySection) {
+      return false;
+    }
+
+    let data = mapSectionValues(state.pollingStationResults, currentValues, dataEntrySection);
+    if (aborting && state.cache) {
+      const cache = state.cache;
+      const cachedDataEntrySection = state.dataEntryStructure.find((s) => s.id === cache.key);
+      if (cachedDataEntrySection) {
+        data = mapSectionValues(data, cache.data, cachedDataEntrySection);
+      }
+    }
 
     if (data.recounted === false) {
       // remove recount if recount has changed to no
       data.voters_recounts = undefined;
+    } else if (data.recounted === true && data.voters_recounts === undefined) {
+      data.voters_recounts = {
+        poll_card_count: 0,
+        proxy_certificate_count: 0,
+        voter_card_count: 0,
+        total_admitted_voters_count: 0,
+      };
     }
+
     // prepare data to send to server
     const clientState = getClientState(state.formState, currentSection.acceptErrorsAndWarnings, continueToNextSection);
     const progress = calculateDataEntryProgress(state.formState);

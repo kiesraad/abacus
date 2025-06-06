@@ -25,8 +25,16 @@ export function CheckAndSaveForm() {
 
   const navigate = useNavigate();
   const { election } = useElection();
-  const { error, formState, onSubmitForm, status, onFinaliseDataEntry, pollingStationId, entryNumber } =
-    useDataEntryContext("save");
+  const {
+    error,
+    dataEntryStructure,
+    formState,
+    onSubmitForm,
+    status,
+    onFinaliseDataEntry,
+    pollingStationId,
+    entryNumber,
+  } = useDataEntryContext("save");
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionId) => {
@@ -104,14 +112,11 @@ export function CheckAndSaveForm() {
         )}
 
         {summary.notableFormSections.map((section) => {
+          const title = dataEntryStructure.find((s) => s.id === section.formSection.id)?.title || "";
           const link = (title: React.ReactElement) => (
             <Link to={getUrlForFormSection(section.formSection.id)}>{title}</Link>
           );
-          const content = tx(
-            `check_and_save.notable_form_sections.${section.status}`,
-            { link },
-            { link_title: section.title || section.formSection.title || "" },
-          );
+          const content = tx(`check_and_save.notable_form_sections.${section.status}`, { link }, { link_title: title });
 
           return (
             <StatusList.Item

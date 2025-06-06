@@ -6,7 +6,10 @@ import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { t, tx } from "@/i18n/translate";
-import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
+import {
+  CandidateDefinitionValidateResponse,
+  ELECTION_IMPORT_CANDIDATES_VALIDATE_REQUEST_PATH,
+} from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { CheckHash } from "./CheckHash";
@@ -15,9 +18,9 @@ export function UploadCandidatesDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
 
-  const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate-candidates`;
+  const path: ELECTION_IMPORT_CANDIDATES_VALIDATE_REQUEST_PATH = `/api/elections/import/validate-candidates`;
   const [error, setError] = useState<ReactNode | undefined>();
-  const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
+  const { create } = useCrud<CandidateDefinitionValidateResponse>({ create: path });
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
@@ -60,6 +63,7 @@ export function UploadCandidatesDefinition() {
 
   if (
     state.election &&
+    state.candidateList &&
     state.candidateDefinitionFileName &&
     state.candidateDefinitionRedactedHash &&
     state.candidateDefinitionData

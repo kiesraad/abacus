@@ -1,6 +1,12 @@
 import { useReducer } from "react";
 
-import { ElectionDefinitionValidateResponse, NewElection, RedactedEmlHash } from "@/types/generated/openapi";
+import {
+  CandidateDefinitionValidateResponse,
+  ElectionDefinitionValidateResponse,
+  NewCandidateList,
+  NewElection,
+  RedactedEmlHash,
+} from "@/types/generated/openapi";
 
 import { ElectionCreateContext, IElectionCreateContext } from "../hooks/ElectionCreateContext";
 
@@ -17,7 +23,7 @@ export type ElectionCreateAction =
     }
   | {
       type: "SELECT_CANDIDATES_DEFINITION";
-      response: ElectionDefinitionValidateResponse;
+      response: CandidateDefinitionValidateResponse;
       candidateDefinitionData: string;
       candidateDefinitionFileName: string;
     }
@@ -27,15 +33,16 @@ export type ElectionCreateAction =
     };
 
 export interface ElectionCreateState {
-  electionDefinitionRedactedHash?: RedactedEmlHash;
   election?: NewElection;
   candidateList?: NewCandidateList;
   electionDefinitionHash?: string[];
   electionDefinitionData?: string;
   electionDefinitionFileName?: string;
+  electionDefinitionRedactedHash?: RedactedEmlHash;
   candidateDefinitionHash?: string[];
   candidateDefinitionData?: string;
   candidateDefinitionFileName?: string;
+  candidateDefinitionRedactedHash?: RedactedEmlHash;
 }
 
 function reducer(state: ElectionCreateState, action: ElectionCreateAction): ElectionCreateState {

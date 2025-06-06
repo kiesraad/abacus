@@ -180,9 +180,8 @@ pub struct ElectionDefinitionImportRequest {
     candidate_data: String,
 }
 
-///
-///
-///
+/// Uploads candidate list, validates it and returns the associated candidate list and
+/// a redacted hash, to be filled by the administrator.
 #[utoipa::path(
     post,
     path = "/api/elections/import/validate-candidates",

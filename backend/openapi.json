@@ -222,7 +222,7 @@
     },
     "/api/elections/import/validate-candidates": {
       "post": {
-        "description": "\n\n\n\n",
+        "summary": "Uploads candidate list, validates it and returns the associated candidate list and\na redacted hash, to be filled by the administrator.",
         "operationId": "election_import_candidates_validate",
         "requestBody": {
           "content": {

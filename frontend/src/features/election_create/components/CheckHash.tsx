@@ -4,7 +4,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import { RedactedEmlHash } from "@/types/generated/openapi";
 import { formatDateFull } from "@/utils/format";
 
@@ -14,7 +14,7 @@ interface CheckHashProps {
   date: string;
   title: string;
   header: string;
-  description: string;
+  description: ReactNode;
   redactedHash: RedactedEmlHash;
   error: ReactNode | undefined;
   onSubmit: (chunks: string[]) => void;

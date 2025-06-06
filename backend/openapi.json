@@ -220,6 +220,64 @@
         }
       }
     },
+    "/api/elections/import/validate-candidates": {
+      "post": {
+        "description": "\n\n\n\n",
+        "operationId": "election_import_candidates_validate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CandidateDefinitionValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Candidates validated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateDefinitionValidateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/elections/{election_id}": {
       "get": {
         "summary": "Get election details including the election's candidate list (political groups) and its polling stations",
@@ -2782,6 +2840,42 @@
           }
         }
       },
+      "CandidateDefinitionValidateRequest": {
+        "type": "object",
+        "required": [
+          "data",
+          "election"
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "election": {
+            "$ref": "#/components/schemas/NewElection"
+          },
+          "hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CandidateDefinitionValidateResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "list"
+        ],
+        "properties": {
+          "hash": {
+            "$ref": "#/components/schemas/RedactedEmlHash"
+          },
+          "list": {
+            "$ref": "#/components/schemas/NewCandidateList"
+          }
+        }
+      },
       "CandidateGender": {
         "type": "string",
         "description": "Candidate gender",
@@ -3278,14 +3372,25 @@
       "ElectionDefinitionImportRequest": {
         "type": "object",
         "required": [
-          "hash",
-          "data"
+          "electionHash",
+          "electionData",
+          "candidateHash",
+          "candidateData"
         ],
         "properties": {
-          "data": {
+          "candidateData": {
             "type": "string"
           },
-          "hash": {
+          "candidateHash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "electionData": {
+            "type": "string"
+          },
+          "electionHash": {
             "type": "array",
             "items": {
               "type": "string"
@@ -3931,6 +4036,25 @@
           },
           "username": {
             "type": "string"
+          }
+        }
+      },
+      "NewCandidateList": {
+        "type": "object",
+        "description": "Candidate list request",
+        "required": [
+          "name",
+          "political_groups"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "political_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroup"
+            }
           }
         }
       },

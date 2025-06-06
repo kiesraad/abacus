@@ -14,14 +14,28 @@ export type ElectionCreateAction =
   | {
       type: "SET_ELECTION_DEFINITION_HASH";
       electionDefinitionHash: string[];
+    }
+  | {
+      type: "SELECT_CANDIDATES_DEFINITION";
+      response: ElectionDefinitionValidateResponse;
+      candidateDefinitionData: string;
+      candidateDefinitionFileName: string;
+    }
+  | {
+      type: "SET_CANDIDATES_DEFINITION_HASH";
+      candidateDefinitionHash: string[];
     };
 
 export interface ElectionCreateState {
   electionDefinitionRedactedHash?: RedactedEmlHash;
   election?: NewElection;
+  candidateList?: NewCandidateList;
   electionDefinitionHash?: string[];
   electionDefinitionData?: string;
   electionDefinitionFileName?: string;
+  candidateDefinitionHash?: string[];
+  candidateDefinitionData?: string;
+  candidateDefinitionFileName?: string;
 }
 
 function reducer(state: ElectionCreateState, action: ElectionCreateAction): ElectionCreateState {
@@ -38,6 +52,19 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
       return {
         ...state,
         electionDefinitionHash: action.electionDefinitionHash,
+      };
+    case "SELECT_CANDIDATES_DEFINITION":
+      return {
+        ...state,
+        candidateList: action.response.list,
+        candidateDefinitionRedactedHash: action.response.hash,
+        candidateDefinitionData: action.candidateDefinitionData,
+        candidateDefinitionFileName: action.candidateDefinitionFileName,
+      };
+    case "SET_CANDIDATES_DEFINITION_HASH":
+      return {
+        ...state,
+        candidateDefinitionHash: action.candidateDefinitionHash,
       };
   }
 }

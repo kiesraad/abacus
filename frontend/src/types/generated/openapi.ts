@@ -19,6 +19,11 @@ export type ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
 export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionDefinitionValidateRequest;
 
+// /api/elections/import/validate-candidates
+export type ELECTION_IMPORT_CANDIDATES_VALIDATE_REQUEST_PARAMS = Record<string, never>;
+export type ELECTION_IMPORT_CANDIDATES_VALIDATE_REQUEST_PATH = `/api/elections/import/validate-candidates`;
+export type ELECTION_IMPORT_CANDIDATES_VALIDATE_REQUEST_BODY = CandidateDefinitionValidateRequest;
+
 // /api/elections/{election_id}
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
   election_id: number;
@@ -277,6 +282,17 @@ export interface Candidate {
   number: number;
 }
 
+export interface CandidateDefinitionValidateRequest {
+  data: string;
+  election: NewElection;
+  hash?: string[];
+}
+
+export interface CandidateDefinitionValidateResponse {
+  hash: RedactedEmlHash;
+  list: NewCandidateList;
+}
+
 /**
  * Candidate gender
  */
@@ -424,8 +440,10 @@ export interface ElectionApportionmentResponse {
 export type ElectionCategory = "Municipal";
 
 export interface ElectionDefinitionImportRequest {
-  data: string;
-  hash: string[];
+  candidateData: string;
+  candidateHash: string[];
+  electionData: string;
+  electionHash: string[];
 }
 
 export interface ElectionDefinitionValidateRequest {
@@ -676,6 +694,14 @@ export interface LoginResponse {
   role: Role;
   user_id: number;
   username: string;
+}
+
+/**
+ * Candidate list request
+ */
+export interface NewCandidateList {
+  name: string;
+  political_groups: PoliticalGroup[];
 }
 
 /**

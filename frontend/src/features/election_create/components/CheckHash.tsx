@@ -13,13 +13,14 @@ import { RedactedHash, Stub } from "./RedactedHash";
 interface CheckHashProps {
   date: string;
   title: string;
-  fileName: string;
+  header: string;
+  description: string;
   redactedHash: RedactedEmlHash;
   error: ReactNode | undefined;
   onSubmit: (chunks: string[]) => void;
 }
 
-export function CheckHash({ date, title, fileName, redactedHash, error, onSubmit }: CheckHashProps) {
+export function CheckHash({ date, title, header, description, redactedHash, error, onSubmit }: CheckHashProps) {
   const [stubs, setStubs] = useState<Stub[]>(
     redactedHash.redacted_indexes.map((redacted_index: number) => ({
       selected: false,
@@ -65,19 +66,13 @@ export function CheckHash({ date, title, fileName, redactedHash, error, onSubmit
 
   return (
     <section className="md">
-      <h2>{t("election.check_eml.title")}</h2>
+      <h2>{header}</h2>
       {(stubs.some((stub) => stub.error.length > 0) || error) && (
         <Alert type="error" title={t("election.check_eml.error.title")} inline>
           <p> {t("election.check_eml.error.description")} </p>
         </Alert>
       )}
-      <p className="mt-lg">
-        {tx("election.check_eml.description", {
-          file: () => {
-            return <strong>{fileName}</strong>;
-          },
-        })}
-      </p>
+      <p className="mt-lg">{description}</p>
       <Alert type="notify" variant="no-icon" margin="mb-md" small>
         <p>
           <strong>{title}</strong>

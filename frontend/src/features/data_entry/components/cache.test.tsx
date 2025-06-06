@@ -1,5 +1,6 @@
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, Mock, test, vi } from "vitest";
 
+import { useUser } from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -7,6 +8,7 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
+import { LoginResponse } from "@/types/generated/openapi";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
@@ -15,9 +17,18 @@ import { DataEntryProvider } from "./DataEntryProvider";
 import { VotersAndVotesForm } from "./voters_and_votes/VotersAndVotesForm";
 
 vi.mock("../hooks/useDataEntryContext");
+vi.mock("@/hooks/user/useUser");
+
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
+};
 
 describe("Data Entry cache behavior", () => {
   test("VotersAndVotesForm with cache", async () => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
 
     const cacheData: SectionValues = {

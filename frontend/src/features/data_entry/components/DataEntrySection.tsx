@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
 import { Feedback } from "@/components/ui/Feedback/Feedback";
 import { Form } from "@/components/ui/Form/Form";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
+import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import { FormSectionId } from "@/types/types";
 import { KeyboardKey } from "@/types/ui";
@@ -18,6 +19,7 @@ import { DataEntryNavigation } from "./DataEntryNavigation";
 import { DataEntrySubsections } from "./DataEntrySubsections";
 
 export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
+  const user = useUser();
   const {
     error,
     formRef,
@@ -35,6 +37,10 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
 
   if (!section) {
     throw new Error(`Section with id ${sectionId} not found`);
+  }
+
+  if (!user) {
+    throw new Error("No user found");
   }
 
   const formId = sectionId + "_form";
@@ -83,10 +89,10 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
       <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && !formSection.errors.isEmpty() && (
-        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} />
+        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} userRole={user.role} />
       )}
       {formSection.isSaved && !formSection.warnings.isEmpty() && (
-        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} />
+        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} userRole={user.role} />
       )}
 
       <DataEntrySubsections

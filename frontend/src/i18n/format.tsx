@@ -10,7 +10,7 @@ interface Element {
   children: AST;
 }
 
-export const DEFAULT_ALLOWED_TAGS = ["ul", "li", "p", "strong", "code"];
+export const DEFAULT_ALLOWED_TAGS = ["ul", "li", "p", "strong", "code", "h2", "h3"];
 
 // parse the input string into an AST
 export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {
@@ -50,7 +50,7 @@ export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {
         if (closingIndex !== -1) {
           // parse the inner content
           const inner = input.slice(j, closingIndex);
-          const children = parse(inner);
+          const children = parse(inner, allowed);
 
           // add this tag with its parsed content to the tree
           ast.push({

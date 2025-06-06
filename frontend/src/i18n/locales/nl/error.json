@@ -13,8 +13,8 @@
     "content": "Neem contact op met de ontwikkelaars of rapporteer een bug via <link>https://github.com/kiesraad/abacus</link>"
   },
   "airgap_violation": {
-    "title": "Abacus is niet beschikbaar",
-    "content": "Abacus is alleen bedoeld voor offline gebruik. De applicatie is verbonden met het internet, waardoor Abacus niet gebruikt kan worden. Zorg ervoor dat de applicatie niet verbonden is met het internet en probeer het opnieuw.",
+    "title": "Abacus zit op slot",
+    "content": "<p>Abacus is geblokkeerd omdat de applicatie is verbonden met het internet.</p><ul><li>Wijzigingen zijn niet mogelijk</li><li>Alle werkplekken zijn vergrendeld</li></ul><h3>Wat te doen?</h3><ul><li>Verbreek de internetverbinding</li><li><reload>Herlaad de pagina</reload></li></ul><p>Pas daarna kan de steminvoer worden hervat.</p>",
     "reload": "Probeer opnieuw"
   },
   "api_error": {

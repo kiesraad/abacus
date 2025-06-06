@@ -32,7 +32,7 @@ describe("Test RecountedForm", () => {
 
       const user = userEvent.setup();
 
-      const yes = await screen.findByTestId("yes");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
       await user.click(yes);
       expect(yes).toBeChecked();
 
@@ -49,7 +49,7 @@ describe("Test RecountedForm", () => {
       const user = userEvent.setup();
       const spy = vi.spyOn(global, "fetch");
 
-      const yes = await screen.findByTestId("yes");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
       await user.click(yes);
       expect(yes).toBeChecked();
 
@@ -67,8 +67,8 @@ describe("Test RecountedForm", () => {
 
       renderForm();
 
-      const yes = await screen.findByTestId("yes");
-      const no = await screen.findByTestId("no");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
+      const no = await screen.findByLabelText("Nee, er was geen hertelling");
       expect(yes).toHaveFocus();
       expect(yes).not.toBeChecked();
       expect(no).not.toBeChecked();
@@ -105,7 +105,7 @@ describe("Test RecountedForm", () => {
 
       const user = userEvent.setup();
 
-      const yes = await screen.findByTestId("yes");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
       await user.click(yes);
 
       const spy = vi.spyOn(global, "fetch");
@@ -141,8 +141,8 @@ describe("Test RecountedForm", () => {
 
       renderForm();
 
-      const yes = await screen.findByTestId("yes");
-      const no = await screen.findByTestId("no");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
+      const no = await screen.findByLabelText("Nee, er was geen hertelling");
       const submitButton = screen.getByRole("button", { name: "Volgende" });
 
       expect(yes).not.toBeChecked();
@@ -250,7 +250,7 @@ describe("Test RecountedForm", () => {
       expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
       expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
-      const yes = await screen.findByTestId("yes");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
       await user.click(yes);
 
       expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
@@ -268,7 +268,7 @@ describe("Test RecountedForm", () => {
       });
       expect(acceptErrorsAndWarningsError).toBeVisible();
 
-      const yes = await screen.findByTestId("yes");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
       await user.click(yes);
 
       expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();

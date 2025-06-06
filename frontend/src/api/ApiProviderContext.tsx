@@ -14,6 +14,7 @@ export interface ApiState {
   loading: boolean;
   expiration: Date | null;
   extendSession: () => Promise<void>;
+  airGapError: boolean;
 }
 
 export const ApiProviderContext = createContext<ApiState | null>(null);

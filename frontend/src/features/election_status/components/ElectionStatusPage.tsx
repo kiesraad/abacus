@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { HeaderElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
@@ -15,14 +15,25 @@ import { ElectionStatus } from "./ElectionStatus";
 
 export function ElectionStatusPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { election, pollingStations } = useElection();
   const { statuses } = useElectionStatus();
   const { requestState } = useInitialApiGet<UserListResponse>("/api/user" satisfies USER_LIST_REQUEST_PATH);
 
   const users = requestState.status === "success" ? requestState.data.users : [];
 
+  const showFirstDataEntryKeptAlert = location.hash.startsWith("#data-entry-1-kept") ? location.hash : null;
+  const showSecondDataEntryKeptAlert = location.hash.startsWith("#data-entry-2-kept") ? location.hash : null;
+  const showDataEntriesDiscardedAlert = location.hash.startsWith("#data-entries-discarded") ? location.hash : null;
+  const successAlert =
+    showFirstDataEntryKeptAlert || showSecondDataEntryKeptAlert || showDataEntriesDiscardedAlert || undefined;
+
   function finishInput() {
     void navigate("../report");
+  }
+
+  function closeSuccessAlert() {
+    void navigate(location.pathname);
   }
 
   return (
@@ -38,6 +49,17 @@ export function ElectionStatusPage() {
           </div>
         </section>
       </header>
+      {successAlert && (
+        <Alert type="success" onClose={closeSuccessAlert}>
+          <h2>
+            {showFirstDataEntryKeptAlert
+              ? t("election_status.success.first-data-entry-kept")
+              : showSecondDataEntryKeptAlert
+                ? t("election_status.success.second-data-entry-kept")
+                : t("election_status.success.data-entries-discarded")}
+          </h2>
+        </Alert>
+      )}
       {election.status !== "DataEntryFinished" &&
         statuses.length > 0 &&
         statuses.every((s) => s.status === "definitive") && (

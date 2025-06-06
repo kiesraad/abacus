@@ -1,8 +1,8 @@
 import { expect } from "@playwright/test";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
+import { ResolveDifferencesPgObj } from "e2e-tests/page-objects/election/ResolveDifferencesPgObj";
 
 import { test } from "../../fixtures";
-import { ResolveDifferencesPgObj } from "../../page-objects/election/ResolveDifferencesPgObj";
 
 test.use({
   storageState: "e2e-tests/state/coordinator.json",
@@ -33,6 +33,7 @@ test.describe("resolve differences", () => {
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.firstEntryFinished).toContainText(pollingStation.name + "Sam Kuijpers");
+    await expect(electionStatusPage.alertFirstDataEntryKept).toBeVisible();
   });
 
   test("keep second entry", async ({ page, pollingStationEntriesDifferent: pollingStation }) => {
@@ -48,6 +49,7 @@ test.describe("resolve differences", () => {
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.firstEntryFinished).toContainText(pollingStation.name + "Aliyah van den Berg");
+    await expect(electionStatusPage.alertSecondDataEntryKept).toBeVisible();
   });
 
   test("discard both", async ({ page, pollingStationEntriesDifferent: pollingStation }) => {
@@ -63,5 +65,6 @@ test.describe("resolve differences", () => {
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.notStarted).toContainText(pollingStation.name);
+    await expect(electionStatusPage.alertDataEntriesDiscarded).toBeVisible();
   });
 });

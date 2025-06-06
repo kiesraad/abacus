@@ -105,7 +105,7 @@ export function getDataEntrySummary(formState: FormState): DataEntrySummary {
       if (!section.errors.isEmpty()) {
         result.notableFormSections.push({ status: "errors", formSection: section });
         result.countsAddUp = false;
-        result.hasBlocks = true;
+        result.hasBlocks = section.acceptErrorsAndWarnings ? false : true;
         result.hasErrors = true;
       } else if (!section.warnings.isEmpty()) {
         result.hasWarnings = true;

@@ -80,7 +80,7 @@ impl AirgapDetection {
         self.set_last_check();
     }
 
-    /// Detects if the system is in an airgap by attempting to connect to IPv3, IPv6 addresses and performing DNS lookups
+    /// Detects if the system is in an airgap by attempting to connect to IPv4, IPv6 addresses and performing DNS lookups
     fn is_connected(&self) -> bool {
         // attempt to connect to known IPv4 addresses over TCP
         let tcp_ipv4_connection_success = IPV4

@@ -119,8 +119,11 @@ function getValueAtPath(obj: PollingStationResults, path: string): PathValue {
 function processValue(
   value: string,
   valueType: "string" | "boolean" | "formattedNumber" | undefined,
-): boolean | number | string {
+): boolean | number | string | undefined {
   if (valueType === "boolean") {
+    if (value === "") {
+      return undefined;
+    }
     return value === "true";
   }
 

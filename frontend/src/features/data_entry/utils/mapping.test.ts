@@ -35,51 +35,12 @@ describe("mapSectionValues", () => {
   test.each([
     { input: "true", expected: true, description: "true" },
     { input: "false", expected: false, description: "false" },
+    { input: "", expected: undefined, description: "empty" },
   ])("should handle recounted as $description", ({ input, expected }) => {
     const current = createBasePollingStationResults();
     const formValues = { recounted: input };
 
-    const recountedSection: DataEntrySection = {
-      id: "recounted",
-      title: "Recounted Section",
-      subsections: [
-        {
-          type: "radio",
-          path: "recounted",
-          valueType: "boolean",
-          error: "recounted.error",
-          options: [],
-        },
-      ],
-    };
-
     const result = mapSectionValues(current, formValues, recountedSection);
-
-    expect(result.recounted).toBe(expected);
-  });
-
-  test.each([
-    { input: "true", expected: true, description: "true as boolean" },
-    { input: "false", expected: false, description: "false as boolean" },
-  ])("should handle recounted radio values as $description", ({ input, expected }) => {
-    const current = createBasePollingStationResults();
-    const formValues = { recounted: input };
-
-    const radioSection: DataEntrySection = {
-      id: "recounted",
-      title: "Radio Section",
-      subsections: [
-        {
-          type: "radio",
-          path: "recounted",
-          valueType: "boolean",
-          error: "recounted.error",
-          options: [],
-        },
-      ],
-    };
-
-    const result = mapSectionValues(current, formValues, radioSection);
 
     expect(result.recounted).toBe(expected);
   });
@@ -591,33 +552,6 @@ describe("mapResultsToSectionValues", () => {
     results.recounted = input;
 
     const formValues = mapResultsToSectionValues(recountedSection, results);
-
-    expect(formValues["recounted"]).toBe(expected);
-  });
-
-  test.each([
-    { input: true, expected: "true", description: "true" },
-    { input: false, expected: "false", description: "false" },
-    { input: undefined, expected: "", description: "undefined" },
-  ])("should handle boolean radio values as $description", ({ input, expected }) => {
-    const results = createBasePollingStationResults();
-    results.recounted = input;
-
-    const testSection: DataEntrySection = {
-      id: "recounted",
-      title: "Test Section",
-      subsections: [
-        {
-          type: "radio",
-          path: "recounted",
-          valueType: "boolean",
-          error: "recounted.error",
-          options: [],
-        },
-      ],
-    };
-
-    const formValues = mapResultsToSectionValues(testSection, results);
 
     expect(formValues["recounted"]).toBe(expected);
   });

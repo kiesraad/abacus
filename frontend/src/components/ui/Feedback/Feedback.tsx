@@ -2,6 +2,7 @@ import { ReactElement, useEffect, useRef } from "react";
 import { Link } from "react-router";
 
 import { t, tx } from "@/i18n/translate";
+import { Role } from "@/types/generated/openapi";
 import { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 
@@ -13,20 +14,21 @@ interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
   data?: ClientValidationResultCode[];
-  isTypist: boolean;
+  userRole: Role;
 }
 
-export function Feedback({ id, type, data, isTypist }: FeedbackProps) {
+export function Feedback({ id, type, data, userRole }: FeedbackProps) {
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
   const link = (children: ReactElement) => <Link to={`../voters-and-votes`}>{children}</Link>;
-  const role = isTypist ? "typist" : "coordinator";
+  // NOTE: administrator roles are always mapped to coordinator here
+  const role = userRole === "administrator" ? "coordinator" : userRole;
   const feedbackList: FeedbackItem[] =
     data?.map(
       (code: ClientValidationResultCode): FeedbackItem => ({
         title: t(`feedback.${code}.${role}.title`),
         code: `${code[0]}.${code.slice(1)}`,
         content: tx(`feedback.${code}.${role}.content`, { link }),
-        action: isTypist && code === "F101" ? tx(`feedback.F101.typist.action`, {}) : undefined,
+        action: role === "typist" && code === "F101" ? tx(`feedback.F101.${role}.action`, {}) : undefined,
       }),
     ) || [];
 
@@ -48,7 +50,7 @@ export function Feedback({ id, type, data, isTypist }: FeedbackProps) {
           <div className="content">{feedback.content}</div>
         </div>
       ))}
-      {isTypist && feedbackList.length > 0 && (
+      {role === "typist" && feedbackList.length > 0 && (
         <div className="feedback-action">
           {feedbackList.length > 1 ? (
             <h3>

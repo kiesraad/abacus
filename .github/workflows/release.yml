@@ -14,6 +14,10 @@ jobs:
   build:
     if: github.repository == 'kiesraad/abacus'
     name: Build
+    permissions:
+      contents: read
+      attestations: write
+      id-token: write
     strategy:
       matrix:
         target:
@@ -57,6 +61,10 @@ jobs:
         run: cargo --locked test --release --features embed-typst --target=${{ matrix.target.name }}
       - name: Build
         run: cargo --locked build --release --features memory-serve,embed-typst --target=${{ matrix.target.name }}
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{ matrix.target.binary }}
       - uses: actions/upload-artifact@v4
         with:
           name: abacus-${{ matrix.target.os }}

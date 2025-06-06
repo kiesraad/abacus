@@ -5,9 +5,9 @@ import { ApiProvider } from "@/api/ApiProvider";
 import { overrideOnce } from "@/testing/server";
 import { screen } from "@/testing/test-utils";
 
-import { AirGapViolationDialog } from "./AirGapviolationDialog";
+import { AirGapViolationPage } from "./AirGapViolationPage";
 
-describe("AirGapViolationDialog", () => {
+describe("AirGapViolationPage", () => {
   test("Error dialog when air-gap violation is detected", async () => {
     overrideOnce("get", "/api/user/whoami", 503, {
       error: "Blocking request due to airgap violation",
@@ -17,13 +17,13 @@ describe("AirGapViolationDialog", () => {
 
     rtlRender(
       <ApiProvider fetchInitialUser={true}>
-        <AirGapViolationDialog />
+        <AirGapViolationPage />
       </ApiProvider>,
     );
 
     // Wait for the modal to be loaded
     await waitFor(() => {
-      expect(screen.queryByTestId("modal-title")).toHaveTextContent("Abacus is niet beschikbaar");
+      expect(screen.queryByTestId("error-title")).toHaveTextContent("Abacus zit op slot");
     });
   });
 });

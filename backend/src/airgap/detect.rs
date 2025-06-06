@@ -1,9 +1,9 @@
 use std::{
-    net::ToSocketAddrs,
+    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, TcpStream, ToSocketAddrs},
     sync::{Arc, RwLock, atomic::AtomicBool},
     time::{Duration, Instant},
 };
-use tracing::error;
+use tracing::{error, trace};
 
 #[derive(Debug, Clone)]
 pub struct AirgapDetection {
@@ -12,7 +12,25 @@ pub struct AirgapDetection {
     last_check: Arc<RwLock<Option<Instant>>>,
 }
 
-const DNS_LOOKUP_DOMAIN: &str = "kiesraad.nl:443"; // A known domain that should not resolve in an airgapped environment
+const SECURE_PORT: u16 = 443; // Default secure port for HTTPS
+
+const TCP_CONNECT_TIMEOUT: Duration = Duration::from_secs(5); // Timeout for TCP connections
+
+const IPV4: [Ipv4Addr; 2] = [
+    Ipv4Addr::new(104, 26, 1, 225), // Cloudflare (informatiebeveiligingsdienst.nl)
+    Ipv4Addr::new(145, 100, 190, 243), // SURFnet
+];
+
+const IPV6: [Ipv6Addr; 2] = [
+    Ipv6Addr::new(0x2606, 0x4700, 0x20, 0x0, 0x0, 0x0, 0x681a, 0xe1), // Cloudflare (informatiebeveiligingsdienst.nl)
+    Ipv6Addr::new(0x2001, 0x610, 0x188, 0x410, 0x145, 0x100, 0x190, 0x243), // SURFnet
+];
+
+const DOMAINS: [&str; 3] = [
+    "kiesraad.nl",
+    "informatiebeveiligingsdienst.nl",
+    "surfnet.nl",
+];
 
 pub const AIRGAP_DETECTION_INTERVAL: u64 = 60; // interval in seconds
 
@@ -40,7 +58,7 @@ impl AirgapDetection {
 
             move || {
                 loop {
-                    airgap_detection.detect_airgap();
+                    airgap_detection.perform_detection();
 
                     std::thread::sleep(Duration::from_secs(AIRGAP_DETECTION_INTERVAL));
                 }
@@ -50,23 +68,62 @@ impl AirgapDetection {
         airgap_detection
     }
 
-    /// Detects if the system is in an airgap by attempting to connect to a known server.
-    fn detect_airgap(&self) {
-        let dns_lookup_result = DNS_LOOKUP_DOMAIN.to_socket_addrs();
-
-        match dns_lookup_result {
-            Ok(_) => {
-                // if we get a result from the DNS lookup, the system is not in an airgap
-                error!("Airgap violation detected, abacus is connected to the internet!");
-
-                self.set_airgap_violation_detected(true);
-            }
-            Err(_) => {
-                self.set_airgap_violation_detected(false);
-            }
+    fn perform_detection(&self) {
+        if self.is_connected() {
+            error!("Airgap violation detected, abacus is connected to the internet!");
+            self.set_airgap_violation_detected(true);
+        } else {
+            trace!("No airgap violation detected.");
+            self.set_airgap_violation_detected(false);
         }
 
         self.set_last_check();
+    }
+
+    /// Detects if the system is in an airgap by attempting to connect to IPv3, IPv6 addresses and performing DNS lookups
+    fn is_connected(&self) -> bool {
+        // attempt to connect to known IPv4 addresses over TCP
+        let tcp_ipv4_connection_success = IPV4
+            .iter()
+            .map(|ip| SocketAddr::new(IpAddr::V4(*ip), SECURE_PORT))
+            .map(|addr| TcpStream::connect_timeout(&addr, TCP_CONNECT_TIMEOUT))
+            .filter_map(Result::ok)
+            .count();
+
+        if tcp_ipv4_connection_success > 0 {
+            trace!("TCP IPv4 connections: {tcp_ipv4_connection_success}");
+
+            return true;
+        }
+
+        // attempt to connect to known IPv6 addresses over TCP
+        let tcp_ipv6_connection_success = IPV6
+            .iter()
+            .map(|ip| SocketAddr::new(IpAddr::V6(*ip), SECURE_PORT))
+            .map(|addr| TcpStream::connect_timeout(&addr, TCP_CONNECT_TIMEOUT))
+            .filter_map(Result::ok)
+            .count();
+
+        if tcp_ipv6_connection_success > 0 {
+            trace!("TCP IPv6 connections: {tcp_ipv6_connection_success}");
+
+            return true;
+        }
+
+        // perform a DNS lookup using the default resolver
+        let dns_lookup_success = DOMAINS
+            .iter()
+            .map(|d| format!("{d}:{SECURE_PORT}").to_socket_addrs())
+            .filter_map(Result::ok)
+            .count();
+
+        if dns_lookup_success > 0 {
+            trace!("DNS lookup success: {dns_lookup_success}");
+
+            return true;
+        }
+
+        false
     }
 
     fn set_airgap_violation_detected(&self, status: bool) {

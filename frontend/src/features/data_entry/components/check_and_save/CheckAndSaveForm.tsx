@@ -29,8 +29,16 @@ export function CheckAndSaveForm() {
   const { election } = useElection();
   const [isConfirmed, setIsConfirmed] = React.useState(false);
   const [isConfirmedError, setIsConfirmedError] = React.useState<string | null>(null);
-  const { error, formState, onSubmitForm, status, onFinaliseDataEntry, pollingStationId, entryNumber } =
-    useDataEntryContext("save");
+  const {
+    error,
+    dataEntryStructure,
+    formState,
+    onSubmitForm,
+    status,
+    onFinaliseDataEntry,
+    pollingStationId,
+    entryNumber,
+  } = useDataEntryContext("save");
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionId) => {
@@ -123,7 +131,7 @@ export function CheckAndSaveForm() {
                 <Link to={getUrlForFormSection(section.id)} className="section-title">
                   {section.title || section.id}
                 </Link>
-                <StatusList id="save-form-summary-list" className="error">
+                <StatusList id={`save-form-summary-list-${section.id}`} className="error">
                   {section.errors.getCodes().map((code) => {
                     return (
                       <StatusList.Item
@@ -133,7 +141,7 @@ export function CheckAndSaveForm() {
                         padding
                         id={`section-error-${section.id}-${code}`}
                       >
-                        {tx(`feedback.${code}.title`, {
+                        {tx(`feedback.${code}.typist.title`, {
                           link: (title: React.ReactElement) => (
                             <Link to={getUrlForFormSection(section.id)}>{title}</Link>
                           ),
@@ -150,7 +158,7 @@ export function CheckAndSaveForm() {
                         padding
                         id={`section-error-${section.id}-${code}`}
                       >
-                        {tx(`feedback.${code}.title`, {
+                        {tx(`feedback.${code}.typist.title`, {
                           link: (title: React.ReactElement) => (
                             <Link to={getUrlForFormSection(section.id)}>{title}</Link>
                           ),

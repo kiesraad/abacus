@@ -1,6 +1,7 @@
 import { UserEvent, userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
+import { useUser } from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -8,7 +9,7 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, userTypeInputs } from "@/testing/test-utils";
-import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import { LoginResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
 
 import { errorWarningMocks, getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
@@ -20,6 +21,15 @@ import {
 } from "../../testing/test.utils";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DifferencesForm } from "./DifferencesForm";
+
+vi.mock("@/hooks/user/useUser");
+
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
+};
 
 function renderForm() {
   return render(
@@ -41,6 +51,7 @@ const differencesFieldIds = {
 
 describe("Test DifferencesForm", () => {
   beforeEach(() => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 

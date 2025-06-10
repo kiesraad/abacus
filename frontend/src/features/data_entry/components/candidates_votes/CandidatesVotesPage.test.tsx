@@ -1,17 +1,27 @@
 import { useParams } from "react-router";
 
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { useUser } from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen, waitFor } from "@/testing/test-utils";
+import { LoginResponse } from "@/types/generated/openapi";
 
 import { DataEntryProvider } from "../DataEntryProvider";
 import { CandidatesVotesPage } from "./CandidatesVotesPage";
 
 vi.mock("react-router");
+vi.mock("@/hooks/user/useUser");
+
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
+};
 
 function renderPage() {
   return render(
@@ -25,6 +35,7 @@ function renderPage() {
 
 describe("Test CandidatesVotesPage", () => {
   beforeEach(() => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler);
   });
 

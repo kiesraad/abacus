@@ -156,8 +156,6 @@ pub async fn election_import_validate(
     _user: Admin,
     Json(edu): Json<ElectionDefinitionValidateRequest>,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
-    println!("{:?}", EmlHash::from(edu.data.as_bytes()).chunks);
-
     if let Some(user_hash) = edu.hash {
         if user_hash != EmlHash::from(edu.data.as_bytes()).chunks {
             return Err(APIError::InvalidHashError);
@@ -196,9 +194,6 @@ pub async fn election_import_candidates_validate(
     _user: Admin,
     Json(edu): Json<CandidateDefinitionValidateRequest>,
 ) -> Result<Json<CandidateDefinitionValidateResponse>, APIError> {
-    // TODO: remove
-    println!("{:?}", EmlHash::from(edu.candidate_data.as_bytes()).chunks);
-
     if edu.election_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
         return Err(APIError::InvalidHashError);
     }

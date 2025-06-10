@@ -49,7 +49,7 @@ export function ElectionSummaryTable({
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
-            {t("voters_and_votes.blank_votes_count")}
+            {t("voters_votes_counts.votes_counts.blank_votes_count")}
           </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
             {formatNumber(votesCounts.blank_votes_count)}
@@ -60,7 +60,7 @@ export function ElectionSummaryTable({
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
-            {t("voters_and_votes.invalid_votes_count")}
+            {t("voters_votes_counts.votes_counts.invalid_votes_count")}
           </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
             {formatNumber(votesCounts.invalid_votes_count)}
@@ -71,7 +71,7 @@ export function ElectionSummaryTable({
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
-            {t("voters_and_votes.votes_candidates_count")}
+            {t("voters_votes_counts.votes_counts.votes_candidates_count")}
           </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
             {formatNumber(votesCounts.votes_candidates_count)}

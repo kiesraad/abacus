@@ -36,6 +36,7 @@ export function TestUserProvider({ userRole, children, overrideExpiration }: Tes
       return Promise.resolve({} as ApiResult<LoginResponse>);
     },
     loading: false,
+    airGapError: false,
     expiration,
     extendSession: function (): Promise<void> {
       expiration.setMinutes(expiration.getMinutes() + 30);

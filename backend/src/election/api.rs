@@ -172,7 +172,6 @@ pub async fn election_import_validate(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct ElectionDefinitionImportRequest {
     election_hash: [String; crate::eml::hash::CHUNK_COUNT],
     election_data: String,
@@ -197,18 +196,25 @@ pub async fn election_import_candidates_validate(
     _user: Admin,
     Json(edu): Json<CandidateDefinitionValidateRequest>,
 ) -> Result<Json<CandidateDefinitionValidateResponse>, APIError> {
-    println!("{:?}", EmlHash::from(edu.data.as_bytes()).chunks);
+    // TODO: remove
+    println!("{:?}", EmlHash::from(edu.candidate_data.as_bytes()).chunks);
 
-    if let Some(user_hash) = edu.hash {
-        if user_hash != EmlHash::from(edu.data.as_bytes()).chunks {
+    if edu.election_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
+        return Err(APIError::InvalidHashError);
+    }
+    if let Some(user_hash) = edu.candidate_hash {
+        if user_hash != EmlHash::from(edu.candidate_data.as_bytes()).chunks {
             return Err(APIError::InvalidHashError);
         }
     }
 
-    let eml = EML230::from_str(&edu.data)?;
+    let eml = EML110::from_str(&edu.election_data)?;
+    let election = eml.as_abacus_election()?;
+
+    let eml = EML230::from_str(&edu.candidate_data)?;
     Ok(Json(CandidateDefinitionValidateResponse {
-        hash: RedactedEmlHash::from(edu.data.as_bytes()),
-        list: eml.as_candidate_list(&edu.election)?,
+        hash: RedactedEmlHash::from(edu.candidate_data.as_bytes()),
+        list: eml.as_candidate_list(&election)?,
     }))
 }
 
@@ -216,9 +222,10 @@ pub async fn election_import_candidates_validate(
 pub struct CandidateDefinitionValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<Vec<String>>, nullable = false)]
-    hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
-    data: String,
-    election: NewElection,
+    candidate_hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
+    candidate_data: String,
+    election_hash: [String; crate::eml::hash::CHUNK_COUNT],
+    election_data: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]

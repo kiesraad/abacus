@@ -207,38 +207,23 @@ impl TryFrom<Candidate> for structs::Candidate {
 
     fn try_from(parsed: Candidate) -> Result<Self, Self::Error> {
         Ok(structs::Candidate {
-            //pub number: CandidateNumber,
             number: parsed
                 .candidate_identifier
                 .id
                 .parse()
                 .or(Err(EMLImportError::InvalidCandidate))?,
-
-            //pub initials: String,
             initials: match parsed.candidate_full_name.person_name.name_line {
                 Some(line) => line.value,
                 None => return Err(EMLImportError::InvalidCandidate),
             },
-
-            //pub first_name: Option<String>,
             first_name: parsed.candidate_full_name.person_name.first_name,
-
-            //pub last_name_prefix: Option<String>,
             last_name_prefix: parsed.candidate_full_name.person_name.name_prefix,
-
-            //pub last_name: String,
             last_name: parsed.candidate_full_name.person_name.last_name,
-
-            //pub locality: String,
             locality: parsed.qualifying_address.locality_name().to_string(),
-
-            //pub country_code: Option<String>,
-            country_code: match parsed.qualifying_address.country_name_code() {
-                None => None,
-                Some(s) => Some(s.to_string()),
-            },
-
-            //pub gender: Option<CandidateGender>,
+            country_code: parsed
+                .qualifying_address
+                .country_name_code()
+                .map(|s| s.to_string()),
             gender: match parsed.gender {
                 None => None,
                 Some(gender) => match gender {

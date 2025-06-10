@@ -38,19 +38,21 @@ impl EML230 {
 
     pub fn as_candidate_list(
         &self,
-        election: &NewElection,
+        _election: &NewElection,
     ) -> std::result::Result<NewCandidateList, EMLImportError> {
         // we need to be importing from a 230b file
         if self.base.id != "230b" {
             return Err(EMLImportError::Needs230b);
         }
 
+        // TODO: uncomment when we have new test files
+        //
         // make sure candidate list election matches election definition
         //if election.election_id != self.election().election_identifier.election_name {
         //    return Err(EMLImportError::MismatchElectionIdentifier);
         //}
 
-        // TODO: more checkes
+        // TODO: more validation see issue #1589
 
         // extract initial listing of political groups
         let political_groups = self

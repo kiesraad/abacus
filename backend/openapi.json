@@ -2843,17 +2843,24 @@
       "CandidateDefinitionValidateRequest": {
         "type": "object",
         "required": [
-          "data",
-          "election"
+          "candidate_data",
+          "election_hash",
+          "election_data"
         ],
         "properties": {
-          "data": {
+          "candidate_data": {
             "type": "string"
           },
-          "election": {
-            "$ref": "#/components/schemas/NewElection"
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
-          "hash": {
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
             "type": "array",
             "items": {
               "type": "string"
@@ -3372,25 +3379,25 @@
       "ElectionDefinitionImportRequest": {
         "type": "object",
         "required": [
-          "electionHash",
-          "electionData",
-          "candidateHash",
-          "candidateData"
+          "election_hash",
+          "election_data",
+          "candidate_hash",
+          "candidate_data"
         ],
         "properties": {
-          "candidateData": {
+          "candidate_data": {
             "type": "string"
           },
-          "candidateHash": {
+          "candidate_hash": {
             "type": "array",
             "items": {
               "type": "string"
             }
           },
-          "electionData": {
+          "election_data": {
             "type": "string"
           },
-          "electionHash": {
+          "election_hash": {
             "type": "array",
             "items": {
               "type": "string"

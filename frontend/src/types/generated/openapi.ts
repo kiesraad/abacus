@@ -283,9 +283,10 @@ export interface Candidate {
 }
 
 export interface CandidateDefinitionValidateRequest {
-  data: string;
-  election: NewElection;
-  hash?: string[];
+  candidate_data: string;
+  candidate_hash?: string[];
+  election_data: string;
+  election_hash: string[];
 }
 
 export interface CandidateDefinitionValidateResponse {
@@ -440,10 +441,10 @@ export interface ElectionApportionmentResponse {
 export type ElectionCategory = "Municipal";
 
 export interface ElectionDefinitionImportRequest {
-  candidateData: string;
-  candidateHash: string[];
-  electionData: string;
-  electionHash: string[];
+  candidate_data: string;
+  candidate_hash: string[];
+  election_data: string;
+  election_hash: string[];
 }
 
 export interface ElectionDefinitionValidateRequest {

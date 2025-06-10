@@ -53,6 +53,51 @@ Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the proje
 
 Use `cargo test` to run the tests. The tests are also run in a GitHub Actions workflow.
 
+### Air gap detection
+
+In production, Abacus must be built with air gap detection enabled. To enforce air gap detection during build, enable the feature `airgap-detection`:
+
+```shell
+cargo build --release --features airgap-detection
+```
+
+To enable air gap detection for a build without this feature, pass the CLI flag `--airgap-detection`. In development:
+
+```shell
+cargo run -- --airgap-detection
+```
+
+Using a binary:
+
+```shell
+abacus --airgap-detection
+```
+
+### Building for various platforms
+
+You can use [`cross`](https://github.com/cross-rs/cross) to compile for different architectures.
+
+For example:
+
+```shell
+# build the frontend
+cd frontend
+npm install
+npm run build
+cd ..
+
+# build for ARMv6 32-bit Linux (like the Raspberry Pi 1/2/Zero)
+cross build --release --features memory-serve,embed-typst,airgap-detection --manifest-path backend/Cargo.toml --target arm-unknown-linux-gnueabihf
+
+# build for ARMv7-A 32-bit Linux (like the Raspberry Pi 3/4/5)
+cross build --release --features memory-serve,embed-typst,airgap-detection --manifest-path backend/Cargo.toml --target armv7-unknown-linux-gnueabihf
+
+# build for AArch64 64-bit Linux (Apple silicon)
+cross build --release --features memory-serve,embed-typst,airgap-detection  --manifest-path backend/Cargo.toml --target aarch64-unknown-linux-gnu
+```
+
+To use `cross` on Apple silicon, set the `CROSS_CONTAINER_OPTS` environment variable to `--platform linux/amd64` when running the command.
+
 ## Structure
 
 ### Dependencies
@@ -126,28 +171,3 @@ The OpenAPI JSON specification is available in the repository at `openapi.json` 
 The Swagger UI is available at [/api-docs](http://localhost:8080/api-docs).
 
 To update `openapi.json` in the repository, run the command `cargo run --bin gen-openapi`.
-
-### Building for various platforms
-
-You can use [`cross`](https://github.com/cross-rs/cross) to compile for different architectures.
-
-For example:
-
-```shell
-# build the frontend
-cd frontend
-npm install
-npm run build
-cd ..
-
-# build for ARMv6 32-bit Linux (like the Raspberry Pi 1/2/Zero)
-cross build --release --features memory-serve,embed-typst --manifest-path backend/Cargo.toml --target arm-unknown-linux-gnueabihf
-
-# build for ARMv7-A 32-bit Linux (like the Raspberry Pi 3/4/5)
-cross build --release --features memory-serve,embed-typst --manifest-path backend/Cargo.toml --target armv7-unknown-linux-gnueabihf
-
-# build for AArch64 64-bit Linux (like the Raspberry Pi 3/4/5)
-cross build --release --features memory-serve,embed-typst --manifest-path backend/Cargo.toml --target aarch64-unknown-linux-gnu
-```
-
-To use `cross` on Apple Silicon, set the `CROSS_CONTAINER_OPTS` environment variable to `--platform linux/amd64` when running the command.

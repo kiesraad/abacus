@@ -143,7 +143,7 @@ describe("Test CheckAndSaveForm", () => {
   });
 
   test("Save Form renders errors and warnings list when accepted errors", async () => {
-    const defaultState = getDefaultDataEntryState().formState;
+    const defaultState = customFormState();
     const mockFormState: FormState = {
       ...defaultState,
       sections: {
@@ -165,6 +165,60 @@ describe("Test CheckAndSaveForm", () => {
     renderForm();
 
     expect(await screen.findByRole("button", { name: "Afronden" })).toBeInTheDocument();
+
+    const summaryList = screen.findByTestId(`save-form-summary-list-voters_votes_counts`);
+
+    expect(summaryList).toBeDefined();
+    expect(within(await summaryList).getByText("Controleer toegelaten kiezers")).toBeInTheDocument();
+    expect(
+      within(await summaryList).getByText("Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen"),
+    ).toBeInTheDocument();
+  });
+
+  test("Can't complete data entry without accepting errors", async () => {
+    const defaultState = customFormState();
+    const mockFormState: FormState = {
+      ...defaultState,
+      sections: {
+        ...defaultState.sections,
+        voters_votes_counts: {
+          ...defaultState.sections.voters_votes_counts,
+          errors: new ValidationResultSet([errorWarningMocks.F201]),
+          warnings: new ValidationResultSet([errorWarningMocks.W203]),
+          acceptErrorsAndWarnings: true,
+        },
+      },
+    };
+
+    const defaultValues = getEmptyDataEntryRequest().data;
+    overrideServerClaimDataEntryResponse({
+      formState: mockFormState,
+      pollingStationResults: defaultValues,
+      validationResults: { errors: [errorWarningMocks.F201], warnings: [errorWarningMocks.W203] },
+    });
+    renderForm();
+
+    const completeButton = await screen.findByRole("button", { name: "Afronden" });
+    expect(completeButton).toBeInTheDocument();
+
+    const acceptErrorsCheckbox = screen.getByRole("checkbox", {
+      name: "Ik heb de fouten besproken met de coördinator",
+    });
+    expect(acceptErrorsCheckbox).toBeInTheDocument();
+
+    await userEvent.click(completeButton);
+
+    const errorMessage = await screen.findByRole("alert");
+    expect(errorMessage).toHaveTextContent("Je kan alleen verder als je dit met de coördinator hebt overlegd.");
+
+    await userEvent.click(acceptErrorsCheckbox);
+
+    expect(acceptErrorsCheckbox).toBeChecked();
+    const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
+
+    await userEvent.click(completeButton);
+
+    expect(finalise).toHaveBeenCalledOnce();
   });
 });
 

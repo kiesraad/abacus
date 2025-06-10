@@ -219,7 +219,7 @@ export function buildFormState(
     (sectionID: FormSectionId) => sectionID === newFormState.current,
   );
 
-  updateFormStateAfterSubmit(newFormState, validationResults, acceptErrorsAndWarnings);
+  updateFormStateAfterSubmit(dataEntryStructure, newFormState, validationResults, acceptErrorsAndWarnings);
 
   let targetFormSectionId: FormSectionId;
   if (clientState.continue) {
@@ -232,6 +232,7 @@ export function buildFormState(
 }
 
 export function updateFormStateAfterSubmit(
+  dataEntryStructure: DataEntryStructure,
   formState: FormState,
   validationResults: ValidationResults,
   continueToNextSection: boolean = false,
@@ -250,8 +251,8 @@ export function updateFormStateAfterSubmit(
   }
 
   //distribute errors and warnings to sections
-  addValidationResultsToFormState(validationResults.errors, formState, "errors");
-  addValidationResultsToFormState(validationResults.warnings, formState, "warnings");
+  addValidationResultsToFormState(validationResults.errors, formState, dataEntryStructure, "errors");
+  addValidationResultsToFormState(validationResults.warnings, formState, dataEntryStructure, "warnings");
 
   //determine the new furthest section, if applicable
   if (continueToNextSection && currentFormSection && formState.furthest === currentFormSection.id) {

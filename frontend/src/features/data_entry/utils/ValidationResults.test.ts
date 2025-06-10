@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { ValidationResult } from "@/types/generated/openapi";
 
-import { errorWarningMocks, getDefaultDataEntryState } from "../testing/mock-data";
+import { errorWarningMocks, getDefaultDataEntryState, getRecountedDataEntryStructure } from "../testing/mock-data";
 import {
   addValidationResultsToFormState,
   isGlobalValidationResult,
@@ -45,38 +45,50 @@ describe("mapFieldNameToFormSection", () => {
     ["data.votes_counts.blank_votes_count", "voters_votes_counts"],
     ["data.voters_recounts.poll_card_count", "voters_votes_counts"],
     ["data.political_group_votes[0].total", "political_group_votes_1"],
-    ["data.political_group_votes[8].candidate_votes[1].votes", "political_group_votes_9"],
-    ["data.political_group_votes[11].candidate_votes[1].votes", "political_group_votes_12"],
-    ["data.political_group_votes[20].candidate_votes[5].votes", "political_group_votes_21"],
+    ["data.political_group_votes[0].candidate_votes[0].votes", "political_group_votes_1"],
+    ["data.political_group_votes[0].candidate_votes[1].votes", "political_group_votes_1"],
+    ["data.political_group_votes[1].total", "political_group_votes_2"],
+    ["data.political_group_votes[1].candidate_votes[0].votes", "political_group_votes_2"],
+    // Test parent object paths
+    ["data.political_group_votes[0]", "political_group_votes_1"],
+    ["data.political_group_votes[1]", "political_group_votes_2"],
+    ["data.voters_counts", "voters_votes_counts"],
+    ["data.votes_counts", "voters_votes_counts"],
   ])("map field name %s to field section %s", (fieldName: string, formSection: string) => {
-    expect(mapFieldNameToFormSection(fieldName)).equals(formSection);
+    const dataEntryStructure = getRecountedDataEntryStructure();
+    expect(mapFieldNameToFormSection(fieldName, dataEntryStructure)).equals(formSection);
   });
 
   test("should throw error for unknown field name", () => {
-    expect(() => mapFieldNameToFormSection("data.unknown")).toThrowError();
+    const dataEntryStructure = getDefaultDataEntryState().dataEntryStructure;
+    expect(() => mapFieldNameToFormSection("data.unknown", dataEntryStructure)).toThrowError();
   });
 });
 
 describe("addValidationResultToFormState", () => {
   test("should add validation result to form state", () => {
-    const formState = getDefaultDataEntryState().formState;
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
     formState.sections.differences_counts.isSaved = true;
     const validationResults: ValidationResult[] = [errorWarningMocks.F303];
 
-    addValidationResultsToFormState(validationResults, formState, "errors");
+    addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
     expect(formState.sections.differences_counts.errors.size()).toBe(1);
   });
 
   test("addValidationResultToFormState adds result to multiple sections", () => {
-    const formState = getDefaultDataEntryState().formState;
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
 
     formState.sections.voters_votes_counts.isSaved = true;
     if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
 
     const validationResults: ValidationResult[] = [errorWarningMocks.F204];
 
-    addValidationResultsToFormState(validationResults, formState, "errors");
+    addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
     expect(formState.sections.voters_votes_counts.errors.size()).toBe(1);
     const pg1 = formState.sections.political_group_votes_1;
@@ -84,11 +96,13 @@ describe("addValidationResultToFormState", () => {
   });
 
   test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {
-    const formState = getDefaultDataEntryState().formState;
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
     formState.sections.differences_counts.isSaved = false;
     const validationResults: ValidationResult[] = [errorWarningMocks.F303];
 
-    addValidationResultsToFormState(validationResults, formState, "errors");
+    addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
     expect(formState.sections.differences_counts.errors.size()).toBe(0);
   });

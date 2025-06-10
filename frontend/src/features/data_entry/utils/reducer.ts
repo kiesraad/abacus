@@ -98,7 +98,10 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         error: action.error,
       };
     case "FORM_SAVED": {
+      const dataEntryStructure = getDataEntryStructure(state.election, action.data);
+
       const formState = updateFormStateAfterSubmit(
+        dataEntryStructure,
         state.formState,
         action.validationResults,
         action.continueToNextSection,
@@ -109,7 +112,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         status: "idle",
         error: null,
         pollingStationResults: action.data,
-        dataEntryStructure: getDataEntryStructure(state.election, action.data),
+        dataEntryStructure,
         formState,
         targetFormSectionId: action.continueToNextSection ? getNextSectionID(formState) : state.targetFormSectionId,
       };

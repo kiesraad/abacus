@@ -5,7 +5,7 @@ use super::{
     common::{Candidate, ContestIdentifier, EMLImportError, ElectionIdentifier, ManagingAuthority},
 };
 
-use crate::election::{NewCandidateList, NewElection, PoliticalGroup};
+use crate::election::{NewElection, PoliticalGroup};
 
 /// Candidate list (230b)
 ///
@@ -36,10 +36,10 @@ impl EML230 {
         &self.election().contest
     }
 
-    pub fn as_candidate_list(
+    pub fn add_candidate_lists(
         &self,
-        _election: &NewElection,
-    ) -> std::result::Result<NewCandidateList, EMLImportError> {
+        mut election: NewElection,
+    ) -> std::result::Result<NewElection, EMLImportError> {
         // we need to be importing from a 230b file
         if self.base.id != "230b" {
             return Err(EMLImportError::Needs230b);
@@ -55,7 +55,7 @@ impl EML230 {
         // TODO: more validation see issue #1589
 
         // extract initial listing of political groups
-        let political_groups = self
+        election.political_groups = self
             .contest()
             .affiliations
             .iter()
@@ -83,10 +83,7 @@ impl EML230 {
             })
             .collect::<Result<Vec<PoliticalGroup>, EMLImportError>>()?;
 
-        Ok(NewCandidateList {
-            name: self.election().election_identifier.id.clone(),
-            political_groups,
-        })
+        Ok(election)
     }
 }
 

@@ -45,9 +45,6 @@ export function CheckAndSave() {
           <strong>{t("election.singular")}:</strong> {state.election.name}
         </li>
         <li>
-          <strong>{t("election.candidate_list")}:</strong> {state.candidateList?.name}
-        </li>
-        <li>
           <strong>{t("area_designation")}:</strong> {state.election.location}
         </li>
       </ul>

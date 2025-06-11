@@ -220,64 +220,6 @@
         }
       }
     },
-    "/api/elections/import/validate-candidates": {
-      "post": {
-        "summary": "Uploads candidate list, validates it and returns the associated candidate list and\na redacted hash, to be filled by the administrator.",
-        "operationId": "election_import_candidates_validate",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CandidateDefinitionValidateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Candidates validated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CandidateDefinitionValidateResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/elections/{election_id}": {
       "get": {
         "summary": "Get election details including the election's candidate list (political groups) and its polling stations",
@@ -2840,49 +2782,6 @@
           }
         }
       },
-      "CandidateDefinitionValidateRequest": {
-        "type": "object",
-        "required": [
-          "candidate_data",
-          "election_hash",
-          "election_data"
-        ],
-        "properties": {
-          "candidate_data": {
-            "type": "string"
-          },
-          "candidate_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "election_data": {
-            "type": "string"
-          },
-          "election_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "CandidateDefinitionValidateResponse": {
-        "type": "object",
-        "required": [
-          "hash",
-          "list"
-        ],
-        "properties": {
-          "hash": {
-            "$ref": "#/components/schemas/RedactedEmlHash"
-          },
-          "list": {
-            "$ref": "#/components/schemas/NewCandidateList"
-          }
-        }
-      },
       "CandidateGender": {
         "type": "string",
         "description": "Candidate gender",
@@ -3408,13 +3307,25 @@
       "ElectionDefinitionValidateRequest": {
         "type": "object",
         "required": [
-          "data"
+          "election_data"
         ],
         "properties": {
-          "data": {
+          "candidate_data": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
             "type": "string"
           },
-          "hash": {
+          "election_hash": {
             "type": "array",
             "items": {
               "type": "string"
@@ -4043,25 +3954,6 @@
           },
           "username": {
             "type": "string"
-          }
-        }
-      },
-      "NewCandidateList": {
-        "type": "object",
-        "description": "Candidate list request",
-        "required": [
-          "name",
-          "political_groups"
-        ],
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "political_groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroup"
-            }
           }
         }
       },

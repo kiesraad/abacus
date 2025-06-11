@@ -22,7 +22,7 @@ export function UploadElectionDefinition() {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
       const data = await currentFile.text();
-      const response = await create({ data });
+      const response = await create({ election_data: data });
 
       if (isSuccess(response)) {
         dispatch({
@@ -64,7 +64,7 @@ export function UploadElectionDefinition() {
     state.electionDefinitionData
   ) {
     async function onSubmit(chunks: string[]) {
-      const response = await create({ data: state.electionDefinitionData, hash: chunks });
+      const response = await create({ election_data: state.electionDefinitionData, election_hash: chunks });
       if (isSuccess(response)) {
         dispatch({
           type: "SET_ELECTION_DEFINITION_HASH",

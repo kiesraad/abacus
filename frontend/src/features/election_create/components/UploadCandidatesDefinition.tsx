@@ -6,10 +6,7 @@ import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { t, tx } from "@/i18n/translate";
-import {
-  CandidateDefinitionValidateResponse,
-  ELECTION_IMPORT_CANDIDATES_VALIDATE_REQUEST_PATH,
-} from "@/types/generated/openapi";
+import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { CheckHash } from "./CheckHash";
@@ -18,9 +15,9 @@ export function UploadCandidatesDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
 
-  const path: ELECTION_IMPORT_CANDIDATES_VALIDATE_REQUEST_PATH = `/api/elections/import/validate-candidates`;
+  const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const [error, setError] = useState<ReactNode | undefined>();
-  const { create } = useCrud<CandidateDefinitionValidateResponse>({ create: path });
+  const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
@@ -67,7 +64,6 @@ export function UploadCandidatesDefinition() {
 
   if (
     state.election &&
-    state.candidateList &&
     state.candidateDefinitionFileName &&
     state.candidateDefinitionRedactedHash &&
     state.candidateDefinitionData
@@ -93,7 +89,10 @@ export function UploadCandidatesDefinition() {
     return (
       <CheckHash
         date={state.election.election_date}
-        title={state.candidateList.name}
+        title={t("election.check_eml.list_name", {
+          location: state.election.location,
+          name: state.election.election_id,
+        })}
         header={t("election.check_eml.candidates_title")}
         description={tx("election.check_eml.candidates_description", {
           file: () => {

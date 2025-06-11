@@ -95,13 +95,6 @@ impl IntoResponse for ElectionWithPoliticalGroups {
     }
 }
 
-/// Candidate list request
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
-pub struct NewCandidateList {
-    pub name: String,
-    pub political_groups: Vec<PoliticalGroup>,
-}
-
 /// Election request
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
 pub struct NewElection {

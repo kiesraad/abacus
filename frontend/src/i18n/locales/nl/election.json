@@ -1,5 +1,6 @@
 {
   "create": "Verkiezing toevoegen",
+  "add": "Toevoegen: {name}",
   "check_and_save": {
     "title": "Controleren en opslaan",
     "description": "Je gaat de volgende verkiezing toevoegen:"
@@ -9,6 +10,7 @@
     "candidates_title": "Controleer kandidatenlijst",
     "election_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
     "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende kandidaten:",
+    "list_name": "{location}, kandidatenlijst {name}",
     "check_hash": {
       "description": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van de Kiesraad ontvangen.",
       "label": "Controle deel {stub}",

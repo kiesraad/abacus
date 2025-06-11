@@ -171,13 +171,14 @@ pub async fn election_import_validate(
 
     // parse and validate candidates, if available
     if let Some(data) = edu.candidate_data.clone() {
-        hash = RedactedEmlHash::from(data.as_bytes());
         if let Some(user_hash) = edu.candidate_hash {
             if user_hash != EmlHash::from(data.as_bytes()).chunks {
                 return Err(APIError::InvalidHashError);
             }
-            election = EML230::from_str(&data)?.add_candidate_lists(election)?;
         }
+
+        hash = RedactedEmlHash::from(data.as_bytes());
+        election = EML230::from_str(&data)?.add_candidate_lists(election)?;
     }
 
     Ok(Json(ElectionDefinitionValidateResponse { hash, election }))

@@ -185,7 +185,7 @@ describe("Test CheckAndSaveForm", () => {
     overrideServerClaimDataEntryResponse({
       formState: mockFormState,
       pollingStationResults: getInitialValues(),
-      validationResults: { errors: [errorWarningMocks.F201], warnings: [] },
+      validationResults: { errors: [errorWarningMocks.F201], warnings: [errorWarningMocks.W203] },
     });
     renderForm();
 

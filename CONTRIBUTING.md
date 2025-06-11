@@ -26,6 +26,6 @@ Als je een bijdrage aan de broncode wilt leveren vragen we je om vooraf een Cont
 - Als je naar een specifieke pull request of issue kijkt, kun je vragen of opmerkingen daar toevoegen in een comment.
 - Wil je iets toevoegen of wijzigen in de code en/of documentatie via een pull request, dan mail je de voorgestelde wijzigingen naar abacus[@]kiesraad.nl. Na overleg kun je de PR aanmaken. Alle PR's worden grondig gereviewd, zoals we dat ook met ons eigen werk doen. Een goed voorbeeld van een geleverde bijdrage via een PR vind je hier: [PR #945](https://github.com/kiesraad/abacus/pull/945).
 
-## Beveiligingslek
+## Beveiliging
 
-Als je een beveiligingslek vindt, maak dan geen issue aan maar mail ons direct op abacus[@]kiesraad.nl. Kijk in de [readme](/README.md#meldingen-en-security-issues) voor meer informatie.
+Alle beveiligingsmeldingen over onze software zijn welkom. Kijk hiervoor in de sectie [Beveiliging](/SECURITY.md).

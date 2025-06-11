@@ -122,7 +122,7 @@ test("should handle SET_CACHE", () => {
     cache: {
       key: "recounted",
       data: {
-        recounted: true,
+        recounted: "true",
       },
     },
   };
@@ -262,18 +262,14 @@ describe("onSubmitForm", () => {
       cache: {
         key: "voters_votes_counts",
         data: {
-          voters_counts: {
-            poll_card_count: 1,
-            proxy_certificate_count: 2,
-            voter_card_count: 3,
-            total_admitted_voters_count: 4,
-          },
-          votes_counts: {
-            votes_candidates_count: 5,
-            blank_votes_count: 6,
-            invalid_votes_count: 7,
-            total_votes_cast_count: 8,
-          },
+          "voters_counts.poll_card_count": "1",
+          "voters_counts.proxy_certificate_count": "2",
+          "voters_counts.voter_card_count": "3",
+          "voters_counts.total_admitted_voters_count": "4",
+          "votes_counts.votes_candidates_count": "5",
+          "votes_counts.blank_votes_count": "6",
+          "votes_counts.invalid_votes_count": "7",
+          "votes_counts.total_votes_cast_count": "8",
         },
       },
     };
@@ -299,7 +295,18 @@ describe("onSubmitForm", () => {
 
     const data: PollingStationResults = {
       ...getInitialValues(),
-      ...state.cache!.data,
+      voters_counts: {
+        poll_card_count: 1,
+        proxy_certificate_count: 2,
+        voter_card_count: 3,
+        total_admitted_voters_count: 4,
+      },
+      votes_counts: {
+        votes_candidates_count: 5,
+        blank_votes_count: 6,
+        invalid_votes_count: 7,
+        total_votes_cast_count: 8,
+      },
     };
 
     expect(dispatch.mock.calls[2]).toStrictEqual([

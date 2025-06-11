@@ -125,11 +125,12 @@ export function CheckAndSaveForm() {
         <>
           <p className="md">{t("check_and_save.accepted_errors")}</p>
           {notableFormSections.map((section) => {
-            <Link to={getUrlForFormSection(section.id)}>{section.title}</Link>;
+            const title = dataEntryStructure.find((s) => s.id === section.id)?.title || section.id;
+            <Link to={getUrlForFormSection(section.id)}>{title}</Link>;
             return (
               <React.Fragment key={section.id}>
                 <Link to={getUrlForFormSection(section.id)} className="section-title">
-                  {section.title || section.id}
+                  {title || section.id}
                 </Link>
                 <StatusList id={`save-form-summary-list-${section.id}`} className="error">
                   {section.errors.getCodes().map((code) => {
@@ -192,6 +193,7 @@ export function CheckAndSaveForm() {
             <StatusList.Item status="accept">{t("check_and_save.counts_add_up_title")}</StatusList.Item>
 
             {notableFormSections.map((section) => {
+              const title = dataEntryStructure.find((s) => s.id === section.id)?.title || section.id;
               const link = (title: React.ReactElement) => <Link to={getUrlForFormSection(section.id)}>{title}</Link>;
 
               let status: DataEntryFormSectionStatus;
@@ -208,7 +210,7 @@ export function CheckAndSaveForm() {
               const content = tx(
                 `check_and_save.notable_form_sections.${status}`,
                 { link },
-                { link_title: section.title || section.title || "" },
+                { link_title: title || "" },
               );
 
               return (

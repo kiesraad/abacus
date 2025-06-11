@@ -5,7 +5,6 @@ import { describe, expect, test, vi } from "vitest";
 
 import { useUser } from "@/hooks/user/useUser";
 import { setupTestRouter } from "@/testing/test-utils";
-import { PollingStationResults } from "@/types/generated/openapi";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import {
@@ -23,10 +22,7 @@ vi.mock("../hooks/useDataEntryContext");
 const baseMockData = getDefaultDataEntryStateAndActionsLoaded();
 const testPath = `/elections/${baseMockData.election.id}/data-entry/${baseMockData.pollingStationId}/1`;
 
-function renderComponent(
-  onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>,
-  currentValues?: Partial<PollingStationResults>,
-) {
+function renderComponent(onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>) {
   const router = setupTestRouter([
     {
       path: "/",
@@ -34,7 +30,7 @@ function renderComponent(
     },
     {
       path: "/elections/:electionId/data-entry/:pollingStationId/:entryNumber",
-      element: <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />,
+      element: <DataEntryNavigation onSubmit={onSubmit} />,
       children: [{ path: "differences", element: <div>Differences</div> }],
     },
     {

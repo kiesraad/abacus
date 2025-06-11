@@ -4,7 +4,7 @@ import candidate from "./candidate.json";
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
 import data_entry from "./data_entry.json";
-import differences from "./differences.json";
+import differences_counts from "./differences_counts.json";
 import election from "./election.json";
 import election_report from "./election_report.json";
 import election_status from "./election_status.json";
@@ -21,7 +21,7 @@ import recounted from "./recounted.json";
 import resolve_differences from "./resolve_differences.json";
 import status from "./status.json";
 import users from "./users.json";
-import voters_and_votes from "./voters_and_votes.json";
+import voters_votes_counts from "./voters_votes_counts.json";
 import workstations from "./workstations.json";
 
 const nl = {
@@ -32,7 +32,7 @@ const nl = {
   candidates_votes,
   check_and_save,
   data_entry,
-  differences,
+  differences_counts,
   election,
   election_report,
   election_status,
@@ -48,7 +48,7 @@ const nl = {
   resolve_differences,
   status,
   users,
-  voters_and_votes,
+  voters_votes_counts,
   workstations,
 };
 

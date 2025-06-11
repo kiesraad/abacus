@@ -1,6 +1,7 @@
 import { Dispatch } from "react";
 
 import { AnyApiError } from "@/api/ApiResult";
+import { TranslationPath } from "@/i18n/i18n.types";
 import {
   ClaimDataEntryResponse,
   DataEntryStatus,
@@ -8,9 +9,62 @@ import {
   PollingStationResults,
   ValidationResults,
 } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import { FormSectionId, PollingStationResultsPath } from "@/types/types";
 
 import { ValidationResultSet } from "../utils/ValidationResults";
+
+// Data Entry Section Types
+export interface HeadingSubsection {
+  type: "heading";
+  title: TranslationPath;
+}
+
+export interface MessageSubsection {
+  type: "message";
+  message: TranslationPath;
+  className?: string;
+}
+
+export interface RadioSubsectionOption {
+  value: string;
+  label: TranslationPath;
+  autoFocusInput?: boolean;
+}
+
+export interface RadioSubsection {
+  type: "radio";
+  error: TranslationPath;
+  path: PollingStationResultsPath;
+  options: RadioSubsectionOption[];
+  valueType?: "string" | "boolean";
+}
+
+export interface InputGridSubsectionRow {
+  code?: string;
+  path: PollingStationResultsPath;
+  title?: string;
+  isTotal?: boolean;
+  isListTotal?: boolean;
+  addSeparator?: boolean;
+  autoFocusInput?: boolean;
+}
+
+export interface InputGridSubsection {
+  type: "inputGrid";
+  headers: [TranslationPath, TranslationPath, TranslationPath];
+  zebra?: boolean;
+  rows: InputGridSubsectionRow[];
+}
+
+export type DataEntrySubsection = HeadingSubsection | MessageSubsection | RadioSubsection | InputGridSubsection;
+
+export interface DataEntrySection {
+  id: FormSectionId;
+  title: string;
+  subsections: DataEntrySubsection[];
+}
+
+export type DataEntryStructure = DataEntrySection[];
 
 export interface DataEntryState {
   // state from providers
@@ -25,6 +79,7 @@ export interface DataEntryState {
   pollingStationResults: PollingStationResults | null;
 
   // state of the forms excl. data
+  dataEntryStructure: DataEntryStructure;
   formState: FormState;
   targetFormSectionId: FormSectionId | null;
   status: Status;
@@ -34,7 +89,7 @@ export interface DataEntryState {
 
 export interface DataEntryStateAndActions extends DataEntryState {
   dispatch: DataEntryDispatch;
-  onSubmitForm: (data: Partial<PollingStationResults>, options?: SubmitCurrentFormOptions) => Promise<boolean>;
+  onSubmitForm: (currentValues: SectionValues, options?: SubmitCurrentFormOptions) => Promise<boolean>;
   onDeleteDataEntry: () => Promise<boolean>;
   onFinaliseDataEntry: () => Promise<DataEntryStatus | undefined>;
   register: (formSectionId: FormSectionId) => void;
@@ -99,10 +154,12 @@ export interface SubmitCurrentFormOptions {
   showAcceptErrorsAndWarnings?: boolean;
 }
 
+export type SectionValues = Record<string, string>;
+
 //store unvalidated data
 export type TemporaryCache = {
   key: FormSectionId;
-  data: Partial<PollingStationResults>;
+  data: SectionValues;
 };
 
 // Status of the form controller
@@ -127,7 +184,6 @@ export interface FormState {
 export type FormSection = {
   index: number; //fixate the order of filling in sections
   id: FormSectionId;
-  title?: string;
   hasChanges: boolean;
   isSaved: boolean; //whether this section has been sent to the server
   isSubmitted?: boolean; //whether this section has been submitted in the latest request

@@ -1,7 +1,7 @@
-import { ApiError } from "./ApiResult";
+import { ApiError, FatalApiError } from "./ApiResult";
 
 export class ApiErrorEvent extends Event {
-  constructor(public error: ApiError) {
+  constructor(public error: ApiError | FatalApiError) {
     super("apiError");
     this.error = error;
   }

@@ -95,10 +95,10 @@ export function DataEntryProgress() {
         >
           {formState.current !== "differences_counts" && formState.sections.differences_counts.index <= currentIndex ? (
             <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}/differences`}>
-              <span>{t("differences.title")}</span>
+              <span>{t("differences_counts.title")}</span>
             </Link>
           ) : (
-            <span>{t("differences.title")}</span>
+            <span>{t("differences_counts.title")}</span>
           )}
         </ProgressList.Item>
       </ProgressList.Fixed>

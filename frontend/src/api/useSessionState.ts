@@ -71,7 +71,6 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
 
       void (async () => {
         const path: WHOAMI_REQUEST_PATH = "/api/user/whoami";
-        const client = new ApiClient();
         const response = await client.getRequest<LoginResponse>(path, abortController);
 
         if (!abortController.signal.aborted) {
@@ -89,7 +88,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
         abortController.abort(DEFAULT_CANCEL_REASON);
       };
     }
-  }, [fetchInitialUser]);
+  }, [fetchInitialUser, client]);
 
   return {
     expiration,

@@ -30,7 +30,7 @@ import {
 } from "../../testing/test.utils";
 import { getClientState } from "../../utils/dataEntryUtils";
 import { DataEntryProvider } from "../DataEntryProvider";
-import { VotersAndVotesForm } from "./VotersAndVotesForm";
+import { DataEntrySection } from "../DataEntrySection";
 
 vi.mock("@/hooks/user/useUser");
 
@@ -44,7 +44,7 @@ const testUser: LoginResponse = {
 function renderForm() {
   return render(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
-      <VotersAndVotesForm />
+      <DataEntrySection sectionId="voters_votes_counts" />
     </DataEntryProvider>,
   );
 }

@@ -203,21 +203,21 @@ describe("Test DataEntryProgress", () => {
     expect(votersAndVotesLink).toBeVisible();
     expect(votersAndVotesLink).toHaveAttribute(
       "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/voters-and-votes`,
+      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/voters_votes_counts`,
     );
 
     const differencesLink = within(differences).getByRole("link", { name: "Verschillen" });
     expect(differencesLink).toBeVisible();
     expect(differencesLink).toHaveAttribute(
       "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/differences`,
+      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/differences_counts`,
     );
 
     const list1Link = within(list1).getByRole("link", { name: "Lijst 1 - Vurige Vleugels Partij" });
     expect(list1Link).toBeVisible();
     expect(list1Link).toHaveAttribute(
       "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/list/1`,
+      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/political_group_votes_1`,
     );
   });
 

@@ -8,7 +8,7 @@ import {
 } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
-import { DataEntryState, DataEntryStateAndActionsLoaded, FormSection } from "../types/types";
+import { DataEntryState, DataEntryStateAndActionsLoaded, DataEntryStructure, FormSection } from "../types/types";
 import { getDataEntryStructure } from "../utils/structure";
 import { ValidationResultSet } from "../utils/ValidationResults";
 
@@ -57,6 +57,18 @@ export function getDefaultFormSection(id: FormSectionId, index: number): FormSec
     errors: new ValidationResultSet(),
     warnings: new ValidationResultSet(),
   };
+}
+
+export function getDefaultDataEntryStructure(): DataEntryStructure {
+  return getDataEntryStructure(electionMockData);
+}
+
+export function getRecountedDataEntryStructure(): DataEntryStructure {
+  const results: PollingStationResults = {
+    ...getInitialValues(),
+    recounted: true,
+  };
+  return getDataEntryStructure(electionMockData, results);
 }
 
 export function getDefaultDataEntryState(): DataEntryState {
@@ -172,7 +184,7 @@ export const errorWarningMocks: ErrorWarningsMap<ValidationResultCode> = {
   F401: { fields: ["data.political_group_votes[0]"], code: "F401" },
   W001: { fields: ["data.recounted"], code: "W001" },
   W201: { fields: ["data.votes_counts.blank_votes_count"], code: "W201" },
-  W202: { fields: ["data.voters_counts.invalid_votes_count"], code: "W202" },
+  W202: { fields: ["data.votes_counts.invalid_votes_count"], code: "W202" },
   W203: {
     fields: ["data.votes_counts.total_votes_cast_count", "data.voters_counts.total_admitted_voters_count"],
     code: "W203",

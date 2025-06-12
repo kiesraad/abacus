@@ -11,6 +11,7 @@ import { MenuStatus } from "@/types/ui";
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { FormSection } from "../types/types";
 import { isFormSectionEmpty } from "../utils/dataEntryUtils";
+import { getUrlForFormSectionID } from "../utils/utils";
 
 export function DataEntryProgress() {
   const pollingStationId = useNumericParam("pollingStationId");
@@ -54,28 +55,7 @@ export function DataEntryProgress() {
 
   // TODO: remove this once we have routes based on form section ids
   const getRouteForSection = React.useCallback(
-    (sectionId: string): string => {
-      const baseUrl = `/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}`;
-
-      switch (sectionId) {
-        case "recounted":
-          return `${baseUrl}/recounted`;
-        case "voters_votes_counts":
-          return `${baseUrl}/voters-and-votes`;
-        case "differences_counts":
-          return `${baseUrl}/differences`;
-        case "save":
-          return `${baseUrl}/save`;
-        default: {
-          // Handle political group sections (e.g., "political_group_votes_1")
-          const match = sectionId.match(/^political_group_votes_(\d+)$/);
-          if (match) {
-            return `${baseUrl}/list/${match[1]}`;
-          }
-          return baseUrl;
-        }
-      }
-    },
+    (sectionId: FormSectionId): string => getUrlForFormSectionID(election.id, pollingStationId, entryNumber, sectionId),
     [election.id, pollingStationId, entryNumber],
   );
 

@@ -17,7 +17,7 @@ import {
 
 import { errorWarningMocks, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import { DataEntryProvider } from "../DataEntryProvider";
-import { RecountedForm } from "./RecountedForm";
+import { DataEntrySection } from "../DataEntrySection";
 
 vi.mock("@/hooks/user/useUser");
 
@@ -31,7 +31,7 @@ const testUser: LoginResponse = {
 function renderForm() {
   return render(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
-      <RecountedForm />
+      <DataEntrySection sectionId="recounted" />
     </DataEntryProvider>,
   );
 }

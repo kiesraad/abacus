@@ -53,7 +53,6 @@ export function DataEntryProgress() {
 
   const currentIndex = formState.sections[formState.furthest]?.index || 0;
 
-  // TODO: remove this once we have routes based on form section ids
   const getRouteForSection = React.useCallback(
     (sectionId: FormSectionId): string => getUrlForFormSectionID(election.id, pollingStationId, entryNumber, sectionId),
     [election.id, pollingStationId, entryNumber],

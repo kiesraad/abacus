@@ -8,7 +8,7 @@ import {
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { getUrlMethodAndBody, render, screen, within } from "@/testing/test-utils";
+import { getUrlMethodAndBody, render, screen, waitFor, within } from "@/testing/test-utils";
 import {
   ElectionWithPoliticalGroups,
   LoginResponse,
@@ -26,7 +26,7 @@ import {
   overrideServerClaimDataEntryResponse,
 } from "../../testing/test.utils";
 import { DataEntryProvider } from "../DataEntryProvider";
-import { CandidatesVotesForm } from "./CandidatesVotesForm";
+import { DataEntrySection } from "../DataEntrySection";
 
 vi.mock("@/hooks/user/useUser");
 
@@ -40,7 +40,7 @@ const testUser: LoginResponse = {
 function renderForm({ election, groupNumber }: { election?: ElectionWithPoliticalGroups; groupNumber?: number } = {}) {
   return render(
     <DataEntryProvider election={election || electionMockData} pollingStationId={1} entryNumber={1}>
-      <CandidatesVotesForm groupNumber={groupNumber || 1} />
+      <DataEntrySection sectionId={`political_group_votes_${groupNumber || 1}`} />;
     </DataEntryProvider>,
   );
 }
@@ -55,6 +55,28 @@ describe("Test CandidatesVotesForm", () => {
   beforeEach(() => {
     (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
+  });
+
+  test("list not found shows error", async () => {
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    renderForm({ groupNumber: 123 });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "Error thrown during render: Form section political_group_votes_123 not found in data entry structure",
+        ),
+      ).toBeVisible();
+    });
+  });
+
+  test("list found shows form", async () => {
+    renderForm();
+
+    await waitFor(() => {
+      expect(screen.getByRole("group", { name: "Lijst 1 - Vurige Vleugels Partij" })).toBeVisible();
+    });
   });
 
   describe("CandidatesVotesForm renders correctly", () => {

@@ -20,7 +20,7 @@ import {
   overrideServerClaimDataEntryResponse,
 } from "../../testing/test.utils";
 import { DataEntryProvider } from "../DataEntryProvider";
-import { DifferencesForm } from "./DifferencesForm";
+import { DataEntrySection } from "../DataEntrySection";
 
 vi.mock("@/hooks/user/useUser");
 
@@ -34,7 +34,7 @@ const testUser: LoginResponse = {
 function renderForm() {
   return render(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
-      <DifferencesForm />
+      <DataEntrySection sectionId="differences_counts" />
     </DataEntryProvider>,
   );
 }

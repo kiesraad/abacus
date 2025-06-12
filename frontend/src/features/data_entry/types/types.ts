@@ -61,6 +61,7 @@ export type DataEntrySubsection = HeadingSubsection | MessageSubsection | RadioS
 export interface DataEntrySection {
   id: FormSectionId;
   title: string;
+  short_title: string;
   subsections: DataEntrySubsection[];
 }
 

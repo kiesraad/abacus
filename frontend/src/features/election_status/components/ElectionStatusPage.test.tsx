@@ -83,7 +83,7 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
   });
 
-  test("First data entry kept alert works", async () => {
+  test("Data entry kept alert works", async () => {
     const user = userEvent.setup();
 
     // Set up router and navigate to the election data entry status page
@@ -103,44 +103,11 @@ describe("ElectionStatusPage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
 
     // Expect the alert to not be visible
-    const alertHeading = "Verschil opgelost door eerste invoer te bewaren";
+    const alertHeading = "Verschil opgelost voor stembureau 33";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
     // Set the hash to show the alert and expect it to be visible
-    await router.navigate({ hash: "data-entry-1-kept" });
-    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
-
-    // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
-    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
-    await alertClosed;
-  });
-
-  test("Second data entry kept alert works", async () => {
-    const user = userEvent.setup();
-
-    // Set up router and navigate to the election data entry status page
-    const router = setupTestRouter([
-      {
-        path: "/elections/:electionId/status",
-        Component: ElectionLayout,
-        errorElement: <ErrorBoundary />,
-        children: electionStatusRoutes,
-      },
-    ]);
-
-    await router.navigate("/elections/1/status");
-    rtlRender(<Providers router={router} />);
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
-
-    // Expect the alert to not be visible
-    const alertHeading = "Verschil opgelost door tweede invoer te bewaren";
-    expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
-
-    // Set the hash to show the alert and expect it to be visible
-    await router.navigate({ hash: "data-entry-2-kept" });
+    await router.navigate({ hash: "data-entry-kept-1" });
     expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
 
     // Close the alert and expect it to be hidden
@@ -169,11 +136,11 @@ describe("ElectionStatusPage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
 
     // Expect the alert to not be visible
-    const alertHeading = "Verschil opgelost door beide invoeren te verwijderen";
+    const alertHeading = "Verschil opgelost voor stembureau 33";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
     // Set the hash to show the alert and expect it to be visible
-    await router.navigate({ hash: "data-entries-discarded" });
+    await router.navigate({ hash: "data-entries-discarded-1" });
     expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
 
     // Close the alert and expect it to be hidden

@@ -107,7 +107,7 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByLabelText(/De eerste invoer/));
     await user.click(submit);
     expect(resolve).toHaveBeenCalledWith("keep_first_entry");
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-1-kept");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-kept-3");
   });
 
   test("should refresh election status and navigate to election status page after submit", async () => {
@@ -121,7 +121,7 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-2-kept");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-kept-3");
   });
 
   test("should navigate to election status page after submit with correct hash", async () => {
@@ -132,6 +132,6 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByLabelText(/Geen van beide/));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entries-discarded");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entries-discarded-3");
   });
 });

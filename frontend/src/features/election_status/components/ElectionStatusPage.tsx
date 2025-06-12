@@ -22,11 +22,18 @@ export function ElectionStatusPage() {
 
   const users = requestState.status === "success" ? requestState.data.users : [];
 
-  const showFirstDataEntryKeptAlert = location.hash.startsWith("#data-entry-1-kept") ? location.hash : null;
-  const showSecondDataEntryKeptAlert = location.hash.startsWith("#data-entry-2-kept") ? location.hash : null;
-  const showDataEntriesDiscardedAlert = location.hash.startsWith("#data-entries-discarded") ? location.hash : null;
-  const successAlert =
-    showFirstDataEntryKeptAlert || showSecondDataEntryKeptAlert || showDataEntriesDiscardedAlert || undefined;
+  const showDataEntryKeptAlert = location.hash.startsWith("#data-entry-kept-") ? location.hash : null;
+  const showDataEntriesDiscardedAlert = location.hash.startsWith("#data-entries-discarded-") ? location.hash : null;
+  const differencesResolvedAlert = showDataEntryKeptAlert || showDataEntriesDiscardedAlert || undefined;
+
+  let pollingStationNumber = 0;
+  let typist = "";
+  if (differencesResolvedAlert) {
+    const id = parseInt(differencesResolvedAlert.substring(differencesResolvedAlert.lastIndexOf("-") + 1));
+    pollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
+    const typistId = statuses.find((status) => status.polling_station_id === id)?.first_entry_user_id;
+    typist = users.find((user) => user.id === typistId)?.fullname || "";
+  }
 
   function finishInput() {
     void navigate("../report");
@@ -49,15 +56,14 @@ export function ElectionStatusPage() {
           </div>
         </section>
       </header>
-      {successAlert && (
+      {differencesResolvedAlert && (
         <Alert type="success" onClose={closeSuccessAlert}>
-          <h2>
-            {showFirstDataEntryKeptAlert
-              ? t("election_status.success.first-data-entry-kept")
-              : showSecondDataEntryKeptAlert
-                ? t("election_status.success.second-data-entry-kept")
-                : t("election_status.success.data-entries-discarded")}
-          </h2>
+          <h2>{t("election_status.differences_resolved.title", { nr: pollingStationNumber })}</h2>
+          <p>
+            {showDataEntryKeptAlert
+              ? t("election_status.differences_resolved.data_entry_kept", { typist: typist })
+              : t("election_status.differences_resolved.data_entries_discarded", { nr: pollingStationNumber })}
+          </p>
         </Alert>
       )}
       {election.status !== "DataEntryFinished" &&

@@ -33,7 +33,10 @@ test.describe("resolve differences", () => {
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.firstEntryFinished).toContainText(pollingStation.name + "Sam Kuijpers");
-    await expect(electionStatusPage.alertFirstDataEntryKept).toBeVisible();
+    await expect(electionStatusPage.alertDifferencesResolved).toBeVisible();
+    await expect(electionStatusPage.alertDifferencesResolved).toContainText(
+      "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden. Kies hiervoor een andere invoerder dan Sam Kuijpers.",
+    );
   });
 
   test("keep second entry", async ({ page, pollingStationEntriesDifferent: pollingStation }) => {
@@ -49,7 +52,10 @@ test.describe("resolve differences", () => {
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.firstEntryFinished).toContainText(pollingStation.name + "Aliyah van den Berg");
-    await expect(electionStatusPage.alertSecondDataEntryKept).toBeVisible();
+    await expect(electionStatusPage.alertDifferencesResolved).toBeVisible();
+    await expect(electionStatusPage.alertDifferencesResolved).toContainText(
+      "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden. Kies hiervoor een andere invoerder dan Aliyah van den Berg.",
+    );
   });
 
   test("discard both", async ({ page, pollingStationEntriesDifferent: pollingStation }) => {
@@ -65,6 +71,9 @@ test.describe("resolve differences", () => {
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.notStarted).toContainText(pollingStation.name);
-    await expect(electionStatusPage.alertDataEntriesDiscarded).toBeVisible();
+    await expect(electionStatusPage.alertDifferencesResolved).toBeVisible();
+    await expect(electionStatusPage.alertDifferencesResolved).toContainText(
+      "Omdat beide invoeren zijn verwijderd, moet stembureau 33 twee keer opnieuw ingevoerd worden.",
+    );
   });
 });

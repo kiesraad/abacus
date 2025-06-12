@@ -22,13 +22,11 @@ export function ResolveDifferencesPage() {
     let url = `/elections/${election.id}/status`;
     switch (action) {
       case "keep_first_entry":
-        url += "#data-entry-1-kept";
-        break;
       case "keep_second_entry":
-        url += "#data-entry-2-kept";
+        url += `#data-entry-kept-${pollingStation.id}`;
         break;
       case "discard_both_entries":
-        url += "#data-entries-discarded";
+        url += `#data-entries-discarded-${pollingStation.id}`;
         break;
     }
     void navigate(url);

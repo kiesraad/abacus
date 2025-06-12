@@ -62,9 +62,7 @@ describe("ResolveErrorsPage", () => {
     expect(
       await screen.findByLabelText(/Invoer bewaren en correcties laten invoeren door Sanne Molenaar/),
     ).toBeVisible();
-    expect(
-      await screen.findByLabelText(/Invoer verwijderen en na onderzoek door teltafel opnieuw laten invoeren/),
-    ).toBeVisible();
+    expect(await screen.findByLabelText(/Stembureau opnieuw laten invoeren/)).toBeVisible();
   });
 
   test("should only submit after making a selection", async () => {
@@ -91,7 +89,7 @@ describe("ResolveErrorsPage", () => {
     await renderPage();
     expect(getElectionStatus).toHaveBeenCalledTimes(1);
 
-    await user.click(await screen.findByLabelText(/Invoer verwijderen/));
+    await user.click(await screen.findByLabelText(/Stembureau opnieuw laten invoeren/));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);

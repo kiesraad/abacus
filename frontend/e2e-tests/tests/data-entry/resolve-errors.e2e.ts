@@ -9,7 +9,10 @@ test.use({
 });
 
 test.describe("resolve errors", () => {
-  test("do not proceed when no action is chosen", async ({ page, pollingStationEntriesDifferent: pollingStation }) => {
+  test("do not proceed when no action is chosen", async ({
+    page,
+    pollingStationFirstEntryHasErrors: pollingStation,
+  }) => {
     await page.goto(`/elections/${pollingStation.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);

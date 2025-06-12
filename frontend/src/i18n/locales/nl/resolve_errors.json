@@ -1,13 +1,13 @@
 {
-  "form_content": "In het proces-verbaal zijn fouten gevonden. Als het om kleine verschrijvingen of optelfouten gaat, mag een lid van het Gemeentelijk Stembureau het proces-verbaal corrigeren. Je kan de invoer dan teruggeven aan de oorspronkelijke invoerder zodat die de fout ook in Abacus kan herstellen.",
+  "form_content": "In de invoer zijn fouten gevonden die wijzen op fouten in het papieren proces-verbaal. Als het om kleine verschrijvingen of optelfouten gaat, mag een lid van het Gemeentelijk Stembureau het proces-verbaal corrigeren. Je kan de invoer dan teruggeven aan de oorspronkelijke invoerder zodat die de fout ook in Abacus kan herstellen.",
   "form_question": "Wat wil je doen met de invoer in Abacus?",
   "options": {
     "resume_first_entry": "<strong>Invoer bewaren</strong> en correcties laten invoeren door {name}",
-    "resume_first_entry_description": "Kies hiervoor als het proces-verbaal fouten bevat die meteen kunnen worden opgelost door een lid van het Gemeentelijk Stembureau.",
-    "discard_first_entry": "<strong>Invoer verwijderen</strong> en na onderzoek door teltafel opnieuw laten invoeren",
-    "discard_first_entry_description": "Als er fouten in het proces-verbaal zitten die alleen kunnen worden opgelost door een (gedeeltelijke) hertelling. Of als de oorspronkelijke invoerder niet meer aanwezig is."
+    "resume_first_entry_description": "Als het papieren proces-verbaal fouten bevat die meteen kunnen worden opgelost door een lid van het Gemeentelijk Stembureau.",
+    "discard_first_entry": "<strong>Stembureau opnieuw laten invoeren</strong>",
+    "discard_first_entry_description": "Als er fouten in het papieren proces-verbaal zitten die alleen kunnen worden opgelost door een (gedeeltelijke) hertelling. Of als de oorspronkelijke invoerder niet meer aanwezig is."
   },
-  "page_content": "Het papieren proces-verbaal bevat een aantal fouten.",
+  "page_content": "De invoer bevat fouten die wijzen op fouten in het papieren-proces verbaal.",
   "page_title": "Fouten en waarschuwingen oplossen",
   "resolve_errors": "Foutmeldingen en waarschuwingen oplossen",
   "title": "Alle fouten en waarschuwingen"

@@ -9,7 +9,7 @@ export class ResolveErrorsPgObj {
   constructor(protected readonly page: Page) {
     this.validationError = page.getByText(/Dit is een verplichte vraag/);
     this.resumeFirstEntry = page.getByLabel(/Invoer bewaren/);
-    this.discardFirstEntry = page.getByLabel(/Invoer verwijderen/);
+    this.discardFirstEntry = page.getByLabel(/Stembureau opnieuw laten invoeren/);
     this.save = page.getByRole("button", { name: "Opslaan" });
   }
 }

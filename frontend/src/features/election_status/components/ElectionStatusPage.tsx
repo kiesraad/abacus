@@ -58,11 +58,11 @@ export function ElectionStatusPage() {
       </header>
       {differencesResolvedAlert && (
         <Alert type="success" onClose={closeSuccessAlert}>
-          <h2>{t("election_status.differences_resolved.title", { nr: pollingStationNumber })}</h2>
+          <h2>{t("election_status.success.differences_resolved", { nr: pollingStationNumber })}</h2>
           <p>
             {showDataEntryKeptAlert
-              ? t("election_status.differences_resolved.data_entry_kept", { typist: typist })
-              : t("election_status.differences_resolved.data_entries_discarded", { nr: pollingStationNumber })}
+              ? t("election_status.success.data_entry_kept", { typist: typist })
+              : t("election_status.success.data_entries_discarded", { nr: pollingStationNumber })}
           </p>
         </Alert>
       )}

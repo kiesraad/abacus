@@ -46,8 +46,18 @@ pub struct ElectionDetails {
     pub election_election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub election_nomination_date: NaiveDate,
-    pub election_status: String,
 }
+
+// #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+// #[serde(rename_all = "camelCase")]
+// pub struct CommitteeSessionDetails {
+//     pub session_id: u32,
+//     pub session_number: u32,
+//     pub session_election_id: u32,
+//     #[schema(value_type = String)]
+//     pub session_started_at: DateTime<Utc>,
+//     pub session_status: String,
+// }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -112,7 +122,7 @@ pub enum AuditEvent {
     UserLoggedOut(UserLoggedOutDetails),
     UserAccountUpdated(UserDetails),
     UserSessionExtended,
-    // user managament events
+    // user management events
     UserCreated(UserDetails),
     UserUpdated(UserDetails),
     UserDeleted(UserDetails),

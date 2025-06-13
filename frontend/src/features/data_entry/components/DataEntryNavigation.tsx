@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUser } from "@/hooks/user/useUser";
 import { t, tx } from "@/i18n/translate";
+import { SectionValues } from "@/types/types";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
-import { SectionValues, SubmitCurrentFormOptions } from "../types/types";
+import { SubmitCurrentFormOptions } from "../types/types";
 
 export interface DataEntryNavigationProps {
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;

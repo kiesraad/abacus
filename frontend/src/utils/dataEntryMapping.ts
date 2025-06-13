@@ -1,7 +1,6 @@
 import { PollingStationResults } from "@/types/generated/openapi";
+import { DataEntrySection, SectionValues } from "@/types/types";
 import { deformatNumber, formatNumber } from "@/utils/format";
-
-import { DataEntrySection, SectionValues } from "../types/types";
 
 type PathSegment = string | number;
 type PathValue = boolean | number | string | undefined;

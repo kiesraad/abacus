@@ -1,7 +1,7 @@
 import { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import { DataEntryStructure, FormSectionId } from "@/types/types";
 
-import { ClientState, DataEntryStructure, FormSection, FormState } from "../types/types";
+import { ClientState, FormSection, FormState } from "../types/types";
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
 import { addValidationResultsToFormState, ValidationResultSet } from "./ValidationResults";
 

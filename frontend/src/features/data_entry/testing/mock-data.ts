@@ -7,9 +7,9 @@ import {
   ValidationResultCode,
 } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { DataEntryState, DataEntryStateAndActionsLoaded, FormSection } from "../types/types";
-import { getDataEntryStructure } from "../utils/structure";
 import { ValidationResultSet } from "../utils/ValidationResults";
 
 export function getInitialValues(): PollingStationResults {

@@ -3201,8 +3201,7 @@
           "category",
           "number_of_seats",
           "election_date",
-          "nomination_date",
-          "status"
+          "nomination_date"
         ],
         "properties": {
           "category": {
@@ -3242,9 +3241,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "status": {
-            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },
@@ -3337,8 +3333,7 @@
           "electionCategory",
           "electionNumberOfSeats",
           "electionElectionDate",
-          "electionNominationDate",
-          "electionStatus"
+          "electionNominationDate"
         ],
         "properties": {
           "electionCategory": {
@@ -3378,9 +3373,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "electionStatus": {
-            "type": "string"
           }
         }
       },
@@ -3417,15 +3409,6 @@
             }
           }
         }
-      },
-      "ElectionStatus": {
-        "type": "string",
-        "description": "Election status (limited for now)",
-        "enum": [
-          "Created",
-          "DataEntryInProgress",
-          "DataEntryFinished"
-        ]
       },
       "ElectionStatusResponse": {
         "type": "object",
@@ -3544,7 +3527,6 @@
           "number_of_seats",
           "election_date",
           "nomination_date",
-          "status",
           "political_groups"
         ],
         "properties": {
@@ -3591,9 +3573,6 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
-          },
-          "status": {
-            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },
@@ -3947,7 +3926,6 @@
           "number_of_seats",
           "election_date",
           "nomination_date",
-          "status",
           "political_groups"
         ],
         "properties": {
@@ -3989,9 +3967,6 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
-          },
-          "status": {
-            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },

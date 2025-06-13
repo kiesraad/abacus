@@ -1,8 +1,6 @@
-INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date,
-                       status, political_groups)
+INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date, political_groups)
 -- number_of_seats explicitly set to a value less than 19, to be used in elections with less than 19 seats
 VALUES (2, 'Municipal Election', 'Heemdamseburg_2024', 'Heemdamseburg', '0000', 100, 'Municipal', 15, '2024-11-30', '2024-11-1',
-        'DataEntryInProgress',
         '[
           {
             "number": 1,

@@ -406,7 +406,6 @@ export interface Election {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
-  status: ElectionStatus;
 }
 
 /**
@@ -449,7 +448,6 @@ export interface ElectionDetails {
   electionNominationDate: string;
   electionNumberOfSeats: number;
   electionNumberOfVoters: number;
-  electionStatus: string;
 }
 
 /**
@@ -468,11 +466,6 @@ export interface ElectionDetailsResponse {
 export interface ElectionListResponse {
   elections: Election[];
 }
-
-/**
- * Election status (limited for now)
- */
-export type ElectionStatus = "Created" | "DataEntryInProgress" | "DataEntryFinished";
 
 /**
  * Election polling stations data entry statuses response
@@ -532,7 +525,6 @@ export interface ElectionWithPoliticalGroups {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
-  status: ElectionStatus;
 }
 
 export interface EntriesDifferent {
@@ -692,7 +684,6 @@ export interface NewElection {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
-  status: ElectionStatus;
 }
 
 /**

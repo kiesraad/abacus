@@ -1,9 +1,13 @@
 import { t } from "@/i18n/translate";
 import { ElectionWithPoliticalGroups, PoliticalGroup, PollingStationResults } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import {
+  DataEntrySection,
+  DataEntryStructure,
+  DataEntrySubsection,
+  FormSectionId,
+  InputGridSubsectionRow,
+} from "@/types/types";
 import { getCandidateFullName } from "@/utils/candidate";
-
-import { DataEntrySection, DataEntryStructure, DataEntrySubsection, InputGridSubsectionRow } from "../types/types";
 
 export const recountedSection: DataEntrySection = {
   id: "recounted",

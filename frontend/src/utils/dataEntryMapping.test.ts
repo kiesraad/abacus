@@ -1,10 +1,10 @@
 import { describe, expect, test } from "vitest";
 
 import { PollingStationResults } from "@/types/generated/openapi";
+import { DataEntrySection } from "@/types/types";
 
-import { DataEntrySection } from "../types/types";
-import { mapResultsToSectionValues, mapSectionValues } from "./mapping";
-import { createVotersAndVotesSection, differencesSection, recountedSection } from "./structure";
+import { mapResultsToSectionValues, mapSectionValues } from "./dataEntryMapping";
+import { createVotersAndVotesSection, differencesSection, recountedSection } from "./dataEntryStructure";
 
 describe("mapSectionValues", () => {
   const createBasePollingStationResults = (): PollingStationResults => ({

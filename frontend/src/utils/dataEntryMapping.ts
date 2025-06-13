@@ -61,6 +61,11 @@ export function mapResultsToSectionValues(section: DataEntrySection, results: Po
   return formValues;
 }
 
+export function getStringValueAtPath(results: PollingStationResults, path: string): string {
+  const value = getValueAtPath(results, path);
+  return valueToString(value);
+}
+
 function setValueAtPath(
   obj: PollingStationResults,
   path: string,

@@ -59,6 +59,7 @@ describe("mapSectionValues", () => {
       subsections: [
         {
           type: "radio",
+          short_title: "recounted.short_title",
           path: "recounted",
           valueType: "boolean",
           error: "recounted.error",
@@ -122,6 +123,7 @@ describe("mapSectionValues", () => {
       subsections: [
         {
           type: "radio",
+          short_title: "recounted.short_title",
           path: "recounted",
           valueType: "boolean",
           error: "recounted.error",
@@ -460,6 +462,7 @@ describe("mapSectionValues", () => {
       subsections: [
         {
           type: "radio",
+          short_title: "recounted.short_title",
           path: "recounted",
           valueType: "boolean",
           error: "recounted.error",
@@ -581,6 +584,7 @@ describe("mapResultsToSectionValues", () => {
       subsections: [
         {
           type: "radio",
+          short_title: "recounted.short_title",
           path: "recounted",
           valueType: "boolean",
           error: "recounted.error",
@@ -865,7 +869,14 @@ describe("mapResultsToSectionValues", () => {
       short_title: "Recounted",
       subsections: [
         { type: "message", message: "description" },
-        { type: "radio", error: "contains_error", path: "recounted", valueType: "boolean", options: [] },
+        {
+          type: "radio",
+          short_title: "recounted.short_title",
+          error: "contains_error",
+          path: "recounted",
+          valueType: "boolean",
+          options: [],
+        },
         { type: "heading", title: "description" },
         {
           type: "inputGrid",

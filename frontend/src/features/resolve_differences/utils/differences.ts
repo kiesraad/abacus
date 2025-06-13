@@ -1,22 +1,36 @@
-import { PoliticalGroup, PoliticalGroupVotes, PollingStationResults } from "@/types/generated/openapi";
-
-import { DataEntrySection, DataEntryValue, getFromResults } from "./dataEntry";
+import { PollingStationResults } from "@/types/generated/openapi";
+import { DataEntrySection } from "@/types/types";
+import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 
 export function sectionHasDifferences(
   section: DataEntrySection,
   first: PollingStationResults,
   second: PollingStationResults,
-) {
-  return section.fields.some(
-    (field) => !isEqual(getFromResults(first, field.path), getFromResults(second, field.path)),
-  );
-}
+): boolean {
+  const firstValues = mapResultsToSectionValues(section, first);
+  const secondValues = mapResultsToSectionValues(section, second);
 
-export function groupHasDifferences(pg: PoliticalGroup, first?: PoliticalGroupVotes, second?: PoliticalGroupVotes) {
-  return pg.candidates.some((_, i) => !isEqual(first?.candidate_votes[i]?.votes, second?.candidate_votes[i]?.votes));
-}
+  const firstKeys = Object.keys(firstValues);
+  const secondKeys = Object.keys(secondValues);
 
-function isEqual(firstValue: DataEntryValue, secondValue: DataEntryValue): boolean {
-  // Two falsy values are considered equal (e.g. 0 and undefined)
-  return firstValue === secondValue || (!firstValue && !secondValue);
+  // Check if the number of keys differs
+  if (firstKeys.length !== secondKeys.length) {
+    return true;
+  }
+
+  // Check if all keys from first object exist in second object
+  for (const key of firstKeys) {
+    if (!(key in secondValues)) {
+      return true;
+    }
+  }
+
+  // Check if any values differ
+  for (const key of firstKeys) {
+    if (firstValues[key] !== secondValues[key]) {
+      return true;
+    }
+  }
+
+  return false;
 }

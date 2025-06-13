@@ -21,10 +21,19 @@ export function ResolveDifferencesPage() {
     void navigate(`/elections/${election.id}/status`);
   };
   const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation, election, loading, status, action, setAction, onSubmit, validationError } =
-    usePollingStationDataEntryDifferences(pollingStationId, afterSave);
+  const {
+    pollingStation,
+    election,
+    loading,
+    status,
+    dataEntryStructure,
+    action,
+    setAction,
+    onSubmit,
+    validationError,
+  } = usePollingStationDataEntryDifferences(pollingStationId, afterSave);
 
-  if (loading || status === null) {
+  if (loading || status === null || dataEntryStructure === null) {
     return <Loader />;
   }
 
@@ -43,7 +52,7 @@ export function ResolveDifferencesPage() {
           <ResolveDifferencesOverview
             first={status.state.first_entry}
             second={status.state.second_entry}
-            politicalGroups={election.political_groups}
+            structure={dataEntryStructure}
           />
         </aside>
         <article>
@@ -52,7 +61,7 @@ export function ResolveDifferencesPage() {
           <ResolveDifferencesTables
             first={status.state.first_entry}
             second={status.state.second_entry}
-            politicalGroups={election.political_groups}
+            structure={dataEntryStructure}
             action={action}
           />
           <form

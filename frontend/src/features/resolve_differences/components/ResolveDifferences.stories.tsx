@@ -1,8 +1,9 @@
 import { Story } from "@ladle/react";
 
 import { Alert } from "@/components/ui/Alert/Alert";
-import { politicalGroupsMockData } from "@/testing/api-mocks/ElectionMockData";
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ResolveDifferencesAction } from "@/types/generated/openapi";
+import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
@@ -12,6 +13,9 @@ type Props = {
 };
 
 const actions: ResolveDifferencesAction[] = ["keep_first_entry", "keep_second_entry", "discard_both_entries"];
+const first = pollingStationResultsMockData(true);
+const second = pollingStationResultsMockData(false);
+const structure = getDataEntryStructureForDifferences(electionMockData, first, second);
 
 export default {
   title: "App / Resolve Differences",
@@ -30,12 +34,7 @@ export const DefaultResolveDifferencesTables: Story<Props> = ({ action }) => {
         <p>Previewing the result of an action can be seen using the Controls below</p>
       </Alert>
 
-      <ResolveDifferencesTables
-        first={pollingStationResultsMockData(true)}
-        second={pollingStationResultsMockData(false)}
-        action={action}
-        politicalGroups={politicalGroupsMockData}
-      />
+      <ResolveDifferencesTables first={first} second={second} action={action} structure={structure} />
     </>
   );
 };

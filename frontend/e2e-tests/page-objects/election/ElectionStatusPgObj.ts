@@ -6,6 +6,8 @@ export class ElectionStatus {
   readonly firstEntryFinished: Locator;
   readonly definitive: Locator;
   readonly notStarted: Locator;
+  readonly differencesResolved: Locator;
+  readonly alertDifferencesResolved: Locator;
 
   constructor(protected readonly page: Page) {
     this.finish = page.getByRole("button", { name: "Invoerfase afronden" });
@@ -13,5 +15,11 @@ export class ElectionStatus {
     this.firstEntryFinished = page.getByRole("table", { name: "Eerste invoer klaar" });
     this.definitive = page.getByRole("table", { name: "Eerste en tweede invoer klaar" });
     this.notStarted = page.getByRole("table", { name: "Werkvoorraad" });
+
+    this.differencesResolved = page.getByRole("heading", {
+      level: 2,
+      name: /Verschil opgelost voor stembureau \d+/,
+    });
+    this.alertDifferencesResolved = page.getByRole("alert").filter({ has: this.differencesResolved });
   }
 }

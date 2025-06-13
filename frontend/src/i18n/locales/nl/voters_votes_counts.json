@@ -1,6 +1,7 @@
 {
   "admitted_voters_after_recount": "Toegelaten kiezers na hertelling door Gemeentelijk Stembureau",
   "form_title": "Toegelaten kiezers en uitgebrachte stemmen",
+  "short_title": "Aantal kiezers en stemmen",
   "voters_counts": {
     "poll_card_count": "Stempassen",
     "proxy_certificate_count": "Volmachtbewijzen",

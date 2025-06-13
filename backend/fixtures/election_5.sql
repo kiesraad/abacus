@@ -1,7 +1,5 @@
-INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date,
-                       status, political_groups)
+INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date, political_groups)
 VALUES (5, 'Test Election >= 19 seats', 'GroteStad_2026', 'Grote Stad', '0000', 2000, 'Municipal', 23, '2026-03-18', '2026-02-02',
-        'DataEntryInProgress',
         '[
           {
             "number": 1,

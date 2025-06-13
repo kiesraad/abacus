@@ -22,30 +22,90 @@ Er zijn geen regels omdat het niet mogelijk is om foute aantallen in te vullen i
 
 ### Regels voor hertelling GSB (reeks F.1xx)
 
-#### F.101: Vraag 'Is er herteld?' moet beantwoord worden
+#### CSO | F.101: 'Extra onderzoek': beide leeg, of beide ingevuld
 
-> **Controleer het papieren proces-verbaal** (F.101)  
-> Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
->
-> - Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'.
-> - Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator.
-> - Geen vinkje? Kies dan 'nee'.
+> **Controleer je antwoorden** (F.101)  
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-Bij deze foutmelding wordt het standaard handelingsperspectief niet getoond.
+#### CSO | F.102: 'Extra onderzoek': één antwoord per vraag
+
+> **Controleer je antwoorden** (F.101)  
+
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+
+#### CSO | F.111: 'Verschillen met telresultaten van het stembureau': beide vragen verplicht
+
+> **Controleer je antwoorden** (F.101)  
+
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+
+#### CSO | F.112: 'Verschillen met telresultaten van het stembureau': één antwoord per vraag
+
+> **Controleer je antwoorden** (F.101)  
+
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+
+#### DSO | F.151: Over het proces-verbaal: Vragen bij 'Over het proces verbaal' moeten beantwoord worden
+
+> **Controleer je antwoorden** (F.151)  
+> Beantwoord de vragen over het papieren proces-verbaal. Overleg met de coördinator als je twijfelt.
+
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
+
+#### DSO | F.152: Over het proces-verbaal: Ongeldige combinatie van antwoorden: `wel corrigendum, geen inlegvel`
+
+> **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)  
+> Overleg met de coördinator over het ontbrekende inlegvel.
+
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
+
+#### DSO | F.153: 'Controles en correcties': vragen moeten beantwoord worden (geen vinkjes bij de eerste twee vragen)
+
+> **Controleer je antwoorden** (F.153)  
+
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+
+#### DSO | F.154: Controles en correcties: Ongeldige set documenten (vraag 'gecorrigeerde telresultaten' = 'nee')
+
+> **Controleer je antwoorden** (F.154)  
+> Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresulten.
+> Overleg met de coördinator.
+
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+
+#### DSO | F.155: Controles en correcties: Ongeldig antwoord in eerste zitting (vraag 'op verzoek van het CSB' = 'ja')
+
+> **Controleer je antwoorden** (F.154)  
+> Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn.
+> Overleg met de coördinator.
+
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+
+#### DSO | F.156: Controles en correcties: meer dan 1 antwoord op vraag 'zijn er gecorrigeerde telresultaten'
+
+> **Controleer je antwoorden** (F.154)
+
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 ### Regels voor totalen (reeks F.2xx)
 
-#### F.201: (Als niet herteld) `stempassen + volmachten + kiezerspassen = totaal toegelaten kiezers`
+#### F.201: `stempassen + volmachten = totaal toegelaten kiezers`
 
 > **Controleer toegelaten kiezers** (F.201)  
-> De invoer bij A, B, C of D klopt niet.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
+> De invoer bij A, B of D klopt niet.  
 
-Velden markeren: A, B, C en D
+Velden markeren: A, B en D
 
-#### F.202: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen = totaal uitgebrachte stemmen`
+#### F.202: `E.1 t/m E.n tellen niet op naar E`
+
+> **Controleer de stemmen op lijsten en totaal stemmen op kandidaten** (F.202)  
+
+Velden markeren: E.1 t/m E.n en E
+
+#### F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen = totaal uitgebrachte stemmen`
 
 > **Controleer uitgebrachte stemmen** (F.202)  
 > De invoer bij E, F, G of H klopt niet.  
@@ -53,66 +113,59 @@ Velden markeren: A, B, C en D
 
 Velden markeren: E, F, G en H
 
-[Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=126-5677&t=zTY4ajWtsFkiTOYP-4)
-
-#### F.203: (Als herteld) `hertelde stempassen + hertelde volmachten + hertelde kiezerspassen = herteld totaal toegelaten kiezers`
-
-> **Controleer hertelde toegelaten kiezers** (F.203)  
-> De invoer bij A.2, B.2, C.2 of D.2 klopt niet.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
-
-Velden markeren: A.2, B.2, C.2 en D.2
-
-#### F.204: `stemmen op kandidaten = som van uitgebrachte stemmen op de lijsten`
-
-> **Controleer (totaal) aantal stemmen op kandidaten** (F.204)  
-> De optelling van alle lijsten is niet gelijk aan de invoer bij E.  
-> Check of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd.
-
-Veld markeren: E (dit gebeurt pas zodra alle lijsten zijn ingevuld, en er is dan een redirect naar _Aantal kiezers en stemmers_ om de error te laten zien)
 
 ### Regels voor verschillen (reeks F.3xx)
 
-#### F.301 (Als (herteld) totaal aantal kiezers < totaal aantal uitgebrachte stemmen) `meer stembiljetten geteld = totaal aantal uitgebrachte stemmen - (herteld) aantal toegelaten kiezers`
+#### F.301 "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
 
-> **Controleer I (stembiljetten meer geteld)** (F.301)  
-> Je hebt bij _Aantal kiezers en stemmers_ ingevuld dat er meer stemmen dan kiezers waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
+> **Controleer je antwoorden** (F.301)
+
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+
+#### F.302 "Vergelijk D&H": (checkbox D>H is aangevinkt, maar D<=H)
+
+> **Controleer je antwoorden** (F.302)
+
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+
+#### F.303 "Vergelijk D&H": (checkbox D<H is aangevinkt, maar D>=H)
+
+> **Controleer je antwoorden** (F.303)
+
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+
+#### F.304 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+
+> **Controleer je antwoorden** (F.304)
+
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+
+
+
+
+#### F.305 (Als D < H) `I = H - D`
+
+> **Controleer I (stembiljetten meer geteld)** (F.305)
 
 Veld markeren: I
 
-#### F.302 (Als (herteld) totaal aantal kiezers < totaal aantal uitgebrachte stemmen en J is ingevuld) `meer stembiljetten geteld = totaal aantal uitgebrachte stemmen - (herteld) aantal toegelaten kiezers`
+#### F.306 (Als D < H en J is ingevuld) `I = H - D`
 
-> **Controleer J (stembiljetten minder geteld)** (F.302)  
-> Je hebt bij _Aantal kiezers en stemmers_ ingevuld dat er meer stemmen dan kiezers waren. Daarom mag J niet ingevuld zijn.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
+> **Controleer I en J** (F.306)  
 
+Veld markeren: I, J
+
+#### F.307 (Als D > H) `J = D - H`
+
+> **Controleer J** (F.307)  
 Veld markeren: J
 
-#### F.303 (Als (herteld) totaal aantal kiezers > totaal aantal uitgebrachte stemmen) `minder stembiljetten geteld = aantal toegelaten kiezers - totaal aantal uitgebrachte stemmen`
+#### F.308 (Als D > H en I is ingevuld) `J = D - H`
 
-> **Controleer J (stembiljetten minder geteld)** (F.303)  
-> Je hebt bij _Aantal kiezers en stemmers_ ingevuld dat er minder stemmen dan kiezers waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde stembiljetten.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
+> **Controleer I en J** (F.308)  
 
-Veld markeren: J
+Veld markeren: I, J
 
-#### F.304 (Als (herteld) totaal aantal kiezers > totaal aantal uitgebrachte stemmen en I is ingevuld) `minder stembiljetten geteld = herteld aantal toegelaten kiezers - totaal aantal uitgebrachte stemmen`
-
-> **Controleer I (stembiljetten meer geteld)** (F.304)  
-> Je hebt bij _Aantal kiezers en stemmers_ ingevuld dat er minder stemmen dan kiezers waren. Daarom mag I niet ingevuld zijn.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
-
-Veld markeren: I
-
-#### F.305 (Als (herteld) totaal aantal kiezers == totaal aantal uitgebrachte stemmen) `minder stembiljetten geteld = 0 EN meer stembiljetten geteld = 0 EN niet ingeleverde stembiljetten EN te weinig uitgereikte stembiljetten EN te veel uitgereikte stembiljetten EN andere verklaring EN geen verklaring = 0`
-
-> **Controleer ingevulde verschillen** (F.305)  
->
-> Je hebt bij _Aantal kiezers en stemmers_ ingevuld dat er evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
-
-Velden markeren: velden uit set (I, J, K, L, M, N, O) die zijn ingevuld
 
 ### Regels voor kandidaten en lijsttotalen (reeks F.4xx)
 

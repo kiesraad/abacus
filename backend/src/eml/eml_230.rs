@@ -2,8 +2,10 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     EMLBase, EMLDocument,
-    common::{Candidate, ContestIdentifier, ElectionIdentifier, ManagingAuthority},
+    common::{Candidate, ContestIdentifier, EMLImportError, ElectionIdentifier, ManagingAuthority},
 };
+
+use crate::election::{NewElection, PoliticalGroup};
 
 /// Candidate list (230b)
 ///
@@ -24,6 +26,66 @@ pub struct EML230 {
 }
 
 impl EMLDocument for EML230 {}
+
+impl EML230 {
+    fn election(&self) -> &Election {
+        &self.candidate_list.election
+    }
+
+    fn contest(&self) -> &Contest {
+        &self.election().contest
+    }
+
+    pub fn add_candidate_lists(
+        &self,
+        mut election: NewElection,
+    ) -> std::result::Result<NewElection, EMLImportError> {
+        // we need to be importing from a 230b file
+        if self.base.id != "230b" {
+            return Err(EMLImportError::Needs230b);
+        }
+
+        // TODO: uncomment when we have new test files
+        //
+        // make sure candidate list election matches election definition
+        //if election.election_id != self.election().election_identifier.election_name {
+        //    return Err(EMLImportError::MismatchElectionIdentifier);
+        //}
+
+        // TODO: more validation see issue #1589
+
+        // extract initial listing of political groups
+        election.political_groups = self
+            .contest()
+            .affiliations
+            .iter()
+            .map(|aff| {
+                Ok(
+                        PoliticalGroup {
+                            number: aff
+                                .affiliation_identifier
+                                .id
+                                .parse()
+                                .or(Err(EMLImportError::TooManyPoliticalGroups))?,
+                            name: aff.affiliation_identifier.registered_name.clone(),
+                            candidates:
+                                aff.candidates
+                                    .iter()
+                                    .map(|can| {
+                                        crate::election::structs::Candidate::try_from(can.clone())
+                                    })
+                                    .collect::<Result<
+                                        Vec<crate::election::structs::Candidate>,
+                                        EMLImportError,
+                                    >>()?,
+                        },
+                    )
+            })
+            .collect::<Result<Vec<PoliticalGroup>, EMLImportError>>()?;
+
+        Ok(election)
+    }
+}
 
 impl EML230 {
     #[cfg(test)]

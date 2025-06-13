@@ -22,8 +22,10 @@ export function CheckAndSave() {
 
   async function handleSubmit() {
     const response = await create({
-      data: state.electionDefinitionData,
-      hash: state.electionDefinitionHash,
+      election_data: state.electionDefinitionData,
+      election_hash: state.electionDefinitionHash,
+      candidate_data: state.candidateDefinitionData,
+      candidate_hash: state.candidateDefinitionHash,
     });
 
     if (isSuccess(response)) {

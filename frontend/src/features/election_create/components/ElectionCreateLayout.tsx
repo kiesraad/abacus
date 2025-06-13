@@ -10,6 +10,7 @@ import { t } from "@/i18n/translate";
 
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 import cls from "./ElectionCreateLayout.module.css";
+import { ElectionHeader } from "./ElectionHeader";
 
 interface ElectionCreateFormSection {
   key: string;
@@ -38,14 +39,10 @@ export function ElectionCreateLayout() {
   const currentFormSection = formSections.findIndex((formSection) => location.pathname.endsWith(formSection.path));
 
   return (
-    <>
+    <ElectionCreateContextProvider>
       <PageTitle title={`${t("election.create")} - Abacus`} />
       <NavBar location={location} />
-      <header>
-        <section>
-          <h1>{t("election.create")}</h1>
-        </section>
-      </header>
+      <ElectionHeader />
       <main>
         <StickyNav>
           <ProgressList>
@@ -88,12 +85,10 @@ export function ElectionCreateLayout() {
           </ProgressList>
         </StickyNav>
         <article className={cls.container}>
-          <ElectionCreateContextProvider>
-            <Outlet />
-          </ElectionCreateContextProvider>
+          <Outlet />
         </article>
       </main>
       <Footer />
-    </>
+    </ElectionCreateContextProvider>
   );
 }

@@ -424,13 +424,17 @@ export interface ElectionApportionmentResponse {
 export type ElectionCategory = "Municipal";
 
 export interface ElectionDefinitionImportRequest {
-  data: string;
-  hash: string[];
+  candidate_data: string;
+  candidate_hash: string[];
+  election_data: string;
+  election_hash: string[];
 }
 
 export interface ElectionDefinitionValidateRequest {
-  data: string;
-  hash?: string[];
+  candidate_data?: string | null;
+  candidate_hash?: string[];
+  election_data: string;
+  election_hash?: string[];
 }
 
 export interface ElectionDefinitionValidateResponse {

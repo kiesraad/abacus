@@ -18,7 +18,7 @@ use crate::audit_log::{AuditEvent, AuditService};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::{Admin, User},
-    eml::{EML110, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
+    eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},
 };
 
@@ -128,8 +128,13 @@ pub async fn election_create(
 pub struct ElectionDefinitionValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<Vec<String>>, nullable = false)]
-    hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
-    data: String,
+    election_hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
+    election_data: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = Option<Vec<String>>, nullable = false)]
+    candidate_hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
+    candidate_data: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -155,23 +160,36 @@ pub async fn election_import_validate(
     _user: Admin,
     Json(edu): Json<ElectionDefinitionValidateRequest>,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
-    if let Some(user_hash) = edu.hash {
-        if user_hash != EmlHash::from(edu.data.as_bytes()).chunks {
+    // parse and validate election
+    if let Some(user_hash) = edu.election_hash {
+        if user_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
             return Err(APIError::InvalidHashError);
         }
     }
+    let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
+    let mut election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
 
-    let eml = EML110::from_str(&edu.data)?;
-    Ok(Json(ElectionDefinitionValidateResponse {
-        hash: RedactedEmlHash::from(edu.data.as_bytes()),
-        election: eml.as_abacus_election()?,
-    }))
+    // parse and validate candidates, if available
+    if let Some(data) = edu.candidate_data.clone() {
+        if let Some(user_hash) = edu.candidate_hash {
+            if user_hash != EmlHash::from(data.as_bytes()).chunks {
+                return Err(APIError::InvalidHashError);
+            }
+        }
+
+        hash = RedactedEmlHash::from(data.as_bytes());
+        election = EML230::from_str(&data)?.add_candidate_lists(election)?;
+    }
+
+    Ok(Json(ElectionDefinitionValidateResponse { hash, election }))
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct ElectionDefinitionImportRequest {
-    hash: [String; crate::eml::hash::CHUNK_COUNT],
-    data: String,
+    election_hash: [String; crate::eml::hash::CHUNK_COUNT],
+    election_data: String,
+    candidate_hash: [String; crate::eml::hash::CHUNK_COUNT],
+    candidate_data: String,
 }
 
 /// Uploads election definition, validates it, saves it to the database, and returns the created election
@@ -191,11 +209,16 @@ pub async fn election_import(
     State(elections_repo): State<Elections>,
     Json(edu): Json<ElectionDefinitionImportRequest>,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
-    if edu.hash != EmlHash::from(edu.data.as_bytes()).chunks {
+    if edu.election_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
+        return Err(APIError::InvalidHashError);
+    }
+    if edu.candidate_hash != EmlHash::from(edu.candidate_data.as_bytes()).chunks {
         return Err(APIError::InvalidHashError);
     }
 
-    let new_election = EML110::from_str(&edu.data)?.as_abacus_election()?;
+    let mut new_election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
+    new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
+
     let election = elections_repo.create(new_election).await?;
     Ok((StatusCode::CREATED, Json(election)))
 }

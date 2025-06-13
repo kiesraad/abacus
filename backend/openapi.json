@@ -3278,14 +3278,25 @@
       "ElectionDefinitionImportRequest": {
         "type": "object",
         "required": [
-          "hash",
-          "data"
+          "election_hash",
+          "election_data",
+          "candidate_hash",
+          "candidate_data"
         ],
         "properties": {
-          "data": {
+          "candidate_data": {
             "type": "string"
           },
-          "hash": {
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
             "type": "array",
             "items": {
               "type": "string"
@@ -3296,13 +3307,25 @@
       "ElectionDefinitionValidateRequest": {
         "type": "object",
         "required": [
-          "data"
+          "election_data"
         ],
         "properties": {
-          "data": {
+          "candidate_data": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
             "type": "string"
           },
-          "hash": {
+          "election_hash": {
             "type": "array",
             "items": {
               "type": "string"

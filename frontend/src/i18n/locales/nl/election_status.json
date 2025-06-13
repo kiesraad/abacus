@@ -17,9 +17,13 @@
   "no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
   "polling_stations_per_status": "Stembureaus per status",
   "success": {
-    "differences_resolved": "Verschil opgelost voor stembureau {nr}",
+    "data_entries_discarded": "Omdat beide invoeren zijn verwijderd, moet stembureau {nr} twee keer opnieuw ingevoerd worden.",
+    "data_entry_discarded": "Invoer stembureau {nr} verwijderd",
     "data_entry_kept": "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden. Kies hiervoor een andere invoerder dan {typist}.",
-    "data_entries_discarded": "Omdat beide invoeren zijn verwijderd, moet stembureau {nr} twee keer opnieuw ingevoerd worden."
+    "data_entry_resumed": "Stembureau {nr} teruggegeven aan {typist}",
+    "differences_resolved": "Verschil opgelost voor stembureau {nr}",
+    "polling_station_can_be_filled_again": "Het stembureau kan opnieuw ingevoerd worden",
+    "typist_can_continue_data_entry": "De invoerder kan verder met invoeren"
   },
   "title": "Statusoverzicht",
   "typist": {

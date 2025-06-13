@@ -5,7 +5,7 @@ import cls from "./CheckboxAndRadio.module.css";
 export interface CheckboxAndRadioProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   type?: "checkbox" | "radio";
-  label: string;
+  label: string | React.ReactElement;
   checked?: boolean;
   children?: React.ReactNode;
   indeterminate?: boolean;

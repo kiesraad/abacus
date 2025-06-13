@@ -41,7 +41,7 @@ export function ResolveDifferencesPage() {
 
   return (
     <>
-      <PageTitle title={`${t("data_entry.entries_different")} - Abacus`} />
+      <PageTitle title={`${t("resolve_differences.page_title")} - Abacus`} />
       <header>
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
@@ -58,7 +58,7 @@ export function ResolveDifferencesPage() {
           />
         </aside>
         <article>
-          <h2>{t("resolve_differences.page_title")}</h2>
+          <h2>{t("resolve_differences.title")}</h2>
           <p>{t("resolve_differences.page_content")}</p>
           <ResolveDifferencesTables
             first={status.state.first_entry}

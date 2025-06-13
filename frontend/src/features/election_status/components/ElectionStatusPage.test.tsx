@@ -148,4 +148,70 @@ describe("ElectionStatusPage", () => {
     await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
     await alertClosed;
   });
+
+  test("First data entry resumed alert works", async () => {
+    const user = userEvent.setup();
+
+    // Set up router and navigate to the election data entry status page
+    const router = setupTestRouter([
+      {
+        path: "/elections/:electionId/status",
+        Component: ElectionLayout,
+        errorElement: <ErrorBoundary />,
+        children: electionStatusRoutes,
+      },
+    ]);
+
+    await router.navigate("/elections/1/status");
+    rtlRender(<Providers router={router} />);
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+
+    // Expect the alert to not be visible
+    const alertHeading = "Stembureau 36 teruggegeven aan Sanne Molenaar";
+    expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
+
+    // Set the hash to show the alert and expect it to be visible
+    await router.navigate({ hash: "data-entry-resumed-4" });
+    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
+
+    // Close the alert and expect it to be hidden
+    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
+    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
+    await alertClosed;
+  });
+
+  test("First data entry discarded alert works", async () => {
+    const user = userEvent.setup();
+
+    // Set up router and navigate to the election data entry status page
+    const router = setupTestRouter([
+      {
+        path: "/elections/:electionId/status",
+        Component: ElectionLayout,
+        errorElement: <ErrorBoundary />,
+        children: electionStatusRoutes,
+      },
+    ]);
+
+    await router.navigate("/elections/1/status");
+    rtlRender(<Providers router={router} />);
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+
+    // Expect the alert to not be visible
+    const alertHeading = "Invoer stembureau 36 verwijderd";
+    expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
+
+    // Set the hash to show the alert and expect it to be visible
+    await router.navigate({ hash: "data-entry-discarded-4" });
+    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
+
+    // Close the alert and expect it to be hidden
+    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
+    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
+    await alertClosed;
+  });
 });

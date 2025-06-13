@@ -18,6 +18,8 @@ import {
   USER_LIST_REQUEST_PATH,
   UserListResponse,
 } from "@/types/generated/openapi";
+import { DataEntryStructure } from "@/types/types";
+import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
 
 type EntriesDifferentStatus = {
   state: EntriesDifferent;
@@ -33,6 +35,7 @@ interface PollingStationDataEntryStatus {
   election: ElectionWithPoliticalGroups;
   loading: boolean;
   status: EntriesDifferentStatus | null;
+  dataEntryStructure: DataEntryStructure | null;
   onSubmit: () => Promise<void>;
   validationError: string | undefined;
 }
@@ -83,6 +86,7 @@ export function usePollingStationDataEntryDifferences(
   }
 
   let status: EntriesDifferentStatus | null = null;
+  let dataEntryStructure: DataEntryStructure | null = null;
 
   // if the request was successful and the status is "EntriesDifferent", we can show the details
   if (
@@ -100,6 +104,12 @@ export function usePollingStationDataEntryDifferences(
       first_user: firstUser?.fullname || firstUser?.username || "",
       second_user: secondUser?.fullname || secondUser?.username || "",
     };
+
+    dataEntryStructure = getDataEntryStructureForDifferences(
+      election,
+      status.state.first_entry,
+      status.state.second_entry,
+    );
   }
 
   const onSubmit = async () => {
@@ -130,6 +140,7 @@ export function usePollingStationDataEntryDifferences(
     election,
     loading: requestState.status === "loading" || usersRequestState.status === "loading",
     status,
+    dataEntryStructure,
     onSubmit,
     validationError,
   };

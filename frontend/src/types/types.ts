@@ -39,12 +39,17 @@ export interface MessageSubsection {
 
 export interface RadioSubsectionOption {
   value: string;
+  /** Label for data entry form view */
   label: TranslationPath;
+  /** Short label for differences view */
+  short_label: TranslationPath;
   autoFocusInput?: boolean;
 }
 
 export interface RadioSubsection {
   type: "radio";
+  /** Short title for differences view */
+  short_title: TranslationPath;
   error: TranslationPath;
   path: PollingStationResultsPath;
   options: RadioSubsectionOption[];

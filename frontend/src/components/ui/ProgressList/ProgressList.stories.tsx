@@ -2,8 +2,8 @@ import * as React from "react";
 
 import type { Story } from "@ladle/react";
 
-import { t } from "@/i18n/translate";
-import { politicalGroupsMockData } from "@/testing/api-mocks/ElectionMockData";
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { ProgressList } from "./ProgressList";
 
@@ -63,25 +63,18 @@ export const DefaultProgressList: Story<Props> = ({ active }) => (
   </div>
 );
 
-const sections = ["recounted", "voters_votes_counts", "differences_counts"] as const;
+const structure = getDataEntryStructure(electionMockData);
 
 export const OverviewProgressList: Story = () => (
   <ProgressList>
     <ProgressList.Fixed>
-      {sections.map((section, i) => (
+      {structure.map((section, i) => (
         <ProgressList.OverviewItem
-          key={section}
-          status={i === 1 ? "warning" : "idle"}
-          addSpace={i === sections.length - 1}
+          key={section.id}
+          status={i === 1 || i === 4 ? "warning" : "idle"}
+          addSpace={section.id === "political_group_votes_1"}
         >
-          <span>{t(`resolve_differences.section_short.${section}`)}</span>
-        </ProgressList.OverviewItem>
-      ))}
-      {politicalGroupsMockData.map((pg) => (
-        <ProgressList.OverviewItem key={pg.number} status={pg.number === 2 ? "warning" : "idle"}>
-          <span>
-            {t("list")} {pg.number} - {pg.name}
-          </span>
+          <span>{section.short_title}</span>
         </ProgressList.OverviewItem>
       ))}
     </ProgressList.Fixed>

@@ -75,6 +75,6 @@ describe("UI component ProgressList", () => {
     ]);
     expect(listItems[0]).toHaveClass("idle");
     expect(listItems[1]).toHaveClass("warning");
-    expect(listItems[2]).toHaveClass(cls.addSpace!);
+    expect(listItems[3]).toHaveClass(cls.addSpace!);
   });
 });

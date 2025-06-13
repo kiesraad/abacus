@@ -1,4 +1,5 @@
-import { DataEntrySection, SectionValues } from "../types/types";
+import { DataEntrySection, SectionValues } from "@/types/types";
+
 import { HeadingSubsectionComponent } from "./subsections/HeadingSubsection";
 import { InputGridSubsectionComponent } from "./subsections/InputGridSubsection";
 import { MessageSubsectionComponent } from "./subsections/MessageSubsection";

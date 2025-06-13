@@ -1,6 +1,5 @@
 import { t } from "@/i18n/translate";
-
-import { MessageSubsection } from "../../types/types";
+import { MessageSubsection } from "@/types/types";
 
 export interface MessageSubsectionProps {
   subsection: MessageSubsection;

@@ -2,9 +2,7 @@ import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
 import { TranslationPath } from "@/i18n/i18n.types";
 import { t } from "@/i18n/translate";
-import { FormSectionId } from "@/types/types";
-
-import { InputGridSubsection, InputGridSubsectionRow, SectionValues } from "../../types/types";
+import { FormSectionId, InputGridSubsection, InputGridSubsectionRow, SectionValues } from "@/types/types";
 
 export interface InputGridSubsectionProps {
   subsection: InputGridSubsection;

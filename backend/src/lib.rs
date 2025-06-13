@@ -26,6 +26,7 @@ pub mod airgap;
 pub mod apportionment;
 pub mod audit_log;
 pub mod authentication;
+pub mod committee_session;
 pub mod data_entry;
 pub mod election;
 pub mod eml;

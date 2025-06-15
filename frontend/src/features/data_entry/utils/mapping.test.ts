@@ -55,6 +55,7 @@ describe("mapSectionValues", () => {
     const testSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Test Section",
+      short_title: "Test",
       subsections: [
         {
           type: "radio",
@@ -87,6 +88,7 @@ describe("mapSectionValues", () => {
     const testSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Test Section",
+      short_title: "Test",
       subsections: [
         {
           type: "inputGrid",
@@ -116,6 +118,7 @@ describe("mapSectionValues", () => {
     const mixedSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Mixed Section",
+      short_title: "Mixed",
       subsections: [
         {
           type: "radio",
@@ -154,6 +157,7 @@ describe("mapSectionValues", () => {
     const votersCountsSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Voters Counts Section",
+      short_title: "Voters Counts",
       subsections: [
         {
           type: "inputGrid",
@@ -188,6 +192,7 @@ describe("mapSectionValues", () => {
     const votesCountsSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Votes Counts Section",
+      short_title: "Votes Counts",
       subsections: [
         {
           type: "inputGrid",
@@ -222,6 +227,7 @@ describe("mapSectionValues", () => {
     const votersRecountsSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Voters Recounts Section",
+      short_title: "Voters Recounts",
       subsections: [
         {
           type: "inputGrid",
@@ -259,6 +265,7 @@ describe("mapSectionValues", () => {
     const differencesCountsSection: DataEntrySection = {
       id: "differences_counts",
       title: "Differences Counts Section",
+      short_title: "Differences Counts",
       subsections: [
         {
           type: "inputGrid",
@@ -301,6 +308,7 @@ describe("mapSectionValues", () => {
     const politicalGroupVotesSection: DataEntrySection = {
       id: "political_group_votes_1",
       title: "Political Group Votes Section",
+      short_title: "Political Group Votes",
       subsections: [
         {
           type: "inputGrid",
@@ -340,6 +348,7 @@ describe("mapSectionValues", () => {
     const sparsePoliticalGroupVotesSection: DataEntrySection = {
       id: "political_group_votes_1",
       title: "Sparse Political Group Votes Section",
+      short_title: "Sparse Political Group Votes",
       subsections: [
         {
           type: "inputGrid",
@@ -371,6 +380,7 @@ describe("mapSectionValues", () => {
     const formattedNumbersSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Formatted Numbers Section",
+      short_title: "Formatted Numbers",
       subsections: [
         {
           type: "inputGrid",
@@ -401,6 +411,7 @@ describe("mapSectionValues", () => {
     const emptyValuesSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Empty Values Section",
+      short_title: "Empty Values",
       subsections: [
         {
           type: "inputGrid",
@@ -445,6 +456,7 @@ describe("mapSectionValues", () => {
     const recountedPreservationSection: DataEntrySection = {
       id: "recounted",
       title: "Recounted Preservation Section",
+      short_title: "Recounted",
       subsections: [
         {
           type: "radio",
@@ -490,6 +502,7 @@ describe("mapSectionValues", () => {
     const preserveDataSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Preserve Data Section",
+      short_title: "Preserve Data",
       subsections: [
         {
           type: "inputGrid",
@@ -564,6 +577,7 @@ describe("mapResultsToSectionValues", () => {
     const testSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Test Section",
+      short_title: "Test",
       subsections: [
         {
           type: "radio",
@@ -703,6 +717,7 @@ describe("mapResultsToSectionValues", () => {
     const politicalGroupSection: DataEntrySection = {
       id: "political_group_votes_1",
       title: "Political Group Votes",
+      short_title: "Political Group Votes",
       subsections: [
         {
           type: "inputGrid",
@@ -729,6 +744,7 @@ describe("mapResultsToSectionValues", () => {
     const politicalGroupSection: DataEntrySection = {
       id: "political_group_votes_1",
       title: "Political Group Votes",
+      short_title: "Political Group Votes",
       subsections: [
         {
           type: "inputGrid",
@@ -762,6 +778,7 @@ describe("mapResultsToSectionValues", () => {
     const politicalGroupSection: DataEntrySection = {
       id: "political_group_votes_3",
       title: "Political Group Votes",
+      short_title: "Political Group Votes",
       subsections: [
         {
           type: "inputGrid",
@@ -805,6 +822,7 @@ describe("mapResultsToSectionValues", () => {
     const emptySubsectionsSection: DataEntrySection = {
       id: "recounted",
       title: "Test Section",
+      short_title: "Test",
       subsections: [],
     };
 
@@ -818,6 +836,7 @@ describe("mapResultsToSectionValues", () => {
     const messageSection: DataEntrySection = {
       id: "recounted",
       title: "Test Section",
+      short_title: "Test",
       subsections: [
         {
           type: "message",
@@ -843,6 +862,7 @@ describe("mapResultsToSectionValues", () => {
     const mixedSection: DataEntrySection = {
       id: "recounted",
       title: "Recounted",
+      short_title: "Recounted",
       subsections: [
         { type: "message", message: "description" },
         { type: "radio", error: "contains_error", path: "recounted", valueType: "boolean", options: [] },

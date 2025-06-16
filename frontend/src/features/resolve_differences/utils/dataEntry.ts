@@ -1,18 +1,12 @@
 import { PollingStationResults } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
-
-type ObjectPath<T> = {
-  // For each entry, if it is an object (including optional)
-  [K in keyof T]: NonNullable<T[K]> extends object
-    ? T[K] extends unknown[]
-      ? never // Skip arrays, which are also objects
-      : `${K & string}.${Extract<keyof NonNullable<T[K]>, string>}` // "parent.child" template literal for string keys
-    : K & string; // else, the key itself when it is a string
-}[keyof T]; // Get all values together
+import { PollingStationResultsPath as _PollingStationResultsPath, FormSectionId } from "@/types/types";
 
 type SectionId = Extract<FormSectionId, "recounted" | "voters_votes_counts" | "differences_counts">;
 
-export type PollingStationResultsPath = NonNullable<ObjectPath<PollingStationResults>>;
+type PollingStationResultsPath = Exclude<
+  _PollingStationResultsPath,
+  `political_group_votes[${number}].candidate_votes[${number}].votes` | `political_group_votes[${number}].total`
+>;
 
 export interface DataEntrySection {
   id: SectionId;

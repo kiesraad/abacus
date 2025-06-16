@@ -1,8 +1,14 @@
 use std::{error::Error, net::SocketAddr};
 
+use airgap::AirgapDetection;
 #[cfg(feature = "memory-serve")]
 use axum::http::StatusCode;
-use axum::{Router, extract::FromRef, middleware, serve::ListenerExt};
+use axum::{
+    Router,
+    extract::{DefaultBodyLimit, FromRef},
+    middleware,
+    serve::ListenerExt,
+};
 use hyper::http::{HeaderName, HeaderValue, header};
 use sqlx::SqlitePool;
 use tokio::{net::TcpListener, signal};
@@ -10,12 +16,13 @@ use tower_http::{
     set_header::SetResponseHeaderLayer,
     trace::{self, TraceLayer},
 };
-use tracing::{Level, info, trace};
+use tracing::{Level, info, trace, warn};
 use utoipa::OpenApi;
 use utoipa_axum::router::OpenApiRouter;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
+pub mod airgap;
 pub mod apportionment;
 pub mod audit_log;
 pub mod authentication;
@@ -32,9 +39,13 @@ pub mod summary;
 
 pub use error::{APIError, ErrorResponse};
 
+/// Maximum size of the request body in megabytes.
+pub const MAX_BODY_SIZE_MB: usize = 12;
+
 #[derive(FromRef, Clone)]
 pub struct AppState {
     pool: SqlitePool,
+    airgap_detection: AirgapDetection,
 }
 
 pub fn openapi_router() -> OpenApiRouter<AppState> {
@@ -52,8 +63,14 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
 }
 
 /// Axum router for the application
-pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
-    let state = AppState { pool };
+pub fn router(
+    pool: SqlitePool,
+    airgap_detection: AirgapDetection,
+) -> Result<Router, Box<dyn Error>> {
+    let state = AppState {
+        pool,
+        airgap_detection,
+    };
 
     // Serve the OpenAPI documentation at /api-docs (if the openapi feature is enabled)
     #[cfg(feature = "openapi")]
@@ -69,6 +86,8 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     // Add middleware to trace all HTTP requests and extend the user's session lifetime if needed
     // Caution: make sure "inject_user" is added after "extend_session"
     let router = router
+        .layer(middleware::map_response(error::map_error_response))
+        .layer(DefaultBodyLimit::max(1024 * 1024 * MAX_BODY_SIZE_MB))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
@@ -85,6 +104,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .layer(middleware::map_request_with_state(
             state.clone(),
             authentication::inject_user,
+        ))
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            airgap::block_request_on_airgap_violation,
         ));
 
     // Set Cache-Control header to prevent caching of API responses
@@ -162,8 +185,22 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
 }
 
 /// Start the API server on the given port, using the given database pool.
-pub async fn start_server(pool: SqlitePool, listener: TcpListener) -> Result<(), Box<dyn Error>> {
-    let app = router(pool)?;
+pub async fn start_server(
+    pool: SqlitePool,
+    listener: TcpListener,
+    enable_airgap_detection: bool,
+) -> Result<(), Box<dyn Error>> {
+    let airgap_detection = if enable_airgap_detection {
+        info!("Airgap detection is enabled, starting airgap detection task...");
+
+        AirgapDetection::start().await
+    } else {
+        warn!("Airgap detection is disabled, this is not allowed in production.");
+
+        AirgapDetection::nop()
+    };
+
+    let app = router(pool, airgap_detection)?;
 
     info!("Starting API server on http://{}", listener.local_addr()?);
     let listener = listener.tap_io(|tcp_stream| {
@@ -187,7 +224,7 @@ pub async fn start_server(pool: SqlitePool, listener: TcpListener) -> Result<(),
 /// Copied from the
 /// [axum graceful-shutdown example](https://github.com/tokio-rs/axum/blob/6318b57fda6b524b4d3c7909e07946e2b246ebd2/examples/graceful-shutdown/src/main.rs)
 /// (under the MIT license).
-async fn shutdown_signal() {
+pub async fn shutdown_signal() {
     let ctrl_c = async {
         signal::ctrl_c()
             .await
@@ -231,7 +268,7 @@ mod test {
 
         // Start server in background task
         let server_task = tokio::spawn(async move {
-            start_server(pool, listener).await.unwrap();
+            start_server(pool, listener, false).await.unwrap();
         });
 
         // Run the test

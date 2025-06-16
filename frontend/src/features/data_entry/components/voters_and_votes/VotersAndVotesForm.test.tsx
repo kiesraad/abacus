@@ -1,6 +1,7 @@
 import { userEvent, UserEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
+import { useUser } from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -10,11 +11,16 @@ import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, userTypeInputs, waitFor } from "@/testing/test-utils";
 import {
   ClaimDataEntryResponse,
+  LoginResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationResults,
 } from "@/types/generated/openapi";
 
-import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
+import {
+  errorWarningMocks,
+  getDefaultDataEntryState,
+  getEmptyDataEntryRequest,
+  getInitialValues,
+} from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
@@ -22,64 +28,17 @@ import {
   expectFieldsToNotHaveIcon,
   overrideServerClaimDataEntryResponse,
 } from "../../testing/test.utils";
-import { DataEntryState } from "../../types/types";
 import { getClientState } from "../../utils/dataEntryUtils";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
-const initialValues: PollingStationResults = {
-  recounted: undefined,
-  voters_counts: {
-    poll_card_count: 0,
-    proxy_certificate_count: 0,
-    voter_card_count: 0,
-    total_admitted_voters_count: 0,
-  },
-  votes_counts: {
-    votes_candidates_count: 0,
-    blank_votes_count: 0,
-    invalid_votes_count: 0,
-    total_votes_cast_count: 0,
-  },
-  voters_recounts: undefined,
-  differences_counts: {
-    more_ballots_count: 0,
-    fewer_ballots_count: 0,
-    unreturned_ballots_count: 0,
-    too_few_ballots_handed_out_count: 0,
-    too_many_ballots_handed_out_count: 0,
-    other_explanation_count: 0,
-    no_explanation_count: 0,
-  },
-  political_group_votes: electionMockData.political_groups.map((pg) => ({
-    number: pg.number,
-    total: 0,
-    candidate_votes: pg.candidates.map((c) => ({
-      number: c.number,
-      votes: 0,
-    })),
-  })),
-};
+vi.mock("@/hooks/user/useUser");
 
-const defaultDataEntryState: DataEntryState = {
-  election: electionMockData,
-  pollingStationId: 1,
-  error: null,
-  pollingStationResults: null,
-  entryNumber: 1,
-  formState: {
-    current: "voters_votes_counts",
-    furthest: "voters_votes_counts",
-    sections: {
-      recounted: getDefaultFormSection("recounted", 1),
-      voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
-      differences_counts: getDefaultFormSection("differences_counts", 3),
-      save: getDefaultFormSection("save", 4),
-    },
-  },
-  targetFormSectionId: "recounted",
-  status: "idle",
-  cache: null,
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
 };
 
 function renderForm() {
@@ -113,6 +72,7 @@ const recountFieldIds = {
 
 describe("Test VotersAndVotesForm", () => {
   beforeEach(() => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 
@@ -167,7 +127,7 @@ describe("Test VotersAndVotesForm", () => {
     test("Form field entry and keybindings", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: true,
         },
@@ -289,7 +249,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -343,7 +303,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: true,
         },
@@ -371,12 +331,50 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   describe("VotersAndVotesForm errors", () => {
+    test("clicking next without accepting error results in alert shown and then accept error", async () => {
+      const user = userEvent.setup();
+
+      renderForm();
+
+      await screen.findByTestId("voters_votes_counts_form");
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: [
+                "data.voters_counts.total_admitted_voters_count",
+                "data.voters_counts.poll_card_count",
+                "data.voters_counts.proxy_certificate_count",
+                "data.voters_counts.voter_card_count",
+              ],
+              code: "F201",
+            },
+          ],
+          warnings: [],
+        },
+      });
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+      });
+
+      expect(acceptFeedbackCheckbox).toBeVisible();
+      expect(acceptFeedbackCheckbox).not.toBeChecked();
+      acceptFeedbackCheckbox.click();
+      expect(acceptFeedbackCheckbox).toBeChecked();
+
+      await user.click(submitButton);
+    });
+
     test("F.201 IncorrectTotal Voters counts", async () => {
       const user = userEvent.setup();
 
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -424,7 +422,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [errorWarningMocks.F202], warnings: [] },
       });
@@ -457,14 +455,14 @@ describe("Test VotersAndVotesForm", () => {
     test("F.203 IncorrectTotal Voters recounts", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: true,
         },
       });
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [errorWarningMocks.F203],
@@ -509,7 +507,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W201] },
       });
@@ -593,7 +591,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -629,7 +627,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -665,7 +663,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W203] },
       });
@@ -695,14 +693,14 @@ describe("Test VotersAndVotesForm", () => {
     test("W.204 votes counts and voters recounts difference above threshold", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: true,
         },
       });
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W204] },
       });
@@ -739,7 +737,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W205] },
       });
@@ -772,7 +770,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W206] },
       });
@@ -802,14 +800,14 @@ describe("Test VotersAndVotesForm", () => {
     test("W.207 total votes cast and total admitted voters recount should not exceed polling stations number of eligible voters", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: true,
         },
       });
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W207] },
       });
@@ -845,7 +843,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W208] },
       });
@@ -875,22 +873,22 @@ describe("Test VotersAndVotesForm", () => {
     test("W.209 EqualInput voters recounts and votes counts", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: true,
         },
       });
       overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
-        client_state: getClientState(defaultDataEntryState.formState, false, true),
+        client_state: getClientState(getDefaultDataEntryState().formState, false, true),
         data: {
-          ...initialValues,
+          ...getInitialValues(),
           recounted: true,
         },
         validation_results: { errors: [], warnings: [] },
       } satisfies ClaimDataEntryResponse);
       renderForm();
 
-      await screen.findByTestId("voters_and_votes_form");
+      await screen.findByTestId("voters_votes_counts_form");
 
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W209] },
@@ -929,7 +927,7 @@ describe("Test VotersAndVotesForm", () => {
   describe("VotersAndVotesForm accept warnings", () => {
     let user: UserEvent;
     let submitButton: HTMLButtonElement;
-    let acceptWarningsCheckbox: HTMLInputElement;
+    let acceptErrorsAndWarningsCheckbox: HTMLInputElement;
 
     beforeEach(async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -945,56 +943,130 @@ describe("Test VotersAndVotesForm", () => {
       submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      acceptWarningsCheckbox = await screen.findByRole("checkbox", {
+      acceptErrorsAndWarningsCheckbox = await screen.findByRole("checkbox", {
         name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
     });
 
     test("checkbox should disappear when filling in any form input", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
       const input = await screen.findByLabelText("H Totaal uitgebrachte stemmen");
       await user.type(input, "1");
 
-      expect(acceptWarningsCheckbox).not.toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
     });
 
     test("checkbox with error should disappear when filling in any form input", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
       await user.click(submitButton);
 
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      const acceptWarningsError = screen.getByRole("alert", {
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      const acceptErrorsAndWarningsError = screen.getByRole("alert", {
         description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       });
-      expect(acceptWarningsError).toBeVisible();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
 
       const input = await screen.findByLabelText("H Totaal uitgebrachte stemmen");
       await user.type(input, "1");
 
-      expect(acceptWarningsCheckbox).not.toBeVisible();
-      expect(acceptWarningsError).not.toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
+      expect(acceptErrorsAndWarningsError).not.toBeVisible();
     });
 
     test("error should not immediately disappear when checkbox is checked", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
       await user.click(submitButton);
 
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      const acceptWarningsError = screen.getByRole("alert", {
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      const acceptErrorsAndWarningsError = screen.getByRole("alert", {
         description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       });
-      expect(acceptWarningsError).toBeVisible();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
 
-      await user.click(acceptWarningsCheckbox);
-      expect(acceptWarningsCheckbox).toBeChecked();
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      expect(acceptWarningsError).toBeVisible();
+      await user.click(acceptErrorsAndWarningsCheckbox);
+      expect(acceptErrorsAndWarningsCheckbox).toBeChecked();
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
+    });
+  });
+
+  describe("VotersAndVotesForm errors AND warnings", () => {
+    test("Both errors and warning feedback should be shown", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: ["data.votes_counts.blank_votes_count"],
+              code: "F201",
+            },
+          ],
+          warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
+        },
+      });
+
+      renderForm();
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await userEvent.click(submitButton);
+
+      const errorFeedbackMessage =
+        "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+      const warningFeedbackMessage =
+        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(errorFeedbackMessage);
+      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(warningFeedbackMessage);
+    });
+  });
+
+  describe("recounted voters subsection", () => {
+    test("doesn't show when recounted=false", async () => {
+      overrideServerClaimDataEntryResponse({
+        formState: getDefaultDataEntryState().formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+      renderForm();
+
+      // wait for form to render
+      await screen.findByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
+
+      // make sure recounted subsection is not shown
+      expect(
+        screen.queryByRole("group", { name: "Toegelaten kiezers na hertelling door Gemeentelijk Stembureau" }),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByRole("textbox", { name: "A.2 Stempassen" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("textbox", { name: "B.2 Volmachtbewijzen" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("textbox", { name: "C.2 Kiezerspassen" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" })).not.toBeInTheDocument();
+    });
+
+    test("does show when recounted=true", async () => {
+      overrideServerClaimDataEntryResponse({
+        formState: getDefaultDataEntryState().formState,
+        pollingStationResults: {
+          recounted: true,
+        },
+      });
+      renderForm();
+
+      // wait for form to render
+      await screen.findByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
+
+      // make sure recounted subsection is shown
+      expect(
+        screen.queryByRole("heading", { name: "Toegelaten kiezers na hertelling door Gemeentelijk Stembureau" }),
+      ).toBeVisible();
+      expect(screen.queryByRole("textbox", { name: "A.2 Stempassen" })).toBeVisible();
+      expect(screen.queryByRole("textbox", { name: "B.2 Volmachtbewijzen" })).toBeVisible();
+      expect(screen.queryByRole("textbox", { name: "C.2 Kiezerspassen" })).toBeVisible();
+      expect(screen.queryByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" })).toBeVisible();
     });
   });
 });

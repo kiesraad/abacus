@@ -8,20 +8,34 @@ The "save" endpoint which is used for [First/Second]EntryInProgress states is ke
 stateDiagram-v2
   [*] --> FirstEntryNotStarted
   FirstEntryNotStarted --> FirstEntryInProgress: claim
-  #FirstEntryInProgress --> FirstEntryInProgress: save
-  FirstEntryInProgress --> SecondEntryNotStarted: finalise
+  %% FirstEntryInProgress --> FirstEntryInProgress: save
+
+  state first_has_errors <<choice>>
+  FirstEntryInProgress --> first_has_errors: finalise
   FirstEntryInProgress --> FirstEntryNotStarted: discard
+  
+  first_has_errors --> SecondEntryNotStarted: errors? no
+  first_has_errors --> FirstEntryHasErrors: errors? yes
+
   SecondEntryNotStarted --> SecondEntryInProgress: claim
-  #SecondEntryInProgress --> SecondEntryInProgress: save
-  state is_equal <<choice>>
-  SecondEntryInProgress --> is_equal: finalise
+  %% SecondEntryInProgress --> SecondEntryInProgress: save
   SecondEntryInProgress --> SecondEntryNotStarted: discard
+
+  state first_resolve_errors <<choice>>
+  FirstEntryHasErrors --> first_resolve_errors: resolve errors
+  first_resolve_errors --> FirstEntryInProgress: resume first entry
+  first_resolve_errors --> FirstEntryNotStarted: discard first entry
+  
+  state is_different <<choice>>
+  SecondEntryInProgress --> is_different: finalise
+  is_different --> EntriesDifferent: different? yes
+  is_different --> Definitive: different? no
+  
   state resolve <<choice>>
-  EntriesDifferent --> resolve: resolve
-  resolve --> SecondEntryNotStarted: keep one entry
+  EntriesDifferent --> resolve: resolve differences
+  resolve --> first_has_errors: keep one entry
   resolve --> FirstEntryNotStarted: discard both entries
-  is_equal --> Definitive: equal? yes
-  is_equal --> EntriesDifferent: equal? no
+
   Definitive --> [*]
 ```
 

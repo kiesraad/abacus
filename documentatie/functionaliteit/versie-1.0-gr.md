@@ -1,4 +1,4 @@
-# Functionaliteit voor Abacus 1.0 - Gemeenteraadsverkiezingen 2026 (concept)
+# Functionaliteit voor Abacus 1.0 - Gemeenteraadsverkiezingen (concept)
 
 *Dit is een conceptversie die mogelijk nog gewijzigd gaat worden.*
 

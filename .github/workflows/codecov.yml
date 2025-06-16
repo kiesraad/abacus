@@ -41,16 +41,16 @@ jobs:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@3cdba561a313217b22dc79ae30fdccfe1620ed30 # main
+        uses: cargo-bins/cargo-binstall@710e18ff20fb5a28268e20405fa1d09090cc3e11 # main
       - name: Install cargo-llvm-cov
         run: cargo binstall cargo-llvm-cov
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Run tests with coverage
-        run: cargo llvm-cov nextest --branch --profile ci --features embed-typst
+        run: cargo llvm-cov nextest --branch --profile ci --features embed-typst,airgap-detection
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@f2dba722c67b86c6caa034178c6e4d35335f6706 # v1
+        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Backend Nextest Results
@@ -93,7 +93,7 @@ jobs:
         run: npx vitest run --coverage --reporter=junit --outputFile=test-report.junit.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@f2dba722c67b86c6caa034178c6e4d35335f6706 # v1
+        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Frontend Vitest Results

@@ -1,69 +1,84 @@
 import * as React from "react";
 
-import { PollingStationResults } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
-import { SubmitCurrentFormOptions, TemporaryCache } from "../types/types";
+import { SectionValues, SubmitCurrentFormOptions } from "../types/types";
+import { mapResultsToSectionValues } from "../utils/mapping";
 import { mapValidationResultsToFields } from "../utils/ValidationResults";
 import { useDataEntryContext } from "./useDataEntryContext";
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
-export interface UseDataEntryFormSectionParams<FORM_VALUES> {
-  getDefaultFormValues: (results: PollingStationResults, cache?: TemporaryCache | null) => FORM_VALUES;
-  section: FormSectionId;
-}
+export function useDataEntryFormSection({ section: sectionId }: { section: FormSectionId }) {
+  const {
+    error,
+    cache,
+    status,
+    pollingStationResults,
+    dataEntryStructure,
+    formState,
+    onSubmitForm,
+    updateFormSection,
+    election,
+  } = useDataEntryContext(sectionId);
 
-export function useDataEntryFormSection<FORM_VALUES>({
-  getDefaultFormValues,
-  section,
-}: UseDataEntryFormSectionParams<FORM_VALUES>) {
-  const { error, cache, status, pollingStationResults, formState, onSubmitForm, updateFormSection } =
-    useDataEntryContext(section);
+  const section = dataEntryStructure.find((s) => s.id === sectionId);
 
-  //local form state
-  const [currentValues, setCurrentValues] = React.useState<FORM_VALUES>(
-    getDefaultFormValues(pollingStationResults, cache),
-  );
+  if (!section) {
+    throw new Error(`Form section ${sectionId} not found in data entry structure`);
+  }
+
+  // Helper function build currentValues
+  const buildCurrentValues = React.useCallback((): SectionValues => {
+    if (cache?.key === sectionId) {
+      return cache.data;
+    } else {
+      return mapResultsToSectionValues(section, pollingStationResults);
+    }
+  }, [cache, sectionId, section, pollingStationResults]);
+
+  // Local form state
+  const [currentValues, setCurrentValues] = React.useState<SectionValues>(() => buildCurrentValues());
+
+  // Update currentValues when section changes
+  React.useEffect(() => {
+    setCurrentValues(buildCurrentValues());
+  }, [sectionId, buildCurrentValues]);
 
   // derived state
-  const formSection = formState.sections[section];
+  const formSection = formState.sections[sectionId];
   if (!formSection) {
-    throw new Error(`Form section ${section} not found in form state`);
+    throw new Error(`Form section ${sectionId} not found in form state`);
   }
-  const { errors, warnings, isSaved, acceptWarnings, hasChanges } = formSection;
+  const { errors, warnings, isSaved, acceptErrorsAndWarnings, hasChanges } = formSection;
   const defaultProps = {
     errorsAndWarnings: isSaved ? mapValidationResultsToFields(errors, warnings) : undefined,
-    warningsAccepted: acceptWarnings,
+    errorsAndWarningsAccepted: acceptErrorsAndWarnings,
   };
 
-  const showAcceptWarnings = !formSection.warnings.isEmpty() && formSection.errors.isEmpty() && !hasChanges;
+  const showAcceptErrorsAndWarnings = (!formSection.warnings.isEmpty() || !formSection.errors.isEmpty()) && !hasChanges;
 
   // register changes when fields change
-  const setValues = (values: FORM_VALUES) => {
+  const setValues = (path: string, value: string) => {
     if (!hasChanges) {
-      updateFormSection({ hasChanges: true, acceptWarnings: false, acceptWarningsError: false });
+      updateFormSection({ hasChanges: true, acceptErrorsAndWarnings: false, acceptErrorsAndWarningsError: false });
     }
-    setCurrentValues(values);
+    setCurrentValues((cv) => {
+      cv = structuredClone(cv);
+      cv[path] = value;
+      return cv;
+    });
   };
 
-  const setAcceptWarnings = (acceptWarnings: boolean) => {
-    updateFormSection({ acceptWarnings });
+  const setAcceptErrorsAndWarnings = (acceptErrorsAndWarnings: boolean) => {
+    updateFormSection({ acceptErrorsAndWarnings });
   };
 
   // form keyboard navigation
   const formRef = useFormKeyboardNavigation();
 
   // submit and save to form contents
-  const onSubmit = async (
-    data: Partial<PollingStationResults>,
-    options?: SubmitCurrentFormOptions,
-  ): Promise<boolean> => {
-    const result = await onSubmitForm(data, { ...options, showAcceptWarnings });
-    if (!formSection.errors.isEmpty()) {
-      // scroll to top when there are errors, this is mainly necessary when users click "volgende" a second time without changing anything
-      window.scrollTo(0, 0);
-    }
-    return result;
+  const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
+    return await onSubmitForm(currentValues, { ...options, showAcceptErrorsAndWarnings });
   };
 
   // scroll to top when saved
@@ -79,12 +94,14 @@ export function useDataEntryFormSection<FORM_VALUES>({
     onSubmit,
     pollingStationResults,
     currentValues,
+    dataEntryStructure,
     formSection,
     setValues,
     status,
-    setAcceptWarnings,
+    setAcceptErrorsAndWarnings,
     defaultProps,
-    showAcceptWarnings,
+    showAcceptErrorsAndWarnings,
     isSaving: status === "saving",
+    election,
   };
 }

@@ -4,7 +4,7 @@ import {
   fillDataEntryPages,
   fillDataEntryPagesAndSave,
   selectPollingStationForDataEntry,
-} from "e2e-tests/helpers-utils/e2e-test-helpers";
+} from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
 import { formatNumber } from "e2e-tests/helpers-utils/e2e-test-utils";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
@@ -107,9 +107,9 @@ test.describe("full data entry flow", () => {
     await checkAndSavePage.save.click();
 
     await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
 
-    await expect(dataEntryHomePage.alertInputSaved).toHaveText(
+    await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       [
         "Je invoer is opgeslagen",
         "Geef het papieren proces-verbaal terug aan de coördinator.",
@@ -172,7 +172,7 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 
   test("no recount, difference of more ballots counted", async ({ page, pollingStation }) => {
@@ -211,7 +211,7 @@ test.describe("full data entry flow", () => {
     await expect(votersAndVotesPage.warning).toContainText(
       "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
     );
-    await votersAndVotesPage.checkAcceptWarnings();
+    await votersAndVotesPage.checkAcceptErrorsAndWarnings();
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -237,7 +237,7 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 
   test("recount, difference of fewer ballots counted", async ({ page, pollingStation }) => {
@@ -286,7 +286,7 @@ test.describe("full data entry flow", () => {
     await expect(votersAndVotesPage.warning).toContainText(
       "Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).",
     );
-    await votersAndVotesPage.checkAcceptWarnings();
+    await votersAndVotesPage.checkAcceptErrorsAndWarnings();
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -312,7 +312,7 @@ test.describe("full data entry flow", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 
   test("submit with accepted warning on voters and votes page", async ({ page, pollingStation }) => {
@@ -344,7 +344,7 @@ test.describe("full data entry flow", () => {
     );
 
     // accept the warning
-    await votersAndVotesPage.checkAcceptWarnings();
+    await votersAndVotesPage.checkAcceptErrorsAndWarnings();
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -387,7 +387,7 @@ test.describe("full data entry flow", () => {
     await checkAndSavePage.save.click();
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 });
 
@@ -411,8 +411,8 @@ test.describe("second data entry", () => {
 
     await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
-    await expect(dataEntryHomePage.alertInputSaved).toHaveText(
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
 
@@ -454,12 +454,12 @@ test.describe("second data entry", () => {
       "Verschil met eerste invoer. Extra controle nodigW.001Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
     await expect(recountedPage.error).toBeHidden();
-    await expect(recountedPage.acceptWarnings).toBeVisible();
+    await expect(recountedPage.acceptErrorsAndWarnings).toBeVisible();
 
     await recountedPage.next.click();
 
-    await expect(recountedPage.acceptWarnings).not.toBeChecked();
-    await expect(recountedPage.acceptWarningsReminder).toBeVisible();
+    await expect(recountedPage.acceptErrorsAndWarnings).not.toBeChecked();
+    await expect(recountedPage.acceptErrorsAndWarningsReminder).toBeVisible();
 
     // correct selected answer
     await recountedPage.checkNoAndClickNext();
@@ -479,7 +479,7 @@ test.describe("second data entry", () => {
       "Verschil met eerste invoer. Extra controle nodigW.001Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
     await expect(votersAndVotesPage.error).toBeHidden();
-    await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
 
     // correct warnings
     await votersAndVotesPage.inputVotesCounts(noRecountNoDifferencesDataEntry.votes_counts);
@@ -497,8 +497,8 @@ test.describe("second data entry", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
-    await expect(dataEntryHomePage.alertInputSaved).toHaveText(
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
 
@@ -546,10 +546,10 @@ test.describe("second data entry", () => {
       "Verschil met eerste invoer. Extra controle nodigW.001Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
     await expect(votersAndVotesPage.error).toBeHidden();
-    await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
 
     // do not correct differences and accept warning
-    await votersAndVotesPage.checkAcceptWarnings();
+    await votersAndVotesPage.checkAcceptErrorsAndWarnings();
     await votersAndVotesPage.next.click();
 
     // fill in remaining second data entry equal to first data entry
@@ -563,9 +563,14 @@ test.describe("second data entry", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
-    await expect(dataEntryHomePage.alertInputSaved).toHaveText(
-      ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
+    await expect(dataEntryHomePage.dataEntryDifferent).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryDifferent).toHaveText(
+      [
+        "Let op: verschil met eerste invoer",
+        "Je invoer is opgeslagen. ",
+        "Geef het papieren proces-verbaal terug aan de coördinator,",
+        "en geef aan dat er een verschil is met de eerste invoer.",
+      ].join(""),
     );
 
     // check if data entries are marked as different on coordinator status page
@@ -674,7 +679,7 @@ test.describe("errors and warnings", () => {
     await checkAndSavePage.save.click();
 
     const dataEntryHomePage = new DataEntryHomePage(page);
-    await expect(dataEntryHomePage.dataEntrySuccess).toBeVisible();
+    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 
   test("Changing recounted to yes results in error on differences page", async ({ page, pollingStation }) => {
@@ -715,15 +720,13 @@ test.describe("errors and warnings", () => {
     };
     await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
-    await expect(votersAndVotesPage.proxyCertificateCount).toHaveValue("0");
-
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText(
       "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
     await expect(votersAndVotesPage.error).toBeHidden();
-    await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
 
     // correct the warning
     const votersCorrected = {
@@ -739,7 +742,7 @@ test.describe("errors and warnings", () => {
     await votersAndVotesPage.next.click();
 
     await expect(votersAndVotesPage.warning).toBeHidden();
-    await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
 
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.fieldset).toBeVisible();
@@ -778,7 +781,7 @@ test.describe("errors and warnings", () => {
       "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
 
-    await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
 
     // change input
     await votersAndVotesPage.proxyCertificateCount.fill("7");
@@ -789,7 +792,42 @@ test.describe("errors and warnings", () => {
       "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
 
-    await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
+  });
+
+  test("User can accept errors", async ({ page, pollingStation }) => {
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkNoAndClickNext();
+
+    // fill form with data that results in an error
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    const voters = {
+      poll_card_count: 100,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
+    };
+    const votes = {
+      votes_candidates_count: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 10,
+    };
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
+
+    await expect(votersAndVotesPage.error).toContainText(
+      "Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.",
+    );
+
+    await votersAndVotesPage.acceptErrorsAndWarnings.click();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeChecked();
+    await votersAndVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.fieldset).toBeVisible();
   });
 });
 
@@ -938,7 +976,7 @@ test.describe("navigation", () => {
       };
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
-      await votersAndVotesPage.checkAcceptWarnings();
+      await votersAndVotesPage.checkAcceptErrorsAndWarnings();
       await votersAndVotesPage.next.click();
 
       const differencesPage = new DifferencesPage(page);

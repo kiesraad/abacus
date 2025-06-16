@@ -35,6 +35,10 @@ struct Args {
     #[cfg(feature = "dev-database")]
     #[arg(short, long)]
     reset_database: bool,
+
+    /// Enable airgap detection
+    #[arg(short, long)]
+    airgap_detection: bool,
 }
 
 /// Main entry point for the application. Sets up the database, and starts the
@@ -52,10 +56,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     let pool = create_sqlite_pool(&args).await?;
 
+    // Enable airgap detection if the feature is enabled or if the command line argument is set.
+    let enable_airgap_detection = args.airgap_detection || cfg!(feature = "airgap-detection");
+
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(&address).await?;
 
-    start_server(pool, listener).await
+    start_server(pool, listener, enable_airgap_detection).await
 }
 
 /// Create a SQLite database if needed, then connect to it and run migrations.

@@ -54,7 +54,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ElectionRequest"
+                "$ref": "#/components/schemas/NewElection"
               }
             }
           },
@@ -66,7 +66,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Election"
+                  "$ref": "#/components/schemas/ElectionWithPoliticalGroups"
                 }
               }
             }
@@ -104,15 +104,15 @@
         }
       }
     },
-    "/api/elections/validate": {
+    "/api/elections/import": {
       "post": {
-        "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator",
-        "operationId": "election_import_validate",
+        "summary": "Uploads election definition, validates it, saves it to the database, and returns the created election",
+        "operationId": "election_import",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ElectionRequest"
+                "$ref": "#/components/schemas/ElectionAndCandidatesDefinitionImportRequest"
               }
             }
           },
@@ -120,11 +120,69 @@
         },
         "responses": {
           "201": {
+            "description": "Election imported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectionWithPoliticalGroups"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/elections/import/validate": {
+      "post": {
+        "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator.",
+        "operationId": "election_import_validate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ElectionAndCandidateDefinitionValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
             "description": "Election validated",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ElectionDefinitionUploadResponse"
+                  "$ref": "#/components/schemas/ElectionDefinitionValidateResponse"
                 }
               }
             }
@@ -1103,10 +1161,10 @@
         }
       }
     },
-    "/api/polling_stations/{polling_station_id}/data_entries/resolve": {
+    "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
       "post": {
-        "summary": "Resolve data entry differences by providing a `ResolveAction`",
-        "operationId": "polling_station_data_entry_resolve",
+        "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction`",
+        "operationId": "polling_station_data_entry_resolve_differences",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -1124,7 +1182,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResolveAction"
+                "$ref": "#/components/schemas/ResolveDifferencesAction"
               }
             }
           },
@@ -1133,6 +1191,97 @@
         "responses": {
           "200": {
             "description": "Differences resolved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationDataEntry"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "JSON error or invalid data (Unprocessable Content)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors": {
+      "post": {
+        "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction`",
+        "operationId": "polling_station_data_entry_resolve_errors",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveErrorsAction"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Errors resolved successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -1471,7 +1620,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Data entry finalised successfully"
+            "description": "Data entry finalised successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEntryStatus"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -2312,7 +2468,49 @@
                   "eventType": {
                     "type": "string",
                     "enum": [
-                      "DataEntryFinalized"
+                      "DataEntryFinalised"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataEntryDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "DataEntryDiscardedFirst"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataEntryDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "DataEntryResumedFirst"
                     ]
                   }
                 }
@@ -2811,6 +3009,24 @@
             ],
             "properties": {
               "state": {
+                "$ref": "#/components/schemas/FirstEntryHasErrors"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "FirstEntryHasErrors"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
                 "$ref": "#/components/schemas/SecondEntryNotStarted"
               },
               "status": {
@@ -2882,6 +3098,7 @@
         "enum": [
           "first_entry_not_started",
           "first_entry_in_progress",
+          "first_entry_has_errors",
           "second_entry_not_started",
           "second_entry_in_progress",
           "entries_different",
@@ -2973,11 +3190,13 @@
       },
       "Election": {
         "type": "object",
-        "description": "Election, optionally with its political groups",
+        "description": "Election without political groups",
         "required": [
           "id",
           "name",
+          "election_id",
           "location",
+          "domain_id",
           "number_of_voters",
           "category",
           "number_of_seats",
@@ -2989,9 +3208,15 @@
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
           },
+          "domain_id": {
+            "type": "string"
+          },
           "election_date": {
             "type": "string",
             "format": "date"
+          },
+          "election_id": {
+            "type": "string"
           },
           "id": {
             "type": "integer",
@@ -3018,14 +3243,66 @@
             "format": "int32",
             "minimum": 0
           },
-          "political_groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroup"
-            }
-          },
           "status": {
             "$ref": "#/components/schemas/ElectionStatus"
+          }
+        }
+      },
+      "ElectionAndCandidateDefinitionValidateRequest": {
+        "type": "object",
+        "required": [
+          "election_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ElectionAndCandidatesDefinitionImportRequest": {
+        "type": "object",
+        "required": [
+          "election_hash",
+          "election_data",
+          "candidate_hash",
+          "candidate_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -3056,7 +3333,7 @@
           "Municipal"
         ]
       },
-      "ElectionDefinitionUploadResponse": {
+      "ElectionDefinitionValidateResponse": {
         "type": "object",
         "required": [
           "hash",
@@ -3064,7 +3341,7 @@
         ],
         "properties": {
           "election": {
-            "$ref": "#/components/schemas/Election"
+            "$ref": "#/components/schemas/NewElection"
           },
           "hash": {
             "$ref": "#/components/schemas/RedactedEmlHash"
@@ -3076,7 +3353,9 @@
         "required": [
           "electionId",
           "electionName",
+          "electionElectionId",
           "electionLocation",
+          "electionDomainId",
           "electionNumberOfVoters",
           "electionCategory",
           "electionNumberOfSeats",
@@ -3088,9 +3367,15 @@
           "electionCategory": {
             "type": "string"
           },
+          "electionDomainId": {
+            "type": "string"
+          },
           "electionElectionDate": {
             "type": "string",
             "format": "date"
+          },
+          "electionElectionId": {
+            "type": "string"
           },
           "electionId": {
             "type": "integer",
@@ -3131,7 +3416,7 @@
         ],
         "properties": {
           "election": {
-            "$ref": "#/components/schemas/Election"
+            "$ref": "#/components/schemas/ElectionWithPoliticalGroups"
           },
           "polling_stations": {
             "type": "array",
@@ -3153,59 +3438,6 @@
             "items": {
               "$ref": "#/components/schemas/Election"
             }
-          }
-        }
-      },
-      "ElectionRequest": {
-        "type": "object",
-        "description": "Election request",
-        "required": [
-          "name",
-          "location",
-          "number_of_voters",
-          "category",
-          "number_of_seats",
-          "election_date",
-          "nomination_date",
-          "status",
-          "political_groups"
-        ],
-        "properties": {
-          "category": {
-            "$ref": "#/components/schemas/ElectionCategory"
-          },
-          "election_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "location": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "nomination_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "number_of_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "political_groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroup"
-            }
-          },
-          "status": {
-            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },
@@ -3321,6 +3553,73 @@
           }
         }
       },
+      "ElectionWithPoliticalGroups": {
+        "type": "object",
+        "description": "Election with political groups",
+        "required": [
+          "id",
+          "name",
+          "election_id",
+          "location",
+          "domain_id",
+          "number_of_voters",
+          "category",
+          "number_of_seats",
+          "election_date",
+          "nomination_date",
+          "status",
+          "political_groups"
+        ],
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "domain_id": {
+            "type": "string"
+          },
+          "election_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "election_id": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "location": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nomination_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "political_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroup"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/ElectionStatus"
+          }
+        }
+      },
       "EntriesDifferent": {
         "type": "object",
         "required": [
@@ -3385,17 +3684,19 @@
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
+          "AirgapViolation",
           "AllListsExhausted",
           "ApportionmentNotAvailableUntilDataEntryFinalised",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
           "DrawingOfLotsRequired",
+          "EmlImportError",
           "EntryNotFound",
           "EntryNotUnique",
-          "EmlImportError",
           "InternalServerError",
           "InvalidData",
+          "InvalidHash",
           "InvalidJson",
           "InvalidPassword",
           "InvalidPoliticalGroup",
@@ -3409,9 +3710,10 @@
           "PdfGenerationError",
           "PollingStationRepeated",
           "PollingStationValidationErrors",
-          "UserNotFound",
-          "UsernameNotUnique",
+          "RequestPayloadTooLarge",
           "Unauthorized",
+          "UsernameNotUnique",
+          "UserNotFound",
           "ZeroVotesCast"
         ]
       },
@@ -3432,6 +3734,30 @@
           },
           "reference": {
             "$ref": "#/components/schemas/ErrorReference"
+          }
+        }
+      },
+      "FirstEntryHasErrors": {
+        "type": "object",
+        "required": [
+          "first_entry_user_id",
+          "finalised_first_entry",
+          "first_entry_finished_at"
+        ],
+        "properties": {
+          "finalised_first_entry": {
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "First data entry for a polling station"
+          },
+          "first_entry_finished_at": {
+            "type": "string",
+            "description": "When the first data entry was finalised"
+          },
+          "first_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User who did the first data entry",
+            "minimum": 0
           }
         }
       },
@@ -3628,6 +3954,67 @@
           },
           "username": {
             "type": "string"
+          }
+        }
+      },
+      "NewElection": {
+        "type": "object",
+        "description": "Election request",
+        "required": [
+          "name",
+          "election_id",
+          "location",
+          "domain_id",
+          "number_of_voters",
+          "category",
+          "number_of_seats",
+          "election_date",
+          "nomination_date",
+          "status",
+          "political_groups"
+        ],
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "domain_id": {
+            "type": "string"
+          },
+          "election_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "election_id": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nomination_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "political_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroup"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },
@@ -4098,12 +4485,19 @@
           }
         }
       },
-      "ResolveAction": {
+      "ResolveDifferencesAction": {
         "type": "string",
         "enum": [
           "keep_first_entry",
           "keep_second_entry",
           "discard_both_entries"
+        ]
+      },
+      "ResolveErrorsAction": {
+        "type": "string",
+        "enum": [
+          "discard_first_entry",
+          "resume_first_entry"
         ]
       },
       "Role": {

@@ -15,24 +15,27 @@ use utoipa::ToSchema;
 use zip::result::ZipError;
 
 use crate::{
-    apportionment::ApportionmentError, authentication::error::AuthenticationError,
-    data_entry::DataError, eml::EMLImportError, pdf_gen::PdfGenError,
+    MAX_BODY_SIZE_MB, apportionment::ApportionmentError,
+    authentication::error::AuthenticationError, data_entry::DataError, eml::EMLImportError,
+    pdf_gen::PdfGenError,
 };
 
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, Clone, Copy, ToSchema, PartialEq, Eq, Debug)]
 pub enum ErrorReference {
+    AirgapViolation,
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DatabaseError,
     DataEntryAlreadyClaimed,
     DataEntryAlreadyFinalised,
     DrawingOfLotsRequired,
+    EmlImportError,
     EntryNotFound,
     EntryNotUnique,
-    EmlImportError,
     InternalServerError,
     InvalidData,
+    InvalidHash,
     InvalidJson,
     InvalidPassword,
     InvalidPoliticalGroup,
@@ -46,9 +49,10 @@ pub enum ErrorReference {
     PdfGenerationError,
     PollingStationRepeated,
     PollingStationValidationErrors,
-    UserNotFound,
-    UsernameNotUnique,
+    RequestPayloadTooLarge,
     Unauthorized,
+    UsernameNotUnique,
+    UserNotFound,
     ZeroVotesCast,
 }
 
@@ -70,23 +74,26 @@ impl IntoResponse for ErrorResponse {
 /// trait implementation
 #[derive(Debug)]
 pub enum APIError {
+    AddError(String, ErrorReference),
+    AirgapViolation(String),
+    Apportionment(ApportionmentError),
+    Authentication(AuthenticationError),
     BadRequest(String, ErrorReference),
-    NotFound(String, ErrorReference),
     Conflict(String, ErrorReference),
+    ContentTooLarge(String, ErrorReference),
+    EmlImportError(EMLImportError),
     InvalidData(DataError),
+    InvalidHeaderValue,
+    InvalidHashError,
     JsonRejection(JsonRejection),
+    NotFound(String, ErrorReference),
+    PdfGenError(PdfGenError),
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
-    InvalidHeaderValue,
-    PdfGenError(PdfGenError),
     StdError(Box<dyn Error>),
-    AddError(String, ErrorReference),
-    XmlError(SeError),
     XmlDeError(DeError),
-    EmlImportError(EMLImportError),
-    Authentication(AuthenticationError),
+    XmlError(SeError),
     ZipError(ZipError),
-    Apportionment(ApportionmentError),
 }
 
 impl IntoResponse for APIError {
@@ -100,9 +107,17 @@ impl IntoResponse for APIError {
         }
 
         let (status, error_response) = match self {
+            APIError::AirgapViolation(message) => (
+                StatusCode::SERVICE_UNAVAILABLE,
+                to_error(&message, ErrorReference::AirgapViolation, true),
+            ),
             APIError::BadRequest(message, reference) => {
                 (StatusCode::BAD_REQUEST, to_error(&message, reference, true))
             }
+            APIError::ContentTooLarge(max_size, reference) => (
+                StatusCode::PAYLOAD_TOO_LARGE,
+                to_error(&max_size, reference, false),
+            ),
             APIError::NotFound(message, reference) => {
                 (StatusCode::NOT_FOUND, to_error(&message, reference, true))
             }
@@ -173,6 +188,13 @@ impl IntoResponse for APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error", reference, false),
+                )
+            }
+            APIError::InvalidHashError => {
+                error!("Invalid hash");
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("Invalid hash", ErrorReference::InvalidHash, false),
                 )
             }
             APIError::XmlError(err) => {
@@ -374,5 +396,18 @@ pub struct JsonResponse<T>(T);
 impl<T: Serialize> IntoResponse for JsonResponse<T> {
     fn into_response(self) -> Response {
         Json(self).into_response()
+    }
+}
+
+/// Map common internal errors to user-friendly error messages
+pub async fn map_error_response(response: Response) -> Response {
+    if response.status() == StatusCode::PAYLOAD_TOO_LARGE {
+        APIError::ContentTooLarge(
+            MAX_BODY_SIZE_MB.to_string(),
+            ErrorReference::RequestPayloadTooLarge,
+        )
+        .into_response()
+    } else {
+        response
     }
 }

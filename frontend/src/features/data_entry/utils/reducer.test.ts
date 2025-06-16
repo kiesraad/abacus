@@ -2,13 +2,18 @@ import { describe, expect, test, vi } from "vitest";
 
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResponseStatus } from "@/api/ApiResult";
+import { secondEntryNotStartedStatus } from "@/testing/api-mocks/DataEntryMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { Election, PollingStationResults } from "@/types/generated/openapi";
+import {
+  ElectionWithPoliticalGroups,
+  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
+  PollingStationResults,
+} from "@/types/generated/openapi";
 
 import { errorWarningMocks, getDefaultDataEntryState } from "../testing/mock-data";
 import { DataEntryAction, DataEntryState } from "../types/types";
@@ -21,7 +26,7 @@ function getInitialState(): DataEntryState {
 }
 
 export function _getInitialValues(
-  election: Required<Election>,
+  election: ElectionWithPoliticalGroups,
   defaultValues?: Partial<PollingStationResults>,
 ): PollingStationResults {
   return {
@@ -117,7 +122,7 @@ test("should handle SET_CACHE", () => {
     cache: {
       key: "recounted",
       data: {
-        recounted: true,
+        recounted: "true",
       },
     },
   };
@@ -211,7 +216,7 @@ describe("onSubmitForm", () => {
 
     const submit = onSubmitForm(client, "", dispatch, getDefaultDataEntryState());
 
-    const result = await submit({}, { showAcceptWarnings: true });
+    const result = await submit({}, { showAcceptErrorsAndWarnings: true });
     expect(result).toBe(false);
     expect(dispatch).toHaveBeenCalledTimes(0);
   });
@@ -230,7 +235,7 @@ describe("onSubmitForm", () => {
           ...defaultState.formState.sections,
           voters_votes_counts: {
             ...defaultState.formState.sections.voters_votes_counts,
-            acceptWarnings: false,
+            acceptErrorsAndWarnings: false,
             warnings: new ValidationResultSet([errorWarningMocks.W201]),
           },
         },
@@ -239,11 +244,11 @@ describe("onSubmitForm", () => {
 
     const submit = onSubmitForm(client, "", dispatch, state);
 
-    const result = await submit({}, { showAcceptWarnings: true });
+    const result = await submit({}, { showAcceptErrorsAndWarnings: true });
     expect(result).toBe(false);
     expect(dispatch).toHaveBeenCalledWith({
       type: "UPDATE_FORM_SECTION",
-      partialFormSection: { acceptWarningsError: true },
+      partialFormSection: { acceptErrorsAndWarningsError: true },
     } satisfies DataEntryAction);
   });
 
@@ -257,18 +262,14 @@ describe("onSubmitForm", () => {
       cache: {
         key: "voters_votes_counts",
         data: {
-          voters_counts: {
-            poll_card_count: 1,
-            proxy_certificate_count: 2,
-            voter_card_count: 3,
-            total_admitted_voters_count: 4,
-          },
-          votes_counts: {
-            votes_candidates_count: 5,
-            blank_votes_count: 6,
-            invalid_votes_count: 7,
-            total_votes_cast_count: 8,
-          },
+          "voters_counts.poll_card_count": "1",
+          "voters_counts.proxy_certificate_count": "2",
+          "voters_counts.voter_card_count": "3",
+          "voters_counts.total_admitted_voters_count": "4",
+          "votes_counts.votes_candidates_count": "5",
+          "votes_counts.blank_votes_count": "6",
+          "votes_counts.invalid_votes_count": "7",
+          "votes_counts.total_votes_cast_count": "8",
         },
       },
     };
@@ -294,7 +295,18 @@ describe("onSubmitForm", () => {
 
     const data: PollingStationResults = {
       ...getInitialValues(),
-      ...state.cache!.data,
+      voters_counts: {
+        poll_card_count: 1,
+        proxy_certificate_count: 2,
+        voter_card_count: 3,
+        total_admitted_voters_count: 4,
+      },
+      votes_counts: {
+        votes_candidates_count: 5,
+        blank_votes_count: 6,
+        invalid_votes_count: 7,
+        total_votes_cast_count: 8,
+      },
     };
 
     expect(dispatch.mock.calls[2]).toStrictEqual([
@@ -338,8 +350,9 @@ describe("onFinaliseDataEntry", () => {
     const dispatch = vi.fn();
     const client = new ApiClient();
 
-    const requestPath = "/api/polling_stations/1/data_entries/1";
-    const onFinalise = onFinaliseDataEntry(client, requestPath, dispatch);
+    const finaliseUrl: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
+      "/api/polling_stations/1/data_entries/1/finalise";
+    const onFinalise = onFinaliseDataEntry(client, finaliseUrl, dispatch);
 
     const result = await onFinalise();
 
@@ -351,6 +364,6 @@ describe("onFinaliseDataEntry", () => {
       { type: "SET_STATUS", status: "finalised" } satisfies DataEntryAction,
     ]);
 
-    expect(result).toBe(true);
+    expect(result).toStrictEqual(secondEntryNotStartedStatus);
   });
 });

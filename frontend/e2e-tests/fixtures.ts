@@ -1,7 +1,6 @@
 import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
 
 import {
-  DataEntry,
   Election,
   ELECTION_CREATE_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PATH,
@@ -15,10 +14,15 @@ import {
 } from "@/types/generated/openapi";
 
 import { DataEntryApiClient } from "./helpers-utils/api-clients";
+import {
+  completePollingStationDataEntries,
+  completePollingStationDataEntriesWithDifferences,
+  loginAs,
+} from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
-import { loginAs } from "./setup";
 import {
   electionRequest,
+  emptyRequest,
   noRecountNoDifferencesRequest,
   pollingStationRequests,
 } from "./test-data/request-response-templates";
@@ -43,6 +47,8 @@ type Fixtures = {
   pollingStationFirstEntryClaimed: PollingStation;
   // First polling station of the election with first data entry done
   pollingStationFirstEntryDone: PollingStation;
+  // First polling station of the election with first data entry with errors
+  pollingStationFirstEntryHasErrors: PollingStation;
   // First polling station of the election with first and second data entries done
   pollingStationDefinitive: PollingStation;
   // First polling station of the election with differences between the first and second data entry
@@ -52,38 +58,6 @@ type Fixtures = {
   // Newly created User
   newTypist: User;
 };
-
-async function completePollingStationDataEntries(request: APIRequestContext, pollingStationId: number) {
-  for (const entryNumber of [1, 2]) {
-    if (entryNumber === 1) {
-      await loginAs(request, "typist1");
-    } else if (entryNumber === 2) {
-      await loginAs(request, "typist2");
-    }
-
-    const dataEntry = new DataEntryApiClient(request, pollingStationId, entryNumber);
-    await dataEntry.claim();
-    await dataEntry.save(noRecountNoDifferencesRequest);
-    await dataEntry.finalise();
-  }
-}
-
-async function completePollingStationDataEntriesWithDifferences(request: APIRequestContext, pollingStationId: number) {
-  await loginAs(request, "typist1");
-  const firstDataEntry = new DataEntryApiClient(request, pollingStationId, 1);
-  await firstDataEntry.claim();
-  await firstDataEntry.save(noRecountNoDifferencesRequest);
-  await firstDataEntry.finalise();
-
-  await loginAs(request, "typist2");
-  const secondDataEntry = new DataEntryApiClient(request, pollingStationId, 2);
-  await secondDataEntry.claim();
-  const cloneDataEntry = JSON.parse(JSON.stringify(noRecountNoDifferencesRequest)) as DataEntry;
-  cloneDataEntry.data.political_group_votes[0]!.candidate_votes[0]!.votes -= 10;
-  cloneDataEntry.data.political_group_votes[0]!.candidate_votes[1]!.votes += 10;
-  await secondDataEntry.save(cloneDataEntry);
-  await secondDataEntry.finalise();
-}
 
 export const test = base.extend<Fixtures>({
   coordinator: async ({ browser }, use) => {
@@ -156,6 +130,16 @@ export const test = base.extend<Fixtures>({
     const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
     await firstDataEntry.claim();
     await firstDataEntry.save(noRecountNoDifferencesRequest);
+    await firstDataEntry.finalise();
+
+    await use(pollingStation);
+  },
+  pollingStationFirstEntryHasErrors: async ({ request, pollingStation }, use) => {
+    await loginAs(request, "typist1");
+
+    const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
+    await firstDataEntry.claim();
+    await firstDataEntry.save(emptyRequest);
     await firstDataEntry.finalise();
 
     await use(pollingStation);

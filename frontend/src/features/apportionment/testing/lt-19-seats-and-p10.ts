@@ -1,4 +1,9 @@
-import { CandidateNominationResult, Election, ElectionSummary, SeatAssignmentResult } from "@/types/generated/openapi";
+import {
+  CandidateNominationResult,
+  ElectionSummary,
+  ElectionWithPoliticalGroups,
+  SeatAssignmentResult,
+} from "@/types/generated/openapi";
 
 export const seat_assignment: SeatAssignmentResult = {
   seats: 6,
@@ -836,10 +841,12 @@ export const election_summary: ElectionSummary = {
   ],
 };
 
-export const election: Election = {
+export const election: ElectionWithPoliticalGroups = {
   id: 6,
   name: "Test Election < 19 seats & List Exhaustion",
+  election_id: "TestLocation_2026",
   location: "Test Location",
+  domain_id: "0000",
   number_of_voters: 100,
   category: "Municipal",
   number_of_seats: 6,

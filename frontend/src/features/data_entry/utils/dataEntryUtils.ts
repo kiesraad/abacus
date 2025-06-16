@@ -1,7 +1,7 @@
-import { Election, PollingStationResults, ValidationResults } from "@/types/generated/openapi";
+import { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
-import { ClientState, FormSection, FormState } from "../types/types";
+import { ClientState, DataEntryStructure, FormSection, FormState } from "../types/types";
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
 import { addValidationResultsToFormState, ValidationResultSet } from "./ValidationResults";
 
@@ -17,8 +17,8 @@ export function objectHasOnlyEmptyValues(obj: Record<string, "" | number>): bool
 export function formSectionComplete(section: FormSection): boolean {
   return (
     section.isSaved &&
-    (section.errors.isEmpty() || section.errors.hasOnlyGlobalValidationResults()) &&
-    (section.warnings.isEmpty() || section.acceptWarnings)
+    (section.errors.isEmpty() || section.errors.hasOnlyGlobalValidationResults() || section.acceptErrorsAndWarnings) &&
+    (section.warnings.isEmpty() || section.acceptErrorsAndWarnings)
   );
 }
 
@@ -28,7 +28,7 @@ export function resetFormSectionState(formState: FormState) {
     section.errors = new ValidationResultSet();
     section.warnings = new ValidationResultSet();
     section.isSubmitted = undefined;
-    section.acceptWarningsError = false;
+    section.acceptErrorsAndWarningsError = false;
   });
 }
 
@@ -37,7 +37,10 @@ export function getNextSectionID(formState: FormState) {
 
   if (currentSection && currentSection.isSubmitted && formSectionComplete(currentSection)) {
     for (const section of Object.values(formState.sections)) {
-      if ((formState.furthest === "save" && !section.errors.isEmpty()) || section.index === currentSection.index + 1) {
+      if (
+        (formState.furthest === "save" && !section.errors.isEmpty() && !section.acceptErrorsAndWarnings) ||
+        section.index === currentSection.index + 1
+      ) {
         return section.id;
       }
     }
@@ -80,7 +83,6 @@ export type DataEntrySummary = {
   hasErrors: boolean;
   notableFormSections: {
     status: DataEntryFormSectionStatus;
-    title?: string;
     formSection: FormSection;
   }[];
 };
@@ -94,6 +96,7 @@ export function getDataEntrySummary(formState: FormState): DataEntrySummary {
     notableFormSections: [],
   };
 
+  //TODO: errors are "acceptable now"
   Object.values(formState.sections)
     .filter((section) => section.id !== "save")
     .sort(sortFormSections)
@@ -105,7 +108,7 @@ export function getDataEntrySummary(formState: FormState): DataEntrySummary {
         result.hasErrors = true;
       } else if (!section.warnings.isEmpty()) {
         result.hasWarnings = true;
-        if (section.acceptWarnings) {
+        if (section.acceptErrorsAndWarnings) {
           result.notableFormSections.push({ status: "accepted-warnings", formSection: section });
         } else {
           result.notableFormSections.push({ status: "unaccepted-warnings", formSection: section });
@@ -123,89 +126,50 @@ function sortFormSections(a: FormSection, b: FormSection): number {
   return 0;
 }
 
-export function getInitialFormState(election: Required<Election>): FormState {
-  const result: FormState = {
-    current: INITIAL_FORM_SECTION_ID,
-    furthest: INITIAL_FORM_SECTION_ID,
-    sections: {
-      recounted: {
-        index: 0,
-        id: "recounted",
-        title: "Is er herteld?",
-        isSaved: false,
-        acceptWarnings: false,
-        hasChanges: false,
-        acceptWarningsError: false,
-        errors: new ValidationResultSet(),
-        warnings: new ValidationResultSet(),
-      },
-      voters_votes_counts: {
-        index: 1,
-        id: "voters_votes_counts",
-        title: "Toegelaten kiezers en uitgebrachte stemmen",
-        isSaved: false,
-        acceptWarnings: false,
-        hasChanges: false,
-        acceptWarningsError: false,
-        errors: new ValidationResultSet(),
-        warnings: new ValidationResultSet(),
-      },
-      differences_counts: {
-        index: 2,
-        id: "differences_counts",
-        title: "Verschillen",
-        isSaved: false,
-        acceptWarnings: false,
-        hasChanges: false,
-        acceptWarningsError: false,
-        errors: new ValidationResultSet(),
-        warnings: new ValidationResultSet(),
-      },
-      save: {
-        index: election.political_groups.length + 3,
-        id: "save",
-        title: "Controleren en opslaan",
-        isSaved: false,
-        acceptWarnings: false,
-        hasChanges: false,
-        acceptWarningsError: false,
-        errors: new ValidationResultSet(),
-        warnings: new ValidationResultSet(),
-      },
-    },
+function createFormSection(id: FormSectionId, index: number): FormSection {
+  return {
+    index,
+    id,
+    isSaved: false,
+    acceptErrorsAndWarnings: false,
+    hasChanges: false,
+    acceptErrorsAndWarningsError: false,
+    errors: new ValidationResultSet(),
+    warnings: new ValidationResultSet(),
   };
-
-  election.political_groups.forEach((pg, n) => {
-    result.sections[`political_group_votes_${pg.number}`] = {
-      index: n + 3,
-      id: `political_group_votes_${pg.number}`,
-      title: pg.name,
-      isSaved: false,
-      acceptWarnings: false,
-      hasChanges: false,
-      acceptWarningsError: false,
-      errors: new ValidationResultSet(),
-      warnings: new ValidationResultSet(),
-    };
-  });
-
-  return result;
 }
 
-export function getClientState(formState: FormState, acceptWarnings: boolean, continueToNextSection: boolean) {
+export function getInitialFormState(dataEntryStructure: DataEntryStructure): FormState {
+  // Create sections from data entry structure plus save section
+  const sections: Record<string, FormSection> = {};
+
+  dataEntryStructure.forEach((section, index) => {
+    sections[section.id] = createFormSection(section.id, index);
+  });
+
+  sections["save"] = createFormSection("save", dataEntryStructure.length);
+
+  return {
+    current: INITIAL_FORM_SECTION_ID,
+    furthest: INITIAL_FORM_SECTION_ID,
+    sections: sections as Record<FormSectionId, FormSection>,
+  };
+}
+
+export function getClientState(formState: FormState, acceptErrorsAndWarnings: boolean, continueToNextSection: boolean) {
   const clientState: ClientState = {
     furthest: formState.furthest,
     current: formState.current,
-    acceptedWarnings: Object.values(formState.sections)
-      .filter((s: FormSection) => s.acceptWarnings)
+    acceptedErrorsAndWarnings: Object.values(formState.sections)
+      .filter((s: FormSection) => s.acceptErrorsAndWarnings)
       .filter((s: FormSection) => s.id !== formState.current)
       .map((s: FormSection) => s.id),
     continue: continueToNextSection,
   };
   // the form state is not updated for the current submission,
   // so add the current section to the accepted warnings if needed
-  if (acceptWarnings) {
-    clientState.acceptedWarnings.push(formState.current);
+  if (acceptErrorsAndWarnings) {
+    clientState.acceptedErrorsAndWarnings.push(formState.current);
   }
   return clientState;
 }
@@ -226,19 +190,19 @@ export function calculateDataEntryProgress(formState: FormState) {
 export function buildFormState(
   clientState: ClientState,
   validationResults: ValidationResults,
-  election: Required<Election>,
+  dataEntryStructure: DataEntryStructure,
 ) {
-  const newFormState = getInitialFormState(election);
+  const newFormState = getInitialFormState(dataEntryStructure);
 
   // set the furthest and current section
   newFormState.furthest = clientState.furthest;
   newFormState.current = clientState.current;
 
   // set accepted warnings
-  clientState.acceptedWarnings.forEach((sectionID: FormSectionId) => {
+  clientState.acceptedErrorsAndWarnings.forEach((sectionID: FormSectionId) => {
     const section = newFormState.sections[sectionID];
     if (section) {
-      section.acceptWarnings = true;
+      section.acceptErrorsAndWarnings = true;
     }
   });
 
@@ -251,11 +215,11 @@ export function buildFormState(
   }
 
   // set accepted warnings for the current section
-  const acceptWarnings = clientState.acceptedWarnings.some(
+  const acceptErrorsAndWarnings = clientState.acceptedErrorsAndWarnings.some(
     (sectionID: FormSectionId) => sectionID === newFormState.current,
   );
 
-  updateFormStateAfterSubmit(newFormState, validationResults, acceptWarnings);
+  updateFormStateAfterSubmit(dataEntryStructure, newFormState, validationResults, acceptErrorsAndWarnings);
 
   let targetFormSectionId: FormSectionId;
   if (clientState.continue) {
@@ -268,6 +232,7 @@ export function buildFormState(
 }
 
 export function updateFormStateAfterSubmit(
+  dataEntryStructure: DataEntryStructure,
   formState: FormState,
   validationResults: ValidationResults,
   continueToNextSection: boolean = false,
@@ -286,8 +251,8 @@ export function updateFormStateAfterSubmit(
   }
 
   //distribute errors and warnings to sections
-  addValidationResultsToFormState(validationResults.errors, formState, "errors");
-  addValidationResultsToFormState(validationResults.warnings, formState, "warnings");
+  addValidationResultsToFormState(validationResults.errors, formState, dataEntryStructure, "errors");
+  addValidationResultsToFormState(validationResults.warnings, formState, dataEntryStructure, "warnings");
 
   //determine the new furthest section, if applicable
   if (continueToNextSection && currentFormSection && formState.furthest === currentFormSection.id) {
@@ -301,13 +266,6 @@ export function updateFormStateAfterSubmit(
       section.warnings.removeGlobalValidationResults();
     });
   }
-
-  // Reset acceptWarnings when a page gets an error or has no warnings anymore
-  Object.values(formState.sections).forEach((section) => {
-    if (section.acceptWarnings && (!section.errors.isEmpty() || section.warnings.isEmpty())) {
-      section.acceptWarnings = false;
-    }
-  });
 
   return formState;
 }

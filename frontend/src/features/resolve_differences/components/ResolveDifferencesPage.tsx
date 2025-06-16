@@ -9,6 +9,7 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
+import { ResolveDifferencesAction } from "@/types/generated/openapi";
 
 import { usePollingStationDataEntryDifferences } from "../hooks/usePollingStationDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
@@ -17,8 +18,18 @@ import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 export function ResolveDifferencesPage() {
   const navigate = useNavigate();
-  const afterSave = () => {
-    void navigate(`/elections/${election.id}/status`);
+  const afterSave = (action: ResolveDifferencesAction) => {
+    let url = `/elections/${election.id}/status`;
+    switch (action) {
+      case "keep_first_entry":
+      case "keep_second_entry":
+        url += `#data-entry-kept-${pollingStation.id}`;
+        break;
+      case "discard_both_entries":
+        url += `#data-entries-discarded-${pollingStation.id}`;
+        break;
+    }
+    void navigate(url);
   };
   const pollingStationId = useNumericParam("pollingStationId");
   const { pollingStation, election, loading, status, action, setAction, onSubmit, validationError } =
@@ -30,7 +41,7 @@ export function ResolveDifferencesPage() {
 
   return (
     <>
-      <PageTitle title={`${t("data_entry.entries_different")} - Abacus`} />
+      <PageTitle title={`${t("resolve_differences.page_title")} - Abacus`} />
       <header>
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
@@ -47,7 +58,7 @@ export function ResolveDifferencesPage() {
           />
         </aside>
         <article>
-          <h2>{t("resolve_differences.page_title")}</h2>
+          <h2>{t("resolve_differences.title")}</h2>
           <p>{t("resolve_differences.page_content")}</p>
           <ResolveDifferencesTables
             first={status.state.first_entry}

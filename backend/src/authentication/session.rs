@@ -279,4 +279,15 @@ mod test {
 
         assert_eq!(None, session_from_db);
     }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_session_count(pool: SqlitePool) {
+        let sessions = Sessions::new(pool);
+
+        let _active_session1 = sessions.create(1, TimeDelta::seconds(60)).await.unwrap();
+        let _active_session2 = sessions.create(2, TimeDelta::seconds(120)).await.unwrap();
+        let _expired_session = sessions.create(2, TimeDelta::seconds(0)).await.unwrap();
+
+        assert_eq!(2, sessions.count().await.unwrap());
+    }
 }

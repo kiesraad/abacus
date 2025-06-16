@@ -4,26 +4,55 @@ import {
   ACCOUNT_UPDATE_REQUEST_BODY,
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_PATH,
+  AUDIT_LOG_LIST_REQUEST_PARAMS,
+  AUDIT_LOG_LIST_REQUEST_PATH,
+  AUDIT_LOG_LIST_USERS_REQUEST_PARAMS,
+  AUDIT_LOG_LIST_USERS_REQUEST_PATH,
+  AuditLogListResponse,
   ClaimDataEntryResponse,
   DataEntryStatus,
+  ELECTION_DETAILS_REQUEST_PARAMS,
+  ELECTION_DETAILS_REQUEST_PATH,
+  ELECTION_LIST_REQUEST_PARAMS,
+  ELECTION_LIST_REQUEST_PATH,
+  ELECTION_STATUS_REQUEST_PARAMS,
+  ELECTION_STATUS_REQUEST_PATH,
+  ElectionDetailsResponse,
+  ElectionListResponse,
+  ElectionStatusResponse,
   ErrorResponse,
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PARAMS,
   LOGIN_REQUEST_PATH,
   LoginResponse,
+  POLLING_STATION_CREATE_REQUEST_BODY,
   POLLING_STATION_CREATE_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PARAMS,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PARAMS,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH,
   POLLING_STATION_DELETE_REQUEST_PARAMS,
+  POLLING_STATION_DELETE_REQUEST_PATH,
   POLLING_STATION_GET_REQUEST_PARAMS,
+  POLLING_STATION_GET_REQUEST_PATH,
   POLLING_STATION_LIST_REQUEST_PARAMS,
+  POLLING_STATION_LIST_REQUEST_PATH,
+  POLLING_STATION_UPDATE_REQUEST_BODY,
   POLLING_STATION_UPDATE_REQUEST_PARAMS,
+  POLLING_STATION_UPDATE_REQUEST_PATH,
   PollingStation,
   PollingStationDataEntry,
   PollingStationListResponse,
@@ -48,9 +77,12 @@ import {
 
 import {
   claimDataEntryResponse,
-  dataEntryResolveMockResponse,
+  dataEntryResolveDifferencesMockResponse,
+  dataEntryResolveErrorsMockResponse,
   dataEntryStatusDifferences,
+  firstEntryHasErrorsStatus,
   saveDataEntryResponse,
+  secondEntryNotStartedStatus,
 } from "./DataEntryMockData";
 import { electionDetailsMockResponse, electionListMockResponse } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
@@ -88,109 +120,156 @@ export const AccountUpdateRequestHandler = http.put<
   ACCOUNT_UPDATE_REQUEST_PATH
 >("/api/user/account", () => HttpResponse.json(loginResponseMockData, { status: 200 }));
 
-export const LogRequestHandler = http.get("/api/log", () => HttpResponse.json(logMockResponse, { status: 200 }));
+export const LogRequestHandler = http.get<
+  ParamsToString<AUDIT_LOG_LIST_REQUEST_PARAMS>,
+  null,
+  AuditLogListResponse,
+  AUDIT_LOG_LIST_REQUEST_PATH
+>("/api/log", () => HttpResponse.json(logMockResponse, { status: 200 }));
 
-export const LogUsersRequestHandler = http.get("/api/log-users", () =>
-  HttpResponse.json(userMockData, { status: 200 }),
-);
+export const LogUsersRequestHandler = http.get<
+  ParamsToString<AUDIT_LOG_LIST_USERS_REQUEST_PARAMS>,
+  null,
+  User[],
+  AUDIT_LOG_LIST_USERS_REQUEST_PATH
+>("/api/log-users", () => HttpResponse.json(userMockData, { status: 200 }));
 
 // get election list handler
-export const ElectionListRequestHandler = http.get("/api/elections", () =>
-  HttpResponse.json(electionListMockResponse, { status: 200 }),
-);
+export const ElectionListRequestHandler = http.get<
+  ParamsToString<ELECTION_LIST_REQUEST_PARAMS>,
+  null,
+  ElectionListResponse,
+  ELECTION_LIST_REQUEST_PATH
+>("/api/elections", () => HttpResponse.json(electionListMockResponse, { status: 200 }));
 
 // get election details handler
-export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
-  "/api/elections/:election_id",
-  () => HttpResponse.json(electionDetailsMockResponse, { status: 200 }),
-);
+export const ElectionRequestHandler = http.get<
+  ParamsToString<ELECTION_DETAILS_REQUEST_PARAMS>,
+  null,
+  ElectionDetailsResponse | ErrorResponse,
+  ELECTION_DETAILS_REQUEST_PATH
+>("/api/elections/1", () => HttpResponse.json(electionDetailsMockResponse, { status: 200 }));
 
 // get election status handler
-export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
-  "/api/elections/:election_id/status",
-  () => HttpResponse.json(statusResponseMock, { status: 200 }),
-);
+export const ElectionStatusRequestHandler = http.get<
+  ParamsToString<ELECTION_STATUS_REQUEST_PARAMS>,
+  null,
+  ElectionStatusResponse,
+  ELECTION_STATUS_REQUEST_PATH
+>("/api/elections/1/status", () => HttpResponse.json(statusResponseMock, { status: 200 }));
 
 export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse, LOGIN_REQUEST_PATH>(
   "/api/user/login",
   () => HttpResponse.json(loginResponseMockData, { status: 200 }),
 );
 
-export const PollingStationDataEntryStatusHandler = http.get<
+export const PollingStationDataEntryStatusEntriesDifferentHandler = http.get<
   ParamsToString<POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PARAMS>,
   null,
   DataEntryStatus,
   POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH
 >("/api/polling_stations/3/data_entries", () => HttpResponse.json(dataEntryStatusDifferences, { status: 200 }));
 
-export const PollingStationDataEntryResolveHandler = http.post<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PARAMS>,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY,
+export const PollingStationDataEntryStatusFirstEntryHasErrorsHandler = http.get<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PARAMS>,
+  null,
+  DataEntryStatus,
+  POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH
+>("/api/polling_stations/5/data_entries", () => HttpResponse.json(firstEntryHasErrorsStatus, { status: 200 }));
+
+export const PollingStationDataEntryResolveDifferencesHandler = http.post<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS>,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
   PollingStationDataEntry,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH
->("/api/polling_stations/3/data_entries/resolve", () =>
-  HttpResponse.json(dataEntryResolveMockResponse, { status: 200 }),
+  POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH
+>("/api/polling_stations/3/data_entries/resolve_differences", () =>
+  HttpResponse.json(dataEntryResolveDifferencesMockResponse, { status: 200 }),
+);
+
+export const PollingStationDataEntryResolveErrorsHandler = http.post<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS>,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY,
+  PollingStationDataEntry,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH
+>("/api/polling_stations/5/data_entries/resolve_errors", () =>
+  HttpResponse.json(dataEntryResolveErrorsMockResponse, { status: 200 }),
 );
 
 // get polling stations
-export const PollingStationListRequestHandler = http.get<ParamsToString<POLLING_STATION_LIST_REQUEST_PARAMS>>(
-  "/api/elections/:election_id/polling_stations",
-  () => {
-    const response: PollingStationListResponse = { polling_stations: pollingStationMockData };
-    return HttpResponse.json(response, { status: 200 });
-  },
-);
+export const PollingStationListRequestHandler = http.get<
+  ParamsToString<POLLING_STATION_LIST_REQUEST_PARAMS>,
+  null,
+  PollingStationListResponse,
+  POLLING_STATION_LIST_REQUEST_PATH
+>("/api/elections/1/polling_stations", () => {
+  const response: PollingStationListResponse = { polling_stations: pollingStationMockData };
+  return HttpResponse.json(response, { status: 200 });
+});
 
 // save data entry handler
 export const PollingStationDataEntrySaveHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  SaveDataEntryResponse | ErrorResponse
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number", () =>
-  HttpResponse.json(saveDataEntryResponse, { status: 200 }),
-);
+  SaveDataEntryResponse | ErrorResponse,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH
+>("/api/polling_stations/1/data_entries/1", () => HttpResponse.json(saveDataEntryResponse, { status: 200 }));
 
 // get data entry handler
 export const PollingStationDataEntryClaimHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PARAMS>,
   null,
-  ClaimDataEntryResponse | ErrorResponse
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number/claim", () =>
-  HttpResponse.json(claimDataEntryResponse, { status: 200 }),
-);
+  ClaimDataEntryResponse | ErrorResponse,
+  POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH
+>("/api/polling_stations/1/data_entries/1/claim", () => HttpResponse.json(claimDataEntryResponse, { status: 200 }));
 
 // delete data entry handler
 export const PollingStationDataEntryDeleteHandler = http.delete<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number", () =>
-  HttpResponse.text(null, { status: 204 }),
-);
+  ParamsToString<POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS>,
+  null,
+  null,
+  POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH
+>("/api/polling_stations/1/data_entries/1", () => new HttpResponse(null, { status: 204 }));
 
 // finalise data entry handler
 export const PollingStationDataEntryFinaliseHandler = http.post<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
->("/api/polling_stations/:election_id/data_entries/:entry_number/finalise", () =>
-  HttpResponse.text(null, { status: 200 }),
+  ParamsToString<POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS>,
+  null,
+  DataEntryStatus | ErrorResponse,
+  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH
+>("/api/polling_stations/1/data_entries/1/finalise", () =>
+  HttpResponse.json(secondEntryNotStartedStatus, { status: 200 }),
 );
 
-export const PollingStationCreateHandler = http.post<ParamsToString<POLLING_STATION_CREATE_REQUEST_PARAMS>>(
-  "/api/elections/:election_id/polling_stations",
-  () => HttpResponse.json(pollingStationMockData[1]! satisfies PollingStation, { status: 201 }),
+export const PollingStationCreateHandler = http.post<
+  ParamsToString<POLLING_STATION_CREATE_REQUEST_PARAMS>,
+  POLLING_STATION_CREATE_REQUEST_BODY,
+  PollingStation,
+  POLLING_STATION_LIST_REQUEST_PATH
+>("/api/elections/1/polling_stations", () =>
+  HttpResponse.json(pollingStationMockData[1]! satisfies PollingStation, { status: 201 }),
 );
 
-export const PollingStationDeleteHandler = http.delete<ParamsToString<POLLING_STATION_DELETE_REQUEST_PARAMS>>(
-  "/api/elections/:election_id/polling_stations/:polling_station_id",
-  () => HttpResponse.text("", { status: 200 }),
-);
+export const PollingStationDeleteHandler = http.delete<
+  ParamsToString<POLLING_STATION_DELETE_REQUEST_PARAMS>,
+  null,
+  null,
+  POLLING_STATION_DELETE_REQUEST_PATH
+>("/api/elections/1/polling_stations/1", () => new HttpResponse(null, { status: 200 }));
 
-export const PollingStationUpdateHandler = http.put<ParamsToString<POLLING_STATION_UPDATE_REQUEST_PARAMS>>(
-  "/api/elections/:election_id/polling_stations/:polling_station_id",
-  () => HttpResponse.text("", { status: 200 }),
-);
+export const PollingStationUpdateHandler = http.put<
+  ParamsToString<POLLING_STATION_UPDATE_REQUEST_PARAMS>,
+  POLLING_STATION_UPDATE_REQUEST_BODY,
+  null,
+  POLLING_STATION_UPDATE_REQUEST_PATH
+>("/api/elections/1/polling_stations/1", () => new HttpResponse(null, { status: 200 }));
 
-export const PollingStationGetHandler = http.get<ParamsToString<POLLING_STATION_GET_REQUEST_PARAMS>>(
-  "/api/elections/:election_id/polling_stations/:polling_station_id",
-  () => HttpResponse.json(pollingStationMockData[0]! satisfies PollingStation, { status: 200 }),
+export const PollingStationGetHandler = http.get<
+  ParamsToString<POLLING_STATION_GET_REQUEST_PARAMS>,
+  null,
+  PollingStation,
+  POLLING_STATION_GET_REQUEST_PATH
+>("/api/elections/1/polling_stations/1", () =>
+  HttpResponse.json(pollingStationMockData[0]! satisfies PollingStation, { status: 200 }),
 );
 
 export const UserCreateRequestHandler = http.post<
@@ -241,20 +320,25 @@ export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginR
 export const handlers: HttpHandler[] = [
   pingHandler,
   AccountUpdateRequestHandler,
+  LogRequestHandler,
+  LogUsersRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   LoginHandler,
+  PollingStationDataEntryStatusEntriesDifferentHandler,
+  PollingStationDataEntryStatusFirstEntryHasErrorsHandler,
+  PollingStationDataEntryResolveDifferencesHandler,
+  PollingStationDataEntryResolveErrorsHandler,
   PollingStationListRequestHandler,
   PollingStationDataEntrySaveHandler,
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
-  PollingStationDataEntryStatusHandler,
   PollingStationCreateHandler,
   PollingStationDeleteHandler,
-  PollingStationGetHandler,
   PollingStationUpdateHandler,
+  PollingStationGetHandler,
   UserCreateRequestHandler,
   UserGetRequestHandler,
   UserListRequestHandler,

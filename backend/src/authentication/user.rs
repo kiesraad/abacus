@@ -65,7 +65,7 @@ impl User {
     /// Updates the `last_activity_at` field, but first checks if it has been
     /// longer than `MIN_UPDATE_LAST_ACTIVITY_AT_SECS`, to prevent excessive
     /// database writes.
-    pub async fn update_last_activity_at(&self, users: &Users) -> Result<(), sqlx::Error> {
+    pub async fn update_last_activity_at(&self, users: &Users) -> Result<(), Error> {
         if self.should_update_last_activity_at() {
             users.update_last_activity_at(self.id()).await?;
         }
@@ -75,7 +75,7 @@ impl User {
 
     fn should_update_last_activity_at(&self) -> bool {
         if let Some(last_activity_at) = self.last_activity_at {
-            chrono::Utc::now()
+            Utc::now()
                 .signed_duration_since(last_activity_at)
                 .num_seconds()
                 > MIN_UPDATE_LAST_ACTIVITY_AT_SECS
@@ -110,8 +110,8 @@ impl User {
             )
             .unwrap(),
             last_activity_at: None,
-            updated_at: chrono::Utc::now(),
-            created_at: chrono::Utc::now(),
+            updated_at: Utc::now(),
+            created_at: Utc::now(),
         }
     }
 }
@@ -132,7 +132,7 @@ where
     }
 }
 
-/// Implement the OptionalFromRequestParts trait for User, this allows us to extract a Option<User> from a request
+/// Implement the OptionalFromRequestParts trait for User, this allows us to extract an Option<User> from a request
 impl<S> OptionalFromRequestParts<S> for User
 where
     S: Send + Sync,
@@ -409,21 +409,24 @@ mod tests {
     #[test(sqlx::test)]
     async fn test_create_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
+        const USERNAME: &str = "test_user";
 
         let user = users
-            .create("test_user", None, "TotallyValidP4ssW0rd", Role::Typist)
+            .create(USERNAME, None, "TotallyValidP4ssW0rd", Role::Typist)
             .await
             .unwrap();
 
-        assert_eq!(user.username, "test_user");
+        assert_eq!(user.username, USERNAME);
 
         let fetched_user = users.get_by_id(user.id).await.unwrap().unwrap();
 
         assert_eq!(user, fetched_user);
 
-        let fetched_user = users.get_by_username("test_user").await.unwrap().unwrap();
+        let fetched_user = users.get_by_username(USERNAME).await.unwrap().unwrap();
 
         assert_eq!(user, fetched_user);
+
+        assert_eq!(users.username_by_id(user.id).await.unwrap(), USERNAME);
     }
 
     #[test(sqlx::test)]
@@ -469,7 +472,7 @@ mod tests {
 
         assert_eq!(user, authenticated_user);
 
-        // Username should be case insensitive
+        // Username should be case-insensitive
         let authenticated_user = users
             .authenticate("Test_User", "TotallyValidP4ssW0rd")
             .await
@@ -551,7 +554,7 @@ mod tests {
             .unwrap();
 
         // User should need password change
-        assert!(user.needs_password_change);
+        assert!(user.needs_password_change());
 
         users
             .update_password(user.id(), "test_user", "temp_password")
@@ -561,7 +564,7 @@ mod tests {
         let user = users.get_by_id(user.id()).await.unwrap().unwrap();
 
         // User now shouldn't need to change their password
-        assert!(!user.needs_password_change);
+        assert!(!user.needs_password_change());
 
         // Set a temporary password via update
         users
@@ -572,7 +575,7 @@ mod tests {
         let user = users.get_by_id(user.id()).await.unwrap().unwrap();
 
         // User needs to change their password again
-        assert!(user.needs_password_change);
+        assert!(user.needs_password_change());
     }
 
     #[test(sqlx::test)]

@@ -3,6 +3,7 @@
   "choose_polling_station": "Kies het stembureau",
   "enter_a_valid_number_to_start": "Voer een geldig nummer van een stembureau in om te beginnen",
   "has_already_been_filled_twice": "Stembureau {nr} <strong>({name})</strong> is al twee keer ingevoerd",
+  "has_errors": "Stembureau {nr} ligt ter beoordeling bij de coördinator",
   "insert_another": "Verder met een volgend stembureau?",
   "insert_number": "Voer het nummer in:",
   "insert_title": "Welk stembureau ga je invoeren?",

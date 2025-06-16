@@ -23,14 +23,16 @@ pub(crate) mod tests {
 
     use super::*;
     use crate::{
-        election::{Election, ElectionCategory, ElectionStatus, tests::election_fixture},
+        election::{
+            ElectionCategory, ElectionStatus, ElectionWithPoliticalGroups, tests::election_fixture,
+        },
         pdf_gen::models::PdfModel,
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
     };
 
     pub fn polling_stations_fixture(
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         polling_station_voter_count: &[i64],
     ) -> Vec<PollingStation> {
         let mut polling_stations = Vec::new();
@@ -58,17 +60,19 @@ pub(crate) mod tests {
     #[test]
     fn it_generates_a_pdf() {
         let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
-            election: Election {
+            election: ElectionWithPoliticalGroups {
                 id: 1,
                 name: "Municipal Election".to_string(),
+                election_id: "MunicipalElection_2025".to_string(),
                 location: "Heemdamseburg".to_string(),
+                domain_id: "0000".to_string(),
                 number_of_voters: 100,
                 category: ElectionCategory::Municipal,
                 number_of_seats: 29,
                 election_date: Utc::now().date_naive(),
                 nomination_date: Utc::now().date_naive(),
                 status: ElectionStatus::DataEntryFinished,
-                political_groups: None,
+                political_groups: vec![],
             },
             polling_stations: vec![],
             summary: ElectionSummary::zero(),

@@ -1,14 +1,75 @@
 import { Dispatch } from "react";
 
 import { AnyApiError } from "@/api/ApiResult";
-import { ClaimDataEntryResponse, Election, PollingStationResults, ValidationResults } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import { TranslationPath } from "@/i18n/i18n.types";
+import {
+  ClaimDataEntryResponse,
+  DataEntryStatus,
+  ElectionWithPoliticalGroups,
+  PollingStationResults,
+  ValidationResults,
+} from "@/types/generated/openapi";
+import { FormSectionId, PollingStationResultsPath } from "@/types/types";
 
 import { ValidationResultSet } from "../utils/ValidationResults";
 
+// Data Entry Section Types
+export interface HeadingSubsection {
+  type: "heading";
+  title: TranslationPath;
+}
+
+export interface MessageSubsection {
+  type: "message";
+  message: TranslationPath;
+  className?: string;
+}
+
+export interface RadioSubsectionOption {
+  value: string;
+  label: TranslationPath;
+  autoFocusInput?: boolean;
+}
+
+export interface RadioSubsection {
+  type: "radio";
+  error: TranslationPath;
+  path: PollingStationResultsPath;
+  options: RadioSubsectionOption[];
+  valueType?: "string" | "boolean";
+}
+
+export interface InputGridSubsectionRow {
+  code?: string;
+  path: PollingStationResultsPath;
+  title?: string;
+  isTotal?: boolean;
+  isListTotal?: boolean;
+  addSeparator?: boolean;
+  autoFocusInput?: boolean;
+}
+
+export interface InputGridSubsection {
+  type: "inputGrid";
+  headers: [TranslationPath, TranslationPath, TranslationPath];
+  zebra?: boolean;
+  rows: InputGridSubsectionRow[];
+}
+
+export type DataEntrySubsection = HeadingSubsection | MessageSubsection | RadioSubsection | InputGridSubsection;
+
+export interface DataEntrySection {
+  id: FormSectionId;
+  title: string;
+  short_title: string;
+  subsections: DataEntrySubsection[];
+}
+
+export type DataEntryStructure = DataEntrySection[];
+
 export interface DataEntryState {
   // state from providers
-  election: Required<Election>;
+  election: ElectionWithPoliticalGroups;
   pollingStationId: number;
   entryNumber: number;
 
@@ -19,6 +80,7 @@ export interface DataEntryState {
   pollingStationResults: PollingStationResults | null;
 
   // state of the forms excl. data
+  dataEntryStructure: DataEntryStructure;
   formState: FormState;
   targetFormSectionId: FormSectionId | null;
   status: Status;
@@ -28,9 +90,9 @@ export interface DataEntryState {
 
 export interface DataEntryStateAndActions extends DataEntryState {
   dispatch: DataEntryDispatch;
-  onSubmitForm: (data: Partial<PollingStationResults>, options?: SubmitCurrentFormOptions) => Promise<boolean>;
+  onSubmitForm: (currentValues: SectionValues, options?: SubmitCurrentFormOptions) => Promise<boolean>;
   onDeleteDataEntry: () => Promise<boolean>;
-  onFinaliseDataEntry: () => Promise<boolean>;
+  onFinaliseDataEntry: () => Promise<DataEntryStatus | undefined>;
   register: (formSectionId: FormSectionId) => void;
   setCache: (cache: TemporaryCache) => void;
   updateFormSection: (partialFormSection: Partial<FormSection>) => void;
@@ -87,16 +149,18 @@ export type DataEntryAction =
     };
 
 export interface SubmitCurrentFormOptions {
-  acceptWarnings?: boolean;
+  acceptErrorsAndWarnings?: boolean;
   aborting?: boolean;
   continueToNextSection?: boolean;
-  showAcceptWarnings?: boolean;
+  showAcceptErrorsAndWarnings?: boolean;
 }
+
+export type SectionValues = Record<string, string>;
 
 //store unvalidated data
 export type TemporaryCache = {
   key: FormSectionId;
-  data: Partial<PollingStationResults>;
+  data: SectionValues;
 };
 
 // Status of the form controller
@@ -106,7 +170,7 @@ export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" |
 export interface ClientState {
   furthest: FormSectionId;
   current: FormSectionId;
-  acceptedWarnings: FormSectionId[];
+  acceptedErrorsAndWarnings: FormSectionId[];
   continue: boolean;
 }
 
@@ -121,12 +185,11 @@ export interface FormState {
 export type FormSection = {
   index: number; //fixate the order of filling in sections
   id: FormSectionId;
-  title?: string;
   hasChanges: boolean;
   isSaved: boolean; //whether this section has been sent to the server
   isSubmitted?: boolean; //whether this section has been submitted in the latest request
-  acceptWarnings: boolean;
-  acceptWarningsError: boolean;
+  acceptErrorsAndWarnings: boolean;
+  acceptErrorsAndWarningsError: boolean;
   errors: ValidationResultSet;
   warnings: ValidationResultSet;
 };

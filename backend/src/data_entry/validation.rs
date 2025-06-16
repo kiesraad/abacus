@@ -7,7 +7,7 @@ use super::{
     CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
     VotersCounts, VotesCounts, comparison::Compare, status::DataEntryStatus,
 };
-use crate::{election::Election, polling_station::PollingStation};
+use crate::{election::ElectionWithPoliticalGroups, polling_station::PollingStation};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
 pub struct ValidationResults {
@@ -157,7 +157,7 @@ impl fmt::Display for DataError {
 pub trait Validate {
     fn validate(
         &self,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
@@ -167,7 +167,7 @@ pub trait Validate {
 pub fn validate_data_entry_status(
     data_entry_status: &DataEntryStatus,
     polling_station: &PollingStation,
-    election: &Election,
+    election: &ElectionWithPoliticalGroups,
 ) -> Result<ValidationResults, DataError> {
     let mut validation_results = ValidationResults::default();
     data_entry_status.validate(
@@ -188,7 +188,7 @@ pub fn validate_data_entry_status(
 impl Validate for DataEntryStatus {
     fn validate(
         &self,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
@@ -232,7 +232,7 @@ impl Validate for DataEntryStatus {
 impl Validate for PollingStationResults {
     fn validate(
         &self,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
@@ -539,7 +539,7 @@ impl Validate for PollingStationResults {
 impl Validate for Count {
     fn validate(
         &self,
-        _election: &Election,
+        _election: &ElectionWithPoliticalGroups,
         _polling_station: &PollingStation,
         _validation_results: &mut ValidationResults,
         _field_name: &FieldPath,
@@ -579,7 +579,7 @@ fn identical_voters_counts_and_votes_counts(voters: &VotersCounts, votes: &Votes
 impl Validate for VotersCounts {
     fn validate(
         &self,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
@@ -635,7 +635,7 @@ impl Validate for VotersCounts {
 impl Validate for VotesCounts {
     fn validate(
         &self,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
@@ -716,7 +716,7 @@ impl Validate for VotesCounts {
 impl Validate for DifferencesCounts {
     fn validate(
         &self,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
@@ -814,14 +814,13 @@ impl Validate for DifferencesCounts {
 impl Validate for Vec<PoliticalGroupVotes> {
     fn validate(
         &self,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
         // check if the list of political groups has the correct length
-        let pg = election.political_groups.as_ref();
-        if pg.is_none() || pg.expect("candidate list should not be None").len() != self.len() {
+        if election.political_groups.len() != self.len() {
             return Err(DataError::new(
                 "list of political groups does not have correct length",
             ));
@@ -849,7 +848,7 @@ impl Validate for Vec<PoliticalGroupVotes> {
 impl Validate for PoliticalGroupVotes {
     fn validate(
         &self,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
@@ -857,8 +856,6 @@ impl Validate for PoliticalGroupVotes {
         // check if the list of candidates has the correct length
         let pg = election
             .political_groups
-            .as_ref()
-            .expect("candidate list should not be None")
             .get(self.number as usize - 1)
             .expect("political group should exist");
 
@@ -922,7 +919,7 @@ fn difference_admitted_voters_count_and_votes_cast_count_above_threshold(
 impl Validate for CandidateVotes {
     fn validate(
         &self,
-        election: &Election,
+        election: &ElectionWithPoliticalGroups,
         polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,

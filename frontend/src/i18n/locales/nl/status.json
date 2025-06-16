@@ -1,10 +1,11 @@
 {
   "definitive": "Eerste en tweede invoer klaar",
-  "entries_different": "Verschil invoer 1 en 2",
+  "entries_different": "Verschil 1e en 2e invoer",
   "errors_and_warnings": "Fouten en waarschuwingen",
   "first_and_second_entry_finished": "1e en 2e invoer klaar",
   "first_entry_finished_short": "1e invoer klaar",
   "first_entry_finished": "Eerste invoer klaar",
+  "first_entry_has_errors": "Fouten in proces-verbaal",
   "first_entry_in_progress": "Eerste invoer bezig",
   "first_entry_not_started": "Eerste invoer nog niet gestart",
   "in_progress": "Invoer bezig",

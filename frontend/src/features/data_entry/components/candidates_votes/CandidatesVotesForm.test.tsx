@@ -1,6 +1,7 @@
 import { UserEvent, userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
+import { useUser } from "@/hooks/user/useUser";
 import { electionMockData, politicalGroupMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -8,9 +9,14 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, within } from "@/testing/test-utils";
-import { Election, PoliticalGroup, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import {
+  ElectionWithPoliticalGroups,
+  LoginResponse,
+  PoliticalGroup,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+} from "@/types/generated/openapi";
 
-import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
+import { errorWarningMocks, getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
@@ -19,37 +25,22 @@ import {
   getCandidateFullNamesFromMockData,
   overrideServerClaimDataEntryResponse,
 } from "../../testing/test.utils";
-import { DataEntryState } from "../../types/types";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
-const defaultDataEntryState: DataEntryState = {
-  election: electionMockData,
-  pollingStationId: 1,
-  error: null,
-  pollingStationResults: null,
-  entryNumber: 1,
-  formState: {
-    current: "differences_counts",
-    furthest: "differences_counts",
-    sections: {
-      recounted: getDefaultFormSection("recounted", 1),
-      voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
-      differences_counts: getDefaultFormSection("differences_counts", 3),
-      save: getDefaultFormSection("save", 4),
-    },
-  },
-  targetFormSectionId: "recounted",
-  status: "idle",
-  cache: null,
+vi.mock("@/hooks/user/useUser");
+
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
 };
 
-const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
-
-function renderForm({ group, election }: { group?: PoliticalGroup; election?: Required<Election> } = {}) {
+function renderForm({ election, groupNumber }: { election?: ElectionWithPoliticalGroups; groupNumber?: number } = {}) {
   return render(
     <DataEntryProvider election={election || electionMockData} pollingStationId={1} entryNumber={1}>
-      <CandidatesVotesForm group={group || politicalGroupMockData} />
+      <CandidatesVotesForm groupNumber={groupNumber || 1} />
     </DataEntryProvider>,
   );
 }
@@ -62,28 +53,32 @@ const candidatesFieldIds = {
 
 describe("Test CandidatesVotesForm", () => {
   beforeEach(() => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 
   describe("CandidatesVotesForm renders correctly", () => {
     test("Candidates with first name", async () => {
-      const politicalGroupMockData: PoliticalGroup = {
-        number: 1,
-        name: "Lijst 1 - Vurige Vleugels Partij",
-        candidates: [
+      const election: ElectionWithPoliticalGroups = {
+        ...electionMockData,
+        political_groups: [
           {
             number: 1,
-            initials: "E.",
-            first_name: "Eldor",
-            last_name: "Zilverlicht",
-            locality: "Amsterdam",
+            name: "Lijst 1 - Vurige Vleugels Partij",
+            candidates: [
+              {
+                number: 1,
+                initials: "E.",
+                first_name: "Eldor",
+                last_name: "Zilverlicht",
+                locality: "Amsterdam",
+              },
+            ],
           },
         ],
       };
 
-      const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
-
-      renderForm({ group: politicalGroupMock });
+      renderForm({ election });
 
       const candidateRow = await screen.findByTestId(`row-${candidatesFieldIds.candidate0}`);
       const candidateName = within(candidateRow).getAllByRole("cell")[2];
@@ -91,22 +86,25 @@ describe("Test CandidatesVotesForm", () => {
     });
 
     test("Candidates without first names", async () => {
-      const politicalGroupMockData: PoliticalGroup = {
-        number: 1,
-        name: "Lijst 1 - Vurige Vleugels Partij",
-        candidates: [
+      const election: ElectionWithPoliticalGroups = {
+        ...electionMockData,
+        political_groups: [
           {
             number: 1,
-            initials: "E.",
-            last_name: "Zilverlicht",
-            locality: "Amsterdam",
+            name: "Lijst 1 - Vurige Vleugels Partij",
+            candidates: [
+              {
+                number: 1,
+                initials: "E.",
+                last_name: "Zilverlicht",
+                locality: "Amsterdam",
+              },
+            ],
           },
         ],
       };
 
-      const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
-
-      renderForm({ group: politicalGroupMock });
+      renderForm({ election });
 
       const candidateRow = await screen.findByTestId("row-data.political_group_votes[0].candidate_votes[0].votes");
       const candidateName = within(candidateRow).getAllByRole("cell")[2];
@@ -118,13 +116,15 @@ describe("Test CandidatesVotesForm", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
       });
 
       renderForm();
+
+      const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
       const candidate1 = await screen.findByRole("textbox", { name: `1 ${candidateNames[0]}` });
       await user.type(candidate1, "12345");
@@ -140,7 +140,7 @@ describe("Test CandidatesVotesForm", () => {
     test("Starting input doesn't render totals warning", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -158,7 +158,7 @@ describe("Test CandidatesVotesForm", () => {
     test("hitting shift+enter does result in api call", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -188,7 +188,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -285,10 +285,12 @@ describe("Test CandidatesVotesForm", () => {
         ],
       };
 
-      const electionMockData: Required<Election> = {
+      const electionMockData: ElectionWithPoliticalGroups = {
         id: 1,
         name: "Gemeenteraadsverkiezingen 2026",
+        election_id: "Heemdamseburg_2024",
         location: "Heemdamseburg",
+        domain_id: "0000",
         number_of_voters: 100,
         category: "Municipal",
         number_of_seats: 29,
@@ -321,10 +323,8 @@ describe("Test CandidatesVotesForm", () => {
         ],
       };
 
-      const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
-
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           ...getEmptyDataEntryRequest().data,
           political_group_votes: [
@@ -359,7 +359,7 @@ describe("Test CandidatesVotesForm", () => {
           ],
         },
       });
-      renderForm({ group: politicalGroupMock, election: electionMockData });
+      renderForm({ election: electionMockData });
 
       const expectedRequest = {
         data: {
@@ -436,7 +436,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -485,14 +485,14 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
       });
       renderForm();
 
-      await screen.findByTestId("candidates_form_1");
+      await screen.findByTestId("political_group_votes_1_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [errorWarningMocks.F401], warnings: [] },
       });
@@ -519,14 +519,14 @@ describe("Test CandidatesVotesForm", () => {
     test("Imagined warning on this form", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
       });
       renderForm();
 
-      await screen.findByTestId("candidates_form_1");
+      await screen.findByTestId("political_group_votes_1_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -555,7 +555,7 @@ describe("Test CandidatesVotesForm", () => {
   describe("CandidatesVotesForm accept warnings", () => {
     let user: UserEvent;
     let submitButton: HTMLButtonElement;
-    let acceptWarningsCheckbox: HTMLInputElement;
+    let acceptErrorsAndWarningsCheckbox: HTMLInputElement;
 
     beforeEach(async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -571,56 +571,60 @@ describe("Test CandidatesVotesForm", () => {
       submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      acceptWarningsCheckbox = await screen.findByRole("checkbox", {
+      acceptErrorsAndWarningsCheckbox = await screen.findByRole("checkbox", {
         name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
     });
 
     test("checkbox should disappear when filling in any form input", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
+
+      const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
       const input = screen.getByRole("textbox", { name: `2 ${candidateNames[1]}` });
       await user.type(input, "1");
 
-      expect(acceptWarningsCheckbox).not.toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
     });
 
     test("checkbox with error should disappear when filling in any form input", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
       await user.click(submitButton);
 
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      const acceptWarningsError = await screen.findByRole("alert", {
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      const acceptErrorsAndWarningsError = await screen.findByRole("alert", {
         description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       });
-      expect(acceptWarningsError).toBeVisible();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
+
+      const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
       const input = screen.getByRole("textbox", { name: `2 ${candidateNames[1]}` });
       await user.type(input, "1");
 
-      expect(acceptWarningsCheckbox).not.toBeVisible();
-      expect(acceptWarningsError).not.toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
+      expect(acceptErrorsAndWarningsError).not.toBeVisible();
     });
 
     test("error should not immediately disappear when checkbox is checked", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
       await user.click(submitButton);
 
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      const acceptWarningsError = screen.getByRole("alert", {
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      const acceptErrorsAndWarningsError = screen.getByRole("alert", {
         description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       });
-      expect(acceptWarningsError).toBeVisible();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
 
-      await user.click(acceptWarningsCheckbox);
-      expect(acceptWarningsCheckbox).toBeChecked();
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      expect(acceptWarningsError).toBeVisible();
+      await user.click(acceptErrorsAndWarningsCheckbox);
+      expect(acceptErrorsAndWarningsCheckbox).toBeChecked();
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
     });
   });
 });

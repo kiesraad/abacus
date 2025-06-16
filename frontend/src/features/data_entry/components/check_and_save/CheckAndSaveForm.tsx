@@ -25,8 +25,16 @@ export function CheckAndSaveForm() {
 
   const navigate = useNavigate();
   const { election } = useElection();
-  const { error, formState, onSubmitForm, status, onFinaliseDataEntry, pollingStationId, entryNumber } =
-    useDataEntryContext("save");
+  const {
+    error,
+    dataEntryStructure,
+    formState,
+    onSubmitForm,
+    status,
+    onFinaliseDataEntry,
+    pollingStationId,
+    entryNumber,
+  } = useDataEntryContext("save");
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionId) => {
@@ -40,7 +48,7 @@ export function CheckAndSaveForm() {
   }, [formState]);
 
   const finalisationAllowed = Object.values(formState.sections).every(
-    (section) => section.errors.isEmpty() && (section.warnings.isEmpty() || section.acceptWarnings),
+    (section) => section.errors.isEmpty() && (section.warnings.isEmpty() || section.acceptErrorsAndWarnings),
   );
 
   // save the current state, without finalising (for the abort dialog)
@@ -54,11 +62,17 @@ export function CheckAndSaveForm() {
       return false;
     }
 
-    if (await onFinaliseDataEntry()) {
-      await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
+    const dataEntryStatus = await onFinaliseDataEntry();
+    if (dataEntryStatus !== undefined) {
+      if (dataEntryStatus.status === "EntriesDifferent") {
+        await navigate(`/elections/${election.id}/data-entry#data-entry-different`);
+      } else if (dataEntryStatus.status === "FirstEntryHasErrors") {
+        await navigate(`/elections/${election.id}/data-entry#data-entry-errors`);
+      } else {
+        await navigate(`/elections/${election.id}/data-entry#data-entry-${entryNumber}-saved`);
+      }
       return true;
     }
-
     return false;
   };
 
@@ -98,14 +112,11 @@ export function CheckAndSaveForm() {
         )}
 
         {summary.notableFormSections.map((section) => {
+          const title = dataEntryStructure.find((s) => s.id === section.formSection.id)?.title || "";
           const link = (title: React.ReactElement) => (
             <Link to={getUrlForFormSection(section.formSection.id)}>{title}</Link>
           );
-          const content = tx(
-            `check_and_save.notable_form_sections.${section.status}`,
-            { link },
-            { link_title: section.title || section.formSection.title || "" },
-          );
+          const content = tx(`check_and_save.notable_form_sections.${section.status}`, { link }, { link_title: title });
 
           return (
             <StatusList.Item

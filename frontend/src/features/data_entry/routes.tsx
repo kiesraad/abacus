@@ -19,7 +19,7 @@ export const dataEntryRoutes: RouteObject[] = [
       },
       { path: "differences", Component: DifferencesPage },
       {
-        path: "list/:listNumber",
+        path: "list/:groupNumber",
         Component: CandidatesVotesPage,
       },
       { path: "save", Component: CheckAndSavePage },

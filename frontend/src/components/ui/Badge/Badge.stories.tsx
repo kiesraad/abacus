@@ -7,6 +7,7 @@ import { Badge, BadgeProps } from "./Badge";
 const badgeTypes: DataEntryStatusName[] = [
   "first_entry_not_started",
   "first_entry_in_progress",
+  "first_entry_has_errors",
   "second_entry_not_started",
   "second_entry_in_progress",
   "entries_different",

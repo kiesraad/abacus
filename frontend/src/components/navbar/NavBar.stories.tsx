@@ -5,7 +5,7 @@ import { Story } from "@ladle/react";
 import { ElectionProviderContext } from "@/hooks/election/ElectionProviderContext";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { Election, Role } from "@/types/generated/openapi";
+import { Role } from "@/types/generated/openapi";
 
 import { NavBar } from "./NavBar";
 import cls from "./NavBar.module.css";
@@ -34,6 +34,7 @@ const locations: { pathname: string; userRole: Role }[] = [
   { pathname: "/elections/1", userRole: "coordinator" },
   { pathname: "/elections/1/report", userRole: "coordinator" },
   { pathname: "/elections/1/status", userRole: "coordinator" },
+  { pathname: "/elections/1/status/1/resolve-differences", userRole: "coordinator" },
   { pathname: "/elections/1/polling-stations", userRole: "coordinator" },
   { pathname: "/elections/1/polling-stations/create", userRole: "coordinator" },
   { pathname: "/elections/1/polling-stations/1/update", userRole: "coordinator" },
@@ -45,8 +46,7 @@ const locations: { pathname: string; userRole: Role }[] = [
 export const AllRoutes: Story = () => (
   <ElectionProviderContext.Provider
     value={{
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      election: electionDetailsMockResponse.election as Required<Election>,
+      election: electionDetailsMockResponse.election,
       pollingStations: electionDetailsMockResponse.polling_stations,
     }}
   >
@@ -54,8 +54,7 @@ export const AllRoutes: Story = () => (
       <React.Fragment key={location.pathname + location.userRole}>
         <TestUserProvider userRole={location.userRole}>
           <code>
-            {location.pathname}
-            {location.userRole}
+            {location.pathname} ({location.userRole})
           </code>
           <NavBar location={location} />
           <br />

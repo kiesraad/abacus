@@ -1,8 +1,16 @@
 {
   "create": "Verkiezing toevoegen",
+  "add": "Toevoegen: {name}",
+  "check_and_save": {
+    "title": "Controleren en opslaan",
+    "description": "Je gaat de volgende verkiezing toevoegen:"
+  },
   "check_eml": {
-    "title": "Controleer verkiezingsdefinitie",
-    "description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
+    "election_title": "Controleer verkiezingsdefinitie",
+    "candidates_title": "Controleer kandidatenlijst",
+    "election_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
+    "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende kandidaten:",
+    "list_name": "{location}, kandidatenlijst {name}",
     "check_hash": {
       "description": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van de Kiesraad ontvangen.",
       "label": "Controle deel {stub}",
@@ -16,7 +24,8 @@
   "import_eml": "Importeer verkiezingsdefinitie",
   "invalid_election_definition": {
     "title": "Ongeldige verkiezingsdefinitie",
-    "description": "Het bestand <file>filename</file> bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie."
+    "description": "Het bestand <file>filename</file> bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
+    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte."
   },
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",
@@ -24,6 +33,8 @@
   "no_elections_added": "Nog geen verkiezingen ingesteld",
   "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",
   "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
+  "singular": "verkiezing",
+  "candidate_list": "kandidatenlijst",
   "start_when_count_list_received": "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.",
   "status": "Status",
   "title": {
@@ -33,5 +44,12 @@
     "plural": "Verkiezingen",
     "singular": "Verkiezing"
   },
-  "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het."
+  "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
+  "import_candidates_eml": "Importeer kandidatenlijst",
+  "use_instructions_to_import_candidates_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de kandidatenlijst kunt downloaden. Zet het bestand op deze computer en importeer het.",
+  "invalid_candidates_definition": {
+    "title": "Ongeldige kandidatenlijst",
+    "description": "Het bestand <file>filename</file> bevat geen geldige kandidatenlijst. Kies een bestand met een geldige definitie.",
+    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte."
+  }
 }

@@ -10,7 +10,7 @@ describe("FullSeatsTable", () => {
     render(
       <FullSeatsTable
         finalStanding={seat_assignment.final_standing}
-        politicalGroups={election.political_groups!}
+        politicalGroups={election.political_groups}
         quota={seat_assignment.quota}
         resultChanges={[]}
       />,

@@ -40,6 +40,14 @@ test("The first entry in progress badge is visible", () => {
   expect(badgeElementImg).toBeVisible();
 });
 
+test("The first entry has errors badge is visible", () => {
+  render(<Badge type="first_entry_has_errors" />);
+
+  const badgeElement = screen.getByText("1e invoer");
+
+  expect(badgeElement).toBeVisible();
+});
+
 test("The second entry badge is visible", () => {
   render(<Badge type="second_entry_not_started" />);
 

@@ -1,6 +1,7 @@
 import { UserEvent, userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
+import { useUser } from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -8,11 +9,24 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen } from "@/testing/test-utils";
-import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, SaveDataEntryResponse } from "@/types/generated/openapi";
+import {
+  LoginResponse,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  SaveDataEntryResponse,
+} from "@/types/generated/openapi";
 
 import { errorWarningMocks, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { RecountedForm } from "./RecountedForm";
+
+vi.mock("@/hooks/user/useUser");
+
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
+};
 
 function renderForm() {
   return render(
@@ -24,15 +38,17 @@ function renderForm() {
 
 describe("Test RecountedForm", () => {
   beforeEach(() => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
+
   describe("RecountedForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       renderForm();
 
       const user = userEvent.setup();
 
-      const yes = await screen.findByTestId("yes");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
       await user.click(yes);
       expect(yes).toBeChecked();
 
@@ -49,7 +65,7 @@ describe("Test RecountedForm", () => {
       const user = userEvent.setup();
       const spy = vi.spyOn(global, "fetch");
 
-      const yes = await screen.findByTestId("yes");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
       await user.click(yes);
       expect(yes).toBeChecked();
 
@@ -67,8 +83,8 @@ describe("Test RecountedForm", () => {
 
       renderForm();
 
-      const yes = await screen.findByTestId("yes");
-      const no = await screen.findByTestId("no");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
+      const no = await screen.findByLabelText("Nee, er was geen hertelling");
       expect(yes).toHaveFocus();
       expect(yes).not.toBeChecked();
       expect(no).not.toBeChecked();
@@ -105,7 +121,7 @@ describe("Test RecountedForm", () => {
 
       const user = userEvent.setup();
 
-      const yes = await screen.findByTestId("yes");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
       await user.click(yes);
 
       const spy = vi.spyOn(global, "fetch");
@@ -141,8 +157,8 @@ describe("Test RecountedForm", () => {
 
       renderForm();
 
-      const yes = await screen.findByTestId("yes");
-      const no = await screen.findByTestId("no");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
+      const no = await screen.findByLabelText("Nee, er was geen hertelling");
       const submitButton = screen.getByRole("button", { name: "Volgende" });
 
       expect(yes).not.toBeChecked();
@@ -228,7 +244,7 @@ describe("Test RecountedForm", () => {
   describe("RecountedForm accept warnings", () => {
     let user: UserEvent;
     let submitButton: HTMLButtonElement;
-    let acceptWarningsCheckbox: HTMLInputElement;
+    let acceptErrorsAndWarningsCheckbox: HTMLInputElement;
 
     beforeEach(async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -241,56 +257,56 @@ describe("Test RecountedForm", () => {
       submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      acceptWarningsCheckbox = await screen.findByRole("checkbox", {
+      acceptErrorsAndWarningsCheckbox = await screen.findByRole("checkbox", {
         name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
       });
     });
 
     test("checkbox should disappear when filling in any form input", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
-      const yes = await screen.findByTestId("yes");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
       await user.click(yes);
 
-      expect(acceptWarningsCheckbox).not.toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
     });
 
     test("checkbox with error should disappear when filling in any form input", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
       await user.click(submitButton);
 
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      const acceptWarningsError = await screen.findByRole("alert", {
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      const acceptErrorsAndWarningsError = await screen.findByRole("alert", {
         description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       });
-      expect(acceptWarningsError).toBeVisible();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
 
-      const yes = await screen.findByTestId("yes");
+      const yes = await screen.findByLabelText("Ja, er was een hertelling");
       await user.click(yes);
 
-      expect(acceptWarningsCheckbox).not.toBeVisible();
-      expect(acceptWarningsError).not.toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
+      expect(acceptErrorsAndWarningsError).not.toBeVisible();
     });
 
     test("error should not immediately disappear when checkbox is checked", async () => {
-      expect(acceptWarningsCheckbox).toBeVisible();
-      expect(acceptWarningsCheckbox).not.toBeInvalid();
+      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
+      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
       await user.click(submitButton);
 
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      const acceptWarningsError = screen.getByRole("alert", {
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      const acceptErrorsAndWarningsError = screen.getByRole("alert", {
         description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       });
-      expect(acceptWarningsError).toBeVisible();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
 
-      await user.click(acceptWarningsCheckbox);
-      expect(acceptWarningsCheckbox).toBeChecked();
-      expect(acceptWarningsCheckbox).toBeInvalid();
-      expect(acceptWarningsError).toBeVisible();
+      await user.click(acceptErrorsAndWarningsCheckbox);
+      expect(acceptErrorsAndWarningsCheckbox).toBeChecked();
+      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
+      expect(acceptErrorsAndWarningsError).toBeVisible();
     });
   });
 });

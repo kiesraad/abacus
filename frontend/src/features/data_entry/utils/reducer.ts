@@ -1,24 +1,27 @@
-import { Election } from "@/types/generated/openapi";
+import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { ClientState, DataEntryAction, DataEntryState } from "../types/types";
 import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
+import { getDataEntryStructure } from "./structure";
 
 export const INITIAL_FORM_SECTION_ID: FormSectionId = "recounted";
 
 export function getInitialState(
-  election: Required<Election>,
+  election: ElectionWithPoliticalGroups,
   pollingStationId: number,
   entryNumber: number,
 ): DataEntryState {
+  const dataEntryStructure = getDataEntryStructure(election);
   return {
     election,
     pollingStationId,
     error: null,
     pollingStationResults: null,
     entryNumber,
-    formState: getInitialFormState(election),
-    targetFormSectionId: INITIAL_FORM_SECTION_ID,
+    dataEntryStructure,
+    formState: getInitialFormState(dataEntryStructure),
+    targetFormSectionId: null,
     status: "idle",
     cache: null,
   };
@@ -27,33 +30,37 @@ export function getInitialState(
 export default function dataEntryReducer(state: DataEntryState, action: DataEntryAction): DataEntryState {
   // uncomment the following line to see the action in the console
   /// eslint-disable-next-line
-  // console.log("ACTION", action);
+  //console.log("ACTION", action, "OLD", state);
 
   switch (action.type) {
-    case "DATA_ENTRY_CLAIMED":
+    case "DATA_ENTRY_CLAIMED": {
+      const dataEntryStructure = getDataEntryStructure(state.election, action.dataEntry.data);
       if (action.dataEntry.client_state) {
         const { formState, targetFormSectionId } = buildFormState(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           action.dataEntry.client_state as ClientState,
           action.dataEntry.validation_results,
-          state.election,
+          dataEntryStructure,
         );
         return {
           ...state,
+          dataEntryStructure,
           formState,
           targetFormSectionId,
           pollingStationResults: action.dataEntry.data,
           error: null,
         };
+      } else {
+        return {
+          ...state,
+          dataEntryStructure,
+          formState: getInitialFormState(state.dataEntryStructure),
+          targetFormSectionId: INITIAL_FORM_SECTION_ID,
+          pollingStationResults: action.dataEntry.data,
+          error: null,
+        };
       }
-
-      return {
-        ...state,
-        formState: getInitialFormState(state.election),
-        targetFormSectionId: INITIAL_FORM_SECTION_ID,
-        pollingStationResults: action.dataEntry.data,
-        error: null,
-      };
+    }
     case "DATA_ENTRY_CLAIM_FAILED":
       return {
         ...state,
@@ -91,16 +98,21 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         error: action.error,
       };
     case "FORM_SAVED": {
+      const dataEntryStructure = getDataEntryStructure(state.election, action.data);
+
       const formState = updateFormStateAfterSubmit(
+        dataEntryStructure,
         state.formState,
         action.validationResults,
         action.continueToNextSection,
       );
+
       return {
         ...state,
         status: "idle",
         error: null,
         pollingStationResults: action.data,
+        dataEntryStructure,
         formState,
         targetFormSectionId: action.continueToNextSection ? getNextSectionID(formState) : state.targetFormSectionId,
       };

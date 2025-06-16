@@ -1,3 +1,4 @@
+use crate::election::{CandidateGender, structs};
 use serde::{Deserialize, Serialize};
 
 /// Managing authority for the EML document
@@ -153,14 +154,19 @@ pub struct ElectionDomain {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EMLImportError {
     InvalidDateFormat,
+    InvalidCandidate,
     MismatchNumberOfSeats,
+    MismatchElectionIdentifier,
     MismatchPreferenceThreshold,
     MissingNumberOfSeats,
     MissingNominationDate,
     MissingPreferenceThreshold,
     MissingRegion,
     MissingSubcategory,
+    MissingElectionTree,
+    MissingElectionDomain,
     Needs101a,
+    Needs230b,
     NumberOfSeatsNotInRange,
     OnlyMunicipalSupported,
     TooManyPoliticalGroups,
@@ -194,6 +200,40 @@ pub struct Candidate {
     #[serde(skip_serializing_if = "Option::is_none", default)]
     pub gender: Option<Gender>,
     pub qualifying_address: QualifyingAddress,
+}
+
+impl TryFrom<Candidate> for structs::Candidate {
+    type Error = crate::eml::EMLImportError;
+
+    fn try_from(parsed: Candidate) -> Result<Self, Self::Error> {
+        Ok(structs::Candidate {
+            number: parsed
+                .candidate_identifier
+                .id
+                .parse()
+                .or(Err(EMLImportError::InvalidCandidate))?,
+            initials: match parsed.candidate_full_name.person_name.name_line {
+                Some(line) => line.value,
+                None => return Err(EMLImportError::InvalidCandidate),
+            },
+            first_name: parsed.candidate_full_name.person_name.first_name,
+            last_name_prefix: parsed.candidate_full_name.person_name.name_prefix,
+            last_name: parsed.candidate_full_name.person_name.last_name,
+            locality: parsed.qualifying_address.locality_name().to_string(),
+            country_code: parsed
+                .qualifying_address
+                .country_name_code()
+                .map(|s| s.to_string()),
+            gender: match parsed.gender {
+                None => None,
+                Some(gender) => match gender {
+                    Gender::Male => Some(CandidateGender::Male),
+                    Gender::Female => Some(CandidateGender::Female),
+                    Gender::Unknown => None,
+                },
+            },
+        })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -252,7 +292,6 @@ pub struct QualifyingAddress {
 }
 
 impl QualifyingAddress {
-    #[cfg(test)]
     pub fn locality_name(&self) -> &str {
         match &self.data {
             QualifyingAddressData::Locality(locality) => &locality.locality_name,
@@ -260,7 +299,6 @@ impl QualifyingAddress {
         }
     }
 
-    #[cfg(test)]
     pub fn country_name_code(&self) -> Option<&str> {
         match &self.data {
             QualifyingAddressData::Locality(_) => None,

@@ -11,6 +11,7 @@ import { render, screen, waitFor, within } from "@/testing/test-utils";
 import { errorWarningMocks, getDefaultFormSection } from "../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../testing/test.utils";
 import { FormState } from "../types/types";
+import { ValidationResultSet } from "../utils/ValidationResults";
 import { DataEntryProgress } from "./DataEntryProgress";
 import { DataEntryProvider } from "./DataEntryProvider";
 
@@ -77,8 +78,8 @@ describe("Test DataEntryProgress", () => {
 
     formState.current = "political_group_votes_2";
     formState.furthest = "political_group_votes_2";
-    formState.sections.voters_votes_counts.acceptWarnings = false;
-    formState.sections.differences_counts.acceptWarnings = true;
+    formState.sections.voters_votes_counts.acceptErrorsAndWarnings = false;
+    formState.sections.differences_counts.acceptErrorsAndWarnings = true;
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
@@ -96,10 +97,10 @@ describe("Test DataEntryProgress", () => {
     });
 
     const recounted = screen.getByTestId("list-item-recounted");
-    const votersAndVotes = screen.getByTestId("list-item-voters-and-votes");
-    const differences = screen.getByTestId("list-item-differences");
-    const list1 = screen.getByTestId("list-item-pg-1");
-    const list2 = screen.getByTestId("list-item-pg-2");
+    const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
+    const differences = screen.getByTestId("list-item-differences_counts");
+    const list1 = screen.getByTestId("list-item-political_group_votes_1");
+    const list2 = screen.getByTestId("list-item-political_group_votes_2");
     const checkAndSave = screen.getByTestId("list-item-save");
 
     expect(recounted).toHaveClass("error");
@@ -132,6 +133,38 @@ describe("Test DataEntryProgress", () => {
     expect(within(checkAndSave).queryByRole("img")).not.toBeInTheDocument();
   });
 
+  test("Prioritise errors over warnings", async () => {
+    const formState = getDefaultFormState();
+
+    formState.current = "political_group_votes_2";
+    formState.furthest = "political_group_votes_2";
+
+    formState.sections.voters_votes_counts.errors = new ValidationResultSet([errorWarningMocks.F201]);
+    formState.sections.voters_votes_counts.warnings = new ValidationResultSet([errorWarningMocks.W201]);
+
+    overrideServerClaimDataEntryResponse({
+      formState: formState,
+      pollingStationResults: pollingStationResults,
+      continueToNextSection: false,
+      validationResults: {
+        errors: [errorWarningMocks.F201],
+        warnings: [errorWarningMocks.W201],
+      },
+    });
+    renderForm();
+
+    await waitFor(() => {
+      expect(screen.getByText("Is er herteld?")).toBeVisible();
+    });
+
+    const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
+
+    expect(votersAndVotes).toHaveClass("error");
+    expect(votersAndVotes).toHaveAttribute("aria-current", "false");
+    const votersAndVotesIcon = within(votersAndVotes).getByRole("img");
+    expect(votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
+  });
+
   test("shows links to other pages when on last page", async () => {
     const formState = getDefaultFormState();
 
@@ -151,9 +184,9 @@ describe("Test DataEntryProgress", () => {
     });
 
     const recounted = screen.getByTestId("list-item-recounted");
-    const votersAndVotes = screen.getByTestId("list-item-voters-and-votes");
-    const differences = screen.getByTestId("list-item-differences");
-    const list1 = screen.getByTestId("list-item-pg-1");
+    const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
+    const differences = screen.getByTestId("list-item-differences_counts");
+    const list1 = screen.getByTestId("list-item-political_group_votes_1");
 
     const electionId = 1;
     const pollingStationId = 1;
@@ -206,7 +239,7 @@ describe("Test DataEntryProgress", () => {
       expect(screen.getByText("Is er herteld?")).toBeVisible();
     });
 
-    const list1 = screen.getByTestId("list-item-pg-1");
+    const list1 = screen.getByTestId("list-item-political_group_votes_1");
     const checkAndSave = screen.getByTestId("list-item-save");
 
     const electionId = 1;
@@ -250,11 +283,11 @@ describe("Test DataEntryProgress", () => {
       expect(screen.getByText("Is er herteld?")).toBeVisible();
     });
 
-    const list1 = screen.getByTestId("list-item-pg-1");
+    const list1 = screen.getByTestId("list-item-political_group_votes_1");
     expect(list1).toHaveClass("idle disabled");
     expect(list1).toHaveAttribute("aria-current", "false");
 
-    const list2 = screen.getByTestId("list-item-pg-2");
+    const list2 = screen.getByTestId("list-item-political_group_votes_2");
     expect(list2).toHaveClass("idle disabled");
     expect(list2).toHaveAttribute("aria-current", "false");
 

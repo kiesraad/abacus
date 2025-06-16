@@ -1,11 +1,11 @@
-use chrono::Datelike;
 use serde::{Deserialize, Serialize};
 
 use super::{
     EMLBase,
     common::{
         AffiliationIdentifier, AuthorityAddress, AuthorityIdentifier, ContestIdentifier,
-        ElectionCategory, ElectionIdentifier, ElectionSubcategory, ManagingAuthority,
+        ElectionCategory, ElectionDomain, ElectionIdentifier, ElectionSubcategory,
+        ManagingAuthority,
     },
 };
 use crate::{
@@ -31,12 +31,12 @@ pub struct EML510 {
 
 impl EML510 {
     pub fn from_results(
-        election: &crate::election::Election,
+        election: &crate::election::ElectionWithPoliticalGroups,
         results: &[(PollingStation, PollingStationResults)],
         summary: &ElectionSummary,
         creation_date_time: &chrono::DateTime<chrono::Local>,
     ) -> EML510 {
-        let authority_id = "0000".to_string(); // TODO: replace with actual authority id from election definition (i.e. data from election tree)
+        let authority_id = election.domain_id.clone(); // TODO: replace with election tree when that is available
         let total_votes = TotalVotes::from_summary(election, summary);
         let reporting_unit_votes = results
             .iter()
@@ -45,24 +45,20 @@ impl EML510 {
             })
             .collect();
         let contest = Contest {
-            contest_identifier: ContestIdentifier::new(
-                election.id.to_string(),     // TODO: set contest id from election definition
-                Some(election.name.clone()), // TODO: set contest name in contest id from election definition (optional value)
-            ),
+            contest_identifier: ContestIdentifier::new("geen".to_string(), None),
             total_votes,
             reporting_unit_votes,
         };
         let election_eml = Election {
             election_identifier: ElectionIdentifier {
-                id: format!(
-                    "{}{}",
-                    election.category.to_eml_code(),
-                    election.election_date.year()
-                ), // TODO: set election id from election definition instead of this generated id
+                id: election.election_id.clone(),
                 election_name: election.name.clone(),
                 election_category: ElectionCategory::from(election.category),
                 election_subcategory: election_subcategory(election),
-                election_domain: None, // TODO: set election domain from election definition
+                election_domain: Some(ElectionDomain {
+                    id: election.domain_id.clone(),
+                    name: election.location.clone(),
+                }),
                 election_date: election.election_date.format("%Y-%m-%d").to_string(),
                 nomination_date: None,
             },
@@ -92,7 +88,9 @@ impl EML510 {
 
 impl super::base::EMLDocument for EML510 {}
 
-fn election_subcategory(election: &crate::election::Election) -> Option<ElectionSubcategory> {
+fn election_subcategory(
+    election: &crate::election::ElectionWithPoliticalGroups,
+) -> Option<ElectionSubcategory> {
     match (&election.category, election.number_of_seats) {
         (crate::election::ElectionCategory::Municipal, ..19) => Some(ElectionSubcategory::GR1),
         (crate::election::ElectionCategory::Municipal, 19..) => Some(ElectionSubcategory::GR2),
@@ -147,7 +145,7 @@ pub struct TotalVotes {
 
 impl TotalVotes {
     pub fn from_summary(
-        election: &crate::election::Election,
+        election: &crate::election::ElectionWithPoliticalGroups,
         summary: &ElectionSummary,
     ) -> TotalVotes {
         TotalVotes {
@@ -239,7 +237,7 @@ pub struct ReportingUnitVotes {
 
 impl ReportingUnitVotes {
     pub fn from_polling_station(
-        election: &crate::election::Election,
+        election: &crate::election::ElectionWithPoliticalGroups,
         authority_id: &str,
         polling_station: &PollingStation,
         results: &PollingStationResults,
@@ -424,15 +422,15 @@ pub struct Selection {
 
 impl Selection {
     pub fn from_political_group_votes(
-        election: &crate::election::Election,
+        election: &crate::election::ElectionWithPoliticalGroups,
         votes: &[PoliticalGroupVotes],
     ) -> Vec<Selection> {
         let mut selections = vec![];
         for pg in votes {
             let epg = election
                 .political_groups
-                .as_ref()
-                .and_then(|pgs| pgs.iter().find(|p| p.number == pg.number));
+                .iter()
+                .find(|p| p.number == pg.number);
 
             selections.push(Selection {
                 selector: Selector::AffiliationIdentifier(AffiliationIdentifier {

@@ -119,7 +119,7 @@ export function CheckAndSaveForm() {
         <>
           <p className="md">{t("check_and_save.accepted_errors")}</p>
           {notableFormSections.map((section) => {
-            <Link to={getUrlForFormSection(section.id)}>{section.title}</Link>;
+            const title = dataEntryStructure.find((s) => s.id === section.id)?.title || section.id;
             return (
               <React.Fragment key={section.id}>
                 <Link to={getUrlForFormSection(section.id)} className="section-title">

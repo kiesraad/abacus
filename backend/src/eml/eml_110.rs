@@ -121,6 +121,11 @@ impl EML110 {
             }
         }
 
+        // check that the voting method is SPV
+        if self.election().contest.voting_method != VotingMethod::SinglePreferenceVote {
+            return Err(EMLImportError::InvalidVotingMethod);
+        }
+
         // get and parse the election date
         let Ok(election_date) =
             NaiveDate::parse_from_str(&self.election_identifier().election_date, "%Y-%m-%d")
@@ -581,5 +586,13 @@ mod tests {
         let doc = EML110::from_str(data).unwrap();
         let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::OnlyMunicipalSupported));
+    }
+
+    #[test]
+    fn test_invalid_election_voting_method() {
+        let data = include_str!("./tests/eml110a_invalid_election_voting_method.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.as_abacus_election().unwrap_err();
+        assert!(matches!(res, EMLImportError::InvalidVotingMethod));
     }
 }

@@ -153,8 +153,9 @@ pub struct ElectionDomain {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EMLImportError {
-    InvalidDateFormat,
     InvalidCandidate,
+    InvalidDateFormat,
+    InvalidVotingMethod,
     MismatchNumberOfSeats,
     MismatchElectionIdentifier,
     MismatchPreferenceThreshold,

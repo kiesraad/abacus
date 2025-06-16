@@ -53,11 +53,6 @@ export function DataEntryProgress() {
 
   const currentIndex = formState.sections[formState.furthest]?.index || 0;
 
-  const getRouteForSection = React.useCallback(
-    (sectionId: FormSectionId): string => getUrlForFormSectionID(election.id, pollingStationId, entryNumber, sectionId),
-    [election.id, pollingStationId, entryNumber],
-  );
-
   const renderProgressItem = React.useCallback(
     (
       section: { id: FormSectionId; short_title: string },
@@ -83,7 +78,7 @@ export function DataEntryProgress() {
           scrollIntoView={options.scrollIntoView}
         >
           {canNavigate ? (
-            <Link to={getRouteForSection(section.id)}>
+            <Link to={getUrlForFormSectionID(election.id, pollingStationId, entryNumber, section.id)}>
               <span>{section.short_title}</span>
             </Link>
           ) : (
@@ -92,7 +87,7 @@ export function DataEntryProgress() {
         </ProgressList.Item>
       );
     },
-    [formState, currentIndex, menuStatusForFormSection, getRouteForSection],
+    [formState, currentIndex, menuStatusForFormSection, election.id, pollingStationId, entryNumber],
   );
 
   // Separate sections into fixed and scrollable groups

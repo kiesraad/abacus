@@ -48,16 +48,16 @@ pub struct ElectionDetails {
     pub election_nomination_date: NaiveDate,
 }
 
-// #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-// #[serde(rename_all = "camelCase")]
-// pub struct CommitteeSessionDetails {
-//     pub session_id: u32,
-//     pub session_number: u32,
-//     pub session_election_id: u32,
-//     #[schema(value_type = String)]
-//     pub session_started_at: DateTime<Utc>,
-//     pub session_status: String,
-// }
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct CommitteeSessionDetails {
+    pub session_id: u32,
+    pub session_number: u32,
+    pub session_election_id: u32,
+    #[schema(value_type = String)]
+    pub session_started_at: DateTime<Utc>,
+    pub session_status: String,
+}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -128,6 +128,9 @@ pub enum AuditEvent {
     UserDeleted(UserDetails),
     // election events
     ElectionCreated(ElectionDetails),
+    // committee session events
+    CommitteeSessionCreated(CommitteeSessionDetails),
+    CommitteeSessionUpdated(CommitteeSessionDetails),
     // apportionment
     ApportionmentCreated(ElectionDetails),
     // polling station events
@@ -168,6 +171,8 @@ impl AuditEvent {
             AuditEvent::UserUpdated(_) => AuditEventLevel::Success,
             AuditEvent::UserDeleted(_) => AuditEventLevel::Info,
             AuditEvent::ElectionCreated(_) => AuditEventLevel::Success,
+            AuditEvent::CommitteeSessionCreated(_) => AuditEventLevel::Success,
+            AuditEvent::CommitteeSessionUpdated(_) => AuditEventLevel::Success,
             AuditEvent::ApportionmentCreated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationCreated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationUpdated(_) => AuditEventLevel::Success,

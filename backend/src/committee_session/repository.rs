@@ -1,9 +1,9 @@
-// use axum::extract::FromRef;
+use axum::extract::FromRef;
 use sqlx::{Error, SqlitePool, query_as};
 
 use super::{CommitteeSession, NewCommitteeSession};
 
-// use crate::AppState;
+use crate::AppState;
 
 pub struct CommitteeSessions(SqlitePool);
 
@@ -56,8 +56,8 @@ impl CommitteeSessions {
     }
 }
 
-// impl FromRef<AppState> for CommitteeSession {
-//     fn from_ref(input: &AppState) -> Self {
-//         Self(input.pool.clone())
-//     }
-// }
+impl FromRef<AppState> for CommitteeSessions {
+    fn from_ref(input: &AppState) -> Self {
+        Self(input.pool.clone())
+    }
+}

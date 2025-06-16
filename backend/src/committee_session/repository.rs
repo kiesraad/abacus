@@ -1,7 +1,7 @@
 use axum::extract::FromRef;
-use sqlx::{Error, SqlitePool, query_as};
+use sqlx::{Error, SqlitePool, query, query_as};
 
-use super::{CommitteeSession, NewCommitteeSession};
+use super::{CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest};
 
 use crate::AppState;
 
@@ -15,7 +15,7 @@ impl CommitteeSessions {
 
     pub async fn list(&self) -> Result<Vec<CommitteeSession>, Error> {
         let committee_sessions: Vec<CommitteeSession> =
-            query_as("SELECT id, number, election_id, started_at, status FROM committee_sessions")
+            query_as("SELECT id, number, election_id, location, start_date, start_time, status FROM committee_sessions")
                 .fetch_all(&self.0)
                 .await?;
         Ok(committee_sessions)
@@ -32,7 +32,7 @@ impl CommitteeSessions {
 
     pub async fn create(
         &self,
-        committee_session: NewCommitteeSession,
+        committee_session: CommitteeSessionCreateRequest,
     ) -> Result<CommitteeSession, Error> {
         query_as(
             r#"
@@ -45,14 +45,41 @@ impl CommitteeSessions {
               id,
               number,
               election_id,
-              started_at,
               status
             "#,
         )
         .bind(committee_session.election_id)
+        .bind(committee_session.number)
         .bind(committee_session.status)
         .fetch_one(&self.0)
         .await
+    }
+
+    pub async fn update(
+        &self,
+        committee_session_id: u32,
+        committee_session_update: CommitteeSessionUpdateRequest,
+    ) -> Result<bool, Error> {
+        let rows_affected = query!(
+            r#"
+            UPDATE committee_sessions
+            SET
+              location = ?,
+              start_date = ?,
+              start_time = ?
+            WHERE
+              id = ?
+            "#,
+            committee_session_update.location,
+            committee_session_update.start_date,
+            committee_session_update.start_time,
+            committee_session_id,
+        )
+        .execute(&self.0)
+        .await?
+        .rows_affected();
+
+        Ok(rows_affected > 0)
     }
 }
 

@@ -54,8 +54,9 @@ pub struct CommitteeSessionDetails {
     pub session_id: u32,
     pub session_number: u32,
     pub session_election_id: u32,
-    #[schema(value_type = String)]
-    pub session_started_at: DateTime<Utc>,
+    pub session_location: String,
+    pub session_start_date: String,
+    pub session_start_time: String,
     pub session_status: String,
 }
 

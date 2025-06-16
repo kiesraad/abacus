@@ -2,6 +2,24 @@
 
 /** PATHS **/
 
+// /api/committee_sessions
+export type COMMITTEE_SESSION_LIST_REQUEST_PARAMS = Record<string, never>;
+export type COMMITTEE_SESSION_LIST_REQUEST_PATH = `/api/committee_sessions`;
+export type COMMITTEE_SESSION_CREATE_REQUEST_PARAMS = Record<string, never>;
+export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
+export type COMMITTEE_SESSION_CREATE_REQUEST_BODY = CommitteeSessionCreateRequest;
+
+// /api/committee_sessions/{committee_session_id}
+export interface COMMITTEE_SESSION_DETAILS_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_DETAILS_REQUEST_PATH = `/api/committee_sessions/${number}`;
+export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
+export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
+
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
@@ -222,6 +240,8 @@ export type AuditEvent =
   | (UserDetails & { eventType: "UserUpdated" })
   | (UserDetails & { eventType: "UserDeleted" })
   | (ElectionDetails & { eventType: "ElectionCreated" })
+  | (CommitteeSessionDetails & { eventType: "CommitteeSessionCreated" })
+  | (CommitteeSessionDetails & { eventType: "CommitteeSessionUpdated" })
   | (ElectionDetails & { eventType: "ApportionmentCreated" })
   | (PollingStationDetails & { eventType: "PollingStationCreated" })
   | (PollingStationDetails & { eventType: "PollingStationUpdated" })
@@ -315,6 +335,59 @@ export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
   validation_results: ValidationResults;
+}
+
+/**
+ * Committee session
+ */
+export interface CommitteeSession {
+  election_id: number;
+  id: number;
+  location: string;
+  number: number;
+  start_date: string;
+  start_time: string;
+  status: CommitteeSessionStatus;
+}
+
+/**
+ * Committee session create request
+ */
+export interface CommitteeSessionCreateRequest {
+  election_id: number;
+  number: number;
+  status: CommitteeSessionStatus;
+}
+
+export interface CommitteeSessionDetails {
+  sessionElectionId: number;
+  sessionId: number;
+  sessionLocation: string;
+  sessionNumber: number;
+  sessionStartDate: string;
+  sessionStartTime: string;
+  sessionStatus: string;
+}
+
+/**
+ * Committee session list response
+ */
+export interface CommitteeSessionListResponse {
+  committee_sessions: CommitteeSession[];
+}
+
+/**
+ * Committee session status
+ */
+export type CommitteeSessionStatus = "Created" | "DataEntryInProgress" | "DataEntryPaused" | "DataEntryFinished";
+
+/**
+ * Committee session update request
+ */
+export interface CommitteeSessionUpdateRequest {
+  location: string;
+  start_date: string;
+  start_time: string;
 }
 
 export interface CreateUserRequest {

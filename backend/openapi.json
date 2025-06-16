@@ -10,6 +10,222 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/committee_sessions": {
+      "get": {
+        "summary": "Get a list of all [CommitteeSession]s",
+        "operationId": "committee_session_list",
+        "responses": {
+          "200": {
+            "description": "Committee session list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommitteeSessionListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new [CommitteeSession]",
+        "operationId": "committee_session_create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitteeSessionCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Committee session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommitteeSession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/committee_sessions/{committee_session_id}": {
+      "get": {
+        "summary": "Get [CommitteeSession] details",
+        "operationId": "committee_session_details",
+        "parameters": [
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "description": "Committee session database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committee session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommitteeSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a [CommitteeSession].",
+        "operationId": "committee_session_update",
+        "parameters": [
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitteeSessionUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Committee session updated successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Committee session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/elections": {
       "get": {
         "summary": "Get a list of all elections, without their candidate lists",
@@ -2369,6 +2585,48 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/CommitteeSessionDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "CommitteeSessionCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommitteeSessionDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "CommitteeSessionUpdated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/ElectionDetails"
               },
               {
@@ -2915,6 +3173,158 @@
           },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
+          }
+        }
+      },
+      "CommitteeSession": {
+        "type": "object",
+        "description": "Committee session",
+        "required": [
+          "id",
+          "number",
+          "election_id",
+          "location",
+          "start_date",
+          "start_time",
+          "status"
+        ],
+        "properties": {
+          "election_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "location": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CommitteeSessionStatus"
+          }
+        }
+      },
+      "CommitteeSessionCreateRequest": {
+        "type": "object",
+        "description": "Committee session create request",
+        "required": [
+          "election_id",
+          "number",
+          "status"
+        ],
+        "properties": {
+          "election_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "status": {
+            "$ref": "#/components/schemas/CommitteeSessionStatus"
+          }
+        }
+      },
+      "CommitteeSessionDetails": {
+        "type": "object",
+        "required": [
+          "sessionId",
+          "sessionNumber",
+          "sessionElectionId",
+          "sessionLocation",
+          "sessionStartDate",
+          "sessionStartTime",
+          "sessionStatus"
+        ],
+        "properties": {
+          "sessionElectionId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "sessionId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "sessionLocation": {
+            "type": "string"
+          },
+          "sessionNumber": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "sessionStartDate": {
+            "type": "string"
+          },
+          "sessionStartTime": {
+            "type": "string"
+          },
+          "sessionStatus": {
+            "type": "string"
+          }
+        }
+      },
+      "CommitteeSessionListResponse": {
+        "type": "object",
+        "description": "Committee session list response",
+        "required": [
+          "committee_sessions"
+        ],
+        "properties": {
+          "committee_sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommitteeSession"
+            }
+          }
+        }
+      },
+      "CommitteeSessionStatus": {
+        "type": "string",
+        "description": "Committee session status",
+        "enum": [
+          "Created",
+          "DataEntryInProgress",
+          "DataEntryPaused",
+          "DataEntryFinished"
+        ]
+      },
+      "CommitteeSessionUpdateRequest": {
+        "type": "object",
+        "description": "Committee session update request",
+        "required": [
+          "location",
+          "start_date",
+          "start_time"
+        ],
+        "properties": {
+          "location": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
           }
         }
       },

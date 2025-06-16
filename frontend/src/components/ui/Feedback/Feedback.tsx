@@ -15,9 +15,10 @@ interface FeedbackProps {
   type: AlertType;
   data?: ClientValidationResultCode[];
   userRole: Role;
+  shouldFocus?: boolean;
 }
 
-export function Feedback({ id, type, data, userRole }: FeedbackProps) {
+export function Feedback({ id, type, data, userRole, shouldFocus = true }: FeedbackProps) {
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
   const link = (children: ReactElement) => <Link to={`../voters-and-votes`}>{children}</Link>;
   // NOTE: administrator roles are always mapped to coordinator here
@@ -33,8 +34,10 @@ export function Feedback({ id, type, data, userRole }: FeedbackProps) {
     ) || [];
 
   useEffect(() => {
-    feedbackHeader.current?.focus();
-  }, []);
+    if (shouldFocus) {
+      feedbackHeader.current?.focus();
+    }
+  }, [data, shouldFocus]);
 
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>

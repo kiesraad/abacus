@@ -125,7 +125,7 @@ pub async fn election_create(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-pub struct ElectionDefinitionValidateRequest {
+pub struct ElectionAndCandidateDefinitionValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<Vec<String>>, nullable = false)]
     election_hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
@@ -148,7 +148,7 @@ pub struct ElectionDefinitionValidateResponse {
 #[utoipa::path(
     post,
     path = "/api/elections/import/validate",
-    request_body = ElectionDefinitionValidateRequest,
+    request_body = ElectionAndCandidateDefinitionValidateRequest,
     responses(
         (status = 200, description = "Election validated", body = ElectionDefinitionValidateResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
@@ -158,7 +158,7 @@ pub struct ElectionDefinitionValidateResponse {
 )]
 pub async fn election_import_validate(
     _user: Admin,
-    Json(edu): Json<ElectionDefinitionValidateRequest>,
+    Json(edu): Json<ElectionAndCandidateDefinitionValidateRequest>,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     // parse and validate election
     if let Some(user_hash) = edu.election_hash {
@@ -185,7 +185,7 @@ pub async fn election_import_validate(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-pub struct ElectionDefinitionImportRequest {
+pub struct ElectionAndCandidatesDefinitionImportRequest {
     election_hash: [String; crate::eml::hash::CHUNK_COUNT],
     election_data: String,
     candidate_hash: [String; crate::eml::hash::CHUNK_COUNT],
@@ -196,7 +196,7 @@ pub struct ElectionDefinitionImportRequest {
 #[utoipa::path(
     post,
     path = "/api/elections/import",
-    request_body = ElectionDefinitionImportRequest,
+    request_body = ElectionAndCandidatesDefinitionImportRequest,
     responses(
         (status = 201, description = "Election imported", body = ElectionWithPoliticalGroups),
         (status = 400, description = "Bad request", body = ErrorResponse),
@@ -207,7 +207,7 @@ pub struct ElectionDefinitionImportRequest {
 pub async fn election_import(
     _user: Admin,
     State(elections_repo): State<Elections>,
-    Json(edu): Json<ElectionDefinitionImportRequest>,
+    Json(edu): Json<ElectionAndCandidatesDefinitionImportRequest>,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
     if edu.election_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
         return Err(APIError::InvalidHashError);

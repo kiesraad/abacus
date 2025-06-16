@@ -11,7 +11,7 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationDataEntryResolveDifferencesHandler,
-  PollingStationDataEntryStatusHandler,
+  PollingStationDataEntryStatusEntriesDifferentHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
@@ -48,7 +48,7 @@ describe("ResolveDifferencesPage", () => {
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
       PollingStationDataEntryResolveDifferencesHandler,
-      PollingStationDataEntryStatusHandler,
+      PollingStationDataEntryStatusEntriesDifferentHandler,
       UserListRequestHandler,
     );
   });
@@ -74,6 +74,11 @@ describe("ResolveDifferencesPage", () => {
       ["1", "2", mdash, "Foo, A. (Alice)"],
       ["2", mdash, "2", "Doe, C. (Charlie)"],
     ]);
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Welke invoer moet bewaard blijven?" })).toBeVisible();
+    expect(await screen.findByLabelText(/De eerste invoer/)).toBeVisible();
+    expect(await screen.findByLabelText(/De tweede invoer/)).toBeVisible();
+    expect(await screen.findByLabelText(/Geen van beide/)).toBeVisible();
   });
 
   test("should show the selection in the table", async () => {
@@ -107,6 +112,7 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByLabelText(/De eerste invoer/));
     await user.click(submit);
     expect(resolve).toHaveBeenCalledWith("keep_first_entry");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-kept-3");
   });
 
   test("should refresh election status and navigate to election status page after submit", async () => {
@@ -116,10 +122,21 @@ describe("ResolveDifferencesPage", () => {
     await renderPage();
     expect(getElectionStatus).toHaveBeenCalledTimes(1);
 
-    await user.click(await screen.findByLabelText(/De eerste invoer/));
+    await user.click(await screen.findByLabelText(/De tweede invoer/));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-kept-3");
+  });
+
+  test("should navigate to election status page after submit with correct hash", async () => {
+    const user = userEvent.setup();
+
+    await renderPage();
+
+    await user.click(await screen.findByLabelText(/Geen van beide/));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entries-discarded-3");
   });
 });

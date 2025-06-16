@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { HeaderElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
@@ -15,14 +15,39 @@ import { ElectionStatus } from "./ElectionStatus";
 
 export function ElectionStatusPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { election, pollingStations } = useElection();
   const { statuses } = useElectionStatus();
   const { requestState } = useInitialApiGet<UserListResponse>("/api/user" satisfies USER_LIST_REQUEST_PATH);
 
   const users = requestState.status === "success" ? requestState.data.users : [];
 
+  const showDataEntryKeptAlert = location.hash.startsWith("#data-entry-kept-") ? location.hash : null;
+  const showDataEntriesDiscardedAlert = location.hash.startsWith("#data-entries-discarded-") ? location.hash : null;
+  const showFirstEntryResumedAlert = location.hash.startsWith("#data-entry-resumed-") ? location.hash : null;
+  const showFirstEntryDiscardedAlert = location.hash.startsWith("#data-entry-discarded-") ? location.hash : null;
+  const successAlert =
+    showDataEntryKeptAlert ||
+    showDataEntriesDiscardedAlert ||
+    showFirstEntryResumedAlert ||
+    showFirstEntryDiscardedAlert ||
+    undefined;
+
+  let pollingStationNumber = 0;
+  let typist = "";
+  if (successAlert) {
+    const id = parseInt(successAlert.substring(successAlert.lastIndexOf("-") + 1));
+    pollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
+    const typistId = statuses.find((status) => status.polling_station_id === id)?.first_entry_user_id;
+    typist = users.find((user) => user.id === typistId)?.fullname || "";
+  }
+
   function finishInput() {
     void navigate("../report");
+  }
+
+  function closeSuccessAlert() {
+    void navigate(location.pathname);
   }
 
   return (
@@ -38,6 +63,26 @@ export function ElectionStatusPage() {
           </div>
         </section>
       </header>
+      {successAlert && (
+        <Alert type="success" onClose={closeSuccessAlert}>
+          <h2>
+            {showFirstEntryDiscardedAlert
+              ? t("election_status.success.data_entry_discarded", { nr: pollingStationNumber })
+              : showFirstEntryResumedAlert
+                ? t("election_status.success.data_entry_resumed", { nr: pollingStationNumber, typist: typist })
+                : t("election_status.success.differences_resolved", { nr: pollingStationNumber })}
+          </h2>
+          <p>
+            {showFirstEntryDiscardedAlert
+              ? t("election_status.success.polling_station_can_be_filled_again")
+              : showFirstEntryResumedAlert
+                ? t("election_status.success.typist_can_continue_data_entry")
+                : showDataEntryKeptAlert
+                  ? t("election_status.success.data_entry_kept", { typist: typist })
+                  : t("election_status.success.data_entries_discarded", { nr: pollingStationNumber })}
+          </p>
+        </Alert>
+      )}
       {election.status !== "DataEntryFinished" &&
         statuses.length > 0 &&
         statuses.every((s) => s.status === "definitive") && (

@@ -1,6 +1,7 @@
 import { UserEvent, userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
+import { useUser } from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -8,9 +9,9 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, userTypeInputs } from "@/testing/test-utils";
-import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import { LoginResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
 
-import { errorWarningMocks, getDefaultFormSection, getEmptyDataEntryRequest } from "../../testing/mock-data";
+import { errorWarningMocks, getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
@@ -18,29 +19,16 @@ import {
   expectFieldsToNotHaveIcon,
   overrideServerClaimDataEntryResponse,
 } from "../../testing/test.utils";
-import { DataEntryState } from "../../types/types";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DifferencesForm } from "./DifferencesForm";
 
-const defaultDataEntryState: DataEntryState = {
-  election: electionMockData,
-  pollingStationId: 1,
-  error: null,
-  pollingStationResults: null,
-  entryNumber: 1,
-  formState: {
-    current: "differences_counts",
-    furthest: "differences_counts",
-    sections: {
-      recounted: getDefaultFormSection("recounted", 1),
-      voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
-      differences_counts: getDefaultFormSection("differences_counts", 3),
-      save: getDefaultFormSection("save", 4),
-    },
-  },
-  targetFormSectionId: "recounted",
-  status: "idle",
-  cache: null,
+vi.mock("@/hooks/user/useUser");
+
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
 };
 
 function renderForm() {
@@ -63,6 +51,7 @@ const differencesFieldIds = {
 
 describe("Test DifferencesForm", () => {
   beforeEach(() => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 
@@ -71,7 +60,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -92,7 +81,7 @@ describe("Test DifferencesForm", () => {
     test("hitting shift+enter does result in api call", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -117,7 +106,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -221,7 +210,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           ...votersAndVotesValues,
         },
@@ -229,7 +218,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("differences_form");
+      await screen.findByTestId("differences_counts_form");
       const spy = vi.spyOn(global, "fetch");
 
       await userTypeInputs(user, expectedRequest.data.differences_counts, "data.differences_counts.");
@@ -251,14 +240,14 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
       });
       renderForm();
 
-      await screen.findByTestId("differences_form");
+      await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [errorWarningMocks.F301], warnings: [] },
       });
@@ -288,14 +277,14 @@ describe("Test DifferencesForm", () => {
     test("F.302 Should be empty", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: true,
         },
       });
       renderForm();
 
-      await screen.findByTestId("differences_form");
+      await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [errorWarningMocks.F302], warnings: [] },
       });
@@ -326,7 +315,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -334,7 +323,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("differences_form");
+      await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [errorWarningMocks.F303], warnings: [] },
       });
@@ -365,7 +354,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: true,
         },
@@ -373,7 +362,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("differences_form");
+      await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [errorWarningMocks.F304], warnings: [] },
       });
@@ -404,7 +393,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -412,7 +401,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("differences_form");
+      await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [errorWarningMocks.F305], warnings: [] },
       });
@@ -445,7 +434,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -453,7 +442,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("differences_form");
+      await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W301] },
       });
@@ -505,7 +494,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -513,7 +502,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("differences_form");
+      await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W301] },
       });
@@ -544,7 +533,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: defaultDataEntryState.formState,
+        formState: getDefaultDataEntryState().formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -552,7 +541,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm();
 
-      await screen.findByTestId("differences_form");
+      await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [errorWarningMocks.W302] },
       });

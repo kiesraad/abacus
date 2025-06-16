@@ -1,5 +1,6 @@
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, Mock, test, vi } from "vitest";
 
+import { useUser } from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -7,33 +8,38 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
+import { LoginResponse } from "@/types/generated/openapi";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
-import { DataEntryStateAndActionsLoaded } from "../types/types";
+import { DataEntryStateAndActionsLoaded, SectionValues } from "../types/types";
 import { DataEntryProvider } from "./DataEntryProvider";
 import { VotersAndVotesForm } from "./voters_and_votes/VotersAndVotesForm";
-import { VotersAndVotesValues } from "./voters_and_votes/votersAndVotesValues";
 
 vi.mock("../hooks/useDataEntryContext");
+vi.mock("@/hooks/user/useUser");
+
+const testUser: LoginResponse = {
+  username: "test-user-1",
+  user_id: 1,
+  role: "typist",
+  needs_password_change: false,
+};
 
 describe("Data Entry cache behavior", () => {
   test("VotersAndVotesForm with cache", async () => {
+    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
 
-    const cacheData: VotersAndVotesValues = {
-      voters_counts: {
-        poll_card_count: 100,
-        proxy_certificate_count: 200,
-        voter_card_count: 300,
-        total_admitted_voters_count: 600,
-      },
-      votes_counts: {
-        votes_candidates_count: 400,
-        blank_votes_count: 500,
-        invalid_votes_count: 600,
-        total_votes_cast_count: 150,
-      },
+    const cacheData: SectionValues = {
+      "voters_counts.poll_card_count": "100",
+      "voters_counts.proxy_certificate_count": "200",
+      "voters_counts.voter_card_count": "300",
+      "voters_counts.total_admitted_voters_count": "600",
+      "votes_counts.votes_candidates_count": "400",
+      "votes_counts.blank_votes_count": "500",
+      "votes_counts.invalid_votes_count": "600",
+      "votes_counts.total_votes_cast_count": "150",
     };
 
     const state: DataEntryStateAndActionsLoaded = {
@@ -53,27 +59,27 @@ describe("Data Entry cache behavior", () => {
     );
 
     const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
-    expect(pollCards).toHaveValue(cacheData.voters_counts.poll_card_count.toString());
+    expect(pollCards).toHaveValue("100");
 
     const proxyCertificates = screen.getByRole("textbox", { name: "B Volmachtbewijzen" });
-    expect(proxyCertificates).toHaveValue(cacheData.voters_counts.proxy_certificate_count.toString());
+    expect(proxyCertificates).toHaveValue("200");
 
     const voterCards = screen.getByRole("textbox", { name: "C Kiezerspassen" });
-    expect(voterCards).toHaveValue(cacheData.voters_counts.voter_card_count.toString());
+    expect(voterCards).toHaveValue("300");
 
     const totalAdmittedVoters = screen.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
-    expect(totalAdmittedVoters).toHaveValue(cacheData.voters_counts.total_admitted_voters_count.toString());
+    expect(totalAdmittedVoters).toHaveValue("600");
 
     const votesOnCandidates = screen.getByRole("textbox", { name: "E Stemmen op kandidaten" });
-    expect(votesOnCandidates).toHaveValue(cacheData.votes_counts.votes_candidates_count.toString());
+    expect(votesOnCandidates).toHaveValue("400");
 
     const blankVotes = screen.getByRole("textbox", { name: "F Blanco stemmen" });
-    expect(blankVotes).toHaveValue(cacheData.votes_counts.blank_votes_count.toString());
+    expect(blankVotes).toHaveValue("500");
 
     const invalidVotes = screen.getByRole("textbox", { name: "G Ongeldige stemmen" });
-    expect(invalidVotes).toHaveValue(cacheData.votes_counts.invalid_votes_count.toString());
+    expect(invalidVotes).toHaveValue("600");
 
     const totalVotesCast = screen.getByRole("textbox", { name: "H Totaal uitgebrachte stemmen" });
-    expect(totalVotesCast).toHaveValue(cacheData.votes_counts.total_votes_cast_count.toString());
+    expect(totalVotesCast).toHaveValue("150");
   });
 });

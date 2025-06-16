@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Link } from "react-router";
 
+import { ApiResult, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { MockTest } from "@/components/dev/MockTest";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -8,6 +10,7 @@ import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { useElectionList } from "@/hooks/election/useElectionList";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
+import { LoginResponse } from "@/types/generated/openapi";
 
 function TypistLinks() {
   const { electionList } = useElectionList();
@@ -85,6 +88,11 @@ function AdministratorCoordinatorLinks() {
 function DevLinks() {
   const { user, login, logout } = useApiState();
   const { isTypist, isAdministrator, isCoordinator } = useUserRole();
+  const [response, setResponse] = useState<ApiResult<LoginResponse> | null>(null);
+
+  if (response !== null && isError(response)) {
+    throw response;
+  }
 
   return (
     <>
@@ -95,7 +103,7 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("admin1", "Admin1Password01");
+              void login("admin1", "Admin1Password01").then(setResponse);
             }}
           >
             {t("administrator")} 1
@@ -105,7 +113,7 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("admin2", "Admin2Password01");
+              void login("admin2", "Admin2Password01").then(setResponse);
             }}
           >
             {t("administrator")} 2
@@ -115,7 +123,7 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("coordinator1", "Coordinator1Password01");
+              void login("coordinator1", "Coordinator1Password01").then(setResponse);
             }}
           >
             {t("coordinator")} 1
@@ -125,7 +133,7 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("coordinator2", "Coordinator2Password01");
+              void login("coordinator2", "Coordinator2Password01").then(setResponse);
             }}
           >
             {t("coordinator")} 2
@@ -135,7 +143,7 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("typist1", "Typist1Password01");
+              void login("typist1", "Typist1Password01").then(setResponse);
             }}
           >
             {t("typist")} 1
@@ -145,7 +153,7 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("typist2", "Typist2Password01");
+              void login("typist2", "Typist2Password01").then(setResponse);
             }}
           >
             {t("typist")} 2

@@ -11,9 +11,10 @@ import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateRespon
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { CheckHash } from "./CheckHash";
 
-export function UploadElectionDefinition() {
+export function UploadCandidatesDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
+
   const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const [error, setError] = useState<ReactNode | undefined>();
   const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
@@ -22,14 +23,18 @@ export function UploadElectionDefinition() {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
       const data = await currentFile.text();
-      const response = await create({ election_data: data });
+      const response = await create({
+        candidate_data: data,
+        election_hash: state.electionDefinitionHash,
+        election_data: state.electionDefinitionData,
+      });
 
       if (isSuccess(response)) {
         dispatch({
-          type: "SELECT_ELECTION_DEFINITION",
+          type: "SELECT_CANDIDATES_DEFINITION",
           response: response.data,
-          electionDefinitionData: data,
-          electionDefinitionFileName: currentFile.name,
+          candidateDefinitionData: data,
+          candidateDefinitionFileName: currentFile.name,
         });
         setError(undefined);
       } else if (isError(response)) {
@@ -37,7 +42,7 @@ export function UploadElectionDefinition() {
         if (response instanceof ApiError && response.code === 413) {
           setError(
             tx(
-              "election.invalid_election_definition.file_too_large",
+              "election.invalid_candidates_definition.file_too_large",
               {
                 file: () => <strong>{currentFile.name}</strong>,
               },
@@ -48,7 +53,7 @@ export function UploadElectionDefinition() {
           );
         } else {
           setError(
-            tx("election.invalid_election_definition.description", {
+            tx("election.invalid_candidates_definition.description", {
               file: () => <strong>{currentFile.name}</strong>,
             }),
           );
@@ -59,18 +64,23 @@ export function UploadElectionDefinition() {
 
   if (
     state.election &&
-    state.electionDefinitionFileName &&
-    state.electionDefinitionRedactedHash &&
-    state.electionDefinitionData
+    state.candidateDefinitionFileName &&
+    state.candidateDefinitionRedactedHash &&
+    state.candidateDefinitionData
   ) {
     async function onSubmit(chunks: string[]) {
-      const response = await create({ election_data: state.electionDefinitionData, election_hash: chunks });
+      const response = await create({
+        candidate_data: state.candidateDefinitionData,
+        election_hash: state.electionDefinitionHash,
+        election_data: state.electionDefinitionData,
+        candidate_hash: chunks,
+      });
       if (isSuccess(response)) {
         dispatch({
-          type: "SET_ELECTION_DEFINITION_HASH",
-          electionDefinitionHash: chunks,
+          type: "SET_CANDIDATES_DEFINITION_HASH",
+          candidateDefinitionHash: chunks,
         });
-        await navigate("/elections/create/list-of-candidates");
+        await navigate("/elections/create/check-and-save");
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
         setError(response.message);
       }
@@ -79,14 +89,17 @@ export function UploadElectionDefinition() {
     return (
       <CheckHash
         date={state.election.election_date}
-        title={state.election.name}
-        header={t("election.check_eml.election_title")}
-        description={tx("election.check_eml.election_description", {
+        title={t("election.check_eml.list_name", {
+          location: state.election.location,
+          name: state.election.election_id,
+        })}
+        header={t("election.check_eml.candidates_title")}
+        description={tx("election.check_eml.candidates_description", {
           file: () => {
-            return <strong>{state.electionDefinitionFileName}</strong>;
+            return <strong>{state.candidateDefinitionFileName}</strong>;
           },
         })}
-        redactedHash={state.electionDefinitionRedactedHash}
+        redactedHash={state.candidateDefinitionRedactedHash}
         error={error}
         onSubmit={(chunks) => void onSubmit(chunks)}
       />
@@ -95,15 +108,15 @@ export function UploadElectionDefinition() {
 
   return (
     <section className="md">
-      <h2>{t("election.import_eml")}</h2>
+      <h2>{t("election.import_candidates_eml")}</h2>
       <div className="mt-lg mb-lg">
         {error && (
-          <Alert type="error" title={t("election.invalid_election_definition.title")} inline>
+          <Alert type="error" title={t("election.invalid_candidates_definition.title")} inline>
             <p>{error}</p>
           </Alert>
         )}
       </div>
-      <p className="mb-lg">{t("election.use_instructions_to_import_eml")}</p>
+      <p className="mb-lg">{t("election.use_instructions_to_import_candidates_eml")}</p>
       <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
         {t("select_file")}
       </FileInput>

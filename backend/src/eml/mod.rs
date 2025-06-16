@@ -4,7 +4,7 @@ pub mod axum;
 mod base;
 mod common;
 mod eml_110;
-mod eml_230;
+pub mod eml_230;
 mod eml_510;
 mod eml_520;
 pub mod hash;

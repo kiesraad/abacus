@@ -5,6 +5,7 @@
     "location": "Heemdamseburg",
     "number_of_voters": 40,
     "category": "Municipal",
+    "domain_id": "0123",
     "election_date": "2024-11-30",
     "nomination_date": "2024-11-01",
     "political_groups": [

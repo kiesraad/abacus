@@ -36,6 +36,8 @@ pub mod pdf_gen;
 pub mod polling_station;
 pub mod report;
 pub mod summary;
+#[cfg(feature = "dev-database")]
+pub mod test_data_gen;
 
 pub use error::{APIError, ErrorResponse};
 

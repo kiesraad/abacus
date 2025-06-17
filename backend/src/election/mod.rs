@@ -1,5 +1,5 @@
 mod api;
-pub(crate) mod repository;
+pub mod repository;
 pub(crate) mod structs;
 
 pub use self::{api::*, structs::*};

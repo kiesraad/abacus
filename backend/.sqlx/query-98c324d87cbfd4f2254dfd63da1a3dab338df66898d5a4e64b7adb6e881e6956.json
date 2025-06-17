@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE committee_sessions\n            SET\n              location = ?,\n              start_date = ?,\n              start_time = ?\n            WHERE\n              id = ?\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "98c324d87cbfd4f2254dfd63da1a3dab338df66898d5a4e64b7adb6e881e6956"
+}

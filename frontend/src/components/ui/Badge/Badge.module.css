@@ -56,11 +56,6 @@
   color: var(--badge-difference);
 }
 
-.entries_different {
-  background: var(--badge-difference-bg);
-  color: var(--badge-difference);
-}
-
 .extra_entry {
   background: var(--badge-extra-entry-bg);
   color: var(--badge-extra-entry);
@@ -79,7 +74,8 @@
 }
 
 .second_entry_not_started,
-.second_entry_in_progress {
+.second_entry_in_progress,
+.entries_different {
   background: var(--badge-second-entry-bg);
   color: var(--badge-second-entry);
 }

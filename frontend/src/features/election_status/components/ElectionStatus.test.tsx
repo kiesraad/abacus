@@ -53,7 +53,7 @@ describe("ElectionStatus", () => {
     expect(headings[0]).toHaveTextContent("Fouten en waarschuwingen (2)");
     expect(tables[0]).toHaveTableContent([
       ["Nummer", "Stembureau", "Te controleren"],
-      ["39", "Test gemeentehuis Verschil invoer 1 en 2", "Verschil 1e en 2e invoer"],
+      ["39", "Test gemeentehuis 2e invoer", "Verschil 1e en 2e invoer"],
       ["40", "Test kerk 1e invoer", "Fouten in proces-verbaal"],
     ]);
 

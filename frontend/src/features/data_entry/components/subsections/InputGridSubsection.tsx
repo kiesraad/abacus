@@ -25,7 +25,7 @@ export function InputGridSubsectionComponent({
   missingTotalError,
 }: InputGridSubsectionProps) {
   return (
-    <InputGrid>
+    <InputGrid zebra={subsection.zebra}>
       <InputGrid.Header>
         <th>{t(subsection.headers[0])}</th>
         <th>{t(subsection.headers[1])}</th>

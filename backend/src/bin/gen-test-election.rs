@@ -55,12 +55,10 @@ struct Args {
     voters: Range<u32>,
 }
 
-fn parse_range<T>(
-    range: &str,
-) -> Result<Range<T>, Box<dyn std::error::Error + 'static + Send + Sync>>
+fn parse_range<T>(range: &str) -> Result<Range<T>, Box<dyn Error + 'static + Send + Sync>>
 where
     T: FromStr + std::ops::Add<T, Output = T> + From<u8> + Copy,
-    <T as FromStr>::Err: std::error::Error + Send + Sync + 'static,
+    <T as FromStr>::Err: Error + Send + Sync + 'static,
 {
     let mut iter = range.split("..");
     let lower_bound = T::from_str(&iter.next().ok_or("Invalid range")?.replace("_", ""))?;
@@ -110,7 +108,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
 /// Generate a random election using the limits from args.
 fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
-    // start by generation the political groups
+    // start by generating the political groups
     let mut political_groups = vec![];
     let num_political_groups = rng.random_range(args.political_groups.clone());
     info!("Generating {num_political_groups} political groups");
@@ -122,7 +120,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
     // generate the number of voters from the voters range
     let number_of_voters = rng.random_range(args.voters.clone());
 
-    // generate a nomination date, and an election date not too long afterwards
+    // generate a nomination date, and an election date not too long afterward
     let nomination_date = abacus::test_data_gen::date_between(
         rng,
         NaiveDate::from_ymd_opt(2020, 1, 1).expect("Invalid date"),
@@ -131,7 +129,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
     let election_date =
         abacus::test_data_gen::date_between(rng, nomination_date, nomination_date + Days::new(63));
 
-    // extract the year from the election date, generate the locality for which this election would be
+    // extract the year from the election date, generate the locality where this election would be
     let year = election_date.year();
     let locality = abacus::test_data_gen::locality(rng).to_owned();
 
@@ -142,7 +140,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
 
     info!("Election has name '{name}'");
 
-    // and put it all in the struct (generating some additional fiels where needed)
+    // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
         domain_id: abacus::test_data_gen::domain_id(rng),

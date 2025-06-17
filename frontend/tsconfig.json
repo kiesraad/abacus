@@ -19,6 +19,7 @@
     "noUncheckedIndexedAccess": true,
     "rootDir": ".",
     "paths": {
+      ".storybook/*": [".storybook/*"],
       "ladle/*": [".ladle/*"],
       "@/*": ["src/*"]
     },
@@ -26,6 +27,7 @@
   },
   "include": [
     ".ladle/**/*",
+    ".storybook/**/*",
     "src/**/*",
     "scripts/**/*",
     "playwright.e2e.config.ts",

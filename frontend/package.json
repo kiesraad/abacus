@@ -28,7 +28,9 @@
     "gen:po": "vite-node scripts/gen_po.js",
     "gen:translation-json": "vite-node scripts/gen_translation-json.js",
     "check-server": "vite-node scripts/check_server.js",
-    "serve": "npm run build:msw && npx serve dist"
+    "serve": "npm run build:msw && npx serve dist",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "browserslist": "^4.25.0",
@@ -43,6 +45,7 @@
     "@eslint/js": "^9.29.0",
     "@ladle/react": "^5.0.3",
     "@playwright/test": "^1.52.0",
+    "@storybook/react-vite": "^9.0.11",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -66,10 +69,12 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
+    "eslint-plugin-storybook": "^9.0.11",
     "jsdom": "^26.1.0",
     "lefthook": "^1.11.13",
     "msw": "^2.10.2",
     "prettier": "^3.5.3",
+    "storybook": "^9.0.11",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.33.1",
     "vite-node": "^3.0.4",

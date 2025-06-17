@@ -37,3 +37,5 @@ mockServiceWorker.js
 # playwright state
 e2e-tests/state/
 !e2e-tests/state/.gitkeep
+*storybook.log
+storybook-static

@@ -1,4 +1,4 @@
-import type { Story } from "@ladle/react";
+import type { StoryFn, StoryObj } from "@storybook/react-vite";
 
 import type { DataEntryStatusName } from "@/types/generated/openapi";
 
@@ -14,7 +14,7 @@ const badgeTypes: DataEntryStatusName[] = [
   "definitive",
 ];
 
-export const AllBadges: Story = () => {
+export const AllBadges: StoryFn = () => {
   return (
     <>
       {badgeTypes.map((type) => (
@@ -26,17 +26,24 @@ export const AllBadges: Story = () => {
   );
 };
 
-export const CustomizableBadge: Story<BadgeProps> = ({ type, showIcon }) => <Badge type={type} showIcon={showIcon} />;
+export const CustomizableBadge: StoryObj<BadgeProps> = {
+  args: {
+    type: "first_entry_not_started",
+    showIcon: false,
+  },
+  argTypes: {
+    type: {
+      options: badgeTypes,
+      control: { type: "radio" },
+    },
+    showIcon: {
+      options: [true, false],
+      control: { type: "radio" },
+    },
+  },
+  render: ({ type, showIcon }) => <Badge type={type} showIcon={showIcon} />,
+};
 
-CustomizableBadge.argTypes = {
-  type: {
-    options: badgeTypes,
-    defaultValue: "first_entry_not_started",
-    control: { type: "radio" },
-  },
-  showIcon: {
-    options: [true, false],
-    defaultValue: false,
-    control: { type: "radio" },
-  },
+export default {
+  title: "UI/Badge",
 };

@@ -19,6 +19,8 @@ const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: tr
     message: "Cross-feature imports are not allowed.",
   }));
 
+// FIXME: Storybook config using https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+
 export default tseslint.config(
   {
     // global ignores

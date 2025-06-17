@@ -6,7 +6,7 @@ CREATE TABLE committee_sessions
     location    TEXT,
     start_date  TEXT,
     start_time  TEXT,
-    status      TEXT                              NOT NULL,
+    status      TEXT                              NOT NULL DEFAULT 'created',
 
     FOREIGN KEY (election_id) REFERENCES elections (id) ON DELETE CASCADE
 );

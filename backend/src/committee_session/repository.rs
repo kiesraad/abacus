@@ -38,9 +38,8 @@ impl CommitteeSessions {
             r#"
             INSERT INTO committee_sessions (
               number,
-              election_id,
-              status
-            ) VALUES (?, ?, ?)
+              election_id
+            ) VALUES (?, ?)
             RETURNING
               id,
               number,
@@ -50,7 +49,6 @@ impl CommitteeSessions {
         )
         .bind(committee_session.election_id)
         .bind(committee_session.number)
-        .bind(committee_session.status)
         .fetch_one(&self.0)
         .await
     }

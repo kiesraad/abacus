@@ -13,10 +13,7 @@ use super::{
     repository::CommitteeSessions,
 };
 use crate::audit_log::{AuditEvent, AuditService};
-use crate::{
-    APIError, AppState, ErrorResponse,
-    authentication::{Admin, User},
-};
+use crate::{APIError, AppState, ErrorResponse, authentication::Coordinator};
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -49,7 +46,7 @@ impl IntoResponse for CommitteeSessionListResponse {
   ),
 )]
 pub async fn committee_session_list(
-    _user: User,
+    _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
 ) -> Result<Json<CommitteeSessionListResponse>, APIError> {
     let committee_sessions = committee_sessions_repo.list().await?;
@@ -71,7 +68,7 @@ pub async fn committee_session_list(
   ),
 )]
 pub async fn committee_session_details(
-    _user: User,
+    _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
     Path(id): Path<u32>,
 ) -> Result<Json<CommitteeSession>, APIError> {
@@ -92,7 +89,7 @@ pub async fn committee_session_details(
     ),
 )]
 pub async fn committee_session_create(
-    _user: Admin,
+    _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
     audit_service: AuditService,
     Json(committee_session_request): Json<CommitteeSessionCreateRequest>,
@@ -124,7 +121,7 @@ pub async fn committee_session_create(
     ),
 )]
 pub async fn committee_session_update(
-    _user: Admin,
+    _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
     audit_service: AuditService,
     Path(id): Path<u32>,

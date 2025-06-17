@@ -68,20 +68,20 @@ pub enum CommitteeSessionStatus {
     DataEntryFinished,
 }
 
-#[cfg(test)]
-pub(crate) mod tests {
-    use super::*;
-
-    /// Create a test committee session.
-    pub fn committee_session_fixture() -> CommitteeSession {
-        CommitteeSession {
-            id: 1,
-            number: 1,
-            election_id: 1,
-            location: "Heemdamsebrug".to_string(),
-            start_date: "25-10-2025".to_string(),
-            start_time: "10:45".to_string(),
-            status: CommitteeSessionStatus::DataEntryInProgress,
-        }
-    }
-}
+// #[cfg(test)]
+// pub(crate) mod tests {
+//     use super::*;
+//
+//     Create a test committee session.
+//     pub fn committee_session_fixture() -> CommitteeSession {
+//         CommitteeSession {
+//             id: 1,
+//             number: 1,
+//             election_id: 1,
+//             location: "Heemdamsebrug".to_string(),
+//             start_date: "25-10-2025".to_string(),
+//             start_time: "10:45".to_string(),
+//             status: CommitteeSessionStatus::DataEntryInProgress,
+//         }
+//     }
+// }

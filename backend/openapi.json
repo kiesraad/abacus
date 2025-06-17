@@ -48,7 +48,7 @@
         }
       },
       "post": {
-        "summary": "Create a new [CommitteeSession]",
+        "summary": "Create a new [CommitteeSession].",
         "operationId": "committee_session_create",
         "requestBody": {
           "content": {
@@ -3222,9 +3222,8 @@
         "type": "object",
         "description": "Committee session create request",
         "required": [
-          "election_id",
           "number",
-          "status"
+          "election_id"
         ],
         "properties": {
           "election_id": {
@@ -3236,9 +3235,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "status": {
-            "$ref": "#/components/schemas/CommitteeSessionStatus"
           }
         }
       },

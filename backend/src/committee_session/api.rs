@@ -12,8 +12,11 @@ use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
     repository::CommitteeSessions,
 };
-use crate::audit_log::{AuditEvent, AuditService};
-use crate::{APIError, AppState, ErrorResponse, authentication::Coordinator};
+use crate::{
+    APIError, AppState, ErrorResponse,
+    audit_log::{AuditEvent, AuditService},
+    authentication::Coordinator,
+};
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -76,7 +79,7 @@ pub async fn committee_session_details(
     Ok(Json(committee_session))
 }
 
-/// Create a new [CommitteeSession]
+/// Create a new [CommitteeSession].
 #[utoipa::path(
     post,
     path = "/api/committee_sessions",

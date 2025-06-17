@@ -47,8 +47,8 @@ impl CommitteeSessions {
               status
             "#,
         )
-        .bind(committee_session.election_id)
         .bind(committee_session.number)
+        .bind(committee_session.election_id)
         .fetch_one(&self.0)
         .await
     }

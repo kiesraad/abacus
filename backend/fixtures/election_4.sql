@@ -411,6 +411,9 @@ VALUES (4, 'Test Election < 19 seats', 'TestLocation_2026', 'Test Location', '00
           }
         ]');
 
+INSERT INTO committee_sessions (id, number, election_id)
+VALUES (4, 1, 4);
+
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
 VALUES (7, 4, 'Testgebouw', 40, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Klein Dorp');

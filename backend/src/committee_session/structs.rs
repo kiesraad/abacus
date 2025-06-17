@@ -43,9 +43,8 @@ impl IntoResponse for CommitteeSession {
 /// Committee session create request
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
 pub struct CommitteeSessionCreateRequest {
-    pub election_id: u32,
     pub number: u32,
-    pub status: CommitteeSessionStatus,
+    pub election_id: u32,
 }
 
 /// Committee session update request

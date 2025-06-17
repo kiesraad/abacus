@@ -12,6 +12,9 @@ components:
   - name: "(Backend) Authentication"
     include:
       - ".*/backend/src/authentication/.*"
+  - name: "(Backend) Committee Session"
+    include:
+      - ".*/backend/src/committee_session/.*"
   - name: "(Backend) Data entry"
     include:
       - ".*/backend/src/data_entry/.*"

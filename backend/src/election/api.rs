@@ -13,13 +13,16 @@ use super::{
     repository::Elections,
     structs::{Election, ElectionWithPoliticalGroups},
 };
-#[cfg(feature = "dev-database")]
-use crate::audit_log::{AuditEvent, AuditService};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::{Admin, User},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},
+};
+#[cfg(feature = "dev-database")]
+use crate::{
+    audit_log::{AuditEvent, AuditService},
+    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -112,13 +115,27 @@ pub async fn election_details(
 pub async fn election_create(
     _user: Admin,
     State(elections_repo): State<Elections>,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     audit_service: AuditService,
     Json(new_election): Json<NewElection>,
 ) -> Result<(StatusCode, ElectionWithPoliticalGroups), APIError> {
     let election = elections_repo.create(new_election).await?;
-
     audit_service
         .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
+        .await?;
+
+    // Create first committee session for the election
+    let committee_session = committee_sessions_repo
+        .create(CommitteeSessionCreateRequest {
+            number: 1,
+            election_id: election.id,
+        })
+        .await?;
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+            None,
+        )
         .await?;
 
     Ok((StatusCode::CREATED, election))

@@ -806,6 +806,9 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen_2024', 'Juinen', '0000', 3500, 'Municipa
          }
        ]');
 
+INSERT INTO committee_sessions (id, number, election_id)
+VALUES (1, 1, 1);
+
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
 VALUES (4, 1, 'Studio The Rules', 1, NULL, 'FixedLocation', 'Gerontoplein 1', '1337 YQ', 'Juinen'),

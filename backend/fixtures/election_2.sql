@@ -47,6 +47,9 @@ VALUES (2, 'Municipal Election', 'Heemdamseburg_2024', 'Heemdamseburg', '0000', 
           }
         ]');
 
+INSERT INTO committee_sessions (id, number, election_id)
+VALUES (2, 1, 2);
+
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
 VALUES (1, 2, 'Op Rolletjes', 33, NULL, 'Mobile', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),

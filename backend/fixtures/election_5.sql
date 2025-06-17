@@ -304,6 +304,9 @@ VALUES (5, 'Test Election >= 19 seats', 'GroteStad_2026', 'Grote Stad', '0000', 
           }
         ]');
 
+INSERT INTO committee_sessions (id, number, election_id)
+VALUES (5, 1, 5);
+
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
 VALUES (8, 5, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad');

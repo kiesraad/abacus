@@ -100,6 +100,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let ps_repo = PollingStations::new(pool.clone());
     generate_polling_stations(&mut rng, &election, &ps_repo, &args).await;
 
+    info!(
+        "Election generated with election id: {}, election name: '{}'",
+        election.id, election.name
+    );
+
     Ok(())
 }
 
@@ -107,7 +112,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
     // start by generation the political groups
     let mut political_groups = vec![];
-    for i in 1..rng.random_range(args.political_groups.clone()) {
+    let num_political_groups = rng.random_range(args.political_groups.clone());
+    info!("Generating {num_political_groups} political groups");
+
+    for i in 1..num_political_groups {
         political_groups.push(generate_political_party(rng, i, args));
     }
 
@@ -131,6 +139,8 @@ fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
     let name = format!("Gemeenteraad {locality} {year}");
     let cleaned_up_locality = locality.replace(" ", "_").replace("'", "");
     let election_id = format!("{cleaned_up_locality}_{year}");
+
+    info!("Election has name '{name}'");
 
     // and put it all in the struct (generating some additional fiels where needed)
     NewElection {
@@ -200,6 +210,7 @@ async fn generate_polling_stations(
     args: &Args,
 ) {
     let number_of_ps = rng.random_range(args.polling_stations.clone());
+    info!("Generating {number_of_ps} polling stations for election");
     let mut remaining_voters = election.number_of_voters;
     for i in 1..=number_of_ps {
         // compute a some somewhat distributed number of voters for each polling station

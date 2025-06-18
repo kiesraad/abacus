@@ -1067,7 +1067,10 @@ test.describe("Check and Save page", () => {
 
     await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
     await candidatesListPage_1.next.click();
+    await candidatesListPage_1.checkAcceptErrorsAndWarnings();
+    await candidatesListPage_1.next.click();
 
+    await expect(candidatesListPage_1.error).toBeVisible();
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
 

@@ -1,9 +1,8 @@
+import { HeadingSubsectionComponent } from "@/components/data_entry/subsections/HeadingSubsection";
+import { InputGridSubsectionComponent } from "@/components/data_entry/subsections/InputGridSubsection";
+import { MessageSubsectionComponent } from "@/components/data_entry/subsections/MessageSubsection";
+import { RadioSubsectionComponent } from "@/components/data_entry/subsections/RadioSubsection";
 import { DataEntrySection, SectionValues } from "@/types/types";
-
-import { HeadingSubsectionComponent } from "./subsections/HeadingSubsection";
-import { InputGridSubsectionComponent } from "./subsections/InputGridSubsection";
-import { MessageSubsectionComponent } from "./subsections/MessageSubsection";
-import { RadioSubsectionComponent } from "./subsections/RadioSubsection";
 
 export interface DataEntrySubsectionsProps {
   section: DataEntrySection;

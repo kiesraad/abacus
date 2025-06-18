@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" Id="230b" SchemaVersion="5">
   <TransactionId>1</TransactionId>
-  <ManagingAuthority>
-    <AuthorityIdentifier Id="0363">Amsterdam</AuthorityIdentifier>
-    <AuthorityAddress/>
-  </ManagingAuthority>
   <IssueDate>2022-02-04</IssueDate>
   <kr:CreationDateTime>2022-02-04T11:16:26.827</kr:CreationDateTime>
   <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>

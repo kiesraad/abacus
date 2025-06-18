@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
@@ -55,7 +54,6 @@ export function ResolveDifferencesPage() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          <Badge type="entries_different" />
         </section>
       </header>
       <main className={cls.resolveDifferences}>

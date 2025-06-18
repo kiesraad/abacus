@@ -9,10 +9,15 @@ export type ELECTION_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
 export type ELECTION_CREATE_REQUEST_BODY = NewElection;
 
-// /api/elections/validate
+// /api/elections/import
+export type ELECTION_IMPORT_REQUEST_PARAMS = Record<string, never>;
+export type ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
+export type ELECTION_IMPORT_REQUEST_BODY = ElectionAndCandidatesDefinitionImportRequest;
+
+// /api/elections/import/validate
 export type ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS = Record<string, never>;
-export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/validate`;
-export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = NewElection;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionAndCandidateDefinitionValidateRequest;
 
 // /api/elections/{election_id}
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
@@ -100,12 +105,21 @@ export interface POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PARAMS {
 }
 export type POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH = `/api/polling_stations/${number}/data_entries`;
 
-// /api/polling_stations/{polling_station_id}/data_entries/resolve
-export interface POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PARAMS {
+// /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
+export interface POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: number;
 }
-export type POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/resolve`;
-export type POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY = ResolveAction;
+export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH =
+  `/api/polling_stations/${number}/data_entries/resolve_differences`;
+export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
+
+// /api/polling_stations/{polling_station_id}/data_entries/resolve_errors
+export interface POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH =
+  `/api/polling_stations/${number}/data_entries/resolve_errors`;
+export type POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = ResolveErrorsAction;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
@@ -211,6 +225,8 @@ export type AuditEvent =
   | (DataEntryDetails & { eventType: "DataEntrySaved" })
   | (DataEntryDetails & { eventType: "DataEntryDeleted" })
   | (DataEntryDetails & { eventType: "DataEntryFinalised" })
+  | (DataEntryDetails & { eventType: "DataEntryDiscardedFirst" })
+  | (DataEntryDetails & { eventType: "DataEntryResumedFirst" })
   | (DataEntryDetails & { eventType: "DataEntryKeptFirst" })
   | (DataEntryDetails & { eventType: "DataEntryKeptSecond" })
   | (DataEntryDetails & { eventType: "DataEntryDiscardedBoth" })
@@ -377,7 +393,7 @@ export interface DifferencesCounts {
 }
 
 /**
- * Election, optionally with its political groups
+ * Election without political groups
  */
 export interface Election {
   category: ElectionCategory;
@@ -390,8 +406,21 @@ export interface Election {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
-  political_groups?: PoliticalGroup[];
   status: ElectionStatus;
+}
+
+export interface ElectionAndCandidateDefinitionValidateRequest {
+  candidate_data?: string | null;
+  candidate_hash?: string[];
+  election_data: string;
+  election_hash?: string[];
+}
+
+export interface ElectionAndCandidatesDefinitionImportRequest {
+  candidate_data: string;
+  candidate_hash: string[];
+  election_data: string;
+  election_hash: string[];
 }
 
 /**
@@ -408,7 +437,7 @@ export interface ElectionApportionmentResponse {
  */
 export type ElectionCategory = "Municipal";
 
-export interface ElectionDefinitionUploadResponse {
+export interface ElectionDefinitionValidateResponse {
   election: NewElection;
   hash: RedactedEmlHash;
 }
@@ -431,7 +460,7 @@ export interface ElectionDetails {
  * Election details response, including the election's candidate list (political groups) and its polling stations
  */
 export interface ElectionDetailsResponse {
-  election: Election;
+  election: ElectionWithPoliticalGroups;
   polling_stations: PollingStation[];
 }
 
@@ -492,6 +521,24 @@ export interface ElectionSummary {
   votes_counts: VotesCounts;
 }
 
+/**
+ * Election with political groups
+ */
+export interface ElectionWithPoliticalGroups {
+  category: ElectionCategory;
+  domain_id: string;
+  election_date: string;
+  election_id: string;
+  id: number;
+  location: string;
+  name: string;
+  nomination_date: string;
+  number_of_seats: number;
+  number_of_voters: number;
+  political_groups: PoliticalGroup[];
+  status: ElectionStatus;
+}
+
 export interface EntriesDifferent {
   /** First data entry for a polling station */
   first_entry: PollingStationResults;
@@ -517,6 +564,7 @@ export interface ErrorDetails {
  * Error reference used to show the corresponding error message to the end-user
  */
 export type ErrorReference =
+  | "AirgapViolation"
   | "AllListsExhausted"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "DatabaseError"
@@ -528,6 +576,7 @@ export type ErrorReference =
   | "EntryNotUnique"
   | "InternalServerError"
   | "InvalidData"
+  | "InvalidHash"
   | "InvalidJson"
   | "InvalidPassword"
   | "InvalidPoliticalGroup"
@@ -822,7 +871,9 @@ export interface RedactedEmlHash {
   redacted_indexes: number[];
 }
 
-export type ResolveAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
+export type ResolveDifferencesAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
+
+export type ResolveErrorsAction = "discard_first_entry" | "resume_first_entry";
 
 export type Role = "administrator" | "typist" | "coordinator";
 

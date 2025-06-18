@@ -9,7 +9,7 @@ use utoipa::ToSchema;
 
 use crate::audit_log::ElectionDetails;
 
-/// Election, optionally with its political groups
+/// Election without political groups
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
 pub struct Election {
     pub id: u32,
@@ -25,10 +25,26 @@ pub struct Election {
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
     pub status: ElectionStatus,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    #[sqlx(default, json)]
-    pub political_groups: Option<Vec<PoliticalGroup>>,
+}
+
+/// Election with political groups
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
+pub struct ElectionWithPoliticalGroups {
+    pub id: u32,
+    pub name: String,
+    pub election_id: String,
+    pub location: String,
+    pub domain_id: String,
+    pub number_of_voters: u32,
+    pub category: ElectionCategory,
+    pub number_of_seats: u32,
+    #[schema(value_type = String, format = "date")]
+    pub election_date: NaiveDate,
+    #[schema(value_type = String, format = "date")]
+    pub nomination_date: NaiveDate,
+    pub status: ElectionStatus,
+    #[sqlx(json)]
+    pub political_groups: Vec<PoliticalGroup>,
 }
 
 impl From<Election> for ElectionDetails {
@@ -49,7 +65,31 @@ impl From<Election> for ElectionDetails {
     }
 }
 
+impl From<ElectionWithPoliticalGroups> for ElectionDetails {
+    fn from(value: ElectionWithPoliticalGroups) -> Self {
+        Self {
+            election_id: value.id,
+            election_name: value.name,
+            election_election_id: value.election_id,
+            election_location: value.location,
+            election_domain_id: value.domain_id,
+            election_number_of_voters: value.number_of_voters,
+            election_category: value.category.to_string(),
+            election_number_of_seats: value.number_of_seats,
+            election_election_date: value.election_date,
+            election_nomination_date: value.nomination_date,
+            election_status: value.status.to_string(),
+        }
+    }
+}
+
 impl IntoResponse for Election {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}
+
+impl IntoResponse for ElectionWithPoliticalGroups {
     fn into_response(self) -> Response {
         Json(self).into_response()
     }
@@ -157,7 +197,7 @@ pub(crate) mod tests {
     pub fn election_fixture_with_given_number_of_seats(
         political_groups_candidates: &[u32],
         number_of_seats: u32,
-    ) -> Election {
+    ) -> ElectionWithPoliticalGroups {
         let political_groups = political_groups_candidates
             .iter()
             .enumerate()
@@ -179,7 +219,7 @@ pub(crate) mod tests {
             })
             .collect();
 
-        Election {
+        ElectionWithPoliticalGroups {
             id: 1,
             name: "Test".to_string(),
             election_id: "Test_2023".to_string(),
@@ -191,14 +231,14 @@ pub(crate) mod tests {
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             status: ElectionStatus::DataEntryInProgress,
-            political_groups: Some(political_groups),
+            political_groups,
         }
     }
 
     /// Create a test election with some political groups.
     /// The number of political groups is the length of the `political_groups_candidates` slice.
     /// The number of candidates in each political group is equal to the value in the slice at that index.
-    pub fn election_fixture(political_groups_candidates: &[u32]) -> Election {
+    pub fn election_fixture(political_groups_candidates: &[u32]) -> ElectionWithPoliticalGroups {
         election_fixture_with_given_number_of_seats(political_groups_candidates, 29)
     }
 }

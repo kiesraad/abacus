@@ -8,17 +8,18 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
   DataEntryStatus,
-  Election,
+  ElectionWithPoliticalGroups,
   EntriesDifferent,
-  PoliticalGroup,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
+  POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH,
   PollingStation,
-  ResolveAction,
+  ResolveDifferencesAction,
   USER_LIST_REQUEST_PATH,
   UserListResponse,
 } from "@/types/generated/openapi";
+import { DataEntryStructure } from "@/types/types";
+import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
 
 type EntriesDifferentStatus = {
   state: EntriesDifferent;
@@ -28,24 +29,25 @@ type EntriesDifferentStatus = {
 };
 
 interface PollingStationDataEntryStatus {
-  action: ResolveAction | undefined;
-  setAction: (action: ResolveAction | undefined) => void;
+  action: ResolveDifferencesAction | undefined;
+  setAction: (action: ResolveDifferencesAction | undefined) => void;
   pollingStation: PollingStation;
-  election: Election & { political_groups: PoliticalGroup[] };
+  election: ElectionWithPoliticalGroups;
   loading: boolean;
   status: EntriesDifferentStatus | null;
+  dataEntryStructure: DataEntryStructure | null;
   onSubmit: () => Promise<void>;
   validationError: string | undefined;
 }
 
 export function usePollingStationDataEntryDifferences(
   pollingStationId: number,
-  afterSave: () => void,
+  afterSave: (action: ResolveDifferencesAction) => void,
 ): PollingStationDataEntryStatus {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
-  const [action, setAction] = useState<ResolveAction>();
+  const [action, setAction] = useState<ResolveDifferencesAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
   const [validationError, setValidationError] = useState<string>();
@@ -84,6 +86,7 @@ export function usePollingStationDataEntryDifferences(
   }
 
   let status: EntriesDifferentStatus | null = null;
+  let dataEntryStructure: DataEntryStructure | null = null;
 
   // if the request was successful and the status is "EntriesDifferent", we can show the details
   if (
@@ -101,6 +104,12 @@ export function usePollingStationDataEntryDifferences(
       first_user: firstUser?.fullname || firstUser?.username || "",
       second_user: secondUser?.fullname || secondUser?.username || "",
     };
+
+    dataEntryStructure = getDataEntryStructureForDifferences(
+      election,
+      status.state.first_entry,
+      status.state.second_entry,
+    );
   }
 
   const onSubmit = async () => {
@@ -111,14 +120,14 @@ export function usePollingStationDataEntryDifferences(
       setValidationError(undefined);
     }
 
-    const path: POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve`;
-    const body: POLLING_STATION_DATA_ENTRY_RESOLVE_REQUEST_BODY = action;
+    const path: POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_differences`;
+    const body: POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = action;
     const response = await client.postRequest(path, body);
 
     if (isSuccess(response)) {
       // reload the election status and navigate to the overview page
       await electionContext?.refetch();
-      afterSave();
+      afterSave(action);
     } else {
       setError(response);
     }
@@ -131,6 +140,7 @@ export function usePollingStationDataEntryDifferences(
     election,
     loading: requestState.status === "loading" || usersRequestState.status === "loading",
     status,
+    dataEntryStructure,
     onSubmit,
     validationError,
   };

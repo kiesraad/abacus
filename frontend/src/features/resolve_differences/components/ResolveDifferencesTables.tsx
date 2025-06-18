@@ -1,32 +1,23 @@
+import { TranslationPath } from "@/i18n/i18n.types";
 import { t } from "@/i18n/translate";
-import { PoliticalGroup, PoliticalGroupVotes, PollingStationResults, ResolveAction } from "@/types/generated/openapi";
-import { getCandidateFullName } from "@/utils/candidate";
+import { PollingStationResults, ResolveDifferencesAction } from "@/types/generated/openapi";
+import { DataEntrySection, DataEntryStructure, RadioSubsectionOption } from "@/types/types";
+import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 
-import { DataEntrySection, getFromResults, sections } from "../utils/dataEntry";
 import { DifferencesTable } from "./DifferencesTable";
 
 export interface ResolveDifferencesTablesProps {
   first: PollingStationResults;
   second: PollingStationResults;
-  politicalGroups: PoliticalGroup[];
-  action?: ResolveAction;
+  structure: DataEntryStructure;
+  action?: ResolveDifferencesAction;
 }
 
-export function ResolveDifferencesTables({ first, second, action, politicalGroups }: ResolveDifferencesTablesProps) {
+export function ResolveDifferencesTables({ first, second, action, structure }: ResolveDifferencesTablesProps) {
   return (
     <>
-      {sections.map((section) => (
+      {structure.map((section) => (
         <SectionTable key={section.id} section={section} first={first} second={second} action={action} />
-      ))}
-
-      {politicalGroups.map((politicalGroup, i) => (
-        <CandidatesTable
-          key={politicalGroup.number}
-          politicalGroup={politicalGroup}
-          first={first.political_group_votes[i]}
-          second={second.political_group_votes[i]}
-          action={action}
-        />
       ))}
     </>
   );
@@ -36,67 +27,84 @@ interface SectionTableProps {
   section: DataEntrySection;
   first: PollingStationResults;
   second: PollingStationResults;
-  action?: ResolveAction;
+  action?: ResolveDifferencesAction;
 }
 
 function SectionTable({ section, first, second, action }: SectionTableProps) {
-  const title = t(`resolve_differences.section.${section.id}`);
+  let title = section.title;
+  const firstValues = mapResultsToSectionValues(section, first);
+  const secondValues = mapResultsToSectionValues(section, second);
 
-  const headers = [
-    t("resolve_differences.headers.field"),
-    t("resolve_differences.headers.first_entry"),
-    t("resolve_differences.headers.second_entry"),
-    t("resolve_differences.headers.description"),
-  ];
+  return (
+    <div>
+      {section.subsections.map((subsection, subsectionIdx) => {
+        switch (subsection.type) {
+          case "heading":
+            // override previous title
+            title = t(subsection.title);
+            return;
+          case "message":
+            // message is not rendered
+            return;
+          case "radio": {
+            const headers = [
+              t("resolve_differences.headers.field"),
+              t("resolve_differences.headers.first_entry"),
+              t("resolve_differences.headers.second_entry"),
+              t("resolve_differences.headers.description"),
+            ];
 
-  const rows = section.fields.map((field) => ({
-    code: field.code,
-    first: yesno(getFromResults(first, field.path)),
-    second: yesno(getFromResults(second, field.path)),
-    description: t(`polling_station_results.field.${field.path}`),
-  }));
+            const row = {
+              code: "",
+              first: mapRadioValue(firstValues[subsection.path], subsection.options),
+              second: mapRadioValue(secondValues[subsection.path], subsection.options),
+              description: t(subsection.short_title),
+            };
 
-  return <DifferencesTable title={title} headers={headers} rows={rows} action={action} />;
+            return (
+              <DifferencesTable
+                key={`${section.id}-${subsectionIdx}`}
+                title={title}
+                headers={headers}
+                rows={[row]}
+                action={action}
+              />
+            );
+          }
+          case "inputGrid": {
+            const headers = [
+              t(subsection.headers[0]),
+              t("resolve_differences.headers.first_entry"),
+              t("resolve_differences.headers.second_entry"),
+              t(subsection.headers[2]),
+            ];
+
+            const rows = subsection.rows.map((row) => ({
+              code: row.code,
+              first: firstValues[row.path],
+              second: secondValues[row.path],
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- dynamic title translation path cannot be typechecked
+              description: row.title || t(`${section.id}.${row.path}` as TranslationPath),
+            }));
+
+            return (
+              <DifferencesTable
+                key={`${section.id}-${subsectionIdx}`}
+                title={title}
+                headers={headers}
+                rows={rows}
+                action={action}
+              />
+            );
+          }
+        }
+      })}
+    </div>
+  );
 }
 
-function yesno<T>(value: T) {
-  if (value === true) {
-    return t("resolve_differences.yes");
-  } else if (value === false) {
-    return t("resolve_differences.no");
-  } else {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    return value as Exclude<T, boolean>;
-  }
-}
-
-interface CandidatesTableProps {
-  politicalGroup: PoliticalGroup;
-  first?: PoliticalGroupVotes;
-  second?: PoliticalGroupVotes;
-  action?: ResolveAction;
-}
-
-function CandidatesTable({ politicalGroup, first, second, action }: CandidatesTableProps) {
-  if (!first || !second) {
-    return null;
-  }
-
-  const title = `${t("list")} ${politicalGroup.number} – ${politicalGroup.name}`;
-
-  const headers = [
-    t("resolve_differences.headers.number"),
-    t("resolve_differences.headers.first_entry"),
-    t("resolve_differences.headers.second_entry"),
-    t("resolve_differences.headers.candidate"),
-  ];
-
-  const rows = politicalGroup.candidates.map((candidate, i) => ({
-    code: candidate.number,
-    first: first.candidate_votes[i]?.votes,
-    second: second.candidate_votes[i]?.votes,
-    description: getCandidateFullName(candidate),
-  }));
-
-  return <DifferencesTable title={title} headers={headers} rows={rows} action={action} />;
+function mapRadioValue(value: string | undefined, options: RadioSubsectionOption[]): string {
+  if (!value) return "";
+  const option = options.find((option) => option.value === value);
+  return option ? t(option.short_label) : value;
 }

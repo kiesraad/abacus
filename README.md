@@ -8,10 +8,12 @@
 
 ### Documentatie
 
-- Begin hier voor meer context: [Het verkiezingsproces en Abacus](https://kiesraad.github.io/abacus-documentatie/verkiezingsproces-en-abacus.html)
-- Begin hier als je meteen aan de slag wilt: [Installeren en starten](https://kiesraad.github.io/abacus-documentatie/installeren-en-starten.html)
-- Functionaliteit voor de demo en voor versie 1.0: [Functionaliteit van Abacus: eisen en wensen](/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md)
-- Voor alle documentatie: [Hoofdpagina voor documentatie](/documentatie/README.md)
+- Voor informatie over het installeren, starten en gebruiken van Abacus ga je naar de website [Abacus Documentatie](https://kiesraad.github.io/abacus-documentatie/). Hier vind je niet alleen alle beschikbare gebruikersdocumentatie, maar bieden we ook uitleg over het verkiezingsproces.
+- Alle documentatie met betrekking tot de ontwikkeling van Abacus vind je op de [Hoofdpagina voor documentatie](/documentatie/README.md) in deze repository. Hier staat documentatie over de functionaliteit, de softwarearchitectuur, ons ontwikkelproces en specifieke facetten van het verkiezingsproces.
+
+### Functionaliteit
+
+- De functionele eisen en wensen voor versie 1.0 zijn te vinden via [Functionaliteit van Abacus: eisen en wensen](/documentatie./functionaliteit/functionaliteit-eisen-en-wensen.md).
 
 ### Projectstructuur
 
@@ -68,15 +70,11 @@ Meer informatie over het proces en de uitvoering van de verkiezingen in Nederlan
 
 ## Bijdragen
 
-We ontwikkelen Abacus open source omdat dit de transparantie bevordert. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken, alle vragen zijn welkom. Voor de duidelijkheid: de Kiesraad heeft concrete plannen en doelstellingen met Abacus, en die zijn leidend. Hierdoor is het goed mogelijk dat een waardevolle bijdrage uit de community toch niet kan worden meegenomen, omdat we anders beloofde dingen niet op tijd waar kunnen maken. Als je iets wilt bijdragen aan de software, neem dan vooraf contact op via e-mail: abacus[@]kiesraad.nl.
+Je kunt op verschillende manieren bijdragen leveren aan Abacus. Kijk hiervoor in de sectie [Bijdragen](CONTRIBUTING.md).
 
-Het team werkt met een planning en epics zoals opgenomen in het projectbord. Alle PR's worden grondig gereviewd, zoals we dat ook met ons eigen werk doen. We zoeken regelmatig nieuwe collega's.
+## Beveiliging
 
-Als je een bijdrage aan de broncode wilt leveren vragen we je om vooraf een [contributor licence agreement (CLA)](/CLA.md) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. Stuur de getekende CLA naar abacus[@]kiesraad.nl. Dank alvast!
-
-## Meldingen en security-issues
-
-Alle meldingen over onze software zijn welkom. Voor meldingen kun je het team direct bereiken via abacus[@]kiesraad.nl, voor security-issues kun je direct contact opnemen met onze CISO Fleur van Leusden via security[@]kiesraad.nl.
+Alle beveiligingsmeldingen over onze software zijn welkom. Kijk hiervoor in de sectie [Beveiliging](/SECURITY.md).
 
 ## Over de Kiesraad
 

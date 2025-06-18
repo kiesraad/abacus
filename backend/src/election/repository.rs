@@ -1,15 +1,13 @@
 use axum::extract::FromRef;
-use sqlx::types::Json;
-use sqlx::{Error, SqlitePool, query_as};
+use sqlx::{Error, SqlitePool, query_as, types::Json};
 
-use super::Election;
-use super::NewElection;
+use super::{Election, ElectionWithPoliticalGroups, NewElection};
+
 use crate::AppState;
 
 pub struct Elections(SqlitePool);
 
 impl Elections {
-    #[cfg(test)]
     pub fn new(pool: SqlitePool) -> Self {
         Self(pool)
     }
@@ -23,15 +21,19 @@ impl Elections {
         Ok(elections)
     }
 
-    pub async fn get(&self, id: u32) -> Result<Election, Error> {
-        let election: Election = query_as("SELECT * FROM elections WHERE id = ?")
-            .bind(id)
-            .fetch_one(&self.0)
-            .await?;
+    pub async fn get(&self, id: u32) -> Result<ElectionWithPoliticalGroups, Error> {
+        let election: ElectionWithPoliticalGroups =
+            query_as("SELECT * FROM elections WHERE id = ?")
+                .bind(id)
+                .fetch_one(&self.0)
+                .await?;
         Ok(election)
     }
 
-    pub async fn create(&self, election: NewElection) -> Result<Election, Error> {
+    pub async fn create(
+        &self,
+        election: NewElection,
+    ) -> Result<ElectionWithPoliticalGroups, Error> {
         query_as(
             r#"
             INSERT INTO elections (

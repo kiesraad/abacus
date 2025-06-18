@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  color: var(--gray-600);
 }
 
 .error h1 {
@@ -12,9 +13,15 @@
   margin-bottom: 2rem;
 }
 
+.error h3 {
+  font-size: var(--font-size-body);
+  color: var(--gray-600);
+  font-weight: bold;
+}
+
 .error h4 {
-  color: var(--text-color-body);
   font-size: var(--font-size-md);
+  color: var(--gray-600);
   font-weight: bold;
 }
 
@@ -24,11 +31,16 @@
 
 .error p {
   font-size: var(--font-size-md);
+  color: var(--gray-600);
   max-width: 38rem;
 }
 
 .error nav {
   margin-top: 2rem;
+}
+
+.error a {
+  color: var(--gray-600);
 }
 
 .stack {

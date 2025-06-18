@@ -158,6 +158,17 @@ export const noRecountNoDifferencesRequest: DataEntry = {
   },
 };
 
+export const emptyRequest: DataEntry = {
+  progress: 80,
+  data: emptyDataEntryResponse.data!,
+  client_state: {
+    furthest: "political_group_votes_1",
+    current: "political_group_votes_1",
+    acceptedErrorsAndWarnings: [],
+    continue: true,
+  },
+};
+
 export const noErrorsWarningsResponse: SaveDataEntryResponse = {
   validation_results: {
     errors: [],

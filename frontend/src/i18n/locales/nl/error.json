@@ -12,7 +12,13 @@
     "title": "Komt het probleem terug?",
     "content": "Neem contact op met de ontwikkelaars of rapporteer een bug via <link>https://github.com/kiesraad/abacus</link>"
   },
+  "airgap_violation": {
+    "title": "Abacus zit op slot",
+    "content": "<p>Abacus is geblokkeerd omdat de applicatie is verbonden met het internet.</p><ul><li>Wijzigingen zijn niet mogelijk</li><li>Alle werkplekken zijn vergrendeld</li></ul><h3>Wat te doen?</h3><ul><li>Verbreek de internetverbinding</li><li><reload>Herlaad de pagina</reload></li></ul><p>Pas daarna kan de steminvoer worden hervat.</p>",
+    "reload": "Probeer opnieuw"
+  },
   "api_error": {
+    "AirgapViolation": "Abacus is niet beschikbaar omdat de applicatie verbonden is met het internet. Abacus is alleen bedoeld voor offline gebruik.",
     "AllListsExhausted": "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
     "ApportionmentNotAvailableUntilDataEntryFinalised": "De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd",
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
@@ -25,6 +31,7 @@
     "InternalServerError": "Er is een interne fout opgetreden",
     "InvalidData": "De invoer is niet geldig",
     "InvalidJson": "De JSON is niet geldig",
+    "InvalidHash": "De hash is niet geldig",
     "InvalidXml": "De XML is niet geldig",
     "InvalidPassword": "Het opgegeven wachtwoord is onjuist",
     "InvalidPoliticalGroup": "De politieke partij is niet geldig",

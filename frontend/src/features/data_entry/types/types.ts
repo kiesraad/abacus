@@ -1,14 +1,20 @@
 import { Dispatch } from "react";
 
 import { AnyApiError } from "@/api/ApiResult";
-import { ClaimDataEntryResponse, Election, PollingStationResults, ValidationResults } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import {
+  ClaimDataEntryResponse,
+  DataEntryStatus,
+  ElectionWithPoliticalGroups,
+  PollingStationResults,
+  ValidationResults,
+} from "@/types/generated/openapi";
+import { DataEntryStructure, FormSectionId, SectionValues } from "@/types/types";
 
 import { ValidationResultSet } from "../utils/ValidationResults";
 
 export interface DataEntryState {
   // state from providers
-  election: Required<Election>;
+  election: ElectionWithPoliticalGroups;
   pollingStationId: number;
   entryNumber: number;
 
@@ -19,6 +25,7 @@ export interface DataEntryState {
   pollingStationResults: PollingStationResults | null;
 
   // state of the forms excl. data
+  dataEntryStructure: DataEntryStructure;
   formState: FormState;
   targetFormSectionId: FormSectionId | null;
   status: Status;
@@ -28,9 +35,9 @@ export interface DataEntryState {
 
 export interface DataEntryStateAndActions extends DataEntryState {
   dispatch: DataEntryDispatch;
-  onSubmitForm: (data: Partial<PollingStationResults>, options?: SubmitCurrentFormOptions) => Promise<boolean>;
+  onSubmitForm: (currentValues: SectionValues, options?: SubmitCurrentFormOptions) => Promise<boolean>;
   onDeleteDataEntry: () => Promise<boolean>;
-  onFinaliseDataEntry: () => Promise<boolean>;
+  onFinaliseDataEntry: () => Promise<DataEntryStatus | undefined>;
   register: (formSectionId: FormSectionId) => void;
   setCache: (cache: TemporaryCache) => void;
   updateFormSection: (partialFormSection: Partial<FormSection>) => void;
@@ -96,7 +103,7 @@ export interface SubmitCurrentFormOptions {
 //store unvalidated data
 export type TemporaryCache = {
   key: FormSectionId;
-  data: Partial<PollingStationResults>;
+  data: SectionValues;
 };
 
 // Status of the form controller
@@ -121,7 +128,6 @@ export interface FormState {
 export type FormSection = {
   index: number; //fixate the order of filling in sections
   id: FormSectionId;
-  title?: string;
   hasChanges: boolean;
   isSaved: boolean; //whether this section has been sent to the server
   isSubmitted?: boolean; //whether this section has been submitted in the latest request

@@ -1,5 +1,5 @@
-import { Election, PollingStationResults, ValidationResults } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
+import { DataEntryStructure, FormSectionId } from "@/types/types";
 
 import { ClientState, FormSection, FormState } from "../types/types";
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
@@ -83,7 +83,6 @@ export type DataEntrySummary = {
   hasErrors: boolean;
   notableFormSections: {
     status: DataEntryFormSectionStatus;
-    title?: string;
     formSection: FormSection;
   }[];
 };
@@ -127,73 +126,34 @@ function sortFormSections(a: FormSection, b: FormSection): number {
   return 0;
 }
 
-export function getInitialFormState(election: Required<Election>): FormState {
-  const result: FormState = {
-    current: INITIAL_FORM_SECTION_ID,
-    furthest: INITIAL_FORM_SECTION_ID,
-    sections: {
-      recounted: {
-        index: 0,
-        id: "recounted",
-        title: "Is er herteld?",
-        isSaved: false,
-        acceptErrorsAndWarnings: false,
-        hasChanges: false,
-        acceptErrorsAndWarningsError: false,
-        errors: new ValidationResultSet(),
-        warnings: new ValidationResultSet(),
-      },
-      voters_votes_counts: {
-        index: 1,
-        id: "voters_votes_counts",
-        title: "Toegelaten kiezers en uitgebrachte stemmen",
-        isSaved: false,
-        acceptErrorsAndWarnings: false,
-        hasChanges: false,
-        acceptErrorsAndWarningsError: false,
-        errors: new ValidationResultSet(),
-        warnings: new ValidationResultSet(),
-      },
-      differences_counts: {
-        index: 2,
-        id: "differences_counts",
-        title: "Verschillen",
-        isSaved: false,
-        acceptErrorsAndWarnings: false,
-        hasChanges: false,
-        acceptErrorsAndWarningsError: false,
-        errors: new ValidationResultSet(),
-        warnings: new ValidationResultSet(),
-      },
-      save: {
-        index: election.political_groups.length + 3,
-        id: "save",
-        title: "Controleren en opslaan",
-        isSaved: false,
-        acceptErrorsAndWarnings: false,
-        hasChanges: false,
-        acceptErrorsAndWarningsError: false,
-        errors: new ValidationResultSet(),
-        warnings: new ValidationResultSet(),
-      },
-    },
+function createFormSection(id: FormSectionId, index: number): FormSection {
+  return {
+    index,
+    id,
+    isSaved: false,
+    acceptErrorsAndWarnings: false,
+    hasChanges: false,
+    acceptErrorsAndWarningsError: false,
+    errors: new ValidationResultSet(),
+    warnings: new ValidationResultSet(),
   };
+}
 
-  election.political_groups.forEach((pg, n) => {
-    result.sections[`political_group_votes_${pg.number}`] = {
-      index: n + 3,
-      id: `political_group_votes_${pg.number}`,
-      title: pg.name,
-      isSaved: false,
-      acceptErrorsAndWarnings: false,
-      hasChanges: false,
-      acceptErrorsAndWarningsError: false,
-      errors: new ValidationResultSet(),
-      warnings: new ValidationResultSet(),
-    };
+export function getInitialFormState(dataEntryStructure: DataEntryStructure): FormState {
+  // Create sections from data entry structure plus save section
+  const sections: Record<string, FormSection> = {};
+
+  dataEntryStructure.forEach((section, index) => {
+    sections[section.id] = createFormSection(section.id, index);
   });
 
-  return result;
+  sections["save"] = createFormSection("save", dataEntryStructure.length);
+
+  return {
+    current: INITIAL_FORM_SECTION_ID,
+    furthest: INITIAL_FORM_SECTION_ID,
+    sections: sections as Record<FormSectionId, FormSection>,
+  };
 }
 
 export function getClientState(formState: FormState, acceptErrorsAndWarnings: boolean, continueToNextSection: boolean) {
@@ -230,9 +190,9 @@ export function calculateDataEntryProgress(formState: FormState) {
 export function buildFormState(
   clientState: ClientState,
   validationResults: ValidationResults,
-  election: Required<Election>,
+  dataEntryStructure: DataEntryStructure,
 ) {
-  const newFormState = getInitialFormState(election);
+  const newFormState = getInitialFormState(dataEntryStructure);
 
   // set the furthest and current section
   newFormState.furthest = clientState.furthest;
@@ -259,7 +219,7 @@ export function buildFormState(
     (sectionID: FormSectionId) => sectionID === newFormState.current,
   );
 
-  updateFormStateAfterSubmit(newFormState, validationResults, acceptErrorsAndWarnings);
+  updateFormStateAfterSubmit(dataEntryStructure, newFormState, validationResults, acceptErrorsAndWarnings);
 
   let targetFormSectionId: FormSectionId;
   if (clientState.continue) {
@@ -272,6 +232,7 @@ export function buildFormState(
 }
 
 export function updateFormStateAfterSubmit(
+  dataEntryStructure: DataEntryStructure,
   formState: FormState,
   validationResults: ValidationResults,
   continueToNextSection: boolean = false,
@@ -290,8 +251,8 @@ export function updateFormStateAfterSubmit(
   }
 
   //distribute errors and warnings to sections
-  addValidationResultsToFormState(validationResults.errors, formState, "errors");
-  addValidationResultsToFormState(validationResults.warnings, formState, "warnings");
+  addValidationResultsToFormState(validationResults.errors, formState, dataEntryStructure, "errors");
+  addValidationResultsToFormState(validationResults.warnings, formState, dataEntryStructure, "warnings");
 
   //determine the new furthest section, if applicable
   if (continueToNextSection && currentFormSection && formState.furthest === currentFormSection.id) {

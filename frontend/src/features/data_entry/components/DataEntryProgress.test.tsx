@@ -97,10 +97,10 @@ describe("Test DataEntryProgress", () => {
     });
 
     const recounted = screen.getByTestId("list-item-recounted");
-    const votersAndVotes = screen.getByTestId("list-item-voters-and-votes");
-    const differences = screen.getByTestId("list-item-differences");
-    const list1 = screen.getByTestId("list-item-pg-1");
-    const list2 = screen.getByTestId("list-item-pg-2");
+    const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
+    const differences = screen.getByTestId("list-item-differences_counts");
+    const list1 = screen.getByTestId("list-item-political_group_votes_1");
+    const list2 = screen.getByTestId("list-item-political_group_votes_2");
     const checkAndSave = screen.getByTestId("list-item-save");
 
     expect(recounted).toHaveClass("error");
@@ -157,7 +157,7 @@ describe("Test DataEntryProgress", () => {
       expect(screen.getByText("Is er herteld?")).toBeVisible();
     });
 
-    const votersAndVotes = screen.getByTestId("list-item-voters-and-votes");
+    const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
 
     expect(votersAndVotes).toHaveClass("error");
     expect(votersAndVotes).toHaveAttribute("aria-current", "false");
@@ -184,9 +184,9 @@ describe("Test DataEntryProgress", () => {
     });
 
     const recounted = screen.getByTestId("list-item-recounted");
-    const votersAndVotes = screen.getByTestId("list-item-voters-and-votes");
-    const differences = screen.getByTestId("list-item-differences");
-    const list1 = screen.getByTestId("list-item-pg-1");
+    const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
+    const differences = screen.getByTestId("list-item-differences_counts");
+    const list1 = screen.getByTestId("list-item-political_group_votes_1");
 
     const electionId = 1;
     const pollingStationId = 1;
@@ -203,21 +203,21 @@ describe("Test DataEntryProgress", () => {
     expect(votersAndVotesLink).toBeVisible();
     expect(votersAndVotesLink).toHaveAttribute(
       "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/voters-and-votes`,
+      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/voters_votes_counts`,
     );
 
     const differencesLink = within(differences).getByRole("link", { name: "Verschillen" });
     expect(differencesLink).toBeVisible();
     expect(differencesLink).toHaveAttribute(
       "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/differences`,
+      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/differences_counts`,
     );
 
     const list1Link = within(list1).getByRole("link", { name: "Lijst 1 - Vurige Vleugels Partij" });
     expect(list1Link).toBeVisible();
     expect(list1Link).toHaveAttribute(
       "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/list/1`,
+      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/political_group_votes_1`,
     );
   });
 
@@ -239,7 +239,7 @@ describe("Test DataEntryProgress", () => {
       expect(screen.getByText("Is er herteld?")).toBeVisible();
     });
 
-    const list1 = screen.getByTestId("list-item-pg-1");
+    const list1 = screen.getByTestId("list-item-political_group_votes_1");
     const checkAndSave = screen.getByTestId("list-item-save");
 
     const electionId = 1;
@@ -283,11 +283,11 @@ describe("Test DataEntryProgress", () => {
       expect(screen.getByText("Is er herteld?")).toBeVisible();
     });
 
-    const list1 = screen.getByTestId("list-item-pg-1");
+    const list1 = screen.getByTestId("list-item-political_group_votes_1");
     expect(list1).toHaveClass("idle disabled");
     expect(list1).toHaveAttribute("aria-current", "false");
 
-    const list2 = screen.getByTestId("list-item-pg-2");
+    const list2 = screen.getByTestId("list-item-political_group_votes_2");
     expect(list2).toHaveClass("idle disabled");
     expect(list2).toHaveAttribute("aria-current", "false");
 

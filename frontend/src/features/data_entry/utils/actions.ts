@@ -1,7 +1,8 @@
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResult, isSuccess } from "@/api/ApiResult";
-import { DataEntry, PollingStationResults, SaveDataEntryResponse } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import { DataEntry, DataEntryStatus, SaveDataEntryResponse } from "@/types/generated/openapi";
+import { FormSectionId, SectionValues } from "@/types/types";
+import { mapSectionValues } from "@/utils/dataEntryMapping";
 
 import {
   DataEntryDispatch,
@@ -37,7 +38,7 @@ export function onSubmitForm(
   state: DataEntryState,
 ) {
   return async (
-    partialPollingStationResults: Partial<PollingStationResults>,
+    currentValues: SectionValues,
     {
       aborting = false,
       continueToNextSection = true,
@@ -60,21 +61,32 @@ export function onSubmitForm(
       return false;
     }
 
-    const data: PollingStationResults = aborting
-      ? {
-          ...state.pollingStationResults,
-          ...partialPollingStationResults,
-          ...state.cache?.data,
-        }
-      : {
-          ...state.pollingStationResults,
-          ...partialPollingStationResults,
-        };
+    const dataEntrySection = state.dataEntryStructure.find((s) => s.id === currentSection.id);
+    if (!dataEntrySection) {
+      return false;
+    }
+
+    let data = mapSectionValues(state.pollingStationResults, currentValues, dataEntrySection);
+    if (aborting && state.cache) {
+      const cache = state.cache;
+      const cachedDataEntrySection = state.dataEntryStructure.find((s) => s.id === cache.key);
+      if (cachedDataEntrySection) {
+        data = mapSectionValues(data, cache.data, cachedDataEntrySection);
+      }
+    }
 
     if (data.recounted === false) {
       // remove recount if recount has changed to no
       data.voters_recounts = undefined;
+    } else if (data.recounted === true && data.voters_recounts === undefined) {
+      data.voters_recounts = {
+        poll_card_count: 0,
+        proxy_certificate_count: 0,
+        voter_card_count: 0,
+        total_admitted_voters_count: 0,
+      };
     }
+
     // prepare data to send to server
     const clientState = getClientState(state.formState, currentSection.acceptErrorsAndWarnings, continueToNextSection);
     const progress = calculateDataEntryProgress(state.formState);
@@ -126,18 +138,18 @@ export function onDeleteDataEntry(client: ApiClient, requestPath: string, dispat
 }
 
 export function onFinaliseDataEntry(client: ApiClient, requestPath: string, dispatch: DataEntryDispatch) {
-  return async (): Promise<boolean> => {
+  return async (): Promise<DataEntryStatus | undefined> => {
     dispatch({ type: "SET_STATUS", status: "finalising" });
 
-    const response = await client.postRequest(requestPath + "/finalise");
+    const response = await client.postRequest<DataEntryStatus>(requestPath);
 
     if (!isSuccess(response)) {
       dispatch({ type: "SET_STATUS", status: "idle" });
       dispatch({ type: "FORM_SAVE_FAILED", error: response });
-      return false;
+      return undefined;
     }
 
     dispatch({ type: "SET_STATUS", status: "finalised" });
-    return true;
+    return response.data;
   };
 }

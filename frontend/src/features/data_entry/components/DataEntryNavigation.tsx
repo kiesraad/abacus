@@ -4,19 +4,28 @@ import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUser } from "@/hooks/user/useUser";
 import { t, tx } from "@/i18n/translate";
-import { PollingStationResults } from "@/types/generated/openapi";
+import { SectionValues } from "@/types/types";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { SubmitCurrentFormOptions } from "../types/types";
 
 export interface DataEntryNavigationProps {
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;
-  currentValues?: Partial<PollingStationResults>;
+  currentValues?: SectionValues;
 }
 
 export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryNavigationProps) {
-  const { status, election, pollingStationId, formState, setCache, entryNumber, onDeleteDataEntry, updateFormSection } =
-    useDataEntryContext();
+  const {
+    status,
+    election,
+    pollingStationId,
+    dataEntryStructure,
+    formState,
+    setCache,
+    entryNumber,
+    onDeleteDataEntry,
+    updateFormSection,
+  } = useDataEntryContext();
   const user = useUser();
 
   // path check to see if the current location is part of the data entry flow
@@ -90,6 +99,8 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
 
   // when unsaved changes are detected and navigating within the data entry flow
   if (isPartOfDataEntryFlow(blocker.location.pathname)) {
+    const title =
+      dataEntryStructure.find((s) => s.id === formState.current)?.title || t("polling_station.current_form");
     return (
       <Modal
         title={t("polling_station.unsaved_changes_title")}
@@ -97,13 +108,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
           blocker.reset();
         }}
       >
-        <p>
-          {tx(
-            "polling_station.unsaved_changes_message",
-            {},
-            { name: formState.sections[formState.current]?.title || t("polling_station.current_form") },
-          )}
-        </p>
+        <p>{tx("polling_station.unsaved_changes_message", {}, { name: title })}</p>
         <p>{t("polling_station.save_changes")}</p>
         <nav>
           <Button

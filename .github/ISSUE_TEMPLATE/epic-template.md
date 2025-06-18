@@ -33,6 +33,7 @@ To consider for the scope:
 - functionality to be implemented (include a link to the design)
 - handling multiple users interacting with the same data
 - audit logging
+- navbar
 - refactorings
 - documentation: use cases, dev documentation, user documentation
 - knowledge sharing

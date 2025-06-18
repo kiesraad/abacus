@@ -130,6 +130,8 @@ pub enum AuditEvent {
     DataEntryDeleted(DataEntryDetails),
     DataEntryFinalised(DataEntryDetails),
     // data entry resolving events
+    DataEntryDiscardedFirst(DataEntryDetails),
+    DataEntryResumedFirst(DataEntryDetails),
     DataEntryKeptFirst(DataEntryDetails),
     DataEntryKeptSecond(DataEntryDetails),
     DataEntryDiscardedBoth(DataEntryDetails),
@@ -166,6 +168,8 @@ impl AuditEvent {
             AuditEvent::DataEntryFinalised(_) => AuditEventLevel::Success,
             AuditEvent::Error(ErrorDetails { level, .. }) => *level,
             AuditEvent::UnknownEvent => AuditEventLevel::Warning,
+            AuditEvent::DataEntryDiscardedFirst(_) => AuditEventLevel::Info,
+            AuditEvent::DataEntryResumedFirst(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryKeptFirst(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryKeptSecond(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryDiscardedBoth(_) => AuditEventLevel::Info,

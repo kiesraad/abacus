@@ -94,9 +94,18 @@ export function CheckAndSaveForm() {
 
     if (await onFinaliseDataEntry()) {
       await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
-      return true;
+      const dataEntryStatus = await onFinaliseDataEntry();
+      if (dataEntryStatus !== undefined) {
+        if (dataEntryStatus.status === "EntriesDifferent") {
+          await navigate(`/elections/${election.id}/data-entry#data-entry-different`);
+        } else if (dataEntryStatus.status === "FirstEntryHasErrors") {
+          await navigate(`/elections/${election.id}/data-entry#data-entry-errors`);
+        } else {
+          await navigate(`/elections/${election.id}/data-entry#data-entry-${entryNumber}-saved`);
+        }
+        return true;
+      }
     }
-
     return false;
   };
 
@@ -123,7 +132,7 @@ export function CheckAndSaveForm() {
             return (
               <React.Fragment key={section.id}>
                 <Link to={getUrlForFormSection(section.id)} className="section-title">
-                  {section.title || section.id}
+                  {title || section.id}
                 </Link>
                 <StatusList id={`save-form-summary-list-${section.id}`} className="error">
                   {section.errors.getCodes().map((code) => {
@@ -187,7 +196,7 @@ export function CheckAndSaveForm() {
 
             {notableFormSections.map((section) => {
               const link = (title: React.ReactElement) => <Link to={getUrlForFormSection(section.id)}>{title}</Link>;
-
+              const title = dataEntryStructure.find((s) => s.id === section.id)?.title || section.id;
               let status: DataEntryFormSectionStatus;
               if (!section.errors.isEmpty()) {
                 status = "errors";
@@ -202,7 +211,7 @@ export function CheckAndSaveForm() {
               const content = tx(
                 `check_and_save.notable_form_sections.${status}`,
                 { link },
-                { link_title: section.title || section.title || "" },
+                { link_title: title || "" },
               );
 
               return (

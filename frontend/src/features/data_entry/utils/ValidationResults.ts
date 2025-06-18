@@ -1,5 +1,5 @@
 import { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import { DataEntryStructure, FormSectionId } from "@/types/types";
 
 import { FormState } from "../types/types";
 
@@ -57,35 +57,56 @@ export function isGlobalValidationResult(validationResult: ValidationResult): bo
 /*
  * Maps a field name as used in a ValidationResult to a form section as used in the data entry state.
  */
-export function mapFieldNameToFormSection(fieldName: string): FormSectionId {
-  const parts = fieldName.split(".");
-  if (parts[1] === undefined) {
-    throw new Error(`Field "${fieldName}" could not be mapped to a form section (no second part).`);
-  }
-  const section = parts[1].split("[")[0];
-  switch (section) {
-    case "recounted":
-      return "recounted";
-    case "votes_counts":
-    case "voters_counts":
-    case "voters_recounts":
-      return "voters_votes_counts";
-    case "differences_counts":
-      return "differences_counts";
-    case "political_group_votes": {
-      const index = parseInt(parts[1].substring(parts[1].indexOf("[") + 1, parts[1].indexOf("]"))) + 1;
-      return `political_group_votes_${index}`;
+export function mapFieldNameToFormSection(fieldName: string, dataEntryStructure: DataEntryStructure): FormSectionId {
+  // Remove "data." prefix if present
+  const normalizedFieldName = fieldName.startsWith("data.") ? fieldName.substring(5) : fieldName;
+
+  // First, try to find exact match in the data entry structure
+  for (const section of dataEntryStructure) {
+    for (const subsection of section.subsections) {
+      if (subsection.type === "radio" && subsection.path === normalizedFieldName) {
+        return section.id;
+      }
+
+      if (subsection.type === "inputGrid") {
+        for (const row of subsection.rows) {
+          if (row.path === normalizedFieldName) {
+            return section.id;
+          }
+        }
+      }
     }
-    default:
-      throw new Error(`Field "${fieldName}" could not be mapped to a form section (unknown second part).`);
   }
+
+  // Fallback: handle parent object paths
+  // For cases like "data.political_group_votes[0]" or "data.voters_counts"
+  for (const section of dataEntryStructure) {
+    for (const subsection of section.subsections) {
+      if (subsection.type === "radio" && subsection.path.startsWith(normalizedFieldName + ".")) {
+        return section.id;
+      }
+
+      if (subsection.type === "inputGrid") {
+        for (const row of subsection.rows) {
+          if (row.path.startsWith(normalizedFieldName + ".") || row.path.startsWith(normalizedFieldName + "[")) {
+            return section.id;
+          }
+        }
+      }
+    }
+  }
+
+  throw new Error(`Field "${fieldName}" could not be mapped to any form section in the data entry structure.`);
 }
 
 /*
  * Returns the set of form sections for a given validation result.
  */
-export function getFormSectionsForValidationResult(validationResult: ValidationResult): Set<FormSectionId> {
-  return new Set(validationResult.fields.map(mapFieldNameToFormSection));
+export function getFormSectionsForValidationResult(
+  validationResult: ValidationResult,
+  dataEntryStructure: DataEntryStructure,
+): Set<FormSectionId> {
+  return new Set(validationResult.fields.map((field) => mapFieldNameToFormSection(field, dataEntryStructure)));
 }
 
 /*
@@ -94,10 +115,11 @@ export function getFormSectionsForValidationResult(validationResult: ValidationR
 export function addValidationResultsToFormState(
   validationResults: ValidationResult[],
   formState: FormState,
+  dataEntryStructure: DataEntryStructure,
   errorsOrWarnings: "errors" | "warnings",
 ) {
   for (const validationResult of validationResults) {
-    const formSections = getFormSectionsForValidationResult(validationResult);
+    const formSections = getFormSectionsForValidationResult(validationResult, dataEntryStructure);
     for (const formSection of formSections) {
       if (formState.sections[formSection] && formState.sections[formSection].isSaved) {
         formState.sections[formSection][errorsOrWarnings].add(validationResult);

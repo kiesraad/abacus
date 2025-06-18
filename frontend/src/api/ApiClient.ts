@@ -192,7 +192,7 @@ export class ApiClient extends EventTarget {
         : await this.handleEmptyOrNonJsonBody(response);
 
       // dispatch error events to subscribers
-      if (apiResult instanceof ApiError) {
+      if (apiResult instanceof ApiError || apiResult instanceof FatalApiError) {
         this.dispatchEvent(new ApiErrorEvent(apiResult));
       }
 

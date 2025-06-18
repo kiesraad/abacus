@@ -1,32 +1,19 @@
 {
+  "form_content": "De resultaten van dit stembureau zijn pas definitief als er twee gelijke invoeren zijn. Kies de invoer die overeenkomt met het papieren proces-verbaal. De andere invoer moet opnieuw gedaan worden.",
+  "form_question": "Welke invoer moet bewaard blijven?",
   "headers": {
-    "candidate": "Kandidaat",
     "description": "Omschrijving",
     "field": "Veld",
     "first_entry": "Eerste invoer",
-    "number": "Nummer",
     "second_entry": "Tweede invoer"
   },
-  "no": "Nee",
-  "section": {
-    "differences_counts": "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
-    "recounted": "Is het selectievakje op de eerste pagina aangevinkt?",
-    "voters_votes_counts": "Toegelaten kiezers en uitgebrachte stemmen"
-  },
-  "section_short": {
-    "differences_counts": "Verschillen",
-    "recounted": "Is er herteld?",
-    "voters_votes_counts": "Aantal kiezers en stemmen"
-  },
-  "yes": "Ja",
-  "page_title": "Verschil tussen eerste en tweede invoer",
-  "page_content": "De eerste en tweede invoer zijn niet gelijk. Controleer welke invoer precies overeenkomt met het papieren proces-verbaal. Je ziet hieronder alleen de verschillen tussen invoer 1 en 2.",
-  "required_error": "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.",
-  "form_question": "Welke invoer moet bewaard blijven?",
-  "form_content": "De resultaten van dit stembureau zijn pas definitief als er twee gelijke invoeren zijn. Kies de invoer die overeenkomt met het papieren proces-verbaal. De andere invoer moet opnieuw gedaan worden.",
   "options": {
+    "discard_both_entries": "Geen van beide: alles opnieuw invoeren",
     "keep_first_entry": "De eerste invoer ({name})",
-    "keep_second_entry": "De tweede invoer ({name})",
-    "discard_both_entries": "Geen van beide: alles opnieuw invoeren"
-  }
+    "keep_second_entry": "De tweede invoer ({name})"
+  },
+  "page_content": "De eerste en tweede invoer zijn niet gelijk. Controleer welke invoer precies overeenkomt met het papieren proces-verbaal. Je ziet hieronder alleen de verschillen tussen invoer 1 en 2.",
+  "page_title": "Verschillen oplossen",
+  "required_error": "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.",
+  "title": "Verschil tussen eerste en tweede invoer"
 }

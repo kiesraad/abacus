@@ -136,6 +136,7 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
         {
           type: "inputGrid",
           headers: ["number", "vote_count", "candidate.title"],
+          zebra: true,
           rows,
         },
       ],

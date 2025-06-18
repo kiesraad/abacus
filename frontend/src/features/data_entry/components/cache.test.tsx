@@ -9,10 +9,11 @@ import {
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 import { LoginResponse } from "@/types/generated/openapi";
+import { SectionValues } from "@/types/types";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
-import { DataEntryStateAndActionsLoaded, SectionValues } from "../types/types";
+import { DataEntryStateAndActionsLoaded } from "../types/types";
 import { DataEntryProvider } from "./DataEntryProvider";
 import { DataEntrySection } from "./DataEntrySection";
 

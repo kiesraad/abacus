@@ -1,9 +1,9 @@
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { ClientState, DataEntryAction, DataEntryState } from "../types/types";
 import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
-import { getDataEntryStructure } from "./structure";
 
 export const INITIAL_FORM_SECTION_ID: FormSectionId = "recounted";
 

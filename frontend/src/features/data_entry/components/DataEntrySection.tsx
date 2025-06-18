@@ -61,6 +61,10 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
 
   const [missingTotalError, setMissingTotalError] = React.useState(false);
 
+  // Memoize getCodes() results to prevent unnecessary focus triggers in Feedback
+  const memoizedErrorCodes = React.useMemo(() => formSection.errors.getCodes(), [formSection.errors]);
+  const memoizedWarningCodes = React.useMemo(() => formSection.warnings.getCodes(), [formSection.warnings]);
+
   React.useEffect(() => {
     if (missingTotalError && totalFieldId) {
       document.getElementById(totalFieldId)?.focus();
@@ -89,10 +93,16 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
       <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && !formSection.errors.isEmpty() && (
-        <Feedback id="feedback-error" type="error" data={formSection.errors.getCodes()} userRole={user.role} />
+        <Feedback id="feedback-error" type="error" data={memoizedErrorCodes} userRole={user.role} shouldFocus={true} />
       )}
       {formSection.isSaved && !formSection.warnings.isEmpty() && (
-        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.getCodes()} userRole={user.role} />
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={memoizedWarningCodes}
+          userRole={user.role}
+          shouldFocus={formSection.errors.isEmpty()}
+        />
       )}
 
       <DataEntrySubsections

@@ -9,12 +9,13 @@ import {
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 import { LoginResponse } from "@/types/generated/openapi";
+import { SectionValues } from "@/types/types";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
-import { DataEntryStateAndActionsLoaded, SectionValues } from "../types/types";
+import { DataEntryStateAndActionsLoaded } from "../types/types";
 import { DataEntryProvider } from "./DataEntryProvider";
-import { VotersAndVotesForm } from "./voters_and_votes/VotersAndVotesForm";
+import { DataEntrySection } from "./DataEntrySection";
 
 vi.mock("../hooks/useDataEntryContext");
 vi.mock("@/hooks/user/useUser");
@@ -54,7 +55,7 @@ describe("Data Entry cache behavior", () => {
 
     render(
       <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
-        <VotersAndVotesForm />
+        <DataEntrySection sectionId="voters_votes_counts" />
       </DataEntryProvider>,
     );
 

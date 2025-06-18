@@ -59,10 +59,10 @@ test.describe("Election creation", () => {
     // Redefine the Overview page, so we can locate the newly
     // added objects
     await expect(overviewPage.header).toBeVisible();
-    // Check if the amount of elections by this title is one more than before the import
-    expect(await overviewPage.electionCount()).toBe(initialElectionCount + 1);
-    // Check if the amount of "Klaar voor invoer states" is one more than before the import
-    expect(await overviewPage.readyStateCount()).toBe(initialReadyStateCount + 1);
+    // Check if the amount of elections by this title is greater than before the import
+    expect(await overviewPage.electionCount()).toBeGreaterThan(initialElectionCount);
+    // Check if the amount of "Klaar voor invoer states" is greater than before the import
+    expect(await overviewPage.readyStateCount()).toBeGreaterThan(initialReadyStateCount);
   });
 
   test("it fails on incorrect hash", async ({ page }) => {

@@ -1,18 +1,17 @@
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResult, isSuccess } from "@/api/ApiResult";
 import { DataEntry, DataEntryStatus, SaveDataEntryResponse } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import { FormSectionId, SectionValues } from "@/types/types";
+import { mapSectionValues } from "@/utils/dataEntryMapping";
 
 import {
   DataEntryDispatch,
   DataEntryState,
   FormSection,
-  SectionValues,
   SubmitCurrentFormOptions,
   TemporaryCache,
 } from "../types/types";
 import { calculateDataEntryProgress, getClientState } from "./dataEntryUtils";
-import { mapSectionValues } from "./mapping";
 
 export function registerForm(dispatch: DataEntryDispatch) {
   return (formSectionId: FormSectionId) => {

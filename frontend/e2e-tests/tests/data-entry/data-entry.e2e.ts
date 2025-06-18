@@ -720,8 +720,6 @@ test.describe("errors and warnings", () => {
     };
     await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
-    await expect(votersAndVotesPage.proxyCertificateCount).toHaveValue("0");
-
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText(

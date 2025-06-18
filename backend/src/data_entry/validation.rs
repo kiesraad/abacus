@@ -2211,4 +2211,123 @@ mod tests {
         );
         assert!(res.is_err());
     }
+
+    #[test]
+    fn test_validation_result_has_errors_has_warnings_methods() {
+        let result1 = ValidationResults {
+            errors: vec![ValidationResult {
+                fields: vec!["field1".to_string()],
+                code: ValidationResultCode::F201,
+            }],
+            warnings: vec![
+                ValidationResult {
+                    fields: vec!["field1".to_string()],
+                    code: ValidationResultCode::W001,
+                },
+                ValidationResult {
+                    fields: vec!["field1".to_string()],
+                    code: ValidationResultCode::W201,
+                },
+            ],
+        };
+
+        assert!(result1.has_warnings());
+        assert!(result1.has_errors());
+
+        let result2 = ValidationResults {
+            errors: vec![],
+            warnings: vec![],
+        };
+
+        assert!(!result2.has_warnings());
+        assert!(!result2.has_errors());
+    }
+
+    #[test]
+    fn test_all_zero_counts() {
+        let voters = VotersCounts {
+            poll_card_count: 100,
+            proxy_certificate_count: 2,
+            voter_card_count: 3,
+            total_admitted_voters_count: 105,
+        };
+        let votes = VotesCounts {
+            votes_candidates_count: 100,
+            blank_votes_count: 2,
+            invalid_votes_count: 2,
+            total_votes_cast_count: 104,
+        };
+        assert!(!all_zero_voters_counts_and_votes_counts(&voters, &votes));
+
+        let voters = VotersCounts {
+            poll_card_count: 0,
+            proxy_certificate_count: 0,
+            voter_card_count: 0,
+            total_admitted_voters_count: 0,
+        };
+        let votes = VotesCounts {
+            votes_candidates_count: 0,
+            blank_votes_count: 0,
+            invalid_votes_count: 0,
+            total_votes_cast_count: 0,
+        };
+        assert!(all_zero_voters_counts_and_votes_counts(&voters, &votes));
+    }
+
+    #[test]
+    fn test_exact_correct_count_avoids_w301() {
+        let election = election_fixture(&[]);
+        let polling_station = polling_station_fixture(None);
+        let mut validation_results = ValidationResults::default();
+
+        // 5 + 5 + 5 - 3 - 2 = 10
+        let differences_counts = DifferencesCounts {
+            too_many_ballots_handed_out_count: 5,
+            other_explanation_count: 5,
+            no_explanation_count: 5,
+            unreturned_ballots_count: 3,
+            too_few_ballots_handed_out_count: 2,
+            more_ballots_count: 10, // W.301 correct total
+            fewer_ballots_count: 0,
+        };
+        differences_counts
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                &"differences_counts".into(),
+            )
+            .unwrap();
+
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 0);
+    }
+
+    #[test]
+    fn test_exact_correct_count_avoids_w302() {
+        let election = election_fixture(&[]);
+        let polling_station = polling_station_fixture(None);
+        let mut validation_results = ValidationResults::default();
+
+        // 3 + 3 + 3 + 3 - 2 = 10
+        let differences_counts = DifferencesCounts {
+            unreturned_ballots_count: 3,
+            too_few_ballots_handed_out_count: 3,
+            other_explanation_count: 3,
+            no_explanation_count: 3,
+            too_many_ballots_handed_out_count: 2,
+            more_ballots_count: 0,
+            fewer_ballots_count: 10,
+        };
+        differences_counts
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                &"differences_counts".into(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 0);
+    }
 }

@@ -1,9 +1,13 @@
 import { t } from "@/i18n/translate";
 import { ElectionWithPoliticalGroups, PoliticalGroup, PollingStationResults } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import {
+  DataEntrySection,
+  DataEntryStructure,
+  DataEntrySubsection,
+  FormSectionId,
+  InputGridSubsectionRow,
+} from "@/types/types";
 import { getCandidateFullName } from "@/utils/candidate";
-
-import { DataEntrySection, DataEntryStructure, DataEntrySubsection, InputGridSubsectionRow } from "../types/types";
 
 export const recountedSection: DataEntrySection = {
   id: "recounted",
@@ -17,12 +21,18 @@ export const recountedSection: DataEntrySection = {
     },
     {
       type: "radio",
+      short_title: "recounted.short_title",
       path: "recounted",
       error: "recounted.error",
       valueType: "boolean",
       options: [
-        { value: "true", label: "recounted.recounted_yes", autoFocusInput: true },
-        { value: "false", label: "recounted.recounted_no" },
+        {
+          value: "true",
+          label: "recounted.recounted_yes",
+          short_label: "recounted.yes",
+          autoFocusInput: true,
+        },
+        { value: "false", label: "recounted.recounted_no", short_label: "recounted.no" },
       ],
     },
   ],
@@ -133,6 +143,15 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
   });
 }
 
+function buildDataEntryStructure(election: ElectionWithPoliticalGroups, recounted: boolean): DataEntryStructure {
+  return [
+    recountedSection,
+    createVotersAndVotesSection(recounted),
+    differencesSection,
+    ...createPoliticalGroupSections(election),
+  ];
+}
+
 /**
  * Returns all data entry sections.
  *
@@ -140,16 +159,28 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
  * but the number of sections and their order do not change.
  *
  * @param election ElectionWithPoliticalGroups object
+ * @param pollingStationResults PollingStationResults object (optional)
  * @returns Complete array of all data entry sections
  */
 export function getDataEntryStructure(
   election: ElectionWithPoliticalGroups,
   pollingStationResults?: PollingStationResults,
 ): DataEntryStructure {
-  return [
-    recountedSection,
-    createVotersAndVotesSection(pollingStationResults?.recounted === true),
-    differencesSection,
-    ...createPoliticalGroupSections(election),
-  ];
+  return buildDataEntryStructure(election, pollingStationResults?.recounted === true);
+}
+
+/**
+ * Returns all data entry sections for differences rendering (with two data entries).
+ *
+ * @param election ElectionWithPoliticalGroups object
+ * @param firstEntry First data entry
+ * @param secondEntry Second data entry
+ * @returns Complete array of all data entry sections
+ */
+export function getDataEntryStructureForDifferences(
+  election: ElectionWithPoliticalGroups,
+  firstEntry: PollingStationResults,
+  secondEntry: PollingStationResults,
+): DataEntryStructure {
+  return buildDataEntryStructure(election, firstEntry.recounted || secondEntry.recounted || false);
 }

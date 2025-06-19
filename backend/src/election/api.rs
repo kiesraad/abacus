@@ -15,14 +15,11 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse,
+    audit_log::{AuditEvent, AuditService},
     authentication::{Admin, User},
+    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},
-};
-#[cfg(feature = "dev-database")]
-use crate::{
-    audit_log::{AuditEvent, AuditService},
-    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -224,6 +221,8 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
 pub async fn election_import(
     _user: Admin,
     State(elections_repo): State<Elections>,
+    State(committee_sessions_repo): State<CommitteeSessions>,
+    audit_service: AuditService,
     Json(edu): Json<ElectionAndCandidatesDefinitionImportRequest>,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
     if edu.election_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
@@ -237,6 +236,21 @@ pub async fn election_import(
     new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
 
     let election = elections_repo.create(new_election).await?;
+
+    // Create first committee session for the election
+    let committee_session = committee_sessions_repo
+        .create(CommitteeSessionCreateRequest {
+            number: 1,
+            election_id: election.id,
+        })
+        .await?;
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+            None,
+        )
+        .await?;
+
     Ok((StatusCode::CREATED, Json(election)))
 }
 

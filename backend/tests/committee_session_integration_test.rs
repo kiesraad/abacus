@@ -78,7 +78,7 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
         "Unexpected response status"
     );
     let body: CommitteeSession = response.json().await.unwrap();
-    assert_eq!(body.id, 2);
+    assert_eq!(body.id, 3);
     assert_eq!(body.number, 2);
     assert_eq!(body.election_id, 2);
     assert_eq!(body.status, CommitteeSessionStatus::Created);

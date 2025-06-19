@@ -343,10 +343,10 @@ export interface ClaimDataEntryResponse {
 export interface CommitteeSession {
   election_id: number;
   id: number;
-  location: string;
+  location?: string | null;
   number: number;
-  start_date: string;
-  start_time: string;
+  start_date?: string | null;
+  start_time?: string | null;
   status: CommitteeSessionStatus;
 }
 
@@ -361,10 +361,10 @@ export interface CommitteeSessionCreateRequest {
 export interface CommitteeSessionDetails {
   sessionElectionId: number;
   sessionId: number;
-  sessionLocation: string;
+  sessionLocation?: string | null;
   sessionNumber: number;
-  sessionStartDate: string;
-  sessionStartTime: string;
+  sessionStartDate?: string | null;
+  sessionStartTime?: string | null;
   sessionStatus: string;
 }
 
@@ -378,7 +378,7 @@ export interface CommitteeSessionListResponse {
 /**
  * Committee session status
  */
-export type CommitteeSessionStatus = "Created" | "DataEntryInProgress" | "DataEntryPaused" | "DataEntryFinished";
+export type CommitteeSessionStatus = "created" | "data_entry_in_progress" | "data_entry_paused" | "data_entry_finished";
 
 /**
  * Committee session update request

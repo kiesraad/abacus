@@ -14,19 +14,44 @@ impl CommitteeSessions {
     }
 
     pub async fn list(&self) -> Result<Vec<CommitteeSession>, Error> {
-        let committee_sessions: Vec<CommitteeSession> =
-            query_as("SELECT id, number, election_id, location, start_date, start_time, status FROM committee_sessions")
-                .fetch_all(&self.0)
-                .await?;
+        let committee_sessions: Vec<CommitteeSession> = query_as!(
+            CommitteeSession,
+            r#"
+            SELECT 
+              id as "id: u32",
+              number as "number: u32",
+              election_id as "election_id: u32",
+              status as "status: _",
+              location,
+              start_date,
+              start_time
+            FROM committee_sessions
+            "#,
+        )
+        .fetch_all(&self.0)
+        .await?;
         Ok(committee_sessions)
     }
 
     pub async fn get(&self, id: u32) -> Result<CommitteeSession, Error> {
-        let committee_session: CommitteeSession =
-            query_as("SELECT * FROM committee_sessions WHERE id = ?")
-                .bind(id)
-                .fetch_one(&self.0)
-                .await?;
+        let committee_session: CommitteeSession = query_as!(
+            CommitteeSession,
+            r#"
+            SELECT 
+              id as "id: u32",
+              number as "number: u32",
+              election_id as "election_id: u32",
+              status as "status: _",
+              location,
+              start_date,
+              start_time
+            FROM committee_sessions
+            WHERE id = ?
+            "#,
+            id
+        )
+        .fetch_one(&self.0)
+        .await?;
         Ok(committee_session)
     }
 
@@ -34,21 +59,25 @@ impl CommitteeSessions {
         &self,
         committee_session: CommitteeSessionCreateRequest,
     ) -> Result<CommitteeSession, Error> {
-        query_as(
+        query_as!(
+            CommitteeSession,
             r#"
             INSERT INTO committee_sessions (
               number,
               election_id
             ) VALUES (?, ?)
             RETURNING
-              id,
-              number,
-              election_id,
-              status
+              id as "id: u32",
+              number as "number: u32",
+              election_id as "election_id: u32",
+              status as "status: _",
+              location,
+              start_date,
+              start_time
             "#,
+            committee_session.number,
+            committee_session.election_id
         )
-        .bind(committee_session.number)
-        .bind(committee_session.election_id)
         .fetch_one(&self.0)
         .await
     }

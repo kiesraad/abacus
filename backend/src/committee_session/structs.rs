@@ -4,6 +4,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
+use strum::VariantNames;
 use utoipa::ToSchema;
 
 use crate::audit_log::CommitteeSessionDetails;
@@ -14,9 +15,12 @@ pub struct CommitteeSession {
     pub id: u32,
     pub number: u32,
     pub election_id: u32,
-    pub location: String,
-    pub start_date: String,
-    pub start_time: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub location: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_time: Option<String>,
     pub status: CommitteeSessionStatus,
 }
 
@@ -57,30 +61,25 @@ pub struct CommitteeSessionUpdateRequest {
 
 /// Committee session status
 #[derive(
-    Serialize, Deserialize, strum::Display, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type,
+    Serialize,
+    Deserialize,
+    VariantNames,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    ToSchema,
+    Type,
+    strum::Display,
 )]
-#[strum(serialize_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+#[sqlx(rename_all = "snake_case")]
 pub enum CommitteeSessionStatus {
     Created,
     DataEntryInProgress,
     DataEntryPaused,
     DataEntryFinished,
 }
-
-// #[cfg(test)]
-// pub(crate) mod tests {
-//     use super::*;
-//
-//     Create a test committee session.
-//     pub fn committee_session_fixture() -> CommitteeSession {
-//         CommitteeSession {
-//             id: 1,
-//             number: 1,
-//             election_id: 1,
-//             location: "Heemdamsebrug".to_string(),
-//             start_date: "25-10-2025".to_string(),
-//             start_time: "10:45".to_string(),
-//             status: CommitteeSessionStatus::DataEntryInProgress,
-//         }
-//     }
-// }

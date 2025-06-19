@@ -45,7 +45,7 @@ export function ElectionStatusPage() {
   }
 
   function finishInput() {
-    // TODO: Add call to endpoint that changes status of committee session to "data_entry_finished"
+    // TODO: Add call to endpoint that changes status of committee session to "data_entry_finished" in issue #1650
     void navigate("../report");
   }
 

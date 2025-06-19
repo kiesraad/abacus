@@ -20,8 +20,8 @@ use crate::{
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
-        .routes(routes!(committee_session_list))
-        .routes(routes!(committee_session_details))
+        .routes(routes!(election_committee_session_list))
+        .routes(routes!(election_committee_session_details))
         .routes(routes!(committee_session_create))
         .routes(routes!(committee_session_update))
 }
@@ -38,28 +38,34 @@ impl IntoResponse for CommitteeSessionListResponse {
     }
 }
 
-/// Get a list of all [CommitteeSession]s
+/// Get a list of all [CommitteeSession]s of an election
 #[utoipa::path(
   get,
-  path = "/api/committee_sessions",
+  path = "/api/elections/{election_id}/committee_sessions",
   responses(
         (status = 200, description = "Committee session list", body = CommitteeSessionListResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
+  params(
+        ("election_id" = u32, description = "Election database id"),
+  ),
 )]
-pub async fn committee_session_list(
+pub async fn election_committee_session_list(
     _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
+    Path(election_id): Path<u32>,
 ) -> Result<Json<CommitteeSessionListResponse>, APIError> {
-    let committee_sessions = committee_sessions_repo.list().await?;
+    let committee_sessions = committee_sessions_repo
+        .election_committee_session_list(election_id)
+        .await?;
     Ok(Json(CommitteeSessionListResponse { committee_sessions }))
 }
 
-/// Get [CommitteeSession] details
+/// Get the current [CommitteeSession] for an election
 #[utoipa::path(
   get,
-  path = "/api/committee_sessions/{committee_session_id}",
+  path = "/api/elections/{election_id}/committee_session",
   responses(
         (status = 200, description = "Committee session", body = CommitteeSession),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -67,15 +73,17 @@ pub async fn committee_session_list(
         (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
   params(
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("election_id" = u32, description = "Election database id"),
   ),
 )]
-pub async fn committee_session_details(
+pub async fn election_committee_session_details(
     _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<u32>,
 ) -> Result<Json<CommitteeSession>, APIError> {
-    let committee_session = committee_sessions_repo.get(id).await?;
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await?;
     Ok(Json(committee_session))
 }
 
@@ -122,30 +130,27 @@ pub async fn committee_session_create(
         (status = 404, description = "Committee session not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    params(
+        ("committee_session_id" = u32, description = "Committee session database id"),
+    ),
 )]
 pub async fn committee_session_update(
     _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
     audit_service: AuditService,
-    Path(id): Path<u32>,
+    Path(committee_session_id): Path<u32>,
     Json(committee_session_request): Json<CommitteeSessionUpdateRequest>,
 ) -> Result<StatusCode, APIError> {
-    let updated = committee_sessions_repo
-        .update(id, committee_session_request)
+    let committee_session = committee_sessions_repo
+        .update(committee_session_id, committee_session_request)
         .await?;
 
-    if updated {
-        let committee_session = committee_sessions_repo.get(id).await?;
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
+            None,
+        )
+        .await?;
 
-        audit_service
-            .log(
-                &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
-                None,
-            )
-            .await?;
-
-        Ok(StatusCode::OK)
-    } else {
-        Ok(StatusCode::NOT_FOUND)
-    }
+    Ok(StatusCode::OK)
 }

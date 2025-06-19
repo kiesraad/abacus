@@ -1,5 +1,5 @@
 use axum::extract::FromRef;
-use sqlx::{Error, SqlitePool, query, query_as};
+use sqlx::{Error, SqlitePool, query_as};
 
 use super::{CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest};
 
@@ -13,8 +13,11 @@ impl CommitteeSessions {
         Self(pool)
     }
 
-    pub async fn list(&self) -> Result<Vec<CommitteeSession>, Error> {
-        let committee_sessions: Vec<CommitteeSession> = query_as!(
+    pub async fn election_committee_session_list(
+        &self,
+        election_id: u32,
+    ) -> Result<Vec<CommitteeSession>, Error> {
+        query_as!(
             CommitteeSession,
             r#"
             SELECT 
@@ -26,15 +29,19 @@ impl CommitteeSessions {
               start_date,
               start_time
             FROM committee_sessions
+            WHERE election_id = ?
             "#,
+            election_id
         )
         .fetch_all(&self.0)
-        .await?;
-        Ok(committee_sessions)
+        .await
     }
 
-    pub async fn get(&self, id: u32) -> Result<CommitteeSession, Error> {
-        let committee_session: CommitteeSession = query_as!(
+    pub async fn get_election_committee_session(
+        &self,
+        election_id: u32,
+    ) -> Result<CommitteeSession, Error> {
+        query_as!(
             CommitteeSession,
             r#"
             SELECT 
@@ -46,13 +53,14 @@ impl CommitteeSessions {
               start_date,
               start_time
             FROM committee_sessions
-            WHERE id = ?
+            WHERE election_id = ?
+            ORDER BY number DESC 
+            LIMIT 1
             "#,
-            id
+            election_id
         )
         .fetch_one(&self.0)
-        .await?;
-        Ok(committee_session)
+        .await
     }
 
     pub async fn create(
@@ -86,27 +94,32 @@ impl CommitteeSessions {
         &self,
         committee_session_id: u32,
         committee_session_update: CommitteeSessionUpdateRequest,
-    ) -> Result<bool, Error> {
-        let rows_affected = query!(
+    ) -> Result<CommitteeSession, Error> {
+        query_as!(
+            CommitteeSession,
             r#"
             UPDATE committee_sessions
             SET
               location = ?,
               start_date = ?,
               start_time = ?
-            WHERE
-              id = ?
+            WHERE id = ?
+            RETURNING
+              id as "id: u32",
+              number as "number: u32",
+              election_id as "election_id: u32",
+              status as "status: _",
+              location,
+              start_date,
+              start_time
             "#,
             committee_session_update.location,
             committee_session_update.start_date,
             committee_session_update.start_time,
             committee_session_id,
         )
-        .execute(&self.0)
-        .await?
-        .rows_affected();
-
-        Ok(rows_affected > 0)
+        .fetch_one(&self.0)
+        .await
     }
 }
 

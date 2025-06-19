@@ -3,17 +3,11 @@
 /** PATHS **/
 
 // /api/committee_sessions
-export type COMMITTEE_SESSION_LIST_REQUEST_PARAMS = Record<string, never>;
-export type COMMITTEE_SESSION_LIST_REQUEST_PATH = `/api/committee_sessions`;
 export type COMMITTEE_SESSION_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
 export type COMMITTEE_SESSION_CREATE_REQUEST_BODY = CommitteeSessionCreateRequest;
 
 // /api/committee_sessions/{committee_session_id}
-export interface COMMITTEE_SESSION_DETAILS_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_DETAILS_REQUEST_PATH = `/api/committee_sessions/${number}`;
 export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
   committee_session_id: number;
 }
@@ -48,6 +42,18 @@ export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
+
+// /api/elections/{election_id}/committee_session
+export interface ELECTION_COMMITTEE_SESSION_DETAILS_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_COMMITTEE_SESSION_DETAILS_REQUEST_PATH = `/api/elections/${number}/committee_session`;
+
+// /api/elections/{election_id}/committee_sessions
+export interface ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
 
 // /api/elections/{election_id}/download_pdf_results
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
@@ -378,7 +384,12 @@ export interface CommitteeSessionListResponse {
 /**
  * Committee session status
  */
-export type CommitteeSessionStatus = "created" | "data_entry_in_progress" | "data_entry_paused" | "data_entry_finished";
+export type CommitteeSessionStatus =
+  | "created"
+  | "ready_for_data_entry"
+  | "data_entry_in_progress"
+  | "data_entry_paused"
+  | "data_entry_finished";
 
 /**
  * Committee session update request

@@ -79,6 +79,7 @@ pub struct CommitteeSessionUpdateRequest {
 #[sqlx(rename_all = "snake_case")]
 pub enum CommitteeSessionStatus {
     Created,
+    ReadyForDataEntry,
     DataEntryInProgress,
     DataEntryPaused,
     DataEntryFinished,

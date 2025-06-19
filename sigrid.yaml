@@ -65,9 +65,9 @@ components:
   - name: "(Frontend) Components/authorization"
     include:
       - ".*/frontend/src/components/authorization/.*"
-  - name: "(Frontend) Components/election_status_with_icon"
+  - name: "(Frontend) Components/committee_session_status_with_icon"
     include:
-      - ".*/frontend/src/components/election_status_with_icon/.*"
+      - ".*/frontend/src/components/committee_session_status_with_icon/.*"
   - name: "(Frontend) Components/error"
     include:
       - ".*/frontend/src/components/error/.*"

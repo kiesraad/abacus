@@ -1,9 +1,11 @@
 {
   "add_polling_station": "Stembureau toevoegen",
   "coordinator": {
+    "created": "Voorbereiden",
     "data_entry_not_started": "Klaar voor invoer",
     "data_entry_in_progress": "Steminvoer bezig",
-    "data_entry_finished": "Steminvoer klaar"
+    "data_entry_paused": "Steminvoer geschorst",
+    "data_entry_finished": "Steminvoer afgerond"
   },
   "definitive": {
     "title": "Alle stembureaus zijn twee keer ingevoerd",
@@ -27,8 +29,10 @@
   },
   "title": "Statusoverzicht",
   "typist": {
-    "data_entry_not_started": "Klaar voor invoer",
+    "created": "Wachten op coördinator",
+    "data_entry_not_started": "Wachten op coördinator",
     "data_entry_in_progress": "Steminvoer bezig",
+    "data_entry_paused": "Steminvoer opgeschort",
     "data_entry_finished": "Steminvoer klaar"
   }
 }

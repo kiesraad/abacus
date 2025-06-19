@@ -1,11 +1,12 @@
 import { useLocation, useNavigate } from "react-router";
 
 import { useInitialApiGet } from "@/api/useInitialApiGet";
-import { HeaderElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
+import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session_status_with_icon/CommitteeSessionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
+import { useCommitteeSession } from "@/hooks/committee_session/useCommitteeSession";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/i18n/translate";
@@ -17,6 +18,7 @@ export function ElectionStatusPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { election, pollingStations } = useElection();
+  const { committeeSession } = useCommitteeSession();
   const { statuses } = useElectionStatus();
   const { requestState } = useInitialApiGet<UserListResponse>("/api/user" satisfies USER_LIST_REQUEST_PATH);
 
@@ -43,6 +45,7 @@ export function ElectionStatusPage() {
   }
 
   function finishInput() {
+    // TODO: Add call to endpoint that changes status of committee session to "data_entry_finished"
     void navigate("../report");
   }
 
@@ -59,7 +62,7 @@ export function ElectionStatusPage() {
         </section>
         <section>
           <div className="election_status">
-            <HeaderElectionStatusWithIcon status={election.status} userRole="coordinator" />
+            <HeaderCommitteeSessionStatusWithIcon status={committeeSession.status} userRole="coordinator" />
           </div>
         </section>
       </header>
@@ -83,7 +86,7 @@ export function ElectionStatusPage() {
           </p>
         </Alert>
       )}
-      {election.status !== "DataEntryFinished" &&
+      {committeeSession.status !== "data_entry_finished" &&
         statuses.length > 0 &&
         statuses.every((s) => s.status === "definitive") && (
           <Alert type="success">

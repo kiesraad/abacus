@@ -386,7 +386,7 @@ export interface CommitteeSessionListResponse {
  */
 export type CommitteeSessionStatus =
   | "created"
-  | "ready_for_data_entry"
+  | "data_entry_not_started"
   | "data_entry_in_progress"
   | "data_entry_paused"
   | "data_entry_finished";

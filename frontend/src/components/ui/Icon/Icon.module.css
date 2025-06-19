@@ -62,6 +62,12 @@
     }
   }
 
+  &.status-not-started {
+    svg {
+      fill: var(--status-not-started);
+    }
+  }
+
   &.xs {
     width: 1rem;
     height: 1rem;

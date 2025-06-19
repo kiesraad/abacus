@@ -10,8 +10,11 @@ import {
   AUDIT_LOG_LIST_USERS_REQUEST_PATH,
   AuditLogListResponse,
   ClaimDataEntryResponse,
+  CommitteeSession,
   DataEntryGetErrorsResponse,
   DataEntryStatus,
+  ELECTION_COMMITTEE_SESSION_DETAILS_REQUEST_PARAMS,
+  ELECTION_COMMITTEE_SESSION_DETAILS_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PARAMS,
   ELECTION_DETAILS_REQUEST_PATH,
   ELECTION_LIST_REQUEST_PARAMS,
@@ -78,6 +81,7 @@ import {
   WHOAMI_REQUEST_PATH,
 } from "@/types/generated/openapi";
 
+import { committeeSessionMockResponse } from "./CommitteeSessionMockData";
 import {
   claimDataEntryResponse,
   dataEntryGetErrorsMockResponse,
@@ -136,6 +140,14 @@ export const LogUsersRequestHandler = http.get<
   User[],
   AUDIT_LOG_LIST_USERS_REQUEST_PATH
 >("/api/log-users", () => HttpResponse.json(userMockData, { status: 200 }));
+
+// get election committee session details handler
+export const ElectionCommitteeSessionRequestHandler = http.get<
+  ParamsToString<ELECTION_COMMITTEE_SESSION_DETAILS_REQUEST_PARAMS>,
+  null,
+  CommitteeSession | ErrorResponse,
+  ELECTION_COMMITTEE_SESSION_DETAILS_REQUEST_PATH
+>("/api/elections/1/committee_session", () => HttpResponse.json(committeeSessionMockResponse, { status: 200 }));
 
 // get election list handler
 export const ElectionListRequestHandler = http.get<

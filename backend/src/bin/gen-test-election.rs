@@ -2,8 +2,8 @@ use std::{error::Error, ops::Range, str::FromStr};
 
 use abacus::{
     election::{
-        CandidateGender, ElectionCategory, ElectionStatus, ElectionWithPoliticalGroups,
-        NewElection, PoliticalGroup, repository::Elections,
+        CandidateGender, ElectionCategory, ElectionWithPoliticalGroups, NewElection,
+        PoliticalGroup, repository::Elections,
     },
     fixtures,
     polling_station::{PollingStationRequest, PollingStationType, repository::PollingStations},
@@ -151,7 +151,6 @@ fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
         number_of_seats: rng.random_range(19..45),
         election_date,
         nomination_date,
-        status: ElectionStatus::DataEntryInProgress,
         political_groups,
     }
 }

@@ -1079,9 +1079,9 @@ test.describe("Check and Save page", () => {
       .getByRole("listitem");
 
     await expect(listItemsVotersAndVotes).toHaveText([
-      "Controleer uitgebrachte stemmen",
-      "Controleer (totaal) aantal stemmen op kandidaten",
-      "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
+      "F202 Controleer uitgebrachte stemmen",
+      "F204 Controleer (totaal) aantal stemmen op kandidaten",
+      "W203 Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     ]);
 
     const listItemsDifferences = page.getByTestId("save-form-summary-list-differences_counts").getByRole("listitem");

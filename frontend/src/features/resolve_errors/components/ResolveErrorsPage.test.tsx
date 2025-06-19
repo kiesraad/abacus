@@ -8,8 +8,8 @@ import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  PollingStationDataEntryGetErrorsHandler,
   PollingStationDataEntryResolveErrorsHandler,
-  PollingStationDataEntryStatusFirstEntryHasErrorsHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
@@ -45,8 +45,8 @@ describe("ResolveErrorsPage", () => {
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
+      PollingStationDataEntryGetErrorsHandler,
       PollingStationDataEntryResolveErrorsHandler,
-      PollingStationDataEntryStatusFirstEntryHasErrorsHandler,
       UserListRequestHandler,
     );
   });

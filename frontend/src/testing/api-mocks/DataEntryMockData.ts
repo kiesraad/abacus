@@ -1,6 +1,7 @@
-import { getEmptyDataEntryRequest } from "@/features/data_entry/testing/mock-data";
+import { errorWarningMocks, getEmptyDataEntryRequest } from "@/features/data_entry/testing/mock-data";
 import {
   ClaimDataEntryResponse,
+  DataEntryGetErrorsResponse,
   DataEntryStatus,
   PollingStationDataEntry,
   PollingStationResults,
@@ -191,6 +192,14 @@ export const dataEntryResolveDifferencesMockResponse: PollingStationDataEntry = 
       second_entry_user_id: 1,
     },
     status: "Definitive",
+  },
+};
+
+export const dataEntryGetErrorsMockResponse: DataEntryGetErrorsResponse = {
+  ...firstEntryHasErrorsStatus.state,
+  validation_results: {
+    errors: [errorWarningMocks.F101],
+    warnings: [errorWarningMocks.W201, errorWarningMocks.W301],
   },
 };
 

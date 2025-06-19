@@ -7,32 +7,26 @@ import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusPr
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
-  DataEntryStatus,
+  DataEntryGetErrorsResponse,
   Election,
-  FirstEntryHasErrors,
   PoliticalGroup,
+  POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH,
-  POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH,
   PollingStation,
   ResolveErrorsAction,
   USER_LIST_REQUEST_PATH,
   UserListResponse,
 } from "@/types/generated/openapi";
 
-type FirstEntryHasErrorsStatus = {
-  state: FirstEntryHasErrors;
-  status: "FirstEntryHasErrors";
-  first_user: string;
-};
-
-interface PollingStationDataEntryStatus {
+interface DataEntryErrors {
   action: ResolveErrorsAction | undefined;
   setAction: (action: ResolveErrorsAction | undefined) => void;
   pollingStation: PollingStation;
   election: Election & { political_groups: PoliticalGroup[] };
   loading: boolean;
-  status: FirstEntryHasErrorsStatus | null;
+  dataEntry: DataEntryGetErrorsResponse | null;
+  userFullname: string | undefined;
   onSubmit: () => Promise<void>;
   validationError: string | undefined;
 }
@@ -40,7 +34,7 @@ interface PollingStationDataEntryStatus {
 export function usePollingStationDataEntryErrors(
   pollingStationId: number,
   afterSave: (action: ResolveErrorsAction) => void,
-): PollingStationDataEntryStatus {
+): DataEntryErrors {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
@@ -49,11 +43,11 @@ export function usePollingStationDataEntryErrors(
   const [error, setError] = useState<AnyApiError | null>(null);
   const [validationError, setValidationError] = useState<string>();
 
-  // fetch the current status of the polling station
-  const path: POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries`;
-  const { requestState } = useInitialApiGet<DataEntryStatus>(path);
+  // fetch the data entry with errors and warnings
+  const path: POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_errors`;
+  const { requestState } = useInitialApiGet<DataEntryGetErrorsResponse>(path);
 
-  // fetch a list of users, to render the first entry and second entry user names
+  // fetch a list of users, to render username
   const usersPath: USER_LIST_REQUEST_PATH = "/api/user";
   const { requestState: usersRequestState } = useInitialApiGetWithErrors<UserListResponse>(usersPath);
 
@@ -71,33 +65,18 @@ export function usePollingStationDataEntryErrors(
   if (requestState.status === "api-error") {
     throw requestState.error;
   }
-
-  // render generic error page when any error occurs
   if (usersRequestState.status === "api-error") {
     throw usersRequestState.error;
   }
 
-  // only allow polling stations with status "FirstEntryHasErrors" to be resolved
-  if (requestState.status === "success" && requestState.data.status !== "FirstEntryHasErrors") {
-    throw new NotFoundError("error.polling_station_not_found");
-  }
+  let dataEntry: DataEntryGetErrorsResponse | null = null;
+  let userFullname: string | undefined = undefined;
 
-  let status: FirstEntryHasErrorsStatus | null = null;
+  if (requestState.status === "success" && usersRequestState.status === "success") {
+    dataEntry = requestState.data;
 
-  // if the request was successful and the status is "FirstEntryHasErrors", we can show the details
-  if (
-    requestState.status === "success" &&
-    usersRequestState.status === "success" &&
-    requestState.data.status === "FirstEntryHasErrors"
-  ) {
-    const users = usersRequestState.data.users;
-    const state = requestState.data.state;
-    const firstUser = users.find((u) => u.id === state.first_entry_user_id);
-
-    status = {
-      ...requestState.data,
-      first_user: firstUser?.fullname || firstUser?.username || "",
-    };
+    const user = usersRequestState.data.users.find((u) => u.id === requestState.data.first_entry_user_id);
+    userFullname = user?.fullname ?? user?.username;
   }
 
   const onSubmit = async () => {
@@ -127,7 +106,8 @@ export function usePollingStationDataEntryErrors(
     pollingStation,
     election,
     loading: requestState.status === "loading" || usersRequestState.status === "loading",
-    status,
+    dataEntry,
+    userFullname,
     onSubmit,
     validationError,
   };

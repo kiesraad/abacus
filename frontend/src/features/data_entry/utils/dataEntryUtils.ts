@@ -87,45 +87,6 @@ export type DataEntrySummary = {
   }[];
 };
 
-export function getDataEntrySummary(formState: FormState): DataEntrySummary {
-  const result: DataEntrySummary = {
-    countsAddUp: true,
-    hasBlocks: false,
-    hasWarnings: false,
-    hasErrors: false,
-    notableFormSections: [],
-  };
-
-  //TODO: errors are "acceptable now"
-  Object.values(formState.sections)
-    .filter((section) => section.id !== "save")
-    .sort(sortFormSections)
-    .forEach((section) => {
-      if (!section.errors.isEmpty()) {
-        result.notableFormSections.push({ status: "errors", formSection: section });
-        result.countsAddUp = false;
-        result.hasBlocks = section.acceptErrorsAndWarnings ? false : true;
-        result.hasErrors = true;
-      } else if (!section.warnings.isEmpty()) {
-        result.hasWarnings = true;
-        if (section.acceptErrorsAndWarnings) {
-          result.notableFormSections.push({ status: "accepted-warnings", formSection: section });
-        } else {
-          result.notableFormSections.push({ status: "unaccepted-warnings", formSection: section });
-          result.hasBlocks = true;
-        }
-      }
-    });
-
-  return result;
-}
-
-function sortFormSections(a: FormSection, b: FormSection): number {
-  if (a.index < b.index) return -1;
-  if (a.index > b.index) return 1;
-  return 0;
-}
-
 function createFormSection(id: FormSectionId, index: number): FormSection {
   return {
     index,

@@ -26,7 +26,7 @@ test("badges are visible", async ({ page }) => {
 
   const entriesDifferentBadge = page.getByTestId("entries_different");
   await expect(entriesDifferentBadge).toBeVisible();
-  await expect(entriesDifferentBadge).toContainText("Verschil invoer 1 en 2");
+  await expect(entriesDifferentBadge).toContainText("2e invoer");
   await expect(entriesDifferentBadge.getByRole("img")).toBeHidden();
 
   const definitiveBadge = page.getByTestId("definitive");

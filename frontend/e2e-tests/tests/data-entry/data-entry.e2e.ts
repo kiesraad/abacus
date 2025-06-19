@@ -1085,7 +1085,7 @@ test.describe("Check and Save page", () => {
     ]);
 
     const listItemsDifferences = page.getByTestId("save-form-summary-list-differences_counts").getByRole("listitem");
-    await expect(listItemsDifferences).toHaveText(["W203 Controleer ingevulde verschillen"]);
+    await expect(listItemsDifferences).toHaveText(["W302 Controleer ingevulde verschillen"]);
 
     await expect(checkAndSavePage.complete).toBeVisible();
     await expect(checkAndSavePage.acceptErrors).toBeVisible();

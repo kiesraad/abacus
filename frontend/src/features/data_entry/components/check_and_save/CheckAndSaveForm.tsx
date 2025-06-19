@@ -129,41 +129,25 @@ export function CheckAndSaveForm() {
             const title = dataEntryStructure.find((s) => s.id === section.id)?.title || section.id;
             return (
               <React.Fragment key={section.id}>
-                <Link to={getUrlForFormSection(section.id)} className="section-title">
-                  {title || section.id}
-                </Link>
-                <StatusList id={`save-form-summary-list-${section.id}`} className="error">
+                <StatusList.Title>
+                  <Link to={getUrlForFormSection(section.id)} className="section-title">
+                    {title || section.id}
+                  </Link>
+                </StatusList.Title>
+                <StatusList id={`save-form-summary-list-${section.id}`}>
                   {section.errors.getCodes().map((code) => {
                     return (
-                      <StatusList.Item
-                        key={code}
-                        status="error"
-                        emphasis
-                        padding
-                        id={`section-error-${section.id}-${code}`}
-                      >
-                        {tx(`feedback.${code}.typist.title`, {
-                          link: (title: React.ReactElement) => (
-                            <Link to={getUrlForFormSection(section.id)}>{title}</Link>
-                          ),
-                        })}
+                      <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>
+                        <strong>{code}</strong>&nbsp;
+                        {tx(`feedback.${code}.typist.title`)}
                       </StatusList.Item>
                     );
                   })}
                   {section.warnings.getCodes().map((code) => {
                     return (
-                      <StatusList.Item
-                        key={code}
-                        status="warning"
-                        emphasis
-                        padding
-                        id={`section-error-${section.id}-${code}`}
-                      >
-                        {tx(`feedback.${code}.typist.title`, {
-                          link: (title: React.ReactElement) => (
-                            <Link to={getUrlForFormSection(section.id)}>{title}</Link>
-                          ),
-                        })}
+                      <StatusList.Item key={code} status="warning" id={`section-error-${section.id}-${code}`}>
+                        <strong>{code}</strong>&nbsp;
+                        {tx(`feedback.${code}.typist.title`)}
                       </StatusList.Item>
                     );
                   })}

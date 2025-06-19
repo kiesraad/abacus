@@ -34,3 +34,7 @@ StatusList.Item = function StatusListItem({ status, children, emphasis, padding,
     </li>
   );
 };
+
+StatusList.Title = function StatusListTitle({ children }: React.HTMLAttributes<HTMLLIElement>) {
+  return <div className={cls.title}>{children}</div>;
+};

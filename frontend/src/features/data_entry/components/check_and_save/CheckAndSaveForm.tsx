@@ -130,15 +130,16 @@ export function CheckAndSaveForm() {
             return (
               <React.Fragment key={section.id}>
                 <StatusList.Title>
-                  <Link to={getUrlForFormSection(section.id)} className="section-title">
-                    {title || section.id}
-                  </Link>
+                  <Link to={getUrlForFormSection(section.id)}>{title}</Link>
                 </StatusList.Title>
                 <StatusList id={`save-form-summary-list-${section.id}`}>
                   {section.errors.getCodes().map((code) => {
                     return (
                       <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>
-                        <strong>{code}</strong>&nbsp;
+                        <strong>
+                          {code[0]}.{code.slice(1)}
+                        </strong>
+                        &nbsp;
                         {tx(`feedback.${code}.typist.title`)}
                       </StatusList.Item>
                     );
@@ -146,7 +147,10 @@ export function CheckAndSaveForm() {
                   {section.warnings.getCodes().map((code) => {
                     return (
                       <StatusList.Item key={code} status="warning" id={`section-error-${section.id}-${code}`}>
-                        <strong>{code}</strong>&nbsp;
+                        <strong>
+                          {code[0]}.{code.slice(1)}
+                        </strong>
+                        &nbsp;
                         {tx(`feedback.${code}.typist.title`)}
                       </StatusList.Item>
                     );

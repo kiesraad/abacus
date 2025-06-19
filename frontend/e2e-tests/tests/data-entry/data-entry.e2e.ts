@@ -1079,13 +1079,13 @@ test.describe("Check and Save page", () => {
       .getByRole("listitem");
 
     await expect(listItemsVotersAndVotes).toHaveText([
-      "F202 Controleer uitgebrachte stemmen",
-      "F204 Controleer (totaal) aantal stemmen op kandidaten",
-      "W203 Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
+      "F.202 Controleer uitgebrachte stemmen",
+      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
+      "W.203 Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     ]);
 
     const listItemsDifferences = page.getByTestId("save-form-summary-list-differences_counts").getByRole("listitem");
-    await expect(listItemsDifferences).toHaveText(["W302 Controleer ingevulde verschillen"]);
+    await expect(listItemsDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
 
     await expect(checkAndSavePage.complete).toBeVisible();
     await expect(checkAndSavePage.acceptErrors).toBeVisible();

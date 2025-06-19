@@ -178,7 +178,7 @@ export function CheckAndSaveForm() {
             )}
           </section>
           <StatusList id="save-form-summary-list">
-            <StatusList.Item status="accept">{t("check_and_save.counts_add_up_title")}</StatusList.Item>
+            {!hasErrors && <StatusList.Item status="accept">{t("check_and_save.counts_add_up_title")}</StatusList.Item>}
 
             {notableFormSections.map((section) => {
               const link = (title: React.ReactElement) => <Link to={getUrlForFormSection(section.id)}>{title}</Link>;

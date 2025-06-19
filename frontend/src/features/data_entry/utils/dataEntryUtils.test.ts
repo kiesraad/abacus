@@ -1,19 +1,18 @@
 import { describe, expect, test } from "vitest";
 
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
+import { ValidationResult } from "@/types/generated/openapi";
+import { ValidationResultSet } from "@/utils/ValidationResults";
+
+import { getDefaultDataEntryState, getDefaultFormSection, getInitialValues } from "../testing/mock-data";
 import {
-  errorWarningMocks,
-  getDefaultDataEntryState,
-  getDefaultFormSection,
-  getInitialValues,
-} from "../testing/mock-data";
-import {
+  addValidationResultsToFormState,
   formSectionComplete,
   getNextSectionID,
   isFormSectionEmpty,
   objectHasOnlyEmptyValues,
   resetFormSectionState,
 } from "./dataEntryUtils";
-import { ValidationResultSet } from "./ValidationResults";
 
 describe("objectHasOnlyEmptyValues", () => {
   test("objectHasOnlyEmptyValues", () => {
@@ -57,7 +56,7 @@ describe("formSectionComplete", () => {
 describe("resetFormSectionState", () => {
   test("should reset form section state", () => {
     const formState = getDefaultDataEntryState().formState;
-    formState.sections.voters_votes_counts.errors = new ValidationResultSet([errorWarningMocks.W201]);
+    formState.sections.voters_votes_counts.errors = new ValidationResultSet([validationResultMockData.W201]);
 
     resetFormSectionState(formState);
 
@@ -152,5 +151,48 @@ describe("isFormSectionEmpty", () => {
     values.recounted = false;
 
     expect(isFormSectionEmpty(section, values)).toBeFalsy();
+  });
+});
+
+describe("addValidationResultToFormState", () => {
+  test("should add validation result to form state", () => {
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
+    formState.sections.differences_counts.isSaved = true;
+    const validationResults: ValidationResult[] = [validationResultMockData.F303];
+
+    addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
+
+    expect(formState.sections.differences_counts.errors.size()).toBe(1);
+  });
+
+  test("addValidationResultToFormState adds result to multiple sections", () => {
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
+
+    formState.sections.voters_votes_counts.isSaved = true;
+    if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
+
+    const validationResults: ValidationResult[] = [validationResultMockData.F204];
+
+    addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
+
+    expect(formState.sections.voters_votes_counts.errors.size()).toBe(1);
+    const pg1 = formState.sections.political_group_votes_1;
+    expect(pg1?.errors.size()).toBe(1);
+  });
+
+  test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
+    formState.sections.differences_counts.isSaved = false;
+    const validationResults: ValidationResult[] = [validationResultMockData.F303];
+
+    addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
+
+    expect(formState.sections.differences_counts.errors.size()).toBe(0);
   });
 });

@@ -1,8 +1,6 @@
 import { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
 import { DataEntryStructure, FormSectionId } from "@/types/types";
 
-import { FormState } from "../types/types";
-
 /*
  * A set of validation results.
  */
@@ -107,25 +105,6 @@ export function getFormSectionsForValidationResult(
   dataEntryStructure: DataEntryStructure,
 ): Set<FormSectionId> {
   return new Set(validationResult.fields.map((field) => mapFieldNameToFormSection(field, dataEntryStructure)));
-}
-
-/*
- * Distributes validation results to the corresponding sections in the form state, but only if that section is saved.
- */
-export function addValidationResultsToFormState(
-  validationResults: ValidationResult[],
-  formState: FormState,
-  dataEntryStructure: DataEntryStructure,
-  errorsOrWarnings: "errors" | "warnings",
-) {
-  for (const validationResult of validationResults) {
-    const formSections = getFormSectionsForValidationResult(validationResult, dataEntryStructure);
-    for (const formSection of formSections) {
-      if (formState.sections[formSection] && formState.sections[formSection].isSaved) {
-        formState.sections[formSection][errorsOrWarnings].add(validationResult);
-      }
-    }
-  }
 }
 
 /*

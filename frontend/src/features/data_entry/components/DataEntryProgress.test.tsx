@@ -5,13 +5,14 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { server } from "@/testing/server";
 import { render, screen, waitFor, within } from "@/testing/test-utils";
+import { ValidationResultSet } from "@/utils/ValidationResults";
 
-import { errorWarningMocks, getDefaultFormSection } from "../testing/mock-data";
+import { getDefaultFormSection } from "../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../testing/test.utils";
 import { FormState } from "../types/types";
-import { ValidationResultSet } from "../utils/ValidationResults";
 import { DataEntryProgress } from "./DataEntryProgress";
 import { DataEntryProvider } from "./DataEntryProvider";
 
@@ -86,8 +87,8 @@ describe("Test DataEntryProgress", () => {
       pollingStationResults: pollingStationResults,
       continueToNextSection: false,
       validationResults: {
-        errors: [errorWarningMocks.F101],
-        warnings: [errorWarningMocks.W201, errorWarningMocks.W301],
+        errors: [validationResultMockData.F101],
+        warnings: [validationResultMockData.W201, validationResultMockData.W301],
       },
     });
     renderForm();
@@ -139,16 +140,16 @@ describe("Test DataEntryProgress", () => {
     formState.current = "political_group_votes_2";
     formState.furthest = "political_group_votes_2";
 
-    formState.sections.voters_votes_counts.errors = new ValidationResultSet([errorWarningMocks.F201]);
-    formState.sections.voters_votes_counts.warnings = new ValidationResultSet([errorWarningMocks.W201]);
+    formState.sections.voters_votes_counts.errors = new ValidationResultSet([validationResultMockData.F201]);
+    formState.sections.voters_votes_counts.warnings = new ValidationResultSet([validationResultMockData.W201]);
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
       pollingStationResults: pollingStationResults,
       continueToNextSection: false,
       validationResults: {
-        errors: [errorWarningMocks.F201],
-        warnings: [errorWarningMocks.W201],
+        errors: [validationResultMockData.F201],
+        warnings: [validationResultMockData.W201],
       },
     });
     renderForm();

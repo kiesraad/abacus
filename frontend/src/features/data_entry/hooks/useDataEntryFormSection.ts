@@ -2,9 +2,9 @@ import * as React from "react";
 
 import { FormSectionId, SectionValues } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
+import { mapValidationResultsToFields } from "@/utils/ValidationResults";
 
 import { SubmitCurrentFormOptions } from "../types/types";
-import { mapValidationResultsToFields } from "../utils/ValidationResults";
 import { useDataEntryContext } from "./useDataEntryContext";
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 

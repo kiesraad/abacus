@@ -1,6 +1,6 @@
 import { PollingStationResults, ValidationResult, ValidationResults } from "@/types/generated/openapi";
 import { DataEntryStructure, FormSectionId } from "@/types/types";
-import { getFormSectionsForValidationResult, ValidationResultSet } from "@/utils/ValidationResults";
+import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
 
 import { ClientState, FormSection, FormState } from "../types/types";
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
@@ -240,11 +240,13 @@ export function addValidationResultsToFormState(
   dataEntryStructure: DataEntryStructure,
   errorsOrWarnings: "errors" | "warnings",
 ) {
-  for (const validationResult of validationResults) {
-    const formSections = getFormSectionsForValidationResult(validationResult, dataEntryStructure);
-    for (const formSection of formSections) {
-      if (formState.sections[formSection] && formState.sections[formSection].isSaved) {
-        formState.sections[formSection][errorsOrWarnings].add(validationResult);
+  for (const section of dataEntryStructure) {
+    const formSection = formState.sections[section.id];
+    if (formSection && formSection.isSaved) {
+      for (const validationResult of validationResults) {
+        if (doesValidationResultApplyToSection(validationResult, section)) {
+          formSection[errorsOrWarnings].add(validationResult);
+        }
       }
     }
   }

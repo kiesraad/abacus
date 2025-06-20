@@ -1,5 +1,5 @@
 import { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
-import { DataEntryStructure, FormSectionId } from "@/types/types";
+import { DataEntrySection } from "@/types/types";
 
 /*
  * A set of validation results.
@@ -53,77 +53,86 @@ export function isGlobalValidationResult(validationResult: ValidationResult): bo
 }
 
 /*
- * Maps a field name as used in a ValidationResult to a form section as used in the data entry state.
+ * Checks if a validation result applies to a specific form section.
+ * This function avoids iterating through all sections in the data entry structure
+ * by checking only the specific section provided.
+ *
+ * @param validationResult - The validation result to check
+ * @param section - The specific section to check against
+ * @returns true if the validation result applies to the section, false otherwise
  */
-export function mapFieldNameToFormSection(fieldName: string, dataEntryStructure: DataEntryStructure): FormSectionId {
-  // Remove "data." prefix if present
-  const normalizedFieldName = fieldName.startsWith("data.") ? fieldName.substring(5) : fieldName;
+export function doesValidationResultApplyToSection(
+  validationResult: ValidationResult,
+  section: DataEntrySection,
+): boolean {
+  return validationResult.fields.some((fieldName) => {
+    // Remove "data." prefix if present
+    const normalizedFieldName = fieldName.startsWith("data.") ? fieldName.substring(5) : fieldName;
 
-  // First, try to find exact match in the data entry structure
-  for (const section of dataEntryStructure) {
+    // Check exact matches in the section
     for (const subsection of section.subsections) {
       if (subsection.type === "radio" && subsection.path === normalizedFieldName) {
-        return section.id;
+        return true;
       }
 
       if (subsection.type === "inputGrid") {
         for (const row of subsection.rows) {
           if (row.path === normalizedFieldName) {
-            return section.id;
+            return true;
           }
         }
       }
     }
-  }
 
-  // Fallback: handle parent object paths
-  // For cases like "data.political_group_votes[0]" or "data.voters_counts"
-  for (const section of dataEntryStructure) {
+    // Check parent object paths
     for (const subsection of section.subsections) {
       if (subsection.type === "radio" && subsection.path.startsWith(normalizedFieldName + ".")) {
-        return section.id;
+        return true;
       }
 
       if (subsection.type === "inputGrid") {
         for (const row of subsection.rows) {
           if (row.path.startsWith(normalizedFieldName + ".") || row.path.startsWith(normalizedFieldName + "[")) {
-            return section.id;
+            return true;
           }
         }
       }
     }
-  }
 
-  throw new Error(`Field "${fieldName}" could not be mapped to any form section in the data entry structure.`);
+    return false;
+  });
 }
 
 /*
- * Returns the set of form sections for a given validation result.
+ * Create a map of field names and whether each field has an error or warning.
  */
-export function getFormSectionsForValidationResult(
-  validationResult: ValidationResult,
-  dataEntryStructure: DataEntryStructure,
-): Set<FormSectionId> {
-  return new Set(validationResult.fields.map((field) => mapFieldNameToFormSection(field, dataEntryStructure)));
-}
-
-/*
- * Create a map of field names and whether each field has an error or warnings. Warnings are only shown
- * if there are no errors in the form section.
- */
-export function mapValidationResultsToFields(
+export function mapValidationResultSetsToFields(
   errors: ValidationResultSet,
   warnings: ValidationResultSet,
 ): Map<string, "error" | "warning"> {
   const result = new Map<string, "error" | "warning">();
-  if (!errors.isEmpty()) {
-    for (const field of errors.getFields()) {
-      result.set(field, "error");
-    }
-  } else {
-    for (const field of warnings.getFields()) {
-      result.set(field, "warning");
-    }
+  for (const field of warnings.getFields()) {
+    result.set(field, "warning");
+  }
+  // an error overwrites a warning on a field
+  for (const field of errors.getFields()) {
+    result.set(field, "error");
   }
   return result;
+}
+
+/*
+ * Returns a ValidationResultSet containing validation results that apply to the given section.
+ *
+ * @param validationResults - Array of validation results to filter
+ * @param section - The data entry section to filter results for
+ */
+export function getValidationResultSetForSection(
+  validationResults: ValidationResult[],
+  section: DataEntrySection,
+): ValidationResultSet {
+  const filteredResults = validationResults.filter((validationResult) =>
+    doesValidationResultApplyToSection(validationResult, section),
+  );
+  return new ValidationResultSet(filteredResults);
 }

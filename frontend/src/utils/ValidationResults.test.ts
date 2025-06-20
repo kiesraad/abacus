@@ -7,9 +7,10 @@ import { PollingStationResults } from "@/types/generated/openapi";
 
 import { getDataEntryStructure } from "./dataEntryStructure";
 import {
+  doesValidationResultApplyToSection,
+  getValidationResultSetForSection,
   isGlobalValidationResult,
-  mapFieldNameToFormSection,
-  mapValidationResultsToFields,
+  mapValidationResultSetsToFields,
   ValidationResultSet,
 } from "./ValidationResults";
 
@@ -40,51 +41,118 @@ describe("isGlobalValidationResult", () => {
   });
 });
 
-describe("mapFieldNameToFormSection", () => {
-  test.each([
-    ["data.recounted", "recounted"],
-    ["data.voters_counts.poll_card_count", "voters_votes_counts"],
-    ["data.votes_counts.blank_votes_count", "voters_votes_counts"],
-    ["data.voters_recounts.poll_card_count", "voters_votes_counts"],
-    ["data.political_group_votes[0].total", "political_group_votes_1"],
-    ["data.political_group_votes[0].candidate_votes[0].votes", "political_group_votes_1"],
-    ["data.political_group_votes[0].candidate_votes[1].votes", "political_group_votes_1"],
-    ["data.political_group_votes[1].total", "political_group_votes_2"],
-    ["data.political_group_votes[1].candidate_votes[0].votes", "political_group_votes_2"],
-    // Test parent object paths
-    ["data.political_group_votes[0]", "political_group_votes_1"],
-    ["data.political_group_votes[1]", "political_group_votes_2"],
-    ["data.voters_counts", "voters_votes_counts"],
-    ["data.votes_counts", "voters_votes_counts"],
-  ])("map field name %s to field section %s", (fieldName: string, formSection: string) => {
+describe("mapValidationResultSetsToFields", () => {
+  test("errors", () => {
+    const errors = new ValidationResultSet([validationResultMockData.F201, validationResultMockData.F202]);
+    const warnings = new ValidationResultSet([validationResultMockData.W201]);
+
+    const errorsAndWarnings = mapValidationResultSetsToFields(errors, warnings);
+    expect(errorsAndWarnings.get("data.votes_counts.blank_votes_count")).toEqual("error");
+  });
+
+  test("warnings", () => {
+    const errors = new ValidationResultSet();
+    const warnings = new ValidationResultSet([validationResultMockData.W201]);
+
+    const errorsAndWarnings = mapValidationResultSetsToFields(errors, warnings);
+    expect(errorsAndWarnings.get("data.votes_counts.blank_votes_count")).toEqual("warning");
+  });
+});
+
+describe("doesValidationResultApplyToSection", () => {
+  test("should return true when validation result applies to section", () => {
     const results: PollingStationResults = {
       ...emptyData,
       recounted: true,
     };
     const dataEntryStructure = getDataEntryStructure(electionMockData, results);
-    expect(mapFieldNameToFormSection(fieldName, dataEntryStructure)).equals(formSection);
+
+    const votersVotesSection = dataEntryStructure.find((s) => s.id === "voters_votes_counts")!;
+    expect(doesValidationResultApplyToSection(validationResultMockData.F201, votersVotesSection)).toBe(true);
+    expect(doesValidationResultApplyToSection(validationResultMockData.F202, votersVotesSection)).toBe(true);
+    expect(doesValidationResultApplyToSection(validationResultMockData.F204, votersVotesSection)).toBe(true);
+    expect(doesValidationResultApplyToSection(validationResultMockData.W203, votersVotesSection)).toBe(true);
+
+    const politicalGroupSection1 = dataEntryStructure.find((s) => s.id === "political_group_votes_1")!;
+    expect(doesValidationResultApplyToSection(validationResultMockData.F401, politicalGroupSection1)).toBe(true);
+    expect(doesValidationResultApplyToSection(validationResultMockData.F204, politicalGroupSection1)).toBe(true);
   });
 
-  test("should throw error for unknown field name", () => {
+  test("should return false when validation result does not apply to section", () => {
     const dataEntryStructure = getDataEntryStructure(electionMockData);
-    expect(() => mapFieldNameToFormSection("data.unknown", dataEntryStructure)).toThrowError();
+
+    const differencesSection = dataEntryStructure.find((s) => s.id === "differences_counts")!;
+    expect(doesValidationResultApplyToSection(validationResultMockData.F201, differencesSection)).toBe(false);
+    expect(doesValidationResultApplyToSection(validationResultMockData.F202, differencesSection)).toBe(false);
+
+    const politicalGroupSection1 = dataEntryStructure.find((s) => s.id === "political_group_votes_1")!;
+    expect(doesValidationResultApplyToSection(validationResultMockData.F301, politicalGroupSection1)).toBe(false);
+
+    const politicalGroupSection2 = dataEntryStructure.find((s) => s.id === "political_group_votes_2")!;
+    expect(doesValidationResultApplyToSection(validationResultMockData.F401, politicalGroupSection2)).toBe(false);
+    expect(doesValidationResultApplyToSection(validationResultMockData.F204, politicalGroupSection2)).toBe(false);
   });
 });
 
-describe("mapValidationResultsToFields", () => {
-  test("mapValidationResultsToFields errors", () => {
-    const errors = new ValidationResultSet([validationResultMockData.F201, validationResultMockData.F202]);
-    const warnings = new ValidationResultSet([validationResultMockData.W201]);
+// TODO: clean up these tests
+describe("getValidationResultSetForSection", () => {
+  test("should return validation results for specific section", () => {
+    const results: PollingStationResults = {
+      ...emptyData,
+      recounted: true,
+    };
+    const dataEntryStructure = getDataEntryStructure(electionMockData, results);
+    const votersVotesSection = dataEntryStructure.find((s) => s.id === "voters_votes_counts")!;
 
-    const errorsAndWarnings = mapValidationResultsToFields(errors, warnings);
-    expect(errorsAndWarnings.get("data.votes_counts.blank_votes_count")).toEqual("error");
+    const validationResults = [
+      validationResultMockData.F201, // voters_counts
+      validationResultMockData.F202, // votes_counts
+      validationResultMockData.W203, // votes_counts and voters_counts
+      validationResultMockData.F204, // votes_counts and political_group_votes
+      validationResultMockData.F301, // differences_counts
+      validationResultMockData.F401, // political_group_votes
+    ];
+
+    const resultSet = getValidationResultSetForSection(validationResults, votersVotesSection);
+
+    expect(resultSet.size()).toBe(4);
+    expect(resultSet.includes("F201")).toBe(true);
+    expect(resultSet.includes("F202")).toBe(true);
+    expect(resultSet.includes("W203")).toBe(true);
+    expect(resultSet.includes("F204")).toBe(true);
+    expect(resultSet.includes("F301")).toBe(false);
+    expect(resultSet.includes("F401")).toBe(false);
   });
 
-  test("getErrorsAndWarnings warnings", () => {
-    const errors = new ValidationResultSet();
-    const warnings = new ValidationResultSet([validationResultMockData.W201]);
+  test("should return empty set when no validation results match section", () => {
+    const dataEntryStructure = getDataEntryStructure(electionMockData);
+    const recountedSection = dataEntryStructure.find((s) => s.id === "recounted")!;
 
-    const errorsAndWarnings = mapValidationResultsToFields(errors, warnings);
-    expect(errorsAndWarnings.get("data.votes_counts.blank_votes_count")).equals("warning");
+    const validationResults = [
+      validationResultMockData.F301, // differences_counts
+      validationResultMockData.F401, // political_group_votes
+    ];
+
+    const resultSet = getValidationResultSetForSection(validationResults, recountedSection);
+
+    expect(resultSet.isEmpty()).toBe(true);
+  });
+
+  test("should work with political group sections", () => {
+    const dataEntryStructure = getDataEntryStructure(electionMockData);
+    const politicalGroupSection = dataEntryStructure.find((s) => s.id === "political_group_votes_1")!;
+
+    const validationResults = [
+      validationResultMockData.F401, // political_group_votes[0]
+      validationResultMockData.F204, // includes political_group_votes[0].total
+      validationResultMockData.F301, // differences_counts
+    ];
+
+    const resultSet = getValidationResultSetForSection(validationResults, politicalGroupSection);
+
+    expect(resultSet.size()).toBe(2);
+    expect(resultSet.includes("F401")).toBe(true);
+    expect(resultSet.includes("F204")).toBe(true);
+    expect(resultSet.includes("F301")).toBe(false);
   });
 });

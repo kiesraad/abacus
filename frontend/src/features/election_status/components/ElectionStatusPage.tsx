@@ -11,6 +11,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/i18n/translate";
 import { USER_LIST_REQUEST_PATH, UserListResponse } from "@/types/generated/openapi";
+import { committeeSessionLabel } from "@/utils/committeeSession";
 
 import { ElectionStatus } from "./ElectionStatus";
 
@@ -58,7 +59,7 @@ export function ElectionStatusPage() {
       <PageTitle title={`${t("election_status.title")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("election_status.first_session")}</h1>
+          <h1>{committeeSessionLabel(committeeSession.number)}</h1>
         </section>
         <section>
           <div className="election_status">

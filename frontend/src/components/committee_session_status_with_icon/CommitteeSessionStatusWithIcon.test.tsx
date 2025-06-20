@@ -10,14 +10,14 @@ type Scenario = [CommitteeSessionStatus, "coordinator" | "typist", string, strin
 const testScenarios: Scenario[] = [
   ["created", "coordinator", "IconSettings", "Voorbereiden"],
   ["data_entry_not_started", "coordinator", "IconSettings", "Klaar voor invoer"],
-  ["data_entry_in_progress", "coordinator", "IconCheckHeart", "Steminvoer bezig"],
-  ["data_entry_paused", "coordinator", "IconHourglass", "Steminvoer geschorst"],
-  ["data_entry_finished", "coordinator", "IconCheckVerified", "Steminvoer afgerond"],
-  ["created", "typist", "IconClock", "Wachten op coördinator"],
-  ["data_entry_not_started", "typist", "IconClock", "Wachten op coördinator"],
-  ["data_entry_in_progress", "typist", "IconCheckHeart", "Steminvoer bezig"],
-  ["data_entry_paused", "typist", "IconHourglass", "Steminvoer opgeschort"],
-  ["data_entry_finished", "typist", "IconCheckVerified", "Steminvoer klaar"],
+  ["data_entry_in_progress", "coordinator", "IconCheckHeart", "Invoerders bezig"],
+  ["data_entry_paused", "coordinator", "IconHourglass", "Invoer gepauzeerd"],
+  ["data_entry_finished", "coordinator", "IconCheckVerified", "Invoerders klaar"],
+  ["created", "typist", "IconClock", "Nog niet begonnen"],
+  ["data_entry_not_started", "typist", "IconClock", "Nog niet begonnen"],
+  ["data_entry_in_progress", "typist", "IconCheckHeart", "Je kan invoeren"],
+  ["data_entry_paused", "typist", "IconHourglass", "Invoer gepauzeerd"],
+  ["data_entry_finished", "typist", "IconCheckVerified", "Alles is ingevoerd"],
 ];
 
 describe("CommitteeSessionStatusWithIcon", () => {

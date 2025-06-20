@@ -1,0 +1,24 @@
+{
+  "coordinator": {
+    "created": "Voorbereiden",
+    "data_entry_not_started": "Klaar voor invoer",
+    "data_entry_in_progress": "Invoerders bezig",
+    "data_entry_paused": "Invoer gepauzeerd",
+    "data_entry_finished": "Invoerders klaar"
+  },
+  "number": {
+    "1": "Eerste",
+    "2": "Tweede",
+    "3": "Derde",
+    "4": "Vierde",
+    "5": "Vijfde"
+  },
+  "session": "Zitting",
+  "typist": {
+    "created": "Nog niet begonnen",
+    "data_entry_not_started": "Nog niet begonnen",
+    "data_entry_in_progress": "Je kan invoeren",
+    "data_entry_paused": "Invoer gepauzeerd",
+    "data_entry_finished": "Alles is ingevoerd"
+  }
+}

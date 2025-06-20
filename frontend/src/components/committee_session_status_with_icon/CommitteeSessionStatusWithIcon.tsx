@@ -32,15 +32,15 @@ function statusIcon(status: CommitteeSessionStatus, role: "coordinator" | "typis
 function statusLabel(status: CommitteeSessionStatus, role: "coordinator" | "typist"): string {
   switch (status) {
     case "created":
-      return t(`election_status.${role}.created`);
+      return t(`committee_session_status.${role}.created`);
     case "data_entry_not_started":
-      return t(`election_status.${role}.data_entry_not_started`);
+      return t(`committee_session_status.${role}.data_entry_not_started`);
     case "data_entry_in_progress":
-      return t(`election_status.${role}.data_entry_in_progress`);
+      return t(`committee_session_status.${role}.data_entry_in_progress`);
     case "data_entry_paused":
-      return t(`election_status.${role}.data_entry_paused`);
+      return t(`committee_session_status.${role}.data_entry_paused`);
     case "data_entry_finished":
-      return t(`election_status.${role}.data_entry_finished`);
+      return t(`committee_session_status.${role}.data_entry_finished`);
   }
 }
 
@@ -53,7 +53,7 @@ export function HeaderCommitteeSessionStatusWithIcon({ status, userRole }: Commi
   return (
     <>
       <span>
-        <strong>{statusLabel(status, userRole)}</strong> ({t("election_status.first_session").toLowerCase()})
+        <strong>{statusLabel(status, userRole)}</strong>
       </span>
       {statusIcon(status, userRole)}
     </>

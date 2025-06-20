@@ -2194,6 +2194,28 @@ mod tests {
             vec!["political_group_votes[0]"]
         );
 
+        // validate with missing total for second political group
+        validation_results = ValidationResults::default();
+        political_group_votes[0].total = 0;
+        political_group_votes
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                &"political_group_votes".into(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::F402
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["political_group_votes[0]"]
+        );
+
         // validate with incorrect number of candidates for the first political group
         validation_results = ValidationResults::default();
         election = election_fixture(&[3, 2]);

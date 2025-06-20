@@ -13,6 +13,7 @@ export interface DataEntrySubsectionsProps {
     errorsAndWarningsAccepted: boolean;
   };
   missingTotalError: boolean;
+  readOnly?: boolean;
 }
 
 export function DataEntrySubsections({
@@ -21,6 +22,7 @@ export function DataEntrySubsections({
   setValues,
   defaultProps,
   missingTotalError,
+  readOnly = false,
 }: DataEntrySubsectionsProps) {
   return (
     <>
@@ -38,6 +40,7 @@ export function DataEntrySubsections({
                 currentValues={currentValues}
                 setValues={setValues}
                 defaultProps={defaultProps}
+                readOnly={readOnly}
               />
             );
           case "inputGrid":
@@ -50,6 +53,7 @@ export function DataEntrySubsections({
                 setValues={setValues}
                 defaultProps={defaultProps}
                 missingTotalError={missingTotalError}
+                readOnly={readOnly}
               />
             );
         }

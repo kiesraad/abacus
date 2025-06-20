@@ -180,7 +180,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=1635-58277&t=zTY4ajWtsFkiTOYP-4)
 
 
-#### F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
+#### F.402 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
 
 > **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg?  Dan kan je verdergaan.** (F.402)
 

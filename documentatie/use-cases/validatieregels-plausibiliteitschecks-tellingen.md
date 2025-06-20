@@ -182,7 +182,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
 
-> **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.** (F.402)
+> **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg?  Dan kan je verdergaan.** (F.402)
 
 Velden markeren: totaal van de lijst 
 N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding onderaan de pagina, onder het totaal-veld.

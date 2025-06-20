@@ -47,8 +47,8 @@ test.describe("Election creation", () => {
     await expect(page.getByText("eml230b_test.eml.xml")).toBeVisible();
     await expect(page.getByText("Woensdag 16 maart 2022")).toBeVisible();
     await expect(checkCandidateDefinitionPage.hashInput1).toBeFocused();
-    await checkCandidateDefinitionPage.hashInput1.fill("8a7b");
-    await checkCandidateDefinitionPage.hashInput2.fill("458a");
+    await checkCandidateDefinitionPage.hashInput1.fill("7dcf");
+    await checkCandidateDefinitionPage.hashInput2.fill("cd3e");
     await checkCandidateDefinitionPage.next.click();
 
     // Now we should be at the check and save page

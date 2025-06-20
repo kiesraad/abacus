@@ -297,47 +297,13 @@
             </QualifyingAddress>
           </Candidate>
         </Affiliation>
-
         <Affiliation>
           <AffiliationIdentifier Id="3">
             <RegisteredName>D66</RegisteredName>
           </AffiliationIdentifier>
           <Type>op zichzelf staande lijst</Type>
           <kr:ListData PublicationLanguage="nl" PublishGender="true"/>
-          <Candidate>
-            <CandidateIdentifier Id="1"/>
-            <CandidateFullName>
-              <xnl:PersonName>
-                <xnl:NameLine NameType="Initials">M.O.</xnl:NameLine>
-                <xnl:FirstName>Marcela</xnl:FirstName>
-                <xnl:LastName>Gopal</xnl:LastName>
-              </xnl:PersonName>
-            </CandidateFullName>
-            <Gender>female</Gender>
-            <QualifyingAddress>
-              <xal:Locality>
-                <xal:LocalityName>Heemdamseburg</xal:LocalityName>
-              </xal:Locality>
-            </QualifyingAddress>
-          </Candidate>
-          <Candidate>
-            <CandidateIdentifier Id="2"/>
-            <CandidateFullName>
-              <xnl:PersonName>
-                <xnl:NameLine NameType="Initials">G.W.</xnl:NameLine>
-                <xnl:FirstName>Giovani</xnl:FirstName>
-                <xnl:LastName>Wolfswinkel</xnl:LastName>
-              </xnl:PersonName>
-            </CandidateFullName>
-            <Gender>male</Gender>
-            <QualifyingAddress>
-              <xal:Locality>
-                <xal:LocalityName>Heemdamseburg</xal:LocalityName>
-              </xal:Locality>
-            </QualifyingAddress>
-          </Candidate>
         </Affiliation>
-
       </Contest>
     </Election>
   </CandidateList>

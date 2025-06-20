@@ -14,7 +14,7 @@
         <ElectionName>Gemeenteraad Amsterdam 2022</ElectionName>
         <ElectionCategory>GR</ElectionCategory>
         <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
-        <kr:ElectionDomain Id="0363">Amsterdam</kr:ElectionDomain>
+        <kr:ElectionDomain Id="0001">Onbekend</kr:ElectionDomain>
         <kr:ElectionDate>2022-03-16</kr:ElectionDate>
          <kr:NominationDate>2022-01-31</kr:NominationDate>
       </ElectionIdentifier>

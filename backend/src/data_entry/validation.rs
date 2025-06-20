@@ -5,9 +5,14 @@ use utoipa::ToSchema;
 
 use super::{
     CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-    VotersCounts, VotesCounts, comparison::Compare, status::DataEntryStatus,
+    VotersCounts, VotesCounts,
+    comparison::Compare,
+    status::{DataEntryStatus, FirstEntryInProgress},
 };
-use crate::{election::ElectionWithPoliticalGroups, polling_station::PollingStation};
+use crate::{
+    data_entry::status::FirstEntryHasErrors, election::ElectionWithPoliticalGroups,
+    polling_station::PollingStation,
+};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
 pub struct ValidationResults {
@@ -194,8 +199,15 @@ impl Validate for DataEntryStatus {
         path: &FieldPath,
     ) -> Result<(), DataError> {
         match self {
-            DataEntryStatus::FirstEntryInProgress(state) => {
-                state.first_entry.validate(
+            DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+                first_entry: entry,
+                ..
+            })
+            | DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+                finalised_first_entry: entry,
+                ..
+            }) => {
+                entry.validate(
                     election,
                     polling_station,
                     validation_results,

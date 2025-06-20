@@ -54,6 +54,7 @@ pub enum ValidationResultCode {
     F304,
     F305,
     F401,
+    F402,
     W001,
     W201,
     W202,
@@ -898,15 +899,20 @@ impl Validate for PoliticalGroupVotes {
             &path.field("total"),
         )?;
 
-        // F.401 validate whether the total number of votes matches the sum of all candidate votes,
-        // cast to u64 to avoid overflow
-        if self.total as u64
-            != self
-                .candidate_votes
-                .iter()
-                .map(|cv| cv.votes as u64)
-                .sum::<u64>()
-        {
+        // all candidate votes, cast to u64 to avoid overflow
+        let candidate_votes_sum: u64 = self
+            .candidate_votes
+            .iter()
+            .map(|cv| cv.votes as u64)
+            .sum::<u64>();
+        if candidate_votes_sum > 0 && self.total == 0 {
+            // F.402 validate whether the total number of votes is empty when there are candidate votes
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.to_string()],
+                code: ValidationResultCode::F402,
+            });
+        } else if self.total as u64 != candidate_votes_sum {
+            // F.401 validate whether the total number of votes matches the sum of all candidate votes
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F401,

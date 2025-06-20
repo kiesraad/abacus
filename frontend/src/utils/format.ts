@@ -52,13 +52,14 @@ function isYesterday(date: Date): boolean {
   );
 }
 
-export function formatDateFull(date: Date) {
-  return date.toLocaleDateString(t("date_locale"), {
+export function formatFullDateWithoutTimezone(date: Date) {
+  return new Intl.DateTimeFormat(t("date_locale"), {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
-  });
+    timeZone: "UTC",
+  }).format(date);
 }
 
 export function formatDateTimeFull(date: Date) {

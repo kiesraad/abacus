@@ -172,7 +172,6 @@ impl EML110 {
             number_of_seats,
             election_date,
             nomination_date,
-            status: crate::election::ElectionStatus::Created,
             political_groups,
         };
 

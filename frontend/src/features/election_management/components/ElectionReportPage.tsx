@@ -67,7 +67,7 @@ export function ElectionReportPage() {
       <PageTitle title={`${t("election.title.finish_data_entry")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("election_status.finish_data_entry_first_session")}</h1>
+          <h1>{t("election_report.finish_data_entry_current_session")}</h1>
         </section>
       </header>
       <main>

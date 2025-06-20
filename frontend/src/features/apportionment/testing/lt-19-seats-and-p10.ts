@@ -852,7 +852,6 @@ export const election: ElectionWithPoliticalGroups = {
   number_of_seats: 6,
   election_date: "2026-03-18",
   nomination_date: "2026-02-02",
-  status: "DataEntryFinished",
   political_groups: [
     {
       number: 1,

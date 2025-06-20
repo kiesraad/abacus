@@ -1,6 +1,5 @@
 import { To, useLocation, useNavigate } from "react-router";
 
-import { ElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { IconPlus } from "@/components/generated/icons";
 import { NavBar } from "@/components/navbar/NavBar";
@@ -84,10 +83,11 @@ export function OverviewPage() {
                     <Table.Cell className="fs-body">{election.name}</Table.Cell>
                     <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
                     <Table.Cell>
-                      <ElectionStatusWithIcon
-                        status={election.status}
-                        userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
-                      />
+                      {/* TODO: Re-add status to Election Overview in issue #1649 */}
+                      {/*<CommitteeSessionStatusWithIcon*/}
+                      {/*  status={election.status}*/}
+                      {/*  userRole={isAdminOrCoordinator ? "coordinator" : "typist"}*/}
+                      {/*/>*/}
                     </Table.Cell>
                   </Table.LinkRow>
                 ))}

@@ -231,7 +231,6 @@ async fn test_election_apportionment_error_apportionment_not_available_no_pollin
             "number_of_seats": 29,
             "election_date": "2026-01-01",
             "nomination_date": "2026-01-01",
-            "status": "DataEntryInProgress",
             "political_groups": [
           {
             "number": 1,

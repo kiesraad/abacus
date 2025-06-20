@@ -5,11 +5,13 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
+import { CommitteeSessionProvider } from "@/hooks/committee_session/CommitteeSessionProvider";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { useUser } from "@/hooks/user/useUser";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import {
+  ElectionCommitteeSessionRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
@@ -34,16 +36,23 @@ const testUser: LoginResponse = {
 const renderDataEntryHomePage = () =>
   render(
     <ElectionProvider electionId={1}>
-      <ElectionStatusProvider electionId={1}>
-        <DataEntryHomePage />
-      </ElectionStatusProvider>
+      <CommitteeSessionProvider electionId={1}>
+        <ElectionStatusProvider electionId={1}>
+          <DataEntryHomePage />
+        </ElectionStatusProvider>
+      </CommitteeSessionProvider>
     </ElectionProvider>,
   );
 
 describe("DataEntryHomePage", () => {
   beforeEach(() => {
     (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
-    server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
+    server.use(
+      ElectionListRequestHandler,
+      ElectionRequestHandler,
+      ElectionCommitteeSessionRequestHandler,
+      ElectionStatusRequestHandler,
+    );
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   });
 

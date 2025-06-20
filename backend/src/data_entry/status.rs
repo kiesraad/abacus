@@ -678,10 +678,7 @@ mod tests {
     use super::*;
     use crate::{
         data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts},
-        election::{
-            Candidate, ElectionCategory, ElectionStatus, ElectionWithPoliticalGroups,
-            PoliticalGroup,
-        },
+        election::{Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup},
         polling_station::{PollingStation, PollingStationType},
     };
 
@@ -740,7 +737,6 @@ mod tests {
             number_of_seats: 18,
             election_date: Utc::now().date_naive(),
             nomination_date: Utc::now().date_naive(),
-            status: ElectionStatus::DataEntryInProgress,
             political_groups: vec![],
         }
     }

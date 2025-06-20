@@ -24,7 +24,6 @@ pub struct Election {
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
-    pub status: ElectionStatus,
 }
 
 /// Election with political groups
@@ -42,7 +41,6 @@ pub struct ElectionWithPoliticalGroups {
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
-    pub status: ElectionStatus,
     #[sqlx(json)]
     pub political_groups: Vec<PoliticalGroup>,
 }
@@ -60,7 +58,6 @@ impl From<Election> for ElectionDetails {
             election_number_of_seats: value.number_of_seats,
             election_election_date: value.election_date,
             election_nomination_date: value.nomination_date,
-            election_status: value.status.to_string(),
         }
     }
 }
@@ -78,7 +75,6 @@ impl From<ElectionWithPoliticalGroups> for ElectionDetails {
             election_number_of_seats: value.number_of_seats,
             election_election_date: value.election_date,
             election_nomination_date: value.nomination_date,
-            election_status: value.status.to_string(),
         }
     }
 }
@@ -109,7 +105,6 @@ pub struct NewElection {
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
-    pub status: ElectionStatus,
     pub political_groups: Vec<PoliticalGroup>,
 }
 
@@ -128,17 +123,6 @@ impl ElectionCategory {
             ElectionCategory::Municipal => "GR",
         }
     }
-}
-
-/// Election status (limited for now)
-#[derive(
-    Serialize, Deserialize, strum::Display, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type,
-)]
-#[strum(serialize_all = "lowercase")]
-pub enum ElectionStatus {
-    Created,
-    DataEntryInProgress,
-    DataEntryFinished,
 }
 
 pub type PGNumber = u32;
@@ -230,7 +214,6 @@ pub(crate) mod tests {
             number_of_seats,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
-            status: ElectionStatus::DataEntryInProgress,
             political_groups,
         }
     }

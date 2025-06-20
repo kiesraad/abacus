@@ -25,7 +25,7 @@ describe("OverviewPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Verkiezing", "Gebied", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Steminvoer bezig"],
+      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", ""],
     ]);
   });
 

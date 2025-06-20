@@ -45,6 +45,7 @@ impl IntoResponse for CommitteeSessionListResponse {
   responses(
         (status = 200, description = "Committee session list", body = CommitteeSessionListResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
   params(

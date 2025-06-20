@@ -1,6 +1,7 @@
 use std::{error::Error, ops::Range, str::FromStr};
 
 use abacus::{
+    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
     election::{
         CandidateGender, ElectionCategory, ElectionWithPoliticalGroups, NewElection,
         PoliticalGroup, repository::Elections,
@@ -93,6 +94,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .create(generate_election(&mut rng, &args))
         .await
         .expect("Failed to create election");
+
+    // generate the committee session for the election
+    let cs_repo = CommitteeSessions::new(pool.clone());
+    cs_repo
+        .create(CommitteeSessionCreateRequest {
+            number: 1,
+            election_id: election.id,
+        })
+        .await
+        .expect("Failed to create committee session");
 
     // generate the polling stations for the election
     let ps_repo = PollingStations::new(pool.clone());

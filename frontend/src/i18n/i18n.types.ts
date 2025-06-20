@@ -27,7 +27,7 @@ type Join<T extends string[]> = T extends []
         : never
       : string;
 
-// a type for translations keys as paths (e.g. "candidates_votes.check_totals" | "candidates_votes.check_paper_report" | ...)
+// a type for translations keys as paths (e.g. "candidates_votes.check_paper_report" | ...)
 export type TranslationPath = Join<TranslationValue<Translation>>;
 
 // Dutch is our type source for translations

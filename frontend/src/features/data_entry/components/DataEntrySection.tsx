@@ -59,32 +59,26 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
     }
   }
 
-  const [missingTotalError, setMissingTotalError] = React.useState(false);
-
   // Memoize getCodes() results to prevent unnecessary focus triggers in Feedback
-  const memoizedErrorCodes = React.useMemo(() => formSection.errors.getCodes(), [formSection.errors]);
+  const memoizedErrorCodes = React.useMemo(() => {
+    const errorCodes = formSection.errors.getCodes();
+    const missingTotalErrorIndex = errorCodes.indexOf("F402", 0);
+    if (missingTotalErrorIndex > -1) {
+      errorCodes.splice(missingTotalErrorIndex, 1);
+    }
+    return errorCodes;
+  }, [formSection.errors]);
   const memoizedWarningCodes = React.useMemo(() => formSection.warnings.getCodes(), [formSection.warnings]);
+  const onlyMissingTotalError = formSection.errors.includes("F402") && formSection.errors.size() === 1;
 
   React.useEffect(() => {
-    if (missingTotalError && totalFieldId) {
+    if (formSection.errors.includes("F402") && totalFieldId) {
       document.getElementById(totalFieldId)?.focus();
     }
-  }, [missingTotalError, totalFieldId]);
+  }, [formSection.errors, totalFieldId]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // if currentValues contains votes on candidates but the total is left empty, trigger the missingTotalError
-    if (totalFieldId) {
-      const isMissingTotal =
-        Object.entries(currentValues).some(([key, value]) => key.endsWith(".votes") && value !== "") &&
-        Object.entries(currentValues).some(([key, value]) => key.endsWith(".total") && value === "");
-      setMissingTotalError(isMissingTotal);
-      if (isMissingTotal) {
-        return false;
-      }
-    }
-
     void onSubmit();
   };
 
@@ -92,7 +86,7 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
     <Form onSubmit={handleSubmit} ref={formRef} id={formId} title={section.title}>
       <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />
       {error instanceof ApiError && <ErrorModal error={error} />}
-      {formSection.isSaved && !formSection.errors.isEmpty() && (
+      {formSection.isSaved && !formSection.errors.isEmpty() && !onlyMissingTotalError && (
         <Feedback id="feedback-error" type="error" data={memoizedErrorCodes} userRole={user.role} shouldFocus={true} />
       )}
       {formSection.isSaved && !formSection.warnings.isEmpty() && (
@@ -110,13 +104,15 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
         currentValues={currentValues}
         setValues={setValues}
         defaultProps={defaultProps}
-        missingTotalError={missingTotalError}
+        missingTotalError={formSection.errors.includes("F402")}
       />
 
-      {missingTotalError && (
+      {formSection.errors.includes("F402") && (
         <div id="missing-total-error">
           <Alert type="error" small>
-            <p>{t("candidates_votes.check_totals")}</p>
+            <p>
+              {t(`feedback.F402.typist.title`)}. {t(`feedback.F402.typist.content`)}
+            </p>
           </Alert>
         </div>
       )}

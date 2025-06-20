@@ -37,10 +37,10 @@ async fn test_election_committee_session_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/2/committee_session");
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
     let response = reqwest::Client::new()
         .get(&url)
-        .header("cookie", coordinator_cookie)
+        .header("cookie", typist_cookie)
         .send()
         .await
         .unwrap();

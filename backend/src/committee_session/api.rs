@@ -15,7 +15,7 @@ use super::{
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
-    authentication::Coordinator,
+    authentication::{Coordinator, User},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -77,7 +77,7 @@ pub async fn election_committee_session_list(
   ),
 )]
 pub async fn election_committee_session_details(
-    _user: Coordinator,
+    _user: User,
     State(committee_sessions_repo): State<CommitteeSessions>,
     Path(election_id): Path<u32>,
 ) -> Result<Json<CommitteeSession>, APIError> {

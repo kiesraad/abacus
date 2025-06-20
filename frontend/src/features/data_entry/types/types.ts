@@ -10,7 +10,7 @@ import {
 } from "@/types/generated/openapi";
 import { DataEntryStructure, FormSectionId, SectionValues } from "@/types/types";
 
-import { ValidationResultSet } from "../utils/ValidationResults";
+import { ValidationResultSet } from "../../../utils/ValidationResults";
 
 export interface DataEntryState {
   // state from providers

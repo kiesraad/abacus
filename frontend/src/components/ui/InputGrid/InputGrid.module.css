@@ -55,6 +55,17 @@
             border-color: var(--border-color-focus);
           }
         }
+        &.readOnly span {
+          display: block;
+          height: 4.5rem;
+          padding: 1rem 1.6rem;
+          text-align: right;
+          font-size: var(--font-size-body);
+          font-style: normal;
+          font-weight: 700;
+          line-height: 2.5rem;
+          color: var(--text-color-body);
+        }
       }
 
       &:last-of-type {

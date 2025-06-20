@@ -12,8 +12,13 @@
   }
 
   form {
+    margin-bottom: 2rem;
+  }
+
+  .resolveForm {
     padding: 1.5rem;
     background-color: var(--base-white);
+    border-radius: 1rem;
 
     fieldset {
       margin-top: 2rem;

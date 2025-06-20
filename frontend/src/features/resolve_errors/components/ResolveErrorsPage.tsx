@@ -9,8 +9,10 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
 import { ResolveErrorsAction } from "@/types/generated/openapi";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
+import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 import cls from "./ResolveErrors.module.css";
 
 export function ResolveErrorsPage() {
@@ -35,6 +37,8 @@ export function ResolveErrorsPage() {
     return <Loader />;
   }
 
+  const structure = getDataEntryStructure(election, dataEntry.finalised_first_entry);
+
   return (
     <>
       <PageTitle title={`${t("resolve_errors.page_title")} - Abacus`} />
@@ -53,7 +57,18 @@ export function ResolveErrorsPage() {
 
           <pre>{JSON.stringify(dataEntry.validation_results, null, 2)}</pre>
 
+          {structure.map((section) => (
+            <section key={section.id}>
+              <ReadOnlyDataEntrySection
+                section={section}
+                data={dataEntry.finalised_first_entry}
+                validationResults={dataEntry.validation_results}
+              />
+            </section>
+          ))}
+
           <form
+            className={cls.resolveForm}
             onSubmit={(e) => {
               e.preventDefault();
               void onSubmit();

@@ -1,4 +1,4 @@
-import { errorWarningMocks, getEmptyDataEntryRequest } from "@/features/data_entry/testing/mock-data";
+import { getEmptyDataEntryRequest } from "@/features/data_entry/testing/mock-data";
 import {
   ClaimDataEntryResponse,
   DataEntryGetErrorsResponse,
@@ -10,6 +10,7 @@ import {
 } from "@/types/generated/openapi";
 
 import { electionMockData, politicalGroupMockData } from "./ElectionMockData";
+import { validationResultMockData } from "./ValidationResultMockData";
 
 export const emptyValidationResults: ValidationResults = {
   errors: [],
@@ -198,8 +199,8 @@ export const dataEntryResolveDifferencesMockResponse: PollingStationDataEntry = 
 export const dataEntryGetErrorsMockResponse: DataEntryGetErrorsResponse = {
   ...firstEntryHasErrorsStatus.state,
   validation_results: {
-    errors: [errorWarningMocks.F101],
-    warnings: [errorWarningMocks.W201, errorWarningMocks.W301],
+    errors: [validationResultMockData.F101],
+    warnings: [validationResultMockData.W201, validationResultMockData.W301],
   },
 };
 

@@ -7,11 +7,12 @@ import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, userTypeInputs } from "@/testing/test-utils";
 import { LoginResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
 
-import { errorWarningMocks, getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
+import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
@@ -249,7 +250,7 @@ describe("Test DifferencesForm", () => {
 
       await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [errorWarningMocks.F301], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F301], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -286,7 +287,7 @@ describe("Test DifferencesForm", () => {
 
       await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [errorWarningMocks.F302], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F302], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -325,7 +326,7 @@ describe("Test DifferencesForm", () => {
 
       await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [errorWarningMocks.F303], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F303], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -364,7 +365,7 @@ describe("Test DifferencesForm", () => {
 
       await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [errorWarningMocks.F304], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F304], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -403,7 +404,7 @@ describe("Test DifferencesForm", () => {
 
       await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [errorWarningMocks.F305], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F305], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -444,7 +445,7 @@ describe("Test DifferencesForm", () => {
 
       await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [errorWarningMocks.W301] },
+        validation_results: { errors: [], warnings: [validationResultMockData.W301] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -504,7 +505,7 @@ describe("Test DifferencesForm", () => {
 
       await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [errorWarningMocks.W301] },
+        validation_results: { errors: [], warnings: [validationResultMockData.W301] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -543,7 +544,7 @@ describe("Test DifferencesForm", () => {
 
       await screen.findByTestId("differences_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [errorWarningMocks.W302] },
+        validation_results: { errors: [], warnings: [validationResultMockData.W302] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -576,7 +577,7 @@ describe("Test DifferencesForm", () => {
 
     beforeEach(async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [errorWarningMocks.W301] },
+        validation_results: { errors: [], warnings: [validationResultMockData.W301] },
       });
 
       renderForm();

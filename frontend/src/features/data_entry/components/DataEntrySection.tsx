@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { ApiError } from "@/api/ApiResult";
+import { DataEntrySubsections } from "@/components/data_entry/DataEntrySubsections";
 import { ErrorModal } from "@/components/error/ErrorModal";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
@@ -16,7 +17,6 @@ import { KeyboardKey } from "@/types/ui";
 
 import { useDataEntryFormSection } from "../hooks/useDataEntryFormSection";
 import { DataEntryNavigation } from "./DataEntryNavigation";
-import { DataEntrySubsections } from "./DataEntrySubsections";
 
 export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
   const user = useUser();

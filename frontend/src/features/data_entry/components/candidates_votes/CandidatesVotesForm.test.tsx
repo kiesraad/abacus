@@ -7,6 +7,7 @@ import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, waitFor, within } from "@/testing/test-utils";
 import {
@@ -16,7 +17,7 @@ import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
 } from "@/types/generated/openapi";
 
-import { errorWarningMocks, getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
+import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
@@ -516,7 +517,7 @@ describe("Test CandidatesVotesForm", () => {
 
       await screen.findByTestId("political_group_votes_1_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [errorWarningMocks.F401], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F401], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });

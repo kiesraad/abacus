@@ -51,31 +51,14 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
   const keyboardHintText = section.id.startsWith("political_group_votes_") ? t("candidates_votes.goto_totals") : null;
 
   // Missing totals error for political group votes form
-  let totalFieldId = null;
-  if (sectionId.startsWith("political_group_votes_")) {
-    const path = Object.keys(currentValues).find((key) => key.endsWith(".total"));
-    if (path) {
-      totalFieldId = `data.${path}`;
-    }
-  }
+  const missingTotalError = formSection.errors.includes("F402");
 
   // Memoize getCodes() results to prevent unnecessary focus triggers in Feedback
-  const memoizedErrorCodes = React.useMemo(() => {
-    const errorCodes = formSection.errors.getCodes();
-    const missingTotalErrorIndex = errorCodes.indexOf("F402", 0);
-    if (missingTotalErrorIndex > -1) {
-      errorCodes.splice(missingTotalErrorIndex, 1);
-    }
-    return errorCodes;
-  }, [formSection.errors]);
+  const memoizedErrorCodes = React.useMemo(
+    () => formSection.errors.getCodes().filter((code) => code !== "F402"),
+    [formSection.errors],
+  );
   const memoizedWarningCodes = React.useMemo(() => formSection.warnings.getCodes(), [formSection.warnings]);
-  const onlyMissingTotalError = formSection.errors.includes("F402") && formSection.errors.size() === 1;
-
-  React.useEffect(() => {
-    if (formSection.errors.includes("F402") && totalFieldId) {
-      document.getElementById(totalFieldId)?.focus();
-    }
-  }, [formSection.errors, totalFieldId]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -86,7 +69,7 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
     <Form onSubmit={handleSubmit} ref={formRef} id={formId} title={section.title}>
       <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />
       {error instanceof ApiError && <ErrorModal error={error} />}
-      {formSection.isSaved && !formSection.errors.isEmpty() && !onlyMissingTotalError && (
+      {formSection.isSaved && memoizedErrorCodes.length > 0 && (
         <Feedback id="feedback-error" type="error" data={memoizedErrorCodes} userRole={user.role} shouldFocus={true} />
       )}
       {formSection.isSaved && !formSection.warnings.isEmpty() && (
@@ -104,10 +87,10 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
         currentValues={currentValues}
         setValues={setValues}
         defaultProps={defaultProps}
-        missingTotalError={formSection.errors.includes("F402")}
+        missingTotalError={missingTotalError}
       />
 
-      {formSection.errors.includes("F402") && (
+      {missingTotalError && (
         <div id="missing-total-error">
           <Alert type="error" small>
             <p>

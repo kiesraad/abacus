@@ -5,7 +5,7 @@
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"
-) [#municipal] else [#public_body]
+)  { municipal } else { public_body }
 
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
@@ -302,18 +302,14 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === #is_municipality[Twee][Vier] eden van het #location_type
 
-#textbox[Naam:][Handtekening:]
-#textbox[Naam:][Handtekening:]
-
-#is_municipality[][
-  #textbox[Naam:][Handtekening:]
-  #textbox[Naam:][Handtekening:]
-]
+#for i in range(0, is_municipality(2, 4)) {
+  textbox[Naam:][Handtekening:]
+}
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
 === Extra ondertekening: (niet verplicht)
 
-#for i in range(0, 5) [
-  #textbox[Naam:][Handtekening:]
-]
+#for i in range(0, 5) {
+  textbox[Naam:][Handtekening:]
+}

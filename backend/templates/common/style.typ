@@ -1,10 +1,20 @@
-#let current-chapter-title() = context {
-  let headings = query(heading.where(level: 1).before(here()))
+// Get the chapter defined in the current page or the last defined chapter
+#let current-chapter() = context {
+  let chapters = query(heading.where(level: 1))
 
-  if headings.len() > 0 {
-    headings.last().body
+  for chapter in chapters {
+    if chapter.location().page() == here().page() {
+      return chapter
+    }
+  }
+
+  let prev_chapter = query(heading.where(level: 1).before(here()))
+
+  if prev_chapter.len() > 0 {
+    return prev_chapter.last()
   }
 }
+
 
 // Default document styling
 #let conf(doc, header: none, footer: none) = [
@@ -20,7 +30,11 @@
     header: context (
       grid(
         columns: (1fr, auto),
-        text(size: 8pt, current-chapter-title()), text(size: 8pt, weight: "semibold", header),
+        text(size: 8pt, {
+          show heading: set text(size: 8pt, weight: "regular");
+          current-chapter()
+        }),
+        text(size: 8pt, weight: "semibold", header),
         v(0.66em),
       )
     ),
@@ -39,7 +53,7 @@
     ),
   )
 
-  #set list(spacing: 1em)
+  #set list(spacing: 1.5em)
 
   #show heading: set block(above: 2em, below: 1.5em)
 

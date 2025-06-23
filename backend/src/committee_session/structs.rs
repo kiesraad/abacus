@@ -15,12 +15,9 @@ pub struct CommitteeSession {
     pub id: u32,
     pub number: u32,
     pub election_id: u32,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub location: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub start_date: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub start_time: Option<String>,
+    pub location: String,
+    pub start_date: String,
+    pub start_time: String,
     pub status: CommitteeSessionStatus,
 }
 

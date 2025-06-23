@@ -3211,6 +3211,9 @@
           "id",
           "number",
           "election_id",
+          "location",
+          "start_date",
+          "start_time",
           "status"
         ],
         "properties": {
@@ -3225,10 +3228,7 @@
             "minimum": 0
           },
           "location": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "number": {
             "type": "integer",
@@ -3236,16 +3236,10 @@
             "minimum": 0
           },
           "start_date": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "start_time": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/CommitteeSessionStatus"
@@ -3278,6 +3272,9 @@
           "sessionId",
           "sessionNumber",
           "sessionElectionId",
+          "sessionLocation",
+          "sessionStartDate",
+          "sessionStartTime",
           "sessionStatus"
         ],
         "properties": {
@@ -3292,10 +3289,7 @@
             "minimum": 0
           },
           "sessionLocation": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "sessionNumber": {
             "type": "integer",
@@ -3303,16 +3297,10 @@
             "minimum": 0
           },
           "sessionStartDate": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "sessionStartTime": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "sessionStatus": {
             "type": "string"

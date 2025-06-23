@@ -54,12 +54,9 @@ pub struct CommitteeSessionDetails {
     pub session_id: u32,
     pub session_number: u32,
     pub session_election_id: u32,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_location: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_start_date: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_start_time: Option<String>,
+    pub session_location: String,
+    pub session_start_date: String,
+    pub session_start_time: String,
     pub session_status: String,
 }
 

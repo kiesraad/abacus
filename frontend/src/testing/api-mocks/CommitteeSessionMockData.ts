@@ -5,6 +5,9 @@ export const committeeSessionMockResponse: CommitteeSession = {
   number: 1,
   election_id: 1,
   status: "data_entry_in_progress",
+  location: "",
+  start_date: "",
+  start_time: "",
 };
 
 export const getCommitteeSessionMockData = (committeeSession: Partial<CommitteeSession> = {}): CommitteeSession => {

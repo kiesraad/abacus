@@ -71,8 +71,11 @@ impl CommitteeSessions {
             r#"
             INSERT INTO committee_sessions (
               number,
-              election_id
-            ) VALUES (?, ?)
+              election_id,
+              location,
+              start_date,
+              start_time
+            ) VALUES (?, ?, ?, ?, ?)
             RETURNING
               id as "id: u32",
               number as "number: u32",
@@ -83,7 +86,10 @@ impl CommitteeSessions {
               start_time
             "#,
             committee_session.number,
-            committee_session.election_id
+            committee_session.election_id,
+            "",
+            "",
+            ""
         )
         .fetch_one(&self.0)
         .await

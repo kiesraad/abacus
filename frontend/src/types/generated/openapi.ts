@@ -349,10 +349,10 @@ export interface ClaimDataEntryResponse {
 export interface CommitteeSession {
   election_id: number;
   id: number;
-  location?: string | null;
+  location: string;
   number: number;
-  start_date?: string | null;
-  start_time?: string | null;
+  start_date: string;
+  start_time: string;
   status: CommitteeSessionStatus;
 }
 
@@ -367,10 +367,10 @@ export interface CommitteeSessionCreateRequest {
 export interface CommitteeSessionDetails {
   sessionElectionId: number;
   sessionId: number;
-  sessionLocation?: string | null;
+  sessionLocation: string;
   sessionNumber: number;
-  sessionStartDate?: string | null;
-  sessionStartTime?: string | null;
+  sessionStartDate: string;
+  sessionStartTime: string;
   sessionStatus: string;
 }
 

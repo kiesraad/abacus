@@ -114,6 +114,11 @@ export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH =
 export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
 
 // /api/polling_stations/{polling_station_id}/data_entries/resolve_errors
+export interface POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH =
+  `/api/polling_stations/${number}/data_entries/resolve_errors`;
 export interface POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
   polling_station_id: number;
 }
@@ -343,6 +348,13 @@ export interface DataEntryDetails {
   firstEntryUserId?: number | null;
   pollingStationId: number;
   secondEntryUserId?: number | null;
+}
+
+export interface DataEntryGetErrorsResponse {
+  finalised_first_entry: PollingStationResults;
+  first_entry_finished_at: string;
+  first_entry_user_id: number;
+  validation_results: ValidationResults;
 }
 
 export type DataEntryStatus =

@@ -30,6 +30,9 @@ export class DifferencesPage extends DataEntryBasePage {
   readonly otherExplanationCount: Locator;
   readonly noExplanationCount: Locator;
 
+  readonly acceptErrorsAndWarnings: Locator;
+  readonly acceptErrorsAndWarningsReminder: Locator;
+
   constructor(page: Page) {
     super(page);
 
@@ -44,6 +47,13 @@ export class DifferencesPage extends DataEntryBasePage {
     this.tooManyBallotsHandedOutCount = page.getByRole("textbox", { name: "M Te veel uitgereikte stembiljetten" });
     this.otherExplanationCount = page.getByRole("textbox", { name: "N Andere verklaring voor het verschil" });
     this.noExplanationCount = page.getByRole("textbox", { name: "O Geen verklaring voor het verschil" });
+
+    this.acceptErrorsAndWarnings = page.getByLabel(
+      "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+    );
+    this.acceptErrorsAndWarningsReminder = page
+      .getByRole("alert")
+      .filter({ hasText: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd." });
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }
@@ -72,5 +82,10 @@ export class DifferencesPage extends DataEntryBasePage {
     await this.tooFewBallotsHandedOutCount.fill(fields.too_few_ballots_handed_out_count.toString());
     await this.otherExplanationCount.fill(fields.other_explanation_count.toString());
     await this.noExplanationCount.fill(fields.no_explanation_count.toString());
+  }
+
+  async checkAcceptErrorsAndWarnings() {
+    await this.acceptErrorsAndWarnings.waitFor();
+    await this.acceptErrorsAndWarnings.check();
   }
 }

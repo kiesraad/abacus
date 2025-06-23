@@ -13,14 +13,15 @@
     "wait_for_instructions": "Wacht op instructies van de coördinator."
   },
   "continue_after_check": "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+  "continue_with_errors": "Je kan alleen verder als je dit met de coördinator hebt overlegd.",
   "data_entry_not_possible": "Je kan stembureau {nr} niet invoeren",
   "definitive": "Definitief",
-  "entries_different": "Verschil invoer 1 en 2",
   "entry_different": "Let op: verschil met eerste invoer",
   "entry_errors": "Let op: fouten in het proces-verbaal",
   "entry_saved": "Je invoer is opgeslagen",
   "first_entry": "1e invoer",
   "form_accept_warnings": "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+  "form_accept_errors": "Ik heb de fouten besproken met de coördinator",
   "list": {
     "not_found": "Geen lijst gevonden voor {listNumber}"
   },

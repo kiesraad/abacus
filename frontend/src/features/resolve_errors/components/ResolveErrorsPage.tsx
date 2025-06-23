@@ -28,10 +28,10 @@ export function ResolveErrorsPage() {
     void navigate(url);
   };
   const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation, election, loading, status, action, setAction, onSubmit, validationError } =
+  const { pollingStation, election, loading, dataEntry, userFullname, action, setAction, onSubmit, validationError } =
     usePollingStationDataEntryErrors(pollingStationId, afterSave);
 
-  if (loading || status === null) {
+  if (loading || dataEntry === null) {
     return <Loader />;
   }
 
@@ -50,6 +50,9 @@ export function ResolveErrorsPage() {
         <article>
           <h2>{t("resolve_errors.title")}</h2>
           <p>{t("resolve_errors.page_content")}</p>
+
+          <pre>{JSON.stringify(dataEntry.validation_results, null, 2)}</pre>
+
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -62,7 +65,9 @@ export function ResolveErrorsPage() {
               {validationError && <ChoiceList.Error id="resolve-errors-error">{validationError}</ChoiceList.Error>}
               <ChoiceList.Radio
                 id="keep_entry"
-                label={tx("resolve_errors.options.resume_first_entry", undefined, { name: status.first_user })}
+                label={tx("resolve_errors.options.resume_first_entry", undefined, {
+                  name: userFullname ?? t("typist"),
+                })}
                 checked={action === "resume_first_entry"}
                 onChange={() => {
                   setAction("resume_first_entry");

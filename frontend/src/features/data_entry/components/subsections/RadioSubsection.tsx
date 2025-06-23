@@ -1,7 +1,6 @@
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { t } from "@/i18n/translate";
-
-import { RadioSubsection, SectionValues } from "../../types/types";
+import { RadioSubsection, SectionValues } from "@/types/types";
 
 export interface RadioSubsectionProps {
   subsection: RadioSubsection;

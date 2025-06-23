@@ -2,7 +2,6 @@
 
 use std::net::SocketAddr;
 
-use crate::shared::example_data_entry;
 use abacus::data_entry::DataEntry;
 use axum::http::HeaderValue;
 use reqwest::{Client, Response, StatusCode};
@@ -17,6 +16,22 @@ fn data_entry_with_error() -> DataEntry {
     // Introduce error F.101
     data_entry.data.recounted = None;
     data_entry
+}
+
+async fn get_resolve_errors(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    polling_station_id: u32,
+) -> Response {
+    let url = format!(
+        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/resolve_errors"
+    );
+    Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap()
 }
 
 async fn resolve_errors(
@@ -53,6 +68,52 @@ async fn resolve_differences(
         .send()
         .await
         .unwrap()
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
+    let addr = utils::serve_api(pool).await;
+
+    let typist = shared::typist_login(&addr).await;
+    let res = shared::complete_data_entry(&addr, &typist, 1, 1, data_entry_with_error()).await;
+    let data_entry_status: serde_json::Value = res.json().await.unwrap();
+    assert_eq!(data_entry_status["status"], "FirstEntryHasErrors");
+
+    let coordinator = shared::coordinator_login(&addr).await;
+    let res = get_resolve_errors(&addr, &coordinator, 1).await;
+    assert_eq!(res.status(), StatusCode::OK);
+    let result: serde_json::Value = res.json().await.unwrap();
+
+    assert!(result["first_entry_user_id"].is_number());
+    assert!(result["finalised_first_entry"].is_object());
+    assert!(result["first_entry_finished_at"].is_string());
+
+    assert_eq!(
+        result["validation_results"]["errors"],
+        serde_json::json!([{
+            "code": "F101",
+            "fields": ["data.recounted"]
+        }])
+    );
+    assert_eq!(
+        result["validation_results"]["warnings"],
+        serde_json::json!([])
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_polling_station_data_entry_errors_not_found(pool: SqlitePool) {
+    let addr = utils::serve_api(pool).await;
+
+    let typist = shared::typist_login(&addr).await;
+    let data_entry_no_errors = shared::example_data_entry(None);
+    let res = shared::complete_data_entry(&addr, &typist, 1, 1, data_entry_no_errors).await;
+    let data_entry_status: serde_json::Value = res.json().await.unwrap();
+    assert_eq!(data_entry_status["status"], "SecondEntryNotStarted");
+
+    let coordinator = shared::coordinator_login(&addr).await;
+    let res = get_resolve_errors(&addr, &coordinator, 1).await;
+    assert_eq!(res.status(), StatusCode::NOT_FOUND);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -123,7 +184,7 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: Sqlit
 async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
     let addr = utils::serve_api(pool).await;
 
-    let first_data_entry = example_data_entry(None);
+    let first_data_entry = shared::example_data_entry(None);
     let mut second_data_entry = first_data_entry.clone();
     second_data_entry.data.voters_counts.poll_card_count =
         first_data_entry.data.voters_counts.poll_card_count - 2;
@@ -151,7 +212,7 @@ async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
 async fn test_polling_station_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePool) {
     let addr = utils::serve_api(pool).await;
 
-    let first_data_entry = example_data_entry(None);
+    let first_data_entry = shared::example_data_entry(None);
     let mut second_data_entry = first_data_entry.clone();
     second_data_entry.data.voters_counts.poll_card_count = 0;
 

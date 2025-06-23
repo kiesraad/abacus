@@ -15,7 +15,7 @@ test("The definitive badge is visible", () => {
 test("The entries different badge is visible", () => {
   render(<Badge type="entries_different" />);
 
-  const badgeElement = screen.getByText("Verschil invoer 1 en 2");
+  const badgeElement = screen.getByText("2e invoer");
 
   expect(badgeElement).toBeVisible();
 });

@@ -1253,6 +1253,65 @@
       }
     },
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors": {
+      "get": {
+        "summary": "Get accepted data entry errors to be resolved",
+        "operationId": "polling_station_data_entry_get_errors",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data entry with errors and warnings to be resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEntryGetErrorsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No data entry with accepted errors found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction`",
         "operationId": "polling_station_data_entry_resolve_errors",
@@ -2964,6 +3023,31 @@
             ],
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "DataEntryGetErrorsResponse": {
+        "type": "object",
+        "required": [
+          "first_entry_user_id",
+          "finalised_first_entry",
+          "first_entry_finished_at",
+          "validation_results"
+        ],
+        "properties": {
+          "finalised_first_entry": {
+            "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "first_entry_finished_at": {
+            "type": "string"
+          },
+          "first_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "validation_results": {
+            "$ref": "#/components/schemas/ValidationResults"
           }
         }
       },

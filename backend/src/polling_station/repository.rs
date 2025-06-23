@@ -7,7 +7,6 @@ use crate::AppState;
 pub struct PollingStations(SqlitePool);
 
 impl PollingStations {
-    #[cfg(test)]
     pub fn new(pool: SqlitePool) -> Self {
         Self(pool)
     }

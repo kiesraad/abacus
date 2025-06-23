@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
@@ -32,10 +31,19 @@ export function ResolveDifferencesPage() {
     void navigate(url);
   };
   const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation, election, loading, status, action, setAction, onSubmit, validationError } =
-    usePollingStationDataEntryDifferences(pollingStationId, afterSave);
+  const {
+    pollingStation,
+    election,
+    loading,
+    status,
+    dataEntryStructure,
+    action,
+    setAction,
+    onSubmit,
+    validationError,
+  } = usePollingStationDataEntryDifferences(pollingStationId, afterSave);
 
-  if (loading || status === null) {
+  if (loading || status === null || dataEntryStructure === null) {
     return <Loader />;
   }
 
@@ -46,7 +54,6 @@ export function ResolveDifferencesPage() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          <Badge type="entries_different" />
         </section>
       </header>
       <main className={cls.resolveDifferences}>
@@ -54,7 +61,7 @@ export function ResolveDifferencesPage() {
           <ResolveDifferencesOverview
             first={status.state.first_entry}
             second={status.state.second_entry}
-            politicalGroups={election.political_groups}
+            structure={dataEntryStructure}
           />
         </aside>
         <article>
@@ -63,7 +70,7 @@ export function ResolveDifferencesPage() {
           <ResolveDifferencesTables
             first={status.state.first_entry}
             second={status.state.second_entry}
-            politicalGroups={election.political_groups}
+            structure={dataEntryStructure}
             action={action}
           />
           <form

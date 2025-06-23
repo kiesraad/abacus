@@ -18,6 +18,10 @@ airgap-detection = []
 name = "gen-openapi"
 required-features = ["openapi"]
 
+[[bin]]
+name = "gen-test-election"
+required-features = ["dev-database"]
+
 # Note: if you add a dependency here, please update the README.md for the backend as well.
 
 [dependencies]

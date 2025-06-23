@@ -9,7 +9,7 @@ import {
   differencesSection,
   getDataEntryStructure,
   recountedSection,
-} from "./structure";
+} from "./dataEntryStructure";
 
 describe("recountedSection", () => {
   test("should have correct structure", () => {

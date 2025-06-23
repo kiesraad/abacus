@@ -42,7 +42,7 @@
     }
 
     &.addSpace {
-      margin-bottom: var(--space-md);
+      margin-top: var(--space-md);
     }
 
     &:global(.ruler) {

@@ -6,10 +6,10 @@ import {
   ValidationResult,
   ValidationResultCode,
 } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import { DataEntryStructure, FormSectionId } from "@/types/types";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import { DataEntryState, DataEntryStateAndActionsLoaded, DataEntryStructure, FormSection } from "../types/types";
-import { getDataEntryStructure } from "../utils/structure";
+import { DataEntryState, DataEntryStateAndActionsLoaded, FormSection } from "../types/types";
 import { ValidationResultSet } from "../utils/ValidationResults";
 
 export function getInitialValues(): PollingStationResults {

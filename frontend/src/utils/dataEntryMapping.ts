@@ -1,7 +1,6 @@
 import { PollingStationResults } from "@/types/generated/openapi";
+import { DataEntrySection, SectionValues } from "@/types/types";
 import { deformatNumber, formatNumber } from "@/utils/format";
-
-import { DataEntrySection, SectionValues } from "../types/types";
 
 type PathSegment = string | number;
 type PathValue = boolean | number | string | undefined;
@@ -60,6 +59,11 @@ export function mapResultsToSectionValues(section: DataEntrySection, results: Po
   }
 
   return formValues;
+}
+
+export function getStringValueAtPath(results: PollingStationResults, path: string): string {
+  const value = getValueAtPath(results, path);
+  return valueToString(value);
 }
 
 function setValueAtPath(

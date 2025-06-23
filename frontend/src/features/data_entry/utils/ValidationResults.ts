@@ -1,7 +1,7 @@
 import { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import { DataEntryStructure, FormSectionId } from "@/types/types";
 
-import { DataEntryStructure, FormState } from "../types/types";
+import { FormState } from "../types/types";
 
 /*
  * A set of validation results.

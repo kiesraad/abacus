@@ -343,4 +343,52 @@ describe("Election create pages", () => {
     // Expect to see the next page
     expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" })).toBeVisible();
   });
+
+  test("Shows the confirmation modal when the button is clicked", async () => {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    await router.navigate("/elections/create/list-of-candidates");
+
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+    await user.upload(input, file);
+
+    // Click the Afbreken button
+    const button = screen.getByText("Afbreken");
+    expect(button).toBeVisible();
+    await user.click(button);
+    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+  });
+
+  test("Shows the confirmation modal when attempting to navigate away", async () => {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    await router.navigate("/elections/create/list-of-candidates");
+
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+    await user.upload(input, file);
+
+    // Click the 'Verkiezingen' nav item
+    const button = screen.getByText("Verkiezingen");
+    expect(button).toBeVisible();
+    await user.click(button);
+    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+  });
 });

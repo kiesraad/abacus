@@ -427,32 +427,28 @@ test.describe("full data entry flow", () => {
 
     await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
     await candidatesListPage_1.next.click();
+    await expect(candidatesListPage_1.error).toBeVisible();
     await candidatesListPage_1.checkAcceptErrorsAndWarnings();
     await candidatesListPage_1.next.click();
 
-    await expect(candidatesListPage_1.error).toBeVisible();
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
 
-    const listItemsVotersAndVotes = page
-      .getByTestId("save-form-summary-list-voters_votes_counts")
-      .getByRole("listitem");
-
-    await expect(listItemsVotersAndVotes).toHaveText([
+    await expect(checkAndSavePage.summaryListItemVotersAndVotes).toHaveText([
       "F.202 Controleer uitgebrachte stemmen",
       "F.204 Controleer (totaal) aantal stemmen op kandidaten",
       "W.203 Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     ]);
-
-    const listItemsDifferences = page.getByTestId("save-form-summary-list-differences_counts").getByRole("listitem");
-    await expect(listItemsDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
+    await expect(checkAndSavePage.summaryListItemDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
+    await expect(checkAndSavePage.summaryListItemPoliticalGroupVotes1).toHaveText([
+      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
+    ]);
 
     await expect(checkAndSavePage.complete).toBeVisible();
     await expect(checkAndSavePage.acceptErrors).toBeVisible();
     await checkAndSavePage.complete.click();
 
     await expect(checkAndSavePage.acceptErrorsReminder).toBeVisible();
-
     await checkAndSavePage.acceptErrors.click();
     await expect(checkAndSavePage.acceptErrors).toBeChecked();
     await checkAndSavePage.complete.click();

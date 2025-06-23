@@ -62,7 +62,7 @@
           text-align: right;
           font-size: var(--font-size-body);
           font-style: normal;
-          font-weight: 700;
+          font-weight: bold;
           line-height: 2.5rem;
           color: var(--text-color-body);
         }

@@ -47,6 +47,12 @@ export function InputGridRow({
   const errorMessage =
     errorMessageId || (hasError ? "feedback-error" : hasUnacceptedWarning ? "feedback-warning" : undefined);
 
+  React.useEffect(() => {
+    if (errorMessageId) {
+      document.getElementById(id)?.focus();
+    }
+  }, [errorMessageId, id]);
+
   const children: [React.ReactElement, React.ReactElement, React.ReactElement] = [
     <td key={`${id}-1`} id={`field-${id}`}>
       {field}

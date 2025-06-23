@@ -54,6 +54,7 @@ pub enum ValidationResultCode {
     F304,
     F305,
     F401,
+    F402,
     W001,
     W201,
     W202,
@@ -898,15 +899,20 @@ impl Validate for PoliticalGroupVotes {
             &path.field("total"),
         )?;
 
-        // F.401 validate whether the total number of votes matches the sum of all candidate votes,
-        // cast to u64 to avoid overflow
-        if self.total as u64
-            != self
-                .candidate_votes
-                .iter()
-                .map(|cv| cv.votes as u64)
-                .sum::<u64>()
-        {
+        // all candidate votes, cast to u64 to avoid overflow
+        let candidate_votes_sum: u64 = self
+            .candidate_votes
+            .iter()
+            .map(|cv| cv.votes as u64)
+            .sum::<u64>();
+        if candidate_votes_sum > 0 && self.total == 0 {
+            // F.402 validate whether the total number of votes is empty when there are candidate votes
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.to_string()],
+                code: ValidationResultCode::F402,
+            });
+        } else if self.total as u64 != candidate_votes_sum {
+            // F.401 validate whether the total number of votes matches the sum of all candidate votes
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F401,
@@ -2182,6 +2188,28 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F401
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["political_group_votes[0]"]
+        );
+
+        // validate with missing total for second political group
+        validation_results = ValidationResults::default();
+        political_group_votes[0].total = 0;
+        political_group_votes
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                &"political_group_votes".into(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::F402
         );
         assert_eq!(
             validation_results.errors[0].fields,

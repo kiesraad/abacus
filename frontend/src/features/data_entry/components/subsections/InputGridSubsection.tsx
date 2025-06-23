@@ -45,7 +45,7 @@ export function InputGridSubsectionComponent({
               onChange={(e) => {
                 setValues(row.path, e.target.value);
               }}
-              autoFocusInput={row.autoFocusInput || (missingTotalError && row.isListTotal)}
+              autoFocusInput={row.autoFocusInput}
               addSeparator={row.addSeparator}
               isTotal={row.isTotal}
               isListTotal={row.isListTotal}

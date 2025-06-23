@@ -1,12 +1,20 @@
-use std::{error::Error, ops::Range, str::FromStr};
+use std::{
+    error::Error,
+    ops::Range,
+    path::{Path, PathBuf},
+    str::FromStr,
+};
 
 use abacus::{
     election::{
         CandidateGender, ElectionCategory, ElectionStatus, ElectionWithPoliticalGroups,
         NewElection, PoliticalGroup, repository::Elections,
     },
+    eml::{EML110, EML230, EMLDocument},
     fixtures,
-    polling_station::{PollingStationRequest, PollingStationType, repository::PollingStations},
+    polling_station::{
+        PollingStation, PollingStationRequest, PollingStationType, repository::PollingStations,
+    },
 };
 use chrono::{Datelike, Days, NaiveDate};
 use clap::Parser;
@@ -39,20 +47,28 @@ struct Args {
     reset_database: bool,
 
     /// Number of political groups to create
-    #[arg(long, default_value = "40..50", value_parser = parse_range::<u32>)]
+    #[arg(long, default_value = "20..50", value_parser = parse_range::<u32>)]
     political_groups: Range<u32>,
 
     /// Number of candidates to create
-    #[arg(long, default_value = "30..80", value_parser = parse_range::<u32>)]
+    #[arg(long, default_value = "10..50", value_parser = parse_range::<u32>)]
     candidates_per_group: Range<u32>,
 
     /// Number of polling stations to create
-    #[arg(long, default_value = "200..500", value_parser = parse_range::<u32>)]
+    #[arg(long, default_value = "50..200", value_parser = parse_range::<u32>)]
     polling_stations: Range<u32>,
 
     /// Number of voters to create
-    #[arg(long, default_value = "500_000..800_000", value_parser = parse_range::<u32>)]
+    #[arg(long, default_value = "100_000..250_000", value_parser = parse_range::<u32>)]
     voters: Range<u32>,
+
+    /// Export the election defintion, candidate list and polling stations to a directory
+    #[arg(long)]
+    export_definition: Option<PathBuf>,
+
+    /// Number of seats in the election
+    #[arg(long, default_value = "9..=45", value_parser = parse_range::<u32>)]
+    seats: Range<u32>,
 }
 
 fn parse_range<T>(range: &str) -> Result<Range<T>, Box<dyn Error + 'static + Send + Sync>>
@@ -63,7 +79,12 @@ where
     let mut iter = range.split("..");
     let lower_bound = T::from_str(&iter.next().ok_or("Invalid range")?.replace("_", ""))?;
     let upper_bound = if let Some(bound) = iter.next() {
-        T::from_str(&bound.replace("_", ""))?
+        if let Some(bound) = bound.strip_prefix("=") {
+            // add one to the bound, assumes that the bound is not already a max
+            T::from_str(&bound.replace("_", ""))? + T::from(1u8)
+        } else {
+            T::from_str(&bound.replace("_", ""))?
+        }
     } else {
         lower_bound + T::from(1u8) // add one to the lower bound, this could fail if the lower bound is already a max
     };
@@ -96,12 +117,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // generate the polling stations for the election
     let ps_repo = PollingStations::new(pool.clone());
-    generate_polling_stations(&mut rng, &election, &ps_repo, &args).await;
+    let polling_stations = generate_polling_stations(&mut rng, &election, &ps_repo, &args).await;
 
     info!(
         "Election generated with election id: {}, election name: '{}'",
         election.id, election.name
     );
+
+    if let Some(export_dir) = args.export_definition {
+        // Export the election definition, candidate list and polling stations to a directory
+        export_election(&export_dir, &election, &polling_stations).await;
+    }
 
     Ok(())
 }
@@ -148,7 +174,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
         location: locality,
         number_of_voters,
         category: ElectionCategory::Municipal,
-        number_of_seats: rng.random_range(19..45),
+        number_of_seats: rng.random_range(args.seats.clone()),
         election_date,
         nomination_date,
         status: ElectionStatus::DataEntryInProgress,
@@ -206,9 +232,11 @@ async fn generate_polling_stations(
     election: &ElectionWithPoliticalGroups,
     ps_repo: &PollingStations,
     args: &Args,
-) {
+) -> Vec<PollingStation> {
     let number_of_ps = rng.random_range(args.polling_stations.clone());
     info!("Generating {number_of_ps} polling stations for election");
+
+    let mut polling_stations = vec![];
     let mut remaining_voters = election.number_of_voters;
     for i in 1..=number_of_ps {
         // compute a some somewhat distributed number of voters for each polling station
@@ -225,7 +253,7 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        ps_repo
+        let ps = ps_repo
             .create(
                 election.id,
                 PollingStationRequest {
@@ -240,7 +268,72 @@ async fn generate_polling_stations(
             )
             .await
             .expect("Failed to create polling station");
+        polling_stations.push(ps);
     }
+
+    polling_stations
+}
+
+/// Export an election (in EML) to the specified directory
+async fn export_election(
+    export_dir: &Path,
+    election: &ElectionWithPoliticalGroups,
+    polling_stations: &[PollingStation],
+) {
+    if export_dir.exists() && !export_dir.is_dir() {
+        panic!("Export directory already exists and is not a directory");
+    }
+
+    if !export_dir.exists() {
+        std::fs::create_dir_all(export_dir).expect("Failed to create export directory");
+    }
+
+    info!("Exporting definitions to {:?}", export_dir);
+
+    let transaction_id = "1";
+
+    info!("Converting election to EML definitions");
+    let definition = EML110::definition_from_abacus_election(election, transaction_id);
+    let polling_stations =
+        EML110::polling_stations_from_election(election, polling_stations, transaction_id);
+    let candidates = EML230::candidates_from_abacus_election(election, transaction_id);
+
+    info!("Converting EML definitions to XML strings");
+    let definition = definition
+        .to_xml_string()
+        .expect("Failed to convert definition to XML string");
+    let polling_stations = polling_stations
+        .to_xml_string()
+        .expect("Failed to convert polling stations to XML string");
+    let candidates = candidates
+        .to_xml_string()
+        .expect("Failed to convert candidates to XML string");
+
+    let def_filename = export_dir.join(format!(
+        "Verkiezingsdefinitie_{}.eml.xml",
+        election.election_id
+    ));
+    let candidate_filename = export_dir.join(format!(
+        "Kandidatenlijsten_{}.eml.xml",
+        election.election_id
+    ));
+    let ps_filename = export_dir.join(format!("Stembureaus_{}.eml.xml", election.election_id));
+    info!("Election definition will be written to {:?}", def_filename);
+    info!("Candidate list will be written to {:?}", candidate_filename);
+    info!("Polling stations will be written to {:?}", ps_filename);
+
+    // Write to files
+    tokio::fs::write(def_filename, definition)
+        .await
+        .expect("Failed to write definition file");
+    tokio::fs::write(candidate_filename, candidates)
+        .await
+        .expect("Failed to write candidates file");
+    tokio::fs::write(ps_filename, polling_stations)
+        .await
+        .expect("Failed to write polling stations file");
+
+    info!("Files written successfully");
 }
 
 /// Create a SQLite database if needed, then connect to it and run migrations.

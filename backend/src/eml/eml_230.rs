@@ -5,7 +5,13 @@ use super::{
     common::{Candidate, ContestIdentifier, EMLImportError, ElectionIdentifier, ManagingAuthority},
 };
 
-use crate::election::{NewElection, PoliticalGroup};
+use crate::{
+    election::{CandidateGender, ElectionWithPoliticalGroups, NewElection, PoliticalGroup},
+    eml::common::{
+        AuthorityAddress, AuthorityIdentifier, CandidateFullName, Country, Gender, Locality,
+        NameLine, PersonName, QualifyingAddress, QualifyingAddressData,
+    },
+};
 
 /// Candidate list (230b)
 ///
@@ -84,6 +90,92 @@ impl EML230 {
             .collect::<Result<Vec<PoliticalGroup>, EMLImportError>>()?;
 
         Ok(election)
+    }
+
+    pub fn candidates_from_abacus_election(
+        election: &ElectionWithPoliticalGroups,
+        transaction_id: &str,
+    ) -> EML230 {
+        let now = chrono::Utc::now();
+
+        EML230 {
+            base: EMLBase::new("230b"),
+            transaction_id: transaction_id.to_owned(),
+            creation_date_time: now.to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+            issue_date: Some(now.format("%Y-%m-%d").to_string()),
+            managing_authority: Some(ManagingAuthority {
+                authority_identifier: AuthorityIdentifier {
+                    id: election.domain_id.clone(),
+                    name: election.location.clone(),
+                    created_by_authority: None,
+                },
+                authority_address: AuthorityAddress {},
+            }),
+            candidate_list: CandidateList {
+                election: Election {
+                    election_identifier: ElectionIdentifier::from_election(election, true),
+                    contest: Contest {
+                        contest_identifier: ContestIdentifier::geen(),
+                        affiliations: election
+                            .political_groups
+                            .iter()
+                            .map(|pg| Affiliation {
+                                affiliation_identifier: AffiliationIdentifier {
+                                    id: pg.number.to_string(),
+                                    registered_name: pg.name.clone(),
+                                },
+                                affiliation_type: AffiliationType::StandAloneList,
+                                list_data: ListData {
+                                    publication_language: "nl".to_string(),
+                                    publish_gender: true,
+                                },
+                                candidates: pg
+                                    .candidates
+                                    .iter()
+                                    .map(|candidate| Candidate {
+                                        candidate_identifier: super::common::CandidateIdentifier {
+                                            id: candidate.number.to_string(),
+                                        },
+                                        candidate_full_name: CandidateFullName {
+                                            person_name: PersonName {
+                                                name_line: Some(NameLine {
+                                                    name_type: "Initials".to_string(),
+                                                    value: candidate.initials.clone(),
+                                                }),
+                                                first_name: candidate.first_name.clone(),
+                                                name_prefix: candidate.last_name_prefix.clone(),
+                                                last_name: candidate.last_name.clone(),
+                                            },
+                                        },
+                                        gender: candidate.gender.as_ref().map(
+                                            |gender| match gender {
+                                                CandidateGender::Male => Gender::Male,
+                                                CandidateGender::Female => Gender::Female,
+                                                CandidateGender::X => Gender::Unknown,
+                                            },
+                                        ),
+                                        qualifying_address: QualifyingAddress {
+                                            data: if let Some(country) = &candidate.country_code {
+                                                QualifyingAddressData::Country(Country {
+                                                    country_name_code: country.clone(),
+                                                    locality: Locality {
+                                                        locality_name: candidate.locality.clone(),
+                                                    },
+                                                })
+                                            } else {
+                                                QualifyingAddressData::Locality(Locality {
+                                                    locality_name: candidate.locality.clone(),
+                                                })
+                                            },
+                                        },
+                                    })
+                                    .collect(),
+                            })
+                            .collect(),
+                    },
+                },
+            },
+        }
     }
 }
 

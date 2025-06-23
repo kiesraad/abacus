@@ -24,6 +24,9 @@ export type ElectionCreateAction =
   | {
       type: "SET_CANDIDATES_DEFINITION_HASH";
       candidateDefinitionHash: string[];
+    }
+  | {
+      type: "RESET";
     };
 
 export interface ElectionCreateState {
@@ -66,6 +69,9 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         ...state,
         candidateDefinitionHash: action.candidateDefinitionHash,
       };
+    // Empty the state
+    case "RESET":
+      return {};
   }
 }
 

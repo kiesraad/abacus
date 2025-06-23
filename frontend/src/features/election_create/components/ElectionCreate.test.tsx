@@ -343,12 +343,4 @@ describe("Election create pages", () => {
     // Expect to see the next page
     expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" })).toBeVisible();
   });
-
-  // Test abort button cancel
-
-  // Test abort button delete
-
-  // Test upload election then navigate away
-
-  // Test upload candidates then navigate away
 });

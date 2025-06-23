@@ -13,6 +13,7 @@ use super::{
     repository::Elections,
     structs::{Election, ElectionWithPoliticalGroups},
 };
+use crate::committee_session::CommitteeSession;
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
@@ -43,9 +44,11 @@ pub struct ElectionListResponse {
     pub elections: Vec<Election>,
 }
 
-/// Election details response, including the election's candidate list (political groups) and its polling stations
+/// Election details response, including the election's candidate list (political groups),
+/// its polling stations and the current committee session
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionDetailsResponse {
+    pub committee_session: CommitteeSession,
     pub election: ElectionWithPoliticalGroups,
     pub polling_stations: Vec<PollingStation>,
 }
@@ -68,7 +71,8 @@ pub async fn election_list(
     Ok(Json(ElectionListResponse { elections }))
 }
 
-/// Get election details including the election's candidate list (political groups) and its polling stations
+/// Get election details including the election's candidate list (political groups),
+/// its polling stations and the current committee session
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}",
@@ -84,13 +88,18 @@ pub async fn election_list(
 )]
 pub async fn election_details(
     _user: User,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     State(elections_repo): State<Elections>,
     State(polling_stations): State<PollingStations>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = elections_repo.get(id).await?;
     let polling_stations = polling_stations.list(id).await?;
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(id)
+        .await?;
     Ok(Json(ElectionDetailsResponse {
+        committee_session,
         election,
         polling_stations,
     }))

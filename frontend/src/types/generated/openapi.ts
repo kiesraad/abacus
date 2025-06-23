@@ -43,12 +43,6 @@ export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
 }
 export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
 
-// /api/elections/{election_id}/committee_session
-export interface ELECTION_COMMITTEE_SESSION_DETAILS_REQUEST_PARAMS {
-  election_id: number;
-}
-export type ELECTION_COMMITTEE_SESSION_DETAILS_REQUEST_PATH = `/api/elections/${number}/committee_session`;
-
 // /api/elections/{election_id}/committee_sessions
 export interface ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS {
   election_id: number;
@@ -550,9 +544,11 @@ export interface ElectionDetails {
 }
 
 /**
- * Election details response, including the election's candidate list (political groups) and its polling stations
+ * Election details response, including the election's candidate list (political groups),
+ * its polling stations and the current committee session
  */
 export interface ElectionDetailsResponse {
+  committee_session: CommitteeSession;
   election: ElectionWithPoliticalGroups;
   polling_stations: PollingStation[];
 }

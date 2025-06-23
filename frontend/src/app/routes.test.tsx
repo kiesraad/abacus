@@ -2,7 +2,6 @@ import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
-  ElectionCommitteeSessionRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
@@ -21,12 +20,7 @@ const renderWithRouter = () => {
 
 describe("routes", () => {
   beforeEach(() => {
-    server.use(
-      ElectionListRequestHandler,
-      ElectionRequestHandler,
-      ElectionCommitteeSessionRequestHandler,
-      ElectionStatusRequestHandler,
-    );
+    server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
 
     // Since we test what happens after an error, we want vitest to ignore them
     vi.spyOn(console, "error").mockImplementation(() => {

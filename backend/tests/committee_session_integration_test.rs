@@ -33,28 +33,6 @@ async fn test_election_committee_session_list_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_election_committee_session_details_works(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-
-    let url = format!("http://{addr}/api/elections/2/committee_session");
-    let typist_cookie = shared::typist_login(&addr).await;
-    let response = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", typist_cookie)
-        .send()
-        .await
-        .unwrap();
-
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::OK);
-    let body: CommitteeSession = response.json().await.unwrap();
-    assert_eq!(body.id, 2);
-    assert_eq!(body.number, 1);
-    assert_eq!(body.election_id, 2);
-    assert_eq!(body.status, CommitteeSessionStatus::Created);
-}
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_committee_session_create_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -77,24 +55,6 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
         StatusCode::CREATED,
         "Unexpected response status"
     );
-    let body: CommitteeSession = response.json().await.unwrap();
-    assert_eq!(body.id, 3);
-    assert_eq!(body.number, 2);
-    assert_eq!(body.election_id, 2);
-    assert_eq!(body.status, CommitteeSessionStatus::Created);
-
-    // Check if get returns the current committee session
-    let url = format!("http://{addr}/api/elections/2/committee_session");
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let response = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::OK);
     let body: CommitteeSession = response.json().await.unwrap();
     assert_eq!(body.id, 3);
     assert_eq!(body.number, 2);
@@ -129,10 +89,10 @@ async fn test_committee_session_update_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_committee_session_details_not_found(pool: SqlitePool) {
+async fn test_election_committee_session_list_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url: String = format!("http://{addr}/api/elections/2/committee_session");
+    let url: String = format!("http://{addr}/api/elections/1/committee_sessions");
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let response = reqwest::Client::new()
         .get(&url)

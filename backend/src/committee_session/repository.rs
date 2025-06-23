@@ -12,7 +12,7 @@ impl CommitteeSessions {
         Self(pool)
     }
 
-    pub async fn election_committee_session_list(
+    pub async fn get_election_committee_session_list(
         &self,
         election_id: u32,
     ) -> Result<Vec<CommitteeSession>, Error> {

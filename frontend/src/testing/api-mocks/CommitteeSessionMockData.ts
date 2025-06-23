@@ -1,6 +1,6 @@
-import { CommitteeSession } from "@/types/generated/openapi";
+import { CommitteeSession, CommitteeSessionListResponse } from "@/types/generated/openapi";
 
-export const committeeSessionMockResponse: CommitteeSession = {
+export const committeeSessionMockData: CommitteeSession = {
   id: 1,
   number: 1,
   election_id: 1,
@@ -12,7 +12,27 @@ export const committeeSessionMockResponse: CommitteeSession = {
 
 export const getCommitteeSessionMockData = (committeeSession: Partial<CommitteeSession> = {}): CommitteeSession => {
   return {
-    ...committeeSessionMockResponse,
+    ...committeeSessionMockData,
     ...committeeSession,
   };
 };
+
+export const getCommitteeSessionListMockData = (
+  committeeSession: Partial<CommitteeSession> = {},
+): CommitteeSessionListResponse => {
+  return {
+    committee_sessions: [
+      {
+        ...committeeSessionMockData,
+        status: "data_entry_finished",
+      },
+      {
+        ...committeeSessionMockData,
+        id: 2,
+        number: 2,
+        ...committeeSession,
+      },
+    ],
+  };
+};
+export const committeeSessionListMockResponse = getCommitteeSessionListMockData();

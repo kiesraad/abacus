@@ -12,16 +12,16 @@ use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
     repository::CommitteeSessions,
 };
+use crate::election::repository::Elections;
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
-    authentication::{Coordinator, User},
+    authentication::Coordinator,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(election_committee_session_list))
-        .routes(routes!(election_committee_session_details))
         .routes(routes!(committee_session_create))
         .routes(routes!(committee_session_update))
 }
@@ -55,37 +55,14 @@ impl IntoResponse for CommitteeSessionListResponse {
 pub async fn election_committee_session_list(
     _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
+    State(elections_repo): State<Elections>,
     Path(election_id): Path<u32>,
 ) -> Result<Json<CommitteeSessionListResponse>, APIError> {
+    elections_repo.get(election_id).await?;
     let committee_sessions = committee_sessions_repo
-        .election_committee_session_list(election_id)
+        .get_election_committee_session_list(election_id)
         .await?;
     Ok(Json(CommitteeSessionListResponse { committee_sessions }))
-}
-
-/// Get the current [CommitteeSession] for an election
-#[utoipa::path(
-  get,
-  path = "/api/elections/{election_id}/committee_session",
-  responses(
-        (status = 200, description = "Committee session", body = CommitteeSession),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-  ),
-  params(
-        ("election_id" = u32, description = "Election database id"),
-  ),
-)]
-pub async fn election_committee_session_details(
-    _user: User,
-    State(committee_sessions_repo): State<CommitteeSessions>,
-    Path(election_id): Path<u32>,
-) -> Result<Json<CommitteeSession>, APIError> {
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await?;
-    Ok(Json(committee_session))
 }
 
 /// Create a new [CommitteeSession].

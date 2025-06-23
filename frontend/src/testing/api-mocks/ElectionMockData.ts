@@ -1,4 +1,5 @@
 import {
+  CommitteeSession,
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionWithPoliticalGroups,
@@ -6,6 +7,7 @@ import {
   PoliticalGroup,
 } from "@/types/generated/openapi";
 
+import { committeeSessionMockData } from "./CommitteeSessionMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
 
 export const politicalGroupMockData: PoliticalGroup = {
@@ -262,8 +264,13 @@ export const electionListMockResponse: ElectionListResponse = {
 
 export const getElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
+  committeeSession: Partial<CommitteeSession> = {},
 ): Required<ElectionDetailsResponse> => {
   return {
+    committee_session: {
+      ...committeeSessionMockData,
+      ...committeeSession,
+    },
     election: {
       ...electionListMockResponse.elections[0]!,
       political_groups: politicalGroupsMockData,

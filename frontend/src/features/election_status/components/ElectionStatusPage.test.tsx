@@ -5,13 +5,10 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { CommitteeSessionProvider } from "@/hooks/committee_session/CommitteeSessionProvider";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
-  ElectionCommitteeSessionRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
@@ -27,11 +24,9 @@ import { ElectionStatusPage } from "./ElectionStatusPage";
 const renderElectionStatusPage = () =>
   render(
     <ElectionProvider electionId={1}>
-      <CommitteeSessionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <ElectionStatusPage />
-        </ElectionStatusProvider>
-      </CommitteeSessionProvider>
+      <ElectionStatusProvider electionId={1}>
+        <ElectionStatusPage />
+      </ElectionStatusProvider>
     </ElectionProvider>,
   );
 
@@ -40,7 +35,6 @@ describe("ElectionStatusPage", () => {
     server.use(
       ElectionListRequestHandler,
       ElectionRequestHandler,
-      ElectionCommitteeSessionRequestHandler,
       ElectionStatusRequestHandler,
       UserListRequestHandler,
     );
@@ -72,13 +66,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input not visible when election is finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData());
-    overrideOnce(
-      "get",
-      "/api/elections/1/committee_session",
-      200,
-      getCommitteeSessionMockData({ status: "data_entry_finished" }),
-    );
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "definitive" },

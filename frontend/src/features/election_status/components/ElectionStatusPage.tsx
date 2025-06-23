@@ -6,7 +6,6 @@ import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
-import { useCommitteeSession } from "@/hooks/committee_session/useCommitteeSession";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/i18n/translate";
@@ -18,8 +17,7 @@ import { ElectionStatus } from "./ElectionStatus";
 export function ElectionStatusPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { election, pollingStations } = useElection();
-  const { committeeSession } = useCommitteeSession();
+  const { committeeSession, election, pollingStations } = useElection();
   const { statuses } = useElectionStatus();
   const { requestState } = useInitialApiGet<UserListResponse>("/api/user" satisfies USER_LIST_REQUEST_PATH);
 

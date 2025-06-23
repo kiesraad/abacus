@@ -6,6 +6,7 @@
   }
 }
 
+// Default document styling
 #let conf(doc, header: none, footer: none) = [
   #set text(
     font: "DM Sans",
@@ -53,9 +54,10 @@
   #doc
 ]
 
+// Document header numbering
 #let document_numbering(doc) = [
   #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: "")
-  #show heading.where(level: 1): set heading(numbering: "Deel 1.1 -")
+  #show heading.where(level: 1): set heading(numbering: "Deel 1.1 -", supplement: "Deel")
   #show heading.where(level: 3): it => [
     #block(
       stroke: (left: 1pt),
@@ -68,33 +70,3 @@
 
   #doc
 ]
-
-#let mono(content) = {
-  text(
-    font: "Geist Mono",
-    content,
-  )
-}
-
-#let title(title1, title2, subtitle1, subtitle2) = {
-  let title_size = 24pt
-  let subtitle_size = 20pt
-  let space = 1em
-
-  grid(
-    columns: 1fr,
-    gutter: 1.33em,
-    grid.hline(stroke: 2pt),
-    v(space),
-    text(size: title_size, weight: "semibold", title1),
-    text(size: title_size, weight: "semibold", title2),
-    v(space),
-    text(size: subtitle_size, subtitle1),
-    text(size: subtitle_size, subtitle2),
-    v(space),
-    grid.hline(position: top)
-  )
-
-  v(space)
-}
-

@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, title, mono, document_numbering
+#import "common/style.typ": conf, document_numbering
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
 #set text(lang: "nl")
@@ -11,21 +11,15 @@
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 
-#let list_votes = input.election.political_groups.zip(input.summary.political_group_votes)
 
-
-#show: doc => conf(
-  doc,
-  header: location_name,
-  footer: [
-    #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
-    #input.hash
-  ],
-)
+#show: doc => conf(doc, header: location_name, footer: [
+  #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
+  #input.hash
+])
 
 #set heading(numbering: none)
 
-#title(
+#title_page(
   is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
   [#input.election.name #format_date(input.election.election_date)],
@@ -184,7 +178,9 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
   #sum(
     letterbox("A")[#input.summary.voters_counts.poll_card_count][Stempassen],
-    letterbox("B")[#input.summary.voters_counts.proxy_certificate_count][Volmachtbewijzen (schriftelijk of via ingevulde stempas],
+    letterbox(
+      "B",
+    )[#input.summary.voters_counts.proxy_certificate_count][Volmachtbewijzen (schriftelijk of via ingevulde stempas],
     letterbox(
       "D",
       light: false,
@@ -195,7 +191,9 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
   #sum(
     letterbox("A")[#input.summary.voters_counts.poll_card_count][Stempassen],
-    letterbox("B")[#input.summary.voters_counts.proxy_certificate_count][Volmachtbewijzen (schriftelijk of via ingevulde stempas],
+    letterbox(
+      "B",
+    )[#input.summary.voters_counts.proxy_certificate_count][Volmachtbewijzen (schriftelijk of via ingevulde stempas],
     letterbox("C")[#input.summary.voters_counts.voter_card_count][Kiezerspassen],
     letterbox(
       "D",
@@ -210,10 +208,15 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #sum(
   sum(
-    ..list_votes.map(((list, votes)) => {
+    ..input.election.political_groups.map(list => {
+      let votes = input.summary.political_group_votes.find(v => v.number == list.number)
+
       letterbox([E.#list.number])[#votes.total][Totaal lijst #list.number - #list.name]
     }),
-    letterbox("E", light: false)[#input.summary.votes_counts.votes_candidates_count][*Totaal stemmen op kandidaten* (tel E.1 t/m E.x op)]
+    letterbox(
+      "E",
+      light: false,
+    )[#input.summary.votes_counts.votes_candidates_count][*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
   ),
   letterbox("F")[#input.summary.votes_counts.blank_votes_count][Blanco stemmen],
   letterbox("G")[#input.summary.votes_counts.invalid_votes_count][Ongeldige stemmen],
@@ -232,11 +235,15 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 === Voor de stembureaus met de nummers #input.summary.differences_counts.more_ballots_count.polling_stations.map(str).join(", ") zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
-#letterbox("I")[#input.summary.differences_counts.more_ballots_count.count][Totaal aantal méér getelde stemmen in deze stembureaus]
+#letterbox(
+  "I",
+)[#input.summary.differences_counts.more_ballots_count.count][Totaal aantal méér getelde stemmen in deze stembureaus]
 
 === Voor de stembureaus met de nummers #input.summary.differences_counts.fewer_ballots_count.polling_stations.map(str).join(", ") zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
-#letterbox("J")[#input.summary.differences_counts.fewer_ballots_count.count][Totaal aantal minder getelde stemmen in deze stembureaus]
+#letterbox(
+  "J",
+)[#input.summary.differences_counts.fewer_ballots_count.count][Totaal aantal minder getelde stemmen in deze stembureaus]
 
 == Uitkomst controleprotocol <monitoring_protocol>
 
@@ -254,39 +261,59 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 == Stemmen per lijst en per kandidaat
 
+#for political_group in input.summary.political_group_votes {
+  let election_political_group = input.election.political_groups.find(pg => pg.number == political_group.number)
 
+  title[Lijst #political_group.number #election_political_group.name]
 
-#for political_group in input.summary.political_group_votes [
-  #let election_pg = input.election.political_groups.find(pg => pg.number == political_group.number)
-
-  #text(size: 16pt, weight: "semibold")[Lijst #political_group.number #election_pg.name]
-
-  #set page(columns: 2)
-
-  #table(
-    columns: (1fr, 3em, auto),
-    inset: 8pt,
-    stroke: 0.5pt + luma(122),
-    fill: (_, y) => if y > 1 and calc.even(y) { luma(240) },
-    table.hline(stroke: none),
-    table.header(
-      table.cell(stroke: none, align: bottom, text(size: 8pt, weight: "semibold", "Kandidaat")),
-      table.cell(stroke: none, align: bottom, text(size: 8pt, weight: "semibold", "")),
-      table.cell(stroke: none, align: bottom, text(size: 8pt, weight: "semibold", "Stemmen")),
-    ),
-    table.hline(stroke: 1pt + black),
-    ..for candidate in political_group.candidate_votes {
-      let election_candidate = election_pg.candidates.find(c => c.number == candidate.number)
-
-      (
-        candidate_name(election_candidate),
-        table.cell(fill: luma(221), align: center, text(number-width: "tabular", weight: "bold", [#candidate.number])),
-        table.cell(align: right, text(number-width: "tabular", [#candidate.number])),
-      )
-    },
-    table.hline(stroke: 1pt + black),
-    // empty line
-    table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 3pt, []),
-    table.cell(colspan: 3, fill: white, align: center, [Subtotaal kolom 1: #political_group.total]),
+  votes_table(
+    headers: ("Kandidaat", "", "Stemmen"),
+    total: political_group.total,
+    values: political_group.candidate_votes.map(candidate => (
+      name: candidate_name(election_political_group.candidates.find(c => c.number == candidate.number)),
+      number: candidate.number,
+      votes: candidate.votes,
+    )),
+    column_total: (c, v) => [Subtotaal kolom #c: #v],
+    sum_total: columns => [Totaal lijst (kolom #columns)],
   )
+}
+
+#pagebreak(weak: true)
+
+#emph_block[Deze pagina is expres leeg]
+
+Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
+
+#pagebreak(weak: true)
+
+
+= Ondertekening
+
+=== Datum
+
+#textbox[Datum en tijd:][Plaats:]
+
+== Verplicht: voorzitter en #is_municipality[twee][vier] leden van het stembureau
+
+=== Voorzitter van het gemeentelijk stembureau:
+
+#textbox[Naam:][Handtekening:]
+
+=== #is_municipality[Twee][Vier] eden van het #location_type
+
+#textbox[Naam:][Handtekening:]
+#textbox[Naam:][Handtekening:]
+
+#is_municipality[][
+  #textbox[Naam:][Handtekening:]
+  #textbox[Naam:][Handtekening:]
+]
+
+== Ondertekening door andere aanwezige leden van het stembureau
+
+=== Extra ondertekening: (niet verplicht)
+
+#for i in range(0, 5) [
+  #textbox[Naam:][Handtekening:]
 ]

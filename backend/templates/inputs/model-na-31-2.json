@@ -14,7 +14,389 @@
         "name": "Political Group A",
         "candidates": [
           { "number": 1, "initials": "A.", "first_name": "Alice", "last_name": "Foo", "locality": "Amsterdam", "gender": "Female" },
-          { "number": 2, "initials": "C.", "first_name": "Charlie", "last_name": "Doe", "locality": "Rotterdam" }
+          { "number": 2, "initials": "C.", "first_name": "Charlie", "last_name": "Doe", "locality": "Rotterdam" },
+          {
+            "number": 3,
+            "initials": "B.",
+            "first_name": "Bob",
+            "last_name": "Bar",
+            "locality": "Utrecht"
+          },
+          {
+            "number": 4,
+            "initials": "D.",
+            "first_name": "David",
+            "last_name": "Baz",
+            "locality": "The Hague"
+          },
+          {
+            "number": 5,
+            "initials": "E.",
+            "first_name": "Eve",
+            "last_name": "Qux",
+            "locality": "Amsterdam"
+          },
+          {
+            "number": 6,
+            "initials": "F.",
+            "first_name": "Frank",
+            "last_name": "Quux",
+            "locality": "Groningen"
+          },
+          {
+            "number": 7,
+            "initials": "G.",
+            "first_name": "Grace",
+            "last_name": "Corge",
+            "locality": "Eindhoven"
+          },
+          {
+            "number": 8,
+            "initials": "H.",
+            "first_name": "Heidi",
+            "last_name": "Grault",
+            "locality": "Tilburg"
+          },
+          {
+            "number": 9,
+            "initials": "I.",
+            "first_name": "Ivan",
+            "last_name": "Garply",
+            "locality": "Amsterdam"
+          },
+          {
+            "number": 10,
+            "initials": "J.",
+            "first_name": "Judy",
+            "last_name": "Waldo",
+            "locality": "Amsterdam"
+          },
+          {
+            "number": 11,
+            "initials": "K.",
+            "first_name": "Kevin",
+            "last_name": "Fred",
+            "locality": "Haarlem"
+          },
+          {
+            "number": 12,
+            "initials": "L.",
+            "first_name": "Laura",
+            "last_name": "Plugh",
+            "locality": "Delft"
+          },
+          {
+            "number": 13,
+            "initials": "M.",
+            "first_name": "Mike",
+            "last_name": "Xyzzy",
+            "locality": "Leiden"
+          },
+          {
+            "number": 14,
+            "initials": "N.",
+            "first_name": "Nina",
+            "last_name": "Thud",
+            "locality": "Breda"
+          },
+          {
+            "number": 15,
+            "initials": "O.",
+            "first_name": "Oscar",
+            "last_name": "Plugh",
+            "locality": "Nijm,egen"
+          },
+          {
+            "number": 16,
+            "initials": "P.",
+            "first_name": "Paul",
+            "last_name": "Waldo",
+            "locality": "Arnhem"
+          },
+          {
+            "number": 17,
+            "initials": "Q.",
+            "first_name": "Quinn",
+            "last_name": "Garply",
+            "locality": "Gouda"
+          },
+          {
+            "number": 18,
+            "initials": "R.",
+            "first_name": "Rachel",
+            "last_name": "Corge",
+            "locality": "Zwolle"
+          },
+          {
+            "number": 19,
+            "initials": "S.",
+            "first_name": "Sam",
+            "last_name": "Grault",
+            "locality": "Leeuwarden"
+          },
+          {
+            "number": 20,
+            "initials": "T.",
+            "first_name": "Tom",
+            "last_name": "Foo",
+            "locality": "Arnhem"
+          },
+          { "number": 1, "initials": "A.", "first_name": "Alice", "last_name": "Foo", "locality": "Amsterdam", "gender": "Female" },
+          { "number": 2, "initials": "C.", "first_name": "Charlie", "last_name": "Doe", "locality": "Rotterdam" },
+          {
+            "number": 3,
+            "initials": "B.",
+            "first_name": "Bob",
+            "last_name": "Bar",
+            "locality": "Utrecht"
+          },
+          {
+            "number": 4,
+            "initials": "D.",
+            "first_name": "David",
+            "last_name": "Baz",
+            "locality": "The Hague"
+          },
+          {
+            "number": 5,
+            "initials": "E.",
+            "first_name": "Eve",
+            "last_name": "Qux",
+            "locality": "Amsterdam"
+          },
+          {
+            "number": 6,
+            "initials": "F.",
+            "first_name": "Frank",
+            "last_name": "Quux",
+            "locality": "Groningen"
+          },
+          {
+            "number": 7,
+            "initials": "G.",
+            "first_name": "Grace",
+            "last_name": "Corge",
+            "locality": "Eindhoven"
+          },
+          {
+            "number": 8,
+            "initials": "H.",
+            "first_name": "Heidi",
+            "last_name": "Grault",
+            "locality": "Tilburg"
+          },
+          {
+            "number": 9,
+            "initials": "I.",
+            "first_name": "Ivan",
+            "last_name": "Garply",
+            "locality": "Amsterdam"
+          },
+          {
+            "number": 10,
+            "initials": "J.",
+            "first_name": "Judy",
+            "last_name": "Waldo",
+            "locality": "Amsterdam"
+          },
+          {
+            "number": 11,
+            "initials": "K.",
+            "first_name": "Kevin",
+            "last_name": "Fred",
+            "locality": "Haarlem"
+          },
+          {
+            "number": 12,
+            "initials": "L.",
+            "first_name": "Laura",
+            "last_name": "Plugh",
+            "locality": "Delft"
+          },
+          {
+            "number": 13,
+            "initials": "M.",
+            "first_name": "Mike",
+            "last_name": "Xyzzy",
+            "locality": "Leiden"
+          },
+          {
+            "number": 14,
+            "initials": "N.",
+            "first_name": "Nina",
+            "last_name": "Thud",
+            "locality": "Breda"
+          },
+          {
+            "number": 15,
+            "initials": "O.",
+            "first_name": "Oscar",
+            "last_name": "Plugh",
+            "locality": "Nijm,egen"
+          },
+          {
+            "number": 16,
+            "initials": "P.",
+            "first_name": "Paul",
+            "last_name": "Waldo",
+            "locality": "Arnhem"
+          },
+          {
+            "number": 17,
+            "initials": "Q.",
+            "first_name": "Quinn",
+            "last_name": "Garply",
+            "locality": "Gouda"
+          },
+          {
+            "number": 18,
+            "initials": "R.",
+            "first_name": "Rachel",
+            "last_name": "Corge",
+            "locality": "Zwolle"
+          },
+          {
+            "number": 19,
+            "initials": "S.",
+            "first_name": "Sam",
+            "last_name": "Grault",
+            "locality": "Leeuwarden"
+          },
+          {
+            "number": 20,
+            "initials": "T.",
+            "first_name": "Tom",
+            "last_name": "Foo",
+            "locality": "Arnhem"
+          },
+          { "number": 1, "initials": "A.", "first_name": "Alice", "last_name": "Foo", "locality": "Amsterdam", "gender": "Female" },
+          { "number": 2, "initials": "C.", "first_name": "Charlie", "last_name": "Doe", "locality": "Rotterdam" },
+          {
+            "number": 3,
+            "initials": "B.",
+            "first_name": "Bob",
+            "last_name": "Bar",
+            "locality": "Utrecht"
+          },
+          {
+            "number": 4,
+            "initials": "D.",
+            "first_name": "David",
+            "last_name": "Baz",
+            "locality": "The Hague"
+          },
+          {
+            "number": 5,
+            "initials": "E.",
+            "first_name": "Eve",
+            "last_name": "Qux",
+            "locality": "Amsterdam"
+          },
+          {
+            "number": 6,
+            "initials": "F.",
+            "first_name": "Frank",
+            "last_name": "Quux",
+            "locality": "Groningen"
+          },
+          {
+            "number": 7,
+            "initials": "G.",
+            "first_name": "Grace",
+            "last_name": "Corge",
+            "locality": "Eindhoven"
+          },
+          {
+            "number": 8,
+            "initials": "H.",
+            "first_name": "Heidi",
+            "last_name": "Grault",
+            "locality": "Tilburg"
+          },
+          {
+            "number": 9,
+            "initials": "I.",
+            "first_name": "Ivan",
+            "last_name": "Garply",
+            "locality": "Amsterdam"
+          },
+          {
+            "number": 10,
+            "initials": "J.",
+            "first_name": "Judy",
+            "last_name": "Waldo",
+            "locality": "Amsterdam"
+          },
+          {
+            "number": 11,
+            "initials": "K.",
+            "first_name": "Kevin",
+            "last_name": "Fred",
+            "locality": "Haarlem"
+          },
+          {
+            "number": 12,
+            "initials": "L.",
+            "first_name": "Laura",
+            "last_name": "Plugh",
+            "locality": "Delft"
+          },
+          {
+            "number": 13,
+            "initials": "M.",
+            "first_name": "Mike",
+            "last_name": "Xyzzy",
+            "locality": "Leiden"
+          },
+          {
+            "number": 14,
+            "initials": "N.",
+            "first_name": "Nina",
+            "last_name": "Thud",
+            "locality": "Breda"
+          },
+          {
+            "number": 15,
+            "initials": "O.",
+            "first_name": "Oscar",
+            "last_name": "Plugh",
+            "locality": "Nijm,egen"
+          },
+          {
+            "number": 16,
+            "initials": "P.",
+            "first_name": "Paul",
+            "last_name": "Waldo",
+            "locality": "Arnhem"
+          },
+          {
+            "number": 17,
+            "initials": "Q.",
+            "first_name": "Quinn",
+            "last_name": "Garply",
+            "locality": "Gouda"
+          },
+          {
+            "number": 18,
+            "initials": "R.",
+            "first_name": "Rachel",
+            "last_name": "Corge",
+            "locality": "Zwolle"
+          },
+          {
+            "number": 19,
+            "initials": "S.",
+            "first_name": "Sam",
+            "last_name": "Grault",
+            "locality": "Leeuwarden"
+          },
+          {
+            "number": 20,
+            "initials": "T.",
+            "first_name": "Tom",
+            "last_name": "Foo",
+            "locality": "Arnhem"
+          }
         ]
       }
     ]
@@ -75,6 +457,238 @@
           {
             "number": 2,
             "votes": 10
+          },
+          {
+            "number": 3,
+            "votes": 0
+          },
+          {
+            "number": 4,
+            "votes": 0
+          },
+          {
+            "number": 5,
+            "votes": 0
+          },
+          {
+            "number": 6,
+            "votes": 0
+          },
+          {
+            "number": 7,
+            "votes": 0
+          },
+          {
+            "number": 8,
+            "votes": 0
+          },
+          {
+            "number": 9,
+            "votes": 0
+          },
+          {
+            "number": 10,
+            "votes": 0
+          },
+          {
+            "number": 11,
+            "votes": 0
+          },
+          {
+            "number": 12,
+            "votes": 0
+          },
+          {
+            "number": 13,
+            "votes": 0
+          },
+          {
+            "number": 14,
+            "votes": 0
+          },
+          {
+            "number": 15,
+            "votes": 0
+          },
+          {
+            "number": 16,
+            "votes": 0
+          },
+          {
+            "number": 17,
+            "votes": 0
+          },
+          {
+            "number": 18,
+            "votes": 0
+          },
+          {
+            "number": 19,
+            "votes": 0
+          },
+          {
+            "number": 20,
+            "votes": 0
+          },
+                    {
+            "number": 1,
+            "votes": 20
+          },
+          {
+            "number": 2,
+            "votes": 10
+          },
+          {
+            "number": 3,
+            "votes": 0
+          },
+          {
+            "number": 4,
+            "votes": 0
+          },
+          {
+            "number": 5,
+            "votes": 0
+          },
+          {
+            "number": 6,
+            "votes": 0
+          },
+          {
+            "number": 7,
+            "votes": 0
+          },
+          {
+            "number": 8,
+            "votes": 0
+          },
+          {
+            "number": 9,
+            "votes": 0
+          },
+          {
+            "number": 10,
+            "votes": 0
+          },
+          {
+            "number": 11,
+            "votes": 0
+          },
+          {
+            "number": 12,
+            "votes": 0
+          },
+          {
+            "number": 13,
+            "votes": 0
+          },
+          {
+            "number": 14,
+            "votes": 0
+          },
+          {
+            "number": 15,
+            "votes": 0
+          },
+          {
+            "number": 16,
+            "votes": 0
+          },
+          {
+            "number": 17,
+            "votes": 0
+          },
+          {
+            "number": 18,
+            "votes": 0
+          },
+          {
+            "number": 19,
+            "votes": 0
+          },
+          {
+            "number": 20,
+            "votes": 0
+          },
+                    {
+            "number": 1,
+            "votes": 20
+          },
+          {
+            "number": 2,
+            "votes": 10
+          },
+          {
+            "number": 3,
+            "votes": 0
+          },
+          {
+            "number": 4,
+            "votes": 0
+          },
+          {
+            "number": 5,
+            "votes": 0
+          },
+          {
+            "number": 6,
+            "votes": 0
+          },
+          {
+            "number": 7,
+            "votes": 0
+          },
+          {
+            "number": 8,
+            "votes": 0
+          },
+          {
+            "number": 9,
+            "votes": 0
+          },
+          {
+            "number": 10,
+            "votes": 0
+          },
+          {
+            "number": 11,
+            "votes": 0
+          },
+          {
+            "number": 12,
+            "votes": 0
+          },
+          {
+            "number": 13,
+            "votes": 0
+          },
+          {
+            "number": 14,
+            "votes": 0
+          },
+          {
+            "number": 15,
+            "votes": 0
+          },
+          {
+            "number": 16,
+            "votes": 0
+          },
+          {
+            "number": 17,
+            "votes": 0
+          },
+          {
+            "number": 18,
+            "votes": 0
+          },
+          {
+            "number": 19,
+            "votes": 0
+          },
+          {
+            "number": 20,
+            "votes": 0
           }
         ]
       }

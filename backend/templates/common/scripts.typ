@@ -57,7 +57,7 @@
     align: (center, right),
     inset: 9pt,
     grid.cell(align: right, stroke: 0.5pt + black, text(number-width: "tabular", value)),
-    grid.cell(stroke: 0.5pt + black, align: center, fill: bg, text(fill: fill, [*#letter*])),
+    grid.cell(stroke: 0.5pt + black, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
     grid.cell(align: horizon + left, content),
   )
 }
@@ -105,6 +105,21 @@
   )
 }
 
+#let empty_lines(lines) = {
+  table(
+    columns: 1fr,
+    stroke: (
+      y: 0.25pt + black,
+      x: (paint: black, thickness: 0.25pt, dash: "densely-dotted"),
+    ),
+    inset: (x: 4pt, y: 8pt),
+    table.vline(stroke: none),
+    table.hline(stroke: 1pt + black),
+    ..range(0, lines).map(_ => table.cell(align: horizon, "")).flatten(),
+    table.vline(stroke: none),
+  )
+}
+
 #let empty_table(columns: (), headers: (), values: (), rows: 0) = {
   light_table(
     columns: columns,
@@ -119,6 +134,24 @@
       })
       .flatten(),
   )
+}
+
+#let candidate_name(election_candidate) = {
+  if "last_name_prefix" in election_candidate [
+    #election_candidate.last_name_prefix
+  ]
+  election_candidate.last_name
+  election_candidate.initials
+  if "first_name" in election_candidate [ (#election_candidate.first_name) ]
+  if "gender" in election_candidate [
+    #if election_candidate.gender == "Male" [
+      (m)
+    ] else if election_candidate.gender == "Female" [
+      (v)
+    ] else if election_candidate.gender == "X" [
+      (x)
+    ]
+  ]
 }
 
 /// Display a TODO label

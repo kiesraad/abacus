@@ -54,7 +54,7 @@
 ]
 
 #let document_numbering(doc) = [
-  #set heading(numbering: "1.1", hanging-indent: 0pt)
+  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: "")
   #show heading.where(level: 1): set heading(numbering: "Deel 1.1 -")
   #show heading.where(level: 3): it => [
     #block(

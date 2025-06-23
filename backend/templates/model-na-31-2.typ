@@ -8,8 +8,11 @@
 ) [#municipal] else [#public_body]
 
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
-
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+#let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
+
+#let list_votes = input.election.political_groups.zip(input.summary.political_group_votes)
+
 
 #show: doc => conf(
   doc,
@@ -40,7 +43,7 @@ Kieskring #TODO #sym.arrow.r #location_name
 Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
 
 #emph_block[
-  In #is_municipality[deze gemeente][dit openbaar lichaam] is gekozen voor *centrale stemopneming*.
+  In #this_location is gekozen voor *centrale stemopneming*.
   Ieder stembureau heeft direct na het stemmen geteld hoeveel stemmen elke lijst
   kreeg. Het *#location_type* telt de stemmen per kandidaat en telt daarna de resultaten van alle stembureaus bij elkaar op.
 ]
@@ -190,6 +193,100 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 ][
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
 
+  #sum(
+    letterbox("A")[#input.summary.voters_counts.poll_card_count][Stempassen],
+    letterbox("B")[#input.summary.voters_counts.proxy_certificate_count][Volmachtbewijzen (schriftelijk of via ingevulde stempas],
+    letterbox("C")[#input.summary.voters_counts.voter_card_count][Kiezerspassen],
+    letterbox(
+      "D",
+      light: false,
+    )[#input.summary.voters_counts.total_admitted_voters_count][Totaal toegelaten kiezers (A+B+C)],
+  )
 ]
 
+#pagebreak(weak: true)
 
+== Uitgebrachte stemmen
+
+#sum(
+  sum(
+    ..list_votes.map(((list, votes)) => {
+      letterbox([E.#list.number])[#votes.total][Totaal lijst #list.number - #list.name]
+    }),
+    letterbox("E", light: false)[#input.summary.votes_counts.votes_candidates_count][*Totaal stemmen op kandidaten* (tel E.1 t/m E.x op)]
+  ),
+  letterbox("F")[#input.summary.votes_counts.blank_votes_count][Blanco stemmen],
+  letterbox("G")[#input.summary.votes_counts.invalid_votes_count][Ongeldige stemmen],
+  letterbox("H", light: false)[#input.summary.votes_counts.invalid_votes_count][*Totaal uitgebrachte stemmen (E+F+G)*],
+)
+
+#pagebreak(weak: true)
+
+== Verschillen tussen aantal kiezers en uitgebrachte stemmen
+
+=== Is bij alle afzonderlijke stembureaus in #this_location het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
+
+#checkbox[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>)*]
+
+#checkbox[Nee, er zijn stembureaus met een verschil]
+
+=== Voor de stembureaus met de nummers #input.summary.differences_counts.more_ballots_count.polling_stations.map(str).join(", ") zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
+
+#letterbox("I")[#input.summary.differences_counts.more_ballots_count.count][Totaal aantal méér getelde stemmen in deze stembureaus]
+
+=== Voor de stembureaus met de nummers #input.summary.differences_counts.fewer_ballots_count.polling_stations.map(str).join(", ") zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
+
+#letterbox("J")[#input.summary.differences_counts.fewer_ballots_count.count][Totaal aantal minder getelde stemmen in deze stembureaus]
+
+== Uitkomst controleprotocol <monitoring_protocol>
+
+Voer de controle uit volgens de stappen in het controleprotocol.
+
+=== Kruis aan wat van toepassing is:
+
+#checkbox[Er zijn geen verschillen geconstateerd.]
+
+#checkbox[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
+
+#empty_lines(5)
+
+#pagebreak(weak: true)
+
+== Stemmen per lijst en per kandidaat
+
+
+
+#for political_group in input.summary.political_group_votes [
+  #let election_pg = input.election.political_groups.find(pg => pg.number == political_group.number)
+
+  #text(size: 16pt, weight: "semibold")[Lijst #political_group.number #election_pg.name]
+
+  #set page(columns: 2)
+
+  #table(
+    columns: (1fr, 3em, auto),
+    inset: 8pt,
+    stroke: 0.5pt + luma(122),
+    fill: (_, y) => if y > 1 and calc.even(y) { luma(240) },
+    table.hline(stroke: none),
+    table.header(
+      table.cell(stroke: none, align: bottom, text(size: 8pt, weight: "semibold", "Kandidaat")),
+      table.cell(stroke: none, align: bottom, text(size: 8pt, weight: "semibold", "")),
+      table.cell(stroke: none, align: bottom, text(size: 8pt, weight: "semibold", "Stemmen")),
+    ),
+    table.hline(stroke: 1pt + black),
+    ..for candidate in political_group.candidate_votes {
+      let election_candidate = election_pg.candidates.find(c => c.number == candidate.number)
+
+      (
+        candidate_name(election_candidate),
+        table.cell(fill: luma(221), align: center, text(number-width: "tabular", weight: "bold", [#candidate.number])),
+        table.cell(align: right, text(number-width: "tabular", [#candidate.number])),
+      )
+    },
+    table.hline(stroke: 1pt + black),
+    // empty line
+    table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 3pt, []),
+    table.cell(colspan: 3, fill: white, align: center, [Subtotaal kolom 1: #political_group.total]),
+  )
+]

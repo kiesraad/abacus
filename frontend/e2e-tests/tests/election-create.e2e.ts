@@ -17,7 +17,7 @@ test.describe("Election creation", () => {
   test("it uploads an election file and candidate list", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
-    const initialElectionCount = await overviewPage.electionCount();
+    const initialElectionCount = await overviewPage.elections.count();
     const initialReadyStateCount = await page.getByText("Klaar voor invoer").count();
     await overviewPage.create.click();
 
@@ -57,13 +57,11 @@ test.describe("Election creation", () => {
     await expect(checkAndSavePage.header).toBeVisible();
     await checkAndSavePage.save.click();
 
-    // Redefine the Overview page, so we can locate the newly
-    // added objects
     await expect(overviewPage.header).toBeVisible();
     // Check if the amount of elections by this title is greater than before the import
-    expect(await overviewPage.electionCount()).toBeGreaterThan(initialElectionCount);
+    expect(await overviewPage.elections.count()).toBeGreaterThan(initialElectionCount);
     // Check if the amount of "Klaar voor invoer states" is greater than before the import
-    expect(await overviewPage.readyStateCount()).toBeGreaterThan(initialReadyStateCount);
+    expect(await overviewPage.electionsInReadyState.count()).toBeGreaterThan(initialReadyStateCount);
   });
 
   test("it fails on incorrect hash", async ({ page }) => {

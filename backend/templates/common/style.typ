@@ -25,8 +25,8 @@
 
   #set page(
     paper: "a4",
-    margin: (x: 2.0cm, y: 2.0cm),
-    numbering: "1 / 1",
+    margin: (x: 1.5cm, y: 2.0cm),
+    numbering: (current, total) => [Pagina #current van #total],
     header: context (
       grid(
         columns: (1fr, auto),
@@ -44,10 +44,7 @@
         text(size: 8pt, footer),
         align(
           end,
-          counter(page).display(
-            (current, total) => [Pagina #current van #total],
-            both: true,
-          ),
+          counter(page).display(both: true),
         ),
       )
     ),

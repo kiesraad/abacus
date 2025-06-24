@@ -120,6 +120,7 @@
 #let candidate_name(election_candidate) = {
   if "last_name_prefix" in election_candidate {
     election_candidate.last_name_prefix
+    " "
   }
   election_candidate.last_name
   " "
@@ -195,47 +196,84 @@
   sum_total: [(#columns)],
 ) = {
   // Counter that keeps track of the column number
-  let c = counter("column")
+  let column = 0
 
-  // Counter that keeps track of the total number of votes within a column
-  let v = counter("votes")
+  // Row counter
+  let rc = 0
 
-  columns(2, table(
-    columns: (1fr, 3em, auto),
-    inset: 8pt,
-    stroke: 0.5pt + silver,
-    fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
-    table.hline(stroke: none),
-    table.header(..headers.map(h => table.cell(stroke: none, align: bottom, text(size: 8pt, weight: "semibold", h)))),
-    table.hline(stroke: 1pt + black),
-    ..values
-      .map(c => (
-        table.cell(c.name),
-        table.cell(fill: luma(213), align: center, text(number-width: "tabular", weight: "bold", [#c.number])),
-        table.cell(align: right, text(number-width: "tabular", {
-          // Sum the number of votes in this column
-          v.update(n => n + c.votes)
+  // Vote counter
+  let votes = 0
 
-          str(c.votes)
-        })),
-      ))
-      .flatten(),
-    table.footer(
-      table.hline(stroke: 1pt + black),
-      // Empty line
-      table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 3pt, []),
-      table.cell(colspan: 3, fill: white, align: center, {
-        // Increment the column counter
-        c.step()
+  // Max rows per table / column
+  let break_count = 25
+  let total_rows = values.len()
 
-        // Caller defined render of column totals
-        column_total(context c.display(), context v.display())
+  // Number of rows remaining on the last page
+  let remainder = calc.rem(total_rows, break_count * 2)
 
-        // Reset the votes per column counter
-        v.update(n => 0)
-      }),
-    ),
-  ))
+  set text(size: 8pt)
+
+  columns(2, {
+    while rc < total_rows {
+      table(
+        columns: (1fr, 2.5em, auto),
+        inset: 8pt,
+        stroke: 0.5pt + silver,
+        fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
+        table.hline(stroke: none),
+        table.header(
+          ..headers.map(h => table.cell(stroke: none, align: bottom, text(size: 8pt, weight: "semibold", h)))
+        ),
+        table.hline(stroke: 1pt + black),
+        ..while rc < total_rows {
+          let c = values.at(rc)
+          // Row counter starting on the last page
+          let togo = rc - (total_rows - remainder)
+          let half_remainder = calc.floor(remainder / 2)
+
+          (
+            table.cell(c.name),
+            table.cell(fill: luma(213), align: center, text(number-width: "tabular", weight: "bold", [#c.number])),
+            table.cell(align: right, text(number-width: "tabular", {
+              // Sum the number of votes in this column
+              votes += c.votes
+
+              str(c.votes)
+            })),
+          )
+
+          rc += 1
+
+          if togo > 0 {
+            if calc.rem(togo, half_remainder) == 0 {
+              break
+            }
+          } else if calc.rem(rc, break_count) == 0 {
+            break
+          }
+        }.flatten(),
+        table.footer(
+          table.hline(stroke: 1pt + black),
+          // Empty line
+          table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 3pt, []),
+          table.cell(colspan: 3, fill: white, align: center, {
+            // Increment the column counter
+            column += 1
+
+            // Caller defined render of column totals
+            column_total(column, votes)
+
+            // Reset the votes per column counter
+            votes = 0
+          }),
+        ),
+      )
+
+      if rc < total_rows {
+        colbreak()
+      }
+    }
+  })
 
   grid(
     columns: (1fr, 8em),
@@ -243,12 +281,14 @@
     inset: 9pt,
     grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(context range(
       1,
-      c.get().first() + 1,
+      column + 1,
     )
       .map(str)
       .join(" + ")))),
     grid.cell(stroke: 0.5pt + black)[#total],
   )
+
+  pagebreak(weak: true)
 }
 
 /// Display a TODO label

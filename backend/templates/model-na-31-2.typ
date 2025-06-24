@@ -169,7 +169,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Aantal kiesgerechtigden
 
-#letterbox("A")[#input.election.number_of_voters][Kiesgerechtigden]
+#letterbox("Z")[#input.election.number_of_voters][Kiesgerechtigden]
 
 == Toegelaten kiezers
 
@@ -193,7 +193,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
     letterbox("A")[#input.summary.voters_counts.poll_card_count][Stempassen],
     letterbox(
       "B",
-    )[#input.summary.voters_counts.proxy_certificate_count][Volmachtbewijzen (schriftelijk of via ingevulde stempas],
+    )[#input.summary.voters_counts.proxy_certificate_count][Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
     letterbox("C")[#input.summary.voters_counts.voter_card_count][Kiezerspassen],
     letterbox(
       "D",

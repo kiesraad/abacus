@@ -3,6 +3,7 @@ import * as React from "react";
 import { FormField } from "../FormField/FormField";
 import { NumberInput } from "../NumberInput/NumberInput";
 import { InputGrid } from "./InputGrid";
+import cls from "./InputGrid.module.css";
 
 export interface InputGridRowProps {
   id: string;
@@ -19,6 +20,7 @@ export interface InputGridRowProps {
   autoFocusInput?: boolean;
   value?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  readOnly?: boolean;
 }
 
 export function InputGridRow({
@@ -36,6 +38,7 @@ export function InputGridRow({
   autoFocusInput,
   value,
   onChange,
+  readOnly,
 }: InputGridRowProps) {
   const hasError = errorsAndWarnings?.get(id) === "error";
   const hasWarning = errorsAndWarnings?.get(id) === "warning";
@@ -54,20 +57,24 @@ export function InputGridRow({
     <td key={`${id}-1`} id={`field-${id}`}>
       {field}
     </td>,
-    <td key={`${id}-2`} id={`cell-${id}`}>
+    <td key={`${id}-2`} id={`cell-${id}`} className={readOnly ? cls.readOnly : undefined}>
       <FormField hasError={!!errorMessageId || hasError} hasWarning={hasWarning}>
-        <NumberInput
-          key={id}
-          id={id}
-          name={name || id}
-          defaultValue={defaultValue}
-          autoFocus={autoFocusInput}
-          value={value}
-          onChange={onChange}
-          aria-labelledby={`field-${id} title-${id}`}
-          aria-invalid={errorMessage !== undefined}
-          aria-errormessage={errorMessage}
-        />
+        {readOnly ? (
+          <span className="font-number">{value !== undefined ? value : defaultValue}</span>
+        ) : (
+          <NumberInput
+            key={id}
+            id={id}
+            name={name || id}
+            defaultValue={defaultValue}
+            autoFocus={autoFocusInput}
+            value={value}
+            onChange={onChange}
+            aria-labelledby={`field-${id} title-${id}`}
+            aria-invalid={errorMessage !== undefined}
+            aria-errormessage={errorMessage}
+          />
+        )}
       </FormField>
     </td>,
     <td key={`${id}-3`} id={`title-${id}`}>

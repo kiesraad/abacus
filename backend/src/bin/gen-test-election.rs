@@ -6,17 +6,25 @@ use std::{
 };
 
 use abacus::{
+    data_entry::{
+        CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
+        VotersCounts, VotesCounts,
+        repository::{PollingStationDataEntries, PollingStationResultsEntries},
+        status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
+    },
     election::{
         CandidateGender, ElectionCategory, ElectionStatus, ElectionWithPoliticalGroups,
         NewElection, PoliticalGroup, repository::Elections,
     },
     eml::{EML110, EML230, EMLDocument},
     fixtures,
+    pdf_gen::models::{ModelNa31_2Input, PdfModel},
     polling_station::{
         PollingStation, PollingStationRequest, PollingStationType, repository::PollingStations,
     },
+    summary::ElectionSummary,
 };
-use chrono::{Datelike, Days, NaiveDate};
+use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use clap::Parser;
 use rand::seq::IndexedRandom;
 use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
@@ -62,13 +70,35 @@ struct Args {
     #[arg(long, default_value = "100_000..250_000", value_parser = parse_range::<u32>)]
     voters: Range<u32>,
 
-    /// Export the election defintion, candidate list and polling stations to a directory
-    #[arg(long)]
-    export_definition: Option<PathBuf>,
-
     /// Number of seats in the election
     #[arg(long, default_value = "9..=45", value_parser = parse_range::<u32>)]
     seats: Range<u32>,
+
+    /// Include (part of) data entry for this election
+    #[arg(long)]
+    with_data_entry: bool,
+
+    /// Percentage of the first data entry to complete if data entry is included
+    #[arg(long, default_value = "100", value_parser = parse_range::<u32>)]
+    first_data_entry: Range<u32>,
+
+    /// Percentage of the completed first data entries that also get a second data entry
+    #[arg(long, default_value = "100", value_parser = parse_range::<u32>)]
+    second_data_entry: Range<u32>,
+
+    /// Percentage of voters that voted (given we generate data entries)
+    #[arg(long, default_value = "60..=85", value_parser = parse_range::<u32>)]
+    turnout: Range<u32>,
+
+    #[arg(long, default_value = "1100", value_parser = parse_range::<u32>)]
+    candidate_distribution_slope: Range<u32>,
+
+    #[arg(long, default_value = "1100", value_parser = parse_range::<u32>)]
+    political_group_distribution_slope: Range<u32>,
+
+    /// Export the election defintion, candidate list and polling stations to a directory
+    #[arg(long)]
+    export_definition: Option<PathBuf>,
 }
 
 fn parse_range<T>(range: &str) -> Result<Range<T>, Box<dyn Error + 'static + Send + Sync>>
@@ -124,9 +154,41 @@ async fn main() -> Result<(), Box<dyn Error>> {
         election.id, election.name
     );
 
+    let data_entry_completed = if args.with_data_entry {
+        let data_entries_repo = PollingStationDataEntries::new(pool.clone());
+        let (_, second_entries) = generate_data_entry(
+            &election,
+            &polling_stations,
+            &mut rng,
+            data_entries_repo,
+            &args,
+        )
+        .await;
+        second_entries == polling_stations.len()
+    } else {
+        false
+    };
+
     if let Some(export_dir) = args.export_definition {
+        let results = if data_entry_completed {
+            let results_repo = PollingStationResultsEntries::new(pool.clone());
+            results_repo
+                .list_with_polling_stations(ps_repo, election.id)
+                .await
+                .expect("Could not load results")
+        } else {
+            vec![]
+        };
+
         // Export the election definition, candidate list and polling stations to a directory
-        export_election(&export_dir, &election, &polling_stations).await;
+        export_election(
+            &export_dir,
+            &election,
+            &polling_stations,
+            data_entry_completed,
+            results,
+        )
+        .await;
     }
 
     Ok(())
@@ -274,11 +336,235 @@ async fn generate_polling_stations(
     polling_stations
 }
 
+/// Generate and store data entries for the given election based on arguments
+async fn generate_data_entry(
+    election: &ElectionWithPoliticalGroups,
+    polling_stations: &[PollingStation],
+    rng: &mut impl rand::Rng,
+    data_entries_repo: PollingStationDataEntries,
+    args: &Args,
+) -> (usize, usize) {
+    info!("Generating data entries for election");
+    let now = chrono::Utc::now();
+    let first_entry_chance = rng.random_range(args.first_data_entry.clone()).min(100);
+    let second_entry_chance = rng.random_range(args.second_data_entry.clone()).min(100);
+
+    let group_slope =
+        rng.random_range(args.political_group_distribution_slope.clone()) as f64 / 1000.0;
+    let group_weights =
+        distribute_power_law_weights(rng, election.political_groups.len(), group_slope);
+
+    let mut generated_first_entries = 0;
+    let mut generated_second_entries = 0;
+
+    for ps in polling_stations {
+        if rng.random_ratio(first_entry_chance, 100) {
+            let ts = abacus::test_data_gen::datetime_around(rng, now, TimeDelta::hours(-24));
+
+            // extract number of voters from polling station, or generate some approx default
+            let voters_available = ps.number_of_voters.unwrap_or_else(|| {
+                election.number_of_voters as i64 / polling_stations.len() as i64
+            });
+
+            // number of voters that actually came and voted
+            let turnout = rng.random_range(args.turnout.clone()) as i64;
+            let voters_turned_out = u32::try_from((voters_available * turnout) / 100)
+                .expect("Failed to convert voters turned out to u32");
+
+            let candidate_slope =
+                rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
+            let results = generate_polling_station_results(
+                rng,
+                &election.political_groups,
+                voters_turned_out,
+                &group_weights,
+                candidate_slope,
+            );
+
+            if rng.random_ratio(second_entry_chance, 100) {
+                // generate a definitive data entry
+                let state = DataEntryStatus::Definitive(Definitive {
+                    first_entry_user_id: 5,  // first typist from users in fixtures
+                    second_entry_user_id: 6, // second typist from users in fixtures
+                    finished_at: ts,
+                });
+
+                data_entries_repo
+                    .make_definitive(ps.id, &state, &results)
+                    .await
+                    .expect("Could not create definitive data entry");
+                generated_second_entries += 1;
+            } else {
+                // generate only a first data entry
+                let state = DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
+                    first_entry_user_id: 5, // first typist from users in fixtures
+                    finalised_first_entry: results.clone(),
+                    first_entry_finished_at: ts,
+                });
+                data_entries_repo
+                    .upsert(ps.id, &state)
+                    .await
+                    .expect("Could not create first data entry");
+                generated_first_entries += 1;
+            };
+        }
+    }
+    (generated_first_entries, generated_second_entries)
+}
+
+fn generate_polling_station_results(
+    rng: &mut impl rand::Rng,
+    political_groups: &[PoliticalGroup],
+    number_of_votes: u32,
+    group_weights: &[f64],
+    candidate_distribution_slope: f64,
+) -> PollingStationResults {
+    let is_recount = rng.random_bool(0.05);
+    // generate a small percentage of blank votes
+    #[allow(clippy::cast_possible_truncation)]
+    let blank_votes = (number_of_votes as f64 * rng.random_range(0.0..0.02)) as u32;
+    let remaining_votes = number_of_votes - blank_votes;
+
+    // generate a small percentage of invalid votes
+    #[allow(clippy::cast_possible_truncation)]
+    let invalid_votes = (remaining_votes as f64 * rng.random_range(0.0..0.02)) as u32;
+    let remaining_votes = remaining_votes - invalid_votes;
+
+    // distribute the remaining votes for this polling station randomly according to a power law distribution
+    let pg_votes = distribute_fill_weights(rng, group_weights, remaining_votes, false);
+    PollingStationResults {
+        recounted: Some(is_recount),
+        voters_counts: VotersCounts {
+            poll_card_count: number_of_votes,
+            proxy_certificate_count: 0,
+            voter_card_count: 0,
+            total_admitted_voters_count: number_of_votes,
+        },
+        votes_counts: VotesCounts {
+            votes_candidates_count: remaining_votes,
+            blank_votes_count: blank_votes,
+            invalid_votes_count: invalid_votes,
+            total_votes_cast_count: number_of_votes,
+        },
+        voters_recounts: if is_recount {
+            Some(VotersCounts {
+                poll_card_count: number_of_votes,
+                proxy_certificate_count: 0,
+                voter_card_count: 0,
+                total_admitted_voters_count: number_of_votes,
+            })
+        } else {
+            None
+        },
+        differences_counts: DifferencesCounts::zero(),
+        political_group_votes: political_groups
+            .iter()
+            .zip(pg_votes)
+            .map(|(pg, votes)| {
+                // distribute the votes for this group among candidates, but give the most votes to the first candidate
+                let candidate_votes = distribute_power_law(
+                    rng,
+                    votes,
+                    pg.candidates.len(),
+                    candidate_distribution_slope,
+                    true,
+                );
+                PoliticalGroupVotes {
+                    number: pg.number,
+                    total: votes,
+                    candidate_votes: pg
+                        .candidates
+                        .iter()
+                        .zip(candidate_votes)
+                        .map(|(candidate, votes)| CandidateVotes {
+                            number: candidate.number,
+                            votes,
+                        })
+                        .collect(),
+                }
+            })
+            .collect(),
+    }
+}
+
+/// Generate weights for a power law distribution.
+/// The slope determines the shape of the distribution, if the slope is zero,
+/// the distribution is uniform. Beyond a slope of 2.0-5.0, the distribution becomes
+/// heavily skewed towards a single target.
+fn distribute_power_law_weights(rng: &mut impl rand::Rng, targets: usize, slope: f64) -> Vec<f64> {
+    // Generate power-law weights: w_i = x_i^-s
+    let mut weights: Vec<f64> = (0..targets)
+        .map(|_| {
+            // generate a uniform random number, avoid 0.0 for division by zero when normalizing
+            let x: f64 = rng.random_range(0.000_001..1.0);
+
+            // Calculate weight, using a power law distribution (i.e. we're over)
+            1.0 / x.powf(slope)
+        })
+        .collect();
+
+    // Normalize weights to sum to 1
+    let sum: f64 = weights.iter().sum();
+    for w in weights.iter_mut() {
+        *w /= sum;
+    }
+
+    weights
+}
+
+/// Distribute a number of votes to a set of weighed targets. If the sorted flag is set,
+/// the targets are sorted from high to low weight.
+fn distribute_fill_weights(
+    rng: &mut impl rand::Rng,
+    weights: &[f64],
+    votes: u32,
+    sorted: bool,
+) -> Vec<u32> {
+    // Convert weights to integer quantities
+    #[allow(clippy::cast_possible_truncation)]
+    let mut result: Vec<u32> = weights
+        .iter()
+        .map(|w| (w * votes as f64).floor() as u32)
+        .collect();
+
+    // Fix rounding discrepancy, assign the rest randomly
+    let mut remaining = votes - result.iter().sum::<u32>();
+    while remaining > 0 {
+        let i = rng.random_range(0..weights.len());
+        result[i] += 1;
+        remaining -= 1;
+    }
+
+    if sorted {
+        // sort from high to low
+        result.sort_by(|a, b| b.cmp(a));
+    }
+
+    result
+}
+
+/// Distribute the votes to a number of targets using a power law distribution.
+/// The slope determines the shape of the distribution, if the slope is zero,
+/// the distribution is uniform. Beyond a slope of 2.0-5.0, the distribution becomes
+/// heavily skewed towards a single target.
+fn distribute_power_law(
+    rng: &mut impl rand::Rng,
+    votes: u32,
+    targets: usize,
+    slope: f64,
+    sorted: bool,
+) -> Vec<u32> {
+    let weights = distribute_power_law_weights(rng, targets, slope);
+    distribute_fill_weights(rng, &weights, votes, sorted)
+}
+
 /// Export an election (in EML) to the specified directory
 async fn export_election(
     export_dir: &Path,
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
+    export_results_json: bool,
+    results: Vec<(PollingStation, PollingStationResults)>,
 ) {
     if export_dir.exists() && !export_dir.is_dir() {
         panic!("Export directory already exists and is not a directory");
@@ -293,19 +579,19 @@ async fn export_election(
     let transaction_id = "1";
 
     info!("Converting election to EML definitions");
-    let definition = EML110::definition_from_abacus_election(election, transaction_id);
-    let polling_stations =
+    let definition_eml = EML110::definition_from_abacus_election(election, transaction_id);
+    let polling_stations_eml =
         EML110::polling_stations_from_election(election, polling_stations, transaction_id);
-    let candidates = EML230::candidates_from_abacus_election(election, transaction_id);
+    let candidates_eml = EML230::candidates_from_abacus_election(election, transaction_id);
 
     info!("Converting EML definitions to XML strings");
-    let definition = definition
+    let definition_data = definition_eml
         .to_xml_string()
         .expect("Failed to convert definition to XML string");
-    let polling_stations = polling_stations
+    let polling_stations_data = polling_stations_eml
         .to_xml_string()
         .expect("Failed to convert polling stations to XML string");
-    let candidates = candidates
+    let candidates_data = candidates_eml
         .to_xml_string()
         .expect("Failed to convert candidates to XML string");
 
@@ -323,15 +609,40 @@ async fn export_election(
     info!("Polling stations will be written to {:?}", ps_filename);
 
     // Write to files
-    tokio::fs::write(def_filename, definition)
+    tokio::fs::write(def_filename, definition_data)
         .await
         .expect("Failed to write definition file");
-    tokio::fs::write(candidate_filename, candidates)
+    tokio::fs::write(candidate_filename, candidates_data)
         .await
         .expect("Failed to write candidates file");
-    tokio::fs::write(ps_filename, polling_stations)
+    tokio::fs::write(ps_filename, polling_stations_data)
         .await
         .expect("Failed to write polling stations file");
+
+    if export_results_json {
+        let election_summary = ElectionSummary::from_results(election, &results)
+            .expect("Failed to create election summary");
+        let input = PdfModel::ModelNa31_2(ModelNa31_2Input {
+            polling_stations: polling_stations.iter().map(Clone::clone).collect(),
+            summary: election_summary,
+            election: election.clone(),
+            hash: "0000".to_string(),
+            creation_date_time: chrono::Utc::now().format("%d-%m-%Y %H:%M").to_string(),
+        });
+        let input_json = input.get_input().expect("Failed to get model input");
+        let results_filename = export_dir.join(format!(
+            "input_{}_{}.json",
+            election.election_id,
+            input.as_filename()
+        ));
+        info!(
+            "Writing results JSON file for input to PDF model to {:?}",
+            results_filename
+        );
+        tokio::fs::write(results_filename, input_json)
+            .await
+            .expect("Failed to write model input file");
+    }
 
     info!("Files written successfully");
 }

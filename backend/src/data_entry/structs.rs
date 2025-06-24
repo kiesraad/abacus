@@ -182,7 +182,6 @@ pub struct DifferencesCounts {
     pub no_explanation_count: Count,
 }
 
-#[cfg(test)]
 impl DifferencesCounts {
     pub fn zero() -> DifferencesCounts {
         DifferencesCounts {

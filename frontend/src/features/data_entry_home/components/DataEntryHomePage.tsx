@@ -127,7 +127,7 @@ export function DataEntryHomePage() {
       )}
       <main>
         <article id="polling-station-choice-form">
-          <PollingStationChoiceForm anotherEntry={!!dataEntryDone} />
+          <PollingStationChoiceForm anotherEntry={!!dataEntryDone || !!dataEntryNotification} />
         </article>
         <ElectionProgress />
       </main>

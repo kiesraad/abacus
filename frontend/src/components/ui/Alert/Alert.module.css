@@ -138,7 +138,7 @@
   &:global(.small) {
     padding: 1rem 1.5rem;
     align-items: center;
-    max-width: 50rem;
+    max-width: 51rem;
     width: fit-content;
 
     aside {

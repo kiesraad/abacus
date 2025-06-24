@@ -6,6 +6,9 @@ export class CheckAndSavePage extends DataEntryBasePage {
   readonly fieldset: Locator;
   readonly summaryText: Locator;
   readonly summaryList: Locator;
+  readonly summaryListItemVotersAndVotes: Locator;
+  readonly summaryListItemDifferences: Locator;
+  readonly summaryListItemPoliticalGroupVotes1: Locator;
   readonly save: Locator;
   readonly complete: Locator;
   readonly acceptErrorsReminder: Locator;
@@ -15,10 +18,22 @@ export class CheckAndSavePage extends DataEntryBasePage {
     super(page);
 
     this.fieldset = page.getByRole("group", { name: "Controleren en opslaan" });
+
     this.summaryText = page.getByTestId("save-form-summary-text");
     this.summaryList = page.getByTestId("save-form-summary-list");
+    this.summaryListItemVotersAndVotes = page
+      .getByTestId("save-form-summary-list-voters_votes_counts")
+      .getByRole("listitem");
+    this.summaryListItemDifferences = page
+      .getByTestId("save-form-summary-list-differences_counts")
+      .getByRole("listitem");
+    this.summaryListItemPoliticalGroupVotes1 = page
+      .getByTestId("save-form-summary-list-political_group_votes_1")
+      .getByRole("listitem");
+
     this.save = page.getByRole("button", { name: "Opslaan" });
     this.complete = page.getByRole("button", { name: "Afronden" });
+
     this.acceptErrorsReminder = page
       .getByRole("alert")
       .filter({ hasText: "Je kan alleen verder als je dit met de coördinator hebt overlegd." });

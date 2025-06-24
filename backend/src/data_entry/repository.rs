@@ -11,7 +11,6 @@ use crate::{
 pub struct PollingStationDataEntries(SqlitePool);
 
 impl PollingStationDataEntries {
-    #[cfg(test)]
     pub fn new(pool: SqlitePool) -> Self {
         Self(pool)
     }
@@ -171,7 +170,6 @@ impl PollingStationDataEntries {
 pub struct PollingStationResultsEntries(SqlitePool);
 
 impl PollingStationResultsEntries {
-    #[cfg(test)]
     pub fn new(pool: SqlitePool) -> Self {
         Self(pool)
     }

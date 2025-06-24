@@ -1,9 +1,9 @@
-import { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
+import { PollingStationResults, ValidationResult, ValidationResults } from "@/types/generated/openapi";
 import { DataEntryStructure, FormSectionId } from "@/types/types";
+import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
 
 import { ClientState, FormSection, FormState } from "../types/types";
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
-import { addValidationResultsToFormState, ValidationResultSet } from "./ValidationResults";
 
 export function objectHasOnlyEmptyValues(obj: Record<string, "" | number>): boolean {
   for (const key in obj) {
@@ -229,4 +229,25 @@ export function updateFormStateAfterSubmit(
   }
 
   return formState;
+}
+
+/*
+ * Distributes validation results to the corresponding sections in the form state, but only if that section is saved.
+ */
+export function addValidationResultsToFormState(
+  validationResults: ValidationResult[],
+  formState: FormState,
+  dataEntryStructure: DataEntryStructure,
+  errorsOrWarnings: "errors" | "warnings",
+) {
+  for (const section of dataEntryStructure) {
+    const formSection = formState.sections[section.id];
+    if (formSection && formSection.isSaved) {
+      for (const validationResult of validationResults) {
+        if (doesValidationResultApplyToSection(validationResult, section)) {
+          formSection[errorsOrWarnings].add(validationResult);
+        }
+      }
+    }
+  }
 }

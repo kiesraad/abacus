@@ -908,7 +908,7 @@ impl Validate for PoliticalGroupVotes {
         if candidate_votes_sum > 0 && self.total == 0 {
             // F.402 validate whether the total number of votes is empty when there are candidate votes
             validation_results.errors.push(ValidationResult {
-                fields: vec![path.to_string()],
+                fields: vec![path.field("total").to_string()],
                 code: ValidationResultCode::F402,
             });
         } else if self.total as u64 != candidate_votes_sum {
@@ -2213,7 +2213,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.errors[0].fields,
-            vec!["political_group_votes[0]"]
+            vec!["political_group_votes[0].total"]
         );
 
         // validate with incorrect number of candidates for the first political group

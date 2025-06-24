@@ -8,18 +8,19 @@ import {
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import {
   ElectionWithPoliticalGroups,
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
   PollingStationResults,
 } from "@/types/generated/openapi";
+import { ValidationResultSet } from "@/utils/ValidationResults";
 
-import { errorWarningMocks, getDefaultDataEntryState } from "../testing/mock-data";
+import { getDefaultDataEntryState } from "../testing/mock-data";
 import { DataEntryAction, DataEntryState } from "../types/types";
 import { onDeleteDataEntry, onFinaliseDataEntry, onSubmitForm } from "./actions";
 import dataEntryReducer, { getInitialState as _getInitialState } from "./reducer";
-import { ValidationResultSet } from "./ValidationResults";
 
 function getInitialState(): DataEntryState {
   return _getInitialState(electionMockData, 1, 1);
@@ -236,7 +237,7 @@ describe("onSubmitForm", () => {
           voters_votes_counts: {
             ...defaultState.formState.sections.voters_votes_counts,
             acceptErrorsAndWarnings: false,
-            warnings: new ValidationResultSet([errorWarningMocks.W201]),
+            warnings: new ValidationResultSet([validationResultMockData.W201]),
           },
         },
       },

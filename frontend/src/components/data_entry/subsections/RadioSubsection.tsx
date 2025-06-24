@@ -10,9 +10,16 @@ export interface RadioSubsectionProps {
     errorsAndWarnings?: Map<string, "error" | "warning">;
     errorsAndWarningsAccepted: boolean;
   };
+  readOnly?: boolean;
 }
 
-export function RadioSubsectionComponent({ subsection, currentValues, setValues, defaultProps }: RadioSubsectionProps) {
+export function RadioSubsectionComponent({
+  subsection,
+  currentValues,
+  setValues,
+  defaultProps,
+  readOnly = false,
+}: RadioSubsectionProps) {
   return (
     <div className="radio-form">
       <ChoiceList>
@@ -31,6 +38,7 @@ export function RadioSubsectionComponent({ subsection, currentValues, setValues,
               setValues(subsection.path, option.value);
             }}
             label={t(option.label)}
+            disabled={readOnly}
           />
         ))}
       </ChoiceList>

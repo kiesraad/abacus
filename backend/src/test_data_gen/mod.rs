@@ -3,7 +3,7 @@ use std::sync::{
     atomic::{AtomicU64, Ordering},
 };
 
-use chrono::{Days, NaiveDate};
+use chrono::{DateTime, Days, NaiveDate, TimeDelta, Utc};
 use rand::seq::{IndexedRandom, SliceRandom};
 
 /// List of first names to select from
@@ -39,6 +39,7 @@ const FIRST_NAMES: &[&str] = &[
     "Dirk-Jan",
     "Madelène",
     "İlknur",
+    "Yağmur",
 ];
 
 /// Generate a first name using the random number generator given
@@ -119,6 +120,7 @@ const LAST_NAMES: &[(Option<&str>, &str)] = &[
     (None, "Aygün"),
     (None, "Bruins-Van den Kerk"),
     (None, "Titulaer"),
+    (None, "Güneş"),
 ];
 
 /// Generate a last name and an optional last name prefix using the random number generator given
@@ -237,6 +239,7 @@ const POLITICAL_GROUP_NAMES: &[&str] = &[
     "Lijst voor de Partijdigheid",
     "Unie van kandidaten",
     "Stem nu!",
+    "Altijd van de Partij",
 ];
 
 static PG_OFFSET: AtomicU64 = AtomicU64::new(0);
@@ -344,4 +347,19 @@ pub fn date_between(rng: &mut impl rand::Rng, start: NaiveDate, end: NaiveDate) 
     }
     let rand = rng.random_range(0..days);
     start + Days::new(rand as u64)
+}
+
+/// Generate some datetime from some point in time and a duration from that point in time
+/// The duration may not exceed about 292 years.
+pub fn datetime_around(
+    rng: &mut impl rand::Rng,
+    point_in_time: DateTime<Utc>,
+    duration: TimeDelta,
+) -> DateTime<Utc> {
+    let nanos = if duration > TimeDelta::zero() {
+        rng.random_range(0..=duration.num_nanoseconds().unwrap_or(i64::MAX))
+    } else {
+        rng.random_range(duration.num_nanoseconds().unwrap_or(i64::MIN)..=0)
+    };
+    point_in_time + TimeDelta::nanoseconds(nanos)
 }

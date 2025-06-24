@@ -4,6 +4,7 @@ import { NavBar } from "../NavBarPgObj";
 
 export class OverviewPgObj {
   readonly navBar: NavBar;
+  readonly main: Locator;
   readonly header: Locator;
   readonly alert: Locator;
   readonly create: Locator;
@@ -12,6 +13,7 @@ export class OverviewPgObj {
 
   constructor(protected readonly page: Page) {
     this.navBar = new NavBar(page);
+    this.main = page.getByRole("main");
     this.header = page.getByRole("heading", { name: "Beheer verkiezingen" });
     this.alert = page.getByRole("heading", { name: "Je account is ingesteld" });
     this.create = page.getByRole("link", { name: "Verkiezing toevoegen" });

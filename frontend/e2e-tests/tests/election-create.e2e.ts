@@ -18,7 +18,7 @@ test.describe("Election creation", () => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
     const initialElectionCount = await overviewPage.elections.count();
-    const initialReadyStateCount = await page.getByText("Klaar voor invoer").count();
+    const initialReadyStateCount = await overviewPage.electionsInReadyState.count();
     await overviewPage.create.click();
 
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
@@ -27,10 +27,8 @@ test.describe("Election creation", () => {
 
     const checkDefinitionPage = new CheckDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
-    // Check that the uploaded file name is present somewhere on the page
-    await expect(page.getByText(eml110a.filename)).toBeVisible();
-    // Election date
-    await expect(page.getByText(eml110a.electionDate)).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml110a.filename);
+    await expect(overviewPage.main).toContainText(eml110a.electionDate);
 
     await expect(checkDefinitionPage.hashInput1).toBeFocused();
     await checkDefinitionPage.hashInput1.fill(eml110a.hashInput1);
@@ -45,8 +43,8 @@ test.describe("Election creation", () => {
     // Candidate check page
     const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
     await expect(checkCandidateDefinitionPage.header).toBeVisible();
-    await expect(page.getByText(eml230b.filename)).toBeVisible();
-    await expect(page.getByText(eml230b.electionDate)).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml230b.filename);
+    await expect(overviewPage.main).toContainText(eml230b.electionDate);
     await expect(checkCandidateDefinitionPage.hashInput1).toBeFocused();
     await checkCandidateDefinitionPage.hashInput1.fill(eml230b.hashInput1);
     await checkCandidateDefinitionPage.hashInput2.fill(eml230b.hashInput2);
@@ -104,8 +102,8 @@ test.describe("Election creation", () => {
 
     const checkDefinitionPage = new CheckDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
-    await expect(page.getByText(eml110a.filename)).toBeVisible();
-    await expect(page.getByText(eml110a.electionDate)).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml110a.filename);
+    await expect(overviewPage.main).toContainText(eml110a.electionDate);
     await expect(checkDefinitionPage.hashInput1).toBeFocused();
     await checkDefinitionPage.hashInput1.fill(eml110a.hashInput1);
     await checkDefinitionPage.hashInput2.fill(eml110a.hashInput2);
@@ -119,8 +117,8 @@ test.describe("Election creation", () => {
     // Candidate check page
     const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
     await expect(checkCandidateDefinitionPage.header).toBeVisible();
-    await expect(page.getByText(eml230b.filename)).toBeVisible();
-    await expect(page.getByText(eml230b.electionDate)).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml230b.filename);
+    await expect(overviewPage.main).toContainText(eml230b.electionDate);
     await expect(checkCandidateDefinitionPage.hashInput1).toBeFocused();
     await checkCandidateDefinitionPage.hashInput1.fill("1234");
     await checkCandidateDefinitionPage.hashInput2.fill("1234");
@@ -140,8 +138,8 @@ test.describe("Election creation", () => {
 
     const checkDefinitionPage = new CheckDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
-    await expect(page.getByText(eml110a.filename)).toBeVisible();
-    await expect(page.getByText(eml110a.electionDate)).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml110a.filename);
+    await expect(overviewPage.main).toContainText(eml110a.electionDate);
     await expect(checkDefinitionPage.hashInput1).toBeFocused();
     await checkDefinitionPage.hashInput1.fill(eml110a.hashInput1);
     await checkDefinitionPage.hashInput2.fill(eml110a.hashInput2);

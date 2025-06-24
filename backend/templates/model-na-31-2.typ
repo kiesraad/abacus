@@ -55,24 +55,6 @@ Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een v
 
 #pagebreak(weak: true)
 
-= Controles in opdracht van het centraal stembureau
-
-#emph_block[
-  Deze pagina is toegevoegd door de leden van het #location_type. In opdracht van het centraal stembureau heeft het #location_type de in dit proces-verbaal opgenomen aantallen (opnieuw) onderzocht. Voeg deze pagina toe na het voorblad van het oorspronkelijke proces-verbaal van het #location_type (Na 31-1 of Na 31-2).
-]
-
-=== Zijn er gecorrigeerde telresultaten?
-
-#checkbox[Nee, de oorspronkelijke telresultaten waren correct]
-
-#checkbox[Ja, er zijn gecorrigeerde telresultaten (zie voor de correcties het corrigendum dat bij dit proces-verbaal is gevoegd)]
-
-=== Opgesteld door het gemeentelijk stembureau
-
-#textbox[Datum en tijd:]
-
-#pagebreak(weak: true)
-
 #show: doc => document_numbering(doc)
 
 = Verslag van de zitting

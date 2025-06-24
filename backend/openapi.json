@@ -134,7 +134,7 @@
     },
     "/api/elections": {
       "get": {
-        "summary": "Get a list of all elections, without their candidate lists",
+        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election",
         "operationId": "election_list",
         "responses": {
           "200": {
@@ -3884,9 +3884,16 @@
         "type": "object",
         "description": "Election list response\n\nDoes not include the candidate list (political groups) to keep the response size small.",
         "required": [
+          "committee_sessions",
           "elections"
         ],
         "properties": {
+          "committee_sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommitteeSession"
+            }
+          },
           "elections": {
             "type": "array",
             "items": {

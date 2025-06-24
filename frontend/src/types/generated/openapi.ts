@@ -559,6 +559,7 @@ export interface ElectionDetailsResponse {
  * Does not include the candidate list (political groups) to keep the response size small.
  */
 export interface ElectionListResponse {
+  committee_sessions: CommitteeSession[];
   elections: Election[];
 }
 

@@ -246,6 +246,7 @@ export const politicalGroupsMockData: PoliticalGroup[] = [
 ];
 
 export const electionListMockResponse: ElectionListResponse = {
+  committee_sessions: [committeeSessionMockData],
   elections: [
     {
       id: 1,

@@ -118,6 +118,10 @@
 
 // Format the name of a candidate
 #let candidate_name(election_candidate) = {
+  if election_candidate == none {
+    return
+  }
+
   if "last_name_prefix" in election_candidate {
     election_candidate.last_name_prefix
     " "

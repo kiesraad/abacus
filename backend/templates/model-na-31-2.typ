@@ -28,7 +28,7 @@
 
 == Details van het #location_type
 
-Kieskring #TODO #sym.arrow.r #location_name
+#sym.arrow.r #location_name
 
 #input.election.location #format_date(input.election.election_date)
 
@@ -188,22 +188,28 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Uitgebrachte stemmen
 
-#sum(
-  sum(
-    ..input.election.political_groups.map(list => {
-      let votes = input.summary.political_group_votes.find(v => v.number == list.number)
+#if input.election.political_groups.len() > 0 [
+  #sum(
+    sum(
+      ..input.election.political_groups.map(list => {
+        let votes = input.summary.political_group_votes.find(v => v.number == list.number)
 
-      letterbox([E.#list.number])[#votes.total][Totaal lijst #list.number - #list.name]
-    }),
-    letterbox(
-      "E",
-      light: false,
-    )[#input.summary.votes_counts.votes_candidates_count][*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
-  ),
-  letterbox("F")[#input.summary.votes_counts.blank_votes_count][Blanco stemmen],
-  letterbox("G")[#input.summary.votes_counts.invalid_votes_count][Ongeldige stemmen],
-  letterbox("H", light: false)[#input.summary.votes_counts.invalid_votes_count][*Totaal uitgebrachte stemmen (E+F+G)*],
-)
+        if votes == none {
+          return
+        }
+
+        letterbox([E.#list.number])[#votes.total][Totaal lijst #list.number - #list.name]
+      }),
+      letterbox(
+        "E",
+        light: false,
+      )[#input.summary.votes_counts.votes_candidates_count][*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
+    ),
+    letterbox("F")[#input.summary.votes_counts.blank_votes_count][Blanco stemmen],
+    letterbox("G")[#input.summary.votes_counts.invalid_votes_count][Ongeldige stemmen],
+    letterbox("H", light: false)[#input.summary.votes_counts.invalid_votes_count][*Totaal uitgebrachte stemmen (E+F+G)*],
+  )
+]
 
 #pagebreak(weak: true)
 
@@ -245,6 +251,10 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 #for political_group in input.summary.political_group_votes {
   let election_political_group = input.election.political_groups.find(pg => pg.number == political_group.number)
+
+  if election_political_group == none {
+    continue
+  }
 
   title[Lijst #political_group.number #election_political_group.name]
 

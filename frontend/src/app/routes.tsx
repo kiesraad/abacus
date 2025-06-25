@@ -4,6 +4,7 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { NotFoundPage } from "@/components/error/NotFoundPage";
 import { AdministratorLayout } from "@/components/layout/AdministratorLayout";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
+import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
 import { accountRoutes } from "@/features/account/routes";
 import { apportionmentRoutes } from "@/features/apportionment/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
@@ -61,6 +62,7 @@ export const routes: RouteObject[] = [
               },
               {
                 path: "status",
+                Component: ElectionStatusLayout,
                 children: [
                   // index
                   ...electionStatusRoutes,

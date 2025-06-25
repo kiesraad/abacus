@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
+import { useUsers } from "@/hooks/user/useUsers";
 import { t, tx } from "@/i18n/translate";
 import { ResolveErrorsAction } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
@@ -30,8 +31,9 @@ export function ResolveErrorsPage() {
     void navigate(url);
   };
   const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation, election, loading, dataEntry, userFullname, action, setAction, onSubmit, validationError } =
+  const { pollingStation, election, loading, dataEntry, action, setAction, onSubmit, validationError } =
     usePollingStationDataEntryErrors(pollingStationId, afterSave);
+  const { getName } = useUsers();
 
   if (loading || dataEntry === null) {
     return <Loader />;
@@ -81,7 +83,7 @@ export function ResolveErrorsPage() {
               <ChoiceList.Radio
                 id="keep_entry"
                 label={tx("resolve_errors.options.resume_first_entry", undefined, {
-                  name: userFullname ?? t("typist"),
+                  name: getName(dataEntry.first_entry_user_id, t("typist")),
                 })}
                 checked={action === "resume_first_entry"}
                 onChange={() => {

@@ -1,5 +1,8 @@
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { UsersProvider } from "@/hooks/user/UsersProvider";
+import { UserListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { server } from "@/testing/server";
 import { render, screen, within } from "@/testing/test-utils";
 
 import { DefaultElectionStatus, Empty } from "./ElectionStatus.stories";
@@ -11,8 +14,16 @@ vi.mock(import("react-router"), async (importOriginal) => ({
 }));
 
 describe("ElectionStatus", () => {
+  beforeEach(() => {
+    server.use(UserListRequestHandler);
+  });
+
   test("Render status of polling station data entries correctly", async () => {
-    render(<DefaultElectionStatus navigate={navigate} />);
+    render(
+      <UsersProvider>
+        <DefaultElectionStatus navigate={navigate} />
+      </UsersProvider>,
+    );
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" })).toBeVisible();
@@ -97,7 +108,11 @@ describe("ElectionStatus", () => {
   });
 
   test("Show no polling stations text instead of tables", async () => {
-    render(<Empty navigate={navigate} />);
+    render(
+      <UsersProvider>
+        <Empty navigate={navigate} />
+      </UsersProvider>,
+    );
 
     expect(await screen.findByText("Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.")).toBeVisible();
   });

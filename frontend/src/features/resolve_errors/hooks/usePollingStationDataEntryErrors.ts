@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 
 import { AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
-import { useInitialApiGet, useInitialApiGetWithErrors } from "@/api/useInitialApiGet";
+import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
@@ -15,8 +15,6 @@ import {
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH,
   PollingStation,
   ResolveErrorsAction,
-  USER_LIST_REQUEST_PATH,
-  UserListResponse,
 } from "@/types/generated/openapi";
 
 interface DataEntryErrors {
@@ -26,7 +24,6 @@ interface DataEntryErrors {
   election: Election & { political_groups: PoliticalGroup[] };
   loading: boolean;
   dataEntry: DataEntryGetErrorsResponse | null;
-  userFullname: string | undefined;
   onSubmit: () => Promise<void>;
   validationError: string | undefined;
 }
@@ -47,10 +44,6 @@ export function usePollingStationDataEntryErrors(
   const path: POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_errors`;
   const { requestState } = useInitialApiGet<DataEntryGetErrorsResponse>(path);
 
-  // fetch a list of users, to render username
-  const usersPath: USER_LIST_REQUEST_PATH = "/api/user";
-  const { requestState: usersRequestState } = useInitialApiGetWithErrors<UserListResponse>(usersPath);
-
   // 404 error if polling station is not found
   if (!pollingStation) {
     throw new NotFoundError("error.polling_station_not_found");
@@ -64,19 +57,6 @@ export function usePollingStationDataEntryErrors(
   // render generic error page when any error occurs
   if (requestState.status === "api-error") {
     throw requestState.error;
-  }
-  if (usersRequestState.status === "api-error") {
-    throw usersRequestState.error;
-  }
-
-  let dataEntry: DataEntryGetErrorsResponse | null = null;
-  let userFullname: string | undefined = undefined;
-
-  if (requestState.status === "success" && usersRequestState.status === "success") {
-    dataEntry = requestState.data;
-
-    const user = usersRequestState.data.users.find((u) => u.id === requestState.data.first_entry_user_id);
-    userFullname = user?.fullname ?? user?.username;
   }
 
   const onSubmit = async () => {
@@ -105,9 +85,8 @@ export function usePollingStationDataEntryErrors(
     setAction,
     pollingStation,
     election,
-    loading: requestState.status === "loading" || usersRequestState.status === "loading",
-    dataEntry,
-    userFullname,
+    loading: requestState.status === "loading",
+    dataEntry: requestState.status === "success" ? requestState.data : null,
     onSubmit,
     validationError,
   };

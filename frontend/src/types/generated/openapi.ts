@@ -2,6 +2,18 @@
 
 /** PATHS **/
 
+// /api/committee_sessions
+export type COMMITTEE_SESSION_CREATE_REQUEST_PARAMS = Record<string, never>;
+export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
+export type COMMITTEE_SESSION_CREATE_REQUEST_BODY = CommitteeSessionCreateRequest;
+
+// /api/committee_sessions/{committee_session_id}
+export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
+export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
+
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
@@ -30,6 +42,12 @@ export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
+
+// /api/elections/{election_id}/committee_sessions
+export interface ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
 
 // /api/elections/{election_id}/download_pdf_results
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
@@ -222,6 +240,8 @@ export type AuditEvent =
   | (UserDetails & { eventType: "UserUpdated" })
   | (UserDetails & { eventType: "UserDeleted" })
   | (ElectionDetails & { eventType: "ElectionCreated" })
+  | (CommitteeSessionDetails & { eventType: "CommitteeSessionCreated" })
+  | (CommitteeSessionDetails & { eventType: "CommitteeSessionUpdated" })
   | (ElectionDetails & { eventType: "ApportionmentCreated" })
   | (PollingStationDetails & { eventType: "PollingStationCreated" })
   | (PollingStationDetails & { eventType: "PollingStationUpdated" })
@@ -315,6 +335,63 @@ export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
   validation_results: ValidationResults;
+}
+
+/**
+ * Committee session
+ */
+export interface CommitteeSession {
+  election_id: number;
+  id: number;
+  location: string;
+  number: number;
+  start_date: string;
+  start_time: string;
+  status: CommitteeSessionStatus;
+}
+
+/**
+ * Committee session create request
+ */
+export interface CommitteeSessionCreateRequest {
+  election_id: number;
+  number: number;
+}
+
+export interface CommitteeSessionDetails {
+  sessionElectionId: number;
+  sessionId: number;
+  sessionLocation: string;
+  sessionNumber: number;
+  sessionStartDate: string;
+  sessionStartTime: string;
+  sessionStatus: string;
+}
+
+/**
+ * Committee session list response
+ */
+export interface CommitteeSessionListResponse {
+  committee_sessions: CommitteeSession[];
+}
+
+/**
+ * Committee session status
+ */
+export type CommitteeSessionStatus =
+  | "created"
+  | "data_entry_not_started"
+  | "data_entry_in_progress"
+  | "data_entry_paused"
+  | "data_entry_finished";
+
+/**
+ * Committee session update request
+ */
+export interface CommitteeSessionUpdateRequest {
+  location: string;
+  start_date: string;
+  start_time: string;
 }
 
 export interface CreateUserRequest {
@@ -418,7 +495,6 @@ export interface Election {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
-  status: ElectionStatus;
 }
 
 export interface ElectionAndCandidateDefinitionValidateRequest {
@@ -465,13 +541,14 @@ export interface ElectionDetails {
   electionNominationDate: string;
   electionNumberOfSeats: number;
   electionNumberOfVoters: number;
-  electionStatus: string;
 }
 
 /**
- * Election details response, including the election's candidate list (political groups) and its polling stations
+ * Election details response, including the election's candidate list (political groups),
+ * its polling stations and the current committee session
  */
 export interface ElectionDetailsResponse {
+  committee_session: CommitteeSession;
   election: ElectionWithPoliticalGroups;
   polling_stations: PollingStation[];
 }
@@ -484,11 +561,6 @@ export interface ElectionDetailsResponse {
 export interface ElectionListResponse {
   elections: Election[];
 }
-
-/**
- * Election status (limited for now)
- */
-export type ElectionStatus = "Created" | "DataEntryInProgress" | "DataEntryFinished";
 
 /**
  * Election polling stations data entry statuses response
@@ -548,7 +620,6 @@ export interface ElectionWithPoliticalGroups {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
-  status: ElectionStatus;
 }
 
 export interface EntriesDifferent {
@@ -708,7 +779,6 @@ export interface NewElection {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
-  status: ElectionStatus;
 }
 
 /**

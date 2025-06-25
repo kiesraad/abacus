@@ -46,6 +46,7 @@ const locations: { pathname: string; userRole: Role }[] = [
 export const AllRoutes: Story = () => (
   <ElectionProviderContext.Provider
     value={{
+      committeeSession: electionDetailsMockResponse.committee_session,
       election: electionDetailsMockResponse.election,
       pollingStations: electionDetailsMockResponse.polling_stations,
     }}

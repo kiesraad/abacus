@@ -1,7 +1,10 @@
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
-use crate::election::PoliticalGroup;
+use crate::{
+    election::PoliticalGroup,
+    eml::common::{AuthorityAddress, AuthorityIdentifier},
+};
 
 use super::{
     EMLBase,
@@ -90,8 +93,7 @@ impl EML110 {
         }
 
         // election subcategory is required
-        let Some(election_subcategory) = self.election_identifier().election_subcategory.clone()
-        else {
+        let Some(election_subcategory) = self.election_identifier().election_subcategory else {
             return Err(EMLImportError::MissingSubcategory);
         };
 
@@ -172,11 +174,141 @@ impl EML110 {
             number_of_seats,
             election_date,
             nomination_date,
-            status: crate::election::ElectionStatus::Created,
             political_groups,
         };
 
         Ok(election)
+    }
+
+    pub fn definition_from_abacus_election(
+        election: &crate::election::ElectionWithPoliticalGroups,
+        transaction_id: &str,
+    ) -> Self {
+        let now = chrono::Utc::now();
+        let subcategory = if election.number_of_seats >= 19 {
+            ElectionSubcategory::GR2
+        } else {
+            ElectionSubcategory::GR1
+        };
+
+        Self {
+            base: EMLBase::new("110a"),
+            transaction_id: transaction_id.to_owned(),
+            creation_date_time: now.to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+            issue_date: Some(now.format("%Y-%m-%d").to_string()),
+            managing_authority: None,
+            election_event: ElectionEvent {
+                event_identifier: EventIdentifier {},
+                election: Election {
+                    election_identifier: ElectionIdentifier::from_election(election, true),
+                    contest: Contest {
+                        contest_identifier: Some(ContestIdentifier::geen()),
+                        voting_method: VotingMethod::SinglePreferenceVote,
+                        max_votes: Some("".to_string()),
+                        polling_places: vec![],
+                    },
+                    number_of_seats: Some(election.number_of_seats),
+                    preference_threshold: Some(if subcategory == ElectionSubcategory::GR2 {
+                        25
+                    } else {
+                        50
+                    }),
+                    // TODO: we currently don't have all the information in the election tree datastructure
+                    election_tree: Some(ElectionTree {
+                        regions: vec![Region {
+                            region_name: election.location.clone(),
+                            region_number: Some(election.domain_id.clone()),
+                            region_category: RegionCategory::Municipality,
+                            roman_numerals: false,
+                            frysian_export_allowed: false,
+                            superior_region_number: None,
+                            superior_region_category: None,
+                            committees: vec![
+                                Committee {
+                                    category: CommitteeCategory::CSB,
+                                    name: None,
+                                    accept_central_submissions: false,
+                                },
+                                Committee {
+                                    category: CommitteeCategory::HSB,
+                                    name: None,
+                                    accept_central_submissions: false,
+                                },
+                            ],
+                        }],
+                    }),
+                    registered_parties: election
+                        .political_groups
+                        .iter()
+                        .map(|group| RegisteredParty {
+                            registered_appellation: group.name.clone(),
+                        })
+                        .collect(),
+                },
+            },
+        }
+    }
+
+    pub fn polling_stations_from_election(
+        election: &crate::election::ElectionWithPoliticalGroups,
+        polling_stations: &[crate::polling_station::PollingStation],
+        transaction_id: &str,
+    ) -> Self {
+        let now = chrono::Utc::now();
+
+        Self {
+            base: EMLBase::new("110b"),
+            transaction_id: transaction_id.to_string(),
+            creation_date_time: now.to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+            issue_date: None,
+            managing_authority: Some(ManagingAuthority {
+                authority_identifier: AuthorityIdentifier {
+                    id: election.domain_id.clone(),
+                    name: election.location.clone(),
+                    created_by_authority: None,
+                },
+                authority_address: AuthorityAddress {},
+            }),
+            election_event: ElectionEvent {
+                event_identifier: EventIdentifier {},
+                election: Election {
+                    election_identifier: ElectionIdentifier::from_election(election, false),
+                    contest: Contest {
+                        contest_identifier: Some(ContestIdentifier::geen()),
+                        voting_method: VotingMethod::Unknown,
+                        max_votes: Some(election.number_of_voters.to_string()),
+                        polling_places: polling_stations
+                            .iter()
+                            .map(|ps| PollingPlace {
+                                physical_location: PhysicalLocation {
+                                    address: Address {
+                                        locality: Locality {
+                                            locality_name: LocalityName {
+                                                name: ps.name.clone(),
+                                                locality_type: None,
+                                                code: None,
+                                            },
+                                            postal_code: Some(PostalCode {
+                                                postal_code_number: ps.postal_code.clone(),
+                                            }),
+                                        },
+                                    },
+                                    polling_station: PollingStation {
+                                        token: ps.number.to_string(),
+                                        id: ps.id.to_string(),
+                                    },
+                                },
+                                channel: VotingChannelType::Polling,
+                            })
+                            .collect(),
+                    },
+                    number_of_seats: None,
+                    preference_threshold: None,
+                    election_tree: None,
+                    registered_parties: vec![],
+                },
+            },
+        }
     }
 }
 

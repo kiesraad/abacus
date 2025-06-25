@@ -5,8 +5,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionListRequestHandler,
@@ -16,19 +15,35 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, setupTestRouter } from "@/testing/test-utils";
+import { screen, setupTestRouter } from "@/testing/test-utils";
 
 import { electionStatusRoutes } from "../routes";
-import { ElectionStatusPage } from "./ElectionStatusPage";
 
-const renderElectionStatusPage = () =>
-  render(
-    <ElectionProvider electionId={1}>
-      <ElectionStatusProvider electionId={1}>
-        <ElectionStatusPage />
-      </ElectionStatusProvider>
-    </ElectionProvider>,
-  );
+async function renderPage() {
+  // Set up router and navigate to the election data entry status page
+  const router = setupTestRouter([
+    {
+      path: "/elections/:electionId",
+      Component: ElectionLayout,
+      errorElement: <ErrorBoundary />,
+      children: [
+        {
+          path: "status",
+          Component: ElectionStatusLayout,
+          children: electionStatusRoutes,
+        },
+      ],
+    },
+  ]);
+
+  await router.navigate("/elections/1/status");
+  rtlRender(<Providers router={router} />);
+
+  // Wait for the page to be loaded
+  expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+
+  return router;
+}
 
 describe("ElectionStatusPage", () => {
   beforeEach(() => {
@@ -40,8 +55,8 @@ describe("ElectionStatusPage", () => {
     );
   });
 
-  test("Finish input not visible when data entry is in progress", () => {
-    renderElectionStatusPage();
+  test("Finish input not visible when data entry is in progress", async () => {
+    await renderPage();
 
     // Test that the data entry finished message doesn't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
@@ -56,17 +71,14 @@ describe("ElectionStatusPage", () => {
       ],
     });
 
-    renderElectionStatusPage();
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+    await renderPage();
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
     expect(screen.getByRole("button", { name: "Invoerfase afronden" })).toBeVisible();
   });
 
   test("Finish input not visible when election is finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({ status: "DataEntryFinished" }));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "definitive" },
@@ -74,10 +86,7 @@ describe("ElectionStatusPage", () => {
       ],
     });
 
-    renderElectionStatusPage();
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+    await renderPage();
 
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
@@ -85,22 +94,7 @@ describe("ElectionStatusPage", () => {
 
   test("Data entry kept alert works", async () => {
     const user = userEvent.setup();
-
-    // Set up router and navigate to the election data entry status page
-    const router = setupTestRouter([
-      {
-        path: "/elections/:electionId/status",
-        Component: ElectionLayout,
-        errorElement: <ErrorBoundary />,
-        children: electionStatusRoutes,
-      },
-    ]);
-
-    await router.navigate("/elections/1/status");
-    rtlRender(<Providers router={router} />);
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+    const router = await renderPage();
 
     // Expect the alert to not be visible
     const alertHeading = "Verschil opgelost voor stembureau 33";
@@ -118,22 +112,7 @@ describe("ElectionStatusPage", () => {
 
   test("Both data entries discarded alert works", async () => {
     const user = userEvent.setup();
-
-    // Set up router and navigate to the election data entry status page
-    const router = setupTestRouter([
-      {
-        path: "/elections/:electionId/status",
-        Component: ElectionLayout,
-        errorElement: <ErrorBoundary />,
-        children: electionStatusRoutes,
-      },
-    ]);
-
-    await router.navigate("/elections/1/status");
-    rtlRender(<Providers router={router} />);
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+    const router = await renderPage();
 
     // Expect the alert to not be visible
     const alertHeading = "Verschil opgelost voor stembureau 33";
@@ -151,22 +130,7 @@ describe("ElectionStatusPage", () => {
 
   test("First data entry resumed alert works", async () => {
     const user = userEvent.setup();
-
-    // Set up router and navigate to the election data entry status page
-    const router = setupTestRouter([
-      {
-        path: "/elections/:electionId/status",
-        Component: ElectionLayout,
-        errorElement: <ErrorBoundary />,
-        children: electionStatusRoutes,
-      },
-    ]);
-
-    await router.navigate("/elections/1/status");
-    rtlRender(<Providers router={router} />);
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+    const router = await renderPage();
 
     // Expect the alert to not be visible
     const alertHeading = "Stembureau 36 teruggegeven aan Sanne Molenaar";
@@ -184,19 +148,7 @@ describe("ElectionStatusPage", () => {
 
   test("First data entry discarded alert works", async () => {
     const user = userEvent.setup();
-
-    // Set up router and navigate to the election data entry status page
-    const router = setupTestRouter([
-      {
-        path: "/elections/:electionId/status",
-        Component: ElectionLayout,
-        errorElement: <ErrorBoundary />,
-        children: electionStatusRoutes,
-      },
-    ]);
-
-    await router.navigate("/elections/1/status");
-    rtlRender(<Providers router={router} />);
+    const router = await renderPage();
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();

@@ -1,5 +1,8 @@
 components:
   # Backend components
+  - name: "(Backend) Airgap detection"
+    include:
+      - ".*/backend/src/airgap/.*"
   - name: "(Backend) Apportionment"
     include:
       - ".*/backend/src/apportionment/.*"
@@ -9,6 +12,9 @@ components:
   - name: "(Backend) Authentication"
     include:
       - ".*/backend/src/authentication/.*"
+  - name: "(Backend) Committee Session"
+    include:
+      - ".*/backend/src/committee_session/.*"
   - name: "(Backend) Data entry"
     include:
       - ".*/backend/src/data_entry/.*"
@@ -30,6 +36,9 @@ components:
   - name: "(Backend) Summary"
     include:
       - ".*/backend/src/summary/.*"
+  - name: "(Backend) Test data generation"
+    include:
+      - ".*/backend/src/test_data_gen/.*"
   - name: "(Backend) bin/abacus"
     include:
       - ".*/backend/src/bin/abacus.rs"
@@ -56,9 +65,9 @@ components:
   - name: "(Frontend) Components/authorization"
     include:
       - ".*/frontend/src/components/authorization/.*"
-  - name: "(Frontend) Components/election_status_with_icon"
+  - name: "(Frontend) Components/committee_session_status_with_icon"
     include:
-      - ".*/frontend/src/components/election_status_with_icon/.*"
+      - ".*/frontend/src/components/committee_session_status_with_icon/.*"
   - name: "(Frontend) Components/error"
     include:
       - ".*/frontend/src/components/error/.*"
@@ -81,6 +90,9 @@ components:
   - name: "(Frontend) Modules/data_entry_home"
     include:
       - ".*/frontend/src/features/data_entry_home/.*"
+  - name: "(Frontend) Modules/election_create"
+    include:
+      - ".*/frontend/src/features/election_create/.*"
   - name: "(Frontend) Modules/election_management"
     include:
       - ".*/frontend/src/features/election_management/.*"
@@ -96,6 +108,12 @@ components:
   - name: "(Frontend) Modules/polling_stations"
     include:
       - ".*/frontend/src/features/polling_stations/.*"
+  - name: "(Frontend) Modules/resolve_differences"
+    include:
+      - ".*/frontend/src/features/resolve_differences/.*"
+  - name: "(Frontend) Modules/resolve_errors"
+    include:
+      - ".*/frontend/src/features/resolve_errors/.*"
   - name: "(Frontend) Modules/users"
     include:
       - ".*/frontend/src/features/users/.*"
@@ -109,6 +127,9 @@ components:
   - name: "(Frontend) lib/API-Mocks"
     include:
       - ".*/frontend/src/testing/api-mocks/.*"
+  - name: "(Frontend) Hooks"
+    include:
+      - ".*/frontend/src/hooks/.*"
   - name: "(Frontend) Lib/i18n"
     include:
       - ".*/frontend/src/i18n/.*"

@@ -1,20 +1,18 @@
 import { describe, expect, test } from "vitest";
 
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
+import { ValidationResult } from "@/types/generated/openapi";
+import { ValidationResultSet } from "@/utils/ValidationResults";
+
+import { getDefaultDataEntryState, getDefaultFormSection, getInitialValues } from "../testing/mock-data";
 import {
-  errorWarningMocks,
-  getDefaultDataEntryState,
-  getDefaultFormSection,
-  getInitialValues,
-} from "../testing/mock-data";
-import {
+  addValidationResultsToFormState,
   formSectionComplete,
-  getDataEntrySummary,
   getNextSectionID,
   isFormSectionEmpty,
   objectHasOnlyEmptyValues,
   resetFormSectionState,
 } from "./dataEntryUtils";
-import { ValidationResultSet } from "./ValidationResults";
 
 describe("objectHasOnlyEmptyValues", () => {
   test("objectHasOnlyEmptyValues", () => {
@@ -58,7 +56,7 @@ describe("formSectionComplete", () => {
 describe("resetFormSectionState", () => {
   test("should reset form section state", () => {
     const formState = getDefaultDataEntryState().formState;
-    formState.sections.voters_votes_counts.errors = new ValidationResultSet([errorWarningMocks.W201]);
+    formState.sections.voters_votes_counts.errors = new ValidationResultSet([validationResultMockData.W201]);
 
     resetFormSectionState(formState);
 
@@ -156,73 +154,45 @@ describe("isFormSectionEmpty", () => {
   });
 });
 
-describe("getPollingStationSummary", () => {
-  test("getPollingStationSummary", () => {
-    const state = getDefaultDataEntryState().formState;
-    const values = getInitialValues();
+describe("addValidationResultToFormState", () => {
+  test("should add validation result to form state", () => {
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
+    formState.sections.differences_counts.isSaved = true;
+    const validationResults: ValidationResult[] = [validationResultMockData.F303];
 
-    values.voters_counts.poll_card_count = 4;
-    values.voters_counts.total_admitted_voters_count = 4;
-    values.votes_counts.votes_candidates_count = 4;
-    values.votes_counts.total_votes_cast_count = 4;
+    addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
-    values.political_group_votes[0] = {
-      number: 1,
-      total: 4,
-      candidate_votes: [
-        {
-          number: 1,
-          votes: 4,
-        },
-      ],
-    };
+    expect(formState.sections.differences_counts.errors.size()).toBe(1);
+  });
 
-    let summary = getDataEntrySummary(state);
-    expect(summary.countsAddUp).toBe(true);
-    expect(summary.hasBlocks).toBe(false);
-    expect(summary.hasWarnings).toBe(false);
-    expect(summary.notableFormSections.length).toBe(0);
+  test("addValidationResultToFormState adds result to multiple sections", () => {
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
 
-    state.sections.differences_counts.acceptErrorsAndWarnings = true;
-    state.sections.differences_counts.warnings = new ValidationResultSet([errorWarningMocks.W301]);
+    formState.sections.voters_votes_counts.isSaved = true;
+    if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
 
-    summary = getDataEntrySummary(state);
-    expect(summary.countsAddUp).toBe(true);
-    expect(summary.hasBlocks).toBe(false);
-    expect(summary.hasWarnings).toBe(true);
-    expect(summary.notableFormSections.length).toBe(1);
-    expect(
-      summary.notableFormSections.some(
-        (item) => item.formSection.id === "differences_counts" && item.status === "accepted-warnings",
-      ),
-    ).toBeTruthy();
+    const validationResults: ValidationResult[] = [validationResultMockData.F204];
 
-    state.sections.voters_votes_counts.errors = new ValidationResultSet([errorWarningMocks.F201]);
+    addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
-    summary = getDataEntrySummary(state);
+    expect(formState.sections.voters_votes_counts.errors.size()).toBe(1);
+    const pg1 = formState.sections.political_group_votes_1;
+    expect(pg1?.errors.size()).toBe(1);
+  });
 
-    expect(summary.countsAddUp).toBe(false);
-    expect(summary.hasBlocks).toBe(true);
-    expect(summary.hasWarnings).toBe(true);
-    expect(summary.notableFormSections.length).toBe(2);
-    expect(
-      summary.notableFormSections.some(
-        (item) => item.formSection.id === "voters_votes_counts" && item.status === "errors",
-      ),
-    ).toBeTruthy();
+  test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
+    formState.sections.differences_counts.isSaved = false;
+    const validationResults: ValidationResult[] = [validationResultMockData.F303];
 
-    state.sections.differences_counts.acceptErrorsAndWarnings = false;
+    addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
-    summary = getDataEntrySummary(state);
-
-    expect(summary.countsAddUp).toBe(false);
-    expect(summary.hasBlocks).toBe(true);
-    expect(summary.hasWarnings).toBe(true);
-    expect(summary.notableFormSections.length).toBe(2);
-    expect(
-      summary.notableFormSections.some(
-        (item) => item.formSection.id == "differences_counts" && item.status === "unaccepted-warnings",
-      ),
-    ).toBeTruthy();
+    expect(formState.sections.differences_counts.errors.size()).toBe(0);
   });
 });

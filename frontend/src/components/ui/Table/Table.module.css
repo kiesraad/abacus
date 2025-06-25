@@ -98,4 +98,6 @@
 :where(.numberCell) {
   font-weight: bold;
   font-size: var(--font-size-body);
+  /* Enable 'Tabular Figures' font feature for fixed-width numbers */
+  font-feature-settings: "tnum" on;
 }

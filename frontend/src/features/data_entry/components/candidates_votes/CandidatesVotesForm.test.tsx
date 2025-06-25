@@ -7,6 +7,7 @@ import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, waitFor, within } from "@/testing/test-utils";
 import {
@@ -16,7 +17,7 @@ import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
 } from "@/types/generated/openapi";
 
-import { errorWarningMocks, getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
+import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
@@ -318,7 +319,6 @@ describe("Test CandidatesVotesForm", () => {
         number_of_seats: 29,
         election_date: "2024-11-30",
         nomination_date: "2024-11-01",
-        status: "DataEntryInProgress",
         political_groups: [
           politicalGroupMockData,
           {
@@ -453,55 +453,6 @@ describe("Test CandidatesVotesForm", () => {
     });
   });
 
-  describe("CandidatesVotesForm client-side errors", () => {
-    test("Show error when list total is empty", async () => {
-      const user = userEvent.setup();
-
-      overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
-      });
-      renderForm();
-
-      const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
-
-      const candidate1 = await screen.findByRole("textbox", { name: `1 ${candidateNames[0]}` });
-      const candidate2 = screen.getByRole("textbox", { name: `2 ${candidateNames[1]}` });
-      const total = screen.getByRole("textbox", { name: "Totaal lijst 1" });
-
-      const spy = vi.spyOn(global, "fetch");
-
-      await user.type(candidate1, "10");
-
-      await user.type(candidate2, "20");
-
-      // First submit before adding a total
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      expect(spy).not.toHaveBeenCalled();
-      const feedbackMessage =
-        "Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld.";
-      expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
-      expect(await screen.findByRole("textbox", { name: "Totaal lijst 1" })).toHaveFocus();
-      const expectedInvalidFieldIds = [candidatesFieldIds.total];
-      const expectedValidFieldIds = [candidatesFieldIds.candidate0, candidatesFieldIds.candidate1];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
-
-      // Add the total and submit again
-      await user.type(total, "1");
-      await user.click(submitButton);
-
-      expect(screen.queryByTestId("missing-total-error")).not.toBeInTheDocument();
-      expect(spy).toHaveBeenCalledOnce();
-    });
-  });
-
   describe("CandidatesVotesForm errors", () => {
     test("F.401 IncorrectTotal group total", async () => {
       const user = userEvent.setup();
@@ -516,7 +467,7 @@ describe("Test CandidatesVotesForm", () => {
 
       await screen.findByTestId("political_group_votes_1_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [errorWarningMocks.F401], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F401], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -534,6 +485,40 @@ describe("Test CandidatesVotesForm", () => {
       ];
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
+    });
+
+    test("F.402 EmptyTotal group total", async () => {
+      const user = userEvent.setup();
+
+      overrideServerClaimDataEntryResponse({
+        formState: getDefaultDataEntryState().formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+      renderForm();
+
+      await screen.findByTestId("political_group_votes_1_form");
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [validationResultMockData.F402], warnings: [] },
+      });
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackMessage =
+        "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.402)";
+      expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(await screen.findByRole("textbox", { name: "Totaal lijst 1" })).toHaveFocus();
+
+      const expectedInvalidFieldIds = [candidatesFieldIds.total];
+      const expectedValidFieldIds = [candidatesFieldIds.candidate0, candidatesFieldIds.candidate1];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
   });
 

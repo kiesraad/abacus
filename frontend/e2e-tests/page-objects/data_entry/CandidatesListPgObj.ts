@@ -10,6 +10,9 @@ export class CandidatesListPage extends DataEntryBasePage {
   readonly next: Locator;
   readonly total: Locator;
 
+  readonly acceptErrorsAndWarnings: Locator;
+  readonly acceptErrorsAndWarningsReminder: Locator;
+
   constructor(page: Page, pgNumber: number, pgName: string) {
     super(page);
 
@@ -18,6 +21,13 @@ export class CandidatesListPage extends DataEntryBasePage {
 
     this.total = page.getByRole("textbox", { name: "Totaal" });
     this.next = page.getByRole("button", { name: "Volgende" });
+
+    this.acceptErrorsAndWarnings = page.getByLabel(
+      "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+    );
+    this.acceptErrorsAndWarningsReminder = page
+      .getByRole("alert")
+      .filter({ hasText: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd." });
   }
 
   getCandidate(index: number) {
@@ -34,5 +44,10 @@ export class CandidatesListPage extends DataEntryBasePage {
     }
 
     await this.total.fill(total.toString());
+  }
+
+  async checkAcceptErrorsAndWarnings() {
+    await this.acceptErrorsAndWarnings.waitFor();
+    await this.acceptErrorsAndWarnings.check();
   }
 }

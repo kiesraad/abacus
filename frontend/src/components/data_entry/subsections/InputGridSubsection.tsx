@@ -14,6 +14,7 @@ export interface InputGridSubsectionProps {
     errorsAndWarningsAccepted: boolean;
   };
   missingTotalError: boolean;
+  readOnly?: boolean;
 }
 
 export function InputGridSubsectionComponent({
@@ -23,9 +24,10 @@ export function InputGridSubsectionComponent({
   setValues,
   defaultProps,
   missingTotalError,
+  readOnly = false,
 }: InputGridSubsectionProps) {
   return (
-    <InputGrid>
+    <InputGrid zebra={subsection.zebra}>
       <InputGrid.Header>
         <th>{t(subsection.headers[0])}</th>
         <th>{t(subsection.headers[1])}</th>
@@ -50,6 +52,7 @@ export function InputGridSubsectionComponent({
               isTotal={row.isTotal}
               isListTotal={row.isListTotal}
               errorMessageId={row.isListTotal && missingTotalError ? "missing-total-error" : undefined}
+              readOnly={readOnly}
               {...defaultProps}
             />
           );

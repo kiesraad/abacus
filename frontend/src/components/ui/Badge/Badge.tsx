@@ -13,7 +13,7 @@ const typeToLabel: { [S in DataEntryStatusName]: { label: string; icon?: ReactEl
   first_entry_has_errors: { label: t("data_entry.first_entry") },
   second_entry_not_started: { label: t("data_entry.second_entry") },
   second_entry_in_progress: { label: t("data_entry.second_entry"), icon: <Icon size="sm" icon={<IconPencil />} /> },
-  entries_different: { label: t("data_entry.entries_different") },
+  entries_different: { label: t("data_entry.second_entry") },
   definitive: { label: t("data_entry.definitive") },
 };
 

@@ -7,6 +7,7 @@ import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen } from "@/testing/test-utils";
 import {
@@ -15,7 +16,7 @@ import {
   SaveDataEntryResponse,
 } from "@/types/generated/openapi";
 
-import { errorWarningMocks, getEmptyDataEntryRequest } from "../../testing/mock-data";
+import { getEmptyDataEntryRequest } from "../../testing/mock-data";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
 
@@ -165,7 +166,7 @@ describe("Test RecountedForm", () => {
       expect(no).not.toBeChecked();
 
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [errorWarningMocks.F101], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F101], warnings: [] },
       } as SaveDataEntryResponse);
 
       await user.click(submitButton);
@@ -185,7 +186,7 @@ describe("Test RecountedForm", () => {
 
       await screen.findByTestId("recounted_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [errorWarningMocks.W001] },
+        validation_results: { errors: [], warnings: [validationResultMockData.W001] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -225,7 +226,7 @@ describe("Test RecountedForm", () => {
 
       await screen.findByTestId("recounted_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [errorWarningMocks.W001] },
+        validation_results: { errors: [], warnings: [validationResultMockData.W001] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -248,7 +249,7 @@ describe("Test RecountedForm", () => {
 
     beforeEach(async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [errorWarningMocks.W001] },
+        validation_results: { errors: [], warnings: [validationResultMockData.W001] },
       });
 
       renderForm();

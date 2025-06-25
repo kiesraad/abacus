@@ -2,7 +2,6 @@ import type { Story } from "@ladle/react";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { extendedPollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import { userMockData } from "@/testing/api-mocks/UserMockData";
 
 import { ElectionStatus } from "./ElectionStatus";
 
@@ -73,20 +72,13 @@ export const DefaultElectionStatus: Story<StoryProps> = ({ navigate }) => {
       ]}
       election={electionMockData}
       pollingStations={extendedPollingStationMockData}
-      users={userMockData}
       navigate={navigate}
     />
   );
 };
 
 export const Empty: Story<StoryProps> = ({ navigate }) => (
-  <ElectionStatus
-    statuses={[]}
-    election={electionMockData}
-    pollingStations={[]}
-    users={userMockData}
-    navigate={navigate}
-  />
+  <ElectionStatus statuses={[]} election={electionMockData} pollingStations={[]} navigate={navigate} />
 );
 
 export default {

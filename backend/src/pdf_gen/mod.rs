@@ -23,9 +23,7 @@ pub(crate) mod tests {
 
     use super::*;
     use crate::{
-        election::{
-            ElectionCategory, ElectionStatus, ElectionWithPoliticalGroups, tests::election_fixture,
-        },
+        election::{ElectionCategory, ElectionWithPoliticalGroups, tests::election_fixture},
         pdf_gen::models::PdfModel,
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
@@ -71,7 +69,6 @@ pub(crate) mod tests {
                 number_of_seats: 29,
                 election_date: Utc::now().date_naive(),
                 nomination_date: Utc::now().date_naive(),
-                status: ElectionStatus::DataEntryFinished,
                 political_groups: vec![],
             },
             polling_stations: vec![],

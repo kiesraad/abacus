@@ -1,9 +1,9 @@
-import { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
+import { PollingStationResults, ValidationResult, ValidationResults } from "@/types/generated/openapi";
 import { DataEntryStructure, FormSectionId } from "@/types/types";
+import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
 
 import { ClientState, FormSection, FormState } from "../types/types";
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
-import { addValidationResultsToFormState, ValidationResultSet } from "./ValidationResults";
 
 export function objectHasOnlyEmptyValues(obj: Record<string, "" | number>): boolean {
   for (const key in obj) {
@@ -86,45 +86,6 @@ export type DataEntrySummary = {
     formSection: FormSection;
   }[];
 };
-
-export function getDataEntrySummary(formState: FormState): DataEntrySummary {
-  const result: DataEntrySummary = {
-    countsAddUp: true,
-    hasBlocks: false,
-    hasWarnings: false,
-    hasErrors: false,
-    notableFormSections: [],
-  };
-
-  //TODO: errors are "acceptable now"
-  Object.values(formState.sections)
-    .filter((section) => section.id !== "save")
-    .sort(sortFormSections)
-    .forEach((section) => {
-      if (!section.errors.isEmpty()) {
-        result.notableFormSections.push({ status: "errors", formSection: section });
-        result.countsAddUp = false;
-        result.hasBlocks = true;
-        result.hasErrors = true;
-      } else if (!section.warnings.isEmpty()) {
-        result.hasWarnings = true;
-        if (section.acceptErrorsAndWarnings) {
-          result.notableFormSections.push({ status: "accepted-warnings", formSection: section });
-        } else {
-          result.notableFormSections.push({ status: "unaccepted-warnings", formSection: section });
-          result.hasBlocks = true;
-        }
-      }
-    });
-
-  return result;
-}
-
-function sortFormSections(a: FormSection, b: FormSection): number {
-  if (a.index < b.index) return -1;
-  if (a.index > b.index) return 1;
-  return 0;
-}
 
 function createFormSection(id: FormSectionId, index: number): FormSection {
   return {
@@ -268,4 +229,25 @@ export function updateFormStateAfterSubmit(
   }
 
   return formState;
+}
+
+/*
+ * Distributes validation results to the corresponding sections in the form state, but only if that section is saved.
+ */
+export function addValidationResultsToFormState(
+  validationResults: ValidationResult[],
+  formState: FormState,
+  dataEntryStructure: DataEntryStructure,
+  errorsOrWarnings: "errors" | "warnings",
+) {
+  for (const section of dataEntryStructure) {
+    const formSection = formState.sections[section.id];
+    if (formSection && formSection.isSaved) {
+      for (const validationResult of validationResults) {
+        if (doesValidationResultApplyToSection(validationResult, section)) {
+          formSection[errorsOrWarnings].add(validationResult);
+        }
+      }
+    }
+  }
 }

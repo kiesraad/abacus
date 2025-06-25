@@ -1114,7 +1114,7 @@ mod tests {
 
         /// Apportionment with residual seats assigned with largest remainders method
         ///
-        /// Full seats: [6, 3, 3, 0, 0, 0, 0] - Remainder seats: 3  
+        /// Full seats: [6, 3, 3, 0, 0, 0, 0, 0] - Remainder seats: 3  
         /// Remainders: [0/15, 0/15, 0/15, 55, 50, 45, 45, 45], only votes of lists [1, 2, 3] meet the threshold of 75% of the quota  
         /// 1 - largest remainder: seat assigned to list 1  
         /// 2 - largest remainder: seat assigned to list 2  

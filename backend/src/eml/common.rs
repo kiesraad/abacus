@@ -74,7 +74,7 @@ impl From<crate::election::ElectionCategory> for ElectionCategory {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ElectionSubcategory {
     /// Provinciale staten (provinicial council), single electoral district
     PS1,
@@ -141,6 +141,36 @@ pub struct ElectionIdentifier {
     pub nomination_date: Option<String>,
 }
 
+impl ElectionIdentifier {
+    pub fn from_election(
+        election: &crate::election::structs::ElectionWithPoliticalGroups,
+        include_nomination_date: bool,
+    ) -> Self {
+        let subcategory = if election.number_of_seats >= 19 {
+            ElectionSubcategory::GR2
+        } else {
+            ElectionSubcategory::GR1
+        };
+
+        Self {
+            id: election.election_id.clone(),
+            election_name: election.name.clone(),
+            election_category: ElectionCategory::GR,
+            election_subcategory: Some(subcategory),
+            election_domain: Some(ElectionDomain {
+                id: election.domain_id.clone(),
+                name: election.location.clone(),
+            }),
+            election_date: election.election_date.format("%Y-%m-%d").to_string(),
+            nomination_date: if include_nomination_date {
+                Some(election.nomination_date.format("%Y-%m-%d").to_string())
+            } else {
+                None
+            },
+        }
+    }
+}
+
 /// Election domain part of election identifier
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -188,11 +218,15 @@ pub struct ContestIdentifier {
 }
 
 impl ContestIdentifier {
-    pub fn new(id: impl Into<String>, contest_name: Option<String>) -> ContestIdentifier {
+    pub fn new(id: impl Into<String>, contest_name: Option<String>) -> Self {
         ContestIdentifier {
             id: id.into(),
             contest_name,
         }
+    }
+
+    pub fn geen() -> Self {
+        Self::new("geen", None)
     }
 }
 

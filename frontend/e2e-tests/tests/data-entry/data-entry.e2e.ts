@@ -389,6 +389,74 @@ test.describe("full data entry flow", () => {
     await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
     await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
+
+  test("submit with accepted errors on voters and votes, differences and candidate votes pages", async ({
+    page,
+    pollingStation,
+  }) => {
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkNoAndClickNext();
+
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    const voters = {
+      poll_card_count: 100,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
+    };
+    const votes = {
+      votes_candidates_count: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 10,
+    };
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+
+    await votersAndVotesPage.checkAcceptErrorsAndWarnings();
+    await votersAndVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await differencesPage.fewerBallotsCount.fill(`${voters.poll_card_count - votes.total_votes_cast_count}`);
+    await differencesPage.next.click();
+    await differencesPage.checkAcceptErrorsAndWarnings();
+    await differencesPage.next.click();
+
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+
+    await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
+    await candidatesListPage_1.next.click();
+    await expect(candidatesListPage_1.error).toBeVisible();
+    await candidatesListPage_1.checkAcceptErrorsAndWarnings();
+    await candidatesListPage_1.next.click();
+
+    const checkAndSavePage = new CheckAndSavePage(page);
+    await expect(checkAndSavePage.fieldset).toBeVisible();
+
+    await expect(checkAndSavePage.summaryListItemVotersAndVotes).toHaveText([
+      "F.202 Controleer uitgebrachte stemmen",
+      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
+      "W.203 Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
+    ]);
+    await expect(checkAndSavePage.summaryListItemDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
+    await expect(checkAndSavePage.summaryListItemPoliticalGroupVotes1).toHaveText([
+      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
+    ]);
+
+    await expect(checkAndSavePage.complete).toBeVisible();
+    await expect(checkAndSavePage.acceptErrors).toBeVisible();
+    await checkAndSavePage.complete.click();
+
+    await expect(checkAndSavePage.acceptErrorsReminder).toBeVisible();
+    await checkAndSavePage.acceptErrors.click();
+    await expect(checkAndSavePage.acceptErrors).toBeChecked();
+    await checkAndSavePage.complete.click();
+
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
+    await expect(dataEntryHomePage.dataEntryErrors).toBeVisible();
+  });
 });
 
 test.describe("second data entry", () => {

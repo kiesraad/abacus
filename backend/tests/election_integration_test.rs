@@ -1,13 +1,13 @@
 #![cfg(test)]
 
-use axum::http::StatusCode;
-use sqlx::SqlitePool;
-use test_log::test;
-
 use crate::{shared::create_result, utils::serve_api};
+use abacus::committee_session::CommitteeSessionStatus;
 #[cfg(feature = "dev-database")]
 use abacus::election::Election;
 use abacus::election::{ElectionDetailsResponse, ElectionListResponse};
+use axum::http::StatusCode;
+use sqlx::SqlitePool;
+use test_log::test;
 
 pub mod shared;
 pub mod utils;
@@ -47,6 +47,10 @@ async fn test_election_details_works(pool: SqlitePool) {
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionDetailsResponse = response.json().await.unwrap();
+    assert_eq!(
+        body.committee_session.status,
+        CommitteeSessionStatus::Created
+    );
     assert_eq!(body.election.name, "Municipal Election");
     assert_eq!(body.polling_stations.len(), 2);
     assert!(

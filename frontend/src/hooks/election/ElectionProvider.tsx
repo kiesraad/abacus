@@ -21,6 +21,7 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
       renderOnSuccess={(data) => (
         <ElectionProviderContext.Provider
           value={{
+            committeeSession: data.committee_session,
             election: data.election,
             pollingStations: data.polling_stations,
           }}

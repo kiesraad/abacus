@@ -94,9 +94,9 @@ export function CheckAndSaveForm() {
 
     const dataEntryStatus = await onFinaliseDataEntry();
     if (dataEntryStatus !== undefined) {
-      if (dataEntryStatus.status === "EntriesDifferent") {
+      if (dataEntryStatus.status === "entries_different") {
         await navigate(`/elections/${election.id}/data-entry#data-entry-different`);
-      } else if (dataEntryStatus.status === "FirstEntryHasErrors") {
+      } else if (dataEntryStatus.status === "first_entry_has_errors") {
         await navigate(`/elections/${election.id}/data-entry#data-entry-errors`);
       } else {
         await navigate(`/elections/${election.id}/data-entry#data-entry-${entryNumber}-saved`);

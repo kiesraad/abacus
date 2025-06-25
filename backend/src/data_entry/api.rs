@@ -10,7 +10,8 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    DataError, PollingStationDataEntry, PollingStationResults, ValidationResults,
+    DataEntryStatusResponse, DataError, PollingStationDataEntry, PollingStationResults,
+    ValidationResults,
     entry_number::EntryNumber,
     repository::PollingStationDataEntries,
     status::{
@@ -301,7 +302,7 @@ async fn polling_station_data_entry_delete(
     post,
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
     responses(
-        (status = 200, description = "Data entry finalised successfully", body = DataEntryStatus),
+        (status = 200, description = "Data entry finalised successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
@@ -320,7 +321,7 @@ async fn polling_station_data_entry_finalise(
     State(polling_stations_repo): State<PollingStations>,
     audit_service: AuditService,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
-) -> Result<Json<DataEntryStatus>, APIError> {
+) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let state = polling_station_data_entries.get_or_default(id).await?;
 
     let polling_station = polling_stations_repo.get(id).await?;
@@ -362,7 +363,7 @@ async fn polling_station_data_entry_finalise(
         )
         .await?;
 
-    Ok(Json(data_entry.state.0))
+    Ok(Json(data_entry.into()))
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
@@ -449,7 +450,7 @@ async fn polling_station_data_entry_get_errors(
     path = "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors",
     request_body = ResolveErrorsAction,
     responses(
-        (status = 200, description = "Errors resolved successfully", body = PollingStationDataEntry),
+        (status = 200, description = "Errors resolved successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
@@ -466,7 +467,7 @@ async fn polling_station_data_entry_resolve_errors(
     Path(polling_station_id): Path<u32>,
     audit_service: AuditService,
     action: ResolveErrorsAction,
-) -> Result<Json<PollingStationDataEntry>, APIError> {
+) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let state = polling_station_data_entries
         .get_or_default(polling_station_id)
         .await?;
@@ -484,7 +485,7 @@ async fn polling_station_data_entry_resolve_errors(
         .log(&action.audit_event(data_entry.clone()), None)
         .await?;
 
-    Ok(Json(data_entry))
+    Ok(Json(data_entry.into()))
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -541,7 +542,7 @@ async fn polling_station_data_entry_get_differences(
     path = "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences",
     request_body = ResolveDifferencesAction,
     responses(
-        (status = 200, description = "Differences resolved successfully", body = PollingStationDataEntry),
+        (status = 200, description = "Differences resolved successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
@@ -560,7 +561,7 @@ async fn polling_station_data_entry_resolve_differences(
     Path(polling_station_id): Path<u32>,
     audit_service: AuditService,
     action: ResolveDifferencesAction,
-) -> Result<Json<PollingStationDataEntry>, APIError> {
+) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let polling_station = polling_stations.get(polling_station_id).await?;
     let election = elections.get(polling_station.election_id).await?;
     let state = polling_station_data_entries
@@ -583,7 +584,7 @@ async fn polling_station_data_entry_resolve_differences(
         .log(&action.audit_event(data_entry.clone()), None)
         .await?;
 
-    Ok(Json(data_entry))
+    Ok(Json(data_entry.into()))
 }
 
 /// Election polling stations data entry statuses response

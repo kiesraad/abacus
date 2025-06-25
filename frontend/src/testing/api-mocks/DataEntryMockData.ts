@@ -3,8 +3,6 @@ import {
   ClaimDataEntryResponse,
   DataEntryGetDifferencesResponse,
   DataEntryGetErrorsResponse,
-  DataEntryStatus,
-  PollingStationDataEntry,
   PollingStationResults,
   SaveDataEntryResponse,
   ValidationResults,
@@ -161,56 +159,12 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
   },
 };
 
-export const entriesDifferentStatus: DataEntryStatus = {
-  state: {
-    ...dataEntryStatusDifferences,
-    first_entry_finished_at: "",
-    second_entry_finished_at: "",
-  },
-  status: "EntriesDifferent",
-};
-
-export const firstEntryHasErrorsStatus: DataEntryStatus = {
-  state: {
-    finalised_first_entry: getEmptyDataEntryRequest().data,
-    first_entry_finished_at: "",
-    first_entry_user_id: 1,
-  },
-  status: "FirstEntryHasErrors",
-};
-
-export const secondEntryNotStartedStatus: DataEntryStatus = {
-  state: {
-    finalised_first_entry: getEmptyDataEntryRequest().data,
-    first_entry_finished_at: "",
-    first_entry_user_id: 1,
-  },
-  status: "SecondEntryNotStarted",
-};
-
-export const dataEntryResolveDifferencesMockResponse: PollingStationDataEntry = {
-  polling_station_id: 3,
-  updated_at: "2025-04-14T17:19:42.133270353Z",
-  state: {
-    state: {
-      finished_at: "2025-04-14T17:19:42.133270353Z",
-      first_entry_user_id: 2,
-      second_entry_user_id: 1,
-    },
-    status: "Definitive",
-  },
-};
-
 export const dataEntryGetErrorsMockResponse: DataEntryGetErrorsResponse = {
-  ...firstEntryHasErrorsStatus.state,
+  finalised_first_entry: getEmptyDataEntryRequest().data,
+  first_entry_finished_at: "",
+  first_entry_user_id: 1,
   validation_results: {
     errors: [validationResultMockData.F101],
     warnings: [validationResultMockData.W201, validationResultMockData.W301],
   },
-};
-
-export const dataEntryResolveErrorsMockResponse: PollingStationDataEntry = {
-  polling_station_id: 3,
-  updated_at: "2025-04-14T17:19:42.133270353Z",
-  state: secondEntryNotStartedStatus,
 };

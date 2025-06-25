@@ -13,7 +13,7 @@ import {
   CommitteeSessionListResponse,
   DataEntryGetDifferencesResponse,
   DataEntryGetErrorsResponse,
-  DataEntryStatus,
+  DataEntryStatusResponse,
   ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS,
   ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PARAMS,
@@ -61,7 +61,6 @@ import {
   POLLING_STATION_UPDATE_REQUEST_PARAMS,
   POLLING_STATION_UPDATE_REQUEST_PATH,
   PollingStation,
-  PollingStationDataEntry,
   PollingStationListResponse,
   SaveDataEntryResponse,
   User,
@@ -86,11 +85,8 @@ import { committeeSessionListMockResponse } from "./CommitteeSessionMockData";
 import {
   claimDataEntryResponse,
   dataEntryGetErrorsMockResponse,
-  dataEntryResolveDifferencesMockResponse,
-  dataEntryResolveErrorsMockResponse,
   dataEntryStatusDifferences,
   saveDataEntryResponse,
-  secondEntryNotStartedStatus,
 } from "./DataEntryMockData";
 import { electionDetailsMockResponse, electionListMockResponse } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
@@ -200,19 +196,19 @@ export const PollingStationDataEntryGetErrorsHandler = http.get<
 export const PollingStationDataEntryResolveDifferencesHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
-  PollingStationDataEntry,
+  DataEntryStatusResponse,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH
 >("/api/polling_stations/3/data_entries/resolve_differences", () =>
-  HttpResponse.json(dataEntryResolveDifferencesMockResponse, { status: 200 }),
+  HttpResponse.json({ status: "definitive" }, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveErrorsHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY,
-  PollingStationDataEntry,
+  DataEntryStatusResponse,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH
 >("/api/polling_stations/5/data_entries/resolve_errors", () =>
-  HttpResponse.json(dataEntryResolveErrorsMockResponse, { status: 200 }),
+  HttpResponse.json({ status: "definitive" }, { status: 200 }),
 );
 
 // get polling stations
@@ -254,10 +250,10 @@ export const PollingStationDataEntryDeleteHandler = http.delete<
 export const PollingStationDataEntryFinaliseHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS>,
   null,
-  DataEntryStatus | ErrorResponse,
+  DataEntryStatusResponse | ErrorResponse,
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH
 >("/api/polling_stations/1/data_entries/1/finalise", () =>
-  HttpResponse.json(secondEntryNotStartedStatus, { status: 200 }),
+  HttpResponse.json({ status: "second_entry_not_started" }, { status: 200 }),
 );
 
 export const PollingStationCreateHandler = http.post<

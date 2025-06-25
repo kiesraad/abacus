@@ -3,14 +3,13 @@ import { Dispatch } from "react";
 import { AnyApiError } from "@/api/ApiResult";
 import {
   ClaimDataEntryResponse,
-  DataEntryStatus,
+  DataEntryStatusResponse,
   ElectionWithPoliticalGroups,
   PollingStationResults,
   ValidationResults,
 } from "@/types/generated/openapi";
 import { DataEntryStructure, FormSectionId, SectionValues } from "@/types/types";
-
-import { ValidationResultSet } from "../../../utils/ValidationResults";
+import { ValidationResultSet } from "@/utils/ValidationResults";
 
 export interface DataEntryState {
   // state from providers
@@ -37,7 +36,7 @@ export interface DataEntryStateAndActions extends DataEntryState {
   dispatch: DataEntryDispatch;
   onSubmitForm: (currentValues: SectionValues, options?: SubmitCurrentFormOptions) => Promise<boolean>;
   onDeleteDataEntry: () => Promise<boolean>;
-  onFinaliseDataEntry: () => Promise<DataEntryStatus | undefined>;
+  onFinaliseDataEntry: () => Promise<DataEntryStatusResponse | undefined>;
   register: (formSectionId: FormSectionId) => void;
   setCache: (cache: TemporaryCache) => void;
   updateFormSection: (partialFormSection: Partial<FormSection>) => void;

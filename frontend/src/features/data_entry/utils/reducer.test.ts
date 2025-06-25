@@ -2,7 +2,6 @@ import { describe, expect, test, vi } from "vitest";
 
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResponseStatus } from "@/api/ApiResult";
-import { secondEntryNotStartedStatus } from "@/testing/api-mocks/DataEntryMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryDeleteHandler,
@@ -365,6 +364,6 @@ describe("onFinaliseDataEntry", () => {
       { type: "SET_STATUS", status: "finalised" } satisfies DataEntryAction,
     ]);
 
-    expect(result).toStrictEqual(secondEntryNotStartedStatus);
+    expect(result?.status).toBe("second_entry_not_started");
   });
 });

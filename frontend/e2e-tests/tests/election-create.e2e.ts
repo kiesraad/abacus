@@ -58,7 +58,7 @@ test.describe("Election creation", () => {
     await expect(overviewPage.header).toBeVisible();
     // Check if the amount of elections by this title is greater than before the import
     expect(await overviewPage.elections.count()).toBeGreaterThan(initialElectionCount);
-    // Check if the amount of "Klaar voor invoer" states is greater than before the import
+    // Check if the amount of "Voorbereiden" states is greater than before the import
     expect(await overviewPage.electionsCreatedState.count()).toBeGreaterThan(initialCreatedStateCount);
   });
 

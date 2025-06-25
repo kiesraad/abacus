@@ -13,11 +13,12 @@ use super::{
     repository::Elections,
     structs::{Election, ElectionWithPoliticalGroups},
 };
-#[cfg(feature = "dev-database")]
-use crate::audit_log::{AuditEvent, AuditService};
+use crate::committee_session::CommitteeSession;
 use crate::{
     APIError, AppState, ErrorResponse,
+    audit_log::{AuditEvent, AuditService},
     authentication::{Admin, User},
+    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},
 };
@@ -43,9 +44,11 @@ pub struct ElectionListResponse {
     pub elections: Vec<Election>,
 }
 
-/// Election details response, including the election's candidate list (political groups) and its polling stations
+/// Election details response, including the election's candidate list (political groups),
+/// its polling stations and the current committee session
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionDetailsResponse {
+    pub committee_session: CommitteeSession,
     pub election: ElectionWithPoliticalGroups,
     pub polling_stations: Vec<PollingStation>,
 }
@@ -68,7 +71,8 @@ pub async fn election_list(
     Ok(Json(ElectionListResponse { elections }))
 }
 
-/// Get election details including the election's candidate list (political groups) and its polling stations
+/// Get election details including the election's candidate list (political groups),
+/// its polling stations and the current committee session
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}",
@@ -84,13 +88,18 @@ pub async fn election_list(
 )]
 pub async fn election_details(
     _user: User,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     State(elections_repo): State<Elections>,
     State(polling_stations): State<PollingStations>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = elections_repo.get(id).await?;
     let polling_stations = polling_stations.list(id).await?;
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(id)
+        .await?;
     Ok(Json(ElectionDetailsResponse {
+        committee_session,
         election,
         polling_stations,
     }))
@@ -112,13 +121,27 @@ pub async fn election_details(
 pub async fn election_create(
     _user: Admin,
     State(elections_repo): State<Elections>,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     audit_service: AuditService,
     Json(new_election): Json<NewElection>,
 ) -> Result<(StatusCode, ElectionWithPoliticalGroups), APIError> {
     let election = elections_repo.create(new_election).await?;
-
     audit_service
         .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
+        .await?;
+
+    // Create first committee session for the election
+    let committee_session = committee_sessions_repo
+        .create(CommitteeSessionCreateRequest {
+            number: 1,
+            election_id: election.id,
+        })
+        .await?;
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+            None,
+        )
         .await?;
 
     Ok((StatusCode::CREATED, election))
@@ -207,6 +230,8 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
 pub async fn election_import(
     _user: Admin,
     State(elections_repo): State<Elections>,
+    State(committee_sessions_repo): State<CommitteeSessions>,
+    audit_service: AuditService,
     Json(edu): Json<ElectionAndCandidatesDefinitionImportRequest>,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
     if edu.election_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
@@ -220,6 +245,21 @@ pub async fn election_import(
     new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
 
     let election = elections_repo.create(new_election).await?;
+
+    // Create first committee session for the election
+    let committee_session = committee_sessions_repo
+        .create(CommitteeSessionCreateRequest {
+            number: 1,
+            election_id: election.id,
+        })
+        .await?;
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+            None,
+        )
+        .await?;
+
     Ok((StatusCode::CREATED, Json(election)))
 }
 

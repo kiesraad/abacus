@@ -10,6 +10,128 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/committee_sessions": {
+      "post": {
+        "summary": "Create a new [CommitteeSession].",
+        "operationId": "committee_session_create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitteeSessionCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Committee session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommitteeSession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/committee_sessions/{committee_session_id}": {
+      "put": {
+        "summary": "Update a [CommitteeSession].",
+        "operationId": "committee_session_update",
+        "parameters": [
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "description": "Committee session database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitteeSessionUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Committee session updated successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Committee session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/elections": {
       "get": {
         "summary": "Get a list of all elections, without their candidate lists",
@@ -222,7 +344,7 @@
     },
     "/api/elections/{election_id}": {
       "get": {
-        "summary": "Get election details including the election's candidate list (political groups) and its polling stations",
+        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session",
         "operationId": "election_details",
         "parameters": [
           {
@@ -341,6 +463,67 @@
           },
           "422": {
             "description": "Election apportionment is not possible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/elections/{election_id}/committee_sessions": {
+      "get": {
+        "summary": "Get a list of all [CommitteeSession]s of an election",
+        "operationId": "election_committee_session_list",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committee session list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommitteeSessionListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -2369,6 +2552,48 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/CommitteeSessionDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "CommitteeSessionCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommitteeSessionDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "CommitteeSessionUpdated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/ElectionDetails"
               },
               {
@@ -2918,6 +3143,155 @@
           }
         }
       },
+      "CommitteeSession": {
+        "type": "object",
+        "description": "Committee session",
+        "required": [
+          "id",
+          "number",
+          "election_id",
+          "location",
+          "start_date",
+          "start_time",
+          "status"
+        ],
+        "properties": {
+          "election_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "location": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CommitteeSessionStatus"
+          }
+        }
+      },
+      "CommitteeSessionCreateRequest": {
+        "type": "object",
+        "description": "Committee session create request",
+        "required": [
+          "number",
+          "election_id"
+        ],
+        "properties": {
+          "election_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "CommitteeSessionDetails": {
+        "type": "object",
+        "required": [
+          "sessionId",
+          "sessionNumber",
+          "sessionElectionId",
+          "sessionLocation",
+          "sessionStartDate",
+          "sessionStartTime",
+          "sessionStatus"
+        ],
+        "properties": {
+          "sessionElectionId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "sessionId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "sessionLocation": {
+            "type": "string"
+          },
+          "sessionNumber": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "sessionStartDate": {
+            "type": "string"
+          },
+          "sessionStartTime": {
+            "type": "string"
+          },
+          "sessionStatus": {
+            "type": "string"
+          }
+        }
+      },
+      "CommitteeSessionListResponse": {
+        "type": "object",
+        "description": "Committee session list response",
+        "required": [
+          "committee_sessions"
+        ],
+        "properties": {
+          "committee_sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommitteeSession"
+            }
+          }
+        }
+      },
+      "CommitteeSessionStatus": {
+        "type": "string",
+        "description": "Committee session status",
+        "enum": [
+          "created",
+          "data_entry_not_started",
+          "data_entry_in_progress",
+          "data_entry_paused",
+          "data_entry_finished"
+        ]
+      },
+      "CommitteeSessionUpdateRequest": {
+        "type": "object",
+        "description": "Committee session update request",
+        "required": [
+          "location",
+          "start_date",
+          "start_time"
+        ],
+        "properties": {
+          "location": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          }
+        }
+      },
       "CreateUserRequest": {
         "type": "object",
         "required": [
@@ -3285,8 +3659,7 @@
           "category",
           "number_of_seats",
           "election_date",
-          "nomination_date",
-          "status"
+          "nomination_date"
         ],
         "properties": {
           "category": {
@@ -3326,9 +3699,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "status": {
-            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },
@@ -3444,8 +3814,7 @@
           "electionCategory",
           "electionNumberOfSeats",
           "electionElectionDate",
-          "electionNominationDate",
-          "electionStatus"
+          "electionNominationDate"
         ],
         "properties": {
           "electionCategory": {
@@ -3485,20 +3854,21 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "electionStatus": {
-            "type": "string"
           }
         }
       },
       "ElectionDetailsResponse": {
         "type": "object",
-        "description": "Election details response, including the election's candidate list (political groups) and its polling stations",
+        "description": "Election details response, including the election's candidate list (political groups),\nits polling stations and the current committee session",
         "required": [
+          "committee_session",
           "election",
           "polling_stations"
         ],
         "properties": {
+          "committee_session": {
+            "$ref": "#/components/schemas/CommitteeSession"
+          },
           "election": {
             "$ref": "#/components/schemas/ElectionWithPoliticalGroups"
           },
@@ -3524,15 +3894,6 @@
             }
           }
         }
-      },
-      "ElectionStatus": {
-        "type": "string",
-        "description": "Election status (limited for now)",
-        "enum": [
-          "Created",
-          "DataEntryInProgress",
-          "DataEntryFinished"
-        ]
       },
       "ElectionStatusResponse": {
         "type": "object",
@@ -3651,7 +4012,6 @@
           "number_of_seats",
           "election_date",
           "nomination_date",
-          "status",
           "political_groups"
         ],
         "properties": {
@@ -3698,9 +4058,6 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
-          },
-          "status": {
-            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },
@@ -4054,7 +4411,6 @@
           "number_of_seats",
           "election_date",
           "nomination_date",
-          "status",
           "political_groups"
         ],
         "properties": {
@@ -4096,9 +4452,6 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
-          },
-          "status": {
-            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },

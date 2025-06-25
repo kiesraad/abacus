@@ -17,7 +17,6 @@ export const electionRequest: NewElection = {
   number_of_seats: 29,
   election_date: "2026-01-01",
   nomination_date: "2026-01-01",
-  status: "DataEntryInProgress",
   political_groups: [
     {
       number: 1,

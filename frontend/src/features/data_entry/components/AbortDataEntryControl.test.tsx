@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { useElection } from "@/hooks/election/useElection";
+import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
@@ -30,6 +31,7 @@ function renderComponent() {
 describe("AbortDataEntryControl", () => {
   beforeEach(() => {
     vi.mocked(useElection).mockReturnValue({
+      committeeSession: committeeSessionMockData,
       election: electionMockData,
       pollingStations: [],
       pollingStation: undefined,

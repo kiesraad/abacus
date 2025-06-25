@@ -6,6 +6,7 @@ use std::{
 };
 
 use abacus::{
+    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
     data_entry::{
         CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
         VotersCounts, VotesCounts,
@@ -13,8 +14,8 @@ use abacus::{
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
     election::{
-        CandidateGender, ElectionCategory, ElectionStatus, ElectionWithPoliticalGroups,
-        NewElection, PoliticalGroup, repository::Elections,
+        CandidateGender, ElectionCategory, ElectionWithPoliticalGroups, NewElection,
+        PoliticalGroup, repository::Elections,
     },
     eml::{EML110, EML230, EMLDocument},
     fixtures,
@@ -145,6 +146,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await
         .expect("Failed to create election");
 
+    // generate the committee session for the election
+    let cs_repo = CommitteeSessions::new(pool.clone());
+    cs_repo
+        .create(CommitteeSessionCreateRequest {
+            number: 1,
+            election_id: election.id,
+        })
+        .await
+        .expect("Failed to create committee session");
+
     // generate the polling stations for the election
     let ps_repo = PollingStations::new(pool.clone());
     let polling_stations = generate_polling_stations(&mut rng, &election, &ps_repo, &args).await;
@@ -239,7 +250,6 @@ fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
         number_of_seats: rng.random_range(args.seats.clone()),
         election_date,
         nomination_date,
-        status: ElectionStatus::DataEntryInProgress,
         political_groups,
     }
 }

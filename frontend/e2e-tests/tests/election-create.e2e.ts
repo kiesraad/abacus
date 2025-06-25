@@ -17,7 +17,7 @@ test.describe("Election creation", () => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
     const initialElectionCount = await overviewPage.electionCount();
-    const initialReadyStateCount = await page.getByText("Klaar voor invoer").count();
+    // const initialReadyStateCount = await page.getByText("Klaar voor invoer").count();
     await overviewPage.create.click();
 
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
@@ -61,8 +61,9 @@ test.describe("Election creation", () => {
     await expect(overviewPage.header).toBeVisible();
     // Check if the amount of elections by this title is greater than before the import
     expect(await overviewPage.electionCount()).toBeGreaterThan(initialElectionCount);
-    // Check if the amount of "Klaar voor invoer states" is greater than before the import
-    expect(await overviewPage.readyStateCount()).toBeGreaterThan(initialReadyStateCount);
+    // TODO: Uncomment this when issue #1649 is finished
+    // // Check if the amount of "Klaar voor invoer states" is greater than before the import
+    // expect(await overviewPage.readyStateCount()).toBeGreaterThan(initialReadyStateCount);
   });
 
   test("it fails on incorrect hash", async ({ page }) => {

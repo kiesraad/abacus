@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router";
 
 import { useInitialApiGet } from "@/api/useInitialApiGet";
-import { HeaderElectionStatusWithIcon } from "@/components/election_status_with_icon/ElectionStatusWithIcon";
+import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session_status_with_icon/CommitteeSessionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -10,13 +10,14 @@ import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/i18n/translate";
 import { USER_LIST_REQUEST_PATH, UserListResponse } from "@/types/generated/openapi";
+import { committeeSessionLabel } from "@/utils/committeeSession";
 
 import { ElectionStatus } from "./ElectionStatus";
 
 export function ElectionStatusPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { election, pollingStations } = useElection();
+  const { committeeSession, election, pollingStations } = useElection();
   const { statuses } = useElectionStatus();
   const { requestState } = useInitialApiGet<UserListResponse>("/api/user" satisfies USER_LIST_REQUEST_PATH);
 
@@ -43,6 +44,7 @@ export function ElectionStatusPage() {
   }
 
   function finishInput() {
+    // TODO: Add call to endpoint that changes status of committee session to "data_entry_finished" in issue #1650
     void navigate("../report");
   }
 
@@ -55,11 +57,11 @@ export function ElectionStatusPage() {
       <PageTitle title={`${t("election_status.title")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("election_status.first_session")}</h1>
+          <h1>{committeeSessionLabel(committeeSession.number)}</h1>
         </section>
         <section>
           <div className="election_status">
-            <HeaderElectionStatusWithIcon status={election.status} userRole="coordinator" />
+            <HeaderCommitteeSessionStatusWithIcon status={committeeSession.status} userRole="coordinator" />
           </div>
         </section>
       </header>
@@ -83,7 +85,7 @@ export function ElectionStatusPage() {
           </p>
         </Alert>
       )}
-      {election.status !== "DataEntryFinished" &&
+      {committeeSession.status !== "data_entry_finished" &&
         statuses.length > 0 &&
         statuses.every((s) => s.status === "definitive") && (
           <Alert type="success">

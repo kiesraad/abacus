@@ -1,7 +1,5 @@
-INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date,
-                       status, political_groups)
+INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date, political_groups)
 VALUES (4, 'Test Election < 19 seats', 'TestLocation_2026', 'Test Location', '0000', 2000, 'Municipal', 15, '2026-03-18', '2026-02-02',
-        'DataEntryInProgress',
         '[
           {
             "number": 1,
@@ -412,6 +410,9 @@ VALUES (4, 'Test Election < 19 seats', 'TestLocation_2026', 'Test Location', '00
             ]
           }
         ]');
+
+INSERT INTO committee_sessions (id, number, election_id, location, start_date, start_time)
+VALUES (4, 1, 4, '', '', '');
 
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)

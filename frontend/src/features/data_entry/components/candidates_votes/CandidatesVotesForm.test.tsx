@@ -319,7 +319,6 @@ describe("Test CandidatesVotesForm", () => {
         number_of_seats: 29,
         election_date: "2024-11-30",
         nomination_date: "2024-11-01",
-        status: "DataEntryInProgress",
         political_groups: [
           politicalGroupMockData,
           {

@@ -318,7 +318,7 @@ mod tests {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct DataEntryStatusResponse {
-    status: DataEntryStatusName,
+    pub status: DataEntryStatusName,
 }
 
 impl From<PollingStationDataEntry> for DataEntryStatusResponse {

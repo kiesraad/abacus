@@ -835,9 +835,9 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         let body = response.into_body().collect().await.unwrap().to_bytes();
-        let status: DataEntryStatus = serde_json::from_slice(&body).unwrap();
+        let DataEntryStatusResponse { status } = serde_json::from_slice(&body).unwrap();
 
-        assert!(matches!(status, DataEntryStatus::FirstEntryHasErrors(_)));
+        assert_eq!(status, DataEntryStatusName::FirstEntryHasErrors);
 
         // Check that it has been logged in the audit log
         let audit_log_row =

@@ -9,7 +9,7 @@ import cls from "./Icon.module.css";
 export interface IconProps {
   icon: React.ReactNode;
   size?: Size;
-  color?: "primary" | "warning" | "error" | "accept" | ProgressBarColorClass;
+  color?: "primary" | "warning" | "error" | "accept" | "status-not-started" | ProgressBarColorClass;
   spacing?: number;
 }
 

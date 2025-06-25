@@ -2,9 +2,7 @@ import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
 import { TranslationPath } from "@/i18n/i18n.types";
 import { t } from "@/i18n/translate";
-import { FormSectionId } from "@/types/types";
-
-import { InputGridSubsection, InputGridSubsectionRow, SectionValues } from "../../types/types";
+import { FormSectionId, InputGridSubsection, InputGridSubsectionRow, SectionValues } from "@/types/types";
 
 export interface InputGridSubsectionProps {
   subsection: InputGridSubsection;
@@ -16,6 +14,7 @@ export interface InputGridSubsectionProps {
     errorsAndWarningsAccepted: boolean;
   };
   missingTotalError: boolean;
+  readOnly?: boolean;
 }
 
 export function InputGridSubsectionComponent({
@@ -25,9 +24,10 @@ export function InputGridSubsectionComponent({
   setValues,
   defaultProps,
   missingTotalError,
+  readOnly = false,
 }: InputGridSubsectionProps) {
   return (
-    <InputGrid>
+    <InputGrid zebra={subsection.zebra}>
       <InputGrid.Header>
         <th>{t(subsection.headers[0])}</th>
         <th>{t(subsection.headers[1])}</th>
@@ -52,6 +52,7 @@ export function InputGridSubsectionComponent({
               isTotal={row.isTotal}
               isListTotal={row.isListTotal}
               errorMessageId={row.isListTotal && missingTotalError ? "missing-total-error" : undefined}
+              readOnly={readOnly}
               {...defaultProps}
             />
           );

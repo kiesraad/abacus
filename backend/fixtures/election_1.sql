@@ -1,6 +1,5 @@
-INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date,
-                       status, political_groups)
-VALUES (1, 'Gemeenteraad 2026', 'Juinen_2024', 'Juinen', '0000', 3500, 'Municipal', 29, '2024-11-30', '2024-11-1', 'DataEntryInProgress', '[
+INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date, political_groups)
+VALUES (1, 'Gemeenteraad 2026', 'Juinen_2024', 'Juinen', '0000', 3500, 'Municipal', 29, '2024-11-30', '2024-11-1', '[
          {
            "number": 1,
            "name": "Lijst Hekking",
@@ -806,6 +805,9 @@ VALUES (1, 'Gemeenteraad 2026', 'Juinen_2024', 'Juinen', '0000', 3500, 'Municipa
            ]
          }
        ]');
+
+INSERT INTO committee_sessions (id, number, election_id, location, start_date, start_time)
+VALUES (1, 1, 1, '', '', '');
 
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)

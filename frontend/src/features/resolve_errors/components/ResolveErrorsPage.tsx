@@ -7,10 +7,13 @@ import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
+import { useUsers } from "@/hooks/user/useUsers";
 import { t, tx } from "@/i18n/translate";
 import { ResolveErrorsAction } from "@/types/generated/openapi";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
+import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 import cls from "./ResolveErrors.module.css";
 
 export function ResolveErrorsPage() {
@@ -28,12 +31,15 @@ export function ResolveErrorsPage() {
     void navigate(url);
   };
   const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation, election, loading, status, action, setAction, onSubmit, validationError } =
+  const { pollingStation, election, loading, dataEntry, action, setAction, onSubmit, validationError } =
     usePollingStationDataEntryErrors(pollingStationId, afterSave);
+  const { getName } = useUsers();
 
-  if (loading || status === null) {
+  if (loading || dataEntry === null) {
     return <Loader />;
   }
+
+  const structure = getDataEntryStructure(election, dataEntry.finalised_first_entry);
 
   return (
     <>
@@ -50,7 +56,21 @@ export function ResolveErrorsPage() {
         <article>
           <h2>{t("resolve_errors.title")}</h2>
           <p>{t("resolve_errors.page_content")}</p>
+
+          <pre>{JSON.stringify(dataEntry.validation_results, null, 2)}</pre>
+
+          {structure.map((section) => (
+            <section key={section.id}>
+              <ReadOnlyDataEntrySection
+                section={section}
+                data={dataEntry.finalised_first_entry}
+                validationResults={dataEntry.validation_results}
+              />
+            </section>
+          ))}
+
           <form
+            className={cls.resolveForm}
             onSubmit={(e) => {
               e.preventDefault();
               void onSubmit();
@@ -62,7 +82,9 @@ export function ResolveErrorsPage() {
               {validationError && <ChoiceList.Error id="resolve-errors-error">{validationError}</ChoiceList.Error>}
               <ChoiceList.Radio
                 id="keep_entry"
-                label={tx("resolve_errors.options.resume_first_entry", undefined, { name: status.first_user })}
+                label={tx("resolve_errors.options.resume_first_entry", undefined, {
+                  name: getName(dataEntry.first_entry_user_id, t("typist")),
+                })}
                 checked={action === "resume_first_entry"}
                 onChange={() => {
                   setAction("resume_first_entry");

@@ -1,7 +1,5 @@
-INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date,
-                       status, political_groups)
+INSERT INTO elections (id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date, political_groups)
 VALUES (3, 'Municipal Re-election', 'Heemdamseburg_2024', 'Heemdamseburg', '0000', 100, 'Municipal', 29, '2024-12-31', '2024-12-1',
-        'DataEntryInProgress',
         '[
           {
             "number": 1,
@@ -47,6 +45,10 @@ VALUES (3, 'Municipal Re-election', 'Heemdamseburg_2024', 'Heemdamseburg', '0000
             ]
           }
         ]');
+
+INSERT INTO committee_sessions (id, number, election_id, location, start_date, start_time)
+VALUES (3, 1, 3, '', '', '');
+
 
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)

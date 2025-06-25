@@ -1,6 +1,5 @@
 import { t } from "@/i18n/translate";
-
-import { HeadingSubsection } from "../../types/types";
+import { HeadingSubsection } from "@/types/types";
 
 export interface HeadingSubsectionProps {
   subsection: HeadingSubsection;

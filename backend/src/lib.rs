@@ -26,6 +26,7 @@ pub mod airgap;
 pub mod apportionment;
 pub mod audit_log;
 pub mod authentication;
+pub mod committee_session;
 pub mod data_entry;
 pub mod election;
 pub mod eml;
@@ -36,6 +37,8 @@ pub mod pdf_gen;
 pub mod polling_station;
 pub mod report;
 pub mod summary;
+#[cfg(feature = "dev-database")]
+pub mod test_data_gen;
 
 pub use error::{APIError, ErrorResponse};
 
@@ -56,6 +59,7 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
         .merge(apportionment::router())
         .merge(audit_log::router())
         .merge(authentication::router())
+        .merge(committee_session::router())
         .merge(data_entry::router())
         .merge(election::router())
         .merge(polling_station::router())

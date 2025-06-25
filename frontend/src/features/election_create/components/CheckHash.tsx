@@ -6,7 +6,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import { RedactedEmlHash } from "@/types/generated/openapi";
-import { formatDateFull } from "@/utils/format";
+import { formatFullDateWithoutTimezone } from "@/utils/format";
 
 import { RedactedHash, Stub } from "./RedactedHash";
 
@@ -77,7 +77,7 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
         <p>
           <strong>{title}</strong>
           <br />
-          <span className="capitalize-first">{formatDateFull(new Date(date))}</span>
+          <span className="capitalize-first">{formatFullDateWithoutTimezone(new Date(date))}</span>
         </p>
         <div>
           <span>

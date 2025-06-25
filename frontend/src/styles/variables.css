@@ -152,7 +152,7 @@
   --color-error-bg: #fbe9ed;
   --color-error-hover: #f6cad2;
 
-  --color-warning: #f79009;
+  --color-warning: var(--orange-500);
   --color-warning-darker: #d4690b;
   --color-warning-bg: #fef4d7;
   --color-warning-hover: #fedf89;
@@ -223,4 +223,6 @@
   --progress-bar-definitive: var(--color-success);
   --progress-bar-not-started: var(--gray-200);
   --progress-bar-not-started-border: var(--gray-450);
+
+  --status-not-started: #9f1ab1;
 }

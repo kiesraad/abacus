@@ -6,7 +6,7 @@ import { DefaultGrid } from "./InputGrid.stories";
 
 describe("InputGrid", () => {
   test("InputGrid renders", () => {
-    render(<DefaultGrid />);
+    render(<DefaultGrid readOnly={false} />);
     expect(true).toBe(true);
   });
 });

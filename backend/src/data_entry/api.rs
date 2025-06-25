@@ -23,6 +23,7 @@ use crate::{
     APIError, AppState,
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
+    data_entry::status::FirstEntryHasErrors,
     election::repository::Elections,
     error::{ErrorReference, ErrorResponse},
     polling_station::repository::PollingStations,
@@ -62,6 +63,7 @@ pub struct ClaimDataEntryResponse {
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(polling_station_data_entry_status))
+        .routes(routes!(polling_station_data_entry_get_errors))
         .routes(routes!(polling_station_data_entry_claim))
         .routes(routes!(polling_station_data_entry_save))
         .routes(routes!(polling_station_data_entry_delete))
@@ -400,6 +402,63 @@ impl ResolveErrorsAction {
                 AuditEvent::DataEntryResumedFirst(data_entry.into())
             }
         }
+    }
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct DataEntryGetErrorsResponse {
+    pub first_entry_user_id: u32,
+    pub finalised_first_entry: PollingStationResults,
+    #[schema(value_type = String)]
+    pub first_entry_finished_at: DateTime<Utc>,
+    pub validation_results: ValidationResults,
+}
+
+/// Get accepted data entry errors to be resolved
+#[utoipa::path(
+    get,
+    path = "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors",
+    responses(
+        (status = 200, description = "Data entry with errors and warnings to be resolved", body = DataEntryGetErrorsResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "No data entry with accepted errors found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+async fn polling_station_data_entry_get_errors(
+    _user: Coordinator,
+    State(data_entry_repo): State<PollingStationDataEntries>,
+    State(polling_stations_repo): State<PollingStations>,
+    State(elections): State<Elections>,
+    Path(id): Path<u32>,
+) -> Result<Json<DataEntryGetErrorsResponse>, APIError> {
+    let status = data_entry_repo.get(id).await?;
+    match status.clone() {
+        DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+            first_entry_user_id,
+            finalised_first_entry,
+            first_entry_finished_at,
+        }) => {
+            let polling_station = polling_stations_repo.get(id).await?;
+            let election = elections.get(polling_station.election_id).await?;
+
+            let validation_results =
+                validate_data_entry_status(&status, &polling_station, &election)?;
+
+            Ok(Json(DataEntryGetErrorsResponse {
+                first_entry_user_id,
+                finalised_first_entry,
+                first_entry_finished_at,
+                validation_results,
+            }))
+        }
+        _ => Err(APIError::NotFound(
+            "No data entry with accepted errors found".to_string(),
+            ErrorReference::EntryNotFound,
+        )),
     }
 }
 

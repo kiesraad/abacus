@@ -12,6 +12,7 @@
   "counts_add_up_title": "Alle optellingen kloppen",
   "can_not_save": "Je kan de resultaten van dit stembureau nog niet opslaan",
   "can_save": "Je kan de resultaten van dit stembureau opslaan",
+  "accepted_errors": "Het papieren proces-verbaal bevat een aantal fouten. Overleg met de coördinator wat te doen.",
   "notable_form_sections": {
     "empty": "Op <link>{link_title}</link> zijn geen stemmen ingevoerd",
     "accepted-warnings": "<link>{link_title}</link> heeft geaccepteerde waarschuwingen",

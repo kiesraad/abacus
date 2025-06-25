@@ -1,3 +1,5 @@
+import { TranslationPath } from "@/i18n/i18n.types";
+
 import { PollingStationResults } from "./generated/openapi";
 
 export type FormSectionId =
@@ -20,3 +22,64 @@ export type PollingStationResultsPath =
   | NonNullable<ObjectPath<PollingStationResults>>
   | `political_group_votes[${number}].candidate_votes[${number}].votes`
   | `political_group_votes[${number}].total`;
+
+export type SectionValues = Record<string, string>;
+
+// Data Entry Section Types
+export interface HeadingSubsection {
+  type: "heading";
+  title: TranslationPath;
+}
+
+export interface MessageSubsection {
+  type: "message";
+  message: TranslationPath;
+  className?: string;
+}
+
+export interface RadioSubsectionOption {
+  value: string;
+  /** Label for data entry form view */
+  label: TranslationPath;
+  /** Short label for differences view */
+  short_label: TranslationPath;
+  autoFocusInput?: boolean;
+}
+
+export interface RadioSubsection {
+  type: "radio";
+  /** Short title for differences view */
+  short_title: TranslationPath;
+  error: TranslationPath;
+  path: PollingStationResultsPath;
+  options: RadioSubsectionOption[];
+  valueType?: "string" | "boolean";
+}
+
+export interface InputGridSubsectionRow {
+  code?: string;
+  path: PollingStationResultsPath;
+  title?: string;
+  isTotal?: boolean;
+  isListTotal?: boolean;
+  addSeparator?: boolean;
+  autoFocusInput?: boolean;
+}
+
+export interface InputGridSubsection {
+  type: "inputGrid";
+  headers: [TranslationPath, TranslationPath, TranslationPath];
+  zebra?: boolean;
+  rows: InputGridSubsectionRow[];
+}
+
+export type DataEntrySubsection = HeadingSubsection | MessageSubsection | RadioSubsection | InputGridSubsection;
+
+export interface DataEntrySection {
+  id: FormSectionId;
+  title: string;
+  short_title: string;
+  subsections: DataEntrySubsection[];
+}
+
+export type DataEntryStructure = DataEntrySection[];

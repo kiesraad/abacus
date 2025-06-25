@@ -5,9 +5,14 @@ use utoipa::ToSchema;
 
 use super::{
     CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-    VotersCounts, VotesCounts, comparison::Compare, status::DataEntryStatus,
+    VotersCounts, VotesCounts,
+    comparison::Compare,
+    status::{DataEntryStatus, FirstEntryInProgress},
 };
-use crate::{election::ElectionWithPoliticalGroups, polling_station::PollingStation};
+use crate::{
+    data_entry::status::FirstEntryHasErrors, election::ElectionWithPoliticalGroups,
+    polling_station::PollingStation,
+};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
 pub struct ValidationResults {
@@ -49,6 +54,7 @@ pub enum ValidationResultCode {
     F304,
     F305,
     F401,
+    F402,
     W001,
     W201,
     W202,
@@ -194,8 +200,15 @@ impl Validate for DataEntryStatus {
         path: &FieldPath,
     ) -> Result<(), DataError> {
         match self {
-            DataEntryStatus::FirstEntryInProgress(state) => {
-                state.first_entry.validate(
+            DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+                first_entry: entry,
+                ..
+            })
+            | DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+                finalised_first_entry: entry,
+                ..
+            }) => {
+                entry.validate(
                     election,
                     polling_station,
                     validation_results,
@@ -886,15 +899,20 @@ impl Validate for PoliticalGroupVotes {
             &path.field("total"),
         )?;
 
-        // F.401 validate whether the total number of votes matches the sum of all candidate votes,
-        // cast to u64 to avoid overflow
-        if self.total as u64
-            != self
-                .candidate_votes
-                .iter()
-                .map(|cv| cv.votes as u64)
-                .sum::<u64>()
-        {
+        // all candidate votes, cast to u64 to avoid overflow
+        let candidate_votes_sum: u64 = self
+            .candidate_votes
+            .iter()
+            .map(|cv| cv.votes as u64)
+            .sum::<u64>();
+        if candidate_votes_sum > 0 && self.total == 0 {
+            // F.402 validate whether the total number of votes is empty when there are candidate votes
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.field("total").to_string()],
+                code: ValidationResultCode::F402,
+            });
+        } else if self.total as u64 != candidate_votes_sum {
+            // F.401 validate whether the total number of votes matches the sum of all candidate votes
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F401,
@@ -2174,6 +2192,28 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec!["political_group_votes[0]"]
+        );
+
+        // validate with missing total for second political group
+        validation_results = ValidationResults::default();
+        political_group_votes[0].total = 0;
+        political_group_votes
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                &"political_group_votes".into(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::F402
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["political_group_votes[0].total"]
         );
 
         // validate with incorrect number of candidates for the first political group

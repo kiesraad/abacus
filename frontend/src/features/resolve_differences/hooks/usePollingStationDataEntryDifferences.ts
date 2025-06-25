@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 
 import { AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
-import { useInitialApiGet, useInitialApiGetWithErrors } from "@/api/useInitialApiGet";
+import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
@@ -15,15 +15,13 @@ import {
   POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH,
   PollingStation,
   ResolveDifferencesAction,
-  USER_LIST_REQUEST_PATH,
-  UserListResponse,
 } from "@/types/generated/openapi";
+import { DataEntryStructure } from "@/types/types";
+import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
 
 type EntriesDifferentStatus = {
   state: EntriesDifferent;
   status: "EntriesDifferent";
-  first_user: string;
-  second_user: string;
 };
 
 interface PollingStationDataEntryStatus {
@@ -33,6 +31,7 @@ interface PollingStationDataEntryStatus {
   election: ElectionWithPoliticalGroups;
   loading: boolean;
   status: EntriesDifferentStatus | null;
+  dataEntryStructure: DataEntryStructure | null;
   onSubmit: () => Promise<void>;
   validationError: string | undefined;
 }
@@ -53,10 +52,6 @@ export function usePollingStationDataEntryDifferences(
   const path: POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries`;
   const { requestState } = useInitialApiGet<DataEntryStatus>(path);
 
-  // fetch a list of users, to render the first entry and second entry user names
-  const usersPath: USER_LIST_REQUEST_PATH = "/api/user";
-  const { requestState: usersRequestState } = useInitialApiGetWithErrors<UserListResponse>(usersPath);
-
   // 404 error if polling station is not found
   if (!pollingStation) {
     throw new NotFoundError("error.polling_station_not_found");
@@ -72,34 +67,23 @@ export function usePollingStationDataEntryDifferences(
     throw requestState.error;
   }
 
-  // render generic error page when any error occurs
-  if (usersRequestState.status === "api-error") {
-    throw usersRequestState.error;
-  }
-
   // only allow polling stations with status "EntriesDifferent" to be resolved
   if (requestState.status === "success" && requestState.data.status !== "EntriesDifferent") {
     throw new NotFoundError("error.polling_station_not_found");
   }
 
   let status: EntriesDifferentStatus | null = null;
+  let dataEntryStructure: DataEntryStructure | null = null;
 
   // if the request was successful and the status is "EntriesDifferent", we can show the details
-  if (
-    requestState.status === "success" &&
-    usersRequestState.status === "success" &&
-    requestState.data.status === "EntriesDifferent"
-  ) {
-    const users = usersRequestState.data.users;
-    const state = requestState.data.state;
-    const firstUser = users.find((u) => u.id === state.first_entry_user_id);
-    const secondUser = users.find((u) => u.id === state.second_entry_user_id);
+  if (requestState.status === "success" && requestState.data.status === "EntriesDifferent") {
+    status = requestState.data;
 
-    status = {
-      ...requestState.data,
-      first_user: firstUser?.fullname || firstUser?.username || "",
-      second_user: secondUser?.fullname || secondUser?.username || "",
-    };
+    dataEntryStructure = getDataEntryStructureForDifferences(
+      election,
+      status.state.first_entry,
+      status.state.second_entry,
+    );
   }
 
   const onSubmit = async () => {
@@ -128,8 +112,9 @@ export function usePollingStationDataEntryDifferences(
     setAction,
     pollingStation,
     election,
-    loading: requestState.status === "loading" || usersRequestState.status === "loading",
+    loading: requestState.status === "loading",
     status,
+    dataEntryStructure,
     onSubmit,
     validationError,
   };

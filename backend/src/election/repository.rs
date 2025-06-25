@@ -8,14 +8,13 @@ use crate::AppState;
 pub struct Elections(SqlitePool);
 
 impl Elections {
-    #[cfg(test)]
     pub fn new(pool: SqlitePool) -> Self {
         Self(pool)
     }
 
     pub async fn list(&self) -> Result<Vec<Election>, Error> {
         let elections: Vec<Election> = query_as(
-            "SELECT id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date, status FROM elections",
+            "SELECT id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date FROM elections",
         )
         .fetch_all(&self.0)
         .await?;
@@ -47,9 +46,8 @@ impl Elections {
               number_of_seats,
               election_date,
               nomination_date,
-              status,
               political_groups
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
               id,
               name,
@@ -61,7 +59,6 @@ impl Elections {
               number_of_seats,
               election_date,
               nomination_date,
-              status,
               political_groups
             "#,
         )
@@ -74,7 +71,6 @@ impl Elections {
         .bind(election.number_of_seats)
         .bind(election.election_date)
         .bind(election.nomination_date)
-        .bind(election.status)
         .bind(Json(election.political_groups))
         .fetch_one(&self.0)
         .await

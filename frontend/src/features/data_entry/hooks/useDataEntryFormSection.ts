@@ -1,10 +1,10 @@
 import * as React from "react";
 
-import { FormSectionId } from "@/types/types";
+import { FormSectionId, SectionValues } from "@/types/types";
+import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
+import { mapValidationResultSetsToFields } from "@/utils/ValidationResults";
 
-import { SectionValues, SubmitCurrentFormOptions } from "../types/types";
-import { mapResultsToSectionValues } from "../utils/mapping";
-import { mapValidationResultsToFields } from "../utils/ValidationResults";
+import { SubmitCurrentFormOptions } from "../types/types";
 import { useDataEntryContext } from "./useDataEntryContext";
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
@@ -51,7 +51,7 @@ export function useDataEntryFormSection({ section: sectionId }: { section: FormS
   }
   const { errors, warnings, isSaved, acceptErrorsAndWarnings, hasChanges } = formSection;
   const defaultProps = {
-    errorsAndWarnings: isSaved ? mapValidationResultsToFields(errors, warnings) : undefined,
+    errorsAndWarnings: isSaved ? mapValidationResultSetsToFields(errors, warnings) : undefined,
     errorsAndWarningsAccepted: acceptErrorsAndWarnings,
   };
 

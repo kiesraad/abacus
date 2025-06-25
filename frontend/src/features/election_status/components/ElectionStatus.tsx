@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import { Election, ElectionStatusResponseEntry, PollingStation, User } from "@/types/generated/openapi";
+import { Election, ElectionStatusResponseEntry, PollingStation } from "@/types/generated/openapi";
 
 import {
   categoryColorClass,
@@ -22,14 +22,12 @@ export interface ElectionStatusProps {
   election: Required<Election>;
   pollingStations: PollingStation[];
   navigate: (path: string) => void;
-  users: User[];
 }
 
-export function ElectionStatus({ statuses, election, pollingStations, navigate, users }: ElectionStatusProps) {
+export function ElectionStatus({ statuses, election, pollingStations, navigate }: ElectionStatusProps) {
   const { progressBarData, categoryCounts, pollingStationWithStatusAndTypist, tableCategories } = useElectionStatus(
     statuses,
     pollingStations,
-    users,
   );
 
   return (

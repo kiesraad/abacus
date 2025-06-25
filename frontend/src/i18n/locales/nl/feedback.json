@@ -110,6 +110,16 @@
       "content": "De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     }
   },
+  "F402": {
+    "typist": {
+      "title": "Controleer het totaal van de lijst",
+      "content": "Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.402)"
+    },
+    "coordinator": {
+      "title": "Controleer het totaal van de lijst",
+      "content": "Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.402)"
+    }
+  },
   "W001": {
     "typist": {
       "title": "Verschil met eerste invoer. Extra controle nodig",

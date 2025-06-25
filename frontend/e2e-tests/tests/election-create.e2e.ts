@@ -198,8 +198,7 @@ test.describe("Election creation", () => {
     // Click cancel, assert we are still on the election create page
     await expect(abortModal.closeButton).toBeVisible();
     await abortModal.closeButton.click();
-    const updatedCheckDefinitionPage = new CheckElectionDefinitionPgObj(page);
-    await expect(updatedCheckDefinitionPage.header).toBeVisible();
+    await expect(checkDefinitionPage.header).toBeVisible();
   });
 
   test("warning modal cancel button should stay on page", async ({ page }) => {
@@ -225,8 +224,7 @@ test.describe("Election creation", () => {
     // Click cancel, assert we are still on the election create page
     await expect(abortModal.cancelButton).toBeVisible();
     await abortModal.cancelButton.click();
-    const updatedCheckDefinitionPage = new CheckElectionDefinitionPgObj(page);
-    await expect(updatedCheckDefinitionPage.header).toBeVisible();
+    await expect(checkDefinitionPage.header).toBeVisible();
   });
 
   test("warning modal delete button should continue navigation", async ({ page }) => {
@@ -249,11 +247,10 @@ test.describe("Election creation", () => {
     const abortModal = new AbortModalPgObj(page);
     await expect(abortModal.header).toBeVisible();
 
-    // Click delete, assert we are bcak at the overview
+    // Click delete, assert we are back at the overview
     await expect(abortModal.deleteButton).toBeVisible();
     await abortModal.deleteButton.click();
-    const updatedOverviewPage = new OverviewPgObj(page);
-    await expect(updatedOverviewPage.header).toBeVisible();
+    await expect(overviewPage.header).toBeVisible();
   });
 
   test("uploading a candidate list, then navigating should trigger the modal", async ({ page }) => {
@@ -273,8 +270,8 @@ test.describe("Election creation", () => {
     await expect(page.getByText(eml110a.electionDate)).toBeVisible();
 
     await expect(checkDefinitionPage.hashInput1).toBeFocused();
-    await checkDefinitionPage.hashInput1.fill(eml230b.hashInput1);
-    await checkDefinitionPage.hashInput2.fill(eml230b.hashInput2);
+    await checkDefinitionPage.hashInput1.fill(eml110a.hashInput1);
+    await checkDefinitionPage.hashInput2.fill(eml110a.hashInput2);
     await checkDefinitionPage.next.click();
 
     // Candidate page

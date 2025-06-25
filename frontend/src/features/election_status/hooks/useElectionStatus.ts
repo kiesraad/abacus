@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 
 import { PercentageAndColorClass, ProgressBarColorClass } from "@/components/ui/ProgressBar/ProgressBar";
-import { DataEntryStatusName, ElectionStatusResponseEntry, PollingStation, User } from "@/types/generated/openapi";
+import { useUsers } from "@/hooks/user/useUsers";
+import { DataEntryStatusName, ElectionStatusResponseEntry, PollingStation } from "@/types/generated/openapi";
 
 export const statusCategories = [
   "errors_and_warnings",
@@ -37,31 +38,16 @@ export function statusCount(entries: ElectionStatusResponseEntry[], category: St
   return entries.filter((s) => statusesForCategory[category].includes(s.status)).length;
 }
 
-function getTypistName(users: User[], status: ElectionStatusResponseEntry | undefined) {
-  if (status === undefined || users.length === 0) {
-    return "";
-  }
-
-  let typistId: number | undefined;
-  switch (status.status) {
+function getTypist(status: ElectionStatusResponseEntry | undefined): number | undefined {
+  switch (status?.status) {
     case "first_entry_in_progress":
     case "second_entry_not_started":
-      typistId = status.first_entry_user_id;
-      break;
+      return status.first_entry_user_id;
     case "second_entry_in_progress":
-      typistId = status.second_entry_user_id;
-      break;
+      return status.second_entry_user_id;
     default:
-      break;
+      return undefined;
   }
-
-  if (typistId === undefined) {
-    return "";
-  }
-
-  const user = users.find((user) => user.id === typistId);
-
-  return user?.fullname ?? user?.username ?? "";
 }
 
 interface ElectionStatusData {
@@ -74,8 +60,9 @@ interface ElectionStatusData {
 export function useElectionStatus(
   statuses: ElectionStatusResponseEntry[],
   pollingStations: PollingStation[],
-  users: User[],
 ): ElectionStatusData {
+  const { getName } = useUsers();
+
   const categoryCounts: Record<StatusCategory, number> = useMemo(
     () =>
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -106,7 +93,7 @@ export function useElectionStatus(
     return {
       ...ps,
       ...status,
-      typist: getTypistName(users, status),
+      typist: getName(getTypist(status)),
     } satisfies PollingStationWithStatusAndTypist;
   });
 

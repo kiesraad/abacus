@@ -121,8 +121,8 @@ test.describe("Election creation", () => {
     await expect(overviewPage.main).toContainText(eml230b.filename);
     await expect(overviewPage.main).toContainText(eml230b.electionDate);
     await expect(checkCandidateDefinitionPage.hashInput1).toBeFocused();
-    await checkCandidateDefinitionPage.hashInput1.fill("1234");
-    await checkCandidateDefinitionPage.hashInput2.fill("1234");
+    await checkCandidateDefinitionPage.hashInput1.fill("9825");
+    await checkCandidateDefinitionPage.hashInput2.fill("8af1");
     await checkCandidateDefinitionPage.next.click();
 
     await expect(checkCandidateDefinitionPage.error).toBeVisible();
@@ -161,22 +161,22 @@ test.describe("Election creation", () => {
     // Upload election
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
     await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
 
     // Process hash
     const checkDefinitionPage = new CheckDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
-    await expect(page.getByText("eml110a_test.eml.xml")).toBeVisible();
-    await expect(page.getByText("Woensdag 16 maart 2022")).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml110a.filename);
+    await expect(overviewPage.main).toContainText(eml110a.electionDate);
     await expect(checkDefinitionPage.hashInput1).toBeFocused();
-    await checkDefinitionPage.hashInput1.fill("9825");
-    await checkDefinitionPage.hashInput2.fill("8af1");
+    await checkDefinitionPage.hashInput1.fill(eml110a.hashInput1);
+    await checkDefinitionPage.hashInput2.fill(eml110a.hashInput2);
     await checkDefinitionPage.next.click();
 
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml230b_test.eml.xml");
+    await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
     const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
     await expect(checkCandidateDefinitionPage.header).toBeVisible();
 
@@ -195,31 +195,31 @@ test.describe("Election creation", () => {
     // Upload election
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
     await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
 
     // Process hash
     const checkDefinitionPage = new CheckDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
-    await expect(page.getByText("eml110a_test.eml.xml")).toBeVisible();
-    await expect(page.getByText("Woensdag 16 maart 2022")).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml110a.filename);
+    await expect(overviewPage.main).toContainText(eml110a.electionDate);
     await expect(checkDefinitionPage.hashInput1).toBeFocused();
-    await checkDefinitionPage.hashInput1.fill("9825");
-    await checkDefinitionPage.hashInput2.fill("8af1");
+    await checkDefinitionPage.hashInput1.fill(eml110a.hashInput1);
+    await checkDefinitionPage.hashInput2.fill(eml110a.hashInput2);
     await checkDefinitionPage.next.click();
 
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml230b_test.eml.xml");
+    await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
 
     // Candidate check page
     const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
     await expect(checkCandidateDefinitionPage.header).toBeVisible();
-    await expect(page.getByText("eml230b_test.eml.xml")).toBeVisible();
-    await expect(page.getByText("Woensdag 16 maart 2022")).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml230b.filename);
+    await expect(overviewPage.main).toContainText(eml230b.electionDate);
     await expect(checkCandidateDefinitionPage.hashInput1).toBeFocused();
-    await checkCandidateDefinitionPage.hashInput1.fill("8a7b");
-    await checkCandidateDefinitionPage.hashInput2.fill("458a");
+    await checkCandidateDefinitionPage.hashInput1.fill(eml230b.hashInput1);
+    await checkCandidateDefinitionPage.hashInput2.fill(eml230b.hashInput2);
     await checkCandidateDefinitionPage.next.click();
 
     // Now we should be at the check and save page
@@ -259,31 +259,31 @@ test.describe("Election creation", () => {
     // Upload election
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
     await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
 
     // Process hash
     const checkDefinitionPage = new CheckDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
-    await expect(page.getByText("eml110a_test.eml.xml")).toBeVisible();
-    await expect(page.getByText("Woensdag 16 maart 2022")).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml110a.filename);
+    await expect(overviewPage.main).toContainText(eml110a.electionDate);
     await expect(checkDefinitionPage.hashInput1).toBeFocused();
-    await checkDefinitionPage.hashInput1.fill("9825");
-    await checkDefinitionPage.hashInput2.fill("8af1");
+    await checkDefinitionPage.hashInput1.fill(eml110a.hashInput1);
+    await checkDefinitionPage.hashInput2.fill(eml110a.hashInput2);
     await checkDefinitionPage.next.click();
 
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml230b_test.eml.xml");
+    await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
 
     // Candidate check page
     const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
     await expect(checkCandidateDefinitionPage.header).toBeVisible();
-    await expect(page.getByText("eml230b_test.eml.xml")).toBeVisible();
-    await expect(page.getByText("Woensdag 16 maart 2022")).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml230b.filename);
+    await expect(overviewPage.main).toContainText(eml230b.electionDate);
     await expect(checkCandidateDefinitionPage.hashInput1).toBeFocused();
-    await checkCandidateDefinitionPage.hashInput1.fill("8a7b");
-    await checkCandidateDefinitionPage.hashInput2.fill("458a");
+    await checkCandidateDefinitionPage.hashInput1.fill(eml230b.hashInput1);
+    await checkCandidateDefinitionPage.hashInput2.fill(eml230b.hashInput2);
     await checkCandidateDefinitionPage.next.click();
 
     // Now we should be at the check and save page
@@ -293,7 +293,7 @@ test.describe("Election creation", () => {
     // Now upload a new election
     await page.goto("/elections/create");
     await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
 
     // Back button
     await page.goBack();
@@ -310,27 +310,27 @@ test.describe("Election creation", () => {
     // Election page
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
     await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
     const checkDefinitionPage = new CheckDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
-    await expect(page.getByText("eml110a_test.eml.xml")).toBeVisible();
-    await expect(page.getByText("Woensdag 16 maart 2022")).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml110a.filename);
+    await expect(overviewPage.main).toContainText(eml110a.electionDate);
     await expect(checkDefinitionPage.hashInput1).toBeFocused();
-    await checkDefinitionPage.hashInput1.fill("9825");
-    await checkDefinitionPage.hashInput2.fill("8af1");
+    await checkDefinitionPage.hashInput1.fill(eml110a.hashInput1);
+    await checkDefinitionPage.hashInput2.fill(eml110a.hashInput2);
     await checkDefinitionPage.next.click();
 
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml230b_test.eml.xml");
+    await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
     const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
     await expect(checkCandidateDefinitionPage.header).toBeVisible();
-    await expect(page.getByText("eml230b_test.eml.xml")).toBeVisible();
-    await expect(page.getByText("Woensdag 16 maart 2022")).toBeVisible();
+    await expect(overviewPage.main).toContainText(eml230b.filename);
+    await expect(overviewPage.main).toContainText(eml230b.electionDate);
     await expect(checkCandidateDefinitionPage.hashInput1).toBeFocused();
-    await checkCandidateDefinitionPage.hashInput1.fill("8a7b");
-    await checkCandidateDefinitionPage.hashInput2.fill("458a");
+    await checkCandidateDefinitionPage.hashInput1.fill(eml230b.hashInput1);
+    await checkCandidateDefinitionPage.hashInput2.fill(eml230b.hashInput2);
     await checkCandidateDefinitionPage.next.click();
 
     // Now we should be at the check and save page

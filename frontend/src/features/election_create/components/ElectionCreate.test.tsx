@@ -235,6 +235,9 @@ describe("Election create pages", () => {
     expect(await screen.findByText("Controle digitale vingerafdruk niet gelukt")).toBeInTheDocument();
   });
 
+  //
+  //
+  //
   async function uploadElectionDefinition(router, user, file) {
     await router.navigate("/elections/create");
 
@@ -248,6 +251,9 @@ describe("Election create pages", () => {
     await user.upload(input, file);
   }
 
+  //
+  //
+  //
   async function inputElectionHash(router, user, file) {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 

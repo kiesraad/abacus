@@ -161,7 +161,7 @@ test.describe("Election creation", () => {
 
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
     await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
 
     const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
@@ -182,7 +182,7 @@ test.describe("Election creation", () => {
 
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
     await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
 
     const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
@@ -209,7 +209,7 @@ test.describe("Election creation", () => {
 
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
     await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
 
     const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
@@ -236,7 +236,7 @@ test.describe("Election creation", () => {
 
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
     await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
 
     const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
@@ -263,24 +263,24 @@ test.describe("Election creation", () => {
 
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
     await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml110a_test.eml.xml");
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
 
     const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
     // Check that the uploaded file name is present somewhere on the page
-    await expect(page.getByText("eml110a_test.eml.xml")).toBeVisible();
+    await expect(page.getByText(eml110a.filename)).toBeVisible();
     // Election date
-    await expect(page.getByText("Woensdag 16 maart 2022")).toBeVisible();
+    await expect(page.getByText(eml110a.electionDate)).toBeVisible();
 
     await expect(checkDefinitionPage.hashInput1).toBeFocused();
-    await checkDefinitionPage.hashInput1.fill("9825");
-    await checkDefinitionPage.hashInput2.fill("8af1");
+    await checkDefinitionPage.hashInput1.fill(eml230b.hashInput1);
+    await checkDefinitionPage.hashInput2.fill(eml230b.hashInput2);
     await checkDefinitionPage.next.click();
 
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(page, "../backend/src/eml/tests/eml230b_test.eml.xml");
+    await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
 
     // Menu button back to election overview
     await expect(checkDefinitionPage.backToOverviewButton).toBeVisible();

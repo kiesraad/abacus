@@ -117,13 +117,12 @@ export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PARAMS = Record<string, never>;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PATH = `/api/log-users`;
 
-// /api/polling_stations/{polling_station_id}/data_entries
-export interface POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PARAMS {
+// /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
+export interface POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: number;
 }
-export type POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH = `/api/polling_stations/${number}/data_entries`;
-
-// /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
+export type POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH =
+  `/api/polling_stations/${number}/data_entries/resolve_differences`;
 export interface POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: number;
 }
@@ -425,6 +424,13 @@ export interface DataEntryDetails {
   firstEntryUserId?: number | null;
   pollingStationId: number;
   secondEntryUserId?: number | null;
+}
+
+export interface DataEntryGetDifferencesResponse {
+  first_entry: PollingStationResults;
+  first_entry_user_id: number;
+  second_entry: PollingStationResults;
+  second_entry_user_id: number;
 }
 
 export interface DataEntryGetErrorsResponse {

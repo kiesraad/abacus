@@ -7,22 +7,16 @@ import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusPr
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
-  DataEntryStatus,
+  DataEntryGetDifferencesResponse,
   ElectionWithPoliticalGroups,
-  EntriesDifferent,
+  POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
-  POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH,
   PollingStation,
   ResolveDifferencesAction,
 } from "@/types/generated/openapi";
 import { DataEntryStructure } from "@/types/types";
 import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
-
-type EntriesDifferentStatus = {
-  state: EntriesDifferent;
-  status: "EntriesDifferent";
-};
 
 interface PollingStationDataEntryStatus {
   action: ResolveDifferencesAction | undefined;
@@ -30,7 +24,7 @@ interface PollingStationDataEntryStatus {
   pollingStation: PollingStation;
   election: ElectionWithPoliticalGroups;
   loading: boolean;
-  status: EntriesDifferentStatus | null;
+  differences: DataEntryGetDifferencesResponse | null;
   dataEntryStructure: DataEntryStructure | null;
   onSubmit: () => Promise<void>;
   validationError: string | undefined;
@@ -48,9 +42,8 @@ export function usePollingStationDataEntryDifferences(
   const [error, setError] = useState<AnyApiError | null>(null);
   const [validationError, setValidationError] = useState<string>();
 
-  // fetch the current status of the polling station
-  const path: POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries`;
-  const { requestState } = useInitialApiGet<DataEntryStatus>(path);
+  const path: POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_differences`;
+  const { requestState } = useInitialApiGet<DataEntryGetDifferencesResponse>(path);
 
   // 404 error if polling station is not found
   if (!pollingStation) {
@@ -67,24 +60,10 @@ export function usePollingStationDataEntryDifferences(
     throw requestState.error;
   }
 
-  // only allow polling stations with status "EntriesDifferent" to be resolved
-  if (requestState.status === "success" && requestState.data.status !== "EntriesDifferent") {
-    throw new NotFoundError("error.polling_station_not_found");
-  }
-
-  let status: EntriesDifferentStatus | null = null;
-  let dataEntryStructure: DataEntryStructure | null = null;
-
-  // if the request was successful and the status is "EntriesDifferent", we can show the details
-  if (requestState.status === "success" && requestState.data.status === "EntriesDifferent") {
-    status = requestState.data;
-
-    dataEntryStructure = getDataEntryStructureForDifferences(
-      election,
-      status.state.first_entry,
-      status.state.second_entry,
-    );
-  }
+  const differences = requestState.status === "success" ? requestState.data : null;
+  const dataEntryStructure = differences
+    ? getDataEntryStructureForDifferences(election, differences.first_entry, differences.second_entry)
+    : null;
 
   const onSubmit = async () => {
     if (action === undefined) {
@@ -113,7 +92,7 @@ export function usePollingStationDataEntryDifferences(
     pollingStation,
     election,
     loading: requestState.status === "loading",
-    status,
+    differences,
     dataEntryStructure,
     onSubmit,
     validationError,

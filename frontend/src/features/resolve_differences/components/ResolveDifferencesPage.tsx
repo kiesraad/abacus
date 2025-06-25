@@ -36,7 +36,7 @@ export function ResolveDifferencesPage() {
     pollingStation,
     election,
     loading,
-    status,
+    differences,
     dataEntryStructure,
     action,
     setAction,
@@ -45,11 +45,11 @@ export function ResolveDifferencesPage() {
   } = usePollingStationDataEntryDifferences(pollingStationId, afterSave);
   const { getName } = useUsers();
 
-  if (loading || status === null || dataEntryStructure === null) {
+  if (loading || differences === null || dataEntryStructure === null) {
     return <Loader />;
   }
 
-  const { first_entry, first_entry_user_id, second_entry, second_entry_user_id } = status.state;
+  const { first_entry, first_entry_user_id, second_entry, second_entry_user_id } = differences;
 
   return (
     <>

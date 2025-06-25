@@ -1295,13 +1295,15 @@
         }
       }
     },
-    "/api/polling_stations/{polling_station_id}/data_entries": {
+    "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
       "get": {
-        "operationId": "polling_station_data_entry_status",
+        "summary": "Get data entry differences to be resolved",
+        "operationId": "polling_station_data_entry_get_differences",
         "parameters": [
           {
             "name": "polling_station_id",
             "in": "path",
+            "description": "Polling station database id",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1312,17 +1314,27 @@
         ],
         "responses": {
           "200": {
-            "description": "Get data entries for polling station",
+            "description": "Data entry differences to be resolved",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DataEntryStatus"
+                  "$ref": "#/components/schemas/DataEntryGetDifferencesResponse"
                 }
               }
             }
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No data entry with differences found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1342,9 +1354,7 @@
             }
           }
         }
-      }
-    },
-    "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
+      },
       "post": {
         "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction`",
         "operationId": "polling_station_data_entry_resolve_differences",
@@ -3395,6 +3405,33 @@
               "integer",
               "null"
             ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "DataEntryGetDifferencesResponse": {
+        "type": "object",
+        "required": [
+          "first_entry_user_id",
+          "first_entry",
+          "second_entry_user_id",
+          "second_entry"
+        ],
+        "properties": {
+          "first_entry": {
+            "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "first_entry_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "second_entry": {
+            "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "second_entry_user_id": {
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           }

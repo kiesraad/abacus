@@ -18,6 +18,16 @@ fn data_entry_with_error() -> DataEntry {
     data_entry
 }
 
+fn different_data_entries() -> (DataEntry, DataEntry) {
+    let first_data_entry = shared::example_data_entry(None);
+
+    let mut second_data_entry = first_data_entry.clone();
+    second_data_entry.data.voters_counts.poll_card_count -= 2;
+    second_data_entry.data.voters_counts.proxy_certificate_count += 2;
+
+    (first_data_entry, second_data_entry)
+}
+
 async fn get_resolve_errors(
     addr: &SocketAddr,
     cookie: &HeaderValue,
@@ -47,6 +57,22 @@ async fn resolve_errors(
         .post(&url)
         .header("cookie", cookie)
         .json(action)
+        .send()
+        .await
+        .unwrap()
+}
+
+async fn get_resolve_differences(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    polling_station_id: u32,
+) -> Response {
+    let url = format!(
+        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/resolve_differences"
+    );
+    Client::new()
+        .get(&url)
+        .header("cookie", cookie)
         .send()
         .await
         .unwrap()
@@ -178,6 +204,47 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: Sqlit
     let coordinator = shared::coordinator_login(&addr).await;
     let response = resolve_errors(&addr, &coordinator, 1, "make_tea").await;
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
+    let addr = utils::serve_api(pool).await;
+    let (first_entry, second_entry) = different_data_entries();
+
+    let typist = shared::typist_login(&addr).await;
+    shared::complete_data_entry(&addr, &typist, 1, 1, first_entry).await;
+
+    let typist2 = shared::typist2_login(&addr).await;
+    let res = shared::complete_data_entry(&addr, &typist2, 1, 2, second_entry).await;
+    let data_entry_status: serde_json::Value = res.json().await.unwrap();
+    assert_eq!(data_entry_status["status"], "EntriesDifferent");
+
+    let coordinator = shared::coordinator_login(&addr).await;
+    let res = get_resolve_differences(&addr, &coordinator, 1).await;
+    assert_eq!(res.status(), StatusCode::OK);
+    let result: serde_json::Value = res.json().await.unwrap();
+
+    assert!(result["first_entry_user_id"].is_number());
+    assert!(result["second_entry_user_id"].is_number());
+    assert_ne!(
+        result["first_entry"]["voters_counts"]["poll_card_count"],
+        result["second_entry"]["voters_counts"]["poll_card_count"]
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_polling_station_data_entry_differences_not_found(pool: SqlitePool) {
+    let addr = utils::serve_api(pool).await;
+
+    let typist = shared::typist_login(&addr).await;
+    let data_entry = shared::example_data_entry(None);
+    let res = shared::complete_data_entry(&addr, &typist, 1, 1, data_entry).await;
+    let data_entry_status: serde_json::Value = res.json().await.unwrap();
+    assert_eq!(data_entry_status["status"], "SecondEntryNotStarted");
+
+    let coordinator = shared::coordinator_login(&addr).await;
+    let res = get_resolve_differences(&addr, &coordinator, 1).await;
+    assert_eq!(res.status(), StatusCode::NOT_FOUND);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

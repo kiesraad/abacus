@@ -2,7 +2,7 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { dataEntryStatusDifferences, firstEntryHasErrorsStatus } from "@/testing/api-mocks/DataEntryMockData";
+import { entriesDifferentStatus, firstEntryHasErrorsStatus } from "@/testing/api-mocks/DataEntryMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionRequestHandler,
@@ -73,7 +73,7 @@ describe("Test CheckAndSaveForm", () => {
 
     // set up a listener to check if the finalisation request is made
     const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, dataEntryStatusDifferences);
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, entriesDifferentStatus);
 
     // click the save button
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));

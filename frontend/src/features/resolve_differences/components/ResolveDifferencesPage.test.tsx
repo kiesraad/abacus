@@ -11,8 +11,8 @@ import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  PollingStationDataEntryGetDifferencesHandler,
   PollingStationDataEntryResolveDifferencesHandler,
-  PollingStationDataEntryStatusEntriesDifferentHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
@@ -50,8 +50,8 @@ describe("ResolveDifferencesPage", () => {
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
+      PollingStationDataEntryGetDifferencesHandler,
       PollingStationDataEntryResolveDifferencesHandler,
-      PollingStationDataEntryStatusEntriesDifferentHandler,
       UserListRequestHandler,
     );
   });

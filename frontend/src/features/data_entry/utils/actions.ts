@@ -1,6 +1,6 @@
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResult, isSuccess } from "@/api/ApiResult";
-import { DataEntry, DataEntryStatus, SaveDataEntryResponse } from "@/types/generated/openapi";
+import { DataEntry, DataEntryStatusResponse, SaveDataEntryResponse } from "@/types/generated/openapi";
 import { FormSectionId, SectionValues } from "@/types/types";
 import { mapSectionValues } from "@/utils/dataEntryMapping";
 
@@ -138,10 +138,10 @@ export function onDeleteDataEntry(client: ApiClient, requestPath: string, dispat
 }
 
 export function onFinaliseDataEntry(client: ApiClient, requestPath: string, dispatch: DataEntryDispatch) {
-  return async (): Promise<DataEntryStatus | undefined> => {
+  return async (): Promise<DataEntryStatusResponse | undefined> => {
     dispatch({ type: "SET_STATUS", status: "finalising" });
 
-    const response = await client.postRequest<DataEntryStatus>(requestPath);
+    const response = await client.postRequest<DataEntryStatusResponse>(requestPath);
 
     if (!isSuccess(response)) {
       dispatch({ type: "SET_STATUS", status: "idle" });

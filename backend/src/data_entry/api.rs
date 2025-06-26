@@ -10,7 +10,8 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    DataError, PollingStationDataEntry, PollingStationResults, ValidationResults,
+    DataEntryStatusResponse, DataError, PollingStationDataEntry, PollingStationResults,
+    ValidationResults,
     entry_number::EntryNumber,
     repository::PollingStationDataEntries,
     status::{
@@ -23,7 +24,7 @@ use crate::{
     APIError, AppState,
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
-    data_entry::status::FirstEntryHasErrors,
+    data_entry::status::{EntriesDifferent, FirstEntryHasErrors},
     election::repository::Elections,
     error::{ErrorReference, ErrorResponse},
     polling_station::repository::PollingStations,
@@ -62,34 +63,15 @@ pub struct ClaimDataEntryResponse {
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
-        .routes(routes!(polling_station_data_entry_status))
-        .routes(routes!(polling_station_data_entry_get_errors))
         .routes(routes!(polling_station_data_entry_claim))
         .routes(routes!(polling_station_data_entry_save))
         .routes(routes!(polling_station_data_entry_delete))
         .routes(routes!(polling_station_data_entry_finalise))
+        .routes(routes!(polling_station_data_entry_get_errors))
         .routes(routes!(polling_station_data_entry_resolve_errors))
+        .routes(routes!(polling_station_data_entry_get_differences))
         .routes(routes!(polling_station_data_entry_resolve_differences))
         .routes(routes!(election_status))
-}
-
-#[utoipa::path(
-    get,
-    path = "/api/polling_stations/{polling_station_id}/data_entries",
-    responses(
-        (status = 200, description = "Get data entries for polling station", body = DataEntryStatus),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-)]
-async fn polling_station_data_entry_status(
-    _user: Coordinator,
-    State(data_entry_repo): State<PollingStationDataEntries>,
-    Path(id): Path<u32>,
-) -> Result<Json<DataEntryStatus>, APIError> {
-    let status = data_entry_repo.get(id).await?;
-
-    Ok(Json(status))
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
@@ -320,7 +302,7 @@ async fn polling_station_data_entry_delete(
     post,
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
     responses(
-        (status = 200, description = "Data entry finalised successfully", body = DataEntryStatus),
+        (status = 200, description = "Data entry finalised successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
@@ -339,7 +321,7 @@ async fn polling_station_data_entry_finalise(
     State(polling_stations_repo): State<PollingStations>,
     audit_service: AuditService,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
-) -> Result<Json<DataEntryStatus>, APIError> {
+) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let state = polling_station_data_entries.get_or_default(id).await?;
 
     let polling_station = polling_stations_repo.get(id).await?;
@@ -381,7 +363,7 @@ async fn polling_station_data_entry_finalise(
         )
         .await?;
 
-    Ok(Json(data_entry.state.0))
+    Ok(Json(data_entry.into()))
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
@@ -468,7 +450,7 @@ async fn polling_station_data_entry_get_errors(
     path = "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors",
     request_body = ResolveErrorsAction,
     responses(
-        (status = 200, description = "Errors resolved successfully", body = PollingStationDataEntry),
+        (status = 200, description = "Errors resolved successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
@@ -485,7 +467,7 @@ async fn polling_station_data_entry_resolve_errors(
     Path(polling_station_id): Path<u32>,
     audit_service: AuditService,
     action: ResolveErrorsAction,
-) -> Result<Json<PollingStationDataEntry>, APIError> {
+) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let state = polling_station_data_entries
         .get_or_default(polling_station_id)
         .await?;
@@ -503,7 +485,55 @@ async fn polling_station_data_entry_resolve_errors(
         .log(&action.audit_event(data_entry.clone()), None)
         .await?;
 
-    Ok(Json(data_entry))
+    Ok(Json(data_entry.into()))
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct DataEntryGetDifferencesResponse {
+    pub first_entry_user_id: u32,
+    pub first_entry: PollingStationResults,
+    pub second_entry_user_id: u32,
+    pub second_entry: PollingStationResults,
+}
+
+/// Get data entry differences to be resolved
+#[utoipa::path(
+    get,
+    path = "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences",
+    responses(
+        (status = 200, description = "Data entry differences to be resolved", body = DataEntryGetDifferencesResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "No data entry with differences found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+async fn polling_station_data_entry_get_differences(
+    _user: Coordinator,
+    State(data_entry_repo): State<PollingStationDataEntries>,
+    Path(id): Path<u32>,
+) -> Result<Json<DataEntryGetDifferencesResponse>, APIError> {
+    let status = data_entry_repo.get(id).await?;
+    match status {
+        DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry_user_id,
+            first_entry,
+            second_entry_user_id,
+            second_entry,
+            ..
+        }) => Ok(Json(DataEntryGetDifferencesResponse {
+            first_entry_user_id,
+            first_entry,
+            second_entry_user_id,
+            second_entry,
+        })),
+        _ => Err(APIError::NotFound(
+            "No data entry with differences found".to_string(),
+            ErrorReference::EntryNotFound,
+        )),
+    }
 }
 
 /// Resolve data entry differences by providing a `ResolveDifferencesAction`
@@ -512,7 +542,7 @@ async fn polling_station_data_entry_resolve_errors(
     path = "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences",
     request_body = ResolveDifferencesAction,
     responses(
-        (status = 200, description = "Differences resolved successfully", body = PollingStationDataEntry),
+        (status = 200, description = "Differences resolved successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
@@ -531,7 +561,7 @@ async fn polling_station_data_entry_resolve_differences(
     Path(polling_station_id): Path<u32>,
     audit_service: AuditService,
     action: ResolveDifferencesAction,
-) -> Result<Json<PollingStationDataEntry>, APIError> {
+) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let polling_station = polling_stations.get(polling_station_id).await?;
     let election = elections.get(polling_station.election_id).await?;
     let state = polling_station_data_entries
@@ -554,7 +584,7 @@ async fn polling_station_data_entry_resolve_differences(
         .log(&action.audit_event(data_entry.clone()), None)
         .await?;
 
-    Ok(Json(data_entry))
+    Ok(Json(data_entry.into()))
 }
 
 /// Election polling stations data entry statuses response
@@ -773,24 +803,6 @@ pub mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_polling_station_data_entry_status(pool: SqlitePool) {
-        finalise_different_entries(pool.clone()).await;
-        let response = polling_station_data_entry_status(
-            Coordinator(User::test_user(Role::Coordinator, 1)),
-            State(PollingStationDataEntries::new(pool.clone())),
-            Path(1),
-        )
-        .await
-        .into_response();
-
-        assert_eq!(response.status(), StatusCode::OK);
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let status: DataEntryStatus = serde_json::from_slice(&body).unwrap();
-
-        assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
-    }
-
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_create_data_entry(pool: SqlitePool) {
         let mut request_body = example_data_entry();
         request_body.data.voters_counts.poll_card_count = 100; // incorrect value
@@ -823,9 +835,9 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         let body = response.into_body().collect().await.unwrap().to_bytes();
-        let status: DataEntryStatus = serde_json::from_slice(&body).unwrap();
+        let DataEntryStatusResponse { status } = serde_json::from_slice(&body).unwrap();
 
-        assert!(matches!(status, DataEntryStatus::FirstEntryHasErrors(_)));
+        assert_eq!(status, DataEntryStatusName::FirstEntryHasErrors);
 
         // Check that it has been logged in the audit log
         let audit_log_row =

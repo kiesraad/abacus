@@ -117,13 +117,12 @@ export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PARAMS = Record<string, never>;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PATH = `/api/log-users`;
 
-// /api/polling_stations/{polling_station_id}/data_entries
-export interface POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PARAMS {
+// /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
+export interface POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: number;
 }
-export type POLLING_STATION_DATA_ENTRY_STATUS_REQUEST_PATH = `/api/polling_stations/${number}/data_entries`;
-
-// /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
+export type POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH =
+  `/api/polling_stations/${number}/data_entries/resolve_differences`;
 export interface POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: number;
 }
@@ -427,21 +426,19 @@ export interface DataEntryDetails {
   secondEntryUserId?: number | null;
 }
 
+export interface DataEntryGetDifferencesResponse {
+  first_entry: PollingStationResults;
+  first_entry_user_id: number;
+  second_entry: PollingStationResults;
+  second_entry_user_id: number;
+}
+
 export interface DataEntryGetErrorsResponse {
   finalised_first_entry: PollingStationResults;
   first_entry_finished_at: string;
   first_entry_user_id: number;
   validation_results: ValidationResults;
 }
-
-export type DataEntryStatus =
-  | { status: "FirstEntryNotStarted" }
-  | { state: FirstEntryInProgress; status: "FirstEntryInProgress" }
-  | { state: FirstEntryHasErrors; status: "FirstEntryHasErrors" }
-  | { state: SecondEntryNotStarted; status: "SecondEntryNotStarted" }
-  | { state: SecondEntryInProgress; status: "SecondEntryInProgress" }
-  | { state: EntriesDifferent; status: "EntriesDifferent" }
-  | { state: Definitive; status: "Definitive" };
 
 export type DataEntryStatusName =
   | "first_entry_not_started"
@@ -452,13 +449,8 @@ export type DataEntryStatusName =
   | "entries_different"
   | "definitive";
 
-export interface Definitive {
-  /** When both data entries were finalised */
-  finished_at: string;
-  /** User who did the first data entry */
-  first_entry_user_id: number;
-  /** User who did the second data entry */
-  second_entry_user_id: number;
+export interface DataEntryStatusResponse {
+  status: DataEntryStatusName;
 }
 
 /**
@@ -622,21 +614,6 @@ export interface ElectionWithPoliticalGroups {
   political_groups: PoliticalGroup[];
 }
 
-export interface EntriesDifferent {
-  /** First data entry for a polling station */
-  first_entry: PollingStationResults;
-  /** When the first data entry was finalised */
-  first_entry_finished_at: string;
-  /** User who did the first data entry */
-  first_entry_user_id: number;
-  /** Second data entry for a polling station */
-  second_entry: PollingStationResults;
-  /** When the second data entry was finalised */
-  second_entry_finished_at: string;
-  /** User who did the second data entry */
-  second_entry_user_id: number;
-}
-
 export interface ErrorDetails {
   level: AuditEventLevel;
   path: string;
@@ -686,26 +663,6 @@ export interface ErrorResponse {
   error: string;
   fatal: boolean;
   reference: ErrorReference;
-}
-
-export interface FirstEntryHasErrors {
-  /** First data entry for a polling station */
-  finalised_first_entry: PollingStationResults;
-  /** When the first data entry was finalised */
-  first_entry_finished_at: string;
-  /** User who did the first data entry */
-  first_entry_user_id: number;
-}
-
-export interface FirstEntryInProgress {
-  /** Client state for the data entry (arbitrary JSON) */
-  client_state: unknown;
-  /** First data entry for a polling station */
-  first_entry: PollingStationResults;
-  /** User who is doing the first data entry */
-  first_entry_user_id: number;
-  /** Data entry progress between 0 and 100 */
-  progress: number;
 }
 
 /**
@@ -871,12 +828,6 @@ export interface PollingStation {
   postal_code: string;
 }
 
-export interface PollingStationDataEntry {
-  polling_station_id: number;
-  state: DataEntryStatus;
-  updated_at: string;
-}
-
 export interface PollingStationDetails {
   pollingStationAddress: string;
   pollingStationElectionId: number;
@@ -999,32 +950,6 @@ export interface SeatChangeStep {
   change: SeatChange;
   residual_seat_number?: number;
   standings: PoliticalGroupStanding[];
-}
-
-export interface SecondEntryInProgress {
-  /** Client state for the data entry (arbitrary JSON) */
-  client_state: unknown;
-  /** First data entry for a polling station */
-  finalised_first_entry: PollingStationResults;
-  /** When the first data entry was finalised */
-  first_entry_finished_at: string;
-  /** User who did the first data entry */
-  first_entry_user_id: number;
-  /** Data entry progress between 0 and 100 */
-  progress: number;
-  /** Second data entry for a polling station */
-  second_entry: PollingStationResults;
-  /** User who is doing the second data entry */
-  second_entry_user_id: number;
-}
-
-export interface SecondEntryNotStarted {
-  /** First data entry for a polling station */
-  finalised_first_entry: PollingStationResults;
-  /** When the first data entry was finalised */
-  first_entry_finished_at: string;
-  /** User who did the first data entry */
-  first_entry_user_id: number;
 }
 
 /**

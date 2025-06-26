@@ -73,6 +73,7 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | politieke partij        |           | political party                      |                                                       |
 | politieke groepering    |           | political group                      |                                                       |
 | lijst                   |           | list                                 |                                                       |
+| blanco lijst            |           | unnamed list                         |                                                       |
 | kiesgerechtigde         |           | eligible voter                       |                                                       |
 | stembureaulid           |           | polling station member               |                                                       |
 | stemopneming            |           | (vote) counting method               |                                                       |

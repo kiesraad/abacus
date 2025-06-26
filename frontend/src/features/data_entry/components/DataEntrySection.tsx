@@ -12,13 +12,12 @@ import { Form } from "@/components/ui/Form/Form";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
-import { FormSectionId } from "@/types/types";
 import { KeyboardKey } from "@/types/ui";
 
 import { useDataEntryFormSection } from "../hooks/useDataEntryFormSection";
 import { DataEntryNavigation } from "./DataEntryNavigation";
 
-export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
+export function DataEntrySection() {
   const user = useUser();
   const {
     error,
@@ -26,24 +25,19 @@ export function DataEntrySection({ sectionId }: { sectionId: FormSectionId }) {
     onSubmit,
     currentValues,
     setValues,
-    dataEntryStructure,
+    section,
     formSection,
     status,
     setAcceptErrorsAndWarnings,
     defaultProps,
     showAcceptErrorsAndWarnings,
-  } = useDataEntryFormSection({ section: sectionId });
-  const section = dataEntryStructure.find((s) => s.id === sectionId);
-
-  if (!section) {
-    throw new Error(`Section with id ${sectionId} not found`);
-  }
+  } = useDataEntryFormSection();
 
   if (!user) {
     throw new Error("No user found");
   }
 
-  const formId = sectionId + "_form";
+  const formId = section.id + "_form";
 
   const bottomBarType = section.subsections.some((subsection) => subsection.type === "inputGrid")
     ? "inputGrid"

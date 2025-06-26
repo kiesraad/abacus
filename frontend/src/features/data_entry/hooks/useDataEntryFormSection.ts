@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { FormSectionId, SectionValues } from "@/types/types";
+import { SectionValues } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 import { mapValidationResultSetsToFields } from "@/utils/ValidationResults";
 
@@ -8,7 +8,7 @@ import { SubmitCurrentFormOptions } from "../types/types";
 import { useDataEntryContext } from "./useDataEntryContext";
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
-export function useDataEntryFormSection({ section: sectionId }: { section: FormSectionId }) {
+export function useDataEntryFormSection() {
   const {
     error,
     cache,
@@ -19,8 +19,9 @@ export function useDataEntryFormSection({ section: sectionId }: { section: FormS
     onSubmitForm,
     updateFormSection,
     election,
-  } = useDataEntryContext(sectionId);
+  } = useDataEntryContext();
 
+  const sectionId = formState.current;
   const section = dataEntryStructure.find((s) => s.id === sectionId);
 
   if (!section) {
@@ -94,7 +95,7 @@ export function useDataEntryFormSection({ section: sectionId }: { section: FormS
     onSubmit,
     pollingStationResults,
     currentValues,
-    dataEntryStructure,
+    section,
     formSection,
     setValues,
     status,

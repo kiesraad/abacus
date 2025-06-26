@@ -62,6 +62,40 @@ impl CommitteeSessions {
         .await
     }
 
+    pub async fn get_committee_session_for_each_election(
+        &self,
+    ) -> Result<Vec<CommitteeSession>, Error> {
+        query_as!(
+            CommitteeSession,
+            r#"
+            SELECT
+              id as "id: u32",
+              number as "number: u32",
+              election_id as "election_id: u32",
+              status as "status: _",
+              location,
+              start_date,
+              start_time
+            FROM (
+              SELECT
+                id,
+                number,
+                election_id,
+                status,
+                location,
+                start_date,
+                start_time,
+              row_number() over (
+                PARTITION BY election_id
+                ORDER BY number DESC
+              ) AS row_number FROM committee_sessions
+            ) t WHERE t.row_number = 1
+            "#,
+        )
+        .fetch_all(&self.0)
+        .await
+    }
+
     pub async fn create(
         &self,
         committee_session: CommitteeSessionCreateRequest,

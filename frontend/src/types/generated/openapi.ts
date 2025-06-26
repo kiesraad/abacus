@@ -548,9 +548,11 @@ export interface ElectionDetailsResponse {
 /**
  * Election list response
  *
+ * Also includes a list of the current committee session for each election.
  * Does not include the candidate list (political groups) to keep the response size small.
  */
 export interface ElectionListResponse {
+  committee_sessions: CommitteeSession[];
   elections: Election[];
 }
 

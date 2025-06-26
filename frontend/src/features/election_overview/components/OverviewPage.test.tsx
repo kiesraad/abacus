@@ -25,12 +25,13 @@ describe("OverviewPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Verkiezing", "Gebied", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", ""],
+      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Je kan invoeren"],
     ]);
   });
 
   test("Show no elections message", async () => {
     overrideOnce("get", "/api/elections", 200, {
+      committee_sessions: [],
       elections: [],
     } satisfies ElectionListResponse);
 

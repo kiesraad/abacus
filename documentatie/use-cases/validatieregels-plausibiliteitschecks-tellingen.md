@@ -92,7 +92,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 ### Regels voor totalen (reeks F.2xx)
 
-#### F.201: `stempassen + volmachten = totaal toegelaten kiezers`
+#### F.201: `stempassen + volmachten <> totaal toegelaten kiezers`
 
 > **Controleer toegelaten kiezers** (F.201)  
 > De invoer bij A, B of D klopt niet.  
@@ -105,7 +105,7 @@ Velden markeren: A, B en D
 
 Velden markeren: E.1 t/m E.n en E
 
-#### F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen = totaal uitgebrachte stemmen`
+#### F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal uitgebrachte stemmen`
 
 > **Controleer uitgebrachte stemmen** (F.202)  
 > De invoer bij E, F, G of H klopt niet.  
@@ -140,36 +140,47 @@ Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
-
-
-
-#### F.305 (Als D < H) `I = H - D`
+#### F.305 (Als D < H) `I <> H - D`
 
 > **Controleer I (stembiljetten meer geteld)** (F.305)
 
 Veld markeren: I
 
-#### F.306 (Als D < H en J is ingevuld) `I = H - D`
+#### F.306 (Als D < H en J is ingevuld) `I <> H - D`
 
 > **Controleer I en J** (F.306)  
 
 Veld markeren: I, J
 
-#### F.307 (Als D > H) `J = D - H`
+#### F.307 (Als D > H) `J <> D - H`
 
 > **Controleer J** (F.307)  
 Veld markeren: J
 
-#### F.308 (Als D > H en I is ingevuld) `J = D - H`
+#### F.308 (Als D > H en I is ingevuld) `J <> D - H`
 
 > **Controleer I en J** (F.308)  
 
 Veld markeren: I, J
 
+#### F.309 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+
+> **Controleer je antwoorden** (F.309)  
+
+Veld markeren: 3.3.2
+
+#### DSO | F.310 (2.2.3 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap controles en correcties' is niet aangevinkt)
+
+> Invoerder: **Controleer je antwoorden** (F.310)
+> Coördinator: **Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen**
+
+Veld markeren: 2.3.2
+
+
 
 ### Regels voor kandidaten en lijsttotalen (reeks F.4xx)
 
-#### F.401 `Totaal aantal stemmen op een lijst = som van aantal stemmen op de kandidaten van die lijst`
+#### F.401 `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
 
 > **Controleer ingevoerde aantallen** (F.401)  
 > De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.  
@@ -179,7 +190,6 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=1635-58277&t=zTY4ajWtsFkiTOYP-4)
 
-
 #### F.402 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
 
 > **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg?  Dan kan je verdergaan.** (F.402)
@@ -187,6 +197,13 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 Velden markeren: totaal van de lijst 
 N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding onderaan de pagina, onder het totaal-veld.
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11)
+
+#### F.403 `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
+
+> **Controleer het totaal van de lijst** (F.403)
+> Als die overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij [Aantal kiezers en stemmen]()
+
+Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen
 
 
 ## Plausibiliteitschecks geven waarschuwingen
@@ -200,7 +217,7 @@ De foutmelding die wordt getoond bestaat uit dezelfde onderdelen als bij de vali
 
 ### Checks voor alle velden (reeks W.0xx)
 
-#### W.001 (Bij tweede invoer) Alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
+#### W.001 (Bij tweede invoer) Niet alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
 
 > **Verschil met eerste invoer. Extra controle nodig** (W.001)  
 > Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.
@@ -215,7 +232,7 @@ Geen checks.
 
 ### Checks voor totalen (reeks W.2xx)
 
-#### W.201 aantal blanco stemmen is minder dan 3% van het totaal uitgebrachte stemmen
+#### W.201 aantal blanco stemmen is groter of gelijk aan 3% van het totaal uitgebrachte stemmen
 
 > **Controleer aantal blanco stemmen** (W.201)  
 > Het aantal blanco stemmen is erg hoog.  
@@ -225,7 +242,7 @@ Veld markeren: F
 
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=137-3939&t=zTY4ajWtsFkiTOYP-4)
 
-#### W.202: Aantal ongeldige stemmen is minder dan 3% van het totaal uitgebrachte stemmen
+#### W.202: Aantal ongeldige stemmen is groter of gelijk aan 3% van het totaal uitgebrachte stemmen
 
 > **Controleer aantal ongeldige stemmen** (W.202)  
 > Het aantal ongeldige stemmen is erg hoog.  
@@ -233,29 +250,23 @@ Veld markeren: F
 
 Veld markeren: G
 
-#### W.203: Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is minder dan 2% en minder dan 15
+#### W.203: Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter of gelijk aan 2% en groter of gelijk aan 15
 
 - 2% of meer: abs(toegelaten kiezers - getelde stembiljetten) / getelde stembiljetten \>= 0.02
 - 15 of meer: abs(toegelaten kiezers - getelde stembiljetten) \>= 15
 
 > **Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
-> Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).  
+> Er is een groot verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
 Velden markeren: D en H
 
-#### W.204: Verschil tussen herteld totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is minder dan 2% en minder dan 15
+#### W.204: Verschil tussen herteld totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter of gelijk aan 2% of groter of gelijk aan 15
 
 - 2% of meer: abs(herteld toegelaten kiezers - getelde stembiljetten) / getelde stembiljetten \>= 0.02
 - 15 of meer: abs(herteld toegelaten kiezers - getelde stembiljetten) \>= 15
 
-> **Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezers** (W.204)  
-> Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
-
-Velden markeren: H en D.2
-
-#### W.205 Totaal aantal uitgebrachte stemmen niet leeg en groter dan 0
+#### W.205 Totaal aantal uitgebrachte stemmen leeg of 0
 
 > **Controleer aantal uitgebrachte stemmen** (W.205)  
 > Het totaal aantal uitgebrachte stemmen (H) is nul.  
@@ -263,55 +274,6 @@ Velden markeren: H en D.2
 
 Veld markeren: H
 
-#### W.206 (Als niet herteld en alleen als aantal kiesgerechtigden is ingevuld) Totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen zijn niet groter dan het aantal kiesgerechtigden
-
-> **Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.206)  
-> Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is hoger dan het aantal kiesgerechtigden voor dit stembureau.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
-
-Veld markeren: D en H
-
-#### W.207 (Als herteld en alleen als aantal kiesgerechtigden is ingevuld) Totaal aantal uitgebrachte stemmen en totaal herteld aantal toegelaten kiezers is niet groter dan het aantal kiesgerechtigden
-
-> **Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezers** (W.207)  
-> Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten kiezers (D.2) is hoger dan het aantal kiesgerechtigden voor dit stembureau.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
-
-Veld markeren: H en D.2
-
-#### W.208 Getallen in blok toegelaten kiezers (A t/m D) zijn niet allemaal gelijk aan getallen in blok uitgebrachte stemmen (E t/m H)
-
-> **Controleer A t/m D en E t/m H** (W.208)  
-> De getallen bij A t/m D zijn precies hetzelfde als E t/m H.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
-
-Velden markeren: geen (laat alleen waarschuwing zien op de pagina)
-
-#### W.209 Getallen in blok uitgebrachte stemmen (E t/m H) zijn niet allemaal gelijk aan getallen in blok hertelde toegelaten kiezers (A.2 t/m D.2)
-
-> **Controleer E t/m H en A.2 t/m D.2** (W.209)  
-> De getallen bij E t/m H zijn precies hetzelfde als A.2 t/m D.2.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
-
-Velden markeren: E, F, G, H, A.2, B.2, C.2, D.2
-
-### Checks voor verschillen (reeks W.3xx)
-
-#### W.301: (Alleen als (herteld) totaal aantal kiezers < totaal aantal uitgebrachte stemmen) `te veel uitgereikte stembiljetten + andere verklaring + geen verklaring - niet ingeleverde stembiljetten - te weinig uitgereikte stembiljetten = meer stembiljetten geteld`
-
-> **Controleer ingevulde verschillen** (W.301)  
-> De invoer bij I, K, L, M, N of O klopt niet.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
-
-Velden markeren: I, K, L, M, N en O
-
-#### W.302: (Alleen als (herteld) totaal aantal kiezers > totaal aantal uitgebrachte stemmen) `niet ingeleverde stembiljetten + te weinig uitgereikte stembiljetten + andere verklaring + geen verklaring - te veel uitgereikte stembiljetten = minder stembiljetten geteld`
-
-> **Controleer ingevulde verschillen** (W.302)  
-> De invoer bij J, K, L, M, N of O klopt niet.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
-
-Velden markeren: J, K, L, M, N en O
 
 ### Checks voor kandidaten en lijsttotalen (reeks W.4xx)
 

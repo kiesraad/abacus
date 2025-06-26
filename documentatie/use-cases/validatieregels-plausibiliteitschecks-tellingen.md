@@ -2,7 +2,7 @@
 
 ## Validatieregels geven fouten
 
-Validatieregels vragen de gebruiker de invoer extra te controleren. Ze resulteren in een niet-blokkerende foutmelding. De foutmelding wordt getoond als de regel evalueert naar `FALSE`.
+Validatieregels vragen de gebruiker de invoer extra te controleren. Ze resulteren in een niet-blokkerende foutmelding. De foutmelding wordt getoond als de regel evalueert naar `TRUE`.
 
 De foutmelding die wordt getoond bestaat uit vier onderdelen:
 
@@ -22,65 +22,85 @@ Er zijn geen regels omdat het niet mogelijk is om foute aantallen in te vullen i
 
 ### Regels voor hertelling GSB (reeks F.1xx)
 
-#### CSO | F.101: 'Extra onderzoek': beide leeg, of beide ingevuld
+#### CSO | F.101: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
 
-> **Controleer je antwoorden** (F.101)  
+> Invoerder: **Controleer je antwoorden** (F.101)
+> Coördinator: **Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden. Als er geen extra onderzoek is gedaan, moeten deze vragen overgeslagen worden.** (F.101)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-#### CSO | F.102: 'Extra onderzoek': één antwoord per vraag
+#### CSO | F.102: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
 
-> **Controleer je antwoorden** (F.101)  
+> Invoerder: **Controleer je antwoorden** (F.101)
+> Coördinator: **Er mag maar 1 antwoord per vraag worden gegeven.** (F.102)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### CSO | F.111: 'Verschillen met telresultaten van het stembureau': beide vragen verplicht
 
-> **Controleer je antwoorden** (F.101)  
+> Invoerder: **Controleer je antwoorden** (F.101)
+> Coördinator: **Bij beide vragen moet een antwoord gegeven worden.** (F.102)
+
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-#### CSO | F.112: 'Verschillen met telresultaten van het stembureau': één antwoord per vraag
+#### CSO | F.112: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
 
-> **Controleer je antwoorden** (F.101)  
+> Invoerder: **Controleer je antwoorden** (F.101)  
+> Coördinator: **Er mag maar 1 antwoord per vraag worden gegeven.** (F.102)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### DSO | F.151: Over het proces-verbaal: Vragen bij 'Over het proces verbaal' moeten beantwoord worden
 
-> **Controleer je antwoorden** (F.151)  
+> Invoerder: **Controleer je antwoorden** (F.151)  
 > Beantwoord de vragen over het papieren proces-verbaal. Overleg met de coördinator als je twijfelt.
+
+> Coördinator: **Er is niet correct aangegeven welke documenten zijn ingevoerd** (F.151)
+> Bekijk welke documenten aanwezig zijn, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden. 
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 #### DSO | F.152: Over het proces-verbaal: Ongeldige combinatie van antwoorden: `wel corrigendum, geen inlegvel`
 
-> **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)  
+> Inoverder: **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)  
 > Overleg met de coördinator over het ontbrekende inlegvel.
+
+> Coördinator: **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)
+> Zorg dat een correct ingevuld inlegvel wordt toegevoegd, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 #### DSO | F.153: 'Controles en correcties': vragen moeten beantwoord worden (geen vinkjes bij de eerste twee vragen)
 
-> **Controleer je antwoorden** (F.153)  
+> Invoerder: **Controleer je antwoorden** (F.153)
+
+> Coördinator: **De vragen op het inlegvel zijn niet volledig beantwoordt** (F.153)
+> Zorg dat het inlegvel volledig is ingevuld, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-#### DSO | F.154: Controles en correcties: Ongeldige set documenten (vraag 'gecorrigeerde telresultaten' = 'nee')
+#### DSO, eerste zitting | F.154: Controles en correcties: Ongeldige set documenten (vraag 'gecorrigeerde telresultaten' = 'nee')
 
-> **Controleer je antwoorden** (F.154)  
-> Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresulten.
+> Invoerder: **Controleer je antwoorden** (F.154)  
+> Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.
 > Overleg met de coördinator.
+
+> Coördinator: **Onterecht corrigendum?** (F.154)  
+> Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.
+> Als er geen gecorrigeerde telresultaten zijn, dan hoort er ook geen corrigendum te zijn. Verwijder het corrigendum, of geef op het inlegvel aan dat
+> er wel gecorrigeerde telresultaten zijn. Geef daarna de invoer terug aan de invoerder.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-#### DSO | F.155: Controles en correcties: Ongeldig antwoord in eerste zitting (vraag 'op verzoek van het CSB' = 'ja')
+#### DSO, eerste zitting | F.155: Controles en correcties: Ongeldig antwoord in eerste zitting (vraag 'op verzoek van het CSB' = 'ja')
 
-> **Controleer je antwoorden** (F.154)  
-> Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn.
-> Overleg met de coördinator.
+> Invoerder: **Controleer je antwoorden** (F.154)
+
+> Coördinator: **Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn.** (F.154)
+> **TODO**: Hier zijn we gebleven
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 

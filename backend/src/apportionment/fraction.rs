@@ -148,7 +148,7 @@ impl Display for Fraction {
             if remainder > 0 {
                 write!(f, "{} {}/{}", integer, remainder, self.denominator)
             } else {
-                write!(f, "{}", integer)
+                write!(f, "{integer}")
             }
         } else {
             write!(f, "{}/{}", self.numerator, self.denominator)
@@ -158,7 +158,7 @@ impl Display for Fraction {
 
 impl Debug for Fraction {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{}", self)
+        write!(f, "{self}")
     }
 }
 

@@ -1,6 +1,13 @@
 {
   "create": "Verkiezing toevoegen",
   "add": "Toevoegen: {name}",
+  "abort": {
+    "action": "Afbreken",
+    "description": "<p>De verkiezing wordt pas opgeslagen als je alle stappen doorlopen hebt. Weet je zeker dat je door wilt gaan?</p>",
+    "discard_input": "Verwijder verkiezing",
+    "save_input": "Annuleren",
+    "title": "Niet opgeslagen wijzigingen"
+  },
   "check_and_save": {
     "title": "Controleren en opslaan",
     "description": "Je gaat de volgende verkiezing toevoegen:"

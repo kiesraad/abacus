@@ -50,16 +50,16 @@ test.describe("full data entry flow", () => {
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.pollCardCount).toBeFocused();
     const voters: VotersCounts = {
-      poll_card_count: 800,
+      poll_card_count: 803,
       proxy_certificate_count: 50,
-      voter_card_count: 75,
-      total_admitted_voters_count: 925,
+      voter_card_count: 76,
+      total_admitted_voters_count: 929,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 890,
+      votes_candidates_count: 894,
       blank_votes_count: 20,
       invalid_votes_count: 15,
-      total_votes_cast_count: 925,
+      total_votes_cast_count: 929,
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     await votersAndVotesPage.inputVotesCounts(votes);
@@ -79,7 +79,7 @@ test.describe("full data entry flow", () => {
     const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
     await expect(candidatesListPage_2.getCandidate(0)).toBeFocused();
 
-    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_2.fillCandidatesAndTotal([3, 1], 4);
     const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
     await candidatesListPage_1.next.click();
 

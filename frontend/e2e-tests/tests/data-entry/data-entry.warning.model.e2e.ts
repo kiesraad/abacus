@@ -223,22 +223,22 @@ test.describe("Data entry model test - warnings", () => {
           recountedPageWarningSubmitted: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
           },
           recountedPageChangedToWarningSubmitted: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
           },
           recountedPageChangedToWarningDiscarded: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
         };
         const recountedPageEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
-            await recountedPage.navPanel.votersAndVotes.click();
+            await recountedPage.progressList.votersAndVotes.click();
           },
         };
 
@@ -382,7 +382,7 @@ test.describe("Data entry model test - warnings", () => {
             await votersAndVotesPage.next.click();
           },
           GO_TO_RECOUNTED_PAGE: async () => {
-            await votersAndVotesPage.navPanel.recounted.click();
+            await votersAndVotesPage.progressList.recounted.click();
           },
           CLICK_ABORT: async () => {
             await votersAndVotesPage.abortInput.click();
@@ -405,20 +405,20 @@ test.describe("Data entry model test - warnings", () => {
         const differencesPageStates = {
           differencesPageWarningAccepted: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
           differencesPageCorrected: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
           differencesPageValidSubmitted: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
         };
         const differencesPageEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
-            await differencesPage.navPanel.votersAndVotes.click();
+            await differencesPage.progressList.votersAndVotes.click();
           },
         };
 

@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-export class NavigationPanel {
+export class ProgressList {
   readonly navElement: Locator;
   readonly recounted: Locator;
   readonly recountedIcon: Locator;

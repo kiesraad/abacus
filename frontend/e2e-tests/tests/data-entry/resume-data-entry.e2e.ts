@@ -82,7 +82,7 @@ test.describe("resume data entry flow", () => {
 
       const differencesPage = new DifferencesPage(page);
       await expect(differencesPage.fieldset).toBeVisible();
-      await differencesPage.navPanel.recounted.click();
+      await differencesPage.progressList.recounted.click();
 
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.no).toBeChecked();
@@ -119,11 +119,11 @@ test.describe("resume data entry flow", () => {
 
       const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
       await expect(candidatesListPage_1.fieldset).toBeVisible();
-      await candidatesListPage_1.navPanel.votersAndVotes.click();
+      await candidatesListPage_1.progressList.votersAndVotes.click();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
-      await votersAndVotesPage.navPanel.list(1).click();
+      await votersAndVotesPage.progressList.list(1).click();
 
       await expect(candidatesListPage_1.fieldset).toBeVisible();
     });
@@ -283,7 +283,7 @@ test.describe("resume data entry flow", () => {
       };
       await votersAndVotesPage.inputVotersCounts(voters);
 
-      await votersAndVotesPage.navPanel.recounted.click();
+      await votersAndVotesPage.progressList.recounted.click();
       await expect(recountedPage.fieldset).toBeVisible();
 
       await recountedPage.abortInput.click();
@@ -294,7 +294,7 @@ test.describe("resume data entry flow", () => {
       await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
 
       await expect(recountedPage.fieldset).toBeVisible();
-      await recountedPage.navPanel.votersAndVotes.click();
+      await recountedPage.progressList.votersAndVotes.click();
 
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       await expect(votersAndVotesPage.pollCardCount).toHaveValue("42");
@@ -324,7 +324,7 @@ test.describe("resume data entry flow", () => {
         voter_card_count: 100,
       });
 
-      await votersAndVotesPage.navPanel.recounted.click();
+      await votersAndVotesPage.progressList.recounted.click();
       await expect(recountedPage.fieldset).toBeVisible();
       await recountedPage.no.click();
       await recountedPage.abortInput.click();

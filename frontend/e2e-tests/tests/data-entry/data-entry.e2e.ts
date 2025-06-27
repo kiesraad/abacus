@@ -74,6 +74,12 @@ test.describe("full data entry flow", () => {
     await expect(candidatesListPage_1.getCandidate(0)).toBeFocused();
 
     await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
+    await candidatesListPage_1.next.click();
+
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    await expect(candidatesListPage_2.getCandidate(0)).toBeFocused();
+
+    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
     await candidatesListPage_1.next.click();
 
@@ -163,9 +169,13 @@ test.describe("full data entry flow", () => {
 
     const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
-
     await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
     await candidatesListPage_1.next.click();
+
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    await expect(candidatesListPage_2.fieldset).toBeVisible();
+    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_2.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -228,9 +238,13 @@ test.describe("full data entry flow", () => {
 
     const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
-
     await candidatesListPage_1.fillCandidatesAndTotal([902, 233], 1135);
     await candidatesListPage_1.next.click();
+
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    await expect(candidatesListPage_2.fieldset).toBeVisible();
+    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_2.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -304,9 +318,13 @@ test.describe("full data entry flow", () => {
 
     const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
-
     await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
     await candidatesListPage_1.next.click();
+
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    await expect(candidatesListPage_2.fieldset).toBeVisible();
+    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_2.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -358,6 +376,11 @@ test.describe("full data entry flow", () => {
     await expect(candidatesListPage_1.fieldset).toBeVisible();
     await candidatesListPage_1.fillCandidatesAndTotal([99, 1], 100);
     await candidatesListPage_1.next.click();
+
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    await expect(candidatesListPage_2.fieldset).toBeVisible();
+    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_2.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -424,12 +447,18 @@ test.describe("full data entry flow", () => {
     await differencesPage.next.click();
 
     const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
-
-    await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
+    await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 891);
     await candidatesListPage_1.next.click();
     await expect(candidatesListPage_1.error).toBeVisible();
     await candidatesListPage_1.checkAcceptErrorsAndWarnings();
     await candidatesListPage_1.next.click();
+
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_2.next.click();
+    await expect(candidatesListPage_2.error).toContainText("F.204");
+    await candidatesListPage_2.checkAcceptErrorsAndWarnings();
+    await candidatesListPage_2.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -441,6 +470,10 @@ test.describe("full data entry flow", () => {
     ]);
     await expect(checkAndSavePage.summaryListItemDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
     await expect(checkAndSavePage.summaryListItemPoliticalGroupVotes1).toHaveText([
+      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
+      "F.401 Controleer ingevoerde aantallen",
+    ]);
+    await expect(checkAndSavePage.summaryListItemPoliticalGroupVotes2).toHaveText([
       "F.204 Controleer (totaal) aantal stemmen op kandidaten",
     ]);
 
@@ -729,6 +762,11 @@ test.describe("errors and warnings", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([2, 1], 3);
     await candidatesListPage_1.next.click();
 
+    // TODO: what data makes sense for list 2 in a test to correct error F.204?
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_2.next.click();
+
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.error).toContainText(
@@ -741,6 +779,9 @@ test.describe("errors and warnings", () => {
     // fill counts of List 1 with data that does match the total votes on candidates
     await candidatesListPage_1.fillCandidatesAndTotal([70, 30], 100);
     await candidatesListPage_1.next.click();
+
+    await expect(candidatesListPage_2.fieldset).toBeVisible();
+    await candidatesListPage_2.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -1082,13 +1123,17 @@ test.describe("navigation", () => {
       await differencesPage.navPanel.list(1).click();
       await candidatesListPage_1.fillCandidatesAndTotal([50, 50], 100);
       await candidatesListPage_1.next.click();
-      const checkAndSavePage = new CheckAndSavePage(page);
-      await expect(checkAndSavePage.fieldset).toBeVisible();
-      await expect(checkAndSavePage.navPanel.checkAndSaveIcon).toHaveAccessibleName("je bent hier");
-      await expect(checkAndSavePage.navPanel.listIcon(1)).toHaveAccessibleName("opgeslagen");
 
-      await checkAndSavePage.navPanel.list(1).click();
-      await expect(candidatesListPage_1.navPanel.checkAndSaveIcon).toHaveAccessibleName("nog niet afgerond");
+      // TODO: can this test be improved now there are 2 candidate lists?
+      // TODO: should this test include an icon on the check and save page?
+      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+      await expect(candidatesListPage_2.fieldset).toBeVisible();
+      await expect(candidatesListPage_2.navPanel.listIcon(2)).toHaveAccessibleName("je bent hier");
+      await expect(candidatesListPage_2.navPanel.listIcon(1)).toHaveAccessibleName("opgeslagen");
+
+      await candidatesListPage_2.navPanel.list(1).click();
+      await expect(candidatesListPage_1.navPanel.listIcon(2)).toHaveAccessibleName("nog niet afgerond");
+      await expect(candidatesListPage_1.navPanel.checkAndSaveIcon).toBeHidden();
     });
   });
 });

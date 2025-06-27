@@ -39,6 +39,27 @@ export const electionRequest: NewElection = {
         },
       ],
     },
+    {
+      number: 2,
+      name: "",
+      candidates: [
+        {
+          number: 1,
+          initials: "E.",
+          first_name: "Edgar",
+          last_name: "Fizz",
+          locality: "Utrecht",
+          gender: "Male",
+        },
+        {
+          number: 2,
+          initials: "H.",
+          first_name: "Hilde",
+          last_name: "Smit",
+          locality: "Rotterdam",
+        },
+      ],
+    },
   ],
 };
 
@@ -100,6 +121,20 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
           },
         ],
       },
+      {
+        number: 2,
+        total: 0,
+        candidate_votes: [
+          {
+            number: 1,
+            votes: 0,
+          },
+          {
+            number: 2,
+            votes: 0,
+          },
+        ],
+      },
     ],
   },
   client_state: null,
@@ -143,23 +178,47 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
         },
       ],
     },
+    {
+      number: 2,
+      total: 0, // TODO: increase number of votes
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 0,
+        },
+        {
+          number: 2,
+          votes: 0,
+        },
+      ],
+    },
   ],
 };
 
+// TODO: check contents based on usage
 export const noRecountNoDifferencesRequest: DataEntry = {
-  progress: 80,
+  progress: 83,
   data: noRecountNoDifferencesDataEntry,
   client_state: {
-    furthest: "political_group_votes_1",
-    current: "political_group_votes_1",
+    furthest: "political_group_votes_2",
+    current: "political_group_votes_2",
     acceptedErrorsAndWarnings: [],
     continue: true,
   },
 };
 
-export const emptyRequest: DataEntry = {
+// TODO: check contents based on usage
+export const requestWithError: DataEntry = {
   progress: 80,
-  data: emptyDataEntryResponse.data!,
+  data: {
+    ...noRecountNoDifferencesDataEntry,
+    voters_counts: {
+      poll_card_count: 10800,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 925,
+    },
+  },
   client_state: {
     furthest: "political_group_votes_1",
     current: "political_group_votes_1",

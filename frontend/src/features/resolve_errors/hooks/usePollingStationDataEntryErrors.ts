@@ -8,8 +8,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
   DataEntryGetErrorsResponse,
-  Election,
-  PoliticalGroup,
+  ElectionWithPoliticalGroups,
   POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH,
@@ -21,7 +20,7 @@ interface DataEntryErrors {
   action: ResolveErrorsAction | undefined;
   setAction: (action: ResolveErrorsAction | undefined) => void;
   pollingStation: PollingStation;
-  election: Election & { political_groups: PoliticalGroup[] };
+  election: ElectionWithPoliticalGroups;
   loading: boolean;
   dataEntry: DataEntryGetErrorsResponse | null;
   onSubmit: () => Promise<void>;

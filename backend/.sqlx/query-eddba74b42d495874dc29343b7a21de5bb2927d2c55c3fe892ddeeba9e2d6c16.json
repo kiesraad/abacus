@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                r.polling_station_id AS \"polling_station_id: u32\",\n                r.committee_session_id AS \"committee_session_id: u32\",\n                r.data,\n                r.created_at              \n            FROM polling_station_results AS r\n            LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id\n            WHERE p.election_id = $1\n        ",
+  "query": "\n            SELECT\n                r.polling_station_id AS \"polling_station_id: u32\",\n                r.committee_session_id AS \"committee_session_id: u32\",\n                r.data,\n                r.created_at\n            FROM polling_station_results AS r\n            LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id\n            WHERE p.election_id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -34,5 +34,5 @@
       false
     ]
   },
-  "hash": "840b567bbb3de785cb2644210c7db1b2fa80206da47ec208feff2b7340529a01"
+  "hash": "eddba74b42d495874dc29343b7a21de5bb2927d2c55c3fe892ddeeba9e2d6c16"
 }

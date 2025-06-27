@@ -198,7 +198,7 @@ impl PollingStationResultsEntries {
                 r.polling_station_id AS "polling_station_id: u32",
                 r.committee_session_id AS "committee_session_id: u32",
                 r.data,
-                r.created_at              
+                r.created_at
             FROM polling_station_results AS r
             LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
             WHERE p.election_id = $1

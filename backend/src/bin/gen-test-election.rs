@@ -5,9 +5,10 @@ use std::{
     str::FromStr,
 };
 
-use abacus::committee_session::CommitteeSession;
 use abacus::{
-    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
+    },
     data_entry::{
         CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
         VotersCounts, VotesCounts,

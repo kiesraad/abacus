@@ -309,7 +309,7 @@ test.describe("Data entry model test - valid data", () => {
             await votersAndVotesPage.navBar.clickElection(election.election.location, election.election.name);
           },
           GO_TO_RECOUNTED_PAGE: async () => {
-            await votersAndVotesPage.navPanel.recounted.click();
+            await votersAndVotesPage.progressList.recounted.click();
           },
           SUBMIT: async () => {
             await votersAndVotesPage.next.click();
@@ -324,7 +324,7 @@ test.describe("Data entry model test - valid data", () => {
 
         const differencesPageEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
-            await differencesPage.navPanel.votersAndVotes.click();
+            await differencesPage.progressList.votersAndVotes.click();
           },
         };
 

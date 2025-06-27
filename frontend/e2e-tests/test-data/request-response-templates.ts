@@ -195,7 +195,6 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
   ],
 };
 
-// TODO: check contents based on usage
 export const noRecountNoDifferencesRequest: DataEntry = {
   progress: 83,
   data: noRecountNoDifferencesDataEntry,
@@ -207,9 +206,8 @@ export const noRecountNoDifferencesRequest: DataEntry = {
   },
 };
 
-// TODO: check contents based on usage
 export const requestWithError: DataEntry = {
-  progress: 80,
+  progress: 83,
   data: {
     ...noRecountNoDifferencesDataEntry,
     voters_counts: {
@@ -220,9 +218,9 @@ export const requestWithError: DataEntry = {
     },
   },
   client_state: {
-    furthest: "political_group_votes_1",
-    current: "political_group_votes_1",
-    acceptedErrorsAndWarnings: [],
+    furthest: "political_group_votes_2",
+    current: "political_group_votes_2",
+    acceptedErrorsAndWarnings: ["voters_votes_counts", "differences_counts"],
     continue: true,
   },
 };

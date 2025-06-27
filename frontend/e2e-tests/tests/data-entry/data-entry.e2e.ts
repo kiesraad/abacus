@@ -762,7 +762,7 @@ test.describe("errors and warnings", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([2, 1], 3);
     await candidatesListPage_1.next.click();
 
-    // TODO: what data makes sense for list 2 in a test to correct error F.204?
+    // fill counts of List 2 with 0 so correcting the error is easier
     const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_2.next.click();
@@ -1084,7 +1084,17 @@ test.describe("navigation", () => {
         total_votes_cast_count: 100,
       };
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+      await expect(votersAndVotesPage.warning).toBeVisible();
 
+      await votersAndVotesPage.navPanel.recounted.click();
+      await expect(recountedPage.fieldset).toBeVisible();
+      await expect(recountedPage.navPanel.recountedIcon).toHaveAccessibleName("je bent hier");
+      await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
+
+      await recountedPage.navPanel.votersAndVotes.click();
+      await expect(votersAndVotesPage.fieldset).toBeVisible();
+      await expect(votersAndVotesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
+      await expect(votersAndVotesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("je bent hier");
       await votersAndVotesPage.checkAcceptErrorsAndWarnings();
       await votersAndVotesPage.next.click();
 
@@ -1124,8 +1134,6 @@ test.describe("navigation", () => {
       await candidatesListPage_1.fillCandidatesAndTotal([50, 50], 100);
       await candidatesListPage_1.next.click();
 
-      // TODO: can this test be improved now there are 2 candidate lists?
-      // TODO: should this test include an icon on the check and save page?
       const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
       await expect(candidatesListPage_2.fieldset).toBeVisible();
       await expect(candidatesListPage_2.navPanel.listIcon(2)).toHaveAccessibleName("je bent hier");

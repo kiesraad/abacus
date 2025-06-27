@@ -7,7 +7,7 @@ import { UnsavedChangesModal } from "./UnsavedChangesModalPgObj";
 export class DataEntryBasePage {
   readonly navBar: NavBar;
   readonly unsavedChangesModal: UnsavedChangesModal;
-  readonly navPanel: NavigationPanel;
+  readonly navPanel: NavigationPanel; // TODO: rename to progressList to avoid confusion with navbar and to match component name
 
   readonly abortInput: Locator;
 

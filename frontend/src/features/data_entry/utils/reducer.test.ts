@@ -134,10 +134,10 @@ test("should handle SET_CACHE", () => {
 
 test("should handle UPDATE_FORM_SECTION", () => {
   const oldState = getInitialState();
-  oldState.formState.current = "voters_votes_counts";
 
   const action: DataEntryAction = {
     type: "UPDATE_FORM_SECTION",
+    sectionId: "voters_votes_counts",
     partialFormSection: {
       hasChanges: true,
     },
@@ -173,6 +173,7 @@ test("should handle FORM_SAVED", () => {
       errors: [],
       warnings: [],
     },
+    sectionId: "recounted",
     aborting: false,
     continueToNextSection: true,
   };
@@ -196,19 +197,6 @@ test("should handle RESET_TARGET_FORM_SECTION", () => {
   expect(state.targetFormSectionId).toBeNull();
 });
 
-test("should handle REGISTER_CURRENT_FORM", () => {
-  const action: DataEntryAction = {
-    type: "REGISTER_CURRENT_FORM",
-    formSectionId: "voters_votes_counts",
-  };
-
-  const state = dataEntryReducer(getInitialState(), action);
-  expect(state.formState.current).toBeDefined();
-  expect(state.formState.current).toEqual(action.formSectionId);
-  expect(state.formState.sections.recounted.isSubmitted).toBeDefined();
-  expect(state.formState.sections.recounted.isSubmitted).toEqual(false);
-});
-
 describe("onSubmitForm", () => {
   test("No current section", async () => {
     const dispatch = vi.fn();
@@ -216,7 +204,7 @@ describe("onSubmitForm", () => {
 
     const submit = onSubmitForm(client, "", dispatch, getDefaultDataEntryState());
 
-    const result = await submit({}, { showAcceptErrorsAndWarnings: true });
+    const result = await submit("recounted", {}, { showAcceptErrorsAndWarnings: true });
     expect(result).toBe(false);
     expect(dispatch).toHaveBeenCalledTimes(0);
   });
@@ -229,7 +217,6 @@ describe("onSubmitForm", () => {
       ...defaultState,
       pollingStationResults: getInitialValues(),
       formState: {
-        current: "voters_votes_counts",
         furthest: "voters_votes_counts",
         sections: {
           ...defaultState.formState.sections,
@@ -244,10 +231,11 @@ describe("onSubmitForm", () => {
 
     const submit = onSubmitForm(client, "", dispatch, state);
 
-    const result = await submit({}, { showAcceptErrorsAndWarnings: true });
+    const result = await submit("voters_votes_counts", {}, { showAcceptErrorsAndWarnings: true });
     expect(result).toBe(false);
     expect(dispatch).toHaveBeenCalledWith({
       type: "UPDATE_FORM_SECTION",
+      sectionId: "voters_votes_counts",
       partialFormSection: { acceptErrorsAndWarningsError: true },
     } satisfies DataEntryAction);
   });
@@ -286,11 +274,13 @@ describe("onSubmitForm", () => {
       },
     });
 
-    const result = await submit({}, { aborting: true });
+    const result = await submit("voters_votes_counts", {}, { aborting: true });
 
     expect(dispatch).toHaveBeenCalledTimes(3);
 
-    expect(dispatch.mock.calls[0]).toStrictEqual([{ type: "SET_STATUS", status: "saving" } satisfies DataEntryAction]);
+    expect(dispatch.mock.calls[0]).toStrictEqual([
+      { type: "SET_STATUS", status: "saving", sectionId: "voters_votes_counts" } satisfies DataEntryAction,
+    ]);
     expect(dispatch.mock.calls[1]).toStrictEqual([{ type: "SET_STATUS", status: "aborted" } satisfies DataEntryAction]);
 
     const data: PollingStationResults = {
@@ -314,6 +304,7 @@ describe("onSubmitForm", () => {
         type: "FORM_SAVED",
         data,
         validationResults: { errors: [], warnings: [] },
+        sectionId: "voters_votes_counts",
         aborting: true,
         continueToNextSection: true,
       } satisfies DataEntryAction,

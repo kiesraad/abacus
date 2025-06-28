@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { FormSectionId, SectionValues } from "@/types/types";
+import { SectionValues } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 import { mapValidationResultSetsToFields } from "@/utils/ValidationResults";
 
@@ -8,7 +8,7 @@ import { SubmitCurrentFormOptions } from "../types/types";
 import { useDataEntryContext } from "./useDataEntryContext";
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
-export function useDataEntryFormSection({ section: sectionId }: { section: FormSectionId }) {
+export function useDataEntryFormSection() {
   const {
     error,
     cache,
@@ -19,11 +19,12 @@ export function useDataEntryFormSection({ section: sectionId }: { section: FormS
     onSubmitForm,
     updateFormSection,
     election,
-  } = useDataEntryContext(sectionId);
+    sectionId,
+  } = useDataEntryContext();
 
   const section = dataEntryStructure.find((s) => s.id === sectionId);
 
-  if (!section) {
+  if (!sectionId || !section) {
     throw new Error(`Form section ${sectionId} not found in data entry structure`);
   }
 
@@ -60,7 +61,11 @@ export function useDataEntryFormSection({ section: sectionId }: { section: FormS
   // register changes when fields change
   const setValues = (path: string, value: string) => {
     if (!hasChanges) {
-      updateFormSection({ hasChanges: true, acceptErrorsAndWarnings: false, acceptErrorsAndWarningsError: false });
+      updateFormSection(sectionId, {
+        hasChanges: true,
+        acceptErrorsAndWarnings: false,
+        acceptErrorsAndWarningsError: false,
+      });
     }
     setCurrentValues((cv) => {
       cv = structuredClone(cv);
@@ -70,7 +75,7 @@ export function useDataEntryFormSection({ section: sectionId }: { section: FormS
   };
 
   const setAcceptErrorsAndWarnings = (acceptErrorsAndWarnings: boolean) => {
-    updateFormSection({ acceptErrorsAndWarnings });
+    updateFormSection(sectionId, { acceptErrorsAndWarnings });
   };
 
   // form keyboard navigation
@@ -78,7 +83,7 @@ export function useDataEntryFormSection({ section: sectionId }: { section: FormS
 
   // submit and save to form contents
   const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
-    return await onSubmitForm(currentValues, { ...options, showAcceptErrorsAndWarnings });
+    return await onSubmitForm(sectionId, currentValues, { ...options, showAcceptErrorsAndWarnings });
   };
 
   // scroll to top when saved
@@ -103,5 +108,6 @@ export function useDataEntryFormSection({ section: sectionId }: { section: FormS
     showAcceptErrorsAndWarnings,
     isSaving: status === "saving",
     election,
+    sectionId,
   };
 }

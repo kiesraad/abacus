@@ -30,7 +30,7 @@ interface DataEntryErrors {
 
 export function usePollingStationDataEntryErrors(
   pollingStationId: number,
-  afterSave: (action: ResolveErrorsAction) => void,
+  afterSave?: (action: ResolveErrorsAction) => void,
 ): DataEntryErrors {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
@@ -60,6 +60,10 @@ export function usePollingStationDataEntryErrors(
   }
 
   const onSubmit = async () => {
+    if (!afterSave) {
+      throw new Error("afterSave is required");
+    }
+
     if (action === undefined) {
       setValidationError(t("resolve_differences.required_error"));
       return;

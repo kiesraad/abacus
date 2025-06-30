@@ -17,7 +17,7 @@ import { server } from "@/testing/server";
 import { screen, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
-import { ResolveErrorsPage } from "./ResolveErrorsPage";
+import { ResolveErrorsIndexPage } from "./ResolveErrorsIndexPage";
 
 const navigate = vi.fn();
 
@@ -33,7 +33,7 @@ const renderPage = async () => {
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
           <UsersProvider>
-            <ResolveErrorsPage />
+            <ResolveErrorsIndexPage />
           </UsersProvider>
         </ElectionStatusProvider>
       </ElectionProvider>

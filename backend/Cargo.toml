@@ -55,13 +55,13 @@ tracing = "0.1.41"
 tower-http = { version = "0.6", features = ["set-header", "trace"] }
 typst = { version = "0.13.1", optional = true }
 typst-pdf = { version = "0.13.1", optional = true }
-quick-xml = { version = "0.37.5", features = ["serialize"] }
+quick-xml = { version = "0.38.0", features = ["serialize"] }
 sha2 = "0.10.9"
 argon2 = "0.5.3"
 password-hash = { version = "0.5.0", features = ["getrandom"] }
 rand = "0.9.0"
 cookie = { version = "0.18.1", features = ["percent-encode"] }
-zip = { version = "4.1.0", default-features = false, features = [
+zip = { version = "4.2.0", default-features = false, features = [
     "deflate",
     "chrono",
 ] }

@@ -1,10 +1,10 @@
-import { useBlocker } from "react-router";
+import { useBlocker, useParams } from "react-router";
 
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUser } from "@/hooks/user/useUser";
 import { t, tx } from "@/i18n/translate";
-import { SectionValues } from "@/types/types";
+import { FormSectionId, SectionValues } from "@/types/types";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { SubmitCurrentFormOptions } from "../types/types";
@@ -25,8 +25,9 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
     entryNumber,
     onDeleteDataEntry,
     updateFormSection,
-    sectionId,
   } = useDataEntryContext();
+  const params = useParams<{ sectionId: FormSectionId }>();
+  const sectionId = params.sectionId ?? null;
   const user = useUser();
 
   // path check to see if the current location is part of the data entry flow

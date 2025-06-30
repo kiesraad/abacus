@@ -1,6 +1,7 @@
 import * as React from "react";
+import { useParams } from "react-router";
 
-import { SectionValues } from "@/types/types";
+import { FormSectionId, SectionValues } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 import { mapValidationResultSetsToFields } from "@/utils/ValidationResults";
 
@@ -19,8 +20,10 @@ export function useDataEntryFormSection() {
     onSubmitForm,
     updateFormSection,
     election,
-    sectionId,
   } = useDataEntryContext();
+
+  const params = useParams<{ sectionId: FormSectionId }>();
+  const sectionId = params.sectionId ?? null;
 
   const section = dataEntryStructure.find((s) => s.id === sectionId);
 

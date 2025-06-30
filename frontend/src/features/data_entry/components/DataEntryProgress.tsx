@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link } from "react-router";
+import { Link, useParams } from "react-router";
 
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useElection } from "@/hooks/election/useElection";
@@ -16,8 +16,9 @@ import { getUrlForFormSectionID } from "../utils/utils";
 export function DataEntryProgress() {
   const pollingStationId = useNumericParam("pollingStationId");
   const { election } = useElection();
-
-  const { dataEntryStructure, formState, pollingStationResults, entryNumber, sectionId } = useDataEntryContext();
+  const { dataEntryStructure, formState, pollingStationResults, entryNumber } = useDataEntryContext();
+  const params = useParams<{ sectionId: FormSectionId }>();
+  const sectionId = params.sectionId ?? null;
 
   const menuStatusForFormSection = React.useCallback(
     (formSection?: FormSection): Exclude<MenuStatus, "active"> => {

@@ -108,7 +108,6 @@ export function getDefaultDataEntryStateAndActionsLoaded(): DataEntryStateAndAct
   return {
     ...getDefaultDataEntryState(),
     dispatch: () => null,
-    sectionId: "voters_votes_counts",
     onSubmitForm: () => Promise.resolve(true),
     onDeleteDataEntry: () => Promise.resolve(true),
     onFinaliseDataEntry: () => Promise.resolve(undefined),

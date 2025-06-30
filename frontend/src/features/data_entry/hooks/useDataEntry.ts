@@ -37,7 +37,6 @@ export default function useDataEntry(
 
   return {
     ...state,
-    sectionId,
     dispatch,
     onSubmitForm: onSubmitForm(client, saveRequestPath, dispatch, state),
     onDeleteDataEntry: onDeleteDataEntry(client, deleteRequestPath, dispatch),

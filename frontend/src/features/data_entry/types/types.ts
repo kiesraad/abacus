@@ -33,7 +33,6 @@ export interface DataEntryState {
 }
 
 export interface DataEntryStateAndActions extends DataEntryState {
-  sectionId: FormSectionId | null;
   dispatch: DataEntryDispatch;
   onSubmitForm: (
     sectionId: FormSectionId,

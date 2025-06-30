@@ -47,7 +47,6 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
     <DataEntryContext.Provider
       value={{
         ...stateAndActions,
-        sectionId,
         pollingStationResults: stateAndActions.pollingStationResults,
       }}
     >

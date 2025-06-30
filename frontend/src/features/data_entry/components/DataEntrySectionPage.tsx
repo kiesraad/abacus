@@ -1,9 +1,13 @@
-import { useDataEntryContext } from "../hooks/useDataEntryContext";
+import { useParams } from "react-router";
+
+import { FormSectionId } from "@/types/types";
+
 import { CheckAndSaveForm } from "./check_and_save/CheckAndSaveForm";
 import { DataEntrySection } from "./DataEntrySection";
 
 export function DataEntrySectionPage() {
-  const { sectionId } = useDataEntryContext();
+  const params = useParams<{ sectionId: FormSectionId }>();
+  const sectionId = params.sectionId ?? null;
 
   // Handle index route case (no sectionId) - navigation logic will redirect
   if (!sectionId) {

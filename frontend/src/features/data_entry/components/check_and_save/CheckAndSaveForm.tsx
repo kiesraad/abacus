@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 
 import { ApiError } from "@/api/ApiResult";
 import { ErrorModal } from "@/components/error/ErrorModal";
@@ -38,8 +38,10 @@ export function CheckAndSaveForm() {
     onFinaliseDataEntry,
     pollingStationId,
     entryNumber,
-    sectionId,
   } = useDataEntryContext();
+
+  const params = useParams<{ sectionId: FormSectionId }>();
+  const sectionId = params.sectionId ?? null;
 
   if (sectionId !== "save") {
     throw new Error(`CheckAndSaveForm can only be used with sectionId "save", not "${sectionId}"`);

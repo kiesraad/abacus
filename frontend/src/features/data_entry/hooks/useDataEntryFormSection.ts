@@ -31,17 +31,14 @@ export function useDataEntryFormSection() {
     throw new Error(`Form section ${sectionId} not found in data entry structure`);
   }
 
-  // Helper function build currentValues
-  const buildCurrentValues = React.useCallback((): SectionValues => {
+  // Local form state
+  const [currentValues, setCurrentValues] = React.useState<SectionValues>((): SectionValues => {
     if (cache?.key === sectionId) {
       return cache.data;
     } else {
       return mapResultsToSectionValues(section, pollingStationResults);
     }
-  }, [cache, sectionId, section, pollingStationResults]);
-
-  // Local form state
-  const [currentValues, setCurrentValues] = React.useState<SectionValues>(() => buildCurrentValues());
+  });
 
   // derived state
   const formSection = formState.sections[sectionId];

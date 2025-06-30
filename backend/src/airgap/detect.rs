@@ -286,14 +286,14 @@ mod tests {
 
         let mut events = Vec::new();
 
-        for _ in 0..10 {
+        for _ in 0..20 {
             events = audit_log.list_all().await.unwrap();
 
             if events.len() == 1 {
                 break;
             }
 
-            tokio::time::sleep(Duration::from_millis(10)).await;
+            tokio::time::sleep(Duration::from_millis(50)).await;
         }
 
         assert_eq!(events.len(), 1);

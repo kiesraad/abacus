@@ -61,7 +61,7 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
           {details.userRole && (
             <>
               <dt>{t("log.field.role")}</dt>
-              <dd>{details.userRole}</dd>
+              <dd>{t(details.userRole)}</dd>
             </>
           )}
           {details.userId && (

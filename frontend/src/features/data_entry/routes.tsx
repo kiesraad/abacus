@@ -1,10 +1,10 @@
 import { RouteObject } from "react-router";
 
-import { DataEntryLayout } from "./components/DataEntryLayout";
+import { DataEntryPage } from "./components/DataEntryPage";
 
 export const dataEntryRoutes: RouteObject[] = [
   {
     path: ":sectionId?",
-    Component: DataEntryLayout,
+    Component: DataEntryPage,
   },
 ];

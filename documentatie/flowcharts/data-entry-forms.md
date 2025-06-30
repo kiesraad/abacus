@@ -109,34 +109,32 @@ flowchart TD
 
     %% elements
     flow-start([start])
-
+    next-button(next button)
+    call-api(call API)
+    
     errors-warnings-cur-page{"errors/warnings <br/> for current page?"}
     errors-warnings-accepted{"errors/warnings accepted?"}
     user-addresses-errors-warnings{user addresses errors/warnings}
 
-    next-button(next button)
-    call-api(call API)
-    change-input(change input)
     accept-errors-warnings(accept errors/warnings)
-
+    change-input(change input)
     go-to-next-page([go to next page])
 
-    %% flow
+%% flow
     flow-start --> next-button
     next-button --> call-api
     call-api --> errors-warnings-cur-page
 
     errors-warnings-cur-page -- yes --> errors-warnings-accepted
-    
-    user-addresses-errors-warnings -- resolve --> change-input
-    user-addresses-errors-warnings -- accept --> accept-errors-warnings
-    change-input --> next-button
-
     errors-warnings-accepted -- no --> user-addresses-errors-warnings
-    errors-warnings-accepted -- yes --> go-to-next-page
+    user-addresses-errors-warnings -- resolve --> change-input
+    change-input --> next-button
+    user-addresses-errors-warnings -- accept --> accept-errors-warnings
     accept-errors-warnings --> next-button
 
+    errors-warnings-accepted -- yes --> go-to-next-page
     errors-warnings-cur-page -- no --> go-to-next-page
+
 ```
 
 - If there is a warning or error and the user changes the input, they should no longer have the option to accept the errors/warnings. They need to click "Next" first, to validate the changed input.
@@ -174,16 +172,16 @@ flowchart TD
     flow-start --> inside-outside
     inside-outside -- outside --> user-made-changes
     inside-outside -- inside --> on-furthest-page
-    on-furthest-page -- yes --> cache-input
-    cache-input --> go-to-page
-    
-
     on-furthest-page -- no --> user-made-changes
+    
     user-made-changes -- no --> go-to-page
     user-made-changes -- yes --> save-changes
     save-changes -- yes --> call-save-api
     save-changes -- no --> reset-changes
     save-changes -- close × --> remain-on-page
+
+    on-furthest-page -- yes --> cache-input
+    cache-input --> go-to-page
     reset-changes --> go-to-page
     call-save-api --> go-to-page
 ```

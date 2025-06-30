@@ -2875,6 +2875,34 @@
             ]
           },
           {
+            "type": "object",
+            "required": [
+              "eventType"
+            ],
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "enum": [
+                  "AirGapViolationDetected"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "eventType"
+            ],
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "enum": [
+                  "AirGapViolationResolved"
+                ]
+              }
+            }
+          },
+          {
             "allOf": [
               {
                 "$ref": "#/components/schemas/ErrorDetails"
@@ -2927,10 +2955,6 @@
           "time",
           "event",
           "eventLevel",
-          "userId",
-          "username",
-          "userFullname",
-          "userRole",
           "ip"
         ],
         "properties": {
@@ -2958,18 +2982,34 @@
             "type": "string"
           },
           "userFullname": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "userId": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "format": "int32",
             "minimum": 0
           },
           "userRole": {
-            "$ref": "#/components/schemas/Role"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Role"
+              }
+            ]
           },
           "username": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "workstation": {
             "type": [

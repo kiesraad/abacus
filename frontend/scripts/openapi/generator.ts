@@ -170,6 +170,11 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
       break;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  if ((s.type as string) === "null") {
+    return "null";
+  }
+
   if (s.nullable) {
     type += " | null";
   }

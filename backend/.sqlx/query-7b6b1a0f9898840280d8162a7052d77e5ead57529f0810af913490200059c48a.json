@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, user_fullname, user_role, ip)\n            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                username,\n                ip,\n                user_fullname,\n                user_role\n            ",
+  "query": "INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, user_fullname, user_role, ip)\n            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                username,\n                ip,\n                user_fullname,\n                user_role as \"user_role: Role\"\n            ",
   "describe": {
     "columns": [
       {
@@ -54,7 +54,7 @@
         "type_info": "Text"
       },
       {
-        "name": "user_role",
+        "name": "user_role: Role",
         "ordinal": 10,
         "type_info": "Text"
       }
@@ -69,12 +69,12 @@
       false,
       true,
       true,
-      false,
-      false,
       true,
-      false,
-      false
+      true,
+      true,
+      true,
+      true
     ]
   },
-  "hash": "146ead0dbbae4148094ae0de010563e6a8426359bb75f836e575077405833120"
+  "hash": "7b6b1a0f9898840280d8162a7052d77e5ead57529f0810af913490200059c48a"
 }

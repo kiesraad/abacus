@@ -704,7 +704,7 @@ pub mod tests {
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
             State(Elections::new(pool.clone())),
-            AuditService::new(AuditLog(pool), user, None),
+            AuditService::new(AuditLog(pool), Some(user), None),
             Path((1, entry_number)),
         )
         .await
@@ -726,7 +726,7 @@ pub mod tests {
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
             State(Elections::new(pool.clone())),
-            AuditService::new(AuditLog(pool), user, None),
+            AuditService::new(AuditLog(pool), Some(user), None),
             request_body.clone(),
         )
         .await
@@ -741,7 +741,7 @@ pub mod tests {
         polling_station_data_entry_delete(
             Typist(user.clone()),
             State(PollingStationDataEntries::new(pool.clone())),
-            AuditService::new(AuditLog(pool), user, None),
+            AuditService::new(AuditLog(pool), Some(user), None),
             Path((1, entry_number)),
         )
         .await
@@ -758,7 +758,7 @@ pub mod tests {
             State(PollingStationDataEntries::new(pool.clone())),
             State(Elections::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
-            AuditService::new(AuditLog(pool), user, None),
+            AuditService::new(AuditLog(pool), Some(user), None),
             Path((1, entry_number)),
         )
         .await
@@ -773,7 +773,7 @@ pub mod tests {
             State(PollingStations::new(pool.clone())),
             State(Elections::new(pool.clone())),
             Path(1),
-            AuditService::new(AuditLog(pool), user, None),
+            AuditService::new(AuditLog(pool), Some(user), None),
             action,
         )
         .await
@@ -1011,7 +1011,7 @@ pub mod tests {
         let response = polling_station_data_entry_delete(
             Typist(User::test_user(Role::Typist, 1)),
             State(PollingStationDataEntries::new(pool.clone())),
-            AuditService::new(AuditLog(pool), user, None),
+            AuditService::new(AuditLog(pool), Some(user), None),
             Path((1, EntryNumber::FirstEntry)),
         )
         .await

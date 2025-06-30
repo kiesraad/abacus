@@ -254,6 +254,8 @@ export type AuditEvent =
   | (DataEntryDetails & { eventType: "DataEntryKeptFirst" })
   | (DataEntryDetails & { eventType: "DataEntryKeptSecond" })
   | (DataEntryDetails & { eventType: "DataEntryDiscardedBoth" })
+  | { eventType: "AirGapViolationDetected" }
+  | { eventType: "AirGapViolationResolved" }
   | (ErrorDetails & { eventType: "Error" })
   | { eventType: "UnknownEvent" };
 
@@ -266,10 +268,10 @@ export interface AuditLogEvent {
   ip: string;
   message?: string | null;
   time: string;
-  userFullname: string;
-  userId: number;
-  userRole: Role;
-  username: string;
+  userFullname?: string | null;
+  userId?: number | null;
+  userRole?: null | Role;
+  username?: string | null;
   workstation?: number | null;
 }
 

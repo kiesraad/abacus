@@ -1,13 +1,24 @@
+use sqlx::SqlitePool;
 use std::{
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, TcpStream, ToSocketAddrs},
     sync::{Arc, RwLock, atomic::AtomicBool},
     time::{Duration, Instant},
 };
-use tracing::{error, trace};
+use tokio::sync::mpsc::{self, Sender};
+use tracing::{error, info, trace, warn};
+
+use crate::audit_log::{AuditEvent, AuditLog};
 
 #[derive(Debug, Clone)]
+pub enum AirGapStatusChange {
+    AirGapViolationDetected,
+    AirGapViolationResolved,
+}
+
+#[derive(Clone)]
 pub struct AirgapDetection {
     enabled: bool,
+    updates: Option<Sender<AirGapStatusChange>>,
     airgap_violation_detected: Arc<AtomicBool>,
     last_check: Arc<RwLock<Option<Instant>>>,
 }
@@ -39,6 +50,7 @@ impl AirgapDetection {
     pub fn nop() -> Self {
         Self {
             enabled: false,
+            updates: None,
             airgap_violation_detected: Arc::new(AtomicBool::new(false)),
             last_check: Arc::new(RwLock::new(None)),
         }
@@ -46,12 +58,36 @@ impl AirgapDetection {
 
     /// Starts the airgap detection in a background task.
     /// It will periodically check for airgap violations by attempting to connect to a known server.
-    pub async fn start() -> AirgapDetection {
+    pub async fn start(pool: SqlitePool) -> AirgapDetection {
+        let (tx, mut rx) = mpsc::channel::<AirGapStatusChange>(1);
+
         let airgap_detection = AirgapDetection {
             enabled: true,
+            updates: Some(tx),
             airgap_violation_detected: Arc::new(AtomicBool::new(false)),
             last_check: Arc::new(RwLock::new(None)),
         };
+
+        let audit_log = AuditLog(pool);
+
+        tokio::task::spawn(async move {
+            loop {
+                if let Some(status) = rx.recv().await {
+                    let event = match status {
+                        AirGapStatusChange::AirGapViolationDetected => {
+                            AuditEvent::AirGapViolationDetected
+                        }
+                        AirGapStatusChange::AirGapViolationResolved => {
+                            AuditEvent::AirGapViolationResolved
+                        }
+                    };
+
+                    if let Err(e) = audit_log.create(&event, None, None, None).await {
+                        error!("Failed to log air gap status change: {e:#?}");
+                    }
+                }
+            }
+        });
 
         std::thread::spawn({
             let airgap_detection = airgap_detection.clone();
@@ -68,13 +104,41 @@ impl AirgapDetection {
         airgap_detection
     }
 
+    fn send_update(&self) {
+        if let Some(sender) = self.updates.as_ref() {
+            let status = if self.violation_detected() {
+                AirGapStatusChange::AirGapViolationDetected
+            } else {
+                AirGapStatusChange::AirGapViolationResolved
+            };
+
+            if let Err(e) = sender.blocking_send(status) {
+                error!("Failed to send airgap status update: {e}");
+            }
+        }
+    }
+
     fn perform_detection(&self) {
+        let was_connected = self.violation_detected();
+
         if self.is_connected() {
-            error!("Airgap violation detected, abacus is connected to the internet!");
             self.set_airgap_violation_detected(true);
+
+            if was_connected {
+                warn!("Airgap violation detected, abacus is still connected to the internet.");
+            } else {
+                error!("Airgap violation detected, abacus is connected to the internet!");
+                self.send_update();
+            }
         } else {
-            trace!("No airgap violation detected.");
             self.set_airgap_violation_detected(false);
+
+            if was_connected {
+                info!("Airgap violation resolved, abacus is no longer connected to the internet.");
+                self.send_update();
+            } else {
+                trace!("No airgap violation detected.");
+            }
         }
 
         self.set_last_check();
@@ -161,12 +225,14 @@ mod tests {
     use super::*;
     use axum::{Router, body::Body, http::Request, middleware, routing::get};
     use hyper::StatusCode;
+    use test_log::test;
     use tower::ServiceExt;
 
     #[tokio::test]
     async fn test_block_request_on_airgap_violation() {
         let airgap_detection = AirgapDetection {
             enabled: true,
+            updates: None,
             airgap_violation_detected: Arc::new(AtomicBool::new(false)),
             last_check: Arc::new(RwLock::new(None)),
         };
@@ -212,10 +278,33 @@ mod tests {
         assert_eq!(res.status(), StatusCode::SERVICE_UNAVAILABLE);
     }
 
+    #[test(sqlx::test)]
+    async fn test_log_status_changes_to_audit_log(pool: SqlitePool) {
+        let audit_log = AuditLog(pool.clone());
+
+        AirgapDetection::start(pool).await;
+
+        let mut events = Vec::new();
+
+        for _ in 0..10 {
+            events = audit_log.list_all().await.unwrap();
+
+            if events.len() == 1 {
+                break;
+            }
+
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+
+        assert_eq!(events.len(), 1);
+        assert_eq!(events[0].event(), &AuditEvent::AirGapViolationDetected);
+    }
+
     #[tokio::test]
     async fn test_block_request_on_airgap_detection_outdated() {
         let airgap_detection = AirgapDetection {
             enabled: true,
+            updates: None,
             airgap_violation_detected: Arc::new(AtomicBool::new(false)),
             last_check: Arc::new(RwLock::new(Some(Instant::now()))),
         };

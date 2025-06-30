@@ -1,8 +1,9 @@
 import { ReactNode, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 import { ApiError, FatalApiError } from "@/api/ApiResult";
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import { FormSectionId } from "@/types/types";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
 import useDataEntry from "../hooks/useDataEntry";
@@ -16,7 +17,9 @@ export interface DataEntryProviderProps {
 
 export function DataEntryProvider({ election, pollingStationId, entryNumber, children }: DataEntryProviderProps) {
   const navigate = useNavigate();
-  const stateAndActions = useDataEntry(election, pollingStationId, entryNumber);
+  const params = useParams<{ sectionId: FormSectionId }>();
+  const sectionId = params.sectionId ?? null;
+  const stateAndActions = useDataEntry(election, pollingStationId, entryNumber, sectionId);
 
   // handle non-fatal error navigation
   useEffect(() => {

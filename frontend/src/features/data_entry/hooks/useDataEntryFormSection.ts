@@ -40,11 +40,6 @@ export function useDataEntryFormSection() {
   // Local form state
   const [currentValues, setCurrentValues] = React.useState<SectionValues>(() => buildCurrentValues());
 
-  // Update currentValues when section changes
-  React.useEffect(() => {
-    setCurrentValues(buildCurrentValues());
-  }, [sectionId, buildCurrentValues]);
-
   // derived state
   const formSection = formState.sections[sectionId];
   if (!formSection) {

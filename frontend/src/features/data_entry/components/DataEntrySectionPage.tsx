@@ -13,6 +13,6 @@ export function DataEntrySectionPage() {
   if (sectionId === "save") {
     return <CheckAndSaveForm />;
   } else {
-    return <DataEntrySection />;
+    return <DataEntrySection key={sectionId} />;
   }
 }

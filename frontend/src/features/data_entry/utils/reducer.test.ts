@@ -109,6 +109,7 @@ test("should handle SET_STATUS", () => {
   const action: DataEntryAction = {
     type: "SET_STATUS",
     status: "saving",
+    sectionId: "voters_votes_counts",
   };
 
   const state = dataEntryReducer(getInitialState(), action);

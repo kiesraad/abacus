@@ -78,8 +78,12 @@ export type DataEntryAction =
     }
   | {
       type: "SET_STATUS";
-      status: Status;
-      sectionId?: FormSectionId;
+      status: "saving";
+      sectionId: FormSectionId;
+    }
+  | {
+      type: "SET_STATUS";
+      status: Exclude<Status, "saving">;
     }
   | {
       type: "SET_CACHE";

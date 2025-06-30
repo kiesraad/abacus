@@ -25,6 +25,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
     entryNumber,
     onDeleteDataEntry,
     updateFormSection,
+    sectionId,
   } = useDataEntryContext();
   const user = useUser();
 
@@ -54,11 +55,11 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
       return true;
     }
 
-    const formSection = formState.sections[formState.current];
+    const formSection = sectionId ? formState.sections[sectionId] : null;
     if (formSection?.hasChanges) {
-      if (formState.current === formState.furthest) {
+      if (sectionId === formState.furthest) {
         setCache({
-          key: formState.current,
+          key: sectionId,
           data: currentValues,
         });
         return false;
@@ -93,14 +94,15 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
   };
 
   const onModalDoNoSave = () => {
-    updateFormSection({ hasChanges: false });
+    if (sectionId) {
+      updateFormSection(sectionId, { hasChanges: false });
+    }
     blocker.proceed();
   };
 
   // when unsaved changes are detected and navigating within the data entry flow
   if (isPartOfDataEntryFlow(blocker.location.pathname)) {
-    const title =
-      dataEntryStructure.find((s) => s.id === formState.current)?.title || t("polling_station.current_form");
+    const title = dataEntryStructure.find((s) => s.id === sectionId)?.title || t("polling_station.current_form");
     return (
       <Modal
         title={t("polling_station.unsaved_changes_title")}

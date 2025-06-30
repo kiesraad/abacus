@@ -1,3 +1,5 @@
+import { useParams } from "react-router";
+
 import { describe, expect, Mock, test, vi } from "vitest";
 
 import { useUser } from "@/hooks/user/useUser";
@@ -19,6 +21,7 @@ import { DataEntrySection } from "./DataEntrySection";
 
 vi.mock("../hooks/useDataEntryContext");
 vi.mock("@/hooks/user/useUser");
+vi.mock("react-router");
 
 const testUser: LoginResponse = {
   username: "test-user-1",
@@ -52,10 +55,11 @@ describe("Data Entry cache behavior", () => {
       },
     };
     vi.mocked(useDataEntryContext).mockReturnValue(state);
+    vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
 
     render(
       <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
-        <DataEntrySection sectionId="voters_votes_counts" />
+        <DataEntrySection />
       </DataEntryProvider>,
     );
 

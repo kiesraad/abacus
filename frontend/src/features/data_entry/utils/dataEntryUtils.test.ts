@@ -70,7 +70,7 @@ describe("getNextSectionID", () => {
     formState.sections.recounted.isSaved = true;
     formState.sections.recounted.isSubmitted = true;
 
-    const nextSection = getNextSectionID(formState);
+    const nextSection = getNextSectionID(formState, "recounted");
 
     expect(nextSection).toBe("voters_votes_counts");
   });

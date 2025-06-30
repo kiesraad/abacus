@@ -32,8 +32,8 @@ export function resetFormSectionState(formState: FormState) {
   });
 }
 
-export function getNextSectionID(formState: FormState) {
-  const currentSection = formState.sections[formState.current];
+export function getNextSectionID(formState: FormState, currentSectionId: FormSectionId) {
+  const currentSection = formState.sections[currentSectionId];
 
   if (currentSection && currentSection.isSubmitted && formSectionComplete(currentSection)) {
     for (const section of Object.values(formState.sections)) {
@@ -111,26 +111,30 @@ export function getInitialFormState(dataEntryStructure: DataEntryStructure): For
   sections["save"] = createFormSection("save", dataEntryStructure.length);
 
   return {
-    current: INITIAL_FORM_SECTION_ID,
     furthest: INITIAL_FORM_SECTION_ID,
     sections: sections as Record<FormSectionId, FormSection>,
   };
 }
 
-export function getClientState(formState: FormState, acceptErrorsAndWarnings: boolean, continueToNextSection: boolean) {
+export function getClientState(
+  formState: FormState,
+  currentSectionId: FormSectionId,
+  acceptErrorsAndWarnings: boolean,
+  continueToNextSection: boolean,
+) {
   const clientState: ClientState = {
     furthest: formState.furthest,
-    current: formState.current,
+    current: currentSectionId,
     acceptedErrorsAndWarnings: Object.values(formState.sections)
       .filter((s: FormSection) => s.acceptErrorsAndWarnings)
-      .filter((s: FormSection) => s.id !== formState.current)
+      .filter((s: FormSection) => s.id !== currentSectionId)
       .map((s: FormSection) => s.id),
     continue: continueToNextSection,
   };
   // the form state is not updated for the current submission,
   // so add the current section to the accepted warnings if needed
   if (acceptErrorsAndWarnings) {
-    clientState.acceptedErrorsAndWarnings.push(formState.current);
+    clientState.acceptedErrorsAndWarnings.push(currentSectionId);
   }
   return clientState;
 }
@@ -155,9 +159,8 @@ export function buildFormState(
 ) {
   const newFormState = getInitialFormState(dataEntryStructure);
 
-  // set the furthest and current section
+  // set the furthest section
   newFormState.furthest = clientState.furthest;
-  newFormState.current = clientState.current;
 
   // set accepted warnings
   clientState.acceptedErrorsAndWarnings.forEach((sectionID: FormSectionId) => {
@@ -175,18 +178,27 @@ export function buildFormState(
     }
   }
 
+  // Use server's current section for tracking
+  const serverCurrentSection = clientState.current;
+
   // set accepted warnings for the current section
   const acceptErrorsAndWarnings = clientState.acceptedErrorsAndWarnings.some(
-    (sectionID: FormSectionId) => sectionID === newFormState.current,
+    (sectionID: FormSectionId) => sectionID === serverCurrentSection,
   );
 
-  updateFormStateAfterSubmit(dataEntryStructure, newFormState, validationResults, acceptErrorsAndWarnings);
+  updateFormStateAfterSubmit(
+    dataEntryStructure,
+    newFormState,
+    validationResults,
+    serverCurrentSection,
+    acceptErrorsAndWarnings,
+  );
 
   let targetFormSectionId: FormSectionId;
   if (clientState.continue) {
-    targetFormSectionId = getNextSectionID(newFormState) ?? newFormState.current;
+    targetFormSectionId = getNextSectionID(newFormState, serverCurrentSection) ?? serverCurrentSection;
   } else {
-    targetFormSectionId = newFormState.current;
+    targetFormSectionId = serverCurrentSection;
   }
 
   return { formState: newFormState, targetFormSectionId };
@@ -196,13 +208,14 @@ export function updateFormStateAfterSubmit(
   dataEntryStructure: DataEntryStructure,
   formState: FormState,
   validationResults: ValidationResults,
+  sectionId: FormSectionId,
   continueToNextSection: boolean = false,
 ): FormState {
   resetFormSectionState(formState);
 
-  const currentFormSection = formState.sections[formState.current];
+  const currentFormSection = formState.sections[sectionId];
   if (currentFormSection) {
-    const saved = formState.furthest !== formState.current || continueToNextSection;
+    const saved = formState.furthest !== sectionId || continueToNextSection;
     //store that this section has been sent to the server
     currentFormSection.isSaved = saved;
     //store that this section has been submitted, this resets on each request
@@ -217,7 +230,7 @@ export function updateFormStateAfterSubmit(
 
   //determine the new furthest section, if applicable
   if (continueToNextSection && currentFormSection && formState.furthest === currentFormSection.id) {
-    formState.furthest = getNextSectionID(formState) ?? formState.furthest;
+    formState.furthest = getNextSectionID(formState, sectionId) ?? formState.furthest;
   }
 
   if (formState.furthest !== "save") {

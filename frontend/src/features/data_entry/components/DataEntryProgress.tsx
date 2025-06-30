@@ -17,7 +17,7 @@ export function DataEntryProgress() {
   const pollingStationId = useNumericParam("pollingStationId");
   const { election } = useElection();
 
-  const { dataEntryStructure, formState, pollingStationResults, entryNumber } = useDataEntryContext();
+  const { dataEntryStructure, formState, pollingStationResults, entryNumber, sectionId } = useDataEntryContext();
 
   const menuStatusForFormSection = React.useCallback(
     (formSection?: FormSection): Exclude<MenuStatus, "active"> => {
@@ -64,7 +64,7 @@ export function DataEntryProgress() {
       const formSection = formState.sections[section.id];
       if (!formSection) return null;
 
-      const isActive = formState.current === section.id;
+      const isActive = sectionId === section.id;
       const canNavigate = !isActive && formSection.index <= currentIndex;
       const isDisabled = options.disabled ?? formSection.index > currentIndex;
 
@@ -87,7 +87,7 @@ export function DataEntryProgress() {
         </ProgressList.Item>
       );
     },
-    [formState, currentIndex, menuStatusForFormSection, election.id, pollingStationId, entryNumber],
+    [formState, currentIndex, sectionId, menuStatusForFormSection, election.id, pollingStationId, entryNumber],
   );
 
   // Separate sections into fixed and scrollable groups

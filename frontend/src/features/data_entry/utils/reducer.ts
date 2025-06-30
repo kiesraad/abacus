@@ -70,7 +70,8 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
       return {
         ...state,
         status: action.status,
-        cache: action.status === "saving" && state.cache?.key === state.formState.current ? null : state.cache,
+        cache:
+          action.status === "saving" && action.sectionId && state.cache?.key === action.sectionId ? null : state.cache,
       };
     case "SET_CACHE":
       return {
@@ -84,8 +85,8 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           ...state.formState,
           sections: {
             ...state.formState.sections,
-            [state.formState.current]: {
-              ...state.formState.sections[state.formState.current],
+            [action.sectionId]: {
+              ...state.formState.sections[action.sectionId],
               ...action.partialFormSection,
             },
           },
@@ -104,6 +105,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         dataEntryStructure,
         state.formState,
         action.validationResults,
+        action.sectionId,
         action.continueToNextSection,
       );
 
@@ -114,32 +116,15 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         pollingStationResults: action.data,
         dataEntryStructure,
         formState,
-        targetFormSectionId: action.continueToNextSection ? getNextSectionID(formState) : state.targetFormSectionId,
+        targetFormSectionId: action.continueToNextSection
+          ? getNextSectionID(formState, action.sectionId)
+          : state.targetFormSectionId,
       };
     }
     case "RESET_TARGET_FORM_SECTION":
       return {
         ...state,
         targetFormSectionId: null,
-      };
-    case "REGISTER_CURRENT_FORM":
-      return {
-        ...state,
-        formState: {
-          ...state.formState,
-          current: action.formSectionId,
-          sections: {
-            ...state.formState.sections,
-            ...(state.formState.sections[state.formState.current]
-              ? {
-                  [state.formState.current]: {
-                    ...state.formState.sections[state.formState.current],
-                    isSubmitted: false,
-                  },
-                }
-              : {}),
-          },
-        },
       };
     default:
       console.error("Unknown action", action);

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import { FormSectionId } from "@/types/types";
 
 import { DataEntryDispatch, DataEntryState } from "../types/types";
 import { getBaseUrl, getUrlForFormSectionID } from "../utils/utils";
@@ -12,6 +13,7 @@ export default function useDataEntryNavigation(
   election: ElectionWithPoliticalGroups,
   pollingStationId: number,
   entryNumber: number,
+  sectionId: FormSectionId | null,
 ) {
   const navigate = useNavigate();
 
@@ -31,7 +33,7 @@ export default function useDataEntryNavigation(
 
   // prevent navigating to sections that are not yet active
   useEffect(() => {
-    const currentSection = state.formState.sections[state.formState.current];
+    const currentSection = sectionId ? state.formState.sections[sectionId] : null;
     const furthestSection = state.formState.sections[state.formState.furthest];
     if (currentSection && furthestSection) {
       if (currentSection.index > furthestSection.index) {
@@ -39,5 +41,5 @@ export default function useDataEntryNavigation(
         void navigate(url);
       }
     }
-  }, [state.formState, navigate, election.id, pollingStationId, entryNumber]);
+  }, [sectionId, state.formState, navigate, election.id, pollingStationId, entryNumber]);
 }

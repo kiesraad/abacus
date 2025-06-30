@@ -13,12 +13,6 @@ import {
 } from "../types/types";
 import { calculateDataEntryProgress, getClientState } from "./dataEntryUtils";
 
-export function registerForm(dispatch: DataEntryDispatch) {
-  return (formSectionId: FormSectionId) => {
-    dispatch({ type: "REGISTER_CURRENT_FORM", formSectionId });
-  };
-}
-
 export function setCache(dispatch: DataEntryDispatch) {
   return (cache: TemporaryCache) => {
     dispatch({ type: "SET_CACHE", cache });
@@ -26,8 +20,8 @@ export function setCache(dispatch: DataEntryDispatch) {
 }
 
 export function updateFormSection(dispatch: DataEntryDispatch) {
-  return (partialFormSection: Partial<FormSection>) => {
-    dispatch({ type: "UPDATE_FORM_SECTION", partialFormSection });
+  return (sectionId: FormSectionId, partialFormSection: Partial<FormSection>) => {
+    dispatch({ type: "UPDATE_FORM_SECTION", sectionId, partialFormSection });
   };
 }
 
@@ -38,6 +32,7 @@ export function onSubmitForm(
   state: DataEntryState,
 ) {
   return async (
+    sectionId: FormSectionId,
     currentValues: SectionValues,
     {
       aborting = false,
@@ -45,7 +40,7 @@ export function onSubmitForm(
       showAcceptErrorsAndWarnings = true,
     }: SubmitCurrentFormOptions = {},
   ): Promise<boolean> => {
-    const currentSection = state.formState.sections[state.formState.current];
+    const currentSection = state.formState.sections[sectionId];
 
     if (!currentSection || !state.pollingStationResults) {
       return false;
@@ -57,7 +52,11 @@ export function onSubmitForm(
       showAcceptErrorsAndWarnings &&
       !currentSection.acceptErrorsAndWarnings
     ) {
-      dispatch({ type: "UPDATE_FORM_SECTION", partialFormSection: { acceptErrorsAndWarningsError: true } });
+      dispatch({
+        type: "UPDATE_FORM_SECTION",
+        sectionId: sectionId,
+        partialFormSection: { acceptErrorsAndWarningsError: true },
+      });
       return false;
     }
 
@@ -88,11 +87,16 @@ export function onSubmitForm(
     }
 
     // prepare data to send to server
-    const clientState = getClientState(state.formState, currentSection.acceptErrorsAndWarnings, continueToNextSection);
+    const clientState = getClientState(
+      state.formState,
+      sectionId,
+      currentSection.acceptErrorsAndWarnings,
+      continueToNextSection,
+    );
     const progress = calculateDataEntryProgress(state.formState);
 
     // send data to server
-    dispatch({ type: "SET_STATUS", status: "saving" });
+    dispatch({ type: "SET_STATUS", status: "saving", sectionId });
 
     const response: ApiResult<SaveDataEntryResponse> = await client.postRequest(requestPath, {
       progress,
@@ -112,6 +116,7 @@ export function onSubmitForm(
       type: "FORM_SAVED",
       data,
       validationResults: response.data.validation_results,
+      sectionId,
       aborting,
       continueToNextSection,
     });

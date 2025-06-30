@@ -1,4 +1,4 @@
-import { Navigate, RouterProvider } from "react-router";
+import { Navigate, RouterProvider, useParams } from "react-router";
 
 import { render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
@@ -53,6 +53,7 @@ describe("DataEntryNavigation", () => {
           status,
         };
 
+        vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
         vi.mocked(useDataEntryContext).mockReturnValue(state);
         vi.mocked(useUser).mockReturnValue(getTypistUser());
         const router = renderComponent(vi.fn());
@@ -69,6 +70,7 @@ describe("DataEntryNavigation", () => {
           status,
         };
 
+        vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
         vi.mocked(useDataEntryContext).mockReturnValue(state);
         vi.mocked(useUser).mockReturnValue(getTypistUser());
         const router = renderComponent(vi.fn());
@@ -83,7 +85,6 @@ describe("DataEntryNavigation", () => {
         const state: DataEntryStateAndActionsLoaded = {
           ...getDefaultDataEntryStateAndActionsLoaded(),
           formState: {
-            current: "voters_votes_counts",
             furthest: "differences_counts",
             sections: {
               ...getDefaultDataEntryState().formState.sections,
@@ -96,6 +97,7 @@ describe("DataEntryNavigation", () => {
           status,
         };
 
+        vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
         vi.mocked(useDataEntryContext).mockReturnValue(state);
         vi.mocked(useUser).mockReturnValue(getTypistUser());
 
@@ -118,6 +120,7 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
+      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(null);
       const router = renderComponent(vi.fn());
@@ -131,6 +134,7 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
+      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(getTypistUser());
       const router = renderComponent(vi.fn());
@@ -145,7 +149,6 @@ describe("DataEntryNavigation", () => {
         ...getDefaultDataEntryStateAndActionsLoaded(),
         setCache,
         formState: {
-          current: "voters_votes_counts",
           furthest: "voters_votes_counts",
           sections: {
             ...getDefaultDataEntryState().formState.sections,
@@ -158,6 +161,7 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
+      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(getTypistUser());
 
@@ -185,6 +189,7 @@ describe("DataEntryNavigation", () => {
         return Promise.resolve(true);
       });
 
+      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(getTypistUser());
       const router = renderComponent(onSubmit);
@@ -212,6 +217,7 @@ describe("DataEntryNavigation", () => {
         return Promise.resolve(true);
       });
 
+      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(getTypistUser());
       const router = renderComponent(onSubmit);
@@ -239,6 +245,7 @@ describe("DataEntryNavigation", () => {
         return Promise.resolve(false);
       });
 
+      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(getTypistUser());
       const router = renderComponent(onSubmit);
@@ -263,6 +270,7 @@ describe("DataEntryNavigation", () => {
         return Promise.resolve(true);
       });
 
+      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(getTypistUser());
       const router = renderComponent(onSubmit);
@@ -288,7 +296,6 @@ describe("DataEntryNavigation", () => {
         ...getDefaultDataEntryStateAndActionsLoaded(),
         updateFormSection,
         formState: {
-          current: "voters_votes_counts",
           furthest: "differences_counts",
           sections: {
             ...getDefaultDataEntryState().formState.sections,
@@ -301,6 +308,7 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
+      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(getTypistUser());
 
@@ -313,7 +321,7 @@ describe("DataEntryNavigation", () => {
       const noSaveButton = within(modal).getByRole("button", { name: "Niet bewaren" });
       expect(noSaveButton).toBeVisible();
       noSaveButton.click();
-      expect(updateFormSection).toHaveBeenCalledWith({
+      expect(updateFormSection).toHaveBeenCalledWith("voters_votes_counts", {
         hasChanges: false,
       });
 
@@ -330,7 +338,6 @@ describe("DataEntryNavigation", () => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),
         formState: {
-          current: "voters_votes_counts",
           furthest: "differences_counts",
           sections: {
             ...getDefaultDataEntryState().formState.sections,
@@ -343,6 +350,7 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
+      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(getTypistUser());
 
@@ -368,7 +376,6 @@ describe("DataEntryNavigation", () => {
         ...getDefaultDataEntryStateAndActionsLoaded(),
         updateFormSection,
         formState: {
-          current: "voters_votes_counts",
           furthest: "differences_counts",
           sections: {
             ...getDefaultDataEntryState().formState.sections,
@@ -381,6 +388,7 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
+      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
       vi.mocked(useDataEntryContext).mockReturnValue(state);
       vi.mocked(useUser).mockReturnValue(getTypistUser());
 

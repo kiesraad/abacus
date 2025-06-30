@@ -38,7 +38,12 @@ export function CheckAndSaveForm() {
     onFinaliseDataEntry,
     pollingStationId,
     entryNumber,
-  } = useDataEntryContext("save");
+    sectionId,
+  } = useDataEntryContext();
+
+  if (sectionId !== "save") {
+    throw new Error(`CheckAndSaveForm can only be used with sectionId "save", not "${sectionId}"`);
+  }
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionId) => {
@@ -73,7 +78,7 @@ export function CheckAndSaveForm() {
 
   // save the current state, without finalising (for the abort dialog)
   const onSubmit = async (options?: SubmitCurrentFormOptions) => {
-    return await onSubmitForm({}, options);
+    return await onSubmitForm("save", {}, options);
   };
 
   // finalise the data entry and navigate away

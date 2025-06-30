@@ -1,5 +1,3 @@
-import { Outlet } from "react-router";
-
 import { NotFoundError } from "@/api/ApiResult";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
@@ -13,6 +11,7 @@ import { usePollingStationStatus } from "../hooks/usePollingStationStatus";
 import { AbortDataEntryControl } from "./AbortDataEntryControl";
 import { DataEntryProgress } from "./DataEntryProgress";
 import { DataEntryProvider } from "./DataEntryProvider";
+import { DataEntrySectionPage } from "./DataEntrySectionPage";
 
 export function DataEntryLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
@@ -46,7 +45,7 @@ export function DataEntryLayout() {
           <DataEntryProgress />
         </StickyNav>
         <article>
-          <Outlet />
+          <DataEntrySectionPage />
         </article>
       </main>
     </DataEntryProvider>

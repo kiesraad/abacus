@@ -8,16 +8,10 @@ import {
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
 } from "@/types/generated/openapi";
+import { FormSectionId } from "@/types/types";
 
 import { DataEntryStateAndActions } from "../types/types";
-import {
-  onDeleteDataEntry,
-  onFinaliseDataEntry,
-  onSubmitForm,
-  registerForm,
-  setCache,
-  updateFormSection,
-} from "../utils/actions";
+import { onDeleteDataEntry, onFinaliseDataEntry, onSubmitForm, setCache, updateFormSection } from "../utils/actions";
 import dataEntryReducer, { getInitialState } from "../utils/reducer";
 import useDataEntryNavigation from "./useDataEntryNavigation";
 import { useInitialDataEntryState } from "./useInitialDataEntryState";
@@ -26,6 +20,7 @@ export default function useDataEntry(
   election: ElectionWithPoliticalGroups,
   pollingStationId: number,
   entryNumber: number,
+  sectionId: FormSectionId | null,
 ): DataEntryStateAndActions {
   const client = useApiClient();
   const [state, dispatch] = useReducer(dataEntryReducer, getInitialState(election, pollingStationId, entryNumber));
@@ -38,15 +33,15 @@ export default function useDataEntry(
   useInitialDataEntryState(client, dispatch, election, saveRequestPath, claimRequestPath);
 
   // navigate to the correct section
-  useDataEntryNavigation(state, dispatch, election, pollingStationId, entryNumber);
+  useDataEntryNavigation(state, dispatch, election, pollingStationId, entryNumber, sectionId);
 
   return {
     ...state,
+    sectionId,
     dispatch,
     onSubmitForm: onSubmitForm(client, saveRequestPath, dispatch, state),
     onDeleteDataEntry: onDeleteDataEntry(client, deleteRequestPath, dispatch),
     onFinaliseDataEntry: onFinaliseDataEntry(client, finaliseRequestPath, dispatch),
-    register: registerForm(dispatch),
     setCache: setCache(dispatch),
     updateFormSection: updateFormSection(dispatch),
   };

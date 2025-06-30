@@ -1,3 +1,5 @@
+import { useParams } from "react-router";
+
 import { userEvent, UserEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
@@ -29,6 +31,7 @@ import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
 
 vi.mock("@/hooks/user/useUser");
+vi.mock("react-router");
 
 const testUser: LoginResponse = {
   username: "test-user-1",
@@ -38,9 +41,11 @@ const testUser: LoginResponse = {
 };
 
 function renderForm() {
+  vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
+
   return render(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
-      <DataEntrySection sectionId="voters_votes_counts" />
+      <DataEntrySection />
     </DataEntryProvider>,
   );
 }
@@ -875,7 +880,7 @@ describe("Test VotersAndVotesForm", () => {
         },
       });
       overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
-        client_state: getClientState(getDefaultDataEntryState().formState, false, true),
+        client_state: getClientState(getDefaultDataEntryState().formState, "voters_votes_counts", false, true),
         data: {
           ...getInitialValues(),
           recounted: true,

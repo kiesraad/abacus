@@ -8,12 +8,7 @@ This page describes the navigation and rendering logic of the data entry forms t
 - [__Navigate away from page__](#navigate-away-from-page): what should happen when the user navigates away from the page in any other way than clicking the "Volgende" button
 - [__Abort data entry ("Invoer afbreken")__](#abort-data-entry-invoer-afbreken): what should happen when the user clicks "Invoer afbreken" at the top of the screen
 
-An important thing to keep in mind when reading these diagrams is that a user can only proceed to the next form by clicking "Volgende" after they have resolved all errors (if any) and accepted all warnings (if any).
-
-
-## Questions
-- Where does "cache input" happen in these flows? After each keystroke?
-
+An important thing to keep in mind when reading these diagrams is that a user can only proceed to the next form by clicking "Volgende" after they have resolved or accepted all errors (if any) and warnings (if any).
 
 ## Render navigation menu
 
@@ -48,7 +43,8 @@ flowchart TD
     current-page -- no --> submitted
     submitted -- no --> styling-unsubmitted
     submitted -- yes --> errors
-    errors -- yes --> styling-error
+    errors -- yes, accepted --> styling-error
+    errors -- yes, not accepted --> styling-error
     errors -- no --> warnings
     warnings -- yes, accepted --> styling-valid
     warnings -- yes, not accepted --> styling-warning
@@ -73,18 +69,16 @@ flowchart TD
 
     render-submitted-data([render with submitted data])
 
-    show-error([show error])
-    hide-checkbox-accepted(["hide checkbox <br/> warnings accepted"])
-    show-warning([show warning])
-    show-checked-accepted(["show checked checkbox <br/> warnings accepted"])
-    show-unchecked-accepted(["show unchecked checkbox <br/> warnings accepted"])
+    hide-checkbox-accepted(["hide checkbox <br/> errors/warnings accepted"])
+    show-errors-warnings([show errors/warnings])
+    show-checked-accepted(["show checked checkbox <br/> errors/warnings accepted"])
+    show-unchecked-accepted(["show unchecked checkbox <br/> errors/warnings accepted"])
 
     page-submitted{page submitted?}
-    error-cur-page{error for current page?}
-    warning-cur-page{warning for current page?}
+    errors-warnings-cur-page{errors/warnings for current page?}
     cached-input-available{cached input available?}
     input-changed{"input changed <br/> since submit?"}
-    warning-accepted{"warning(s) accepted?"}
+    errors-warnings-accepted{"errors/warnings accepted?"}
 
     %% flow
     flow-start --> page-submitted
@@ -94,22 +88,18 @@ flowchart TD
     cached-input-available -- no --> render-empty-fields
     page-submitted -- yes --> render-submitted-data
     
-    render-submitted-data --> error-cur-page
-
-    error-cur-page -- yes --> show-error
-    show-error --> flow-done
-    error-cur-page -- no --> warning-cur-page
-
-    warning-cur-page -- yes --> show-warning
-    show-warning --> input-changed
+    render-submitted-data --> errors-warnings-cur-page
+    errors-warnings-cur-page -- yes --> show-errors-warnings
+    errors-warnings-cur-page -- no --> flow-done
+    
+    show-errors-warnings --> input-changed
     input-changed -- yes --> hide-checkbox-accepted
     hide-checkbox-accepted --> flow-done
-    input-changed -- no --> warning-accepted
-    warning-accepted -- yes --> show-checked-accepted
-    warning-accepted -- no --> show-unchecked-accepted
+    input-changed -- no --> errors-warnings-accepted
+    errors-warnings-accepted -- yes --> show-checked-accepted
+    errors-warnings-accepted -- no --> show-unchecked-accepted
     show-checked-accepted --> flow-done
     show-unchecked-accepted --> flow-done
-    warning-cur-page -- no --> flow-done
 ```
 
 ## Click "Volgende"
@@ -119,50 +109,35 @@ flowchart TD
 
     %% elements
     flow-start([start])
-    go-to-prev-page([go to previous page])
-
-    error-any-prev-page{"error for any <br/> previous page?"}
-    error-cur-page{"error for <br/> current page?"}
-    warning-cur-page{"warning for <br/> current page?"}
-    warnings-accepted{"warning(s) accepted?"}
-    user-addresses-error{user addresses error}
-
-    user-addresses-warning{user addresses warning}
-
     next-button(next button)
-    call-api(call api)
-    change-input(change input)
-    accept-warning(accept warning)
+    call-api(call API)
+    
+    errors-warnings-cur-page{"errors/warnings <br/> for current page?"}
+    errors-warnings-accepted{"errors/warnings accepted?"}
+    user-addresses-errors-warnings{user addresses errors/warnings}
 
+    accept-errors-warnings(accept errors/warnings)
+    change-input(change input)
     go-to-next-page([go to next page])
 
-    %% flow
+%% flow
     flow-start --> next-button
     next-button --> call-api
-    call-api --> error-any-prev-page
+    call-api --> errors-warnings-cur-page
 
-    error-any-prev-page -- yes --> go-to-prev-page
-
-    error-any-prev-page -- no --> error-cur-page
-
-    error-cur-page -- yes --> user-addresses-error
-    
-    user-addresses-error -- resolve --> change-input
+    errors-warnings-cur-page -- yes --> errors-warnings-accepted
+    errors-warnings-accepted -- no --> user-addresses-errors-warnings
+    user-addresses-errors-warnings -- resolve --> change-input
     change-input --> next-button
+    user-addresses-errors-warnings -- accept --> accept-errors-warnings
+    accept-errors-warnings --> next-button
 
-    error-cur-page -- no --> warning-cur-page
-    warning-cur-page -- yes --> warnings-accepted
-    warnings-accepted -- no --> user-addresses-warning
-    warnings-accepted -- yes --> go-to-next-page
-    user-addresses-warning -- resolve --> change-input
-    user-addresses-warning -- accept --> accept-warning
-    accept-warning --> next-button
+    errors-warnings-accepted -- yes --> go-to-next-page
+    errors-warnings-cur-page -- no --> go-to-next-page
 
-    warning-cur-page -- no --> go-to-next-page
 ```
 
-- If there is a warning and the user changes the input, they should no longer have the option to accept the warning. They need to click "Next" first, to validate the changed input.
-- Currently, only error F.204 can trigger on a previous page such that the user is redirected to that page.
+- If there is a warning or error and the user changes the input, they should no longer have the option to accept the errors/warnings. They need to click "Next" first, to validate the changed input.
 
 ## Navigate away from page
 
@@ -197,16 +172,16 @@ flowchart TD
     flow-start --> inside-outside
     inside-outside -- outside --> user-made-changes
     inside-outside -- inside --> on-furthest-page
-    on-furthest-page -- yes --> cache-input
-    cache-input --> go-to-page
-    
-
     on-furthest-page -- no --> user-made-changes
+    
     user-made-changes -- no --> go-to-page
     user-made-changes -- yes --> save-changes
     save-changes -- yes --> call-save-api
     save-changes -- no --> reset-changes
     save-changes -- close × --> remain-on-page
+
+    on-furthest-page -- yes --> cache-input
+    cache-input --> go-to-page
     reset-changes --> go-to-page
     call-save-api --> go-to-page
 ```

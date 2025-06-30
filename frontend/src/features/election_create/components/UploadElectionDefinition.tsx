@@ -61,7 +61,8 @@ export function UploadElectionDefinition() {
     state.election &&
     state.electionDefinitionFileName &&
     state.electionDefinitionRedactedHash &&
-    state.electionDefinitionData
+    state.electionDefinitionData &&
+    !state.electionDefinitionHash
   ) {
     async function onSubmit(chunks: string[]) {
       const response = await create({ election_data: state.electionDefinitionData, election_hash: chunks });

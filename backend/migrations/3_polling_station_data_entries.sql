@@ -1,8 +1,11 @@
 CREATE TABLE polling_station_data_entries
 (
-    polling_station_id INTEGER  PRIMARY KEY NOT NULL,
-    state              BLOB     NOT NULL,
-    updated_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    polling_station_id   INTEGER  NOT NULL,
+    committee_session_id INTEGER  NOT NULL,
+    state                BLOB     NOT NULL,
+    updated_at           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (polling_station_id) REFERENCES polling_stations (id)
+    FOREIGN KEY (polling_station_id) REFERENCES polling_stations (id),
+    FOREIGN KEY (committee_session_id) REFERENCES committee_sessions (id),
+    CONSTRAINT number UNIQUE (polling_station_id, committee_session_id)
 );

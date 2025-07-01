@@ -359,7 +359,9 @@ test.describe("resume data entry flow", () => {
       await expect(recountedPage.no).not.toBeChecked();
     });
 
-    test("discard input from voters and votes page with error", async ({ page, request, pollingStation }) => {
+    test("discard input from voters and votes page with error", async ({ typistOne, pollingStation }) => {
+      const { page, request } = typistOne;
+
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
@@ -382,13 +384,14 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      await loginAs(request, "typist1");
       const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
       expect(claimResponse.status()).toBe(200);
       expect(await claimResponse.json()).toMatchObject(emptyDataEntryResponse);
     });
 
-    test("discard input from voters and votes page with warning", async ({ page, request, pollingStation }) => {
+    test("discard input from voters and votes page with warning", async ({ typistOne, pollingStation }) => {
+      const { page, request } = typistOne;
+
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
@@ -424,7 +427,6 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      await loginAs(request, "typist1");
       const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
       expect(claimResponse.status()).toBe(200);
       expect(await claimResponse.json()).toMatchObject(emptyDataEntryResponse);

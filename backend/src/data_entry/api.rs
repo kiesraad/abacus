@@ -955,6 +955,32 @@ pub mod tests {
             .await
             .expect("No data found");
         assert_eq!(data.committee_session_id, 6);
+        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        let DataEntryStatus::FirstEntryInProgress(_) = status else {
+            panic!("Expected entry to be in FirstEntryInProgress state");
+        };
+
+        // Claim the same polling station again
+        let response = claim(pool.clone(), 8, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Check that a new row was not created
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 1);
+
+        // Check that the entry status is still the same
+        let data = query!("SELECT * FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .expect("No data found");
+        assert_eq!(data.committee_session_id, 6);
+        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        let DataEntryStatus::FirstEntryInProgress(_) = status else {
+            panic!("Expected entry to be in FirstEntryInProgress state");
+        };
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

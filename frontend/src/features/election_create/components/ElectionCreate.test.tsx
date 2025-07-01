@@ -477,7 +477,7 @@ describe("Election create pages", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
     // Delete button should move away from the import page
-    const deleteButton = screen.getByText("Verwijder verkiezing");
+    const deleteButton = screen.getByText("Ja, verwijder verkiezing");
     expect(deleteButton).toBeVisible();
     await user.click(deleteButton);
     expect(screen.queryAllByText("Controleer kandidatenlijst").length).toBe(0);

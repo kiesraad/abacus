@@ -394,7 +394,7 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      expect(requestMade).toBe(false); // assumes a particular fix to the issue
+      expect(requestMade).toBe(false);
     });
   });
 

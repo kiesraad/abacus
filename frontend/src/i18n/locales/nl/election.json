@@ -3,8 +3,8 @@
   "add": "Toevoegen: {name}",
   "abort": {
     "action": "Afbreken",
-    "description": "<p>De verkiezing wordt pas opgeslagen als je alle stappen doorlopen hebt. Weet je zeker dat je door wilt gaan?</p>",
-    "discard_input": "Verwijder verkiezing",
+    "description": "<p>De verkiezing wordt pas opgeslagen als je alle stappen doorlopen hebt. Weet je zeker dat je het aanmaken van de verkiezing wilt afbreken?</p>",
+    "discard_input": "Ja, verwijder verkiezing",
     "save_input": "Annuleren",
     "title": "Niet opgeslagen wijzigingen"
   },

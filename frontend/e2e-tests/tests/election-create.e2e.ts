@@ -6,6 +6,7 @@ import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/cr
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
 import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
+import { NavBar } from "e2e-tests/page-objects/NavBarPgObj";
 
 import { test } from "../fixtures";
 import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
@@ -154,27 +155,6 @@ test.describe("Election creation", () => {
     await expect(uploadCandidateDefinitionPage.error).toBeVisible();
   });
 
-  test("while uploading an election, navigating away should trigger the warning modal", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
-    await overviewPage.create.click();
-
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, eml110a.path);
-
-    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
-    await expect(checkDefinitionPage.header).toBeVisible();
-
-    // Menu button back to election overview
-    await expect(checkDefinitionPage.backToOverviewButton).toBeVisible();
-    await checkDefinitionPage.backToOverviewButton.click();
-
-    // Abort modal should have stopped navigation
-    const AbortModal = new AbortModalPgObj(page);
-    await expect(AbortModal.header).toBeVisible();
-  });
-
   test("warning modal close button should stay on page", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
@@ -188,15 +168,14 @@ test.describe("Election creation", () => {
     await expect(checkDefinitionPage.header).toBeVisible();
 
     // Menu button back to election overview
-    await expect(checkDefinitionPage.backToOverviewButton).toBeVisible();
-    await checkDefinitionPage.backToOverviewButton.click();
+    const navBarPage = new NavBar(page);
+    await navBarPage.electionOverviewButton.click();
 
     // Abort modal should have stopped navigation
     const abortModal = new AbortModalPgObj(page);
     await expect(abortModal.header).toBeVisible();
 
     // Click cancel, assert we are still on the election create page
-    await expect(abortModal.closeButton).toBeVisible();
     await abortModal.closeButton.click();
     await expect(checkDefinitionPage.header).toBeVisible();
   });
@@ -214,15 +193,14 @@ test.describe("Election creation", () => {
     await expect(checkDefinitionPage.header).toBeVisible();
 
     // Menu button back to election overview
-    await expect(checkDefinitionPage.backToOverviewButton).toBeVisible();
-    await checkDefinitionPage.backToOverviewButton.click();
+    const navBarPage = new NavBar(page);
+    await navBarPage.electionOverviewButton.click();
 
     // Abort modal should have stopped navigation
     const abortModal = new AbortModalPgObj(page);
     await expect(abortModal.header).toBeVisible();
 
     // Click cancel, assert we are still on the election create page
-    await expect(abortModal.cancelButton).toBeVisible();
     await abortModal.cancelButton.click();
     await expect(checkDefinitionPage.header).toBeVisible();
   });
@@ -240,15 +218,14 @@ test.describe("Election creation", () => {
     await expect(checkDefinitionPage.header).toBeVisible();
 
     // Menu button back to election overview
-    await expect(checkDefinitionPage.backToOverviewButton).toBeVisible();
-    await checkDefinitionPage.backToOverviewButton.click();
+    const navBarPage = new NavBar(page);
+    await navBarPage.electionOverviewButton.click();
 
     // Abort modal should have stopped navigation
     const abortModal = new AbortModalPgObj(page);
     await expect(abortModal.header).toBeVisible();
 
     // Click delete, assert we are back at the overview
-    await expect(abortModal.deleteButton).toBeVisible();
     await abortModal.deleteButton.click();
     await expect(overviewPage.header).toBeVisible();
   });
@@ -280,8 +257,8 @@ test.describe("Election creation", () => {
     await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
 
     // Menu button back to election overview
-    await expect(checkDefinitionPage.backToOverviewButton).toBeVisible();
-    await checkDefinitionPage.backToOverviewButton.click();
+    const navBarPage = new NavBar(page);
+    await navBarPage.electionOverviewButton.click();
 
     // Abort modal should have stopped navigation
     const AbortModal = new AbortModalPgObj(page);

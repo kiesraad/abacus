@@ -266,13 +266,13 @@ export interface AuditLogEvent {
   eventLevel: AuditEventLevel;
   id: number;
   ip: string;
-  message?: string | null;
+  message?: string;
   time: string;
-  userFullname?: string | null;
-  userId?: number | null;
-  userRole?: null | Role;
-  username?: string | null;
-  workstation?: number | null;
+  userFullname?: string;
+  userId?: number;
+  userRole?: Role;
+  username?: string;
+  workstation?: number;
 }
 
 export interface AuditLogListResponse {

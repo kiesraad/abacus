@@ -45,11 +45,23 @@ pub struct AuditLogEvent {
     time: DateTime<Utc>,
     event: AuditEvent,
     event_level: AuditEventLevel,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     message: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     workstation: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     user_id: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     username: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     user_fullname: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     user_role: Option<Role>,
     #[schema(value_type = String)]
     ip: Ip,

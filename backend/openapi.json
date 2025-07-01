@@ -2973,49 +2973,27 @@
             "type": "string"
           },
           "message": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "time": {
             "type": "string"
           },
           "userFullname": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "userId": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           },
           "userRole": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/Role"
-              }
-            ]
+            "$ref": "#/components/schemas/Role"
           },
           "username": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "workstation": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           }

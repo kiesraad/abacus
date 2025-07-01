@@ -19,6 +19,8 @@
 // Default document styling
 #let conf(doc, header: none, footer: none) = [
   #set text(
+    lang: "nl",
+    region: "nl",
     font: "DM Sans",
     size: 9pt,
   )

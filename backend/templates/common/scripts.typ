@@ -245,6 +245,9 @@
   // Counter that keeps track of the column number
   let column = 0
 
+  // Number of rows in the column
+  let column_row = 0
+
   // Row counter
   let rc = 0
 
@@ -252,11 +255,8 @@
   let votes = 0
 
   // Max rows per table / column
-  let break_count = 25
+  let break_count = (25, 25, 15, 15)
   let total_rows = values.len()
-
-  // Number of rows remaining on the last page
-  let remainder = calc.rem(total_rows, break_count * 2)
 
   set text(size: 8pt)
 
@@ -264,6 +264,7 @@
     while rc < total_rows {
       table(
         columns: (1fr, 2.5em, auto),
+        rows: 23pt,
         inset: 8pt,
         stroke: 0.5pt + silver,
         fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
@@ -274,35 +275,28 @@
         table.hline(stroke: 1pt + black),
         ..while rc < total_rows {
           let c = values.at(rc)
-          // Row counter starting on the last page
-          let togo = rc - (total_rows - remainder)
-          let half_remainder = calc.ceil(remainder / 2)
+          votes += c.votes
+          rc += 1
+          column_row += 1
 
           (
-            table.cell(c.name),
-            table.cell(fill: luma(213), align: center, text(number-width: "tabular", weight: "bold", [#c.number])),
-            table.cell(align: right, text(number-width: "tabular", {
-              // Sum the number of votes in this column
-              votes += c.votes
-
-              fmt-number(c.votes)
-            })),
+            table.cell(align: horizon, text(top-edge: 5pt, c.name)),
+            table.cell(fill: luma(213), align: center + horizon, text(
+              number-width: "tabular",
+              weight: "bold",
+              [#c.number],
+            )),
+            table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes))),
           )
 
-          rc += 1
-
-          if togo > 0 {
-            if calc.rem(togo + 1, half_remainder) == 0 {
-              break
-            }
-          } else if calc.rem(rc, break_count) == 0 {
+          if calc.rem(column_row, break_count.at(column, default: 15)) == 0 {
             break
           }
         }.flatten(),
         table.footer(
           table.hline(stroke: 1pt + black),
           // Empty line
-          table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 3pt, []),
+          table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 0pt, []),
           table.cell(colspan: 3, fill: white, align: center, {
             // Increment the column counter
             column += 1
@@ -312,13 +306,14 @@
 
             // Reset the votes per column counter
             votes = 0
+            column_row = 0
           }),
         ),
       )
 
       if rc < total_rows {
         if (calc.even(column)) {
-          v(1em)
+          v(8pt)
           align(right, text(weight: "bold", continue_on_next_page))
         }
         colbreak()
@@ -329,7 +324,7 @@
   align(bottom, grid(
     columns: (1fr, 8em),
     align: (right, right),
-    inset: 9pt,
+    inset: 8pt,
     grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(context range(
       1,
       column + 1,

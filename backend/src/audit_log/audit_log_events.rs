@@ -45,12 +45,24 @@ pub struct AuditLogEvent {
     time: DateTime<Utc>,
     event: AuditEvent,
     event_level: AuditEventLevel,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     message: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     workstation: Option<u32>,
-    user_id: u32,
-    username: String,
-    user_fullname: String,
-    user_role: Role,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    user_id: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    username: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    user_fullname: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    user_role: Option<Role>,
     #[schema(value_type = String)]
     ip: Ip,
 }
@@ -69,12 +81,12 @@ impl AuditLogEvent {
         self.message.as_ref()
     }
 
-    pub fn user_id(&self) -> u32 {
+    pub fn user_id(&self) -> Option<u32> {
         self.user_id
     }
 
-    pub fn username(&self) -> &str {
-        &self.username
+    pub fn username(&self) -> Option<&str> {
+        self.username.as_deref()
     }
 
     pub fn ip(&self) -> Option<IpAddr> {
@@ -93,6 +105,7 @@ impl FromRef<AppState> for AuditLog {
 
 /// This struct is used to filter the audit log events
 /// The values should always be validated using From<&LogFilterQuery>
+#[derive(Default)]
 pub struct LogFilter {
     pub limit: u32,
     pub offset: u32,
@@ -157,20 +170,20 @@ impl AuditLog {
 
     pub async fn create(
         &self,
-        user: &User,
         event: &AuditEvent,
+        user: Option<&User>,
         message: Option<String>,
         ip: Option<IpAddr>,
     ) -> Result<AuditLogEvent, APIError> {
-        // TODO: set workstation id once we have one
+        // TODO: set workstation id
         let workstation: Option<u32> = None;
         let event_name = event.to_string();
         let event_level = event.level();
         let event = serde_json::to_value(event)?;
-        let user_id = user.id();
-        let username = user.username();
-        let fullname = user.fullname().unwrap_or_default();
-        let role = user.role();
+        let user_id = user.map(|u| u.id());
+        let username = user.map(|u| u.username().to_string());
+        let fullname = user.map(|u| u.fullname().unwrap_or_default().to_string());
+        let role = user.map(|u| u.role());
         let ip = ip.map(|ip| ip.to_string());
 
         let event = sqlx::query_as!(
@@ -188,7 +201,7 @@ impl AuditLog {
                 username,
                 ip,
                 user_fullname,
-                user_role
+                user_role as "user_role: Role"
             "#,
             event,
             event_name,
@@ -207,6 +220,31 @@ impl AuditLog {
         Ok(event)
     }
 
+    #[cfg(test)]
+    pub async fn list_all(&self) -> Result<Vec<AuditLogEvent>, APIError> {
+        sqlx::query_as!(
+            AuditLogEvent,
+            r#"SELECT
+                audit_log.id as "id: u32",
+                time as "time: _",
+                event as "event: serde_json::Value",
+                event_level as "event_level: _",
+                message,
+                workstation as "workstation: _",
+                ip as "ip: String",
+                user_id as "user_id: u32",
+                username,
+                user_fullname,
+                user_role as "user_role: Role"
+            FROM audit_log
+            ORDER BY time DESC
+            "#,
+        )
+        .fetch_all(&self.0)
+        .await
+        .map_err(APIError::from)
+    }
+
     pub async fn list(&self, filter: &LogFilter) -> Result<Vec<AuditLogEvent>, APIError> {
         let (level, event, user, since) = filter.as_query_values()?;
 
@@ -220,9 +258,9 @@ impl AuditLog {
                 event_level as "event_level: _",
                 message,
                 workstation as "workstation: _",
+                ip as "ip: String",
                 user_id as "user_id: u32",
                 audit_log.username,
-                ip as "ip: String",
                 user_fullname,
                 user_role as "user_role: Role"
             FROM audit_log
@@ -274,11 +312,15 @@ impl AuditLog {
         let users = sqlx::query_as!(
             AuditLogUser,
             r#"SELECT
-                user_id as "id: u32",
-                user_fullname as fullname,
-                username,
-                user_role as "role: Role"
+                user_id as "id!: u32",
+                user_fullname as "fullname!: String",
+                username as "username!: String",
+                user_role as "role!: Role"
             FROM audit_log
+            WHERE user_id IS NOT NULL
+            AND user_fullname IS NOT NULL
+            AND username IS NOT NULL
+            AND user_role IS NOT NULL
             GROUP BY user_id
             ORDER BY username"#
         )

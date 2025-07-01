@@ -149,6 +149,9 @@ pub enum AuditEvent {
     DataEntryKeptFirst(DataEntryDetails),
     DataEntryKeptSecond(DataEntryDetails),
     DataEntryDiscardedBoth(DataEntryDetails),
+    // airgap detection events
+    AirGapViolationDetected,
+    AirGapViolationResolved,
     // api errors
     Error(ErrorDetails),
     #[default]
@@ -189,6 +192,8 @@ impl AuditEvent {
             AuditEvent::DataEntryKeptFirst(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryKeptSecond(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryDiscardedBoth(_) => AuditEventLevel::Info,
+            AuditEvent::AirGapViolationDetected => AuditEventLevel::Error,
+            AuditEvent::AirGapViolationResolved => AuditEventLevel::Info,
         }
     }
 }

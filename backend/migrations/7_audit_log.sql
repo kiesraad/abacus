@@ -8,9 +8,9 @@ CREATE TABLE audit_log
     message            TEXT            ,
     workstation        INTEGER         ,
     ip                 TEXT            ,
-    user_id            INTEGER         NOT NULL,
-    username           TEXT            NOT NULL,
-    user_fullname      TEXT            NOT NULL,
-    user_role          TEXT            NOT NULL,
+    user_id            INTEGER         ,
+    username           TEXT            ,
+    user_fullname      TEXT            ,
+    user_role          TEXT            ,
     time               DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

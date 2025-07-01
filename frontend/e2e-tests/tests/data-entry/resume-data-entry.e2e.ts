@@ -340,6 +340,62 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
     });
+
+    test("save input from check and save page", async ({ typistOne, pollingStation }) => {
+      const { page } = typistOne;
+
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+
+      const recountedPage = new RecountedPage(page);
+      await recountedPage.checkNoAndClickNext();
+
+      const votersAndVotesPage = new VotersAndVotesPage(page);
+      const voters: VotersCounts = {
+        poll_card_count: 803,
+        proxy_certificate_count: 50,
+        voter_card_count: 76,
+        total_admitted_voters_count: 929,
+      };
+      const votes: VotesCounts = {
+        votes_candidates_count: 894,
+        blank_votes_count: 20,
+        invalid_votes_count: 15,
+        total_votes_cast_count: 929,
+      };
+      await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+
+      const differencesPage = new DifferencesPage(page);
+      await differencesPage.next.click();
+
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+      await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
+      await candidatesListPage_1.next.click();
+
+      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+      await candidatesListPage_2.fillCandidatesAndTotal([3, 1], 4);
+      await candidatesListPage_2.next.click();
+
+      const checkAndSavePage = new CheckAndSavePage(page);
+      await expect(checkAndSavePage.fieldset).toBeVisible();
+      await checkAndSavePage.abortInput.click();
+
+      const abortInputModal = new AbortInputModal(page);
+      await expect(abortInputModal.heading).toBeVisible();
+
+      let requestMade = false;
+      page.on("request", (request) => {
+        if (request.url().includes("/api/polling_stations")) {
+          requestMade = true;
+        }
+      });
+      await abortInputModal.saveInput.click();
+      await expect(abortInputModal.heading).toBeHidden();
+
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
+
+      expect(requestMade).toBe(false); // assumes a particular fix to the issue
+    });
   });
 
   test.describe("resume after deleting", () => {

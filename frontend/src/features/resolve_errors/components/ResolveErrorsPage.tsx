@@ -15,6 +15,7 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
 import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 import cls from "./ResolveErrors.module.css";
+import { ResolveErrorsOverview } from "./ResolveErrorsOverview";
 
 export function ResolveErrorsPage() {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ export function ResolveErrorsPage() {
           <h2>{t("resolve_errors.title")}</h2>
           <p>{t("resolve_errors.page_content")}</p>
 
-          <pre>{JSON.stringify(dataEntry.validation_results, null, 2)}</pre>
+          <ResolveErrorsOverview structure={structure} results={dataEntry.validation_results} />
 
           {structure.map((section) => (
             <section key={section.id}>

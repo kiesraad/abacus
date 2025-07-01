@@ -1,4 +1,3 @@
-import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -14,14 +13,15 @@ import {
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { screen, spyOnHandler } from "@/testing/test-utils";
+import { render, screen, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { ResolveErrorsPage } from "./ResolveErrorsPage";
 
 const navigate = vi.fn();
 
-vi.mock("react-router", () => ({
+vi.mock("react-router", async (importOriginal) => ({
+  ...(await importOriginal()),
   useNavigate: () => navigate,
   useParams: () => ({ pollingStationId: "5" }),
   useLocation: () => ({ pathname: "/" }),

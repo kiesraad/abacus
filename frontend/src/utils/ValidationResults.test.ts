@@ -8,6 +8,7 @@ import { PollingStationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "./dataEntryStructure";
 import {
   doesValidationResultApplyToSection,
+  dottedCode,
   getValidationResultSetForSection,
   isGlobalValidationResult,
   mapValidationResultSetsToFields,
@@ -154,5 +155,12 @@ describe("getValidationResultSetForSection", () => {
     expect(resultSet.includes("F401")).toBe(true);
     expect(resultSet.includes("F204")).toBe(true);
     expect(resultSet.includes("F301")).toBe(false);
+  });
+});
+
+describe("dottedCode", () => {
+  test("should insert a dot in between validation result code letter and number", () => {
+    expect(dottedCode("F301")).toBe("F.301");
+    expect(dottedCode("W204")).toBe("W.204");
   });
 });

@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM polling_station_data_entries",
+  "describe": {
+    "columns": [
+      {
+        "name": "polling_station_id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "committee_session_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "state",
+        "ordinal": 2,
+        "type_info": "Blob"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 3,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "02e63f0e0faaab5750b4f8c0e14ba2bbd361005617503093ad7a9bed6dcbdfac"
+}

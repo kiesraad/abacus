@@ -1,5 +1,5 @@
 use axum::extract::FromRef;
-use sqlx::{Error, SqlitePool, query, query_as, types::Json};
+use sqlx::{SqlitePool, query, query_as, types::Json};
 
 use super::{PollingStationDataEntry, PollingStationResults, status::DataEntryStatus};
 use crate::{
@@ -21,7 +21,7 @@ impl PollingStationDataEntries {
         &self,
         polling_station_id: u32,
         committee_session_id: u32,
-    ) -> Result<PollingStationDataEntry, Error> {
+    ) -> Result<PollingStationDataEntry, sqlx::Error> {
         query_as!(
             PollingStationDataEntry,
             r#"
@@ -46,7 +46,7 @@ impl PollingStationDataEntries {
         &self,
         polling_station_id: u32,
         committee_session_id: u32,
-    ) -> Result<DataEntryStatus, Error> {
+    ) -> Result<DataEntryStatus, sqlx::Error> {
         self.get_row(polling_station_id, committee_session_id)
             .await
             .map(|psde| psde.state.0)
@@ -58,7 +58,7 @@ impl PollingStationDataEntries {
         &self,
         polling_station_id: u32,
         committee_session_id: u32,
-    ) -> Result<DataEntryStatus, Error> {
+    ) -> Result<DataEntryStatus, sqlx::Error> {
         Ok(query_as!(
             PollingStationDataEntry,
             r#"
@@ -85,7 +85,7 @@ impl PollingStationDataEntries {
         polling_station_id: u32,
         committee_session_id: u32,
         state: &DataEntryStatus,
-    ) -> Result<PollingStationDataEntry, Error> {
+    ) -> Result<PollingStationDataEntry, sqlx::Error> {
         let state = Json(state);
         query_as!(
             PollingStationDataEntry,
@@ -114,7 +114,7 @@ impl PollingStationDataEntries {
     pub async fn statuses(
         &self,
         election_id: u32,
-    ) -> Result<Vec<ElectionStatusResponseEntry>, Error> {
+    ) -> Result<Vec<ElectionStatusResponseEntry>, sqlx::Error> {
         query!(
             r#"
                 SELECT
@@ -148,7 +148,7 @@ impl PollingStationDataEntries {
         committee_session_id: u32,
         new_state: &DataEntryStatus,
         definitive_entry: &PollingStationResults,
-    ) -> Result<(), Error> {
+    ) -> Result<(), sqlx::Error> {
         let mut tx = self.0.begin().await?;
         let definitive_entry = Json(definitive_entry);
         query!(
@@ -191,7 +191,10 @@ impl PollingStationResultsEntries {
     }
 
     /// Get a list of polling station results for an election
-    pub async fn list(&self, election_id: u32) -> Result<Vec<PollingStationResultsEntry>, Error> {
+    pub async fn list(
+        &self,
+        election_id: u32,
+    ) -> Result<Vec<PollingStationResultsEntry>, sqlx::Error> {
         query!(
             r#"
             SELECT
@@ -206,8 +209,8 @@ impl PollingStationResultsEntries {
             election_id
         )
         .try_map(|row| {
-            let data =
-                serde_json::from_slice(&row.data).map_err(|err| Error::Decode(Box::new(err)))?;
+            let data = serde_json::from_slice(&row.data)
+                .map_err(|err| sqlx::Error::Decode(Box::new(err)))?;
             Ok(PollingStationResultsEntry {
                 polling_station_id: row.polling_station_id,
                 committee_session_id: row.committee_session_id,
@@ -224,7 +227,7 @@ impl PollingStationResultsEntries {
         &self,
         polling_stations_repo: PollingStations,
         election_id: u32,
-    ) -> Result<Vec<(PollingStation, PollingStationResults)>, Error> {
+    ) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
         // first get the list of results and polling stations related to an election
         let list = self.list(election_id).await?;
         let polling_stations = polling_stations_repo.list(election_id).await?;
@@ -236,14 +239,14 @@ impl PollingStationResultsEntries {
                     .iter()
                     .find(|p| p.id == entry.polling_station_id)
                     .cloned()
-                    .ok_or(Error::RowNotFound)?;
+                    .ok_or(sqlx::Error::RowNotFound)?;
                 Ok((polling_station, entry.data))
             })
-            .collect::<Result<_, Error>>() // this collect causes the iterator to fail early if there was any error
+            .collect::<Result<_, sqlx::Error>>() // this collect causes the iterator to fail early if there was any error
     }
 
     /// Check if a polling station has results
-    pub async fn exists(&self, id: u32) -> Result<bool, Error> {
+    pub async fn exists(&self, id: u32) -> Result<bool, sqlx::Error> {
         let res = query!(
             r#"
             SELECT EXISTS(

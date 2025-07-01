@@ -7,9 +7,11 @@ import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t, tx } from "@/i18n/translate";
 import { ResolveErrorsAction } from "@/types/generated/openapi";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
 import cls from "./ResolveErrors.module.css";
+import { ResolveErrorsOverview } from "./ResolveErrorsOverview";
 
 export function ResolveErrorsIndexPage() {
   const navigate = useNavigate();
@@ -34,12 +36,14 @@ export function ResolveErrorsIndexPage() {
     return <Loader />;
   }
 
+  const structure = getDataEntryStructure(election, dataEntry.finalised_first_entry);
+
   return (
     <>
       <h2>{t("resolve_errors.title")}</h2>
       <p>{t("resolve_errors.page_content")}</p>
 
-      <pre>{JSON.stringify(dataEntry.validation_results, null, 2)}</pre>
+      <ResolveErrorsOverview structure={structure} results={dataEntry.validation_results} />
 
       <form
         className={cls.resolveForm}

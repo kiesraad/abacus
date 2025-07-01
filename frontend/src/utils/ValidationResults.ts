@@ -136,3 +136,7 @@ export function getValidationResultSetForSection(
   );
   return new ValidationResultSet(filteredResults);
 }
+
+export function dottedCode(code: ValidationResultCode): string {
+  return `${code[0]}.${code.slice(1)}`;
+}

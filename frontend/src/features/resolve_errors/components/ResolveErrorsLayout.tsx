@@ -7,13 +7,15 @@ import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
 import cls from "./ResolveErrors.module.css";
+import { ResolveErrorsNavigation } from "./ResolveErrorsNavigation";
 
 export function ResolveErrorsLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation } = useElection(pollingStationId);
+  const { election, pollingStation } = useElection(pollingStationId);
   const { loading, dataEntry } = usePollingStationDataEntryErrors(pollingStationId);
 
   if (!pollingStation) {
@@ -23,6 +25,8 @@ export function ResolveErrorsLayout() {
   if (loading || !dataEntry) {
     return null;
   }
+
+  const structure = getDataEntryStructure(election, dataEntry.finalised_first_entry);
 
   return (
     <>
@@ -35,7 +39,9 @@ export function ResolveErrorsLayout() {
         </section>
       </header>
       <main className={cls.resolveErrors}>
-        <aside></aside>
+        <aside>
+          <ResolveErrorsNavigation structure={structure} validationResults={dataEntry.validation_results} />
+        </aside>
         <article>
           <Outlet />
         </article>

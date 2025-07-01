@@ -24,14 +24,11 @@ interface DataEntryErrors {
   election: Election & { political_groups: PoliticalGroup[] };
   loading: boolean;
   dataEntry: DataEntryGetErrorsResponse | null;
-  onSubmit: () => Promise<void>;
+  onSubmit: (afterSave: (action: ResolveErrorsAction) => void) => Promise<void>;
   validationError: string | undefined;
 }
 
-export function usePollingStationDataEntryErrors(
-  pollingStationId: number,
-  afterSave?: (action: ResolveErrorsAction) => void,
-): DataEntryErrors {
+export function usePollingStationDataEntryErrors(pollingStationId: number): DataEntryErrors {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
@@ -59,11 +56,7 @@ export function usePollingStationDataEntryErrors(
     throw requestState.error;
   }
 
-  const onSubmit = async () => {
-    if (!afterSave) {
-      throw new Error("afterSave is required");
-    }
-
+  const onSubmit = async (afterSave: (action: ResolveErrorsAction) => void) => {
     if (action === undefined) {
       setValidationError(t("resolve_differences.required_error"));
       return;

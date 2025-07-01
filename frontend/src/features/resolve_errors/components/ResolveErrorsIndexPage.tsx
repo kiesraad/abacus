@@ -15,6 +15,10 @@ import { ResolveErrorsOverview } from "./ResolveErrorsOverview";
 
 export function ResolveErrorsIndexPage() {
   const navigate = useNavigate();
+  const pollingStationId = useNumericParam("pollingStationId");
+  const { pollingStation, election, loading, dataEntry, action, setAction, onSubmit, validationError } =
+    usePollingStationDataEntryErrors(pollingStationId);
+
   const afterSave = (action: ResolveErrorsAction) => {
     let url = `/elections/${election.id}/status`;
     switch (action) {
@@ -27,9 +31,6 @@ export function ResolveErrorsIndexPage() {
     }
     void navigate(url);
   };
-  const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation, election, loading, dataEntry, action, setAction, onSubmit, validationError } =
-    usePollingStationDataEntryErrors(pollingStationId, afterSave);
   const { getName } = useUsers();
 
   if (loading || dataEntry === null) {
@@ -49,7 +50,7 @@ export function ResolveErrorsIndexPage() {
         className={cls.resolveForm}
         onSubmit={(e) => {
           e.preventDefault();
-          void onSubmit();
+          void onSubmit(afterSave);
         }}
       >
         <h3 className="heading-lg mb-md">{t("resolve_errors.form_question")}</h3>

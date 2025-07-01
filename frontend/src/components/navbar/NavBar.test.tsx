@@ -113,7 +113,7 @@ describe("NavBar", () => {
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Statusoverzicht" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Eerste zitting" })).toBeVisible();
   });
 
   test.each([

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 
 import { ApiError } from "@/api/ApiResult";
 import { ErrorModal } from "@/components/error/ErrorModal";
@@ -38,7 +38,14 @@ export function CheckAndSaveForm() {
     onFinaliseDataEntry,
     pollingStationId,
     entryNumber,
-  } = useDataEntryContext("save");
+  } = useDataEntryContext();
+
+  const params = useParams<{ sectionId: FormSectionId }>();
+  const sectionId = params.sectionId ?? null;
+
+  if (sectionId !== "save") {
+    throw new Error(`CheckAndSaveForm can only be used with sectionId "save", not "${sectionId}"`);
+  }
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionId) => {
@@ -73,7 +80,7 @@ export function CheckAndSaveForm() {
 
   // save the current state, without finalising (for the abort dialog)
   const onSubmit = async (options?: SubmitCurrentFormOptions) => {
-    return await onSubmitForm({}, options);
+    return await onSubmitForm("save", {}, options);
   };
 
   // finalise the data entry and navigate away

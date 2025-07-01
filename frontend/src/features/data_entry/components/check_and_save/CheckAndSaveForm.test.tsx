@@ -1,5 +1,7 @@
+import { useParams } from "react-router";
+
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
@@ -21,15 +23,19 @@ import { FormState } from "../../types/types";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
+vi.mock("react-router");
+
 function customFormState(): FormState {
   return {
     ...getDefaultDataEntryState().formState,
-    current: "save",
     furthest: "save",
   };
 }
 
 function renderForm() {
+  // Mock useParams to provide the sectionId
+  vi.mocked(useParams).mockReturnValue({ sectionId: "save" });
+
   return renderReturningRouter(
     <ElectionProvider electionId={1}>
       <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>

@@ -122,7 +122,7 @@ describe("ResolveErrorsNavigation", () => {
     renderNavigation(mockValidationResultsNoErrors);
 
     const overviewLink = screen.getByRole("link", { name: "Fouten en waarschuwingen" });
-    expect(overviewLink).toHaveAttribute("href", "/elections/1/status/5/resolve-errors/");
+    expect(overviewLink).toHaveAttribute("href", "/elections/1/status/5/resolve-errors");
 
     const herteldLink = screen.getByRole("link", { name: "Is er herteld?" });
     expect(herteldLink).toHaveAttribute("href", "/elections/1/status/5/resolve-errors/recounted");

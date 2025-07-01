@@ -132,3 +132,25 @@ pub async fn committee_session_update(
 
     Ok(StatusCode::OK)
 }
+
+#[cfg(test)]
+pub mod tests {
+    use crate::committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
+    };
+    use sqlx::SqlitePool;
+
+    pub async fn create_committee_session(
+        pool: SqlitePool,
+        number: u32,
+        election_id: u32,
+    ) -> CommitteeSession {
+        CommitteeSessions::new(pool.clone())
+            .create(CommitteeSessionCreateRequest {
+                number,
+                election_id,
+            })
+            .await
+            .unwrap()
+    }
+}

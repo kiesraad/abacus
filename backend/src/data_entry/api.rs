@@ -717,13 +717,14 @@ async fn election_status(
 pub mod tests {
     use axum::http::StatusCode;
     use http_body_util::BodyExt;
-    use sqlx::{SqlitePool, query};
+    use sqlx::{SqlitePool, query, query_as};
     use test_log::test;
 
     use super::*;
     use crate::{
         audit_log::AuditLog,
         authentication::Role,
+        committee_session::tests::create_committee_session,
         data_entry::{DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts},
     };
 
@@ -919,27 +920,12 @@ pub mod tests {
         assert_eq!(row_count.count, 1);
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5"))))]
-    async fn test_create_data_entry_when_multiple_committee_sessions_exist(pool: SqlitePool) {
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_create_data_entry_uniqueness(pool: SqlitePool) {
         let mut request_body = example_data_entry();
         request_body.data.voters_counts.poll_card_count = 100; // incorrect value
-        request_body.data.political_group_votes = vec![
-            PoliticalGroupVotes::from_test_data_auto(1, &[36, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-            PoliticalGroupVotes::from_test_data_auto(2, &[30, 10, 0, 0, 0, 0]),
-            PoliticalGroupVotes::from_test_data_auto(3, &[0, 0, 0, 0, 0, 0]),
-            PoliticalGroupVotes::from_test_data_auto(4, &[0, 0, 0, 0, 0]),
-            PoliticalGroupVotes::from_test_data_auto(5, &[0, 0, 0, 0]),
-        ];
 
-        let response = claim(pool.clone(), 8, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-        let response = save(
-            pool.clone(),
-            request_body.clone(),
-            8,
-            EntryNumber::FirstEntry,
-        )
-        .await;
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check if a row was created
@@ -949,38 +935,38 @@ pub mod tests {
             .unwrap();
         assert_eq!(row_count.count, 1);
 
-        // Check if the correct committee session is linked
-        let data = query!("SELECT * FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .expect("No data found");
-        assert_eq!(data.committee_session_id, 6);
-        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
-        let DataEntryStatus::FirstEntryInProgress(_) = status else {
-            panic!("Expected entry to be in FirstEntryInProgress state");
-        };
+        // Create a new committee session
+        let committee_session: CommitteeSession =
+            create_committee_session(pool.clone(), 2, 2).await;
 
         // Claim the same polling station again
-        let response = claim(pool.clone(), 8, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check that a new row was not created
+        // Check that a new row was created
         let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
             .fetch_one(&pool)
             .await
             .unwrap();
-        assert_eq!(row_count.count, 1);
+        assert_eq!(row_count.count, 2);
 
-        // Check that the entry status is still the same
-        let data = query!("SELECT * FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .expect("No data found");
-        assert_eq!(data.committee_session_id, 6);
-        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
-        let DataEntryStatus::FirstEntryInProgress(_) = status else {
-            panic!("Expected entry to be in FirstEntryInProgress state");
-        };
+        // Check that the new data entry is linked to the new committee session
+        let data = query_as!(
+            PollingStationDataEntry,
+            r#"
+            SELECT
+                polling_station_id AS "polling_station_id: u32",
+                committee_session_id AS "committee_session_id: u32",
+                state AS "state: _",
+                updated_at AS "updated_at: _"
+            FROM polling_station_data_entries
+            "#
+        )
+        .fetch_all(&pool)
+        .await
+        .expect("No data found");
+        assert_eq!(data[0].committee_session_id, 2);
+        assert_eq!(data[1].committee_session_id, committee_session.id);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

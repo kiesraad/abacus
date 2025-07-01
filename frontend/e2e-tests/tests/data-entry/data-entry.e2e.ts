@@ -81,7 +81,7 @@ test.describe("full data entry flow", () => {
 
     await candidatesListPage_2.fillCandidatesAndTotal([3, 1], 4);
     const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
-    await candidatesListPage_1.next.click();
+    await candidatesListPage_2.next.click();
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);

@@ -1,55 +1,83 @@
-#let conf(input, doc, footer: none) = [
+// Get the chapter defined in the current page or the last defined chapter
+#let current-chapter() = context {
+  let chapters = query(heading.where(level: 1))
+
+  for chapter in chapters {
+    if chapter.location().page() == here().page() {
+      return chapter
+    }
+  }
+
+  let prev_chapter = query(heading.where(level: 1).before(here()))
+
+  if prev_chapter.len() > 0 {
+    return prev_chapter.last()
+  }
+}
+
+
+// Default document styling
+#let conf(doc, header: none, footer: none) = [
   #set text(
     font: "DM Sans",
-    size: 9pt
+    size: 9pt,
   )
+
   #set page(
     paper: "a4",
-    margin: (x: 2.0cm, y: 1.5cm),
-    numbering: "1 / 1",
-    footer: context(grid(
-      columns: (1fr, auto),
-      gutter: 3pt,
-      [#footer],
-      align(end + top, [
-        pagina #counter(page).display("1 / 1", both: true)
-      ]),
-    )),
+    margin: (x: 1.5cm, y: 2.0cm),
+    numbering: (current, total) => [Pagina #current van #total],
+    header: context (
+      grid(
+        columns: (1fr, auto),
+        text(size: 8pt, {
+          show heading: set text(size: 8pt, weight: "regular")
+          current-chapter()
+        }),
+        text(size: 8pt, weight: "semibold", header),
+
+        v(0.66em),
+      )
+    ),
+    footer: context (
+      grid(
+        columns: (1fr, auto),
+        text(size: 8pt, footer), align(end, counter(page).display(both: true)),
+      )
+    ),
   )
 
-  #set heading(numbering: "1a. ")
+  #set list(spacing: 1.5em)
 
-  #show heading.where(level: 1): it => {
-    block(width: 100%, fill: black, inset: 6pt)[
-      #text(fill: white)[#it]
-    ]
-  }
+  #show par: content => block(width: 75%, content)
+
+  #show heading: set block(above: 2em, below: 1.5em)
+
+  #show heading.where(level: 1): set text(size: 16pt, weight: "regular")
+  #show heading.where(level: 2): set text(size: 14pt, weight: "semibold")
+  #show heading.where(level: 3): set text(size: 10pt, weight: "regular")
+  #show heading.where(level: 3): set block(
+    width: 75%,
+    stroke: (left: 1pt),
+    outset: (left: 6pt, top: 3pt, bottom: 3pt),
+  );
 
   #doc
 ]
 
-#let mono(content) = {
-  text(
-    font: "Geist Mono",
-    content,
-  )
-}
+// Document header numbering
+#let document_numbering(doc) = [
+  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: "")
+  #show heading.where(level: 1): set heading(numbering: "Deel 1.1 -", supplement: "Deel")
+  #show heading.where(level: 3): it => [
+    #block(
+      stroke: (left: 1pt),
+      outset: (left: 6pt, top: 3pt, bottom: 3pt),
+    )[
+      #text(weight: "bold", counter(heading).display(it.numbering))
+      #it.body
+    ]
+  ]
 
-#let title(version, title, subtitle) = {
-  grid(
-    columns: (1fr),
-    gutter: 13pt,
-    grid.hline(),
-    grid.cell(
-      inset: (
-        top: 10pt,
-        bottom: -5pt,
-      ),
-      text(size: 11pt, weight: "extrabold", version),
-    ),
-    text(size: 15pt, weight: "extrabold", title),
-    text(subtitle),
-    [],
-    grid.hline(),
-  )
-}
+  #doc
+]

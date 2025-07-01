@@ -1,10 +1,12 @@
 #![cfg(test)]
 
 use crate::{shared::create_result, utils::serve_api};
-use abacus::committee_session::CommitteeSessionStatus;
 #[cfg(feature = "dev-database")]
 use abacus::election::Election;
-use abacus::election::{ElectionDetailsResponse, ElectionListResponse};
+use abacus::{
+    committee_session::CommitteeSessionStatus,
+    election::{ElectionDetailsResponse, ElectionListResponse},
+};
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;

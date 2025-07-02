@@ -2,9 +2,9 @@
 CREATE TABLE audit_log
 (
     id                 INTEGER         PRIMARY KEY AUTOINCREMENT NOT NULL,
-    event              JSONB           NOT NULL,
+    event              TEXT            NOT NULL,
     event_name         TEXT            NOT NULL,
-    event_level        TEXT CHECK( event_level IN ('error','warning','info','success') ) NOT NULL DEFAULT 'info',
+    event_level        TEXT            CHECK( event_level IN ('error','warning','info','success') ) NOT NULL DEFAULT 'info',
     message            TEXT            ,
     workstation        INTEGER         ,
     ip                 TEXT            ,

@@ -94,9 +94,6 @@ test.describe("resolve differences then errors", () => {
     await resolveDifferencesPage.keepSecondEntry.click();
     await resolveDifferencesPage.save.click();
 
-    // TODO skip overview page
-    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: pollingStation.name }).click();
-
     const resolveErrorsPage = new ResolveErrorsPgObj(page);
     await expect(resolveErrorsPage.title).toBeVisible();
     await resolveErrorsPage.resumeFirstEntry.click();

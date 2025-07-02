@@ -199,7 +199,7 @@ export const PollingStationDataEntryResolveDifferencesHandler = http.post<
   DataEntryStatusResponse,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH
 >("/api/polling_stations/3/data_entries/resolve_differences", () =>
-  HttpResponse.json({ status: "definitive" }, { status: 200 }),
+  HttpResponse.json({ status: "first_entry_not_started" }, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveErrorsHandler = http.post<
@@ -208,7 +208,7 @@ export const PollingStationDataEntryResolveErrorsHandler = http.post<
   DataEntryStatusResponse,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH
 >("/api/polling_stations/5/data_entries/resolve_errors", () =>
-  HttpResponse.json({ status: "definitive" }, { status: 200 }),
+  HttpResponse.json({ status: "first_entry_not_started" }, { status: 200 }),
 );
 
 // get polling stations

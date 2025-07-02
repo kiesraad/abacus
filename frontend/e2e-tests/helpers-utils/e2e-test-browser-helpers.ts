@@ -6,8 +6,15 @@ import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPg
 import { NavigationPanel } from "e2e-tests/page-objects/data_entry/NavigationPanelPgObj";
 import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
+import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
+import { CheckDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckDefinitionPgObj";
+import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
+import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
+import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
 
 import { PollingStation, PollingStationResults } from "@/types/generated/openapi";
+
+import { eml110a, eml230b } from "../test-data/eml-files";
 
 export async function selectPollingStationForDataEntry(page: Page, pollingStation: PollingStation) {
   await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
@@ -72,4 +79,36 @@ export async function fillDataEntryPagesAndSave(page: Page, results: PollingStat
   const dataEntryHomePage = new DataEntryHomePage(page);
   await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   return dataEntryHomePage;
+}
+
+export async function uploadElectionAndInputHash(page: Page) {
+  const overviewPage = new OverviewPgObj(page);
+
+  // Upload election
+  const uploadDefinitionPage = new UploadDefinitionPgObj(page);
+  await expect(uploadDefinitionPage.header).toBeVisible();
+  await uploadDefinitionPage.uploadFile(page, eml110a.path);
+  await expect(overviewPage.main).toContainText(eml110a.filename);
+  await expect(overviewPage.main).toContainText(eml110a.electionDate);
+
+  // Process hash
+  const checkDefinitionPage = new CheckDefinitionPgObj(page);
+  await expect(checkDefinitionPage.header).toBeVisible();
+  await checkDefinitionPage.inputHash(eml110a.hashInput1, eml110a.hashInput2);
+}
+
+export async function uploadCandidatesAndInputHash(page: Page) {
+  const overviewPage = new OverviewPgObj(page);
+
+  // Candidate page
+  const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
+  await expect(uploadCandidateDefinitionPage.header).toBeVisible();
+  await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
+  await expect(overviewPage.main).toContainText(eml230b.filename);
+  await expect(overviewPage.main).toContainText(eml230b.electionDate);
+
+  // Candidate check page
+  const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
+  await expect(checkCandidateDefinitionPage.header).toBeVisible();
+  await checkCandidateDefinitionPage.inputHash(eml230b.hashInput1, eml230b.hashInput2);
 }

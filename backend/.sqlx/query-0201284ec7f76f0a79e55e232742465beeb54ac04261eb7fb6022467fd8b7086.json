@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                ip as \"ip: String\",\n                user_id as \"user_id: u32\",\n                audit_log.username,\n                user_fullname,\n                user_role as \"user_role: Role\"\n            FROM audit_log\n            WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))\n                AND (json_array_length($2) = 0 OR event ->> 'eventType' IN (SELECT value FROM json_each($2)))\n                AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))\n                AND ($4 IS NULL OR unixepoch(time) >= $4)\n            ORDER BY\n                CASE WHEN $4 IS NULL THEN time ELSE 1 END DESC,\n                CASE WHEN $4 IS NULL THEN 1 ELSE time END ASC\n            LIMIT $5 OFFSET $6\n            ",
+  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                json(event) as \"event!: Json<AuditEvent>\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                ip as \"ip: String\",\n                user_id as \"user_id: u32\",\n                audit_log.username,\n                user_fullname,\n                user_role as \"user_role: Role\"\n            FROM audit_log\n            WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))\n                AND (json_array_length($2) = 0 OR event ->> 'eventType' IN (SELECT value FROM json_each($2)))\n                AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))\n                AND ($4 IS NULL OR unixepoch(time) >= $4)\n            ORDER BY\n                CASE WHEN $4 IS NULL THEN time ELSE 1 END DESC,\n                CASE WHEN $4 IS NULL THEN 1 ELSE time END ASC\n            LIMIT $5 OFFSET $6\n            ",
   "describe": {
     "columns": [
       {
@@ -14,9 +14,9 @@
         "type_info": "Text"
       },
       {
-        "name": "event: serde_json::Value",
+        "name": "event!: Json<AuditEvent>",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Null"
       },
       {
         "name": "event_level: _",
@@ -65,7 +65,7 @@
     "nullable": [
       false,
       false,
-      false,
+      null,
       false,
       true,
       true,
@@ -76,5 +76,5 @@
       true
     ]
   },
-  "hash": "82ec3623bc8472d200645090d2023016a2e6b41a0a4d53d4ed5183047ca2186f"
+  "hash": "0201284ec7f76f0a79e55e232742465beeb54ac04261eb7fb6022467fd8b7086"
 }

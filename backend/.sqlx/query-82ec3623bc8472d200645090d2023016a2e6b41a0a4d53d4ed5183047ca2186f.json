@@ -11,7 +11,7 @@
       {
         "name": "time: _",
         "ordinal": 1,
-        "type_info": "Datetime"
+        "type_info": "Text"
       },
       {
         "name": "event: serde_json::Value",

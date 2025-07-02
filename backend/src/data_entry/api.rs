@@ -780,7 +780,7 @@ pub mod tests {
             Typist(user.clone()),
             State(pool.clone()),
             Path((polling_station_id, entry_number)),
-            AuditService::new(AuditLog(pool.clone()), user, None),
+            AuditService::new(AuditLog(pool.clone()), Some(user), None),
         )
         .await
         .into_response()
@@ -800,7 +800,7 @@ pub mod tests {
             Typist(user.clone()),
             State(pool.clone()),
             Path((polling_station_id, entry_number)),
-            AuditService::new(AuditLog(pool.clone()), user, None),
+            AuditService::new(AuditLog(pool.clone()), Some(user), None),
             request_body.clone(),
         )
         .await
@@ -820,7 +820,7 @@ pub mod tests {
             Typist(user.clone()),
             State(pool.clone()),
             Path((polling_station_id, entry_number)),
-            AuditService::new(AuditLog(pool.clone()), user, None),
+            AuditService::new(AuditLog(pool.clone()), Some(user), None),
         )
         .await
         .into_response()
@@ -839,7 +839,7 @@ pub mod tests {
             Typist(user.clone()),
             State(pool.clone()),
             Path((polling_station_id, entry_number)),
-            AuditService::new(AuditLog(pool.clone()), user, None),
+            AuditService::new(AuditLog(pool.clone()), Some(user), None),
         )
         .await
         .into_response()
@@ -855,7 +855,7 @@ pub mod tests {
             Coordinator(user.clone()),
             State(pool.clone()),
             Path(polling_station_id),
-            AuditService::new(AuditLog(pool.clone()), user, None),
+            AuditService::new(AuditLog(pool.clone()), Some(user), None),
             action,
         )
         .await
@@ -1221,7 +1221,7 @@ pub mod tests {
             Typist(User::test_user(Role::Typist, 1)),
             State(pool.clone()),
             Path((1, EntryNumber::FirstEntry)),
-            AuditService::new(AuditLog(pool.clone()), user, None),
+            AuditService::new(AuditLog(pool.clone()), Some(user), None),
         )
         .await
         .into_response();

@@ -10,19 +10,19 @@
   <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
   <CandidateList>
     <Election>
-      <ElectionIdentifier Id="GR2022_Amsterdam">
-        <ElectionName>Gemeenteraad Amsterdam 2022</ElectionName>
+      <ElectionIdentifier Id="GR2024_Heemdamseburg">
+        <ElectionName>Gemeenteraad Heemdamseburg 2022</ElectionName>
         <ElectionCategory>GR</ElectionCategory>
-        <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
-        <kr:ElectionDomain Id="0363">Amsterdam</kr:ElectionDomain>
+        <kr:ElectionSubcategory>GR1</kr:ElectionSubcategory>
+        <kr:ElectionDomain Id="9876">Heemdamseburg</kr:ElectionDomain>
         <kr:ElectionDate>2022-03-16</kr:ElectionDate>
-         <kr:NominationDate>2022-01-31</kr:NominationDate>
+        <kr:NominationDate>2022-01-31</kr:NominationDate>
       </ElectionIdentifier>
       <Contest>
         <ContestIdentifier Id="geen"/>
         <Affiliation>
           <AffiliationIdentifier Id="1">
-            <RegisteredName>GROENLINKS</RegisteredName>
+            <RegisteredName>Heemdamsenaren</RegisteredName>
           </AffiliationIdentifier>
           <Type>op zichzelf staande lijst</Type>
           <kr:ListData PublicationLanguage="nl" PublishGender="true"/>
@@ -297,10 +297,9 @@
             </QualifyingAddress>
           </Candidate>
         </Affiliation>
-
         <Affiliation>
           <AffiliationIdentifier Id="3">
-            <RegisteredName>D66</RegisteredName>
+            <RegisteredName>Heemse Dammers</RegisteredName>
           </AffiliationIdentifier>
           <Type>op zichzelf staande lijst</Type>
           <kr:ListData PublicationLanguage="nl" PublishGender="true"/>
@@ -337,7 +336,6 @@
             </QualifyingAddress>
           </Candidate>
         </Affiliation>
-
       </Contest>
     </Election>
   </CandidateList>

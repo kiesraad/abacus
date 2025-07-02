@@ -8,7 +8,7 @@ use axum::{
 use super::{AuditEvent, AuditLog, AuditLogEvent};
 use crate::{
     APIError,
-    authentication::{User, Users, error::AuthenticationError},
+    authentication::{User, Users},
 };
 
 #[derive(Clone)]
@@ -41,12 +41,8 @@ where
 
 impl AuditService {
     #[cfg(test)]
-    pub fn new(log: AuditLog, user: User, ip: Option<IpAddr>) -> Self {
-        Self {
-            log,
-            user: Some(user),
-            ip,
-        }
+    pub fn new(log: AuditLog, user: Option<User>, ip: Option<IpAddr>) -> Self {
+        Self { log, user, ip }
     }
 
     pub fn with_user(mut self, user: User) -> Self {
@@ -64,11 +60,9 @@ impl AuditService {
         event: &AuditEvent,
         message: Option<String>,
     ) -> Result<AuditLogEvent, APIError> {
-        let Some(user) = &self.user else {
-            return Err(AuthenticationError::UserNotFound.into());
-        };
-
-        self.log.create(user, event, message, self.ip).await
+        self.log
+            .create(event, self.user.as_ref(), message, self.ip)
+            .await
     }
 }
 
@@ -108,32 +102,8 @@ mod test {
 
         assert_eq!(event.event_level(), &AuditEventLevel::Success);
         assert_eq!(event.message(), Some(&"User logged in".to_string()));
-        assert_eq!(event.user_id(), 1);
-        assert_eq!(event.username(), "admin1");
+        assert_eq!(event.user_id(), Some(1));
+        assert_eq!(event.username(), Some("admin1"));
         assert_eq!(event.ip(), Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))));
-    }
-
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
-    async fn test_log_event_without_user(pool: SqlitePool) {
-        let service = AuditService {
-            log: AuditLog::new(pool.clone()),
-            ip: Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))),
-            user: None,
-        };
-
-        let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
-            user_agent: "Mozilla/5.0".to_string(),
-            logged_in_users_count: 5,
-        });
-
-        let error = service.log(&audit_event, None).await.unwrap_err();
-
-        assert!(
-            matches!(
-                error,
-                APIError::Authentication(AuthenticationError::UserNotFound)
-            ),
-            "Expected UserNotFound error, got {error:?}"
-        );
     }
 }

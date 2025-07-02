@@ -13,12 +13,13 @@ use super::{
     repository::Elections,
     structs::{Election, ElectionWithPoliticalGroups},
 };
-use crate::committee_session::CommitteeSession;
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{Admin, User},
-    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
+    },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},
 };

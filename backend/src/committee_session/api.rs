@@ -1,8 +1,8 @@
-use axum::response::{IntoResponse, Response};
 use axum::{
     Json,
     extract::{Path, State},
     http::StatusCode,
+    response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -12,11 +12,11 @@ use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
     repository::CommitteeSessions,
 };
-use crate::election::repository::Elections;
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
+    election::repository::Elections,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

@@ -11,7 +11,7 @@
       {
         "name": "event: serde_json::Value",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Null"
       }
     ],
     "parameters": {

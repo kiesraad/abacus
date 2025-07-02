@@ -6,7 +6,9 @@ use std::{
 };
 
 use abacus::{
-    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
+    },
     data_entry::{
         CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
         VotersCounts, VotesCounts,
@@ -148,7 +150,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // generate the committee session for the election
     let cs_repo = CommitteeSessions::new(pool.clone());
-    cs_repo
+    let committee_session = cs_repo
         .create(CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
@@ -168,6 +170,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let data_entry_completed = if args.with_data_entry {
         let data_entries_repo = PollingStationDataEntries::new(pool.clone());
         let (_, second_entries) = generate_data_entry(
+            &committee_session,
             &election,
             &polling_stations,
             &mut rng,
@@ -348,6 +351,7 @@ async fn generate_polling_stations(
 
 /// Generate and store data entries for the given election based on arguments
 async fn generate_data_entry(
+    committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     rng: &mut impl rand::Rng,
@@ -400,7 +404,7 @@ async fn generate_data_entry(
                 });
 
                 data_entries_repo
-                    .make_definitive(ps.id, &state, &results)
+                    .make_definitive(ps.id, committee_session.id, &state, &results)
                     .await
                     .expect("Could not create definitive data entry");
                 generated_second_entries += 1;
@@ -412,7 +416,7 @@ async fn generate_data_entry(
                     first_entry_finished_at: ts,
                 });
                 data_entries_repo
-                    .upsert(ps.id, &state)
+                    .upsert(ps.id, committee_session.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;

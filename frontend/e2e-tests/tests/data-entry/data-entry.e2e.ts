@@ -18,9 +18,9 @@ import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj"
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import {
+  dataEntryRequest,
   noErrorsWarningsResponse,
   noRecountNoDifferencesDataEntry,
-  noRecountNoDifferencesRequest,
 } from "e2e-tests/test-data/request-response-templates";
 
 import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
@@ -85,7 +85,7 @@ test.describe("full data entry flow", () => {
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);
-    expect(response.request().postDataJSON()).toStrictEqual(noRecountNoDifferencesRequest);
+    expect(response.request().postDataJSON()).toStrictEqual(dataEntryRequest);
     expect(await response.json()).toStrictEqual(noErrorsWarningsResponse);
 
     const checkAndSavePage = new CheckAndSavePage(page);

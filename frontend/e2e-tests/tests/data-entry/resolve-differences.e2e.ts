@@ -3,6 +3,7 @@ import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPg
 import { ResolveDifferencesPgObj } from "e2e-tests/page-objects/election/ResolveDifferencesPgObj";
 
 import { test } from "../../fixtures";
+import { ResolveErrorsPgObj } from "../../page-objects/election/ResolveErrorsPgObj";
 
 test.use({
   storageState: "e2e-tests/state/coordinator.json",
@@ -75,5 +76,33 @@ test.describe("resolve differences", () => {
     await expect(electionStatusPage.alertDifferencesResolved).toContainText(
       "Omdat beide invoeren zijn verwijderd, moet stembureau 33 twee keer opnieuw ingevoerd worden.",
     );
+  });
+});
+
+test.describe("resolve differences then errors", () => {
+  test("keep second entry with errors then resolve errors", async ({
+    page,
+    pollingStationEntriesDifferentWithErrors: pollingStation,
+  }) => {
+    await page.goto(`/elections/${pollingStation.election_id}/status`);
+
+    const electionStatusPage = new ElectionStatus(page);
+    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: pollingStation.name }).click();
+
+    const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
+    await expect(resolveDifferencesPage.title).toBeVisible();
+    await resolveDifferencesPage.keepSecondEntry.click();
+    await resolveDifferencesPage.save.click();
+
+    // TODO skip overview page
+    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: pollingStation.name }).click();
+
+    const resolveErrorsPage = new ResolveErrorsPgObj(page);
+    await expect(resolveErrorsPage.title).toBeVisible();
+    await resolveErrorsPage.resumeFirstEntry.click();
+    await resolveErrorsPage.save.click();
+
+    await expect(electionStatusPage.inProgress).toContainText(pollingStation.name);
+    await expect(electionStatusPage.alertFirstDataEntryResumed).toBeVisible();
   });
 });

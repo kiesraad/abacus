@@ -8,7 +8,7 @@ export class AbortModalPgObj {
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" });
-    this.deleteButton = page.getByRole("button", { name: "Verwijder verkiezing" });
+    this.deleteButton = page.getByRole("button", { name: "Ja, verwijder verkiezing" });
     this.closeButton = page.getByRole("dialog").getByRole("button", { name: "Annuleren" }).first();
     this.cancelButton = page.getByRole("dialog").getByRole("button", { name: "Annuleren" }).nth(1);
   }

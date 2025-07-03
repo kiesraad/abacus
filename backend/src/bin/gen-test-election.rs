@@ -39,10 +39,6 @@ use tracing_subscriber::EnvFilter;
 /// Abacus API and asset server
 #[derive(Parser, Debug)]
 struct Args {
-    /// Server port, optional
-    #[arg(short, long, default_value_t = 8080)]
-    port: u16,
-
     /// Location of the database file, will be created if it doesn't exist
     #[arg(short, long, default_value = "db.sqlite")]
     database: String,

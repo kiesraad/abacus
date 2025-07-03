@@ -56,10 +56,6 @@
   integer,
   thousands-sep: ".",
 ) = {
-  if (integer == 0) {
-    return "-"
-  }
-
   return str(integer).clusters().rev().chunks(3).map(c => c.join("")).join(thousands-sep).rev()
 }
 

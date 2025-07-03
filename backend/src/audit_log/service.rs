@@ -5,7 +5,7 @@ use axum::{
     http::request::Parts,
 };
 
-use super::{AuditEvent, AuditLog, AuditLogEvent};
+use super::{AuditEvent, AuditLog};
 use crate::{
     APIError,
     authentication::{User, Users},
@@ -55,11 +55,7 @@ impl AuditService {
         self.user.is_some()
     }
 
-    pub async fn log(
-        &self,
-        event: &AuditEvent,
-        message: Option<String>,
-    ) -> Result<AuditLogEvent, APIError> {
+    pub async fn log(&self, event: &AuditEvent, message: Option<String>) -> Result<(), APIError> {
         self.log
             .create(event, self.user.as_ref(), message, self.ip)
             .await
@@ -90,7 +86,11 @@ mod test {
             logged_in_users_count: 5,
         });
         let message = Some("User logged in".to_string());
-        let event = service.log(&audit_event, message).await.unwrap();
+        service.log(&audit_event, message).await.unwrap();
+
+        // Verify the event was logged by checking the audit log
+        let logged_events = service.log.list_all().await.unwrap();
+        let event = logged_events.first().unwrap();
 
         assert_eq!(
             event.event(),

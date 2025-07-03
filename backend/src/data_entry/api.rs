@@ -996,7 +996,7 @@ pub mod tests {
 
         // Check that it has been logged in the audit log
         let audit_log_row =
-            query!(r#"SELECT event_name, event as "event: serde_json::Value" FROM audit_log ORDER BY id DESC LIMIT 1"#)
+            query!(r#"SELECT event_name, json(event) as "event: serde_json::Value" FROM audit_log ORDER BY id DESC LIMIT 1"#)
                 .fetch_one(&pool)
                 .await
                 .expect("should have audit log row");

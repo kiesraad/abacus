@@ -164,6 +164,12 @@ impl From<serde_json::Value> for AuditEvent {
     }
 }
 
+impl From<sqlx::types::Json<AuditEvent>> for AuditEvent {
+    fn from(value: sqlx::types::Json<AuditEvent>) -> Self {
+        value.0
+    }
+}
+
 impl AuditEvent {
     pub fn level(&self) -> AuditEventLevel {
         match self {

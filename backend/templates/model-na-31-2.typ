@@ -281,7 +281,7 @@ Voer de controle uit volgens de stappen in het controleprotocol.
       votes: candidate.votes,
     )),
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
-    column_total: (c, v) => [Subtotaal kolom #c: #fmt-number(v)],
+    column_total: (c, v) => [Subtotaal kolom #c: #fmt-number(v, zero: 0)],
     sum_total: columns => [Totaal lijst (kolom #columns)],
   )
 }

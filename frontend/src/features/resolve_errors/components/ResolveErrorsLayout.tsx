@@ -2,6 +2,7 @@ import { Outlet } from "react-router";
 
 import { NotFoundError } from "@/api/ApiResult";
 import { PageTitle } from "@/components/page_title/PageTitle";
+import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { useElection } from "@/hooks/election/useElection";
@@ -39,9 +40,9 @@ export function ResolveErrorsLayout() {
         </section>
       </header>
       <main className={cls.resolveErrors}>
-        <aside>
+        <StickyNav>
           <ResolveErrorsNavigation structure={structure} validationResults={dataEntry.validation_results} />
-        </aside>
+        </StickyNav>
         <article>
           <Outlet />
         </article>

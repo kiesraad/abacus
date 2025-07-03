@@ -44,17 +44,22 @@ export function ResolveErrorsNavigation({ structure, validationResults }: Resolv
     return sectionId ? `${basePath}/${sectionId}` : basePath;
   };
 
+  // Separate sections into fixed and scrollable groups
+  const fixedSections = structure.filter((section) => !section.id.startsWith("political_group_votes_"));
+  const politicalGroupSections = structure.filter((section) => section.id.startsWith("political_group_votes_"));
+
   return (
     <ProgressList>
       <ProgressList.Fixed>
         <ProgressList.Item status="idle" active={currentSectionId === null}>
           <Link to={getSectionUrl("")}>{t("resolve_errors.short_title")}</Link>
         </ProgressList.Item>
-        {structure.map((section) => (
+
+        {fixedSections.map((section) => (
           <ProgressList.Item
             key={section.id}
             status={getSectionStatus(section.id)}
-            addSpace={section.id === structure[0]?.id || section.id === "political_group_votes_1"}
+            addSpace={section.id === structure[0]?.id}
             active={currentSectionId === section.id}
           >
             <Link to={getSectionUrl(section.id)}>
@@ -63,6 +68,21 @@ export function ResolveErrorsNavigation({ structure, validationResults }: Resolv
           </ProgressList.Item>
         ))}
       </ProgressList.Fixed>
+
+      <ProgressList.Scroll>
+        {politicalGroupSections.map((section) => (
+          <ProgressList.Item
+            key={section.id}
+            status={getSectionStatus(section.id)}
+            addSpace={section.id === "political_group_votes_1"}
+            active={currentSectionId === section.id}
+          >
+            <Link to={getSectionUrl(section.id)}>
+              <span>{section.short_title}</span>
+            </Link>
+          </ProgressList.Item>
+        ))}
+      </ProgressList.Scroll>
     </ProgressList>
   );
 }

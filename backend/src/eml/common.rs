@@ -199,7 +199,7 @@ pub enum EMLImportError {
     MissingSubcategory,
     MissingElectionTree,
     MissingElectionDomain,
-    Needs101a,
+    Needs110a,
     Needs230b,
     NumberOfSeatsNotInRange,
     OnlyMunicipalSupported,

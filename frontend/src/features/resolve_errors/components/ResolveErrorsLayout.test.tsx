@@ -9,7 +9,7 @@ import {
   PollingStationDataEntryGetErrorsHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { render, screen, within } from "@/testing/test-utils";
+import { render, screen, waitFor, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { ResolveErrorsLayout } from "./ResolveErrorsLayout";
@@ -57,6 +57,8 @@ describe("ResolveErrorsLayout", () => {
 
     expect(screen.getByRole("link", { name: "Fouten en waarschuwingen" })).toBeInTheDocument();
 
-    expect(document.title).toBe("Fouten en waarschuwingen oplossen - Abacus");
+    await waitFor(() => {
+      expect(document.title).toBe("Fouten en waarschuwingen oplossen - Abacus");
+    });
   });
 });

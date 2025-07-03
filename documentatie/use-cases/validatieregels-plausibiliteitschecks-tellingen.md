@@ -13,8 +13,13 @@ De foutmelding die wordt getoond bestaat uit vier onderdelen:
 
 Titel, nummer en toelichting zijn uniek voor iedere foutmelding. Het handelingsperspectief is voor alle foutmeldingen gelijk, en is als volgt:
 
+Invoerder:
 > - Heb je iets niet goed overgenomen? Herstel de fout en ga verder.
 > - Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.
+
+Coördinator
+> - Controleer of de invoer in Abacus goed is overgenomen van het papieren proces-verbaal
+> - Zit de fout ook in het papieren proces-verbaal? Los de fout dan daar op.
 
 ### Regels voor alle numerieke invoervelden (reeks F.0xx)
 
@@ -100,13 +105,15 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > Invoerder: **Controleer je antwoorden** (F.154)
 
 > Coördinator: **Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn.** (F.154)
-> **TODO**: Hier zijn we gebleven
+> Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### DSO | F.156: Controles en correcties: meer dan 1 antwoord op vraag 'zijn er gecorrigeerde telresultaten'
 
-> **Controleer je antwoorden** (F.154)
+> Invoerder: **Controleer je antwoorden** (F.156)
+> Coördinator: **Er mag maar 1 antwoord per vraag worden gegeven** (F.156)
+> Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
@@ -114,22 +121,35 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### F.201: `stempassen + volmachten <> totaal toegelaten kiezers`
 
-> **Controleer toegelaten kiezers** (F.201)  
+> Invoerder: **Controleer toegelaten kiezers** (F.201)  
 > De invoer bij A, B of D klopt niet.  
+
+> Coördinator: **A en B tellen niet op tot D** (F.201)
+> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.
+> Zo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.
+> Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: A, B en D
 
 #### F.202: `E.1 t/m E.n tellen niet op naar E`
 
-> **Controleer de stemmen op lijsten en totaal stemmen op kandidaten** (F.202)  
+> Invoerder **Controleer de stemmen op lijsten en totaal stemmen op kandidaten** (F.202)
+> Coördinator: **De stemmen op lijsten tellen niet op tot E** (F.202)
+> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en H worden ingevuld.
+> Zo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.
+> Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: E.1 t/m E.n en E
 
 #### F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal uitgebrachte stemmen`
 
-> **Controleer uitgebrachte stemmen** (F.202)  
+> Invoerder: **Controleer uitgebrachte stemmen** (F.202)  
 > De invoer bij E, F, G of H klopt niet.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
+
+> Coördinator: **E, F en G tellen niet op tot H** (F.202)  
+> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getallen bij H wordt ingevuld.
+> Zo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.
+> Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: E, F, G en H
 
@@ -138,61 +158,104 @@ Velden markeren: E, F, G en H
 
 #### F.301 "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
 
-> **Controleer je antwoorden** (F.301)
+> Invoerder: **Controleer je antwoorden** (F.301)
+
+> Coördinator: **De getallen die zijn ingevuld bij D en H zijn niet gelijk** (F.301)
+> Herstel de fout door op papier het juiste getal in te (laten) vullen.
+> Controleer ook of er een onverklaard verschil ontstaat.
+> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
-#### F.302 "Vergelijk D&H": (checkbox D>H is aangevinkt, maar D<=H)
+#### CSO | F.302 "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
+// TODO DSO
+> Invoerder: **Controleer je antwoorden** (F.302)
 
-> **Controleer je antwoorden** (F.302)
-
-Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
-
-#### F.303 "Vergelijk D&H": (checkbox D<H is aangevinkt, maar D>=H)
-
-> **Controleer je antwoorden** (F.303)
-
-Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
-
-#### F.304 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
-
-> **Controleer je antwoorden** (F.304)
+> Coördinator: **Het getal dat is ingevuld bij H is niet groter dan D** (F.302)
+> Herstel de fout door op papier het juiste antwoord aan te (laten) vinken.
+> Controleer ook of er een onverklaard verschil ontstaat.
+> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
-#### F.305 (Als D < H) `I <> H - D`
+#### CSO | F.303 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
+// TODO DSO
+> Invoerder: **Controleer je antwoorden** (F.303)
 
-> **Controleer I (stembiljetten meer geteld)** (F.305)
+> Coördinator: **Het getal dat is ingevuld bij H is niet kleiner dan D** (F.303)
+> Herstel de fout door op papier het juiste antwoord aan te (laten) vinken.
+> Controleer ook of er een onverklaard verschil ontstaat.
+> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
+
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+
+#### CSO | F.304 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+// TODO DSO
+> Invoerder: **Controleer je antwoorden** (F.304)
+
+> Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.304)
+> Herstel de fout door op papier het juiste antwoord aan te (laten) vinken.
+
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+
+#### CSO | F.305 (Als D < H) `I <> H - D`
+// TODO DSO
+> Invoerder: **Controleer I (stembiljetten meer geteld)** (F.305)
+
+> Coördinator: **Controleer I (stembiljetten meer geteld)** (F.305)
+> Herstel de fout door op papier het juiste getal in te (laten) vullen.
+> Controleer ook of het verschil nog volledig verklaard is.
+> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Veld markeren: I
 
-#### F.306 (Als D < H en J is ingevuld) `I <> H - D`
+#### CSO | F.306 (Als D < H en J is ingevuld) `I <> H - D`
+// TODO DSO
+> Invoerder: **Controleer I en J** (F.306)
 
-> **Controleer I en J** (F.306)  
+> Coördinator: **Controleer of I en J verwisseld zijn** (F.306)
+> Herstel de fout door op papier door het verschil op de juiste plek in te (laten) vullen.
+> Controleer ook of het verschil nog volledig verklaard is.
+> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan. 
 
 Veld markeren: I, J
 
-#### F.307 (Als D > H) `J <> D - H`
+#### CSO | F.307 (Als D > H) `J <> D - H`
+// TODO DSO
+> Invoerder: **Controleer J** (F.307)
 
-> **Controleer J** (F.307)  
+> Coördinator: **Controleer J (stembiljetten meer geteld)** (F.307)
+> Herstel de fout door op papier het juiste getal in te (laten) vullen.
+> Controleer ook of het verschil nog volledig verklaard is.
+> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
+
 Veld markeren: J
 
-#### F.308 (Als D > H en I is ingevuld) `J <> D - H`
+#### CSO | F.308 (Als D > H en I is ingevuld) `J <> D - H`
+// TODO DSO
+> Invoerder: **Controleer I en J** (F.308)  
 
-> **Controleer I en J** (F.308)  
+> Coördinator: **Controleer of I en J verwisseld zijn** (F.308)
+> Herstel de fout door op papier door het verschil op de juiste plek in te (laten) vullen.
+> Controleer ook of het verschil nog volledig verklaard is.
+> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Veld markeren: I, J
 
-#### F.309 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+#### CSO | F.309 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+// TODO DSO
+> Invoerder: **Controleer je antwoorden** (F.309)  
 
-> **Controleer je antwoorden** (F.309)  
+> Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.309)
+> Herstel de fout door op papier het juiste antwoord aan te (laten) vinken.
 
 Veld markeren: 3.3.2
 
 #### DSO | F.310 (2.2.3 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap controles en correcties' is niet aangevinkt)
 
 > Invoerder: **Controleer je antwoorden** (F.310)
-> Coördinator: **Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen**
+ 
+> Coördinator: **Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen** (F.310)
 
 Veld markeren: 2.3.2
 
@@ -202,9 +265,20 @@ Veld markeren: 2.3.2
 
 #### F.401 `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
 
-> **Controleer ingevoerde aantallen** (F.401)  
+> Invoerder: **Controleer ingevoerde aantallen** (F.401)  
 > De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
+
+// TODO: we zijn hier gebleven - tekst hieronder klopt nog niet
+> Coördinator: **De optelling van de stemmen op kandidaten komt niet overeen met het ingevulde lijsttotaal** (F.401)
+> Controleer de optelling in het papieren proces-verbaal.
+> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als de juiste totaal wordt ingevuld.
+> Zo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.
+> Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
+
+
+> Herstel de fout door op papier het juiste getal in te (laten) vullen.
+> Pas zo nodig veld , en volg de instructies over hertellen die daar staan.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 

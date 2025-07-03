@@ -1029,11 +1029,13 @@ pub mod tests {
         assert_eq!(row_count.count, 1);
 
         // Check if the data was updated
-        let data = query!("SELECT state FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .expect("No data found");
-        let data: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        let row = query!(
+            "SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries"
+        )
+        .fetch_one(&pool)
+        .await
+        .expect("No data found");
+        let data: DataEntryStatus = row.state.0;
         let DataEntryStatus::FirstEntryInProgress(state) = data else {
             panic!("Expected entry to be in FirstEntryInProgress state");
         };
@@ -1092,11 +1094,11 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check if entry is now in SecondEntryInProgress state
-        let data = query!("SELECT state FROM polling_station_data_entries")
+        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)
             .await
             .expect("One row should exist");
-        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        let status: DataEntryStatus = row.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
 
         // Check that nothing is added to polling_station_results yet
@@ -1175,11 +1177,11 @@ pub mod tests {
         finalise_different_entries(pool.clone()).await;
 
         // Check if entry is now in EntriesDifferent state
-        let data = query!("SELECT state FROM polling_station_data_entries")
+        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)
             .await
             .expect("One row should exist");
-        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        let status: DataEntryStatus = row.state.0;
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
 
         // Check that no result has been created
@@ -1266,11 +1268,11 @@ pub mod tests {
         finalise_different_entries(pool.clone()).await;
         resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepFirstEntry).await;
 
-        let data = query!("SELECT state FROM polling_station_data_entries")
+        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)
             .await
             .expect("One row should exist");
-        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        let status: DataEntryStatus = row.state.0;
         if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
             assert_eq!(
                 entry.finalised_first_entry.voters_counts.poll_card_count,
@@ -1286,11 +1288,11 @@ pub mod tests {
         finalise_different_entries(pool.clone()).await;
         resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepSecondEntry).await;
 
-        let data = query!("SELECT state FROM polling_station_data_entries")
+        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)
             .await
             .expect("One row should exist");
-        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        let status: DataEntryStatus = row.state.0;
         if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
             assert_eq!(
                 entry.finalised_first_entry.voters_counts.poll_card_count,
@@ -1311,11 +1313,11 @@ pub mod tests {
         )
         .await;
 
-        let data = query!("SELECT state FROM polling_station_data_entries")
+        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)
             .await
             .expect("One row should exist");
-        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        let status: DataEntryStatus = row.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryNotStarted));
     }
 }

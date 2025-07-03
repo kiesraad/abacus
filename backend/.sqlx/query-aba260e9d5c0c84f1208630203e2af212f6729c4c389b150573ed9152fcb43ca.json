@@ -11,7 +11,7 @@
       {
         "name": "state: Option<Json<DataEntryStatus>>",
         "ordinal": 1,
-        "type_info": "Blob"
+        "type_info": "Text"
       }
     ],
     "parameters": {

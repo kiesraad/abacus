@@ -1,6 +1,6 @@
 /.cargo
 /target
 /target-docker/
-db.sqlite*
+*.sqlite*
 /templates/**/*.pdf
 cobertura.xml

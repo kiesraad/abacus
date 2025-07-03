@@ -1,4 +1,5 @@
 use axum::extract::FromRef;
+use chrono::NaiveDateTime;
 use sqlx::{SqlitePool, query, query_as, types::Json};
 
 use super::{PollingStationDataEntry, PollingStationResults, status::DataEntryStatus};
@@ -200,21 +201,19 @@ impl PollingStationResultsEntries {
             SELECT
                 r.polling_station_id AS "polling_station_id: u32",
                 r.committee_session_id AS "committee_session_id: u32",
-                r.data,
-                r.created_at
+                r.data AS "data: Json<PollingStationResults>",
+                r.created_at as "created_at: NaiveDateTime"
             FROM polling_station_results AS r
             LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
             WHERE p.election_id = $1
-        "#,
+            "#,
             election_id
         )
         .try_map(|row| {
-            let data = serde_json::from_slice(&row.data)
-                .map_err(|err| sqlx::Error::Decode(Box::new(err)))?;
             Ok(PollingStationResultsEntry {
                 polling_station_id: row.polling_station_id,
                 committee_session_id: row.committee_session_id,
-                data,
+                data: row.data.0,
                 created_at: row.created_at.and_utc(),
             })
         })

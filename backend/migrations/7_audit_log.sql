@@ -2,9 +2,9 @@
 CREATE TABLE audit_log
 (
     id                 INTEGER         PRIMARY KEY AUTOINCREMENT NOT NULL,
-    event              JSONB           NOT NULL,
+    event              TEXT            NOT NULL,
     event_name         TEXT            NOT NULL,
-    event_level        TEXT CHECK( event_level IN ('error','warning','info','success') ) NOT NULL DEFAULT 'info',
+    event_level        TEXT            CHECK( event_level IN ('error','warning','info','success') ) NOT NULL DEFAULT 'info',
     message            TEXT            ,
     workstation        INTEGER         ,
     ip                 TEXT            ,
@@ -12,5 +12,5 @@ CREATE TABLE audit_log
     username           TEXT            ,
     user_fullname      TEXT            ,
     user_role          TEXT            ,
-    time               DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+    time               TEXT            NOT NULL DEFAULT CURRENT_TIMESTAMP
+) STRICT;

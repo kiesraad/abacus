@@ -5,10 +5,10 @@ CREATE TABLE users
     fullname               TEXT            ,
     role                   TEXT            NOT NULL,
     password_hash          TEXT            NOT NULL,
-    needs_password_change  BOOLEAN         NOT NULL DEFAULT TRUE,
-    last_activity_at       DATETIME        ,
-    updated_at             DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_at             DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    needs_password_change  INTEGER         NOT NULL DEFAULT TRUE,
+    last_activity_at       TEXT            ,
+    updated_at             TEXT            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at             TEXT            NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE (username COLLATE NOCASE)
-);
+) STRICT;

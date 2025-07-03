@@ -16,12 +16,12 @@
       {
         "name": "state: _",
         "ordinal": 2,
-        "type_info": "Blob"
+        "type_info": "Text"
       },
       {
         "name": "updated_at: _",
         "ordinal": 3,
-        "type_info": "Datetime"
+        "type_info": "Text"
       }
     ],
     "parameters": {

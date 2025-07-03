@@ -9,7 +9,8 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatus,
+    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
     repository::CommitteeSessions,
 };
 use crate::{
@@ -121,6 +122,51 @@ pub async fn committee_session_update(
 ) -> Result<StatusCode, APIError> {
     let committee_session = committee_sessions_repo
         .update(committee_session_id, committee_session_request)
+        .await?;
+
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
+            None,
+        )
+        .await?;
+
+    Ok(StatusCode::OK)
+}
+
+/// Change the status of a [CommitteeSession].
+#[utoipa::path(
+    put,
+    path = "/api/committee_sessions/{committee_session_id}",
+    request_body = CommitteeSessionStatusChangeRequest,
+    responses(
+        (status = 200, description = "Committee session status changed successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("committee_session_id" = u32, description = "Committee session database id"),
+    ),
+)]
+pub async fn committee_session_status_change(
+    _user: Coordinator,
+    State(committee_sessions_repo): State<CommitteeSessions>,
+    audit_service: AuditService,
+    Path(committee_session_id): Path<u32>,
+    Json(committee_session_request): Json<CommitteeSessionStatusChangeRequest>,
+) -> Result<StatusCode, APIError> {
+    let committee_session = committee_sessions_repo.get(committee_session_id).await?;
+    let new_status = match committee_session_request.status {
+        CommitteeSessionStatus::Created => committee_session.prepare_for_data_entry?,
+        CommitteeSessionStatus::DataEntryNotStarted => committee_session.ready_for_data_entry?,
+        CommitteeSessionStatus::DataEntryInProgress => committee_session.start_data_entry?,
+        CommitteeSessionStatus::DataEntryPaused => committee_session.pause_data_entry?,
+        CommitteeSessionStatus::DataEntryFinished => committee_session.finish_data_entry?,
+    };
+
+    let committee_session = committee_sessions_repo
+        .change_status(committee_session_id, new_status)
         .await?;
 
     audit_service

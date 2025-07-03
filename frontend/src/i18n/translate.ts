@@ -28,7 +28,7 @@ function getTranslation(path: string): string | undefined {
 export function hasTranslation(path: string): boolean {
   const value = getTranslation(path);
 
-  return typeof value === "string" ? true : false;
+  return typeof value === "string";
 }
 
 // get the translation for the given path key, return the path key if not found
@@ -55,7 +55,7 @@ export function translate(path: TranslationPath): string {
  */
 export function t(k: TranslationPath, vars?: Record<string, string | number>): string {
   if (vars) {
-    return Object.entries(vars).reduce((acc, [key, value]) => acc.replace(`{${key}}`, value.toString()), translate(k));
+    return Object.entries(vars).reduce((acc, [key, value]) => acc.replace(`{${key}}`, String(value)), translate(k));
   }
 
   return translate(k);

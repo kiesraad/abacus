@@ -1,4 +1,4 @@
-use std::{error::Error, net::SocketAddr};
+use std::{error::Error, net::SocketAddr, str::FromStr};
 
 use airgap::AirgapDetection;
 #[cfg(feature = "memory-serve")]
@@ -10,7 +10,7 @@ use axum::{
     serve::ListenerExt,
 };
 use hyper::http::{HeaderName, HeaderValue, header};
-use sqlx::SqlitePool;
+use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 use tokio::{net::TcpListener, signal};
 use tower_http::{
     set_header::SetResponseHeaderLayer,
@@ -250,6 +250,34 @@ pub async fn shutdown_signal() {
         _ = ctrl_c => {},
         _ = terminate => {},
     }
+}
+
+/// Create a SQLite database if needed, then connect to it and run migrations.
+/// Return a connection pool.
+pub async fn create_sqlite_pool(
+    database: &str,
+    #[cfg(feature = "dev-database")] reset_database: bool,
+    #[cfg(feature = "dev-database")] seed_data: bool,
+) -> Result<SqlitePool, Box<dyn Error>> {
+    let db = format!("sqlite://{database}");
+    let opts = SqliteConnectOptions::from_str(&db)?.create_if_missing(true);
+
+    #[cfg(feature = "dev-database")]
+    if reset_database {
+        // remove the file, ignoring any errors that occurred (such as the file not existing)
+        let _ = tokio::fs::remove_file(opts.get_filename()).await;
+        info!("removed database file");
+    }
+
+    let pool = SqlitePool::connect_with(opts).await?;
+    sqlx::migrate!().run(&pool).await?;
+
+    #[cfg(feature = "dev-database")]
+    if seed_data {
+        fixtures::seed_fixture_data(&pool).await?;
+    }
+
+    Ok(pool)
 }
 
 #[cfg(test)]

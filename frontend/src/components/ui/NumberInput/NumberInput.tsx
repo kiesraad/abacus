@@ -28,7 +28,7 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
       onPaste={onPaste}
       onFocus={onFocus}
       onBlur={onBlur(props.onChange)}
-      onKeyDown={onKeyDown}
+      onInput={onInput}
       id={id}
       name={props.name || id}
     />
@@ -66,14 +66,9 @@ function onBlur(onChange?: React.ChangeEventHandler<HTMLInputElement>) {
 }
 
 //only accept numbers
-function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-  //allow keyboard shortcuts and navigation (e.g. copy and paste, select all, arrow keys)
-  if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) {
-    return;
-  }
-  if (event.key.length === 1 && isNaN(parseInt(event.key))) {
-    event.preventDefault();
-  }
+function onInput(event: React.FormEvent<HTMLInputElement>) {
+  const input = event.currentTarget;
+  input.value = input.value.replace(/[^0-9]/g, "");
 }
 
 /**

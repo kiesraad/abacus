@@ -191,7 +191,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           <summary onClick={refetchStatuses}>
             {t("polling_station_choice.unknown_number")}
             <br />
-            <span id="openPollingStationList" className={cn(cls.underlined, cls.pointer)}>
+            <span id="openPollingStationList" className={cn("underlined", cls.pointer)}>
               {t("polling_station_choice.view_list")}
             </span>
           </summary>

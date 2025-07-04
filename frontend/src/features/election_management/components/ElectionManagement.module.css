@@ -1,0 +1,8 @@
+.tableTitle {
+  margin-bottom: 1rem;
+}
+
+.electionInformationTable {
+  width: 58.5rem;
+  font-size: var(--font-size-md);
+}

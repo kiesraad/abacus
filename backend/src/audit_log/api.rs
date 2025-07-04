@@ -147,7 +147,7 @@ mod tests {
         authentication::{Sessions, User, Users, inject_user},
     };
 
-    fn new_test_audit_service(pool: SqlitePool, user: User) -> AuditService {
+    fn new_test_audit_service(pool: SqlitePool, user: Option<User>) -> AuditService {
         AuditService::new(
             AuditLog::new(pool.clone()),
             user,
@@ -161,7 +161,7 @@ mod tests {
             .await
             .unwrap()
             .unwrap();
-        let service = new_test_audit_service(pool, user);
+        let service = new_test_audit_service(pool, Some(user));
         let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 1,

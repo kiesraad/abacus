@@ -40,7 +40,12 @@ export function LogsTable({ events, setDetails }: LogsTableProps) {
               {t(`log.event.${event.event.eventType}`)}
               {event.event.eventType == "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
             </Table.Cell>
-            <Table.Cell>{`${event.userId}, ${event.username} (${t(event.userRole)})`}</Table.Cell>
+            <Table.Cell>
+              {event.userId &&
+                event.username &&
+                event.userRole &&
+                `${event.userId}, ${event.username} (${t(event.userRole)})`}
+            </Table.Cell>
           </Table.ClickRow>
         ))}
       </Table.Body>

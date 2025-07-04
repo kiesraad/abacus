@@ -197,7 +197,7 @@ pub async fn start_server(
     let airgap_detection = if enable_airgap_detection {
         info!("Airgap detection is enabled, starting airgap detection task...");
 
-        AirgapDetection::start().await
+        AirgapDetection::start(pool.clone()).await
     } else {
         warn!("Airgap detection is disabled, this is not allowed in production.");
 

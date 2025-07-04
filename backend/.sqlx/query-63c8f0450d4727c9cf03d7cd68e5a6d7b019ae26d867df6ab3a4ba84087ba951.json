@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries",
+  "describe": {
+    "columns": [
+      {
+        "name": "state: sqlx::types::Json<DataEntryStatus>",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "63c8f0450d4727c9cf03d7cd68e5a6d7b019ae26d867df6ab3a4ba84087ba951"
+}

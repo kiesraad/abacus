@@ -33,7 +33,7 @@ pub async fn serve_api(pool: SqlitePool) -> SocketAddr {
 }
 
 pub async fn serve_api_with_airgap_detection(pool: SqlitePool) -> SocketAddr {
-    let airgap_detection = AirgapDetection::start().await;
+    let airgap_detection = AirgapDetection::start(pool.clone()).await;
 
     for i in 0..=100 {
         if i == 100 {

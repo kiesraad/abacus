@@ -52,7 +52,9 @@
     "UserLoggedIn": "Gebruiker ingelogd",
     "UserLoggedOut": "Gebruiker uitgelogd",
     "UserSessionExtended": "Gebruikerssessie verlengd",
-    "UserUpdated": "Gebruiker bijgewerkt"
+    "UserUpdated": "Gebruiker bijgewerkt",
+    "AirGapViolationDetected": "Verbinding met het internet gedetecteerd. Abacus gaat op slot.",
+    "AirGapViolationResolved": "Geen verbinding met het internet meer gedetecteerd."
   },
   "field": {
     "dataEntryProgress": "Voortgang",

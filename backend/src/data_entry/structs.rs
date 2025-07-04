@@ -16,6 +16,7 @@ use crate::{
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]
 pub struct PollingStationDataEntry {
     pub polling_station_id: u32,
+    pub committee_session_id: u32,
     #[schema(value_type = DataEntryStatus)]
     pub state: Json<DataEntryStatus>,
     #[schema(value_type = String)]
@@ -40,6 +41,7 @@ impl From<PollingStationDataEntry> for DataEntryDetails {
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResultsEntry {
     pub polling_station_id: u32,
+    pub committee_session_id: u32,
     pub data: PollingStationResults,
     pub created_at: DateTime<Utc>,
 }

@@ -3,6 +3,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
+import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { render_title_and_header } from "../../utils/utils";
@@ -22,7 +23,7 @@ export function ApportionmentListDetailsPage() {
     throw new NotFoundError("error.not_found");
   }
 
-  const pgName = `${t("list")} ${pg.number} - ${pg.name}`;
+  const pgName = formatPoliticalGroupName(pg);
 
   if (error) {
     return (

@@ -149,6 +149,9 @@ pub enum AuditEvent {
     DataEntryKeptFirst(DataEntryDetails),
     DataEntryKeptSecond(DataEntryDetails),
     DataEntryDiscardedBoth(DataEntryDetails),
+    // airgap detection events
+    AirGapViolationDetected,
+    AirGapViolationResolved,
     // api errors
     Error(ErrorDetails),
     #[default]
@@ -158,6 +161,12 @@ pub enum AuditEvent {
 impl From<serde_json::Value> for AuditEvent {
     fn from(value: serde_json::Value) -> Self {
         serde_json::from_value(value).unwrap_or_default()
+    }
+}
+
+impl From<sqlx::types::Json<AuditEvent>> for AuditEvent {
+    fn from(value: sqlx::types::Json<AuditEvent>) -> Self {
+        value.0
     }
 }
 
@@ -189,6 +198,8 @@ impl AuditEvent {
             AuditEvent::DataEntryKeptFirst(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryKeptSecond(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryDiscardedBoth(_) => AuditEventLevel::Info,
+            AuditEvent::AirGapViolationDetected => AuditEventLevel::Error,
+            AuditEvent::AirGapViolationResolved => AuditEventLevel::Info,
         }
     }
 }

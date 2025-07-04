@@ -32,7 +32,7 @@ export class ProgressList {
   }
 
   list(listNumber: number) {
-    return this.navElement.getByRole("listitem").filter({ hasText: `Lijst ${listNumber} - ` });
+    return this.navElement.getByRole("listitem").filter({ hasText: `Lijst ${listNumber}` });
   }
 
   listIcon(listNumber: number) {

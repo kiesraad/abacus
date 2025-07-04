@@ -33,6 +33,7 @@ export type ProgressListItemProps = {
   children?: React.ReactNode;
   id?: string;
   scrollIntoView?: boolean;
+  addSpace?: boolean;
 };
 
 ProgressList.Item = function ProgressListItem({
@@ -42,6 +43,7 @@ ProgressList.Item = function ProgressListItem({
   children,
   id,
   scrollIntoView,
+  addSpace = false,
 }: ProgressListItemProps) {
   const ref = React.useRef<HTMLLIElement>(null);
 
@@ -57,7 +59,7 @@ ProgressList.Item = function ProgressListItem({
     <li
       ref={ref}
       id={id}
-      className={cn(cls.item, { active: active }, status, { disabled: disabled })}
+      className={cn(cls.item, { active: active }, status, { disabled: disabled }, addSpace && cls.addSpace)}
       aria-current={active ? "step" : false}
     >
       <aside>

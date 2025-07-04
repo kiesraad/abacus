@@ -28,7 +28,7 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
       onPaste={onPaste}
       onFocus={onFocus}
       onBlur={onBlur(props.onChange)}
-      onKeyDown={onKeyDown}
+      onInput={onInput}
       id={id}
       name={props.name || id}
     />
@@ -49,6 +49,7 @@ function onFocus(event: React.FocusEvent<HTMLInputElement>) {
     input.setSelectionRange(0, event.currentTarget.value.length);
   }
 }
+
 //format number on blur and call onChange if provided
 function onBlur(onChange?: React.ChangeEventHandler<HTMLInputElement>) {
   return function (event: React.FocusEvent<HTMLInputElement>) {
@@ -66,69 +67,7 @@ function onBlur(onChange?: React.ChangeEventHandler<HTMLInputElement>) {
 }
 
 //only accept numbers
-function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-  //allow keyboard shortcuts and navigation (e.g. copy and paste, select all, arrow keys)
-  if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) {
-    return;
-  }
-  if (event.key.length === 1 && isNaN(parseInt(event.key))) {
-    event.preventDefault();
-  }
+function onInput(event: React.FormEvent<HTMLInputElement>) {
+  const input = event.currentTarget;
+  input.value = input.value.replace(/[^0-9]/g, "");
 }
-
-/**
- Archived for potential future use
-
-function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-  let caretPosition = event.target.selectionStart;
-  const inputValue = event.target.value;
-  const newValue = formatNumber(inputValue);
-
-  if (caretPosition) {
-    caretPosition += newValue.length - inputValue.length;
-  }
-  event.target.value = formatNumber(event.target.value);
-  //restore caret position
-  event.target.setSelectionRange(caretPosition, caretPosition);
-}
-
-function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-  if (event.key !== "Delete" && event.key !== "Backspace" && event.key !== "ArrowLeft" && event.key !== "ArrowRight")
-    return;
-  const inputValue = event.currentTarget.value;
-  let caretPosition = event.currentTarget.selectionStart || 0;
-  let selectionEnd = event.currentTarget.selectionEnd || caretPosition;
-
-  if (event.key === "Backspace") {
-    if (inputValue.charAt(caretPosition - 1) === ".") {
-      //remove an extra char
-      event.currentTarget.setSelectionRange(caretPosition - 1, caretPosition - 1);
-    }
-  } else if (event.key === "Delete") {
-    if (inputValue.charAt(caretPosition) === ".") {
-      //remove an extra char
-      event.currentTarget.setSelectionRange(caretPosition + 1, caretPosition + 1);
-    }
-
-    // ArrowLeft and ArrowRight selection
-  } else {
-    console.log("S:", caretPosition, "E:", selectionEnd);
-    if (event.key === "ArrowLeft") {
-      if (inputValue.charAt(caretPosition - 1) === ".") {
-        caretPosition -= 1;
-      }
-      //event.key === ArrowRight
-    } else {
-      if (inputValue.charAt(selectionEnd) === ".") {
-        selectionEnd += 1;
-      }
-    }
-
-    if (event.shiftKey) {
-      event.currentTarget.setSelectionRange(caretPosition, selectionEnd);
-    } else {
-      event.currentTarget.setSelectionRange(caretPosition, caretPosition);
-    }
-  }
-}
- */

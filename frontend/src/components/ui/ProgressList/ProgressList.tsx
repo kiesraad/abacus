@@ -46,7 +46,7 @@ ProgressList.Item = function ProgressListItem({
 
   React.useEffect(() => {
     if (scrollIntoView && active) {
-      liRef.current?.scrollIntoView();
+      liRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
     }
   }, [scrollIntoView, active]);
 

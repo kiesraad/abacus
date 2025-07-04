@@ -4,9 +4,9 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
-use strum::VariantNames;
 use utoipa::ToSchema;
 
+use super::status::CommitteeSessionStatus;
 use crate::audit_log::CommitteeSessionDetails;
 
 /// Committee session
@@ -60,30 +60,4 @@ pub struct CommitteeSessionUpdateRequest {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
 pub struct CommitteeSessionStatusChangeRequest {
     pub status: CommitteeSessionStatus,
-}
-
-/// Committee session status
-#[derive(
-    Serialize,
-    Deserialize,
-    VariantNames,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    Hash,
-    ToSchema,
-    Type,
-    strum::Display,
-)]
-#[serde(rename_all = "snake_case")]
-#[strum(serialize_all = "snake_case")]
-#[sqlx(rename_all = "snake_case")]
-pub enum CommitteeSessionStatus {
-    Created,
-    DataEntryNotStarted,
-    DataEntryInProgress,
-    DataEntryPaused,
-    DataEntryFinished,
 }

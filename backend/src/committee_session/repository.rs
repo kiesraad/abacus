@@ -2,8 +2,8 @@ use axum::extract::FromRef;
 use sqlx::{Error, SqlitePool, query_as};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatus,
-    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
+    status::CommitteeSessionStatus,
 };
 
 use crate::AppState;

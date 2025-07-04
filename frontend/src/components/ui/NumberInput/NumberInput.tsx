@@ -4,7 +4,10 @@ import { deformatNumber, formatNumber, validateNumberString } from "@/utils/form
 
 export type NumberInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
-export function NumberInput({ id, ...inputProps }: NumberInputProps) {
+export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(function NumberInput(
+  { id, ...inputProps },
+  ref,
+) {
   const props = {
     className: "font-number",
     maxLength: 9,
@@ -31,9 +34,10 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
       onKeyDown={onKeyDown}
       id={id}
       name={props.name || id}
+      ref={ref}
     />
   );
-}
+});
 
 //deformat number on focus
 function onFocus(event: React.FocusEvent<HTMLInputElement>) {

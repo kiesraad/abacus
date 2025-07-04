@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-export class CheckDefinitionPgObj {
+export class CheckElectionDefinitionPgObj {
   readonly header: Locator;
   readonly hashInput1: Locator;
   readonly hashInput2: Locator;

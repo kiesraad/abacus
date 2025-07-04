@@ -6,9 +6,12 @@ import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 
+import { ElectionInformationTable } from "./ElectionInformationTable";
+import cls from "./ElectionManagement.module.css";
+
 export function ElectionHomePage() {
   const { isTypist } = useUserRole();
-  const { election } = useElection();
+  const { election, pollingStations } = useElection();
 
   if (isTypist) {
     return <Navigate to="data-entry" />;
@@ -24,13 +27,16 @@ export function ElectionHomePage() {
       </header>
       <main>
         <article>
+          <div className="mb-lg">
+            <div>
+              <h2 className={cls.tableTitle}>{t("election_management.about_this_election")}</h2>
+              <ElectionInformationTable election={election} numberOfPollingStations={pollingStations.length} />
+            </div>
+          </div>
           <ul id="election-pages">
             <li>
               {t("coordinator")}:
               <ul>
-                <li>
-                  <Link to={`polling-stations`}>{t("polling_station.title.plural")}</Link>
-                </li>
                 <li>
                   <Link to={`status`}>{t("election_status.main_title")}</Link>
                 </li>
@@ -38,9 +44,6 @@ export function ElectionHomePage() {
                   <Link to={`apportionment`}>{t("apportionment.title")}</Link>
                 </li>
               </ul>
-            </li>
-            <li>
-              <Link to={`polling-stations`}>{t("polling_station.title.plural")}</Link>
             </li>
           </ul>
         </article>

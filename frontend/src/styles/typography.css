@@ -148,3 +148,9 @@ a {
   font-family: var(--font-number);
   font-feature-settings: "ss09" on;
 }
+
+/* Link styling */
+.underlined {
+  text-decoration: underline;
+  color: var(--link-default);
+}

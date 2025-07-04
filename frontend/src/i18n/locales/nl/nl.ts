@@ -7,6 +7,7 @@ import committee_session_status from "./committee_session_status.json";
 import data_entry from "./data_entry.json";
 import differences_counts from "./differences_counts.json";
 import election from "./election.json";
+import election_management from "./election_management.json";
 import election_report from "./election_report.json";
 import election_status from "./election_status.json";
 import error from "./error.json";
@@ -37,6 +38,7 @@ const nl = {
   data_entry,
   differences_counts,
   election,
+  election_management,
   election_report,
   election_status,
   error,

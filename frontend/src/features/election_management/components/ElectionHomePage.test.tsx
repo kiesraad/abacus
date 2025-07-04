@@ -14,7 +14,7 @@ describe("ElectionHomePage", () => {
     server.use(ElectionRequestHandler);
   });
 
-  test("Shows button", async () => {
+  test("Shows election information table", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [],
     });
@@ -31,13 +31,26 @@ describe("ElectionHomePage", () => {
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Over deze verkiezing" })).toBeVisible();
+    const election_information_table = await screen.findByTestId("election-information-table");
+    expect(election_information_table).toBeVisible();
+    expect(election_information_table).toHaveTableContent([
+      ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
+      ["Kiesgebied", ""],
+      ["Lijsten en kandidaten", ""],
+      ["Aantal kiesgerechtigden", "100"],
+      ["Invoer doen voor", ""],
+      ["Stembureaus", "5 stembureaus"],
+      ["Type stemopneming", ""],
+    ]);
+
     const list = await screen.findByTestId("election-pages");
     expect(list).toBeVisible();
-    expect(list.childElementCount).toBe(2);
+    expect(list.childElementCount).toBe(1);
     expect(list.children[0]).toHaveTextContent("Coördinator:");
-    expect(list.children[0]?.children[0]?.childElementCount).toBe(3);
-    expect(list.children[0]?.children[0]?.children[0]).toHaveTextContent("Stembureaus");
-    expect(list.children[0]?.children[0]?.children[1]).toHaveTextContent("Statusoverzicht");
-    expect(list.children[0]?.children[0]?.children[2]).toHaveTextContent("Zetelverdeling");
+    expect(list.children[0]?.children[0]?.childElementCount).toBe(2);
+    expect(list.children[0]?.children[0]?.children[0]).toHaveTextContent("Statusoverzicht");
+    expect(list.children[0]?.children[0]?.children[1]).toHaveTextContent("Zetelverdeling");
   });
 });

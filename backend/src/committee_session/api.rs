@@ -9,16 +9,27 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatus,
-    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-    repository::CommitteeSessions,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatusChangeRequest,
+    CommitteeSessionUpdateRequest, repository::CommitteeSessions,
 };
+use crate::committee_session::status::{CommitteeSessionStatus, CommitteeSessionTransitionError};
+use crate::error::ErrorReference;
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{AdminOrCoordinator, Coordinator},
     election::repository::Elections,
 };
+
+impl From<CommitteeSessionTransitionError> for APIError {
+    fn from(err: CommitteeSessionTransitionError) -> Self {
+        match err {
+            CommitteeSessionTransitionError::Invalid => {
+                APIError::Conflict(err.to_string(), ErrorReference::InvalidStateTransition)
+            }
+        }
+    }
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -158,11 +169,17 @@ pub async fn committee_session_status_change(
 ) -> Result<StatusCode, APIError> {
     let committee_session = committee_sessions_repo.get(committee_session_id).await?;
     let new_status = match committee_session_request.status {
-        CommitteeSessionStatus::Created => committee_session.prepare_for_data_entry?,
-        CommitteeSessionStatus::DataEntryNotStarted => committee_session.ready_for_data_entry?,
-        CommitteeSessionStatus::DataEntryInProgress => committee_session.start_data_entry?,
-        CommitteeSessionStatus::DataEntryPaused => committee_session.pause_data_entry?,
-        CommitteeSessionStatus::DataEntryFinished => committee_session.finish_data_entry?,
+        CommitteeSessionStatus::Created => committee_session.status.prepare_data_entry()?,
+        CommitteeSessionStatus::DataEntryNotStarted => {
+            committee_session.status.ready_for_data_entry()?
+        }
+        CommitteeSessionStatus::DataEntryInProgress => {
+            committee_session.status.start_data_entry()?
+        }
+        CommitteeSessionStatus::DataEntryPaused => committee_session.status.pause_data_entry()?,
+        CommitteeSessionStatus::DataEntryFinished => {
+            committee_session.status.finish_data_entry()?
+        }
     };
 
     let committee_session = committee_sessions_repo

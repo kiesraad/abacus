@@ -33,6 +33,8 @@ export function DataEntrySection() {
     showAcceptErrorsAndWarnings,
     sectionId,
   } = useDataEntryFormSection();
+  const acceptCheckboxRef = React.useRef<HTMLInputElement>(null);
+
   const section = dataEntryStructure.find((s) => s.id === sectionId);
 
   if (!section) {
@@ -59,6 +61,16 @@ export function DataEntrySection() {
     [formSection.errors],
   );
   const memoizedWarningCodes = React.useMemo(() => formSection.warnings.getCodes(), [formSection.warnings]);
+
+  // Scroll unaccepted warnings/errors checkbox into view when error for it is triggered
+  React.useEffect(() => {
+    if (formSection.acceptErrorsAndWarningsError) {
+      acceptCheckboxRef.current?.focus();
+      requestAnimationFrame(() => {
+        acceptCheckboxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
+  }, [formSection.acceptErrorsAndWarningsError]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -112,6 +124,7 @@ export function DataEntrySection() {
           <BottomBar.Row>
             <Checkbox
               id={"acceptWarningsCheckbox"}
+              ref={acceptCheckboxRef}
               checked={formSection.acceptErrorsAndWarnings}
               hasError={formSection.acceptErrorsAndWarningsError}
               onChange={(e) => {

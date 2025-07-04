@@ -12,20 +12,19 @@ export function StickyNav({ children }: StickyNavProps) {
   React.useEffect(() => {
     const nav = navRef.current;
     if (nav) {
-      const setMaxHeight = () => {
+      const updateTopOffset = () => {
         const navTop = nav.getBoundingClientRect().top;
-        const maxHeight = window.innerHeight - navTop - 1;
-        nav.style.maxHeight = `${maxHeight}px`;
+        nav.style.setProperty("--sticky-nav-top-offset", `${navTop}px`);
       };
 
-      window.addEventListener("resize", setMaxHeight);
-      window.addEventListener("scroll", setMaxHeight);
+      window.addEventListener("resize", updateTopOffset);
+      window.addEventListener("scroll", updateTopOffset);
 
-      setMaxHeight();
+      updateTopOffset();
 
       return () => {
-        window.removeEventListener("scroll", setMaxHeight);
-        window.removeEventListener("resize", setMaxHeight);
+        window.removeEventListener("scroll", updateTopOffset);
+        window.removeEventListener("resize", updateTopOffset);
       };
     }
   }, []);

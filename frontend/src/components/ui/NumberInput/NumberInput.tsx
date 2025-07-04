@@ -1,10 +1,30 @@
 import * as React from "react";
 
+import { IconWarningSquare } from "@/components/generated/icons";
+import { tx } from "@/i18n/translate";
 import { deformatNumber, formatNumber, validateNumberString } from "@/utils/format";
+
+import { Icon } from "../Icon/Icon";
+import { Tooltip } from "../Tooltip/Tooltip";
+
+function ellipsis(text: string, maxLength: number = 20): string {
+  // Normalize whitespace: replace newlines and multiple spaces with single spaces
+  // (newlines are converted to line breaks in the i18n code)
+  const normalizedText = text.replace(/\s+/g, " ").trim();
+
+  if (normalizedText.length <= maxLength) {
+    return normalizedText;
+  }
+
+  return normalizedText.substring(0, maxLength - 3) + "...";
+}
 
 export type NumberInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 export function NumberInput({ id, ...inputProps }: NumberInputProps) {
+  const [tooltipInvalidValue, setTooltipInvalidValue] = React.useState<string | null>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
   const props = {
     className: "font-number",
     maxLength: 9,
@@ -14,24 +34,38 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
     type: "text",
   };
 
+  const hideTooltip = React.useCallback(() => {
+    setTooltipInvalidValue(null);
+  }, []);
+
   const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback((event) => {
     const pastedInput = event.clipboardData.getData("text/plain");
     if (!validateNumberString(pastedInput)) {
       event.preventDefault();
-      //TODO: show tooltip
+      setTooltipInvalidValue(pastedInput);
     }
   }, []);
 
+  const tooltipContent = tooltipInvalidValue ? (
+    <div className="tooltip-content">
+      <Icon color="warning" icon={<IconWarningSquare />} />
+      <span>{tx("invalid_paste_content", undefined, { value: ellipsis(tooltipInvalidValue) })}</span>
+    </div>
+  ) : null;
+
   return (
-    <input
-      {...props}
-      onPaste={onPaste}
-      onFocus={onFocus}
-      onBlur={onBlur(props.onChange)}
-      onInput={onInput}
-      id={id}
-      name={props.name || id}
-    />
+    <Tooltip content={tooltipContent} onClose={hideTooltip}>
+      <input
+        {...props}
+        ref={inputRef}
+        onPaste={onPaste}
+        onFocus={onFocus}
+        onBlur={onBlur(props.onChange)}
+        onInput={onInput}
+        id={id}
+        name={props.name || id}
+      />
+    </Tooltip>
   );
 }
 

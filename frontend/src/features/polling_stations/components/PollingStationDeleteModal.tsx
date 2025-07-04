@@ -3,28 +3,29 @@ import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
+import { PollingStation } from "@/types/generated/openapi";
 
 export interface PollingStationDeleteModalProps {
   electionId: number;
-  pollingStationId: number;
-  onDeleted: () => void;
+  pollingStation: PollingStation;
+  onDeleted: (pollingStation: PollingStation) => void;
   onError: () => void;
   onCancel: () => void;
 }
 
 export function PollingStationDeleteModal({
   electionId,
-  pollingStationId,
+  pollingStation,
   onDeleted,
   onCancel,
   onError,
 }: PollingStationDeleteModalProps) {
-  const { remove, requestState } = useCrud(`/api/elections/${electionId}/polling_stations/${pollingStationId}`);
+  const { remove, requestState } = useCrud(`/api/elections/${electionId}/polling_stations/${pollingStation.id}`);
 
   function handleDelete() {
     void remove().then((result) => {
       if (isSuccess(result)) {
-        onDeleted();
+        onDeleted(pollingStation);
       } else {
         onError();
       }

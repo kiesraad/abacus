@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 import { CommitteeSessionStatus } from "@/types/generated/openapi";
 
-import { CommitteeSessionStatusWithIcon, HeaderCommitteeSessionStatusWithIcon } from "./CommitteeSessionStatusWithIcon";
+import { CommitteeSessionStatusWithIcon, HeaderCommitteeSessionStatusWithIcon } from "./CommitteeSessionStatus";
 
 type Scenario = [CommitteeSessionStatus, "coordinator" | "typist", string, string];
 

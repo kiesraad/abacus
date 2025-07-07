@@ -4,10 +4,12 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import cls from "@/features/resolve_differences/components/ResolveDifferences.module.css";
+import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
+  ElectionCommitteeSessionListRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
@@ -35,9 +37,11 @@ const renderPage = async () => {
     <TestUserProvider userRole="coordinator">
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <UsersProvider>
-            <ResolveDifferencesPage />
-          </UsersProvider>
+          <CommitteeSessionListProvider electionId={1}>
+            <UsersProvider>
+              <ResolveDifferencesPage />
+            </UsersProvider>
+          </CommitteeSessionListProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
@@ -55,6 +59,7 @@ describe("ResolveDifferencesPage", () => {
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
+      ElectionCommitteeSessionListRequestHandler,
       PollingStationDataEntryGetDifferencesHandler,
       PollingStationDataEntryResolveDifferencesHandler,
       UserListRequestHandler,

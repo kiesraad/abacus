@@ -2,13 +2,18 @@ import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
+import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { useUser } from "@/hooks/user/useUser";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import {
+  ElectionCommitteeSessionListRequestHandler,
+  ElectionRequestHandler,
+  ElectionStatusRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
 import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
@@ -21,7 +26,9 @@ async function renderPollingStationChoiceForm() {
   const router = renderReturningRouter(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
-        <PollingStationChoiceForm />
+        <CommitteeSessionListProvider electionId={1}>
+          <PollingStationChoiceForm />
+        </CommitteeSessionListProvider>
       </ElectionStatusProvider>
     </ElectionProvider>,
   );
@@ -42,7 +49,7 @@ describe("Test PollingStationChoiceForm", () => {
   beforeEach(() => {
     // mock a current logged in user
     (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
-    server.use(ElectionStatusRequestHandler);
+    server.use(ElectionStatusRequestHandler, ElectionCommitteeSessionListRequestHandler);
   });
 
   describe("Polling station choice form", () => {

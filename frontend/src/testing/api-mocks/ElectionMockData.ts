@@ -253,7 +253,7 @@ export const electionListMockResponse: ElectionListResponse = {
       name: "Gemeenteraadsverkiezingen 2026",
       election_id: "Heemdamseburg_2024",
       location: "Heemdamseburg",
-      domain_id: "0000",
+      domain_id: "0035",
       number_of_voters: 100,
       category: "Municipal",
       number_of_seats: 29,

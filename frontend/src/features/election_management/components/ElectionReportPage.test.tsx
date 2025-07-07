@@ -2,9 +2,13 @@ import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import {
+  ElectionCommitteeSessionListRequestHandler,
+  ElectionRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
@@ -14,7 +18,7 @@ import { ElectionReportPage } from "./ElectionReportPage";
 
 describe("ElectionReportPage", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler);
+    server.use(ElectionRequestHandler, ElectionCommitteeSessionListRequestHandler);
   });
 
   test("Error when election is not ready", async () => {
@@ -60,7 +64,9 @@ describe("ElectionReportPage", () => {
     render(
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <ElectionReportPage />
+          <CommitteeSessionListProvider electionId={1}>
+            <ElectionReportPage />
+          </CommitteeSessionListProvider>
         </ElectionStatusProvider>
       </ElectionProvider>,
     );

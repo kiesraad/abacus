@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import {
+  ElectionCommitteeSessionListRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
@@ -26,7 +28,9 @@ const renderSectionPage = () => {
     <TestUserProvider userRole="coordinator">
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <ResolveErrorsSectionPage />
+          <CommitteeSessionListProvider electionId={1}>
+            <ResolveErrorsSectionPage />
+          </CommitteeSessionListProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
@@ -39,6 +43,7 @@ describe("ResolveErrorsSectionPage", () => {
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
+      ElectionCommitteeSessionListRequestHandler,
       PollingStationDataEntryGetErrorsHandler,
     );
   });

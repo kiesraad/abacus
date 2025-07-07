@@ -7,9 +7,9 @@ The transition labels describe the action/situation that is used for performing 
 stateDiagram-v2
   [*] --> Created
   Created --> DataEntryNotStarted: add a polling station
-  DataEntryNotStarted --> Created: delete all polling stations
+  DataEntryNotStarted --> Created: delete last polling station
   DataEntryNotStarted --> DataEntryInProgress: click start data entry
-  DataEntryInProgress --> Created: delete all polling stations*
+  DataEntryInProgress --> Created: delete last polling station*
   DataEntryInProgress --> DataEntryFinished: all polling station <br/> data entries are complete <br/> without errors or differences
   DataEntryInProgress --> DataEntryPaused: click pause data entry
   DataEntryPaused --> DataEntryInProgress: click continue data entry
@@ -17,4 +17,4 @@ stateDiagram-v2
   DataEntryFinished --> [*]
 ```
 
-* currently it's only possible to delete polling stations that do not have a data entry in progress
+* currently it's only possible to delete polling stations that do not have a data entry

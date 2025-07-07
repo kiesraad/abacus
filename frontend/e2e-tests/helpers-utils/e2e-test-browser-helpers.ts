@@ -10,7 +10,6 @@ import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/c
 import { CheckDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
-import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
 
 import { PollingStation, PollingStationResults } from "@/types/generated/openapi";
 
@@ -82,14 +81,12 @@ export async function fillDataEntryPagesAndSave(page: Page, results: PollingStat
 }
 
 export async function uploadElectionAndInputHash(page: Page) {
-  const overviewPage = new OverviewPgObj(page);
-
   // Upload election
   const uploadDefinitionPage = new UploadDefinitionPgObj(page);
   await expect(uploadDefinitionPage.header).toBeVisible();
   await uploadDefinitionPage.uploadFile(page, eml110a.path);
-  await expect(overviewPage.main).toContainText(eml110a.filename);
-  await expect(overviewPage.main).toContainText(eml110a.electionDate);
+  await expect(uploadDefinitionPage.main).toContainText(eml110a.filename);
+  await expect(uploadDefinitionPage.main).toContainText(eml110a.electionDate);
 
   // Process hash
   const checkDefinitionPage = new CheckDefinitionPgObj(page);
@@ -98,14 +95,12 @@ export async function uploadElectionAndInputHash(page: Page) {
 }
 
 export async function uploadCandidatesAndInputHash(page: Page) {
-  const overviewPage = new OverviewPgObj(page);
-
   // Candidate page
   const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
   await expect(uploadCandidateDefinitionPage.header).toBeVisible();
   await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
-  await expect(overviewPage.main).toContainText(eml230b.filename);
-  await expect(overviewPage.main).toContainText(eml230b.electionDate);
+  await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b.filename);
+  await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b.electionDate);
 
   // Candidate check page
   const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);

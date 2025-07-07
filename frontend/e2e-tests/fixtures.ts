@@ -22,9 +22,9 @@ import {
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import {
   electionRequest,
-  emptyRequest,
   noRecountNoDifferencesRequest,
   pollingStationRequests,
+  requestWithError,
 } from "./test-data/request-response-templates";
 
 export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
@@ -139,7 +139,7 @@ export const test = base.extend<Fixtures>({
 
     const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
     await firstDataEntry.claim();
-    await firstDataEntry.save(emptyRequest);
+    await firstDataEntry.save(requestWithError);
     await firstDataEntry.finalise();
 
     await use(pollingStation);

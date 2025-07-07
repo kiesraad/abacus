@@ -1,8 +1,8 @@
-use axum::response::{IntoResponse, Response};
 use axum::{
     Json,
     extract::{Path, State},
     http::StatusCode,
+    response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -12,11 +12,11 @@ use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
     repository::CommitteeSessions,
 };
-use crate::election::repository::Elections;
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
+    election::repository::Elections,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -131,4 +131,26 @@ pub async fn committee_session_update(
         .await?;
 
     Ok(StatusCode::OK)
+}
+
+#[cfg(test)]
+pub mod tests {
+    use crate::committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
+    };
+    use sqlx::SqlitePool;
+
+    pub async fn create_committee_session(
+        pool: SqlitePool,
+        number: u32,
+        election_id: u32,
+    ) -> CommitteeSession {
+        CommitteeSessions::new(pool.clone())
+            .create(CommitteeSessionCreateRequest {
+                number,
+                election_id,
+            })
+            .await
+            .unwrap()
+    }
 }

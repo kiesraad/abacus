@@ -1,10 +1,10 @@
-import { useBlocker } from "react-router";
+import { useBlocker, useParams } from "react-router";
 
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUser } from "@/hooks/user/useUser";
 import { t, tx } from "@/i18n/translate";
-import { SectionValues } from "@/types/types";
+import { FormSectionId, SectionValues } from "@/types/types";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { SubmitCurrentFormOptions } from "../types/types";
@@ -26,6 +26,8 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
     onDeleteDataEntry,
     updateFormSection,
   } = useDataEntryContext();
+  const params = useParams<{ sectionId: FormSectionId }>();
+  const sectionId = params.sectionId ?? null;
   const user = useUser();
 
   // path check to see if the current location is part of the data entry flow
@@ -54,11 +56,11 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
       return true;
     }
 
-    const formSection = formState.sections[formState.current];
+    const formSection = sectionId ? formState.sections[sectionId] : null;
     if (formSection?.hasChanges) {
-      if (formState.current === formState.furthest) {
+      if (sectionId === formState.furthest) {
         setCache({
-          key: formState.current,
+          key: sectionId,
           data: currentValues,
         });
         return false;
@@ -79,9 +81,12 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
       blocker.reset();
     }
   };
+
   // when save is chosen in the abort dialog
   const onAbortModalSave = async () => {
-    if (await onSubmit({ aborting: true, continueToNextSection: false, showAcceptErrorsAndWarnings: false })) {
+    if (sectionId === "save") {
+      blocker.proceed();
+    } else if (await onSubmit({ aborting: true, continueToNextSection: false, showAcceptErrorsAndWarnings: false })) {
       blocker.proceed();
     } else {
       if (status === "aborted") {
@@ -93,14 +98,15 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
   };
 
   const onModalDoNoSave = () => {
-    updateFormSection({ hasChanges: false });
+    if (sectionId) {
+      updateFormSection(sectionId, { hasChanges: false });
+    }
     blocker.proceed();
   };
 
   // when unsaved changes are detected and navigating within the data entry flow
   if (isPartOfDataEntryFlow(blocker.location.pathname)) {
-    const title =
-      dataEntryStructure.find((s) => s.id === formState.current)?.title || t("polling_station.current_form");
+    const title = dataEntryStructure.find((s) => s.id === sectionId)?.title || t("polling_station.current_form");
     return (
       <Modal
         title={t("polling_station.unsaved_changes_title")}

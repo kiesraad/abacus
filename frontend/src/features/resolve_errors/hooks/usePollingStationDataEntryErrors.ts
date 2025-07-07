@@ -8,8 +8,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
   DataEntryGetErrorsResponse,
-  Election,
-  PoliticalGroup,
+  ElectionWithPoliticalGroups,
   POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH,
@@ -21,17 +20,14 @@ interface DataEntryErrors {
   action: ResolveErrorsAction | undefined;
   setAction: (action: ResolveErrorsAction | undefined) => void;
   pollingStation: PollingStation;
-  election: Election & { political_groups: PoliticalGroup[] };
+  election: ElectionWithPoliticalGroups;
   loading: boolean;
   dataEntry: DataEntryGetErrorsResponse | null;
-  onSubmit: () => Promise<void>;
+  onSubmit: (afterSave: (action: ResolveErrorsAction) => void) => Promise<void>;
   validationError: string | undefined;
 }
 
-export function usePollingStationDataEntryErrors(
-  pollingStationId: number,
-  afterSave: (action: ResolveErrorsAction) => void,
-): DataEntryErrors {
+export function usePollingStationDataEntryErrors(pollingStationId: number): DataEntryErrors {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
@@ -59,7 +55,7 @@ export function usePollingStationDataEntryErrors(
     throw requestState.error;
   }
 
-  const onSubmit = async () => {
+  const onSubmit = async (afterSave: (action: ResolveErrorsAction) => void) => {
     if (action === undefined) {
       setValidationError(t("resolve_differences.required_error"));
       return;

@@ -34,7 +34,7 @@ export function overrideServerClaimDataEntryResponse({
     "/api/polling_stations/1/data_entries/1/claim" satisfies POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
     200,
     {
-      client_state: getClientState(formState, false, continueToNextSection),
+      client_state: getClientState(formState, formState.furthest, false, continueToNextSection),
       data: {
         ...getInitialValues(),
         ...pollingStationResults,

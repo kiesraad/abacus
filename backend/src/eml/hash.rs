@@ -22,8 +22,8 @@ impl From<&[u8]> for EmlHash {
 
         while let (Some(b1), Some(b2)) = (iter.next(), iter.next()) {
             let mut chunk = String::new();
-            write!(&mut chunk, "{:02x}", b1).expect("Writing to a string cannot fail");
-            write!(&mut chunk, "{:02x}", b2).expect("Writing to a string cannot fail");
+            write!(&mut chunk, "{b1:02x}").expect("Writing to a string cannot fail");
+            write!(&mut chunk, "{b2:02x}").expect("Writing to a string cannot fail");
             chunks[chunk_counter] = chunk;
             chunk_counter += 1;
         }

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 
 import { ApiError } from "@/api/ApiResult";
 import { ErrorModal } from "@/components/error/ErrorModal";
@@ -14,6 +14,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
 import { FormSectionId } from "@/types/types";
 import { KeyboardKey, MenuStatus } from "@/types/ui";
+import { dottedCode } from "@/utils/ValidationResults";
 
 import { useDataEntryContext } from "../../hooks/useDataEntryContext";
 import { useFormKeyboardNavigation } from "../../hooks/useFormKeyboardNavigation";
@@ -38,7 +39,14 @@ export function CheckAndSaveForm() {
     onFinaliseDataEntry,
     pollingStationId,
     entryNumber,
-  } = useDataEntryContext("save");
+  } = useDataEntryContext();
+
+  const params = useParams<{ sectionId: FormSectionId }>();
+  const sectionId = params.sectionId ?? null;
+
+  if (sectionId !== "save") {
+    throw new Error(`CheckAndSaveForm can only be used with sectionId "save", not "${sectionId}"`);
+  }
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionId) => {
@@ -73,7 +81,7 @@ export function CheckAndSaveForm() {
 
   // save the current state, without finalising (for the abort dialog)
   const onSubmit = async (options?: SubmitCurrentFormOptions) => {
-    return await onSubmitForm({}, options);
+    return await onSubmitForm("save", {}, options);
   };
 
   // finalise the data entry and navigate away
@@ -94,9 +102,9 @@ export function CheckAndSaveForm() {
 
     const dataEntryStatus = await onFinaliseDataEntry();
     if (dataEntryStatus !== undefined) {
-      if (dataEntryStatus.status === "EntriesDifferent") {
+      if (dataEntryStatus.status === "entries_different") {
         await navigate(`/elections/${election.id}/data-entry#data-entry-different`);
-      } else if (dataEntryStatus.status === "FirstEntryHasErrors") {
+      } else if (dataEntryStatus.status === "first_entry_has_errors") {
         await navigate(`/elections/${election.id}/data-entry#data-entry-errors`);
       } else {
         await navigate(`/elections/${election.id}/data-entry#data-entry-${entryNumber}-saved`);
@@ -136,9 +144,7 @@ export function CheckAndSaveForm() {
                   {section.errors.getCodes().map((code) => {
                     return (
                       <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>
-                        <strong>
-                          {code[0]}.{code.slice(1)}
-                        </strong>
+                        <strong>{dottedCode(code)}</strong>
                         &nbsp;
                         {tx(`feedback.${code}.typist.title`)}
                       </StatusList.Item>
@@ -147,9 +153,7 @@ export function CheckAndSaveForm() {
                   {section.warnings.getCodes().map((code) => {
                     return (
                       <StatusList.Item key={code} status="warning" id={`section-error-${section.id}-${code}`}>
-                        <strong>
-                          {code[0]}.{code.slice(1)}
-                        </strong>
+                        <strong>{dottedCode(code)}</strong>
                         &nbsp;
                         {tx(`feedback.${code}.typist.title`)}
                       </StatusList.Item>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link } from "react-router";
+import { Link, useParams } from "react-router";
 
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useElection } from "@/hooks/election/useElection";
@@ -16,8 +16,9 @@ import { getUrlForFormSectionID } from "../utils/utils";
 export function DataEntryProgress() {
   const pollingStationId = useNumericParam("pollingStationId");
   const { election } = useElection();
-
   const { dataEntryStructure, formState, pollingStationResults, entryNumber } = useDataEntryContext();
+  const params = useParams<{ sectionId: FormSectionId }>();
+  const sectionId = params.sectionId ?? null;
 
   const menuStatusForFormSection = React.useCallback(
     (formSection?: FormSection): Exclude<MenuStatus, "active"> => {
@@ -64,7 +65,7 @@ export function DataEntryProgress() {
       const formSection = formState.sections[section.id];
       if (!formSection) return null;
 
-      const isActive = formState.current === section.id;
+      const isActive = sectionId === section.id;
       const canNavigate = !isActive && formSection.index <= currentIndex;
       const isDisabled = options.disabled ?? formSection.index > currentIndex;
 
@@ -87,7 +88,7 @@ export function DataEntryProgress() {
         </ProgressList.Item>
       );
     },
-    [formState, currentIndex, menuStatusForFormSection, election.id, pollingStationId, entryNumber],
+    [formState, currentIndex, sectionId, menuStatusForFormSection, election.id, pollingStationId, entryNumber],
   );
 
   // Separate sections into fixed and scrollable groups

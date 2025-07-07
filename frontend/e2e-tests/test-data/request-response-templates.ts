@@ -39,6 +39,27 @@ export const electionRequest: NewElection = {
         },
       ],
     },
+    {
+      number: 2,
+      name: "",
+      candidates: [
+        {
+          number: 1,
+          initials: "E.",
+          first_name: "Edgar",
+          last_name: "Fizz",
+          locality: "Utrecht",
+          gender: "Male",
+        },
+        {
+          number: 2,
+          initials: "H.",
+          first_name: "Hilde",
+          last_name: "Smit",
+          locality: "Rotterdam",
+        },
+      ],
+    },
   ],
 };
 
@@ -100,6 +121,20 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
           },
         ],
       },
+      {
+        number: 2,
+        total: 0,
+        candidate_votes: [
+          {
+            number: 1,
+            votes: 0,
+          },
+          {
+            number: 2,
+            votes: 0,
+          },
+        ],
+      },
     ],
   },
   client_state: null,
@@ -108,16 +143,16 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
 export const noRecountNoDifferencesDataEntry: PollingStationResults = {
   recounted: false,
   voters_counts: {
-    poll_card_count: 800,
+    poll_card_count: 803,
     proxy_certificate_count: 50,
-    voter_card_count: 75,
-    total_admitted_voters_count: 925,
+    voter_card_count: 76,
+    total_admitted_voters_count: 929,
   },
   votes_counts: {
-    votes_candidates_count: 890,
+    votes_candidates_count: 894,
     blank_votes_count: 20,
     invalid_votes_count: 15,
-    total_votes_cast_count: 925,
+    total_votes_cast_count: 929,
   },
   differences_counts: {
     more_ballots_count: 0,
@@ -143,27 +178,49 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
         },
       ],
     },
+    {
+      number: 2,
+      total: 4,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 3,
+        },
+        {
+          number: 2,
+          votes: 1,
+        },
+      ],
+    },
   ],
 };
 
 export const noRecountNoDifferencesRequest: DataEntry = {
-  progress: 80,
+  progress: 83,
   data: noRecountNoDifferencesDataEntry,
   client_state: {
-    furthest: "political_group_votes_1",
-    current: "political_group_votes_1",
+    furthest: "political_group_votes_2",
+    current: "political_group_votes_2",
     acceptedErrorsAndWarnings: [],
     continue: true,
   },
 };
 
-export const emptyRequest: DataEntry = {
-  progress: 80,
-  data: emptyDataEntryResponse.data!,
+export const requestWithError: DataEntry = {
+  progress: 83,
+  data: {
+    ...noRecountNoDifferencesDataEntry,
+    voters_counts: {
+      poll_card_count: 10800,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 925,
+    },
+  },
   client_state: {
-    furthest: "political_group_votes_1",
-    current: "political_group_votes_1",
-    acceptedErrorsAndWarnings: [],
+    furthest: "political_group_votes_2",
+    current: "political_group_votes_2",
+    acceptedErrorsAndWarnings: ["voters_votes_counts", "differences_counts"],
     continue: true,
   },
 };

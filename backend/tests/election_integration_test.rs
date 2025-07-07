@@ -1,10 +1,12 @@
 #![cfg(test)]
 
 use crate::{shared::create_result, utils::serve_api};
-use abacus::committee_session::CommitteeSessionStatus;
 #[cfg(feature = "dev-database")]
 use abacus::election::Election;
-use abacus::election::{ElectionDetailsResponse, ElectionListResponse};
+use abacus::{
+    committee_session::CommitteeSessionStatus,
+    election::{ElectionDetailsResponse, ElectionListResponse},
+};
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
@@ -12,7 +14,7 @@ use test_log::test;
 pub mod shared;
 pub mod utils;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "election_5", "users"))))]
 async fn test_election_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -28,6 +30,12 @@ async fn test_election_list_works(pool: SqlitePool) {
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionListResponse = response.json().await.unwrap();
+    assert_eq!(body.committee_sessions.len(), 2);
+    assert_eq!(body.committee_sessions[1].number, 2);
+    assert_eq!(
+        body.committee_sessions[1].status,
+        CommitteeSessionStatus::Created
+    );
     assert_eq!(body.elections.len(), 2);
 }
 

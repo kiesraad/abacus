@@ -2,27 +2,27 @@
 <EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" Id="230b" SchemaVersion="5">
   <TransactionId>1</TransactionId>
   <ManagingAuthority>
-    <AuthorityIdentifier Id="CSB">Centraal stembureau Heemdamseburg</AuthorityIdentifier>
+    <AuthorityIdentifier Id="0363">Amsterdam</AuthorityIdentifier>
     <AuthorityAddress/>
   </ManagingAuthority>
-  <IssueDate>2022-02-03</IssueDate>
-  <kr:CreationDateTime>2022-02-03T15:16:47.122</kr:CreationDateTime>
+  <IssueDate>2022-02-04</IssueDate>
+  <kr:CreationDateTime>2022-02-04T11:16:26.827</kr:CreationDateTime>
   <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
   <CandidateList>
     <Election>
-      <ElectionIdentifier Id="GR2024_Heemdamseburg">
-        <ElectionName>Gemeenteraad Heemdamseburg 2022</ElectionName>
+      <ElectionIdentifier Id="GR2022_Amsterdam">
+        <ElectionName>Gemeenteraad Amsterdam 2022</ElectionName>
         <ElectionCategory>GR</ElectionCategory>
-        <kr:ElectionSubcategory>GR1</kr:ElectionSubcategory>
-        <kr:ElectionDomain Id="9876">Heemdamseburg</kr:ElectionDomain>
+        <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
+        <kr:ElectionDomain Id="0363">Amsterdam</kr:ElectionDomain>
         <kr:ElectionDate>2022-03-16</kr:ElectionDate>
-        <kr:NominationDate>2022-01-31</kr:NominationDate>
+         <kr:NominationDate>2022-01-31</kr:NominationDate>
       </ElectionIdentifier>
       <Contest>
         <ContestIdentifier Id="geen"/>
         <Affiliation>
           <AffiliationIdentifier Id="1">
-            <RegisteredName>Heemdamsenaren</RegisteredName>
+            <RegisteredName>GROENLINKS</RegisteredName>
           </AffiliationIdentifier>
           <Type>op zichzelf staande lijst</Type>
           <kr:ListData PublicationLanguage="nl" PublishGender="true"/>
@@ -297,9 +297,10 @@
             </QualifyingAddress>
           </Candidate>
         </Affiliation>
+
         <Affiliation>
           <AffiliationIdentifier Id="3">
-            <RegisteredName>Heemse Dammers</RegisteredName>
+            <RegisteredName>D66</RegisteredName>
           </AffiliationIdentifier>
           <Type>op zichzelf staande lijst</Type>
           <kr:ListData PublicationLanguage="nl" PublishGender="true"/>
@@ -336,6 +337,7 @@
             </QualifyingAddress>
           </Candidate>
         </Affiliation>
+
       </Contest>
     </Election>
   </CandidateList>

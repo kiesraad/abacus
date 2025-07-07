@@ -16,7 +16,9 @@ export function ElectionListProvider({ children }: ElectionListProviderProps) {
     <RequestStateHandler
       requestState={requestState}
       renderOnSuccess={(data) => (
-        <ElectionListProviderContext.Provider value={{ electionList: data.elections, refetch }}>
+        <ElectionListProviderContext.Provider
+          value={{ committeeSessionList: data.committee_sessions, electionList: data.elections, refetch }}
+        >
           {children}
         </ElectionListProviderContext.Provider>
       )}

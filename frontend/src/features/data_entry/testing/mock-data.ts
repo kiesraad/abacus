@@ -70,7 +70,6 @@ export function getDefaultDataEntryState(): DataEntryState {
     entryNumber: 1,
     dataEntryStructure: getDataEntryStructure(electionMockData),
     formState: {
-      current: "recounted",
       furthest: "recounted",
       sections: {
         recounted: getDefaultFormSection("recounted", 1),
@@ -112,7 +111,6 @@ export function getDefaultDataEntryStateAndActionsLoaded(): DataEntryStateAndAct
     onSubmitForm: () => Promise.resolve(true),
     onDeleteDataEntry: () => Promise.resolve(true),
     onFinaliseDataEntry: () => Promise.resolve(undefined),
-    register: () => null,
     setCache: () => null,
     updateFormSection: () => null,
     pollingStationResults: getInitialValues(),

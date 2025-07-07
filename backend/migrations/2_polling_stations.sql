@@ -12,4 +12,4 @@ CREATE TABLE polling_stations
 
     FOREIGN KEY (election_id) REFERENCES elections (id),
     CONSTRAINT number UNIQUE (election_id, number)
-);
+) STRICT;

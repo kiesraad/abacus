@@ -13,12 +13,13 @@ use super::{
     repository::Elections,
     structs::{Election, ElectionWithPoliticalGroups},
 };
-use crate::committee_session::CommitteeSession;
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{Admin, User},
-    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
+    },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{PollingStation, repository::PollingStations},
 };
@@ -38,9 +39,11 @@ pub fn router() -> OpenApiRouter<AppState> {
 
 /// Election list response
 ///
+/// Also includes a list of the current committee session for each election.
 /// Does not include the candidate list (political groups) to keep the response size small.
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionListResponse {
+    pub committee_sessions: Vec<CommitteeSession>,
     pub elections: Vec<Election>,
 }
 
@@ -53,7 +56,8 @@ pub struct ElectionDetailsResponse {
     pub polling_stations: Vec<PollingStation>,
 }
 
-/// Get a list of all elections, without their candidate lists
+/// Get a list of all elections, without their candidate lists and
+/// a list of the current committee session for each election
 #[utoipa::path(
     get,
     path = "/api/elections",
@@ -65,10 +69,17 @@ pub struct ElectionDetailsResponse {
 )]
 pub async fn election_list(
     _user: User,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     State(elections_repo): State<Elections>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
     let elections = elections_repo.list().await?;
-    Ok(Json(ElectionListResponse { elections }))
+    let committee_sessions = committee_sessions_repo
+        .get_committee_session_for_each_election()
+        .await?;
+    Ok(Json(ElectionListResponse {
+        committee_sessions,
+        elections,
+    }))
 }
 
 /// Get election details including the election's candidate list (political groups),

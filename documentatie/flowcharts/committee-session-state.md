@@ -10,11 +10,13 @@ stateDiagram-v2
   DataEntryNotStarted --> Created: delete last polling station
   DataEntryNotStarted --> DataEntryInProgress: click start data entry
   DataEntryInProgress --> Created: delete last polling station*
-  DataEntryInProgress --> DataEntryFinished: all polling station <br/> data entries are complete <br/> without errors or differences
+  DataEntryInProgress --> DataEntryFinished: all polling stations <br/> have a result
   DataEntryInProgress --> DataEntryPaused: click pause data entry
   DataEntryPaused --> DataEntryInProgress: click continue data entry
+  DataEntryPaused --> Created: delete last polling station*
   DataEntryFinished --> DataEntryInProgress: add new polling station
   DataEntryFinished --> [*]
 ```
 
-* currently it's only possible to delete polling stations that do not have a data entry
+*currently it's only possible to delete polling stations that do not have a data entry,
+deleting data entries and results needs to be implemented after which the polling station can be deleted

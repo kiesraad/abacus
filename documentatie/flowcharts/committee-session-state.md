@@ -20,4 +20,4 @@ stateDiagram-v2
 ```
 
 *currently it's only possible to delete polling stations that do not have a data entry,
-deleting data entries and results needs to be implemented after which the polling station can be deleted
+deleting data entries and results needs to be implemented (see https://github.com/kiesraad/abacus-internal/issues/296) after which the polling station can be deleted

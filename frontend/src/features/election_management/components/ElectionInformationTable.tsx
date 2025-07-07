@@ -28,7 +28,9 @@ export function ElectionInformationTable({ election, numberOfPollingStations }: 
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.electoral_area")}
           </Table.HeaderCell>
-          <Table.Cell></Table.Cell>
+          <Table.Cell>
+            {election.domain_id} - {t("municipality")} {election.location}
+          </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">

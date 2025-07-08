@@ -415,7 +415,7 @@ describe("Election create pages", () => {
   });
 
   // TODO: Test all three buttons
-  test("That the confirmation modal close button closes the modal", async () => {
+  test("That the confirmation modal cancel button closes the modal", async () => {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
     const router = renderWithRouter();

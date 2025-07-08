@@ -191,7 +191,6 @@ exclude:
   - ".*/frontend/scripts/.*"
   - ".*/frontend/src/components/MockTest[.]tsx"
   - ".*/frontend/src/lib/icon/.*"
-  - ".*/[.]ladle.*"
   - ".*[.]d[.]ts"
   - ".*[.]config[.]ts"
 

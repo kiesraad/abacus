@@ -18,10 +18,6 @@
     "test:e2e": "cross-env LOCAL_CI=true RUST_LOG=tower_http-warning playwright test -c playwright.e2e.config.ts",
     "test:e2e-dev": "cross-env RUST_LOG=tower_http-warning playwright test -c playwright.e2e.config.ts",
     "test:e2e-ui": "cross-env LOCAL_CI=true playwright test -c playwright.e2e.config.ts --ui",
-    "test:ladle": "playwright test -c playwright.ladle.config.ts",
-    "test:ladle-ui": "playwright test -c playwright.ladle.config.ts --ui",
-    "ladle": "ladle serve",
-    "build:ladle": "ladle build",
     "start:msw": "cross-env API_MODE=mock vite",
     "gen:icons": "node scripts/gen_icons.js",
     "gen:openapi": "vite-node scripts/gen_openapi.ts",
@@ -41,7 +37,6 @@
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",
     "@eslint/js": "^9.30.1",
-    "@ladle/react": "^5.0.3",
     "@playwright/test": "^1.53.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",

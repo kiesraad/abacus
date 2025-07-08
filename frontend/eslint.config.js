@@ -26,7 +26,6 @@ export default tseslint.config(
   },
   {
     files: ["**/*.ts", "**/*.tsx"],
-    ignores: ["!.ladle/**"],
     extends: [
       eslint.configs.recommended,
       tseslint.configs.strictTypeChecked,
@@ -91,7 +90,6 @@ export default tseslint.config(
   },
   {
     files: ["**/*.js"],
-    ignores: ["!.ladle/**"],
     extends: [eslint.configs.recommended, importPlugin.flatConfigs.recommended],
     languageOptions: {
       ecmaVersion: 2020,
@@ -118,14 +116,6 @@ export default tseslint.config(
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "off",
       "@typescript-eslint/restrict-template-expressions": "off",
-    },
-  },
-  {
-    files: ["src/components/ui/**/*.e2e.ts"],
-    extends: [playwright.configs["flat/recommended"]],
-    rules: {
-      // Needed for Ladle, page.waitForSelector("[data-storyloaded]")
-      "playwright/no-wait-for-selector": "off",
     },
   },
 );

@@ -16,6 +16,8 @@ describe("LogsHomePage", () => {
   test("Show audit log events", async () => {
     render(<LogsHomePage />);
 
+    expect(await screen.findByRole("heading", { name: "Activiteitenlog" })).toBeVisible();
+
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
 
@@ -47,11 +49,16 @@ describe("LogsHomePage", () => {
   test("Show audit log event details", async () => {
     render(<LogsHomePage />);
 
+    const user = userEvent.setup();
+
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
 
-    const user = userEvent.setup();
-    const firstRow = (await screen.findAllByRole("row"))[1] as HTMLTableRowElement;
+    expect(await screen.findByRole("heading", { name: "Activiteitenlog" })).toBeVisible();
+
+    const firstRow = screen.getByRole("row", {
+      name: "24 11 mrt 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
+    });
     await user.click(firstRow);
 
     const list = (await screen.findAllByRole("list"))[0] as HTMLDataListElement;
@@ -89,6 +96,8 @@ describe("LogsHomePage", () => {
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
+
+    expect(await screen.findByRole("heading", { name: "Activiteitenlog" })).toBeVisible();
 
     const formattedDate = formatDateTime(new Date("2025-03-11T09:02:36Z"));
 

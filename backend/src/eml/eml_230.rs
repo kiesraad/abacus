@@ -194,19 +194,27 @@ impl EML230 {
                                                 CandidateGender::X => Gender::Unknown,
                                             },
                                         ),
-                                        qualifying_address: QualifyingAddress {
-                                            data: if let Some(country) = &candidate.country_code {
-                                                QualifyingAddressData::Country(Country {
-                                                    country_name_code: country.clone(),
-                                                    locality: Locality {
+                                        qualifying_address: if candidate.locality.trim().is_empty()
+                                        {
+                                            None
+                                        } else {
+                                            Some(QualifyingAddress {
+                                                data: if let Some(country) = &candidate.country_code
+                                                {
+                                                    QualifyingAddressData::Country(Country {
+                                                        country_name_code: country.clone(),
+                                                        locality: Locality {
+                                                            locality_name: candidate
+                                                                .locality
+                                                                .clone(),
+                                                        },
+                                                    })
+                                                } else {
+                                                    QualifyingAddressData::Locality(Locality {
                                                         locality_name: candidate.locality.clone(),
-                                                    },
-                                                })
-                                            } else {
-                                                QualifyingAddressData::Locality(Locality {
-                                                    locality_name: candidate.locality.clone(),
-                                                })
-                                            },
+                                                    })
+                                                },
+                                            })
                                         },
                                     })
                                     .collect(),
@@ -305,16 +313,39 @@ mod tests {
         assert_eq!(first_pg.candidates.len(), 12);
         let candidate = first_pg.candidates.first().unwrap();
         assert_eq!(
-            candidate.qualifying_address.locality_name(),
+            candidate
+                .qualifying_address
+                .as_ref()
+                .unwrap()
+                .locality_name(),
             "Heemdamseburg"
         );
-        assert_eq!(candidate.qualifying_address.country_name_code(), None);
+        assert_eq!(
+            candidate
+                .qualifying_address
+                .as_ref()
+                .unwrap()
+                .country_name_code(),
+            None
+        );
 
         let candidate = affiliations.get(1).unwrap().candidates.get(3).unwrap();
         assert_eq!(
             candidate.candidate_full_name.person_name.first_name,
             Some("Frédérique".into())
         );
+    }
+
+    #[test]
+    fn test_import_without_candidate_addresses() {
+        let data = include_str!("./tests/eml230b_test_without_addresses.eml.xml");
+        let doc = EML230::from_str(data).unwrap();
+        let affiliations = doc.affiliations();
+        assert_eq!(affiliations.len(), 3);
+        let first_pg = affiliations.first().unwrap();
+        assert_eq!(first_pg.candidates.len(), 12);
+        let candidate = first_pg.candidates.first().unwrap();
+        assert!(candidate.qualifying_address.is_none());
     }
 
     #[test]

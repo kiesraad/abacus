@@ -1,13 +1,21 @@
 .card {
   width: 25.33rem;
-  min-height: 16.5rem;
   background-color: var(--base-white);
   padding: 1.75rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
   align-items: flex-start;
-  align-self: stretch;
+  align-self: flex-start;
+}
+
+.labelStatusDateSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  p {
+    margin-bottom: 0;
+  }
 }
 
 .label {
@@ -16,4 +24,16 @@
 
 .date {
   color: var(--gray-600);
+}
+
+.buttonLinks {
+  font-size: var(--font-size-md);
+  td {
+    line-height: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+  }
+  td:last-child {
+    border-bottom: none;
+  }
 }

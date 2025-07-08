@@ -38,9 +38,13 @@ export function ElectionHomePage() {
               </h2>
             </div>
           </div>
-          <div className="mb-xl">
-            {committeeSessions.map((committeeSession) => (
-              <CommitteeSessionCard key={committeeSession.id} committeeSession={committeeSession} />
+          <div className={cn(cls.cards, "mb-xl")}>
+            {committeeSessions.map((committeeSession, index) => (
+              <CommitteeSessionCard
+                key={committeeSession.id}
+                committeeSession={committeeSession}
+                currentSession={index === 0}
+              />
             ))}
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>

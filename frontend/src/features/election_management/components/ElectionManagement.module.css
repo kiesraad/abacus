@@ -9,6 +9,11 @@
     margin-bottom: 1rem;
   }
 
+  div.cards {
+    display: flex;
+    gap: 2rem;
+  }
+
   div.line {
     border-bottom: 1px solid var(--gray-300);
   }

@@ -56,10 +56,11 @@ export function ElectionInformationTable({ election, numberOfPollingStations }: 
         </Table.Row>
         <Table.LinkRow key={election.id} to={`polling-stations`}>
           <Table.HeaderCell scope="row" className="normal">
-            {t("polling_stations")}
+            {t("polling_station.title.plural")}
           </Table.HeaderCell>
           <Table.Cell className="underlined">
-            {numberOfPollingStations} {t("polling_stations").toLowerCase()}
+            {numberOfPollingStations}{" "}
+            {t(`polling_station.title.${numberOfPollingStations === 1 ? "singular" : "plural"}`).toLowerCase()}
           </Table.Cell>
         </Table.LinkRow>
         <Table.Row>

@@ -174,7 +174,7 @@ test.describe("Election creation", () => {
     const abortModal = new AbortModalPgObj(page);
     await expect(abortModal.header).toBeVisible();
 
-    // Click cancel, assert we are still on the election create page
+    // Click close, assert we are still on the election create page
     await abortModal.closeButton.click();
     await expect(checkDefinitionPage.header).toBeVisible();
   });

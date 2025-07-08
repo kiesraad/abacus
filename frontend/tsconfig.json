@@ -24,6 +24,7 @@
     "types": ["node", "vite/client", "vitest/importMeta"]
   },
   "include": [
+    ".storybook/**/*",
     "src/**/*",
     "scripts/**/*",
     "playwright.e2e.config.ts",

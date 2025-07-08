@@ -62,6 +62,18 @@ npm run test:e2e-dev
 npx playwright show-report <path-to-unzipped-report-folder>
 ```
 
+### Component Development with Storybook
+
+```sh
+# Start Storybook development server
+npm run storybook
+
+# Run Storybook tests
+npm run test -- --project storybook
+```
+
+Storybook runs on [http://localhost:6006](http://localhost:6006) and provides an interactive component library for developing and testing UI components in isolation.
+
 ## Production build
 
 Prerequisites:

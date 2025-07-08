@@ -191,6 +191,7 @@ exclude:
   - ".*/frontend/scripts/.*"
   - ".*/frontend/src/components/MockTest[.]tsx"
   - ".*/frontend/src/lib/icon/.*"
+  - ".*/[.]storybook.*"
   - ".*[.]d[.]ts"
   - ".*[.]config[.]ts"
 

@@ -5,6 +5,7 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import storybook from "eslint-plugin-storybook";
 import { readdirSync } from "fs";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -22,7 +23,7 @@ const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: tr
 export default tseslint.config(
   {
     // global ignores
-    ignores: ["dist/**", "playwright-report/**", "eslint.config.js", "mockServiceWorker.js"],
+    ignores: ["dist/**", "playwright-report/**", "eslint.config.js", "mockServiceWorker.js", "vitest.shims.d.ts"],
   },
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -116,6 +117,19 @@ export default tseslint.config(
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "off",
       "@typescript-eslint/restrict-template-expressions": "off",
+    },
+  },
+  {
+    files: ["**/*.stories.tsx"],
+    extends: [storybook.configs["flat/recommended"]],
+    rules: {
+      "@typescript-eslint/no-unsafe-type-assertion": "off",
+    },
+  },
+  {
+    files: [".storybook/**/*.ts{,x}"],
+    rules: {
+      "@typescript-eslint/no-unsafe-type-assertion": "off",
     },
   },
 );

@@ -36,6 +36,8 @@ jobs:
         run: npm ci
       - name: Build with MSW
         run: npm run build:msw
+      - name: Build Storybook
+        run: npm run build:storybook
       - name: Deploy
         id: deploy
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3

@@ -19,7 +19,6 @@ pub struct PdfGenResult {
 pub(crate) mod tests {
     use chrono::Utc;
     use models::ModelNa31_2Input;
-    use test_log::test;
 
     use super::*;
     use crate::{
@@ -55,8 +54,8 @@ pub(crate) mod tests {
         polling_stations
     }
 
-    #[test]
-    fn it_generates_a_pdf() {
+    #[tokio::test]
+    async fn it_generates_a_pdf() {
         let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
             election: ElectionWithPoliticalGroups {
                 id: 1,
@@ -77,13 +76,14 @@ pub(crate) mod tests {
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),
         }))
+        .await
         .unwrap();
 
         assert!(!content.buffer.is_empty());
     }
 
-    #[test]
-    fn it_generates_a_pdf_with_polling_stations() {
+    #[tokio::test]
+    async fn it_generates_a_pdf_with_polling_stations() {
         let election = election_fixture(&[2, 3]);
         let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
             polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
@@ -93,6 +93,7 @@ pub(crate) mod tests {
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),
         }))
+        .await
         .unwrap();
 
         assert!(!content.buffer.is_empty());

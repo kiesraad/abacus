@@ -48,7 +48,7 @@ export function PollingStationListPage() {
   //TODO: Alert has some layout glitches
   return (
     <>
-      <PageTitle title={`${t("polling_stations")} - Abacus`} />
+      <PageTitle title={`${t("polling_station.title.plural")} - Abacus`} />
       <header>
         <section>
           <h1>{t("polling_station.title.plural")}</h1>

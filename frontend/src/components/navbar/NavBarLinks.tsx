@@ -59,7 +59,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
       {location.pathname.match(/^\/elections\/\d+\/polling-stations\/(create|\d+\/update)$/) && (
         <>
           <IconChevronRight />
-          <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_stations")}</Link>
+          <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
         </>
       )}
       {location.pathname.match(

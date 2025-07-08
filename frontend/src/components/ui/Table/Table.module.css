@@ -107,3 +107,47 @@
   /* Enable 'Tabular Figures' font feature for fixed-width numbers */
   font-feature-settings: "tnum" on;
 }
+
+/* Style list of button links */
+:global(.buttonLinks) {
+  font-size: var(--font-size-md);
+
+  /* Update row link styling */
+  tr.rowLink {
+    &:hover {
+      background: none;
+    }
+    /* General cell styling */
+    td {
+      line-height: 1.5rem;
+      height: 1.5rem;
+      padding: 0;
+    }
+    /* Cell with the chevron icon */
+    td:last-of-type {
+      padding-left: 0;
+      padding-right: 1.5rem;
+      background-position: center right 0;
+    }
+    /* Add bottom padding if not the last row and align chevron accordingly */
+    &:not(:last-child) {
+      td {
+        padding-bottom: 0.5rem;
+        background-position: bottom 0.5rem right 0;
+      }
+    }
+    /* Add top padding if not the first row and align chevron accordingly */
+    &:not(:first-child) {
+      td {
+        padding-top: 0.5rem;
+        background-position: top 0.5rem right 0;
+      }
+    }
+    /* Remove bottom border if last row */
+    &:last-child {
+      td {
+        border-bottom: none;
+      }
+    }
+  }
+}

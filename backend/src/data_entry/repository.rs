@@ -1,4 +1,5 @@
 use axum::extract::FromRef;
+use chrono::NaiveDateTime;
 use sqlx::{SqlitePool, query, query_as, types::Json};
 
 use super::{PollingStationDataEntry, PollingStationResults, status::DataEntryStatus};
@@ -20,18 +21,21 @@ impl PollingStationDataEntries {
     pub async fn get_row(
         &self,
         polling_station_id: u32,
+        committee_session_id: u32,
     ) -> Result<PollingStationDataEntry, sqlx::Error> {
         query_as!(
             PollingStationDataEntry,
             r#"
                 SELECT
                     polling_station_id AS "polling_station_id: u32",
+                    committee_session_id AS "committee_session_id: u32",
                     state AS "state: _",
                     updated_at AS "updated_at: _"
                 FROM polling_station_data_entries
-                WHERE polling_station_id = ?
+                WHERE polling_station_id = ? AND committee_session_id = ?
             "#,
             polling_station_id,
+            committee_session_id
         )
         .fetch_one(&self.0)
         .await
@@ -39,8 +43,12 @@ impl PollingStationDataEntries {
 
     /// Get a data entry or return an error if there is no data entry for the
     /// given polling station id
-    pub async fn get(&self, polling_station_id: u32) -> Result<DataEntryStatus, sqlx::Error> {
-        self.get_row(polling_station_id)
+    pub async fn get(
+        &self,
+        polling_station_id: u32,
+        committee_session_id: u32,
+    ) -> Result<DataEntryStatus, sqlx::Error> {
+        self.get_row(polling_station_id, committee_session_id)
             .await
             .map(|psde| psde.state.0)
     }
@@ -50,18 +58,21 @@ impl PollingStationDataEntries {
     pub async fn get_or_default(
         &self,
         polling_station_id: u32,
+        committee_session_id: u32,
     ) -> Result<DataEntryStatus, sqlx::Error> {
         Ok(query_as!(
             PollingStationDataEntry,
             r#"
                 SELECT
                     polling_station_id AS "polling_station_id: u32",
+                    committee_session_id AS "committee_session_id: u32",
                     state AS "state: _",
                     updated_at AS "updated_at: _"
                 FROM polling_station_data_entries
-                WHERE polling_station_id = ?
+                WHERE polling_station_id = ? AND committee_session_id = ?
             "#,
-            polling_station_id
+            polling_station_id,
+            committee_session_id
         )
         .fetch_optional(&self.0)
         .await?
@@ -73,24 +84,27 @@ impl PollingStationDataEntries {
     pub async fn upsert(
         &self,
         polling_station_id: u32,
+        committee_session_id: u32,
         state: &DataEntryStatus,
     ) -> Result<PollingStationDataEntry, sqlx::Error> {
         let state = Json(state);
         query_as!(
             PollingStationDataEntry,
             r#"
-                INSERT INTO polling_station_data_entries (polling_station_id, state)
-                VALUES (?, ?)
-                ON CONFLICT(polling_station_id) DO
-                UPDATE SET
+                INSERT INTO polling_station_data_entries (polling_station_id, committee_session_id, state)
+                VALUES (?, ?, ?)
+                ON CONFLICT(polling_station_id, committee_session_id) DO UPDATE 
+                SET
                     state = excluded.state,
                     updated_at = CURRENT_TIMESTAMP
                 RETURNING
                     polling_station_id AS "polling_station_id: u32",
+                    committee_session_id AS "committee_session_id: u32",
                     state AS "state: _",
                     updated_at AS "updated_at: _"
             "#,
             polling_station_id,
+            committee_session_id,
             state
         )
         .fetch_one(&self.0)
@@ -132,30 +146,33 @@ impl PollingStationDataEntries {
     pub async fn make_definitive(
         &self,
         polling_station_id: u32,
+        committee_session_id: u32,
         new_state: &DataEntryStatus,
         definitive_entry: &PollingStationResults,
     ) -> Result<(), sqlx::Error> {
         let mut tx = self.0.begin().await?;
         let definitive_entry = Json(definitive_entry);
         query!(
-            "INSERT INTO polling_station_results (polling_station_id, data) VALUES ($1, $2)",
+            "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES ($1, $2, $3)",
             polling_station_id,
-            definitive_entry
+            committee_session_id,
+            definitive_entry,
         )
         .execute(tx.as_mut())
         .await?;
 
         let new_state = Json(new_state);
-        sqlx::query!(
+        query!(
             r#"
-                INSERT INTO polling_station_data_entries (polling_station_id, state)
-                VALUES (?, ?)
-                ON CONFLICT(polling_station_id) DO
+                INSERT INTO polling_station_data_entries (polling_station_id, committee_session_id, state)
+                VALUES (?, ?, ?)
+                ON CONFLICT(polling_station_id, committee_session_id) DO
                 UPDATE SET
                     state = excluded.state,
                     updated_at = CURRENT_TIMESTAMP
             "#,
             polling_station_id,
+            committee_session_id,
             new_state
         )
         .execute(tx.as_mut())
@@ -183,20 +200,20 @@ impl PollingStationResultsEntries {
             r#"
             SELECT
                 r.polling_station_id AS "polling_station_id: u32",
-                r.data,
-                r.created_at
+                r.committee_session_id AS "committee_session_id: u32",
+                r.data AS "data: Json<PollingStationResults>",
+                r.created_at as "created_at: NaiveDateTime"
             FROM polling_station_results AS r
             LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
             WHERE p.election_id = $1
-        "#,
+            "#,
             election_id
         )
         .try_map(|row| {
-            let data = serde_json::from_slice(&row.data)
-                .map_err(|err| sqlx::Error::Decode(Box::new(err)))?;
             Ok(PollingStationResultsEntry {
                 polling_station_id: row.polling_station_id,
-                data,
+                committee_session_id: row.committee_session_id,
+                data: row.data.0,
                 created_at: row.created_at.and_utc(),
             })
         })

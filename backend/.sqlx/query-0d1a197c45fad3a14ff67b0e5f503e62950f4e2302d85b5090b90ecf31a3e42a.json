@@ -16,12 +16,12 @@
       {
         "name": "expires_at: _",
         "ordinal": 2,
-        "type_info": "Datetime"
+        "type_info": "Text"
       },
       {
         "name": "created_at: _",
         "ordinal": 3,
-        "type_info": "Datetime"
+        "type_info": "Text"
       }
     ],
     "parameters": {

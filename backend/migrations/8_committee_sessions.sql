@@ -9,4 +9,4 @@ CREATE TABLE committee_sessions
     status      TEXT                              NOT NULL DEFAULT 'created',
 
     FOREIGN KEY (election_id) REFERENCES elections (id) ON DELETE CASCADE
-);
+) STRICT;

@@ -153,7 +153,7 @@ async fn election_download_zip_results(
     let xml_filename = input.xml_filename();
     let zip_filename = input.zip_filename();
     let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
-    let content = generate_pdf(model)?;
+    let content = generate_pdf(model).await?;
 
     let mut buf = vec![];
     let mut cursor = std::io::Cursor::new(&mut buf);
@@ -218,7 +218,7 @@ async fn election_download_pdf_results(
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
     let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
-    let content = generate_pdf(model)?;
+    let content = generate_pdf(model).await?;
 
     Ok(Attachment::new(content.buffer)
         .filename(pdf_filename)

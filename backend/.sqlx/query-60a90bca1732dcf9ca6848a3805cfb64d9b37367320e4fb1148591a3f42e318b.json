@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                polling_station_id AS \"polling_station_id: u32\",\n                committee_session_id AS \"committee_session_id: u32\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n            FROM polling_station_data_entries\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "polling_station_id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "committee_session_id: u32",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "state: _",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_at: _",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "60a90bca1732dcf9ca6848a3805cfb64d9b37367320e4fb1148591a3f42e318b"
+}

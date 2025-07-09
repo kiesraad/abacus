@@ -81,9 +81,12 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
       blocker.reset();
     }
   };
+
   // when save is chosen in the abort dialog
   const onAbortModalSave = async () => {
-    if (await onSubmit({ aborting: true, continueToNextSection: false, showAcceptErrorsAndWarnings: false })) {
+    if (sectionId === "save") {
+      blocker.proceed();
+    } else if (await onSubmit({ aborting: true, continueToNextSection: false, showAcceptErrorsAndWarnings: false })) {
       blocker.proceed();
     } else {
       if (status === "aborted") {

@@ -18,9 +18,9 @@ import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj"
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import {
+  dataEntryRequest,
   noErrorsWarningsResponse,
   noRecountNoDifferencesDataEntry,
-  noRecountNoDifferencesRequest,
 } from "e2e-tests/test-data/request-response-templates";
 
 import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
@@ -76,16 +76,16 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
     await expect(candidatesListPage_2.getCandidate(0)).toBeFocused();
 
     await candidatesListPage_2.fillCandidatesAndTotal([3, 1], 4);
     const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
-    await candidatesListPage_1.next.click();
+    await candidatesListPage_2.next.click();
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);
-    expect(response.request().postDataJSON()).toStrictEqual(noRecountNoDifferencesRequest);
+    expect(response.request().postDataJSON()).toStrictEqual(dataEntryRequest);
     expect(await response.json()).toStrictEqual(noErrorsWarningsResponse);
 
     const checkAndSavePage = new CheckAndSavePage(page);
@@ -172,7 +172,7 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
     await expect(candidatesListPage_2.fieldset).toBeVisible();
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_2.next.click();
@@ -241,7 +241,7 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([902, 233], 1135);
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
     await expect(candidatesListPage_2.fieldset).toBeVisible();
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_2.next.click();
@@ -321,7 +321,7 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
     await expect(candidatesListPage_2.fieldset).toBeVisible();
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_2.next.click();
@@ -377,7 +377,7 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([99, 1], 100);
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
     await expect(candidatesListPage_2.fieldset).toBeVisible();
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_2.next.click();
@@ -453,7 +453,7 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.checkAcceptErrorsAndWarnings();
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_2.next.click();
     await expect(candidatesListPage_2.error).toContainText("F.204");
@@ -763,7 +763,7 @@ test.describe("errors and warnings", () => {
     await candidatesListPage_1.next.click();
 
     // fill counts of List 2 with 0 so correcting the error is easier
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_2.next.click();
 
@@ -1134,7 +1134,7 @@ test.describe("navigation", () => {
       await candidatesListPage_1.fillCandidatesAndTotal([50, 50], 100);
       await candidatesListPage_1.next.click();
 
-      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
       await expect(candidatesListPage_2.fieldset).toBeVisible();
       await expect(candidatesListPage_2.progressList.listIcon(2)).toHaveAccessibleName("je bent hier");
       await expect(candidatesListPage_2.progressList.listIcon(1)).toHaveAccessibleName("opgeslagen");

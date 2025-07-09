@@ -2,7 +2,6 @@ import * as React from "react";
 
 import { MenuStatus } from "@/types/ui";
 import { cn } from "@/utils/classnames";
-import { domtoren } from "@/utils/domtoren";
 
 import { StatusIcon } from "../Icon/StatusIcon";
 import cls from "./ProgressList.module.css";
@@ -33,6 +32,7 @@ export type ProgressListItemProps = {
   children?: React.ReactNode;
   id?: string;
   scrollIntoView?: boolean;
+  addSpace?: boolean;
 };
 
 ProgressList.Item = function ProgressListItem({
@@ -42,22 +42,21 @@ ProgressList.Item = function ProgressListItem({
   children,
   id,
   scrollIntoView,
+  addSpace = false,
 }: ProgressListItemProps) {
-  const ref = React.useRef<HTMLLIElement>(null);
+  const liRef = React.useRef<HTMLLIElement>(null);
 
   React.useEffect(() => {
     if (scrollIntoView && active) {
-      const li = ref.current;
-      if (li) {
-        domtoren(li).scrollIntoView(10);
-      }
+      liRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
     }
   }, [scrollIntoView, active]);
+
   return (
     <li
-      ref={ref}
+      ref={liRef}
       id={id}
-      className={cn(cls.item, { active: active }, status, { disabled: disabled })}
+      className={cn(cls.item, { active: active }, status, { disabled: disabled }, addSpace && cls.addSpace)}
       aria-current={active ? "step" : false}
     >
       <aside>

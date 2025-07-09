@@ -235,6 +235,34 @@ describe("DataEntryNavigation", () => {
       });
     });
 
+    test("Abort modal save, sectionId save", async () => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        status: "idle",
+      };
+
+      const onSubmit = vi.fn(async () => {
+        return Promise.resolve(true);
+      });
+
+      vi.mocked(useParams).mockReturnValue({ sectionId: "save" });
+      vi.mocked(useDataEntryContext).mockReturnValue(state);
+      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      const router = renderComponent(onSubmit);
+      await router.navigate("/test");
+
+      const modal = await screen.findByRole("dialog");
+
+      const saveButton = within(modal).getByRole("button", { name: "Invoer bewaren" });
+      expect(saveButton).toBeVisible();
+      saveButton.click();
+
+      expect(onSubmit).not.toHaveBeenCalled();
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe("/test");
+      });
+    });
+
     test("Abort modal save, onSubmit false", async () => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),

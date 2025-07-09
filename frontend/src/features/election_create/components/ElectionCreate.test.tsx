@@ -7,12 +7,13 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ApiProvider } from "@/api/ApiProvider";
 import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { ElectionDefinitionValidateResponse, NewElection } from "@/types/generated/openapi";
+import { ElectionDefinitionValidateResponse, NewElection, PollingStationRequest } from "@/types/generated/openapi";
 
 import { electionCreateRoutes } from "../routes";
 
@@ -58,7 +59,10 @@ function renderWithRouter() {
   return router;
 }
 
-function electionValidateResponse(election: NewElection): ElectionDefinitionValidateResponse {
+function electionValidateResponse(
+  election: NewElection,
+  polling_stations: PollingStationRequest[] | null = null,
+): ElectionDefinitionValidateResponse {
   return {
     hash: {
       // NOTE: In actual data, the redacted version of the hash
@@ -85,7 +89,111 @@ function electionValidateResponse(election: NewElection): ElectionDefinitionVali
       redacted_indexes: [2, 9],
     },
     election,
+    polling_stations,
   };
+}
+
+/**
+ * Helper function; navigate to /elections/create
+ * and upload an election definition.
+ */
+async function uploadElectionDefinition(router: Router, file: File) {
+  const user = userEvent.setup();
+  overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+  await router.navigate("/elections/create");
+
+  // Wait for the page to be loaded
+  expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
+  expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
+  const input = await screen.findByLabelText("Bestand kiezen");
+  expect(input).toBeVisible();
+  expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+
+  await user.upload(input, file);
+}
+
+/**
+ * Helper function; assuming we are at the check election hash stage,
+ * check and input the hash and continue.
+ */
+async function inputElectionHash() {
+  const user = userEvent.setup();
+  overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+  // Wait for the page to be loaded and expect the election name to be present
+  expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
+
+  // Expect parts of the hash to be shown
+  expect(screen.getByText("asdf")).toBeInTheDocument();
+  // Expect redacted chunks to be stubs
+  expect(screen.queryByText("zxcv")).not.toBeInTheDocument();
+
+  // Expect stub to be highlighted
+  expect(screen.getByText("1")).toHaveRole("mark");
+  expect(screen.getByText("2")).not.toHaveRole("mark");
+  const inputPart1 = screen.getByLabelText("Controle deel 1");
+  await user.type(inputPart1, "zxcv");
+
+  const inputPart2 = screen.getByLabelText("Controle deel 2");
+  await user.click(inputPart2);
+  expect(screen.getByText("1")).not.toHaveRole("mark");
+  expect(screen.getByText("2")).toHaveRole("mark");
+
+  // Click somewhere arbitrary and expect no highlights
+  await user.click(screen.getByText("Controleer verkiezingsdefinitie"));
+  expect(screen.getByText("1")).not.toHaveRole("mark");
+  expect(screen.getByText("2")).not.toHaveRole("mark");
+  await user.type(inputPart2, "gfsd");
+  await user.click(screen.getByText("Volgende"));
+}
+
+/**
+ * Helper function; assuming we are on the upload candidate page,
+ * upload a valid candidate file.
+ */
+async function uploadCandidateDefinition(file: File) {
+  const user = userEvent.setup();
+  overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+  // Wait for the candidate page to be loaded
+  expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+  const input = await screen.findByLabelText("Bestand kiezen");
+  expect(input).toBeVisible();
+  expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+
+  await user.upload(input, file);
+}
+
+async function inputCandidateHash() {
+  const user = userEvent.setup();
+  overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+  // Expect parts of the hash to be shown
+  expect(screen.getByText("asdf")).toBeInTheDocument();
+  // Expect redacted chunks to be stubs
+  expect(screen.queryByText("zxcv")).not.toBeInTheDocument();
+
+  // Expect stub to be highlighted
+  expect(screen.getByText("1")).toHaveRole("mark");
+  expect(screen.getByText("2")).not.toHaveRole("mark");
+
+  // Override again
+  overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+  const inputPart1 = screen.getByLabelText("Controle deel 1");
+  await user.type(inputPart1, "zxcv");
+
+  const inputPart2 = screen.getByLabelText("Controle deel 2");
+  await user.click(inputPart2);
+  expect(screen.getByText("1")).not.toHaveRole("mark");
+  expect(screen.getByText("2")).toHaveRole("mark");
+
+  // Click somewhere arbitrary and expect no highlights
+  await user.click(screen.getByText("Controleer kandidatenlijst"));
+  expect(screen.getByText("1")).not.toHaveRole("mark");
+  expect(screen.getByText("2")).not.toHaveRole("mark");
+  await user.type(inputPart2, "gfsd");
+  await user.click(screen.getByText("Volgende"));
 }
 
 describe("Election create pages", () => {
@@ -299,48 +407,159 @@ describe("Election create pages", () => {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
     const router = renderWithRouter();
-    const user = userEvent.setup();
-    await router.navigate("/elections/create/list-of-candidates");
-
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    // upload election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    // upload candidate file, set hash and continue
+    await uploadCandidateDefinition(file);
+    await inputCandidateHash();
+
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
+    ).toBeVisible();
+  });
+
+  test("Shows an error when uploading an invalid polling station list", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // upload election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    // upload candidate file, set hash and continue
+    await uploadCandidateDefinition(file);
+    await inputCandidateHash();
+
+    // Make sure we are on the correct page
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
+    ).toBeVisible();
+
+    // Give invalid XML error
+    overrideOnce("post", "/api/elections/import/validate", 400, {
+      error: "Invalid XML",
+      fatal: false,
+      reference: "InvalidXml",
+    });
+
+    // Upload polling station file
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    await user.upload(input, file);
+    const message = screen.getByText(/Ongeldig stembureaubestand/i);
+    expect(message).toBeVisible();
+  });
+
+  test("Shows error when uploading too large polling station file", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // upload election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    // upload candidate file, set hash and continue
+    await uploadCandidateDefinition(file);
+    await inputCandidateHash();
+
+    // Make sure we are on the correct page
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
+    ).toBeVisible();
+
+    overrideOnce("post", "/api/elections/import/validate", 413, {
+      error: "12",
+      fatal: false,
+      reference: "RequestPayloadTooLarge",
+    });
+
+    // Upload polling station file
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    await user.upload(input, file);
+    const message = screen.getByText(/Kies een bestand van maximaal 12 Megabyte./i);
+    expect(message).toBeVisible();
+  });
+
+  test("Skip button on polling station upload page should skip to next page", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // upload election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    // upload candidate file, set hash and continue
+    await uploadCandidateDefinition(file);
+    await inputCandidateHash();
+
+    // Make sure we are on the correct page
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
+    ).toBeVisible();
+    await user.click(screen.getByText("Stap overslaan en stembureaus later toevoegen"));
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" })).toBeVisible();
+  });
+
+  test("Shows overview when uploading valid polling station file", async () => {
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // upload election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    // upload candidate file, set hash and continue
+    await uploadCandidateDefinition(file);
+    await inputCandidateHash();
+
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionValidateResponse(newElectionMockData, pollingStationMockData),
+    );
+
+    // Make sure we are on the correct page
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
+    ).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
     expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
     await user.upload(input, file);
 
-    // Expect parts of the hash to be shown
-    expect(screen.getByText("asdf")).toBeInTheDocument();
-    // Expect redacted chunks to be stubs
-    expect(screen.queryByText("zxcv")).not.toBeInTheDocument();
+    // We should be at the check polling stations page
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();
 
-    // Expect stub to be highlighted
-    expect(screen.getByText("1")).toHaveRole("mark");
-    expect(screen.getByText("2")).not.toHaveRole("mark");
+    // Check the overview table
+    expect(await screen.findByRole("table")).toBeVisible();
+    expect(await screen.findAllByRole("row")).toHaveLength(5);
 
-    // Override again
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-
-    const inputPart1 = screen.getByLabelText("Controle deel 1");
-    await user.type(inputPart1, "zxcv");
-
-    const inputPart2 = screen.getByLabelText("Controle deel 2");
-    await user.click(inputPart2);
-    expect(screen.getByText("1")).not.toHaveRole("mark");
-    expect(screen.getByText("2")).toHaveRole("mark");
-
-    // Click somewhere arbitrary and expect no highlights
-    await user.click(screen.getByText("Controleer kandidatenlijst"));
-    expect(screen.getByText("1")).not.toHaveRole("mark");
-    expect(screen.getByText("2")).not.toHaveRole("mark");
-    await user.type(inputPart2, "gfsd");
+    // click next
     await user.click(screen.getByText("Volgende"));
-
-    // Expect to see the next page
     expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" })).toBeVisible();
   });
 });

@@ -216,10 +216,11 @@ describe("Election create pages", () => {
 
     const router = renderWithRouter();
     const user = userEvent.setup();
-    await router.navigate("/elections/create");
 
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
+
+    await router.navigate("/elections/create");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
@@ -227,11 +228,11 @@ describe("Election create pages", () => {
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
     expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
     await user.upload(input, file);
 
     // Expect error message, file name should be shown
     expect(screen.getByText(filename)).toBeInTheDocument();
+    expect(screen.getByText("Ongeldige verkiezingsdefinitie")).toBeInTheDocument();
   });
 
   test("It shows an error when uploading too large file", async () => {
@@ -266,50 +267,12 @@ describe("Election create pages", () => {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
     const router = renderWithRouter();
-    const user = userEvent.setup();
-    await router.navigate("/elections/create");
-
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-    await user.upload(input, file);
-
-    // Wait for the page to be loaded and expect the election name to be present
-    expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
-
-    // Expect parts of the hash to be shown
-    expect(screen.getByText("asdf")).toBeInTheDocument();
-    // Expect redacted chunks to be stubs
-    expect(screen.queryByText("zxcv")).not.toBeInTheDocument();
-
-    // Expect stub to be highlighted
-    expect(screen.getByText("1")).toHaveRole("mark");
-    expect(screen.getByText("2")).not.toHaveRole("mark");
-
-    // Override again
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-
-    const inputPart1 = screen.getByLabelText("Controle deel 1");
-    await user.type(inputPart1, "zxcv");
-
-    const inputPart2 = screen.getByLabelText("Controle deel 2");
-    await user.click(inputPart2);
-    expect(screen.getByText("1")).not.toHaveRole("mark");
-    expect(screen.getByText("2")).toHaveRole("mark");
-
-    // Click somewhere arbitrary and expect no highlights
-    await user.click(screen.getByText("Controleer verkiezingsdefinitie"));
-    expect(screen.getByText("1")).not.toHaveRole("mark");
-    expect(screen.getByText("2")).not.toHaveRole("mark");
-    await user.type(inputPart2, "gfsd");
-    await user.click(screen.getByText("Volgende"));
+    // update election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
 
     // Expect to see the next page
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
@@ -345,15 +308,18 @@ describe("Election create pages", () => {
   test("It shows an error when uploading an invalid candidate list", async () => {
     // Since we test what happens after an error, we want vitest to ignore them
     vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
+      // do nothing
     });
 
     const router = renderWithRouter();
     const user = userEvent.setup();
-    await router.navigate("/elections/create/list-of-candidates");
 
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // update election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
 
     // Expect to see the next page
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
@@ -372,13 +338,25 @@ describe("Election create pages", () => {
 
     // Expect error message, file name should be shown
     expect(screen.getByText(filename)).toBeInTheDocument();
+    expect(screen.getByText("Ongeldige kandidatenlijst")).toBeInTheDocument();
   });
 
   test("It shows an error when uploading too large candidate list file", async () => {
     // Since we test what happens after an error, we want vitest to ignore them
     vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
+      // do nothing
     });
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // update election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
 
     overrideOnce("post", "/api/elections/import/validate", 413, {
       error: "12",
@@ -386,17 +364,8 @@ describe("Election create pages", () => {
       reference: "RequestPayloadTooLarge",
     });
 
-    const router = renderWithRouter();
-    const user = userEvent.setup();
-    await router.navigate("/elections/create/list-of-candidates");
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
-
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
-
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
-
     await user.upload(input, file);
 
     const message = screen.getByText(/Kies een bestand van maximaal 12 Megabyte./i);
@@ -421,6 +390,154 @@ describe("Election create pages", () => {
     expect(
       await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
     ).toBeVisible();
+  });
+
+  test("It shows the confirmation modal when the abort button is clicked", async () => {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // update election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    // Wait for the candidate page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+    await user.upload(input, file);
+
+    // Click the Afbreken button
+    const button = screen.getByText("Afbreken");
+    expect(button).toBeVisible();
+    await user.click(button);
+    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+  });
+
+  test("It shows the confirmation modal when attempting to navigate away", async () => {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // update election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+    await user.upload(input, file);
+
+    // Click the 'Verkiezingen' nav item
+    const button = screen.getByText("Verkiezingen");
+    expect(button).toBeVisible();
+    await user.click(button);
+
+    // The modal should have triggered
+    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+  });
+
+  test("It does not show the confirmation modal when attempting to navigate away if nothing was done", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    await router.navigate("/elections/create");
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
+
+    // Click the Afbreken button
+    const button = screen.getByText("Afbreken");
+    expect(button).toBeVisible();
+    await user.click(button);
+
+    // No modal should have triggered
+    expect(screen.queryAllByText("Niet opgeslagen wijzigingen").length).toBe(0);
+  });
+
+  test("That the confirmation modal cancel button closes the modal", async () => {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // update election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+    await user.upload(input, file);
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
+
+    // Click the 'Verkiezingen' nav item
+    const button = screen.getByText("Verkiezingen");
+    expect(button).toBeVisible();
+    await user.click(button);
+
+    // The modal should have triggered
+    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+
+    // Close button should keep us at the import page
+    const closeButton = screen.getByText("Annuleren");
+    expect(closeButton).toBeVisible();
+    await user.click(closeButton);
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
+  });
+
+  test("That the confirmation modal delete button closes the modal", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // update election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+    await user.upload(input, file);
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
+
+    // Click the 'Verkiezingen' nav item
+    const button = screen.getByText("Verkiezingen");
+    expect(button).toBeVisible();
+    await user.click(button);
+
+    // The modal should have triggered
+    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+
+    // Delete button should move away from the import page
+    const deleteButton = screen.getByText("Ja, verwijder verkiezing");
+    expect(deleteButton).toBeVisible();
+    await user.click(deleteButton);
+    expect(screen.queryAllByText("Controleer kandidatenlijst").length).toBe(0);
   });
 
   test("Shows an error when uploading an invalid polling station list", async () => {
@@ -563,142 +680,6 @@ describe("Election create pages", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" })).toBeVisible();
   });
 
-  test("It shows the confirmation modal when the abort button is clicked", async () => {
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+  // TODO: Test modal close button
 
-    const router = renderWithRouter();
-    const user = userEvent.setup();
-    await router.navigate("/elections/create/list-of-candidates");
-
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-    await user.upload(input, file);
-
-    // Click the Afbreken button
-    const button = screen.getByText("Afbreken");
-    expect(button).toBeVisible();
-    await user.click(button);
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
-  });
-
-  test("It shows the confirmation modal when attempting to navigate away", async () => {
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-
-    const router = renderWithRouter();
-    const user = userEvent.setup();
-    await router.navigate("/elections/create/list-of-candidates");
-
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-    await user.upload(input, file);
-
-    // Click the 'Verkiezingen' nav item
-    const button = screen.getByText("Verkiezingen");
-    expect(button).toBeVisible();
-    await user.click(button);
-
-    // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
-  });
-
-  test("It does not show the confirmation modal when attempting to navigate away if nothing was done", async () => {
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-
-    const router = renderWithRouter();
-    const user = userEvent.setup();
-    await router.navigate("/elections/create");
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-
-    // Click the Afbreken button
-    const button = screen.getByText("Afbreken");
-    expect(button).toBeVisible();
-    await user.click(button);
-
-    // No modal should have triggered
-    expect(screen.queryAllByText("Niet opgeslagen wijzigingen").length).toBe(0);
-  });
-
-  // TODO: Test all three buttons
-  test("That the confirmation modal cancel button closes the modal", async () => {
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-
-    const router = renderWithRouter();
-    const user = userEvent.setup();
-    await router.navigate("/elections/create/list-of-candidates");
-
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-    await user.upload(input, file);
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
-
-    // Click the 'Verkiezingen' nav item
-    const button = screen.getByText("Verkiezingen");
-    expect(button).toBeVisible();
-    await user.click(button);
-
-    // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
-
-    // Close button should keep us at the import page
-    const closeButton = screen.getByText("Annuleren");
-    expect(closeButton).toBeVisible();
-    await user.click(closeButton);
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
-  });
-
-  test("That the confirmation modal delete button closes the modal", async () => {
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-
-    const router = renderWithRouter();
-    const user = userEvent.setup();
-    await router.navigate("/elections/create/list-of-candidates");
-
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-    await user.upload(input, file);
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
-
-    // Click the 'Verkiezingen' nav item
-    const button = screen.getByText("Verkiezingen");
-    expect(button).toBeVisible();
-    await user.click(button);
-
-    // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
-
-    // Delete button should move away from the import page
-    const deleteButton = screen.getByText("Ja, verwijder verkiezing");
-    expect(deleteButton).toBeVisible();
-    await user.click(deleteButton);
-    expect(screen.queryAllByText("Controleer kandidatenlijst").length).toBe(0);
-  });
 });

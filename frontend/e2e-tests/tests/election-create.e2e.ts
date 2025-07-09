@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import {
   uploadCandidatesAndInputHash,
   uploadElectionAndInputHash,
+  uploadPollingStations,
 } from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
 import { AbortModalPgObj } from "e2e-tests/page-objects/election/create/AbortModalPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
@@ -21,8 +22,6 @@ test.use({
 });
 
 test.describe("Election creation", () => {
-
-  /*
   test("it uploads an election file, candidate list and polling stations", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
@@ -31,16 +30,13 @@ test.describe("Election creation", () => {
     await overviewPage.create.click();
 
     // upload election and check hash
-    await uploadElectionAndInputHash(page)
+    await uploadElectionAndInputHash(page);
 
     // upload candidates list and check
     await uploadCandidatesAndInputHash(page);
 
-    // Polling station page
-    // TODO: finish
-    //const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    //await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
-    //await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
+    // upload polling stations
+    await uploadPollingStations(page);
 
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
@@ -53,7 +49,6 @@ test.describe("Election creation", () => {
     // Check if the amount of "Voorbereiden" states is greater than before the import
     expect(await overviewPage.electionsCreatedState.count()).toBeGreaterThan(initialCreatedStateCount);
   });
-  */
 
   test("it fails on incorrect hash", async ({ page }) => {
     await page.goto("/elections");
@@ -216,7 +211,7 @@ test.describe("Election creation", () => {
     await expect(AbortModal.header).toBeVisible();
   });
 
- test("after election upload, moving back to election page resets election", async ({ page }) => {
+  test("after election upload, moving back to election page resets election", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
     await overviewPage.create.click();
@@ -291,9 +286,9 @@ test.describe("Election creation", () => {
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
 
-    // Now we should be at the check and save page
-    const checkAndSavePage = new CheckAndSavePgObj(page);
-    await expect(checkAndSavePage.header).toBeVisible();
+    // Now we should be at the polling station upload page
+    const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
 
     // Now upload a new election
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
@@ -319,6 +314,9 @@ test.describe("Election creation", () => {
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
 
+    // upload polling stations
+    await uploadPollingStations(page);
+
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
@@ -335,5 +333,22 @@ test.describe("Election creation", () => {
     await expect(uploadDefinitionPage.header).toBeVisible();
   });
 
-  // TODO: add tests for polling station
+  test("it fails on valid, but incorrect polling station file", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new OverviewPgObj(page);
+    await overviewPage.create.click();
+
+    // upload election and check hash
+    await uploadElectionAndInputHash(page);
+
+    // upload candidates list and check hash
+    await uploadCandidatesAndInputHash(page);
+
+    // upload wrong file
+    const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadDefinitionPage.header).toBeVisible();
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
+    await expect(uploadDefinitionPage.main).toContainText(eml110a.filename);
+    await expect(uploadDefinitionPage.error).toBeVisible();
+  });
 });

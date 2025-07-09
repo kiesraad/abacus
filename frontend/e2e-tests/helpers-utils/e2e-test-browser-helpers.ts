@@ -8,12 +8,14 @@ import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj"
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
+import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
+import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
 
 import { PollingStation, PollingStationResults } from "@/types/generated/openapi";
 
-import { eml110a, eml230b } from "../test-data/eml-files";
+import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
 
 export async function selectPollingStationForDataEntry(page: Page, pollingStation: PollingStation) {
   await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
@@ -106,4 +108,20 @@ export async function uploadCandidatesAndInputHash(page: Page) {
   const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
   await expect(checkCandidateDefinitionPage.header).toBeVisible();
   await checkCandidateDefinitionPage.inputHash(eml230b.hashInput1, eml230b.hashInput2);
+}
+
+export async function uploadPollingStations(page: Page) {
+  const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+  await expect(uploadDefinitionPage.header).toBeVisible();
+  await uploadDefinitionPage.uploadFile(page, eml110b.path);
+  await expect(uploadDefinitionPage.main).toContainText(eml110b.filename);
+
+  // Polling station check page
+  const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
+  await expect(checkDefinitionPage.header).toBeVisible();
+
+  // TODO: check table overview
+  // TODO: check show all button
+
+  await checkDefinitionPage.next.click();
 }

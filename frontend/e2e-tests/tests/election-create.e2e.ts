@@ -4,6 +4,7 @@ import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/c
 import { CheckDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
+import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
 import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
 
 import { test } from "../fixtures";
@@ -14,7 +15,7 @@ test.use({
 });
 
 test.describe("Election creation", () => {
-  test("it uploads an election file and candidate list", async ({ page }) => {
+  test("it uploads an election file, candidate list and polling stations", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
     const initialElectionCount = await overviewPage.elections.count();
@@ -49,6 +50,11 @@ test.describe("Election creation", () => {
     await checkCandidateDefinitionPage.hashInput1.fill(eml230b.hashInput1);
     await checkCandidateDefinitionPage.hashInput2.fill(eml230b.hashInput2);
     await checkCandidateDefinitionPage.next.click();
+
+    // Polling station page
+    const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadDefinitionPage.header).toBeVisible();
+    await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
 
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);

@@ -524,7 +524,7 @@ export type ElectionCategory = "Municipal";
 export interface ElectionDefinitionValidateResponse {
   election: NewElection;
   hash: RedactedEmlHash;
-  polling_stations?: unknown[] | null;
+  polling_stations?: PollingStationRequest[] | null;
 }
 
 export interface ElectionDetails {

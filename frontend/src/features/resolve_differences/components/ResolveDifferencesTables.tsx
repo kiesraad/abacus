@@ -1,4 +1,3 @@
-import { TranslationPath } from "@/i18n/i18n.types";
 import { t } from "@/i18n/translate";
 import { PollingStationResults, ResolveDifferencesAction } from "@/types/generated/openapi";
 import { DataEntrySection, DataEntryStructure, RadioSubsectionOption } from "@/types/types";
@@ -83,8 +82,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
               code: row.code,
               first: firstValues[row.path],
               second: secondValues[row.path],
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- dynamic title translation path cannot be typechecked
-              description: row.title || t(`${section.id}.${row.path}` as TranslationPath),
+              description: row.title,
             }));
 
             return (

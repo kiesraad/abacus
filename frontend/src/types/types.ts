@@ -59,7 +59,7 @@ export interface RadioSubsection {
 export interface InputGridSubsectionRow {
   code?: string;
   path: PollingStationResultsPath;
-  title?: string;
+  title: string;
   isTotal?: boolean;
   isListTotal?: boolean;
   addSeparator?: boolean;

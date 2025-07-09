@@ -48,7 +48,6 @@ export function DataEntrySubsections({
               <InputGridSubsectionComponent
                 key={`input-grid-${subsectionIdx}`}
                 subsection={subsection}
-                sectionId={section.id}
                 currentValues={currentValues}
                 setValues={setValues}
                 defaultProps={defaultProps}

@@ -123,6 +123,7 @@ export default tseslint.config(
     files: ["**/*.stories.tsx"],
     extends: [storybook.configs["flat/recommended"]],
     rules: {
+      "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "off",
     },
   },

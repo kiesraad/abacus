@@ -35,6 +35,9 @@ export type ElectionCreateAction =
       response: ElectionDefinitionValidateResponse;
       pollingStationDefinitionData: string;
       pollingStationDefinitionFileName: string;
+    }
+  | {
+      type: "RESET";
     };
 
 export interface ElectionCreateState {
@@ -88,6 +91,9 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         pollingStationDefinitionData: action.pollingStationDefinitionData,
         pollingStationDefinitionFileName: action.pollingStationDefinitionFileName,
       };
+    // Empty the state
+    case "RESET":
+      return {};
   }
 }
 

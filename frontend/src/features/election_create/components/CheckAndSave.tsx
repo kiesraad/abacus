@@ -11,7 +11,7 @@ import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
 export function CheckAndSave() {
   const navigate = useNavigate();
-  const { state } = useElectionCreateContext();
+  const { state, dispatch } = useElectionCreateContext();
   const { refetch } = useElectionList();
   const path: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
   const { create } = useCrud<ElectionAndCandidatesDefinitionImportRequest>({ create: path });
@@ -30,6 +30,12 @@ export function CheckAndSave() {
     });
 
     if (isSuccess(response)) {
+      // clear state
+      dispatch({
+        type: "RESET",
+      });
+
+      // update stored elections
       await refetch();
       await navigate("/elections");
     } else if (isError(response)) {

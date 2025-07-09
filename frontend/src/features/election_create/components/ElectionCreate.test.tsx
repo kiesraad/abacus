@@ -540,6 +540,43 @@ describe("Election create pages", () => {
     expect(screen.queryAllByText("Controleer kandidatenlijst").length).toBe(0);
   });
 
+  test("That the confirmation modal close button closes the modal", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // update election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+    await user.upload(input, file);
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
+
+    // Click the 'Verkiezingen' nav item
+    const button = screen.getByText("Verkiezingen");
+    expect(button).toBeVisible();
+    await user.click(button);
+
+    // The modal should have triggered
+    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+
+    // Delete button should move away from the import page
+    const closeButton = screen.getByTitle("Annuleren");
+    expect(closeButton).toBeVisible();
+    await user.click(closeButton);
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
+  });
+
   test("Shows an error when uploading an invalid polling station list", async () => {
     // Since we test what happens after an error, we want vitest to ignore them
     vi.spyOn(console, "error").mockImplementation(() => {});
@@ -679,7 +716,4 @@ describe("Election create pages", () => {
     await user.click(screen.getByText("Volgende"));
     expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" })).toBeVisible();
   });
-
-  // TODO: Test modal close button
-
 });

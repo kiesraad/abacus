@@ -8,7 +8,6 @@ import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
-  ElectionCommitteeSessionListRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
@@ -52,7 +51,6 @@ describe("ElectionStatusPage", () => {
       ElectionListRequestHandler,
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
-      ElectionCommitteeSessionListRequestHandler,
       UserListRequestHandler,
     );
   });

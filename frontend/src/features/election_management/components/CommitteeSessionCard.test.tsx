@@ -82,19 +82,18 @@ describe("UI component: CommitteeSessionCard", () => {
       <DefaultCommitteeSessionCard
         number={1}
         status="data_entry_finished"
-        startDate="2025-11-09"
-        startTime="09:15"
+        startDate=""
+        startTime=""
         currentSession={true}
       />,
     );
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Invoerders klaar")).toBeVisible();
-    expect(screen.getByText("zondag 9 november 2025 09:15")).toBeVisible();
 
     expect(screen.getByRole("row", { name: "Resultaten en documenten" }));
     expect(screen.getByRole("row", { name: "Steminvoer bekijken" }));
-    expect(screen.queryByRole("row", { name: "Details van de zitting" })).not.toBeInTheDocument();
+    expect(screen.getByRole("row", { name: "Details van de zitting" }));
   });
 
   test("The card renders with status data_entry_finished not current session and details already saved", () => {

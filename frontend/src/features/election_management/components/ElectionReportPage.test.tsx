@@ -4,10 +4,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import {
-  ElectionCommitteeSessionListRequestHandler,
-  ElectionRequestHandler,
-} from "@/testing/api-mocks/RequestHandlers";
+import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
@@ -17,7 +14,7 @@ import { ElectionReportPage } from "./ElectionReportPage";
 
 describe("ElectionReportPage", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, ElectionCommitteeSessionListRequestHandler);
+    server.use(ElectionRequestHandler);
   });
 
   test("Error when election is not ready", async () => {

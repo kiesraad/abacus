@@ -15,7 +15,7 @@ use super::{
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
-    authentication::Coordinator,
+    authentication::{AdminOrCoordinator, Coordinator},
     election::repository::Elections,
 };
 
@@ -53,16 +53,15 @@ impl IntoResponse for CommitteeSessionListResponse {
   ),
 )]
 pub async fn election_committee_session_list(
-    _user: Coordinator,
+    _user: AdminOrCoordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
     State(elections_repo): State<Elections>,
     Path(election_id): Path<u32>,
 ) -> Result<Json<CommitteeSessionListResponse>, APIError> {
     elections_repo.get(election_id).await?;
-    let mut committee_sessions = committee_sessions_repo
+    let committee_sessions = committee_sessions_repo
         .get_election_committee_session_list(election_id)
         .await?;
-    committee_sessions.reverse();
     Ok(Json(CommitteeSessionListResponse { committee_sessions }))
 }
 

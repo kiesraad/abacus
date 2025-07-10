@@ -47,7 +47,7 @@ export interface ButtonLink {
 
 function ButtonLinkList(buttonLinks: ButtonLink[], firstRowBold: boolean) {
   return (
-    <Table className="buttonLinks">
+    <Table className={cls.buttonLinks}>
       <Table.Body>
         {buttonLinks.map((buttonLink, index) => (
           <Table.LinkRow key={index} to={buttonLink.to}>

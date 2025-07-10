@@ -1,10 +1,9 @@
-import { HTMLAttributes, ReactNode } from "react";
-import { To } from "react-router";
+import { Fragment, HTMLAttributes, ReactNode } from "react";
+import { To, useNavigate } from "react-router";
 
 import { CommitteeSessionStatusLabel } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";
 import { CommitteeSessionStatusIcon } from "@/components/ui/Icon/CommitteeSessionStatusIcon";
-import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import { CommitteeSession } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
@@ -41,21 +40,33 @@ function Card({ icon, label, status, date, button, children, ...props }: CardPro
 }
 
 export interface ButtonLink {
+  id: number;
   label: string;
   to: To;
 }
 
-function ButtonLinkList(buttonLinks: ButtonLink[], firstRowBold: boolean) {
+export interface ButtonLinkListProps {
+  buttonLinks: ButtonLink[];
+  firstRowBold: boolean;
+}
+
+function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
+  const navigate = useNavigate();
   return (
-    <Table className={cls.buttonLinks}>
-      <Table.Body>
-        {buttonLinks.map((buttonLink, index) => (
-          <Table.LinkRow key={index} to={buttonLink.to}>
-            <Table.Cell className={cn(firstRowBold && index === 0 && "font-bold")}>{buttonLink.label}</Table.Cell>
-          </Table.LinkRow>
-        ))}
-      </Table.Body>
-    </Table>
+    <div className={cls.buttonLinks}>
+      {buttonLinks.map((buttonLink, index) => (
+        <Fragment key={`${buttonLink.id}-${buttonLink.label}`}>
+          {index !== 0 && <div className={cls.border}></div>}
+          <button
+            onClick={() => {
+              void navigate(buttonLink.to);
+            }}
+          >
+            <span className={cn(firstRowBold && index === 0 && "font-bold")}>{buttonLink.label}</span>
+          </button>
+        </Fragment>
+      ))}
+    </div>
   );
 }
 
@@ -80,7 +91,7 @@ export function CommitteeSessionCard({
   switch (committeeSession.status) {
     case "created":
       if (committeeSession.number > 1) {
-        buttonLinks.push({ label: t("election_management.select_polling_stations"), to: "" }); // TODO: issue #1716 add link
+        buttonLinks.push({ id: committeeSession.id, label: t("election_management.select_polling_stations"), to: "" }); // TODO: issue #1716 add link
       }
       break;
     case "data_entry_not_started":
@@ -95,18 +106,22 @@ export function CommitteeSessionCard({
     case "data_entry_paused":
       break;
     case "data_entry_finished":
-      buttonLinks.push({ label: t("election_management.results_and_documents"), to: "report" }); // TODO: change link when reports are linked to committee sessions
+      buttonLinks.push({
+        id: committeeSession.id,
+        label: t("election_management.results_and_documents"),
+        to: "report", // TODO: change link when reports are linked to committee sessions
+      });
       if (currentSession) {
-        buttonLinks.push({ label: t("election_management.view_data_entry"), to: "status" });
+        buttonLinks.push({ id: committeeSession.id, label: t("election_management.view_data_entry"), to: "status" });
       }
       break;
   }
   if (committeeSession.start_date === "" || committeeSession.start_time === "" || committeeSession.location === "") {
-    buttonLinks.push({ label: t("election_management.committee_session_details"), to: "" }); // TODO: issue #1750 add link
+    buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" }); // TODO: issue #1750 add link
   }
   return (
     <Card icon={icon} label={label} status={status} date={date} button={button} {...props}>
-      {buttonLinks.length > 0 && ButtonLinkList(buttonLinks, currentSession)}
+      {buttonLinks.length > 0 && <ButtonLinkList buttonLinks={buttonLinks} firstRowBold={currentSession} />}
     </Card>
   );
 }

@@ -1,8 +1,6 @@
-import { useSearchParams } from "react-router";
-
 import { IconPlus } from "@/components/generated/icons";
+import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
@@ -14,7 +12,6 @@ import { usePollingStationListRequest } from "../hooks/usePollingStationListRequ
 
 export function PollingStationListPage() {
   const { election } = useElection();
-  const [searchParams, setSearchParams] = useSearchParams();
   const { requestState } = usePollingStationListRequest(election.id);
 
   if (requestState.status === "loading") {
@@ -27,25 +24,12 @@ export function PollingStationListPage() {
 
   const data = requestState.data;
 
-  const updatedId = searchParams.get("updated");
-  const updatedPollingStation = updatedId ? data.polling_stations.find((ps) => ps.id === parseInt(updatedId)) : null;
-
-  const createdId = searchParams.get("created");
-  const createdPollingStation = createdId ? data.polling_stations.find((ps) => ps.id === parseInt(createdId)) : null;
-
-  const deletedPollingStation = searchParams.get("deleted");
-
-  function closeAlert() {
-    setSearchParams("");
-  }
-
   const labelForPollingStationType = {
     FixedLocation: t("polling_station.type.FixedLocation"),
     Special: t("polling_station.type.Special"),
     Mobile: t("polling_station.type.Mobile"),
   };
-  //TODO: Table needs highlight option
-  //TODO: Alert has some layout glitches
+
   return (
     <>
       <PageTitle title={`${t("polling_stations")} - Abacus`} />
@@ -54,35 +38,9 @@ export function PollingStationListPage() {
           <h1>{t("polling_station.title.plural")}</h1>
         </section>
       </header>
-      {updatedPollingStation && (
-        <Alert type="success" onClose={closeAlert}>
-          <strong>
-            {t("polling_station.message.polling_station_updated", {
-              number: updatedPollingStation.number,
-              name: updatedPollingStation.name,
-            })}
-          </strong>
-        </Alert>
-      )}
 
-      {createdPollingStation && (
-        <Alert type="success" onClose={closeAlert}>
-          <strong>
-            {t("polling_station.message.polling_station_created", {
-              number: createdPollingStation.number,
-              name: createdPollingStation.name,
-            })}
-          </strong>
-        </Alert>
-      )}
+      <Messages />
 
-      {deletedPollingStation && (
-        <Alert type="success" onClose={closeAlert}>
-          <strong>
-            {t("polling_station.message.polling_station_deleted", { pollingStation: deletedPollingStation })}
-          </strong>
-        </Alert>
-      )}
       <main>
         {!data.polling_stations.length ? (
           <article>

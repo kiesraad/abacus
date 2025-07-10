@@ -7,8 +7,10 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
+import { PollingStation } from "@/types/generated/openapi";
 
 import { usePollingStationGet } from "../hooks/usePollingStationGet";
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";
@@ -18,6 +20,7 @@ export function PollingStationUpdatePage() {
   const pollingStationId = useNumericParam("pollingStationId");
   const { election } = useElection();
   const navigate = useNavigate();
+  const { pushMessage } = useMessages();
 
   const { requestState } = usePollingStationGet(election.id, pollingStationId);
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
@@ -34,18 +37,31 @@ export function PollingStationUpdatePage() {
     setError(undefined);
   }
 
-  function handleSaved() {
-    void navigate(`${parentUrl}?updated=${pollingStationId}`);
+  function handleSaved(pollingStation: PollingStation) {
+    pushMessage({
+      title: t("polling_station.message.polling_station_updated", {
+        number: pollingStation.number,
+        name: pollingStation.name,
+      }),
+    });
+
+    void navigate(parentUrl);
   }
 
   function handleCancel() {
     void navigate(parentUrl);
   }
 
-  function handleDeleted() {
+  function handleDeleted(pollingStation: PollingStation) {
     toggleShowDeleteModal();
-    const pollingStation = "data" in requestState ? `${requestState.data.number} (${requestState.data.name})` : "";
-    void navigate(`${parentUrl}?deleted=${encodeURIComponent(pollingStation)}`);
+    pushMessage({
+      title: t("polling_station.message.polling_station_deleted", {
+        number: pollingStation.number,
+        name: pollingStation.name,
+      }),
+    });
+
+    void navigate(parentUrl);
   }
 
   function handleDeleteError() {
@@ -100,7 +116,7 @@ export function PollingStationUpdatePage() {
                 {showDeleteModal && (
                   <PollingStationDeleteModal
                     electionId={election.id}
-                    pollingStationId={pollingStationId}
+                    pollingStation={requestState.data}
                     onCancel={toggleShowDeleteModal}
                     onError={handleDeleteError}
                     onDeleted={handleDeleted}

@@ -982,7 +982,14 @@
         },
         "responses": {
           "200": {
-            "description": "Polling station updated successfully"
+            "description": "Polling station updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStation"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",

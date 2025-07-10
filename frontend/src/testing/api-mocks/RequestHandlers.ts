@@ -138,7 +138,7 @@ export const LogUsersRequestHandler = http.get<
   AUDIT_LOG_LIST_USERS_REQUEST_PATH
 >("/api/log-users", () => HttpResponse.json(userMockData, { status: 200 }));
 
-// get election committee session details handler
+// get election committee session list handler
 export const ElectionCommitteeSessionListRequestHandler = http.get<
   ParamsToString<ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS>,
   null,
@@ -334,6 +334,7 @@ export const handlers: HttpHandler[] = [
   AccountUpdateRequestHandler,
   LogRequestHandler,
   LogUsersRequestHandler,
+  ElectionCommitteeSessionListRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,

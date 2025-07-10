@@ -28,7 +28,7 @@ h1,
 .heading-xl {
   font-family: var(--font-header), sans-serif;
   font-size: 2.25rem;
-  line-height: 2.35rem;
+  line-height: 2.75rem;
   letter-spacing: -0.045rem;
 }
 
@@ -147,4 +147,10 @@ a {
 .font-number {
   font-family: var(--font-number);
   font-feature-settings: "ss09" on;
+}
+
+/* Link styling */
+.underlined {
+  text-decoration: underline;
+  color: var(--link-default);
 }

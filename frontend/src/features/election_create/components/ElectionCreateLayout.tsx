@@ -23,9 +23,9 @@ const formSections: ElectionCreateFormSection[] = [
   { key: "election_definition", label: t("election_definition"), path: "create" },
   { key: "polling_station_role", label: t("polling_station.role"), path: "create/polling-station-role" },
   { key: "list_of_candidates", label: t("candidate.list.plural"), path: "create/list-of-candidates" },
-  { key: "polling_stations", label: t("polling_stations"), path: "create/polling-stations" },
+  { key: "polling_stations", label: t("polling_station.title.plural"), path: "create/polling-stations" },
   { key: "counting_method_type", label: t("counting_method_type"), path: "create/counting-method-type" },
-  { key: "number_of_voters", label: t("polling_station.number_of_voters"), path: "create/number-of-voters" },
+  { key: "number_of_voters", label: t("number_of_voters"), path: "create/number-of-voters" },
   { key: "check_and_save", label: t("election.check_and_save.title"), path: "create/check-and-save" },
 ];
 

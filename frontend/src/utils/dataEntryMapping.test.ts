@@ -314,7 +314,7 @@ describe("mapSectionValues", () => {
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title"],
+          headers: ["number", "vote_count", "candidate.title.singular"],
           rows: [
             { code: "A", path: "political_group_votes[0].candidate_votes[0].votes" },
             { code: "B", path: "political_group_votes[0].candidate_votes[1].votes" },
@@ -354,7 +354,7 @@ describe("mapSectionValues", () => {
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title"],
+          headers: ["number", "vote_count", "candidate.title.singular"],
           rows: [
             { code: "A", path: "political_group_votes[2].candidate_votes[5].votes" },
             { code: "B", path: "political_group_votes[2].total" },
@@ -725,7 +725,7 @@ describe("mapResultsToSectionValues", () => {
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title"],
+          headers: ["number", "vote_count", "candidate.title.singular"],
           rows: [
             { path: "political_group_votes[0].candidate_votes[0].votes" },
             { path: "political_group_votes[0].candidate_votes[1].votes" },
@@ -752,7 +752,7 @@ describe("mapResultsToSectionValues", () => {
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title"],
+          headers: ["number", "vote_count", "candidate.title.singular"],
           rows: [
             { path: "political_group_votes[0].candidate_votes[0].votes" },
             { path: "political_group_votes[0].candidate_votes[1].votes" },
@@ -786,7 +786,7 @@ describe("mapResultsToSectionValues", () => {
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title"],
+          headers: ["number", "vote_count", "candidate.title.singular"],
           rows: [
             { path: "political_group_votes[2].candidate_votes[5].votes" },
             { path: "political_group_votes[2].total" },

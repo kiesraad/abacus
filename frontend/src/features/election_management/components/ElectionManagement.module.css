@@ -1,0 +1,34 @@
+.electionHome {
+  h2 {
+    font-size: 1.5rem;
+    font-family: var(--font-header), sans-serif;
+    line-height: 2rem;
+  }
+
+  .tableTitle {
+    margin-bottom: 1rem;
+  }
+
+  div.cards {
+    display: flex;
+    gap: 2rem;
+  }
+
+  div.line {
+    border-bottom: 1px solid var(--gray-300);
+  }
+}
+
+.electionInformationTable {
+  width: 58.5rem;
+  font-size: var(--font-size-md);
+}
+
+.reportInfoSection {
+  margin-bottom: 2rem;
+  width: 37.5rem;
+
+  ul {
+    padding-left: 1.75rem;
+  }
+}

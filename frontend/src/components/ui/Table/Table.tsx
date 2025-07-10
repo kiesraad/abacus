@@ -63,8 +63,16 @@ function Body({ children, className }: { children: React.ReactNode; className?: 
   return <tbody className={className}>{children}</tbody>;
 }
 
-function Row({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <tr className={className}>{children}</tr>;
+function Row({
+  children,
+  increasedPadding,
+  className,
+}: {
+  children: React.ReactNode;
+  increasedPadding?: boolean;
+  className?: string;
+}) {
+  return <tr className={cn(increasedPadding && cls.increasedPadding, className)}>{children}</tr>;
 }
 
 function ClickRow({

@@ -27,7 +27,6 @@
     "polling_station_deleted": "Stembureau {number} ({name}) verwijderd",
     "polling_station_updated": "Wijzigingen stembureau {number} ({name}) opgeslagen"
   },
-  "number_of_voters": "Aantal kiesgerechtigden",
   "postal_code": "Postcode",
   "recounted_question": "Is er herteld?",
   "role": "Rol van het stembureau",

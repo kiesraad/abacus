@@ -5,6 +5,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { Election } from "@/types/generated/openapi";
+import { committeeSessionLabel } from "@/utils/committeeSession";
 
 import { NavBarMenuButton } from "./NavBarMenu";
 
@@ -43,7 +44,7 @@ function DataEntryLinks({ location }: NavBarLinksProps) {
 }
 
 function ElectionManagementLinks({ location }: NavBarLinksProps) {
-  const { election } = useElection();
+  const { committeeSession, election } = useElection();
 
   if (location.pathname.match(/^\/elections\/\d+\/?$/)) {
     return <></>;
@@ -58,7 +59,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
       {location.pathname.match(/^\/elections\/\d+\/polling-stations\/(create|\d+\/update)$/) && (
         <>
           <IconChevronRight />
-          <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_stations")}</Link>
+          <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
         </>
       )}
       {location.pathname.match(
@@ -72,7 +73,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
       {location.pathname.match(/^\/elections\/\d+\/status\/\d+\/(resolve-differences|resolve-errors)$/) && (
         <>
           <IconChevronRight />
-          <Link to={`/elections/${election.id}/status`}>{t("election_status.title")}</Link>
+          <Link to={`/elections/${election.id}/status`}>{committeeSessionLabel(committeeSession.number)}</Link>
         </>
       )}
     </>

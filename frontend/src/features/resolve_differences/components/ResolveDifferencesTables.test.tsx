@@ -2,6 +2,8 @@ import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { render, screen } from "@/testing/test-utils";
+import { PollingStationResults } from "@/types/generated/openapi";
+import { DataEntrySection, PollingStationResultsPath } from "@/types/types";
 import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
@@ -73,5 +75,112 @@ describe("ResolveDifferencesTables", () => {
       name: "Lijst 2 - Wijzen van Water en Wind",
     });
     expect(wiseOfWaterAndWindTable).not.toBeInTheDocument();
+  });
+
+  describe("checkboxes subsection handling", () => {
+    // Helper function to create a checkbox section for testing
+    const createCheckboxesSection = (): DataEntrySection => {
+      return {
+        id: "recounted",
+        title: "recounted",
+        short_title: "recounted",
+        subsections: [
+          {
+            type: "checkboxes",
+            short_title: "recounted.short_title",
+            error_path: "recounted",
+            error_message: "recounted.error",
+            options: [
+              // fake paths for testing, real PollingStationResults has only one boolean
+              {
+                path: "recounted.yes" as PollingStationResultsPath,
+                label: "recounted.yes",
+                short_label: "recounted.yes",
+              },
+              {
+                path: "recounted.no" as PollingStationResultsPath,
+                label: "recounted.no",
+                short_label: "recounted.no",
+              },
+            ],
+          },
+        ],
+      };
+    };
+
+    const createFirstResults = () =>
+      ({
+        recounted: {
+          yes: true,
+          no: false,
+        },
+      }) as unknown as PollingStationResults;
+
+    const createSecondResults = () =>
+      ({
+        recounted: {
+          yes: false,
+          no: true,
+        },
+      }) as unknown as PollingStationResults;
+
+    test("renders no table when checkbox values are the same", () => {
+      const checkboxSection = createCheckboxesSection();
+
+      render(
+        <ResolveDifferencesTables
+          first={createFirstResults()}
+          second={createFirstResults()}
+          structure={[checkboxSection]}
+        />,
+      );
+
+      const table = screen.queryByRole("table", { name: "recounted" });
+      expect(table).not.toBeInTheDocument();
+    });
+
+    test("renders checkboxes with single selected option in first entry", () => {
+      const checkboxSection = createCheckboxesSection();
+
+      render(
+        <ResolveDifferencesTables
+          first={createFirstResults()}
+          second={createSecondResults()}
+          structure={[checkboxSection]}
+        />,
+      );
+
+      const table = screen.queryByRole("table", { name: "recounted" });
+      expect(table).toHaveTableContent([
+        ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
+        ["", "Ja", "Nee", "Is er herteld?"],
+      ]);
+    });
+
+    test("renders checkboxes with multiple and no options selected", () => {
+      const checkboxSection = createCheckboxesSection();
+
+      const firstResults = {
+        recounted: {
+          yes: true,
+          no: true,
+        },
+      } as unknown as PollingStationResults;
+
+      const secondResults = {
+        recounted: {
+          yes: false,
+          no: false,
+        },
+      } as unknown as PollingStationResults;
+
+      render(<ResolveDifferencesTables first={firstResults} second={secondResults} structure={[checkboxSection]} />);
+
+      const table = screen.queryByRole("table", { name: "recounted" });
+      expect(table).toHaveTableContent([
+        ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
+        ["", "Ja, Nee", "-", "Is er herteld?"],
+      ]);
+    });
   });
 });

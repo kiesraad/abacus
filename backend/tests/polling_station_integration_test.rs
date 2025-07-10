@@ -134,22 +134,9 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let updated = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
-
-    assert_eq!(
-        updated.status(),
-        StatusCode::OK,
-        "Unexpected response status"
-    );
-
-    let updated_body: PollingStation = updated.json().await.unwrap();
-    assert_eq!(updated_body.name, "Testverandering");
-    assert_eq!(updated_body.address, "Teststraat 2a");
+    let update: PollingStation = response.json().await.unwrap();
+    assert_eq!(update.name, "Testverandering");
+    assert_eq!(update.address, "Teststraat 2a");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -180,22 +167,9 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let updated = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
-
-    assert_eq!(
-        updated.status(),
-        StatusCode::OK,
-        "Unexpected response status"
-    );
-
-    let updated_body: PollingStation = updated.json().await.unwrap();
-    assert_eq!(updated_body.name, "Testverandering");
-    assert_eq!(updated_body.polling_station_type, None);
+    let update: PollingStation = response.json().await.unwrap();
+    assert_eq!(update.name, "Testverandering");
+    assert_eq!(update.polling_station_type, None);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

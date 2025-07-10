@@ -137,8 +137,9 @@ impl PollingStations {
         election_id: u32,
         polling_station_id: u32,
         polling_station_update: PollingStationRequest,
-    ) -> Result<bool, sqlx::Error> {
-        let rows_affected = query!(
+    ) -> Result<PollingStation, sqlx::Error> {
+        query_as!(
+            PollingStation,
             r#"
             UPDATE polling_stations
             SET
@@ -151,6 +152,16 @@ impl PollingStations {
               locality = ?
             WHERE
               id = ? AND election_id = ?
+            RETURNING
+                id AS "id: u32",
+                election_id AS "election_id: u32",
+                name,
+                number,
+                number_of_voters,
+                polling_station_type AS "polling_station_type: _",
+                address,
+                postal_code,
+                locality
             "#,
             polling_station_update.name,
             polling_station_update.number,
@@ -162,11 +173,8 @@ impl PollingStations {
             polling_station_id,
             election_id,
         )
-        .execute(&self.0)
-        .await?
-        .rows_affected();
-
-        Ok(rows_affected > 0)
+        .fetch_one(&self.0)
+        .await
     }
 
     /// Delete a single polling station for an election

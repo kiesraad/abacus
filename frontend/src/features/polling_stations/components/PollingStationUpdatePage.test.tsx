@@ -4,6 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { useMessages } from "@/hooks/messages/useMessages";
 import {
   ElectionRequestHandler,
   PollingStationDeleteHandler,
@@ -17,6 +18,7 @@ import { PollingStation } from "@/types/generated/openapi";
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
 vi.mock("react-router");
+vi.mock("@/hooks/messages/useMessages");
 
 describe("PollingStationUpdatePage", () => {
   const testPollingStation: PollingStation = {
@@ -31,9 +33,12 @@ describe("PollingStationUpdatePage", () => {
     number_of_voters: 1,
   };
 
+  const pushMessage = vi.fn();
+
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationGetHandler, PollingStationUpdateHandler);
     vi.mocked(useParams).mockReturnValue({ pollingStationId: "1" });
+    vi.mocked(useMessages).mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
   });
 
   test("Shows form", async () => {
@@ -61,8 +66,8 @@ describe("PollingStationUpdatePage", () => {
     saveButton.click();
 
     await waitFor(() => {
+      expect(pushMessage).toHaveBeenCalledWith({ title: "Wijzigingen stembureau 34 (Testplek) opgeslagen" });
       expect(router.state.location.pathname).toEqual("/elections/1/polling-stations");
-      expect(router.state.location.search).toEqual("?updated=1");
     });
   });
 
@@ -90,8 +95,8 @@ describe("PollingStationUpdatePage", () => {
 
       expect(deletePollingStation).toHaveBeenCalled();
 
+      expect(pushMessage).toHaveBeenCalledWith({ title: "Stembureau 33 (Op Rolletjes) verwijderd" });
       expect(router.state.location.pathname).toEqual("/elections/1/polling-stations");
-      expect(router.state.location.search).toEqual("?deleted=33%20(Op%20Rolletjes)");
     });
 
     test("Shows an error message when delete was not possible", async () => {

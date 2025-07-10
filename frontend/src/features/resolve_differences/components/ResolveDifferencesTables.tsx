@@ -1,6 +1,6 @@
 import { t } from "@/i18n/translate";
 import { PollingStationResults, ResolveDifferencesAction } from "@/types/generated/openapi";
-import { DataEntrySection, DataEntryStructure, RadioSubsectionOption } from "@/types/types";
+import { DataEntrySection, DataEntryStructure, RadioSubsectionOption, SectionValues } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 
 import { DifferencesTable } from "./DifferencesTable";
@@ -57,6 +57,38 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
               code: "",
               first: mapRadioValue(firstValues[subsection.path], subsection.options),
               second: mapRadioValue(secondValues[subsection.path], subsection.options),
+              description: t(subsection.short_title),
+            };
+
+            return (
+              <DifferencesTable
+                key={`${section.id}-${subsectionIdx}`}
+                title={title}
+                headers={headers}
+                rows={[row]}
+                action={action}
+              />
+            );
+          }
+          case "checkboxes": {
+            const headers = [
+              t("resolve_differences.headers.field"),
+              t("resolve_differences.headers.first_entry"),
+              t("resolve_differences.headers.second_entry"),
+              t("resolve_differences.headers.description"),
+            ];
+
+            const getSelectedOptions = (values: SectionValues) => {
+              return subsection.options
+                .filter((option) => values[option.path] === "true")
+                .map((option) => t(option.short_label))
+                .join(", ");
+            };
+
+            const row = {
+              code: "",
+              first: getSelectedOptions(firstValues) || "-",
+              second: getSelectedOptions(secondValues) || "-",
               description: t(subsection.short_title),
             };
 

@@ -1,37 +1,68 @@
 import { describe, expect, test } from "vitest";
 
 import { PollingStationResults } from "@/types/generated/openapi";
-import { DataEntrySection } from "@/types/types";
+import { DataEntrySection, PollingStationResultsPath } from "@/types/types";
 
 import { mapResultsToSectionValues, mapSectionValues } from "./dataEntryMapping";
 import { createVotersAndVotesSection, differencesSection, recountedSection } from "./dataEntryStructure";
 
-describe("mapSectionValues", () => {
-  const createBasePollingStationResults = (): PollingStationResults => ({
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
-    political_group_votes: [],
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      votes_candidates_count: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-  });
+// Helper function to create a base PollingStationResults object for testing
+const createBasePollingStationResults = (): PollingStationResults => ({
+  differences_counts: {
+    more_ballots_count: 0,
+    fewer_ballots_count: 0,
+    unreturned_ballots_count: 0,
+    too_few_ballots_handed_out_count: 0,
+    too_many_ballots_handed_out_count: 0,
+    other_explanation_count: 0,
+    no_explanation_count: 0,
+  },
+  political_group_votes: [],
+  voters_counts: {
+    poll_card_count: 0,
+    proxy_certificate_count: 0,
+    voter_card_count: 0,
+    total_admitted_voters_count: 0,
+  },
+  votes_counts: {
+    votes_candidates_count: 0,
+    blank_votes_count: 0,
+    invalid_votes_count: 0,
+    total_votes_cast_count: 0,
+  },
+});
 
+// Helper function to create a checkbox section for testing
+const createCheckboxesSection = (): DataEntrySection => {
+  return {
+    id: "recounted",
+    title: "recounted",
+    short_title: "recounted",
+    subsections: [
+      {
+        type: "checkboxes",
+        short_title: "recounted.short_title",
+        error_path: "recounted",
+        error_message: "recounted.error",
+        options: [
+          // fake paths for testing, real PollingStationResults has only one boolean
+          {
+            path: "recounted.yes" as PollingStationResultsPath,
+            label: "recounted.yes",
+            short_label: "recounted.yes",
+          },
+          {
+            path: "recounted.no" as PollingStationResultsPath,
+            label: "recounted.no",
+            short_label: "recounted.no",
+          },
+        ],
+      },
+    ],
+  };
+};
+
+describe("mapSectionValues", () => {
   test.each([
     { input: "true", expected: true, description: "true" },
     { input: "false", expected: false, description: "false" },
@@ -530,35 +561,24 @@ describe("mapSectionValues", () => {
     expect(result.voters_counts.proxy_certificate_count).toBe(25);
     expect(result.political_group_votes[0]?.candidate_votes[1]?.votes).toBe(30);
   });
+
+  test("should handle checkboxes subsection", () => {
+    const current = createBasePollingStationResults();
+    const formValues = {
+      "recounted.yes": "true",
+      "recounted.no": "false",
+    };
+
+    // use `any` because real PollingStationResults doesn't have recounted.yes/recounted.no
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+    const result: any = mapSectionValues(current, formValues, createCheckboxesSection());
+    expect(result.recounted.yes).toBe(true);
+    expect(result.recounted.no).toBe(false);
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+  });
 });
 
 describe("mapResultsToSectionValues", () => {
-  const createBasePollingStationResults = (): PollingStationResults => ({
-    recounted: false,
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
-    political_group_votes: [],
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      votes_candidates_count: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-  });
-
   test.each([
     { input: true, expected: "true", description: "true" },
     { input: false, expected: "false", description: "false" },
@@ -891,5 +911,34 @@ describe("mapResultsToSectionValues", () => {
     expect(Object.keys(formValues).length).toBe(2);
     expect(formValues["recounted"]).toBe("true");
     expect(formValues["voters_counts.poll_card_count"]).toBe("100");
+  });
+
+  test("should extract checkboxes boolean values to string form", () => {
+    // use `any` because real PollingStationResults doesn't have recounted.yes/recounted.no
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unnecessary-type-assertion, @typescript-eslint/no-unsafe-argument */
+    const results: any = createBasePollingStationResults();
+    const checkboxesSection = createCheckboxesSection();
+
+    // Test with both true values
+    (results as any).recounted = { yes: true, no: true };
+
+    let formValues = mapResultsToSectionValues(checkboxesSection, results);
+    expect(formValues["recounted.yes"]).toBe("true");
+    expect(formValues["recounted.no"]).toBe("true");
+
+    // Test with both false values
+    (results as any).recounted = { yes: false, no: false };
+
+    formValues = mapResultsToSectionValues(checkboxesSection, results);
+    expect(formValues["recounted.yes"]).toBe("false");
+    expect(formValues["recounted.no"]).toBe("false");
+
+    // Test with mixed values
+    (results as any).recounted = { yes: true, no: false };
+
+    formValues = mapResultsToSectionValues(checkboxesSection, results);
+    expect(formValues["recounted.yes"]).toBe("true");
+    expect(formValues["recounted.no"]).toBe("false");
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unnecessary-type-assertion, @typescript-eslint/no-unsafe-argument */
   });
 });

@@ -56,6 +56,26 @@ export interface RadioSubsection {
   valueType?: "string" | "boolean";
 }
 
+export interface CheckboxesSubsectionOption {
+  path: PollingStationResultsPath;
+  /** Label for data entry form view */
+  label: TranslationPath;
+  /** Short label for differences view */
+  short_label: TranslationPath;
+  autoFocusInput?: boolean;
+}
+
+export interface CheckboxesSubsection {
+  type: "checkboxes";
+  /** Short title for differences view */
+  short_title: TranslationPath;
+  /** Path in results object that will indicate an error */
+  error_path: PollingStationResultsPath;
+  /** Error message to be shown when there is an error for error_path */
+  error_message: TranslationPath;
+  options: CheckboxesSubsectionOption[];
+}
+
 export interface InputGridSubsectionRow {
   code?: string;
   path: PollingStationResultsPath;
@@ -73,7 +93,12 @@ export interface InputGridSubsection {
   rows: InputGridSubsectionRow[];
 }
 
-export type DataEntrySubsection = HeadingSubsection | MessageSubsection | RadioSubsection | InputGridSubsection;
+export type DataEntrySubsection =
+  | HeadingSubsection
+  | MessageSubsection
+  | RadioSubsection
+  | InputGridSubsection
+  | CheckboxesSubsection;
 
 export interface DataEntrySection {
   id: FormSectionId;

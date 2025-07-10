@@ -37,7 +37,7 @@ export function ElectionHomePage() {
               </h2>
             </div>
           </div>
-          <div className={cn(cls.cards, "mb-xl")}>
+          <div id="committee-session-cards" className={cn(cls.cards, "mb-xl")}>
             <CommitteeSessionCards />
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>

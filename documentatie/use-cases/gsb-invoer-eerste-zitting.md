@@ -23,9 +23,9 @@ __Uitbreidingen:__
 &emsp; 2b3. Het GSB voert de gecorrigeerde/nieuwe Na 31-2 Bijlage 1 in de applicatie in.  
 &emsp; 2b4. Het GSB vermeldt het stembureau bij "extra onderzoeken van het GSB" in het PV.
 
-2c. (DSO) Er zijn controles op de telresultaten van het stembureau uitgevoerd
-&emsp; 2c1. Het GSB vult het inlegvel in.
-&emsp; 2c2. Het GSB voegt het inlegvel toe aan het proces verbaal.
+2c. (DSO) Er zijn controles op de telresultaten van het stembureau uitgevoerd:  
+&emsp; 2c1. Het GSB vult het inlegvel in.  
+&emsp; 2c2. Het GSB voegt het inlegvel toe aan het proces verbaal.  
 
 2-3a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
 &emsp; 2-3a1. De coördinator GSB pauzeert de invoer.  

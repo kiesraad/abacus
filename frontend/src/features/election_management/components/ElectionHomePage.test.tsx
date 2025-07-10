@@ -41,7 +41,7 @@ describe("ElectionHomePage", () => {
     expect(election_information_table).toHaveTableContent([
       ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
-      ["Lijsten en kandidaten", ""],
+      ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
       ["Aantal kiesgerechtigden", "100"],
       ["Invoer doen voor", ""],
       ["Stembureaus", "5 stembureaus"],

@@ -33,6 +33,7 @@
   "history_back": "Terug naar de vorige pagina",
   "invalid_paste_content": "Je probeert <strong>{value}</strong> te plakken. Je kunt hier alleen cijfers invullen.",
   "list": "Lijst",
+  "lists": "Lijsten",
   "list_name": "Lijstnaam",
   "loading": "Laden...",
   "logs": "Logs",

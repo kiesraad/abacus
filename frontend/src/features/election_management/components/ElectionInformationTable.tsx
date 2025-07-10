@@ -1,14 +1,25 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import { Election } from "@/types/generated/openapi";
+import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/format";
 
 import cls from "./ElectionManagement.module.css";
 
 interface ElectionInformationTableProps {
-  election: Election;
+  election: ElectionWithPoliticalGroups;
   numberOfPollingStations: number;
+}
+
+function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
+  let label = "";
+  let number_of_candidates: number = 0;
+  election.political_groups.forEach((ps) => {
+    number_of_candidates += ps.candidates.length;
+  });
+  label += `${election.political_groups.length} ${t(`list${election.political_groups.length === 1 ? "" : "s"}`).toLowerCase()}`;
+  label += ` ${t("and").toLowerCase()} ${number_of_candidates} ${t(`candidate.title.${number_of_candidates === 1 ? "singular" : "plural"}`).toLowerCase()}`;
+  return label;
 }
 
 export function ElectionInformationTable({ election, numberOfPollingStations }: ElectionInformationTableProps) {
@@ -36,7 +47,7 @@ export function ElectionInformationTable({ election, numberOfPollingStations }: 
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.lists_and_candidates")}
           </Table.HeaderCell>
-          <Table.Cell></Table.Cell>
+          <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">

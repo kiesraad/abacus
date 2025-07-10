@@ -1,5 +1,8 @@
 {
-  "title": "Kandidaat",
+  "title": {
+    "singular": "Kandidaat",
+    "plural": "Kandidaten"
+  },
   "Female": "v",
   "list": {
     "plural": "Kandidatenlijsten",

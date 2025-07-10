@@ -3,18 +3,7 @@ import { t } from "@/i18n/translate";
 import { CommitteeSessionStatus } from "@/types/generated/openapi";
 
 export function CommitteeSessionStatusLabel(status: CommitteeSessionStatus, role: "coordinator" | "typist"): string {
-  switch (status) {
-    case "created":
-      return t(`committee_session_status.${role}.created`);
-    case "data_entry_not_started":
-      return t(`committee_session_status.${role}.data_entry_not_started`);
-    case "data_entry_in_progress":
-      return t(`committee_session_status.${role}.data_entry_in_progress`);
-    case "data_entry_paused":
-      return t(`committee_session_status.${role}.data_entry_paused`);
-    case "data_entry_finished":
-      return t(`committee_session_status.${role}.data_entry_finished`);
-  }
+  return t(`committee_session_status.${role}.${status}`);
 }
 
 export interface CommitteeSessionStatusWithIconProps {

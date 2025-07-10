@@ -51,11 +51,9 @@ __Uitbreidingen:__
 ### Niet in scope
 
 - "8a1. Het GSB stelt het bezwaar vast." Wat gebeurt hier precies?
-- Elektronische handtekening van documenten.
 - CSO: Invullen van "Bijlage 2: Bezwaren van aanwezigen op stembureaus" in de applicatie. Wordt wel handmatig toegevoegd aan het geprinte PV door coördinator GSB.
 - Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Dit gaan we niet faciliteren in de applicatie.
 - Invoeren van het resultaat controleprotocol (handmatige controle optellingen software). N.B. Als het controleprotocol verschillen oplevert, dan is er een probleem met het PV uit de applicatie en kan dat PV dus niet gebruikt worden.
-- Het GSB faciliteren in het berekenen van een voorlopige zetelverdeling. (nooit in scope)
 
 
 ### Open punten

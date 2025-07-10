@@ -6,7 +6,7 @@ export function CommitteeSessionCards() {
   const { committeeSessions } = useCommitteeSessionList();
 
   return (
-    <>
+    <div id="committee-session-cards">
       {committeeSessions.map((committeeSession, index) => (
         <CommitteeSessionCard
           key={committeeSession.id}
@@ -14,6 +14,6 @@ export function CommitteeSessionCards() {
           currentSession={index === 0}
         />
       ))}
-    </>
+    </div>
   );
 }

@@ -6,14 +6,16 @@ import { CommitteeSessionStatus } from "@/types/generated/openapi";
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 
 type Props = {
+  number: number;
   status: CommitteeSessionStatus;
   startDate: string;
   startTime: string;
   currentSession: boolean;
 };
 
-export const DefaultCommitteeSessionCard: Story<Props> = ({ status, startDate, startTime, currentSession }) => {
+export const DefaultCommitteeSessionCard: Story<Props> = ({ number, status, startDate, startTime, currentSession }) => {
   const committeeSession = getCommitteeSessionMockData({
+    number: number,
     status: status,
     start_date: startDate,
     start_time: startTime,
@@ -24,6 +26,11 @@ export const DefaultCommitteeSessionCard: Story<Props> = ({ status, startDate, s
 
 export default {
   argTypes: {
+    number: {
+      options: [1, 2, 3],
+      control: { type: "radio" },
+      defaultValue: 1,
+    },
     status: {
       options: [
         "created",

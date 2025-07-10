@@ -1,3 +1,4 @@
+import { within } from "@testing-library/dom";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
@@ -35,6 +36,14 @@ describe("ElectionHomePage", () => {
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
     expect(await screen.findByRole("heading", { level: 2, name: "0035 Heemdamseburg" })).toBeVisible();
+
+    const committee_session_cards = await screen.findByTestId("committee-session-cards");
+    expect(committee_session_cards).toBeVisible();
+    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
+    expect(within(committee_session_cards).getByText("— Invoerders klaar")).toBeInTheDocument();
+    expect(within(committee_session_cards).getByText("Tweede zitting")).toBeVisible();
+    expect(within(committee_session_cards).getByText("— Invoerders bezig")).toBeInTheDocument();
+
     expect(await screen.findByRole("heading", { level: 3, name: "Over deze verkiezing" })).toBeVisible();
     const election_information_table = await screen.findByTestId("election-information-table");
     expect(election_information_table).toBeVisible();

@@ -60,23 +60,8 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- We willen zoveel mogelijk van het PV in de applicatie invoeren. Dus idealiter worden alleen de handtekeningen van de GSB-leden met pen gezet. Dat is niet wat er op dit moment in de use cases staat.
-- Hoe ziet de overdracht van het EML_NL bestand van GSB naar CSB binnen de applicatie er precies uit?
-  - De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
-  - Proces via uitwisselplatform loopt parallel.
-- Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het PV?
 - Moet de applicatie een preview van het te genereren PV tonen, zodat de coördinator GSB die kan controleren en eventuele fouten kan herstellen?
   - Preview: bestand genereren met "concept" in watermerk en in bestandsnaam.
-- Zijn de invoervelden voor de tellingen van een stembureau voor DSO gelijk aan die van CSO?
-  - Waarschijnlijk niet, bijvoorbeeld geen "Is er herteld?" op SB PV.
-  - Nieuwe modellen op nalopen.
-- Is het wenselijk om een 'leeg' corrigendum (wel ingevuld: kandidatenlijsten (keuze welke lijsten), stembureau(?), gemeente, oorspronkelijke resultaten?) te kunnen genereren in applicatie?
-  - N 10-1 (PV SB DSO) en Na 14-1 versie 1 (corrigendum op PV SB DSO)
-  - Ja.
-  - Meerdere opties mogelijk:
-    - minimaal kandidatenlijst en gemeente
-    - extra: stembureau en oorspronkelijke resultaten SB
-
 
 ## De coördinator GSB bewerkt de stembureaus tijdens de eerste of nieuwe zitting (zee)
 
@@ -101,7 +86,6 @@ __Hoofdscenario 2:__
 
 - Het opnemen van andere bijzonderheden i.v.m. stembureaus in het proces-verbaal, bijv. stembureau dat halverwege de dag werd gesloten. Dit hoort in de bezwaren en bijzonderheden van dat betreffende stembureau.
 
-
 ## De coördinator GSB maakt het PV en het digitale bestand aan (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
@@ -115,5 +99,7 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__  
 1a. Niet alle stembureaus hebben definitieve invoer:  
+&emsp; 1a1. De invoer wordt volgens [het reguliere invoerproces](./gsb-invoer-eerste-zitting.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger) alsnog definitief gemaakt. 
 
 1b. De invoer is niet afgesloten:
+&emsp; 1b1. De invoer wordt volgens [het reguliere invoerproces](./gsb-invoer-eerste-zitting.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger) alsnog afgesloten.

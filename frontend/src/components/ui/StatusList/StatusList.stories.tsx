@@ -1,10 +1,8 @@
-import type { Story } from "@ladle/react";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 
 import { StatusList } from "./StatusList";
 
-/** Story stub for form */
-
-export const DefaultStatusList: Story = () => (
+export const DefaultStatusList: StoryFn = () => (
   <StatusList>
     <StatusList.Item status="accept">Accepted</StatusList.Item>
     <StatusList.Item status="active" emphasis>
@@ -19,3 +17,5 @@ export const DefaultStatusList: Story = () => (
     </StatusList.Item>
   </StatusList>
 );
+
+export default {} satisfies Meta;

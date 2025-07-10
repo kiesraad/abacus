@@ -1,4 +1,4 @@
-import type { Story } from "@ladle/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { IconCheckHeart } from "@/components/generated/icons";
 import { Size } from "@/types/ui";
@@ -10,21 +10,23 @@ type Props = {
   size: Size;
 };
 
-export const DefaultIcon: Story<Props> = ({ color, size }) => (
-  <Icon size={size} color={color} icon={<IconCheckHeart />} />
-);
+export const DefaultIcon: StoryObj<Props> = {
+  args: {
+    color: "accept",
+    size: "md",
+  },
+  render: ({ color, size }) => <Icon size={size} color={color} icon={<IconCheckHeart />} />,
+};
 
 export default {
   argTypes: {
     color: {
       options: ["primary", "accept", "warning", "error"],
-      defaultValue: "accept",
       control: { type: "radio" },
     },
     size: {
       options: ["xs", "sm", "md", "lg", "xl"],
-      defaultValue: "md",
       control: { type: "radio" },
     },
   },
-};
+} satisfies Meta<Props>;

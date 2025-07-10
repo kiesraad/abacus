@@ -1,4 +1,4 @@
-import { Story } from "@ladle/react";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 
 import { IconCheckHeart } from "@/components/generated/icons";
 import { Fraction } from "@/types/generated/openapi";
@@ -13,7 +13,7 @@ const data: [number, string, string][] = [
   [3, "another", "thing"],
 ];
 
-export const BasicTable: Story = () => (
+export const BasicTable: StoryFn = () => (
   <Table id="basic_table">
     <Table.Header>
       <Table.HeaderCell>Number</Table.HeaderCell>
@@ -32,7 +32,7 @@ export const BasicTable: Story = () => (
   </Table>
 );
 
-export const StyledTable: Story = () => (
+export const StyledTable: StoryFn = () => (
   <Table id="styled_table">
     <Table.Header className="bg-gray">
       <Table.HeaderCell>Nummer</Table.HeaderCell>
@@ -57,7 +57,7 @@ export const StyledTable: Story = () => (
   </Table>
 );
 
-export const LinkTable: Story = () => {
+export const LinkTable: StoryFn = () => {
   return (
     <Table id="link_table">
       <Table.Header>
@@ -78,7 +78,7 @@ export const LinkTable: Story = () => {
   );
 };
 
-export const TotalTableWithFractions: Story = () => {
+export const TotalTableWithFractions: StoryFn = () => {
   const data: [number, string, Fraction, number][] = [
     [1, "Political Group A", { integer: 3, numerator: 149, denominator: 150 }, 15],
     [2, "Political Group B", { integer: 5, numerator: 0, denominator: 1 }, 11],
@@ -156,7 +156,7 @@ export const TotalTableWithFractions: Story = () => {
   );
 };
 
-export const IconBadgeTable: Story = () => (
+export const IconBadgeTable: StoryFn = () => (
   <Table id="icon_badge_table">
     <Table.Header>
       <Table.HeaderCell>Number</Table.HeaderCell>
@@ -180,3 +180,5 @@ export const IconBadgeTable: Story = () => (
     </Table.Body>
   </Table>
 );
+
+export default {} satisfies Meta;

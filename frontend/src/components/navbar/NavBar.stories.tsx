@@ -1,9 +1,7 @@
 import * as React from "react";
 
-import { Story } from "@ladle/react";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 
-import { ElectionProviderContext } from "@/hooks/election/ElectionProviderContext";
-import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { Role } from "@/types/generated/openapi";
 
@@ -11,9 +9,12 @@ import { NavBar } from "./NavBar";
 import cls from "./NavBar.module.css";
 import { NavBarMenu, NavBarMenuButton } from "./NavBarMenu";
 
-export default {
-  title: "App / Navigation bar",
-};
+const meta = {
+  parameters: {
+    needsElection: true,
+  },
+} satisfies Meta;
+export default meta;
 
 const locations: { pathname: string; userRole: Role }[] = [
   { pathname: "/account/login", userRole: "typist" },
@@ -43,14 +44,8 @@ const locations: { pathname: string; userRole: Role }[] = [
   { pathname: "/elections/1/apportionment/details-residual-seats", userRole: "coordinator" },
 ];
 
-export const AllRoutes: Story = () => (
-  <ElectionProviderContext.Provider
-    value={{
-      committeeSession: electionDetailsMockResponse.committee_session,
-      election: electionDetailsMockResponse.election,
-      pollingStations: electionDetailsMockResponse.polling_stations,
-    }}
-  >
+export const AllRoutes: StoryFn = () => (
+  <>
     {locations.map((location) => (
       <React.Fragment key={location.pathname + location.userRole}>
         <TestUserProvider userRole={location.userRole}>
@@ -62,16 +57,16 @@ export const AllRoutes: Story = () => (
         </TestUserProvider>
       </React.Fragment>
     ))}
-  </ElectionProviderContext.Provider>
+  </>
 );
 
-export const Menu: Story = () => (
+export const Menu: StoryFn = () => (
   <div className={cls.navBarMenuContainer}>
     <NavBarMenu />
   </div>
 );
 
-export const MenuButton: Story = () => (
+export const MenuButton: StoryFn = () => (
   <nav aria-label="primary-navigation" className={cls.navBar}>
     <div className={cls.links}>
       <NavBarMenuButton />

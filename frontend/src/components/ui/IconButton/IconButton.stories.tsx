@@ -1,4 +1,4 @@
-import type { Story } from "@ladle/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { IconCross } from "@/components/generated/icons";
 import { ButtonVariant, Size } from "@/types/ui";
@@ -12,30 +12,34 @@ type Props = {
   isRound: boolean;
 };
 
-export const DefaultIconButton: Story<Props> = ({ label, variant, size, isRound }) => (
-  <IconButton
-    role="button"
-    title="Icon Button"
-    icon={<IconCross />}
-    aria-label={label}
-    variant={variant}
-    size={size}
-    isRound={isRound}
-  />
-);
+export const DefaultIconButton: StoryObj<Props> = {
+  render: ({ label, variant, size, isRound }) => (
+    <IconButton
+      role="button"
+      title="Icon Button"
+      icon={<IconCross />}
+      aria-label={label}
+      variant={variant}
+      size={size}
+      isRound={isRound}
+    />
+  ),
+};
 
-export const DisabledIconButton: Story<Props> = ({ label, variant, size, isRound }) => (
-  <IconButton
-    role="button"
-    title="Icon Button"
-    icon={<IconCross />}
-    aria-label={label}
-    variant={variant}
-    size={size}
-    isRound={isRound}
-    isDisabled
-  />
-);
+export const DisabledIconButton: StoryObj<Props> = {
+  render: ({ label, variant, size, isRound }) => (
+    <IconButton
+      role="button"
+      title="Icon Button"
+      icon={<IconCross />}
+      aria-label={label}
+      variant={variant}
+      size={size}
+      isRound={isRound}
+      isDisabled
+    />
+  ),
+};
 
 export default {
   args: {
@@ -54,4 +58,4 @@ export default {
       control: { type: "boolean" },
     },
   },
-};
+} satisfies Meta<Props>;

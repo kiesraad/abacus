@@ -21,7 +21,7 @@ const config: PlaywrightTestConfig = defineConfig({
   // Increase the test timeout on CI, which is usually slower
   timeout: process.env.CI ? 30_000 : 20_000,
   reporter: process.env.CI
-    ? [["list"], ["github"], ["junit", { outputFile: "playwright.ladle.junit.xml" }], ["html", { open: "never" }]]
+    ? [["list"], ["github"], ["junit", { outputFile: "playwright.e2e.junit.xml" }], ["html", { open: "never" }]]
     : "list",
   testDir: "./e2e-tests",
   outputDir: "./test-results/e2e-tests",

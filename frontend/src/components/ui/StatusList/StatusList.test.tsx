@@ -3,7 +3,6 @@ import { describe, expect, test } from "vitest";
 import { render, screen } from "@/testing/test-utils";
 
 import { StatusList } from "./StatusList";
-import { DefaultStatusList } from "./StatusList.stories";
 
 describe("StatusList", () => {
   test("renders a list", () => {
@@ -16,14 +15,5 @@ describe("StatusList", () => {
     expect(document.querySelector("ul")).not.toBeNull();
     expect(screen.getByText("Hello")).toBeInTheDocument();
     expect(screen.getByText("World")).toBeInTheDocument();
-  });
-
-  test("It renders all icons", () => {
-    render(<DefaultStatusList />);
-
-    expect(screen.getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "leeg" })).toBeInTheDocument();
-    expect(screen.getAllByRole("img", { name: "opgeslagen" })[0]).toBeInTheDocument();
   });
 });

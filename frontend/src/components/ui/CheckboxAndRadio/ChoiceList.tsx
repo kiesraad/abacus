@@ -34,6 +34,8 @@ ChoiceList.Checkbox = ({
   defaultChecked,
   hasError,
   reference,
+  checked,
+  onChange,
 }: ChoiceListOptionProps) => (
   <Checkbox
     id={id}
@@ -43,6 +45,8 @@ ChoiceList.Checkbox = ({
     defaultChecked={defaultChecked}
     hasError={hasError}
     ref={reference}
+    checked={checked}
+    onChange={onChange}
   >
     {children}
   </Checkbox>

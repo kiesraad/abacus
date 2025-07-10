@@ -27,6 +27,12 @@ export function mapSectionValues(
         }
         break;
       }
+      case "checkboxes": {
+        for (const option of subsection.options) {
+          fieldInfoMap.set(option.path, "boolean");
+        }
+        break;
+      }
     }
   }
 
@@ -52,6 +58,13 @@ export function mapResultsToSectionValues(section: DataEntrySection, results: Po
         for (const row of subsection.rows) {
           const gridValue = getValueAtPath(results, row.path);
           formValues[row.path] = valueToString(gridValue);
+        }
+        break;
+      }
+      case "checkboxes": {
+        for (const option of subsection.options) {
+          const checkboxValue = getValueAtPath(results, option.path);
+          formValues[option.path] = valueToString(checkboxValue);
         }
         break;
       }

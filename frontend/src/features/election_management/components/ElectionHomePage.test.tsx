@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import {
@@ -27,9 +26,7 @@ describe("ElectionHomePage", () => {
       <TestUserProvider userRole="coordinator">
         <ElectionProvider electionId={1}>
           <ElectionStatusProvider electionId={1}>
-            <CommitteeSessionListProvider electionId={1}>
-              <ElectionHomePage />
-            </CommitteeSessionListProvider>
+            <ElectionHomePage />
           </ElectionStatusProvider>
         </ElectionProvider>
       </TestUserProvider>,

@@ -1,6 +1,7 @@
 import { HTMLAttributes, ReactNode } from "react";
 import { To } from "react-router";
 
+import { CommitteeSessionStatusLabel } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";
 import { CommitteeSessionStatusIcon } from "@/components/ui/Icon/CommitteeSessionStatusIcon";
 import { Table } from "@/components/ui/Table/Table";
@@ -10,8 +11,7 @@ import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatFullDateWithoutTimezone } from "@/utils/format";
 
-import cls from "./CommitteeSession.module.css";
-import { CommitteeSessionStatusLabel } from "./CommitteeSessionStatus";
+import cls from "./CommitteeSessionCard.module.css";
 
 export type DivProps = HTMLAttributes<HTMLDivElement>;
 

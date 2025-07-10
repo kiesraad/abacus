@@ -1,7 +1,6 @@
+import { CommitteeSessionStatusIcon } from "@/components/ui/Icon/CommitteeSessionStatusIcon";
 import { t } from "@/i18n/translate";
 import { CommitteeSessionStatus } from "@/types/generated/openapi";
-
-import { CommitteeSessionStatusIcon } from "../ui/Icon/CommitteeSessionStatusIcon";
 
 export function CommitteeSessionStatusLabel(status: CommitteeSessionStatus, role: "coordinator" | "typist"): string {
   switch (status) {

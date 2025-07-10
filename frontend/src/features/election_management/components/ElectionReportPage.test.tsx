@@ -2,7 +2,6 @@ import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
-import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import {
@@ -64,9 +63,7 @@ describe("ElectionReportPage", () => {
     render(
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <CommitteeSessionListProvider electionId={1}>
-            <ElectionReportPage />
-          </CommitteeSessionListProvider>
+          <ElectionReportPage />
         </ElectionStatusProvider>
       </ElectionProvider>,
     );

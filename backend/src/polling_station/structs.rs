@@ -50,7 +50,7 @@ impl From<PollingStation> for PollingStationDetails {
 }
 
 /// Polling station of a certain [crate::election::Election]
-#[derive(Serialize, Deserialize, ToSchema, Debug, FromRequest)]
+#[derive(Clone, Serialize, Deserialize, ToSchema, Debug, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 pub struct PollingStationRequest {
     pub name: String,

@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
@@ -18,6 +18,11 @@ export function UploadCandidatesDefinition() {
   const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const [error, setError] = useState<ReactNode | undefined>();
   const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
+
+  // if no election data was stored, navigate back to beginning
+  if (!state.electionDefinitionData) {
+    return <Navigate to="/elections/create" />;
+  }
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
@@ -66,7 +71,8 @@ export function UploadCandidatesDefinition() {
     state.election &&
     state.candidateDefinitionFileName &&
     state.candidateDefinitionRedactedHash &&
-    state.candidateDefinitionData
+    state.candidateDefinitionData &&
+    !state.candidateDefinitionHash
   ) {
     async function onSubmit(chunks: string[]) {
       const response = await create({
@@ -80,7 +86,7 @@ export function UploadCandidatesDefinition() {
           type: "SET_CANDIDATES_DEFINITION_HASH",
           candidateDefinitionHash: chunks,
         });
-        await navigate("/elections/create/check-and-save");
+        await navigate("/elections/create/polling-stations");
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
         setError(response.message);
       }

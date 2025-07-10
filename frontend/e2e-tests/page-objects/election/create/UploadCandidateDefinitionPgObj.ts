@@ -4,11 +4,13 @@ export class UploadCandidateDefinitionPgObj {
   readonly header: Locator;
   readonly error: Locator;
   readonly upload: Locator;
+  readonly main: Locator;
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 2, name: "Importeer kandidatenlijst" });
     this.error = page.getByRole("heading", { level: 3, name: "Ongeldige kandidatenlijst" });
     this.upload = page.getByRole("button", { name: "Bestand kiezen" });
+    this.main = page.getByRole("main");
   }
 
   async uploadFile(page: Page, path: string) {

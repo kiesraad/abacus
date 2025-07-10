@@ -285,5 +285,4 @@ export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = ge
 export const electionMockData = electionDetailsMockResponse.election;
 export const newElectionMockData = {
   ...electionDetailsMockResponse.election,
-  polling_stations: pollingStationMockData,
 } as Required<NewElection>;

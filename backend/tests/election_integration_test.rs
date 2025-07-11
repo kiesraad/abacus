@@ -4,7 +4,7 @@ use crate::{shared::create_result, utils::serve_api};
 #[cfg(feature = "dev-database")]
 use abacus::election::Election;
 use abacus::{
-    committee_session::CommitteeSessionStatus,
+    committee_session::status::CommitteeSessionStatus,
     election::{ElectionDetailsResponse, ElectionListResponse},
 };
 use axum::http::StatusCode;

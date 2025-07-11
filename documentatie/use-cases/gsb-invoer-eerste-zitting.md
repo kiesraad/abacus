@@ -42,7 +42,7 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- Komt het inlegvel uit Abacus of is het onderdeel van de toolkit? (N10-1 wordt als typst template gemaakt dus het kan)
+- Komt het inlegvel uit Abacus of is het onderdeel van de toolkit? (N10-1 wordt als typst template gemaakt dus het kan) -> kan beiden, afhankelijk van het proces en de mogelijkheden van de gemeente
 - Hoe ziet het stoppen/blokkeren van invoer er precies uit?
 - CSO: invoerders vullen gegevens van Bijlage 1 in. DSO: invoerders vullen gegevens van N 10-1 en evt. Na 14-1 in. => input-/output-bestanden?
 
@@ -79,11 +79,15 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- Voert de coördinator GSB de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de applicatie dat? => op welk PV staat deze sectie? 
-  - Nieuw model GSB PV heeft drie vinkjes: toegelaten kiezers opnieuw vastgesteld, onderzocht vanwege andere redenen, stembiljetten (deels) herteld.
-  - De SB PVs verschillen hierin tussen DSO en CSO.
-  - Als de applicatie dit moet doen, moeten de invoerders dit over kunnen nemen van het SB PV.
-  - De applicatie gaat nog uit van de oude modellen, met alleen de vraag "Is er herteld?"
+- Voert de coördinator GSB de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de applicatie dat? => op welk PV staat deze sectie?  
+  -> Na 14-1 Pv corrigendum SB DSO versie 1 / bijlage 1 (per SB) bij Na 31-2 Pv GSB CSO  
+  sectie 1.1 voor de vraag en 2.1 voor nieuwe aantallen (DSO)  
+  sectie 2.1 voor de vraag en 3.1 voor nieuwe aantallen (CSO)  
+
+- Nieuw model GSB PV heeft drie vinkjes: toegelaten kiezers opnieuw vastgesteld, onderzocht vanwege andere redenen, stembiljetten (deels) herteld.
+- De SB PVs verschillen hierin tussen DSO en CSO.
+- Als de applicatie dit moet doen, moeten de invoerders dit over kunnen nemen van het SB PV.
+- De applicatie gaat nog uit van de oude modellen, met alleen de vraag "Is er herteld?"
 
 
 ## De invoerders vullen de resultaten van de tellingen in (vlieger)

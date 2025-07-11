@@ -70,6 +70,17 @@ __Uitbreidingen:__
 1a. Het GSB besluit om n.a.v. een verzoek additionele stembureaus te onderzoeken:  
 &emsp; 1a1. De coördinator GSB selecteert een stembureau en voert "Aanleiding van het onderzoek" (vrije tekst) in de applicatie in.
 
+1b. De coördinator GSB ontdekt dat een stembureau dat op de vooraf gepubliceerde lijst staat niet in Abacus is opgenomen.
+&emsp; 1b1. De coördinator GSB voegt het stembureau toe.
+&emsp; 1b2. Abacus maakt melding op het PV dat het stembureau is toegevoegd
+&emsp; 1b3. Het corrigendum corrigeert het aantal stemmen bij dit stembureau van 0 naar het werkelijke aantal.
+
+1c. De coördinator GSB ontdekt dat het stembureau niet onder de goede naam in Abacus is opgenomen.
+&emsp; 1c1. De coördinator GSB corrigeert de typfouten.
+
+1d. De coördinator GSB ontdekt dat een stembureau ten onrechte is meegenomen in een eerdere zitting. 
+&emsp; 1d1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau. 
+
 3a. De coördinator GSB drukt het hele corrigendum af:  
 
 6a. Het GSB besluit dat er geen hertelling nodig is:  
@@ -86,4 +97,4 @@ __Uitbreidingen:__
 - 'leeg' corrigendum is geen heel goede term
     - Moet je kunnen selecteren welke lijsten er opgenomen moeten worden in het 'lege' corrigendum? Nee, want nieuwe modellen: corrigendum bevat aantallen modellen vorige zitting (niet: eerste zitting tenzij dat de vorige zitting is), dus handig om alle lijsten in corrigendum te hebben.
 - Hoe expliciet willen we zijn over de verschillende momenten waarop welke onderdelen van het corrigendum afgedrukt kunnen worden?
-- Als de coördinator GSB de overige bladzijdes afrdukt, vult deze dan op dat moment ook al de resultaten van het onderzoek in?
+- Als de coördinator GSB de overige bladzijdes afdrukt, vult deze dan op dat moment ook al de resultaten van het onderzoek in?

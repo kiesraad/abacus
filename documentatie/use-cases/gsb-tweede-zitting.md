@@ -72,7 +72,8 @@ __Uitbreidingen:__
 
 1b. De coördinator GSB ontdekt dat een stembureau dat op de vooraf gepubliceerde lijst staat niet in Abacus is opgenomen.
 &emsp; 1b1. De coördinator GSB voegt het stembureau toe.
-&emsp; 1b2. Het corrigendum corrigeert het aantal stemmen bij dit stembureau van 0 naar het werkelijke aantal.
+&emsp; 1b2. Abacus maakt melding op het PV dat het stembureau is toegevoegd
+&emsp; 1b3. Het corrigendum corrigeert het aantal stemmen bij dit stembureau van 0 naar het werkelijke aantal.
 
 1c. De coördinator GSB ontdekt dat het stembureau niet onder de goede naam in Abacus is opgenomen.
 &emsp; 1c1. De coördinator GSB corrigeert de typfouten.

@@ -136,7 +136,9 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
-      expect(pollCards.closest("fieldset")).toHaveAccessibleName("Toegelaten kiezers en uitgebrachte stemmen");
+      expect(pollCards.closest("fieldset")).toHaveAccessibleName(
+        "Toegelaten kiezers en uitgebrachte stemmen B1-3.1 en 3.2",
+      );
       expect(pollCards).toHaveAccessibleName("A Stempassen");
       expect(pollCards).toHaveFocus();
 
@@ -1036,7 +1038,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       // wait for form to render
-      await screen.findByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
+      await screen.findByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen B1-3.1 en 3.2" });
 
       // make sure recounted subsection is not shown
       expect(
@@ -1058,7 +1060,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       // wait for form to render
-      await screen.findByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
+      await screen.findByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen B1-3.1 en 3.2" });
 
       // make sure recounted subsection is shown
       expect(

@@ -36,6 +36,7 @@ die de zetelverdeling vaststelt en daarvoor een proces-verbaal genereert.
 | Gebruikers beheren: invoerders CSB [^2]          |           |                 |        X        |               |               |
 | **Tijdens de zitting GSB**                       |           |                 |                 |               |               |
 | Een nieuwe zitting openen                        |           |        X        |                 |               |               |
+| Stembureaus beheren [^1]                         |           |        X        |                 |               |               |
 | Invoer starten/schorsen/stoppen                  |           |        X        |                 |               |               |
 | Tellingen SB invoeren en waarschuwingen oplossen |           |                 |                 |       X       |               |
 | Conflicten en waarschuwingen oplossen            |           |        X        |                 |               |               |
@@ -55,4 +56,4 @@ die de zetelverdeling vaststelt en daarvoor een proces-verbaal genereert.
 
 [^1]: Stembureaus binnen de gemeente waar gestemd kan worden. Niet GSB(s) of CSB.
 
-[^2]: Zeer gewenst (should have), initieel nog geen gebruikersbeheer voor coördinator. 
+[^2]: Zeer gewenst (should have), initieel nog geen gebruikersbeheer voor coördinator.

@@ -7,9 +7,19 @@ import cls from "./ProgressList.module.css";
 export interface ProgressListScrollProps {
   children: React.ReactNode;
 }
+
+function throwMissingClass(): never {
+  throw new Error(`A required CSS class is missing.`);
+}
+
 export function ProgressListScroll({ children }: ProgressListScrollProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const listRef = React.useRef<HTMLUListElement>(null);
+
+  const clsHasScrolling = cls.hasScrolling ?? throwMissingClass();
+  const clsShowTopGradient = cls.showTopGradient ?? throwMissingClass();
+  const clsShowBottomGradient = cls.showBottomGradient ?? throwMissingClass();
+  const clsScroll = cls.scroll ?? throwMissingClass();
 
   React.useEffect(() => {
     const scrollContainer = containerRef.current;
@@ -22,37 +32,36 @@ export function ProgressListScroll({ children }: ProgressListScrollProps) {
         const clientHeight = scrollList.clientHeight;
 
         if (scrollHeight > clientHeight) {
-          scrollContainer.classList.add("has-scrolling");
+          scrollContainer.classList.add(clsHasScrolling);
         }
 
-        //check for gradient visibility
-
-        // Toggle bottom gradient visibility
+        // Toggle top gradient visibility
         if (scrollTop > 0) {
-          scrollContainer.classList.add("show-top-gradient");
+          scrollContainer.classList.add(clsShowTopGradient);
         } else {
-          scrollContainer.classList.remove("show-top-gradient");
+          scrollContainer.classList.remove(clsShowTopGradient);
         }
 
         // Toggle bottom gradient visibility
         if (scrollTop + clientHeight < scrollHeight) {
-          scrollContainer.classList.add("show-bottom-gradient");
+          scrollContainer.classList.add(clsShowBottomGradient);
         } else {
-          scrollContainer.classList.remove("show-bottom-gradient");
+          scrollContainer.classList.remove(clsShowBottomGradient);
         }
       };
 
       scrollList.addEventListener("scroll", onScroll);
+
       onScroll();
 
       return () => {
         scrollList.removeEventListener("scroll", onScroll);
       };
     }
-  }, []);
+  }, [clsHasScrolling, clsShowTopGradient, clsShowBottomGradient]);
 
   return (
-    <section ref={containerRef} className={cn(cls.scroll, "scroll-container")}>
+    <section ref={containerRef} className={cn(clsScroll, "scroll-container")}>
       <ul ref={listRef}>{children}</ul>
     </section>
   );

@@ -5,8 +5,12 @@ use rand::{Rng, distr::Alphanumeric};
 use super::{PdfGenResult, models::PdfModel};
 use crate::APIError;
 
-pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
-    generate_pdf_internal(model).map_err(APIError::PdfGenError)
+pub async fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
+    Ok(
+        tokio::task::spawn_blocking(move || generate_pdf_internal(model))
+            .await
+            .map_err(PdfGenError::from)??,
+    )
 }
 
 /// Uses environment variables `ABACUS_TYPST_BIN` (`typst` by default) and `ABACUS_TEMPLATES_DIR` (`./templates` by
@@ -95,6 +99,7 @@ fn copy_dir(
 #[derive(Debug)]
 pub enum PdfGenError {
     Io(std::io::Error),
+    Join(tokio::task::JoinError),
     Json(serde_json::Error),
 }
 
@@ -107,5 +112,11 @@ impl From<std::io::Error> for PdfGenError {
 impl From<serde_json::Error> for PdfGenError {
     fn from(err: serde_json::Error) -> Self {
         PdfGenError::Json(err)
+    }
+}
+
+impl From<tokio::task::JoinError> for PdfGenError {
+    fn from(err: tokio::task::JoinError) -> Self {
+        PdfGenError::Join(err)
     }
 }

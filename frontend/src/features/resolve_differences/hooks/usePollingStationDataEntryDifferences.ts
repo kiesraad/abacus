@@ -8,6 +8,8 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
   DataEntryGetDifferencesResponse,
+  DataEntryStatusName,
+  DataEntryStatusResponse,
   ElectionWithPoliticalGroups,
   POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
@@ -32,7 +34,7 @@ interface PollingStationDataEntryStatus {
 
 export function usePollingStationDataEntryDifferences(
   pollingStationId: number,
-  afterSave: (action: ResolveDifferencesAction) => void,
+  afterSave: (status: DataEntryStatusName) => void,
 ): PollingStationDataEntryStatus {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
@@ -75,12 +77,12 @@ export function usePollingStationDataEntryDifferences(
 
     const path: POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_differences`;
     const body: POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = action;
-    const response = await client.postRequest(path, body);
+    const response = await client.postRequest<DataEntryStatusResponse>(path, body);
 
     if (isSuccess(response)) {
-      // reload the election status and navigate to the overview page
+      // reload the election status data then navigate according to new status
       await electionContext?.refetch();
-      afterSave(action);
+      afterSave(response.data.status);
     } else {
       setError(response);
     }

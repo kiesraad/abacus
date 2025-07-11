@@ -4,7 +4,7 @@ use axum::extract::FromRef;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::{SqlitePool, Type, prelude::FromRow};
+use sqlx::{SqlitePool, Type, prelude::FromRow, types::Json};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
@@ -174,35 +174,21 @@ impl AuditLog {
         user: Option<&User>,
         message: Option<String>,
         ip: Option<IpAddr>,
-    ) -> Result<AuditLogEvent, APIError> {
+    ) -> Result<(), APIError> {
         // TODO: set workstation id
         let workstation: Option<u32> = None;
         let event_name = event.to_string();
         let event_level = event.level();
-        let event = serde_json::to_value(event)?;
+        let event = sqlx::types::Json(event);
         let user_id = user.map(|u| u.id());
         let username = user.map(|u| u.username().to_string());
         let fullname = user.map(|u| u.fullname().unwrap_or_default().to_string());
         let role = user.map(|u| u.role());
         let ip = ip.map(|ip| ip.to_string());
 
-        let event = sqlx::query_as!(
-            AuditLogEvent,
-            r#"INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, user_fullname, user_role, ip)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING
-                id as "id: u32",
-                time as "time: _",
-                event as "event: serde_json::Value",
-                event_level as "event_level: _",
-                message,
-                workstation as "workstation: _",
-                user_id as "user_id: u32",
-                username,
-                ip,
-                user_fullname,
-                user_role as "user_role: Role"
-            "#,
+        sqlx::query!(
+            "INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, user_fullname, user_role, ip)
+            VALUES (jsonb(?), ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             event,
             event_name,
             event_level,
@@ -214,10 +200,10 @@ impl AuditLog {
             role,
             ip
         )
-        .fetch_one(&self.0)
+        .execute(&self.0)
         .await?;
 
-        Ok(event)
+        Ok(())
     }
 
     #[cfg(test)]
@@ -227,7 +213,7 @@ impl AuditLog {
             r#"SELECT
                 audit_log.id as "id: u32",
                 time as "time: _",
-                event as "event: serde_json::Value",
+                json(event) as "event!: Json<AuditEvent>",
                 event_level as "event_level: _",
                 message,
                 workstation as "workstation: _",
@@ -254,7 +240,7 @@ impl AuditLog {
             r#"SELECT
                 audit_log.id as "id: u32",
                 time as "time: _",
-                event as "event: serde_json::Value",
+                json(event) as "event!: Json<AuditEvent>",
                 event_level as "event_level: _",
                 message,
                 workstation as "workstation: _",

@@ -2,7 +2,7 @@
 CREATE TABLE audit_log
 (
     id                 INTEGER         PRIMARY KEY AUTOINCREMENT NOT NULL,
-    event              TEXT            NOT NULL,
+    event              BLOB            NOT NULL,
     event_name         TEXT            NOT NULL,
     event_level        TEXT            CHECK( event_level IN ('error','warning','info','success') ) NOT NULL DEFAULT 'info',
     message            TEXT            ,

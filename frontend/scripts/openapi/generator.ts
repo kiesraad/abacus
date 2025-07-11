@@ -176,12 +176,20 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
 
   if (Array.isArray(s.type)) {
     type = s.type
-      .map((t: NonArraySchemaObjectType | "null") => {
+      .map((t: NonArraySchemaObjectType | "null" | "array") => {
         if (t === "null") {
           return "null";
         }
 
-        return tsType({ type: t });
+        if (t === "array") {
+          if ("items" in s) {
+            return tsType({ type: t, items: s.items });
+          } else {
+            // Cannot determine type; type remains "unknown"
+          }
+        } else {
+          return tsType({ type: t });
+        }
       })
       .join(" | ");
   }

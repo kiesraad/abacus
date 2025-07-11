@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, user_fullname, user_role, ip)\n            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id as \"id: u32\",\n                time as \"time: _\",\n                event as \"event: serde_json::Value\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                user_id as \"user_id: u32\",\n                username,\n                ip,\n                user_fullname,\n                user_role as \"user_role: Role\"\n            ",
+  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                json(event) as \"event!: Json<AuditEvent>\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                ip as \"ip: String\",\n                user_id as \"user_id: u32\",\n                username,\n                user_fullname,\n                user_role as \"user_role: Role\"\n            FROM audit_log\n            ORDER BY time DESC\n            ",
   "describe": {
     "columns": [
       {
@@ -14,9 +14,9 @@
         "type_info": "Text"
       },
       {
-        "name": "event: serde_json::Value",
+        "name": "event!: Json<AuditEvent>",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Null"
       },
       {
         "name": "event_level: _",
@@ -34,17 +34,17 @@
         "type_info": "Integer"
       },
       {
-        "name": "user_id: u32",
+        "name": "ip: String",
         "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_id: u32",
+        "ordinal": 7,
         "type_info": "Integer"
       },
       {
         "name": "username",
-        "ordinal": 7,
-        "type_info": "Text"
-      },
-      {
-        "name": "ip",
         "ordinal": 8,
         "type_info": "Text"
       },
@@ -60,12 +60,12 @@
       }
     ],
     "parameters": {
-      "Right": 10
+      "Right": 0
     },
     "nullable": [
       false,
       false,
-      false,
+      null,
       false,
       true,
       true,
@@ -76,5 +76,5 @@
       true
     ]
   },
-  "hash": "7b6b1a0f9898840280d8162a7052d77e5ead57529f0810af913490200059c48a"
+  "hash": "371b371ba611c9368b918759a778c5d5e2508f138ba6bc601b7ff7cbe992f5a7"
 }

@@ -199,7 +199,7 @@ export const PollingStationDataEntryResolveDifferencesHandler = http.post<
   DataEntryStatusResponse,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH
 >("/api/polling_stations/3/data_entries/resolve_differences", () =>
-  HttpResponse.json({ status: "definitive" }, { status: 200 }),
+  HttpResponse.json({ status: "first_entry_not_started" }, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveErrorsHandler = http.post<
@@ -208,7 +208,7 @@ export const PollingStationDataEntryResolveErrorsHandler = http.post<
   DataEntryStatusResponse,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH
 >("/api/polling_stations/5/data_entries/resolve_errors", () =>
-  HttpResponse.json({ status: "definitive" }, { status: 200 }),
+  HttpResponse.json({ status: "first_entry_not_started" }, { status: 200 }),
 );
 
 // get polling stations
@@ -261,9 +261,7 @@ export const PollingStationCreateHandler = http.post<
   POLLING_STATION_CREATE_REQUEST_BODY,
   PollingStation,
   POLLING_STATION_LIST_REQUEST_PATH
->("/api/elections/1/polling_stations", () =>
-  HttpResponse.json(pollingStationMockData[1]! satisfies PollingStation, { status: 201 }),
-);
+>("/api/elections/1/polling_stations", () => HttpResponse.json(pollingStationMockData[1], { status: 201 }));
 
 export const PollingStationDeleteHandler = http.delete<
   ParamsToString<POLLING_STATION_DELETE_REQUEST_PARAMS>,
@@ -275,18 +273,16 @@ export const PollingStationDeleteHandler = http.delete<
 export const PollingStationUpdateHandler = http.put<
   ParamsToString<POLLING_STATION_UPDATE_REQUEST_PARAMS>,
   POLLING_STATION_UPDATE_REQUEST_BODY,
-  null,
+  PollingStation,
   POLLING_STATION_UPDATE_REQUEST_PATH
->("/api/elections/1/polling_stations/1", () => new HttpResponse(null, { status: 200 }));
+>("/api/elections/1/polling_stations/1", () => HttpResponse.json(pollingStationMockData[1], { status: 200 }));
 
 export const PollingStationGetHandler = http.get<
   ParamsToString<POLLING_STATION_GET_REQUEST_PARAMS>,
   null,
   PollingStation,
   POLLING_STATION_GET_REQUEST_PATH
->("/api/elections/1/polling_stations/1", () =>
-  HttpResponse.json(pollingStationMockData[0]! satisfies PollingStation, { status: 200 }),
-);
+>("/api/elections/1/polling_stations/1", () => HttpResponse.json(pollingStationMockData[0], { status: 200 }));
 
 export const UserCreateRequestHandler = http.post<
   USER_CREATE_REQUEST_PARAMS,

@@ -168,33 +168,51 @@ Velden markeren: E, F, G en H
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
 #### CSO | F.302 "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
-// TODO DSO
 > Invoerder: **Controleer je antwoorden** (F.302)
 
 > Coördinator: **Het getal dat is ingevuld bij H is niet groter dan D** (F.302)
-> Herstel de fout door op papier het juiste antwoord aan te (laten) vinken.
-> Controleer ook of er een onverklaard verschil ontstaat.
-> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
+> Herstel de fout door op papier de juiste optie te selecteren.
+
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+
+#### DSO | F.352 "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
+> Invoerder: **Controleer je antwoorden** (F.352)
+
+> Coördinator: **Het getal dat is ingevuld bij H is niet groter dan D** (F.352)
+> Maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
 #### CSO | F.303 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
-// TODO DSO
 > Invoerder: **Controleer je antwoorden** (F.303)
 
 > Coördinator: **Het getal dat is ingevuld bij H is niet kleiner dan D** (F.303)
-> Herstel de fout door op papier het juiste antwoord aan te (laten) vinken.
-> Controleer ook of er een onverklaard verschil ontstaat.
-> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
+> Herstel de fout door op papier de juiste optie te selecteren.
+
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+
+#### DSO | F.353 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
+> Invoerder: **Controleer je antwoorden** (F.353)
+
+> Coördinator: **Het getal dat is ingevuld bij H is niet kleiner dan D** (F.353)
+> Maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
 #### CSO | F.304 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
-// TODO DSO
 > Invoerder: **Controleer je antwoorden** (F.304)
 
 > Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.304)
-> Herstel de fout door op papier het juiste antwoord aan te (laten) vinken.
+> Herstel de fout door op papier de juiste optie te selecteren.
+
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+
+#### DSO | F.354 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+> Invoerder: **Controleer je antwoorden** (F.354)
+
+> Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.354)
+> Is op het proces-verbaal duidelijk aangegeven welk van de opties bedoeld is?
+> Laat dat dan overnemen in Abacus. Zo niet, maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
@@ -247,7 +265,7 @@ Veld markeren: I, J
 > Invoerder: **Controleer je antwoorden** (F.309)  
 
 > Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.309)
-> Herstel de fout door op papier het juiste antwoord aan te (laten) vinken.
+> Herstel de fout door op papier de juiste optie te selecteren.
 
 Veld markeren: 3.3.2
 
@@ -263,29 +281,25 @@ Veld markeren: 2.3.2
 
 ### Regels voor kandidaten en lijsttotalen (reeks F.4xx)
 
-#### F.401 `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
-
+#### CSO | F.401 `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
+// TODO DSO
 > Invoerder: **Controleer ingevoerde aantallen** (F.401)  
 > De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
-// TODO: we zijn hier gebleven - tekst hieronder klopt nog niet
 > Coördinator: **De optelling van de stemmen op kandidaten komt niet overeen met het ingevulde lijsttotaal** (F.401)
-> Controleer de optelling in het papieren proces-verbaal.
-> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als de juiste totaal wordt ingevuld.
-> Zo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.
-> Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
-
-
-> Herstel de fout door op papier het juiste getal in te (laten) vullen.
-> Pas zo nodig veld , en volg de instructies over hertellen die daar staan.
+> Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld.
+> Reken de optelling in het papieren proces-verbaal na.
+> Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.
+> - Zo ja: corrigeer de optelfout op het papieren proces-verbaal.
+> - Zo nee: Onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=1635-58277&t=zTY4ajWtsFkiTOYP-4)
 
 #### F.402 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
-
+// TODO: we zijn hier gebleven
 > **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg?  Dan kan je verdergaan.** (F.402)
 
 Velden markeren: totaal van de lijst 

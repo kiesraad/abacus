@@ -7,7 +7,7 @@ use test_log::test;
 use crate::utils::serve_api;
 use abacus::committee_session::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionListResponse,
-    CommitteeSessionStatus, CommitteeSessionUpdateRequest,
+    CommitteeSessionUpdateRequest, status::CommitteeSessionStatus,
 };
 
 pub mod shared;

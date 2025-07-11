@@ -10,15 +10,18 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatusChangeRequest,
-    CommitteeSessionUpdateRequest, repository::CommitteeSessions,
+    CommitteeSessionUpdateRequest,
+    repository::CommitteeSessions,
+    status::{CommitteeSessionStatus, CommitteeSessionTransitionError},
 };
-use crate::committee_session::status::{CommitteeSessionStatus, CommitteeSessionTransitionError};
-use crate::error::ErrorReference;
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{AdminOrCoordinator, Coordinator},
+    data_entry::repository::PollingStationResultsEntries,
     election::repository::Elections,
+    error::ErrorReference,
+    polling_station::repository::PollingStations,
 };
 
 impl From<CommitteeSessionTransitionError> for APIError {
@@ -163,6 +166,8 @@ pub async fn committee_session_update(
 pub async fn committee_session_status_change(
     _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
+    State(polling_stations_repo): State<PollingStations>,
+    State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     audit_service: AuditService,
     Path(committee_session_id): Path<u32>,
     Json(committee_session_request): Json<CommitteeSessionStatusChangeRequest>,
@@ -171,14 +176,24 @@ pub async fn committee_session_status_change(
     let new_status = match committee_session_request.status {
         CommitteeSessionStatus::Created => committee_session.status.prepare_data_entry()?,
         CommitteeSessionStatus::DataEntryNotStarted => {
-            committee_session.status.ready_for_data_entry()?
+            committee_session
+                .status
+                .ready_for_data_entry(committee_session, polling_stations_repo)
+                .await?
         }
         CommitteeSessionStatus::DataEntryInProgress => {
             committee_session.status.start_data_entry()?
         }
         CommitteeSessionStatus::DataEntryPaused => committee_session.status.pause_data_entry()?,
         CommitteeSessionStatus::DataEntryFinished => {
-            committee_session.status.finish_data_entry()?
+            committee_session
+                .status
+                .finish_data_entry(
+                    committee_session,
+                    polling_stations_repo,
+                    polling_station_results_entries_repo,
+                )
+                .await?
         }
     };
 

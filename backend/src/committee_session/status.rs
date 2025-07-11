@@ -4,6 +4,11 @@ use std::fmt::Display;
 use strum::VariantNames;
 use utoipa::ToSchema;
 
+use crate::{
+    committee_session::CommitteeSession, data_entry::repository::PollingStationResultsEntries,
+    polling_station::repository::PollingStations,
+};
+
 /// Committee session status
 #[derive(
     Serialize,
@@ -35,6 +40,12 @@ pub enum CommitteeSessionTransitionError {
     Invalid,
 }
 
+impl From<sqlx::Error> for CommitteeSessionTransitionError {
+    fn from(_: sqlx::Error) -> Self {
+        CommitteeSessionTransitionError::Invalid
+    }
+}
+
 impl CommitteeSessionStatus {
     pub fn prepare_data_entry(self) -> Result<Self, CommitteeSessionTransitionError> {
         match self {
@@ -42,13 +53,28 @@ impl CommitteeSessionStatus {
             CommitteeSessionStatus::DataEntryNotStarted => Ok(CommitteeSessionStatus::Created),
             CommitteeSessionStatus::DataEntryInProgress => Ok(CommitteeSessionStatus::Created),
             CommitteeSessionStatus::DataEntryPaused => Ok(CommitteeSessionStatus::Created),
-            CommitteeSessionStatus::DataEntryFinished => Ok(CommitteeSessionStatus::Created),
+            CommitteeSessionStatus::DataEntryFinished => {
+                Err(CommitteeSessionTransitionError::Invalid)
+            }
         }
     }
 
-    pub fn ready_for_data_entry(self) -> Result<Self, CommitteeSessionTransitionError> {
+    pub async fn ready_for_data_entry(
+        self,
+        committee_session: CommitteeSession,
+        polling_stations_repo: PollingStations,
+    ) -> Result<Self, CommitteeSessionTransitionError> {
         match self {
-            CommitteeSessionStatus::Created => Ok(self), // TODO: Check if a polling station is present
+            CommitteeSessionStatus::Created => {
+                let polling_stations = polling_stations_repo
+                    .list(committee_session.election_id)
+                    .await?;
+                if polling_stations.is_empty() {
+                    Err(CommitteeSessionTransitionError::Invalid)
+                } else {
+                    Ok(CommitteeSessionStatus::DataEntryNotStarted)
+                }
+            }
             CommitteeSessionStatus::DataEntryNotStarted => Ok(self),
             CommitteeSessionStatus::DataEntryInProgress => {
                 Err(CommitteeSessionTransitionError::Invalid)
@@ -94,15 +120,30 @@ impl CommitteeSessionStatus {
         }
     }
 
-    pub fn finish_data_entry(self) -> Result<Self, CommitteeSessionTransitionError> {
+    pub async fn finish_data_entry(
+        self,
+        committee_session: CommitteeSession,
+        polling_stations_repo: PollingStations,
+        polling_station_results_entries_repo: PollingStationResultsEntries,
+    ) -> Result<Self, CommitteeSessionTransitionError> {
         match self {
             CommitteeSessionStatus::Created => Err(CommitteeSessionTransitionError::Invalid),
             CommitteeSessionStatus::DataEntryNotStarted => {
                 Err(CommitteeSessionTransitionError::Invalid)
             }
             CommitteeSessionStatus::DataEntryInProgress => {
-                Ok(CommitteeSessionStatus::DataEntryFinished)
-            } // TODO: check if all data entries are completed without errors and differences
+                let polling_station_results = polling_station_results_entries_repo
+                    .list_with_polling_stations(
+                        polling_stations_repo,
+                        committee_session.election_id,
+                    )
+                    .await?;
+                if polling_station_results.is_empty() {
+                    Err(CommitteeSessionTransitionError::Invalid)
+                } else {
+                    Ok(CommitteeSessionStatus::DataEntryFinished)
+                }
+            }
             CommitteeSessionStatus::DataEntryPaused => {
                 Err(CommitteeSessionTransitionError::Invalid)
             }

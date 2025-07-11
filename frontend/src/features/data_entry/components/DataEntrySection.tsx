@@ -16,6 +16,7 @@ import { KeyboardKey } from "@/types/ui";
 
 import { useDataEntryFormSection } from "../hooks/useDataEntryFormSection";
 import { DataEntryNavigation } from "./DataEntryNavigation";
+import cls from "./DataEntrySection.module.css";
 
 export function DataEntrySection() {
   const user = useUser();
@@ -66,7 +67,11 @@ export function DataEntrySection() {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id={formId} title={section.title}>
+    <Form onSubmit={handleSubmit} ref={formRef} id={formId}>
+      <legend className={cls.titleContainer}>
+        <span className={cls.title}>{section.title}</span>
+        {section.sectionNumber && <span className={cls.badge}>{section.sectionNumber}</span>}
+      </legend>
       <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && memoizedErrorCodes.length > 0 && (

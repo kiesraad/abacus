@@ -79,6 +79,7 @@ export interface DataEntrySection {
   id: FormSectionId;
   title: string;
   short_title: string;
+  sectionNumber?: string;
   subsections: DataEntrySubsection[];
 }
 

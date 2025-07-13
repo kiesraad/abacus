@@ -186,14 +186,17 @@ impl CommitteeSessionStatus {
             CommitteeSessionStatus::DataEntryInProgress => {
                 let polling_station_results = polling_station_results_entries_repo
                     .list_with_polling_stations(
-                        polling_stations_repo,
+                        polling_stations_repo.clone(),
                         committee_session.election_id,
                     )
                     .await?;
-                if polling_station_results.is_empty() {
-                    Err(CommitteeSessionTransitionError::Invalid)
-                } else {
+                let polling_stations = polling_stations_repo
+                    .list(committee_session.election_id)
+                    .await?;
+                if polling_station_results.len() == polling_stations.len() {
                     Ok(CommitteeSessionStatus::DataEntryFinished)
+                } else {
+                    Err(CommitteeSessionTransitionError::Invalid)
                 }
             }
             CommitteeSessionStatus::DataEntryPaused => {

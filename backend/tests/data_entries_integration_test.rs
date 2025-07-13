@@ -209,7 +209,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::typist_login(&addr).await;
 
-    let request_body = shared::example_data_entry(None);
+    let request_body = example_data_entry(None);
     let invalid_id = 123_456_789;
 
     let url = format!("http://{addr}/api/polling_stations/{invalid_id}/data_entries/1");
@@ -243,7 +243,7 @@ async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::typist_login(&addr).await;
 
-    let request_body = shared::example_data_entry(None);
+    let request_body = example_data_entry(None);
 
     // claim a data entry
     let claim_url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
@@ -310,7 +310,7 @@ async fn test_polling_station_data_entry_claim_finalised(pool: SqlitePool) {
 async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::typist_login(&addr).await;
-    let request_body = shared::example_data_entry(None);
+    let request_body = example_data_entry(None);
 
     // claim a data entry
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");

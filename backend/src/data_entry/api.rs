@@ -14,7 +14,7 @@ use super::{
     DataEntryStatusResponse, DataError, PollingStationDataEntry, PollingStationResults,
     ValidationResults,
     entry_number::EntryNumber,
-    repository::PollingStationDataEntries,
+    repository::{PollingStationDataEntries, PollingStationResultsEntries},
     status::{
         ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
         DataEntryTransitionError, EntriesDifferent, FirstEntryHasErrors,
@@ -25,7 +25,11 @@ use crate::{
     APIError, AppState,
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
-    committee_session::{CommitteeSession, repository::CommitteeSessions},
+    committee_session::{
+        CommitteeSession,
+        repository::CommitteeSessions,
+        status::{CommitteeSessionStatus, change_committee_session_status},
+    },
     election::{ElectionWithPoliticalGroups, repository::Elections},
     error::{ErrorReference, ErrorResponse},
     polling_station::{PollingStation, repository::PollingStations},
@@ -405,6 +409,27 @@ async fn polling_station_data_entry_finalise(
                         .upsert(polling_station_id, committee_session.id, new_state)
                         .await?;
                 }
+            }
+            let polling_station_results_entries_repo =
+                PollingStationResultsEntries::new(pool.clone());
+            let polling_stations_repo = PollingStations::new(pool.clone());
+            let polling_station_results = polling_station_results_entries_repo
+                .list_with_polling_stations(
+                    polling_stations_repo.clone(),
+                    committee_session.election_id,
+                )
+                .await?;
+            let polling_stations = polling_stations_repo
+                .list(committee_session.election_id)
+                .await?;
+            if polling_station_results.len() == polling_stations.len() {
+                change_committee_session_status(
+                    committee_session.id,
+                    CommitteeSessionStatus::DataEntryFinished,
+                    pool.clone(),
+                    audit_service.clone(),
+                )
+                .await?;
             }
         }
     }
@@ -1169,6 +1194,96 @@ pub mod tests {
         )
         .await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_finalise_all_data_entries(pool: SqlitePool) {
+        let committee_sessions_repo = CommitteeSessions::new(pool.clone());
+        let request_body = example_data_entry();
+        let election_id = 2;
+
+        let committee_session = committee_sessions_repo
+            .get_election_committee_session(election_id)
+            .await
+            .unwrap();
+        assert_eq!(
+            committee_session.status,
+            CommitteeSessionStatus::DataEntryInProgress
+        );
+
+        // Save and finalise the first data entry of the first polling station
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Save and finalise the second data entry of the first polling station
+        let response = claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::SecondEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), 1, EntryNumber::SecondEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let committee_session = committee_sessions_repo
+            .get_election_committee_session(election_id)
+            .await
+            .unwrap();
+        assert_eq!(
+            committee_session.status,
+            CommitteeSessionStatus::DataEntryInProgress
+        );
+
+        // Save and finalise the first data entry of the second polling station
+        let response = claim(pool.clone(), 2, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            2,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), 2, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Save and finalise the second data entry of the second polling station
+        let response = claim(pool.clone(), 2, EntryNumber::SecondEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            2,
+            EntryNumber::SecondEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), 2, EntryNumber::SecondEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let committee_session = committee_sessions_repo
+            .get_election_committee_session(election_id)
+            .await
+            .unwrap();
+        assert_eq!(
+            committee_session.status,
+            CommitteeSessionStatus::DataEntryFinished
+        );
     }
 
     // test creating first and different second data entry

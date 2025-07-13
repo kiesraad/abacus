@@ -45,18 +45,18 @@ async fn test_polling_station_listing(pool: SqlitePool) {
     )
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
 async fn test_polling_station_creation_for_committee_session_with_created_status(pool: SqlitePool) {
     let committee_sessions_repo = CommitteeSessions::new(pool.clone());
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 2;
+    let election_id = 3;
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
+
     let committee_session = committee_sessions_repo
         .get_election_committee_session(election_id)
         .await
         .unwrap();
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
-
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
     let response = reqwest::Client::new()
@@ -88,6 +88,10 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
         Some(PollingStationType::FixedLocation)
     );
 
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await
+        .unwrap();
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryNotStarted
@@ -151,6 +155,10 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
         Some(PollingStationType::FixedLocation)
     );
 
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await
+        .unwrap();
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryInProgress
@@ -279,13 +287,24 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_delete_ok(pool: SqlitePool) {
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/2/polling_stations/2");
+    let election_id = 2;
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/2");
+
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await
+        .unwrap();
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryInProgress
+    );
 
     let response = reqwest::Client::new()
         .delete(&url)
-        .header("cookie", &cookie)
+        .header("cookie", cookie.clone())
         .send()
         .await
         .unwrap();
@@ -296,9 +315,18 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await
+        .unwrap();
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryInProgress
+    );
+
     let gone = reqwest::Client::new()
         .get(&url)
-        .header("cookie", cookie)
+        .header("cookie", cookie.clone())
         .send()
         .await
         .unwrap();
@@ -308,6 +336,27 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
         StatusCode::NOT_FOUND,
         "Unexpected response status"
     );
+
+    // Remove last polling station for election
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/1");
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", cookie.clone())
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
+
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await
+        .unwrap();
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

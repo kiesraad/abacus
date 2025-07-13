@@ -47,8 +47,8 @@ VALUES (2, 'Municipal Election', 'CSO', 'Heemdamseburg_2024', 'Heemdamseburg', '
           }
         ]');
 
-INSERT INTO committee_sessions (id, number, election_id, location, start_date, start_time)
-VALUES (2, 1, 2, '', '', '');
+INSERT INTO committee_sessions (id, number, election_id, status, location, start_date, start_time)
+VALUES (2, 1, 2, 'data_entry_in_progress', '', '', '');
 
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)

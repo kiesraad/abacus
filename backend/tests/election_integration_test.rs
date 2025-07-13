@@ -57,7 +57,7 @@ async fn test_election_details_works(pool: SqlitePool) {
     let body: ElectionDetailsResponse = response.json().await.unwrap();
     assert_eq!(
         body.committee_session.status,
-        CommitteeSessionStatus::Created
+        CommitteeSessionStatus::DataEntryInProgress
     );
     assert_eq!(body.election.name, "Municipal Election");
     assert_eq!(body.polling_stations.len(), 2);

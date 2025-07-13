@@ -218,15 +218,23 @@ async fn polling_station_update(
 )]
 async fn polling_station_delete(
     _user: AdminOrCoordinator,
-    State(polling_stations): State<PollingStations>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<StatusCode, APIError> {
-    let polling_station = polling_stations
+    let polling_stations_repo = PollingStations::new(pool.clone());
+    let elections_repo = Elections::new(pool.clone());
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
+
+    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
+    elections_repo.get(election_id).await?;
+    let committee_session = committee_sessions_repo.get(election_id).await?;
+
+    let polling_station = polling_stations_repo
         .get_for_election(election_id, polling_station_id)
         .await?;
 
-    let deleted = polling_stations
+    let deleted = polling_stations_repo
         .delete(election_id, polling_station_id)
         .await?;
 
@@ -237,6 +245,16 @@ async fn polling_station_delete(
                 None,
             )
             .await?;
+
+        if polling_stations_repo.list(election_id).await?.is_empty() {
+            change_committee_session_status(
+                committee_session.id,
+                CommitteeSessionStatus::Created,
+                pool.clone(),
+                audit_service,
+            )
+            .await?;
+        }
 
         Ok(StatusCode::OK)
     } else {

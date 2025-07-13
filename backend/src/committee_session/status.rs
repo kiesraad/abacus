@@ -1,11 +1,14 @@
 use serde::{Deserialize, Serialize};
-use sqlx::Type;
+use sqlx::{SqlitePool, Type};
 use std::fmt::Display;
 use strum::VariantNames;
 use utoipa::ToSchema;
 
 use crate::{
-    committee_session::CommitteeSession, data_entry::repository::PollingStationResultsEntries,
+    APIError,
+    audit_log::{AuditEvent, AuditService},
+    committee_session::{CommitteeSession, repository::CommitteeSessions},
+    data_entry::repository::PollingStationResultsEntries,
     polling_station::repository::PollingStations,
 };
 
@@ -44,6 +47,55 @@ impl From<sqlx::Error> for CommitteeSessionTransitionError {
     fn from(_: sqlx::Error) -> Self {
         CommitteeSessionTransitionError::Invalid
     }
+}
+
+pub async fn change_committee_session_status(
+    committee_session_id: u32,
+    status: CommitteeSessionStatus,
+    pool: SqlitePool,
+    audit_service: AuditService,
+) -> Result<(), APIError> {
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
+    let polling_stations_repo = PollingStations::new(pool.clone());
+    let committee_session = committee_sessions_repo.get(committee_session_id).await?;
+    let new_status = match status {
+        CommitteeSessionStatus::Created => committee_session.status.prepare_data_entry()?,
+        CommitteeSessionStatus::DataEntryNotStarted => {
+            committee_session
+                .status
+                .ready_for_data_entry(committee_session, polling_stations_repo)
+                .await?
+        }
+        CommitteeSessionStatus::DataEntryInProgress => {
+            committee_session.status.start_data_entry()?
+        }
+        CommitteeSessionStatus::DataEntryPaused => committee_session.status.pause_data_entry()?,
+        CommitteeSessionStatus::DataEntryFinished => {
+            let polling_station_results_entries_repo =
+                PollingStationResultsEntries::new(pool.clone());
+            committee_session
+                .status
+                .finish_data_entry(
+                    committee_session,
+                    polling_stations_repo,
+                    polling_station_results_entries_repo,
+                )
+                .await?
+        }
+    };
+
+    let committee_session = committee_sessions_repo
+        .change_status(committee_session_id, new_status)
+        .await?;
+
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
+            None,
+        )
+        .await?;
+
+    Ok(())
 }
 
 impl CommitteeSessionStatus {

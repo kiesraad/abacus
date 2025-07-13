@@ -186,6 +186,19 @@ impl CommitteeSessions {
         .await
     }
 
+    pub async fn delete(&self, committee_session_id: u32) -> Result<bool, Error> {
+        let rows_affected = query_as!(
+            CommitteeSession,
+            r#"DELETE FROM committee_sessions WHERE id = ?"#,
+            committee_session_id,
+        )
+        .execute(&self.0)
+        .await?
+        .rows_affected();
+
+        Ok(rows_affected > 0)
+    }
+
     pub async fn change_status(
         &self,
         committee_session_id: u32,

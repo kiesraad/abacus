@@ -5,6 +5,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -14,6 +15,10 @@ use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{AdminOrCoordinator, User},
+    committee_session::{
+        repository::CommitteeSessions,
+        status::{CommitteeSessionStatus, change_committee_session_status},
+    },
     election::repository::Elections,
 };
 
@@ -87,16 +92,20 @@ async fn polling_station_list(
 )]
 async fn polling_station_create(
     _user: AdminOrCoordinator,
-    State(polling_stations): State<PollingStations>,
-    State(elections): State<Elections>,
+    State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
     audit_service: AuditService,
     new_polling_station: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
-    // Check if the election exists, will respond with NOT_FOUND otherwise
-    elections.get(election_id).await?;
+    let polling_stations_repo = PollingStations::new(pool.clone());
+    let elections_repo = Elections::new(pool.clone());
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
 
-    let polling_station = polling_stations
+    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
+    elections_repo.get(election_id).await?;
+    let committee_session = committee_sessions_repo.get(election_id).await?;
+
+    let polling_station = polling_stations_repo
         .create(election_id, new_polling_station)
         .await?;
 
@@ -106,6 +115,24 @@ async fn polling_station_create(
             None,
         )
         .await?;
+
+    if committee_session.status == CommitteeSessionStatus::Created {
+        change_committee_session_status(
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryNotStarted,
+            pool.clone(),
+            audit_service,
+        )
+        .await?;
+    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        change_committee_session_status(
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+            pool.clone(),
+            audit_service,
+        )
+        .await?;
+    };
 
     Ok((StatusCode::CREATED, polling_station))
 }

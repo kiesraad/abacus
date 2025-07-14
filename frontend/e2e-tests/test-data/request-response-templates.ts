@@ -9,6 +9,7 @@ import {
 
 export const electionRequest: NewElection = {
   name: "Test Election",
+  counting_method: "CSO",
   election_id: "TestLocation_2026",
   location: "Test Location",
   domain_id: "0000",

@@ -18,7 +18,7 @@ Invoerder:
 > - Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.
 
 Coördinator
-> - Controleer of de invoer in Abacus goed is overgenomen van het papieren proces-verbaal
+> - Controleer of de invoer in Abacus goed is overgenomen van het papieren proces-verbaal.
 > - Zit de fout ook in het papieren proces-verbaal? Los de fout dan daar op.
 
 ### Regels voor alle numerieke invoervelden (reeks F.0xx)

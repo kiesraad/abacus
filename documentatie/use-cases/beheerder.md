@@ -1,6 +1,6 @@
 # Beheerder
 
-## De beheerder richt de applicatie in (wolk)
+## De beheerder richt de applicatie in voor GSB en/of CSB (wolk)
 
 _Niveau:_ hoog-over, wolk, ☁️
 
@@ -19,11 +19,6 @@ __Uitbreidingen:__
 ### Niet in scope
 
 - Inlezen totalenlijst (kandidatenlijst met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
-
-### Open punten
-- Hoe precies krijgt de beheerder de beschikking over de verkiezingsdefinitie (met hash-code) en de kandidatenlijst (met hash-code)?
-  - Zowel de verkiezingsdefinitie als de kandidatenlijst worden door het CSB aangemaakt met OSV KS.
-
 
 ## De beheerder installeert de applicatie (zee)
 
@@ -48,11 +43,6 @@ __Uitbreidingen:__
 
 4a. De server en het invoerstation zijn dezelfde machine:
 
-### Open punten
-
-- Het is te verwachten dat de server ook als client gebruikt wordt door de coördinator.
-- Downloaden van een sleutel o.i.d. voor afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
-
 
 ## De beheerder zet de verkiezingen in de applicatie (zee)
 
@@ -69,10 +59,6 @@ __Uitbreidingen:__
 1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
 
 2a. De hash van de verkiezingsdefinitie klopt niet.
-
-### Open punten
-- Verder uitwerken hoe GSB en CSB apart aangemaakt worden.
-
 
 ## De beheerder of coördinator zet de stembureaus in de applicatie (zee)
 
@@ -104,16 +90,6 @@ __Uitbreidingen:__
 4a. De lijst met stembureaus moet aangepast worden:  
 &emsp; 4a1. De beheerder past de stembureaus aan.
 
-### Open punten
-
-- Het is niet helemaal duidelijk hoe de stembureaus aangemaakt worden. Dit kan handmatig of door het importeren van een
-  bestand. We weten niet hoe vaak welke van deze twee manieren of een combinatie van de twee gebruikt worden. Een
-  stembureau-bestand kan door OSV geëxporteerd worden, maar er zouden ook andere tools bestaan die zo'n bestand kunnen
-  genereren.
-- Bij gelijktijdige verkiezingen (gemeenteraad en stadsdeel bijvoorbeeld) zou het mooi zijn om de stembureaus van één
-  naar een andere verkiezing te kopiëren. Minder mooi alternatief is eerst exporteren en dan importeren.
-
-
 ## De beheerder exporteert de stembureaus (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
@@ -124,10 +100,6 @@ __Hoofdscenario__:
 
 1. De beheerder exporteert de stembureaus.
 2. De beheerder slaat de geëxporteerde stembureaus op, zodat ze geïmporteerd kunnen worden bij een volgende verkiezing.
-
-### Open punten
-
-- Is dit eigenlijk de use case voor het opschonen van de gebruikte machines?
 
 ## De beheerder maakt de gebruikers aan (zee)
 

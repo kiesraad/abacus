@@ -2,7 +2,7 @@ import { RefObject, useCallback, useEffect, useRef } from "react";
 
 type Dir = "up" | "down" | "first" | "last";
 
-export function useFormKeyboardNavigation(): RefObject<HTMLFormElement> {
+export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
   const innerRef = useRef<HTMLFormElement>(null);
 
   const moveFocus = useCallback(

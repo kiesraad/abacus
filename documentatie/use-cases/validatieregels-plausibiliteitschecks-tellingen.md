@@ -281,13 +281,27 @@ Veld markeren: 2.3.2
 
 ### Regels voor kandidaten en lijsttotalen (reeks F.4xx)
 
-#### CSO | F.401 `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
+#### CSO F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
 // TODO DSO
-> Invoerder: **Controleer ingevoerde aantallen** (F.401)  
+> Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg?  Dan kan je verdergaan.** (F.401)
+
+> Coördinator: **Het totaal van de lijst is niet ingevuld.** (F.401)
+> Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.{x} in rubriek 3.2)
+> Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.
+> - Zo ja: corrigeer de optelfout op het papieren proces-verbaal.
+> - Zo nee: Onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
+
+Velden markeren: totaal van de lijst 
+N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding onderaan de pagina, onder het totaal-veld.
+[Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11)
+
+#### CSO | F.402 `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
+// TODO DSO
+> Invoerder: **Controleer ingevoerde aantallen** (F.402)  
 > De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
-> Coördinator: **De optelling van de stemmen op kandidaten komt niet overeen met het ingevulde lijsttotaal** (F.401)
+> Coördinator: **De optelling van de stemmen op kandidaten komt niet overeen met het ingevulde lijsttotaal** (F.402)
 > Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld.
 > Reken de optelling in het papieren proces-verbaal na.
 > Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.
@@ -298,18 +312,15 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=1635-58277&t=zTY4ajWtsFkiTOYP-4)
 
-#### F.402 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
-// TODO: we zijn hier gebleven
-> **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg?  Dan kan je verdergaan.** (F.402)
 
-Velden markeren: totaal van de lijst 
-N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding onderaan de pagina, onder het totaal-veld.
-[Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11)
-
-#### F.403 `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
-
-> **Controleer het totaal van de lijst** (F.403)
+#### CSO | F.403 `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
+// TODO DSO
+> Invoerder: **Controleer het totaal van de lijst** (F.403)
 > Als die overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij [Aantal kiezers en stemmen]()
+
+> Coördinator: **Controleer het totaal van de lijst en E.{x} in rubriek 3.2** (F.403)
+> Controleer wat er fout is gegaan in rubriek 3.2 en herstel de fout.
+> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen
 
@@ -340,21 +351,23 @@ Geen checks.
 
 ### Checks voor totalen (reeks W.2xx)
 
-#### W.201 aantal blanco stemmen is groter of gelijk aan 3% van het totaal uitgebrachte stemmen
-
-> **Controleer aantal blanco stemmen** (W.201)  
-> Het aantal blanco stemmen is erg hoog.  
+#### CSO en DSO | W.201 aantal blanco stemmen is groter of gelijk aan 3% van het totaal uitgebrachte stemmen
+> Invoerder: **Controleer aantal blanco stemmen** (W.201)  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
+
+> Coördinator: **Het aantal blanco stemmen is erg hoog** (W.201)
+> Hertel de blanco stemmen of geef een verklaring voor het hoge aantal. Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).
 
 Veld markeren: F
 
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=137-3939&t=zTY4ajWtsFkiTOYP-4)
 
-#### W.202: Aantal ongeldige stemmen is groter of gelijk aan 3% van het totaal uitgebrachte stemmen
+#### CSO en DSO | W.202: Aantal ongeldige stemmen is groter of gelijk aan 3% van het totaal uitgebrachte stemmen
 
-> **Controleer aantal ongeldige stemmen** (W.202)  
-> Het aantal ongeldige stemmen is erg hoog.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
+> Invoerder: **Controleer aantal ongeldige stemmen** (W.202)  
+
+> Coördinator: **Het aantal ongeldige stemmen is erg hoog** (W.202)
+> Hertel de ongeldige stemmen of geef een verklaring voor het hoge aantal. Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).
 
 Veld markeren: G
 
@@ -363,22 +376,24 @@ Veld markeren: G
 - 2% of meer: abs(toegelaten kiezers - getelde stembiljetten) / getelde stembiljetten \>= 0.02
 - 15 of meer: abs(toegelaten kiezers - getelde stembiljetten) \>= 15
 
-> **Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
+> Invoerder: **Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
+
+> Coördinator: **Groot verschil tussen aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
 > Er is een groot verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
+> Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitslag per lijst.
+> Verklaar in het proces-verbaal van het GSB (rubriek 1.2) zo goed mogelijk wat de oorzaak van de opmerkelijke uitslag is.
+> Schrijf ook op welke stappen het GSB heeft gezet om deze te hertellen en onderzoeken. 
 
 Velden markeren: D en H
 
-#### W.204: Verschil tussen herteld totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter of gelijk aan 2% of groter of gelijk aan 15
-
-- 2% of meer: abs(herteld toegelaten kiezers - getelde stembiljetten) / getelde stembiljetten \>= 0.02
-- 15 of meer: abs(herteld toegelaten kiezers - getelde stembiljetten) \>= 15
-
 #### W.205 Totaal aantal uitgebrachte stemmen leeg of 0
 
-> **Controleer aantal uitgebrachte stemmen** (W.205)  
-> Het totaal aantal uitgebrachte stemmen (H) is nul.  
-> Check of je het papieren proces-verbaal goed hebt overgenomen.
+> Invoerder: **Controleer aantal uitgebrachte stemmen** (W.205)  
+
+> Coördinator: **Het totaal aantal uitgebrachte stemmen (H) is nul** (W.205)
+> Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.
+> Zo nee: Verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.
+> Zo ja: Verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht.
 
 Veld markeren: H
 

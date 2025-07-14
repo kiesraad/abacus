@@ -69,7 +69,7 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 #### DSO | F.152: Over het proces-verbaal: Ongeldige combinatie van antwoorden: `wel corrigendum, geen inlegvel`
 
-> Inoverder: **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)  
+> Invoerder: **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)  
 > Overleg met de coördinator over het ontbrekende inlegvel.
 
 > Coördinator: **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)
@@ -82,7 +82,7 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 > Invoerder: **Controleer je antwoorden** (F.153)
 
-> Coördinator: **De vragen op het inlegvel zijn niet volledig beantwoordt** (F.153)
+> Coördinator: **De vragen op het inlegvel zijn niet volledig beantwoord** (F.153)
 > Zorg dat het inlegvel volledig is ingevuld, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
@@ -147,7 +147,7 @@ Velden markeren: E.1 t/m E.n en E
 > De invoer bij E, F, G of H klopt niet.  
 
 > Coördinator: **E, F en G tellen niet op tot H** (F.202)  
-> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getallen bij H wordt ingevuld.
+> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij H wordt ingevuld.
 > Zo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.
 > Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
@@ -232,7 +232,7 @@ Veld markeren: I
 > Invoerder: **Controleer I en J** (F.306)
 
 > Coördinator: **Controleer of I en J verwisseld zijn** (F.306)
-> Herstel de fout door op papier door het verschil op de juiste plek in te (laten) vullen.
+> Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan. 
 
@@ -254,7 +254,7 @@ Veld markeren: J
 > Invoerder: **Controleer I en J** (F.308)  
 
 > Coördinator: **Controleer of I en J verwisseld zijn** (F.308)
-> Herstel de fout door op papier door het verschil op de juiste plek in te (laten) vullen.
+> Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
@@ -269,7 +269,7 @@ Veld markeren: I, J
 
 Veld markeren: 3.3.2
 
-#### DSO | F.310 (2.2.3 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap controles en correcties' is niet aangevinkt)
+#### DSO | F.310 (2.2.3 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap 'controles en correcties' is niet aangevinkt)
 
 > Invoerder: **Controleer je antwoorden** (F.310)
  

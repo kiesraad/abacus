@@ -82,6 +82,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm ci
+      - name: Install Playwright Chromium Browser
+        run: npx playwright install --with-deps chromium
       - name: Check formatting
         run: npx prettier --check .
       - name: Lint
@@ -94,34 +96,6 @@ jobs:
         with:
           name: frontend-build
           path: frontend/dist
-
-  playwright-ladle:
-    name: Playwright Ladle tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install dependencies
-        run: npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps --no-shell
-      - name: Run ladle playwright tests
-        run: npm run test:ladle
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          name: "Playwright Ladle ubuntu-latest"
-          files: frontend/playwright.ladle.junit.xml
-          disable_search: true
-          fail_ci_if_error: true
 
   playwright-e2e:
     name: Playwright e2e tests (${{ matrix.shardIndex }}/${{ matrix.shardTotal }})

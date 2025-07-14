@@ -5,6 +5,7 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import storybook from "eslint-plugin-storybook";
 import { readdirSync } from "fs";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -22,11 +23,10 @@ const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: tr
 export default tseslint.config(
   {
     // global ignores
-    ignores: ["dist/**", "playwright-report/**", "eslint.config.js", "mockServiceWorker.js"],
+    ignores: ["dist/**", "playwright-report/**", "eslint.config.js", "mockServiceWorker.js", "vitest.shims.d.ts"],
   },
   {
     files: ["**/*.ts", "**/*.tsx"],
-    ignores: ["!.ladle/**"],
     extends: [
       eslint.configs.recommended,
       tseslint.configs.strictTypeChecked,
@@ -91,7 +91,6 @@ export default tseslint.config(
   },
   {
     files: ["**/*.js"],
-    ignores: ["!.ladle/**"],
     extends: [eslint.configs.recommended, importPlugin.flatConfigs.recommended],
     languageOptions: {
       ecmaVersion: 2020,
@@ -121,11 +120,16 @@ export default tseslint.config(
     },
   },
   {
-    files: ["src/components/ui/**/*.e2e.ts"],
-    extends: [playwright.configs["flat/recommended"]],
+    files: ["**/*.stories.tsx"],
+    extends: [storybook.configs["flat/recommended"]],
     rules: {
-      // Needed for Ladle, page.waitForSelector("[data-storyloaded]")
-      "playwright/no-wait-for-selector": "off",
+      "@typescript-eslint/no-unsafe-type-assertion": "off",
+    },
+  },
+  {
+    files: [".storybook/**/*.ts{,x}"],
+    rules: {
+      "@typescript-eslint/no-unsafe-type-assertion": "off",
     },
   },
 );

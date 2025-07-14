@@ -1,4 +1,4 @@
-import type { Story } from "@ladle/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { FormField } from "./FormField";
 
@@ -7,25 +7,25 @@ type Props = {
   hasWarning: boolean;
 };
 
-export const DefaultFormField: Story<Props> = ({ hasError, hasWarning }) => (
-  <FormField id="test-form-field" hasError={hasError} hasWarning={hasWarning}>
-    <input id="test-input" type="text" aria-invalid={hasError || hasWarning ? "true" : "false"} />
-  </FormField>
-);
+export const DefaultFormField: StoryObj<Props> = {
+  render: ({ hasError, hasWarning }) => (
+    <FormField id="test-form-field" hasError={hasError} hasWarning={hasWarning}>
+      <input id="test-input" type="text" aria-invalid={hasError || hasWarning ? "true" : "false"} />
+    </FormField>
+  ),
+};
 
 export default {
   args: {
-    label: "Invoer",
-    text: "Invoer",
+    hasError: false,
+    hasWarning: false,
   },
   argTypes: {
     hasError: {
-      options: [true, false],
-      control: { type: "radio" },
+      control: { type: "boolean" },
     },
     hasWarning: {
-      options: [true, false],
-      control: { type: "radio" },
+      control: { type: "boolean" },
     },
   },
-};
+} satisfies Meta<Props>;

@@ -1,4 +1,4 @@
-import { Story } from "@ladle/react";
+import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite";
 
 import * as gte19Seats from "../testing/gte-19-seats";
 import * as lt19Seats from "../testing/lt-19-seats";
@@ -14,11 +14,7 @@ import { HighestAveragesTable } from "./residual_seats/HighestAveragesTable";
 import { LargestRemaindersTable } from "./residual_seats/LargestRemaindersTable";
 import { UniqueHighestAveragesTable } from "./residual_seats/UniqueHighestAveragesTable";
 
-export default {
-  title: "App / Apportionment",
-};
-
-export const DefaultApportionmentTable: Story = () => (
+export const DefaultApportionmentTable: StoryFn = () => (
   <ApportionmentTable
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups}
@@ -27,14 +23,12 @@ export const DefaultApportionmentTable: Story = () => (
     seats={gte19Seats.seat_assignment.seats}
   />
 );
-DefaultApportionmentTable.storyName = "ApportionmentTable";
 
-export const DefaultChosenCandidatesTable: Story = () => (
+export const DefaultChosenCandidatesTable: StoryFn = () => (
   <ChosenCandidatesTable chosenCandidates={gte19Seats.candidate_nomination.chosen_candidates} />
 );
-DefaultChosenCandidatesTable.storyName = "ChosenCandidatesTable";
 
-export const DefaultElectionSummaryTable: Story = () => (
+export const DefaultElectionSummaryTable: StoryFn = () => (
   <ElectionSummaryTable
     votesCounts={gte19Seats.election_summary.votes_counts}
     seats={gte19Seats.seat_assignment.seats}
@@ -43,9 +37,8 @@ export const DefaultElectionSummaryTable: Story = () => (
     preferenceThreshold={gte19Seats.candidate_nomination.preference_threshold}
   />
 );
-DefaultElectionSummaryTable.storyName = "ElectionSummaryTable";
 
-export const DefaultFullSeatsTable: Story = () => (
+export const DefaultFullSeatsTable: StoryFn = () => (
   <FullSeatsTable
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups}
@@ -53,62 +46,48 @@ export const DefaultFullSeatsTable: Story = () => (
     resultChanges={[]}
   />
 );
-DefaultFullSeatsTable.storyName = "FullSeatsTable";
 
-export const DefaultResidualSeatsCalculationTable: Story = () => (
+export const DefaultResidualSeatsCalculationTable: StoryFn = () => (
   <ResidualSeatsCalculationTable
     seats={gte19Seats.seat_assignment.seats}
     fullSeats={gte19Seats.seat_assignment.full_seats}
     residualSeats={gte19Seats.seat_assignment.residual_seats}
   />
 );
-DefaultResidualSeatsCalculationTable.storyName = "ResidualSeatsCalculationTable";
 
-export const DefaultCandidatesRankingTable: Story = () => (
+export const DefaultCandidatesRankingTable: StoryFn = () => (
   <CandidatesRankingTable
     candidateRanking={lt19Seats.political_group_1_candidate_nomination.updated_candidate_ranking}
   />
 );
-DefaultCandidatesRankingTable.storyName = "CandidatesRankingTable";
 
 type CandidatesWithVotesTableProps = {
   showNumber: boolean;
   showLocality: boolean;
 };
 
-export const DefaultCandidatesWithVotesTable: Story<CandidatesWithVotesTableProps> = ({ showNumber, showLocality }) => (
-  <CandidatesWithVotesTable
-    id="test-table"
-    showNumber={showNumber}
-    showLocality={showLocality}
-    candidateList={lt19Seats.political_group_1.candidates}
-    candidateVotesList={lt19Seats.political_group_1_candidate_nomination.preferential_candidate_nomination}
-  />
-);
-DefaultCandidatesWithVotesTable.storyName = "CandidatesWithVotesTable";
-DefaultCandidatesWithVotesTable.argTypes = {
-  showNumber: {
-    options: [true, false],
-    control: { type: "radio" },
-  },
-  showLocality: {
-    options: [true, false],
-    control: { type: "radio" },
-  },
+export const DefaultCandidatesWithVotesTable: StoryObj<CandidatesWithVotesTableProps> = {
+  render: ({ showNumber, showLocality }) => (
+    <CandidatesWithVotesTable
+      id="test-table"
+      showNumber={showNumber}
+      showLocality={showLocality}
+      candidateList={lt19Seats.political_group_1.candidates}
+      candidateVotesList={lt19Seats.political_group_1_candidate_nomination.preferential_candidate_nomination}
+    />
+  ),
 };
 
-export const DefaultHighestAveragesTable: Story = () => (
+export const DefaultHighestAveragesTable: StoryFn = () => (
   <HighestAveragesTable
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     steps={gte19Seats.seat_assignment.steps as HighestAverageAssignmentStep[]}
     finalStanding={gte19Seats.seat_assignment.final_standing}
     politicalGroups={gte19Seats.election.political_groups}
     resultChanges={[]}
   />
 );
-DefaultHighestAveragesTable.storyName = "HighestAveragesTable";
 
-export const DefaultLargestRemaindersTable: Story = () => (
+export const DefaultLargestRemaindersTable: StoryFn = () => (
   <LargestRemaindersTable
     steps={lt19Seats.largest_remainder_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
@@ -116,13 +95,24 @@ export const DefaultLargestRemaindersTable: Story = () => (
     resultChanges={[]}
   />
 );
-DefaultLargestRemaindersTable.storyName = "LargestRemaindersTable";
 
-export const DefaultUniqueHighestAveragesTable: Story = () => (
+export const DefaultUniqueHighestAveragesTable: StoryFn = () => (
   <UniqueHighestAveragesTable
     steps={lt19Seats.highest_average_steps}
     finalStanding={lt19Seats.seat_assignment.final_standing}
     politicalGroups={lt19Seats.election.political_groups}
   />
 );
-DefaultUniqueHighestAveragesTable.storyName = "UniqueHighestAveragesTable";
+
+export default {
+  argTypes: {
+    showNumber: {
+      options: [true, false],
+      control: { type: "radio" },
+    },
+    showLocality: {
+      options: [true, false],
+      control: { type: "radio" },
+    },
+  },
+} satisfies Meta;

@@ -64,9 +64,6 @@ We maken gebruik van TypeScript, een uitgebreidere versie van JavaScript. Dit he
 
 React is een van de meest gebruikte libraries voor het maken van gebruikersinterfaces. Deze library heeft een groot bereik onder developers en wordt goed onderhouden. Een andere overweging was Angular, maar React is stabieler. Ook hebben onze programmeurs hier ervaring mee.
 
-### Ladle
-
-Deze tool wordt gebruikt om te ontwikkelen en testen met React. Deze optie werkt eenvoudiger dan het alternatief Storybook.
 
 ### Playwright
 

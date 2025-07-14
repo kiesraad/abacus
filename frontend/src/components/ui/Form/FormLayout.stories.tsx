@@ -1,11 +1,11 @@
-import type { Story } from "@ladle/react";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 
 import { Button } from "../Button/Button";
 import { ChoiceList } from "../CheckboxAndRadio/ChoiceList";
 import { InputField } from "../InputField/InputField";
 import { FormLayout } from "./FormLayout";
 
-export const DefaultFormLayout: Story = () => (
+export const DefaultFormLayout: StoryFn = () => (
   <div>
     <FormLayout>
       <FormLayout.Section title="Section 1">
@@ -37,3 +37,5 @@ export const DefaultFormLayout: Story = () => (
     </FormLayout>
   </div>
 );
+
+export default {} satisfies Meta;

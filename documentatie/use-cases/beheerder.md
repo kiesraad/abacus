@@ -74,14 +74,14 @@ __Uitbreidingen:__
 - Verder uitwerken hoe GSB en CSB apart aangemaakt worden.
 
 
-## De beheerder zet de stembureaus in de applicatie (zee)
+## De beheerder of coördinator zet de stembureaus in de applicatie (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Precondities:__
 
 - De lijst met gepubliceerde stembureaus is beschikbaar.
-- De invoer is nog niet gestart.
+- De invoerfase van de zitting is nog niet gestart. Na het starten van de invoerfase kan alleen de [coördinator nog wijzigingen in de lijst met stembureaus aanbrengen](./gsb-eerste-zitting.md#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-eerste-of-nieuwe-zitting-zee).
 
 ### Hoofdscenario en uitbreidingen
 
@@ -99,23 +99,19 @@ __Uitbreidingen:__
 2a. Er is geen te importeren bestand met stembureaus:  
 &emsp; 2a1. De beheerder voert de stembureaus handmatig in.
 
-3a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
+3a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus.
 
 4a. De lijst met stembureaus moet aangepast worden:  
 &emsp; 4a1. De beheerder past de stembureaus aan.
 
 ### Open punten
 
-- Zijn er gemeentes waar de Coördinator GSB de stembureaus aan gaat maken?
 - Het is niet helemaal duidelijk hoe de stembureaus aangemaakt worden. Dit kan handmatig of door het importeren van een
   bestand. We weten niet hoe vaak welke van deze twee manieren of een combinatie van de twee gebruikt worden. Een
   stembureau-bestand kan door OSV geëxporteerd worden, maar er zouden ook andere tools bestaan die zo'n bestand kunnen
   genereren.
 - Bij gelijktijdige verkiezingen (gemeenteraad en stadsdeel bijvoorbeeld) zou het mooi zijn om de stembureaus van één
   naar een andere verkiezing te kopiëren. Minder mooi alternatief is eerst exporteren en dan importeren.
-- Zodra invoer gestart is, mag het niet mogelijk zijn om stembureaus aan te passen of te verwijderen. Verwijderen wordt nu
-  afgedwongen d.m.v. foreign keys in de database. Checks voor aanpassen en checks o.b.v. de fases van de verkiezing in de
-  applicatie moeten nog uitgewerkt worden.
 
 
 ## De beheerder exporteert de stembureaus (zee)
@@ -155,4 +151,4 @@ __Uitbreidingen:__
 4a. De lijst met gebruikers moet aangepast worden:  
 &emsp; 4a1. De beheerder past de volledige naam aan van een gebruiker.  
 &emsp; 4a2. De beheerder stelt een nieuw tijdelijk wachtwoord in voor een gebruiker.  
-&emsp; 4a3. De beheerder verwijdert een gebruiker.  
+&emsp; 4a3. De beheerder verwijdert een gebruiker.

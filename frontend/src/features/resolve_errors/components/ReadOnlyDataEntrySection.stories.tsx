@@ -1,4 +1,4 @@
-import type { Story } from "@ladle/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
@@ -67,36 +67,40 @@ type Props = {
   sectionId: FormSectionId;
 };
 
-export const ReadOnlySection: Story<Props> = ({ sectionId }) => {
-  // Get data entry structure
-  const validationResults: ValidationResults = {
-    errors: [validationResultMockData.F201, validationResultMockData.F303],
-    warnings: [validationResultMockData.W201],
-  };
-
-  // Find the selected section
-  const selectedSection = dataEntryStructure.find((section) => section.id === sectionId);
-
-  if (!selectedSection) {
-    return <div>Section not found</div>;
-  }
-
-  return (
-    <ReadOnlyDataEntrySection
-      section={selectedSection}
-      data={pollingStationResults}
-      validationResults={validationResults}
-    />
-  );
-};
-
-export default {
-  title: "Features / Resolve errors",
+export const ReadOnlySection: StoryObj<Props> = {
   argTypes: {
     sectionId: {
       options: sectionIds,
       control: { type: "select" },
-      defaultValue: sectionIds[0],
     },
   },
+
+  args: {
+    sectionId: sectionIds[0],
+  },
+
+  render: ({ sectionId }) => {
+    // Get data entry structure
+    const validationResults: ValidationResults = {
+      errors: [validationResultMockData.F201, validationResultMockData.F303],
+      warnings: [validationResultMockData.W201],
+    };
+
+    // Find the selected section
+    const selectedSection = dataEntryStructure.find((section) => section.id === sectionId);
+
+    if (!selectedSection) {
+      return <div>Section not found</div>;
+    }
+
+    return (
+      <ReadOnlyDataEntrySection
+        section={selectedSection}
+        data={pollingStationResults}
+        validationResults={validationResults}
+      />
+    );
+  },
 };
+
+export default {} satisfies Meta<Props>;

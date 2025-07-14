@@ -19,17 +19,15 @@
     "noUncheckedIndexedAccess": true,
     "rootDir": ".",
     "paths": {
-      "ladle/*": [".ladle/*"],
       "@/*": ["src/*"]
     },
     "types": ["node", "vite/client", "vitest/importMeta"]
   },
   "include": [
-    ".ladle/**/*",
+    ".storybook/**/*",
     "src/**/*",
     "scripts/**/*",
     "playwright.e2e.config.ts",
-    "playwright.ladle.config.ts",
     "vite.config.ts",
     "vite-prod.config.ts",
     "vitest.config.ts",

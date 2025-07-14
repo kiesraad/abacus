@@ -1,79 +1,111 @@
-import type { Story } from "@ladle/react";
-
-import { AlertType } from "@/types/ui";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { action } from "storybook/actions";
 
 import { Alert } from "./Alert";
 
-type Props = {
-  type: AlertType;
-  title: string;
-  text: string;
-  onClose?: () => void;
-};
-
-export const DefaultAlert: Story<Props> = ({ type, title, text }) => (
-  <Alert type={type}>
-    <h2>{title}</h2>
-    <p>{text}</p>
-  </Alert>
-);
-
-export const ClosableAlert: Story<Props> = ({ type, title, text, onClose }) => (
-  <Alert type={type} onClose={onClose}>
-    <h2>{title}</h2>
-    <p>{text}</p>
-  </Alert>
-);
-
-export const SmallAlert: Story<Props> = ({ type, text }) => (
-  <Alert type={type} small>
-    <p>{text}</p>
-  </Alert>
-);
-
-export const NoIconAlert: Story<Props> = ({ type, text }) => (
-  <Alert type={type} variant="no-icon">
-    <p>{text}</p>
-  </Alert>
-);
-
-export const InlineAlert: Story<Props> = ({ type, title, text }) => (
-  <Alert type={type} inline title={title}>
-    <p>{text}</p>
-  </Alert>
-);
-
-export const InlineSmall: Story<Props> = ({ type, title, text }) => (
-  <Alert type={type} inline small title={title}>
-    <p>{text}</p>
-  </Alert>
-);
-
-export const InlineClosableAlert: Story<Props> = ({ type, title, text, onClose }) => (
-  <Alert type={type} inline title={title} onClose={onClose}>
-    <p>{text}</p>
-  </Alert>
-);
-
-export const InlineNoIconAlert: Story<Props> = ({ type, title, text }) => (
-  <Alert type={type} inline variant="no-icon" title={title}>
-    <p>{text}</p>
-  </Alert>
-);
-
-export default {
+const meta = {
+  component: Alert,
   args: {
-    title: "Nog niet ingesteld",
-    text: "Deze computer is nog niet ingesteld voor gebruik. Log in als beheerder of verkiezingsleider en stel in hoe deze computer gebruikt gaat worden.",
+    type: "notify",
+    children: (
+      <>
+        <h2>Nog niet ingesteld</h2>
+        <p>
+          Deze computer is nog niet ingesteld voor gebruik. Log in als beheerder of verkiezingsleider en stel in hoe
+          deze computer gebruikt gaat worden.
+        </p>
+      </>
+    ),
+    // @ts-expect-error: onClose is mapped using argTypes, which is not understood by TypeScript
+    onClose: false,
   },
   argTypes: {
+    children: { control: false },
     type: {
       options: ["error", "warning", "notify", "success"],
       control: { type: "radio" },
-      defaultValue: "error",
     },
     onClose: {
-      action: "Close action",
+      control: { type: "boolean" },
+      mapping: {
+        true: action("on-close"),
+        false: undefined,
+      },
     },
   },
-};
+} satisfies Meta<typeof Alert>;
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+export const DefaultAlert = {
+  args: {},
+} satisfies Story;
+
+export const ClosableAlert = {
+  args: {
+    type: "error",
+    children: (
+      <>
+        <h2>Error Title</h2>
+        <p>This is an error message with a close button.</p>
+      </>
+    ),
+    onClose: action("on-close"),
+  },
+} satisfies Story;
+
+export const SmallAlert = {
+  args: {
+    type: "warning",
+    small: true,
+    children: <p>This is a small warning alert.</p>,
+  },
+} satisfies Story;
+
+export const NoIconAlert = {
+  args: {
+    type: "success",
+    variant: "no-icon",
+    children: <p>This is a success alert without an icon.</p>,
+  },
+} satisfies Story;
+
+export const InlineAlert = {
+  args: {
+    type: "notify",
+    inline: true,
+    title: "Inline Alert Title",
+    children: <p>This is an inline alert with a title.</p>,
+  },
+} satisfies Story;
+
+export const InlineSmall = {
+  args: {
+    type: "warning",
+    inline: true,
+    small: true,
+    title: "Small Inline Alert",
+    children: <p>This is a small inline alert.</p>,
+  },
+} satisfies Story;
+
+export const InlineClosableAlert = {
+  args: {
+    type: "error",
+    inline: true,
+    title: "Inline Closable Alert",
+    children: <p>This is an inline alert that can be closed.</p>,
+    onClose: action("on-close"),
+  },
+} satisfies Story;
+
+export const InlineNoIconAlert = {
+  args: {
+    type: "success",
+    inline: true,
+    variant: "no-icon",
+    title: "Inline No Icon Alert",
+    children: <p>This is an inline alert without an icon.</p>,
+  },
+} satisfies Story;

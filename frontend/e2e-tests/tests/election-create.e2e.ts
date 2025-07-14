@@ -62,6 +62,7 @@ test.describe("Election creation", () => {
 
     // Wrong hash
     const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
+    await expect(checkDefinitionPage.hashInput1).toBeFocused();
     await checkDefinitionPage.inputHash("1234", "abcd");
     await expect(checkDefinitionPage.error).toBeVisible();
   });
@@ -188,7 +189,6 @@ test.describe("Election creation", () => {
     await expect(overviewPage.header).toBeVisible();
   });
 
-  // TODO: check
   test("uploading a candidate list, then navigating should trigger the modal", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);

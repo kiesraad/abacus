@@ -1,4 +1,4 @@
-import type { Story } from "@ladle/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Size } from "@/types/ui";
 
@@ -8,8 +8,10 @@ type Props = {
   size: Size;
 };
 
-export const DefaultSpinner: Story<Props> = ({ size }) => {
-  return <Spinner size={size} />;
+export const DefaultSpinner: StoryObj<Props> = {
+  render: ({ size }) => {
+    return <Spinner size={size} />;
+  },
 };
 
 export default {
@@ -19,4 +21,4 @@ export default {
       control: { type: "radio" },
     },
   },
-};
+} satisfies Meta<Props>;

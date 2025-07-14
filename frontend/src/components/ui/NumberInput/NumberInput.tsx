@@ -21,9 +21,11 @@ function ellipsis(text: string, maxLength: number = 20): string {
 
 export type NumberInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
-export function NumberInput({ id, ...inputProps }: NumberInputProps) {
+export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(function NumberInput(
+  { id, ...inputProps },
+  ref,
+) {
   const [tooltipInvalidValue, setTooltipInvalidValue] = React.useState<string | null>(null);
-  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const props = {
     className: "font-number",
@@ -57,17 +59,17 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
     <Tooltip content={tooltipContent} onClose={hideTooltip}>
       <input
         {...props}
-        ref={inputRef}
         onPaste={onPaste}
         onFocus={onFocus}
         onBlur={onBlur(props.onChange)}
         onInput={onInput}
         id={id}
         name={props.name || id}
+        ref={ref}
       />
     </Tooltip>
   );
-}
+});
 
 //deformat number on focus
 function onFocus(event: React.FocusEvent<HTMLInputElement>) {

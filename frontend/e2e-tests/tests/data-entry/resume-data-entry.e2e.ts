@@ -2,6 +2,7 @@ import { expect, Page } from "@playwright/test";
 import { loginAs } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
+import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
@@ -47,26 +48,26 @@ test.describe("resume data entry flow", () => {
     return new AbortInputModal(page);
   };
 
-  test.describe("abort data entry", () => {
-    test("Closing abort modal with X only closes the modal", async ({ page, pollingStation }) => {
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
-      const recountedPage = new RecountedPage(page);
-      await recountedPage.no.click();
-      await recountedPage.abortInput.click();
+  test("Closing abort modal with X only closes the modal", async ({ page, pollingStation }) => {
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.no.click();
+    await recountedPage.abortInput.click();
 
-      const abortInputModal = new AbortInputModal(page);
+    const abortInputModal = new AbortInputModal(page);
+    await expect(abortInputModal.heading).toBeVisible();
 
-      let requestMade = false;
-      page.on("request", (request) => {
-        if (request.url().includes("/api/polling_stations")) {
-          requestMade = true;
-        }
-      });
-      await abortInputModal.close.click();
-      expect(requestMade).toBe(false);
-
-      await expect(recountedPage.no).toBeChecked();
+    let requestMade = false;
+    page.on("request", (request) => {
+      if (request.url().includes("/api/polling_stations")) {
+        requestMade = true;
+      }
     });
+    await abortInputModal.close.click();
+    await expect(abortInputModal.heading).toBeHidden();
+    expect(requestMade).toBe(false);
+
+    await expect(recountedPage.no).toBeChecked();
   });
 
   test.describe("resume after saving", () => {
@@ -339,6 +340,62 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
     });
+
+    test("save input from check and save page", async ({ typistOne, pollingStation }) => {
+      const { page } = typistOne;
+
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+
+      const recountedPage = new RecountedPage(page);
+      await recountedPage.checkNoAndClickNext();
+
+      const votersAndVotesPage = new VotersAndVotesPage(page);
+      const voters: VotersCounts = {
+        poll_card_count: 803,
+        proxy_certificate_count: 50,
+        voter_card_count: 76,
+        total_admitted_voters_count: 929,
+      };
+      const votes: VotesCounts = {
+        votes_candidates_count: 894,
+        blank_votes_count: 20,
+        invalid_votes_count: 15,
+        total_votes_cast_count: 929,
+      };
+      await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+
+      const differencesPage = new DifferencesPage(page);
+      await differencesPage.next.click();
+
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+      await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
+      await candidatesListPage_1.next.click();
+
+      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+      await candidatesListPage_2.fillCandidatesAndTotal([3, 1], 4);
+      await candidatesListPage_2.next.click();
+
+      const checkAndSavePage = new CheckAndSavePage(page);
+      await expect(checkAndSavePage.fieldset).toBeVisible();
+      await checkAndSavePage.abortInput.click();
+
+      const abortInputModal = new AbortInputModal(page);
+      await expect(abortInputModal.heading).toBeVisible();
+
+      let requestMade = false;
+      page.on("request", (request) => {
+        if (request.url().includes("/api/polling_stations")) {
+          requestMade = true;
+        }
+      });
+      await abortInputModal.saveInput.click();
+      await expect(abortInputModal.heading).toBeHidden();
+
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
+
+      expect(requestMade).toBe(false);
+    });
   });
 
   test.describe("resume after deleting", () => {
@@ -358,7 +415,9 @@ test.describe("resume data entry flow", () => {
       await expect(recountedPage.no).not.toBeChecked();
     });
 
-    test("discard input from voters and votes page with error", async ({ page, request, pollingStation }) => {
+    test("discard input from voters and votes page with error", async ({ typistOne, pollingStation }) => {
+      const { page, request } = typistOne;
+
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
@@ -381,13 +440,14 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      await loginAs(request, "typist1");
       const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
       expect(claimResponse.status()).toBe(200);
       expect(await claimResponse.json()).toMatchObject(emptyDataEntryResponse);
     });
 
-    test("discard input from voters and votes page with warning", async ({ page, request, pollingStation }) => {
+    test("discard input from voters and votes page with warning", async ({ typistOne, pollingStation }) => {
+      const { page, request } = typistOne;
+
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
@@ -423,7 +483,56 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      await loginAs(request, "typist1");
+      const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
+      expect(claimResponse.status()).toBe(200);
+      expect(await claimResponse.json()).toMatchObject(emptyDataEntryResponse);
+    });
+
+    test("discard input from check and save page", async ({ typistOne, pollingStation }) => {
+      const { page, request } = typistOne;
+
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+
+      const recountedPage = new RecountedPage(page);
+      await recountedPage.checkNoAndClickNext();
+
+      const votersAndVotesPage = new VotersAndVotesPage(page);
+      const voters: VotersCounts = {
+        poll_card_count: 803,
+        proxy_certificate_count: 50,
+        voter_card_count: 76,
+        total_admitted_voters_count: 929,
+      };
+      const votes: VotesCounts = {
+        votes_candidates_count: 894,
+        blank_votes_count: 20,
+        invalid_votes_count: 15,
+        total_votes_cast_count: 929,
+      };
+      await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+
+      const differencesPage = new DifferencesPage(page);
+      await differencesPage.next.click();
+
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+      await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
+      await candidatesListPage_1.next.click();
+
+      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
+      await candidatesListPage_2.fillCandidatesAndTotal([3, 1], 4);
+      await candidatesListPage_2.next.click();
+
+      const checkAndSavePage = new CheckAndSavePage(page);
+      await expect(checkAndSavePage.fieldset).toBeVisible();
+      await checkAndSavePage.abortInput.click();
+
+      const abortInputModal = new AbortInputModal(page);
+      await expect(abortInputModal.heading).toBeVisible();
+      await abortInputModal.discardInput.click();
+
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
+
       const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
       expect(claimResponse.status()).toBe(200);
       expect(await claimResponse.json()).toMatchObject(emptyDataEntryResponse);

@@ -8,6 +8,7 @@ import {
   InputGridSubsectionRow,
 } from "@/types/types";
 import { getCandidateFullName } from "@/utils/candidate";
+import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 
 export const recountedSection: DataEntrySection = {
   id: "recounted",
@@ -127,7 +128,7 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
       isListTotal: true,
     });
 
-    const title = `${t("list")} ${politicalGroup.number} - ${politicalGroup.name}`;
+    const title = formatPoliticalGroupName(politicalGroup);
     return {
       id: `political_group_votes_${politicalGroup.number}` as FormSectionId,
       title: title,

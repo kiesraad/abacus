@@ -58,7 +58,7 @@ impl EML110 {
     pub fn as_abacus_election(&self) -> Result<crate::election::NewElection, EMLImportError> {
         // we need to be importing from a 110a file
         if self.base.id != "110a" {
-            return Err(EMLImportError::Needs101a);
+            return Err(EMLImportError::Needs110a);
         }
 
         // check that the election tree is specified
@@ -682,7 +682,7 @@ mod tests {
         let data = include_str!("./tests/eml110b_test.eml.xml");
         let doc = EML110::from_str(data).unwrap();
         let res = doc.as_abacus_election().unwrap_err();
-        assert!(matches!(res, EMLImportError::Needs101a));
+        assert!(matches!(res, EMLImportError::Needs110a));
     }
 
     #[test]

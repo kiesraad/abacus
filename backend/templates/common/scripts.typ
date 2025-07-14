@@ -55,9 +55,10 @@
 #let fmt-number(
   integer,
   thousands-sep: ".",
+  zero: "-"
 ) = {
   if (integer == 0) {
-    return "-"
+    return zero
   }
 
   return str(integer).clusters().rev().chunks(3).map(c => c.join("")).join(thousands-sep).rev()
@@ -341,7 +342,7 @@
     )
       .map(str)
       .join(" + ")))),
-    grid.cell(stroke: 0.5pt + black)[#fmt-number(total)],
+    grid.cell(stroke: 0.5pt + black)[#fmt-number(total, zero: 0)],
   ))
 
   pagebreak(weak: true)

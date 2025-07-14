@@ -144,7 +144,7 @@ async fn polling_station_get(
     path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
     request_body = PollingStationRequest,
     responses(
-        (status = 200, description = "Polling station updated successfully"),
+        (status = 200, description = "Polling station updated successfully", body = PollingStation),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -160,27 +160,19 @@ async fn polling_station_update(
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
     polling_station_update: PollingStationRequest,
-) -> Result<StatusCode, APIError> {
-    let updated = polling_stations
+) -> Result<(StatusCode, PollingStation), APIError> {
+    let polling_station = polling_stations
         .update(election_id, polling_station_id, polling_station_update)
         .await?;
 
-    if updated {
-        let polling_station = polling_stations
-            .get_for_election(election_id, polling_station_id)
-            .await?;
+    audit_service
+        .log(
+            &AuditEvent::PollingStationUpdated(polling_station.clone().into()),
+            None,
+        )
+        .await?;
 
-        audit_service
-            .log(
-                &AuditEvent::PollingStationUpdated(polling_station.clone().into()),
-                None,
-            )
-            .await?;
-
-        Ok(StatusCode::OK)
-    } else {
-        Ok(StatusCode::NOT_FOUND)
-    }
+    Ok((StatusCode::OK, polling_station))
 }
 /// Delete a [PollingStation]
 #[utoipa::path(

@@ -982,7 +982,14 @@
         },
         "responses": {
           "200": {
-            "description": "Polling station updated successfully"
+            "description": "Polling station updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStation"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -2875,6 +2882,34 @@
             ]
           },
           {
+            "type": "object",
+            "required": [
+              "eventType"
+            ],
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "enum": [
+                  "AirGapViolationDetected"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "eventType"
+            ],
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "enum": [
+                  "AirGapViolationResolved"
+                ]
+              }
+            }
+          },
+          {
             "allOf": [
               {
                 "$ref": "#/components/schemas/ErrorDetails"
@@ -2927,10 +2962,6 @@
           "time",
           "event",
           "eventLevel",
-          "userId",
-          "username",
-          "userFullname",
-          "userRole",
           "ip"
         ],
         "properties": {
@@ -2949,10 +2980,7 @@
             "type": "string"
           },
           "message": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "time": {
             "type": "string"
@@ -2972,10 +3000,7 @@
             "type": "string"
           },
           "workstation": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           }

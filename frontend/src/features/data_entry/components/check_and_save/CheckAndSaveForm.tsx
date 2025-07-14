@@ -14,6 +14,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
 import { FormSectionId } from "@/types/types";
 import { KeyboardKey, MenuStatus } from "@/types/ui";
+import { dottedCode } from "@/utils/ValidationResults";
 
 import { useDataEntryContext } from "../../hooks/useDataEntryContext";
 import { useFormKeyboardNavigation } from "../../hooks/useFormKeyboardNavigation";
@@ -143,9 +144,7 @@ export function CheckAndSaveForm() {
                   {section.errors.getCodes().map((code) => {
                     return (
                       <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>
-                        <strong>
-                          {code[0]}.{code.slice(1)}
-                        </strong>
+                        <strong>{dottedCode(code)}</strong>
                         &nbsp;
                         {tx(`feedback.${code}.typist.title`)}
                       </StatusList.Item>
@@ -154,9 +153,7 @@ export function CheckAndSaveForm() {
                   {section.warnings.getCodes().map((code) => {
                     return (
                       <StatusList.Item key={code} status="warning" id={`section-error-${section.id}-${code}`}>
-                        <strong>
-                          {code[0]}.{code.slice(1)}
-                        </strong>
+                        <strong>{dottedCode(code)}</strong>
                         &nbsp;
                         {tx(`feedback.${code}.typist.title`)}
                       </StatusList.Item>

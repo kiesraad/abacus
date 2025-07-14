@@ -11,4 +11,4 @@ CREATE TABLE elections
     election_date    TEXT                              NOT NULL,
     nomination_date  TEXT                              NOT NULL,
     political_groups TEXT                              NOT NULL
-);
+) STRICT;

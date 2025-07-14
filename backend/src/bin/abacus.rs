@@ -1,17 +1,11 @@
 use std::{
     error::Error,
     net::{Ipv4Addr, SocketAddr},
-    str::FromStr,
 };
 
-#[cfg(feature = "dev-database")]
-use abacus::fixtures;
-use abacus::start_server;
+use abacus::{create_sqlite_pool, start_server};
 use clap::Parser;
-use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 use tokio::net::TcpListener;
-#[cfg(feature = "dev-database")]
-use tracing::info;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 
@@ -54,7 +48,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .init();
 
     let args = Args::parse();
-    let pool = create_sqlite_pool(&args).await?;
+    let pool = create_sqlite_pool(
+        &args.database,
+        #[cfg(feature = "dev-database")]
+        args.reset_database,
+        #[cfg(feature = "dev-database")]
+        args.seed_data,
+    )
+    .await?;
 
     // Enable airgap detection if the feature is enabled or if the command line argument is set.
     let enable_airgap_detection = args.airgap_detection || cfg!(feature = "airgap-detection");
@@ -63,30 +64,4 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let listener = TcpListener::bind(&address).await?;
 
     start_server(pool, listener, enable_airgap_detection).await
-}
-
-/// Create a SQLite database if needed, then connect to it and run migrations.
-/// Return a connection pool.
-async fn create_sqlite_pool(
-    #[cfg_attr(not(feature = "dev-database"), allow(unused_variables))] args: &Args,
-) -> Result<SqlitePool, Box<dyn Error>> {
-    let db = format!("sqlite://{}", &args.database);
-    let opts = SqliteConnectOptions::from_str(&db)?.create_if_missing(true);
-
-    #[cfg(feature = "dev-database")]
-    if args.reset_database {
-        // remove the file, ignoring any errors that occurred (such as the file not existing)
-        let _ = tokio::fs::remove_file(opts.get_filename()).await;
-        info!("removed database file");
-    }
-
-    let pool = SqlitePool::connect_with(opts).await?;
-    sqlx::migrate!().run(&pool).await?;
-
-    #[cfg(feature = "dev-database")]
-    if args.seed_data {
-        fixtures::seed_fixture_data(&pool).await?;
-    }
-
-    Ok(pool)
 }

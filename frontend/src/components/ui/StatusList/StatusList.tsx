@@ -35,6 +35,10 @@ StatusList.Item = function StatusListItem({ status, children, emphasis, padding,
   );
 };
 
-StatusList.Title = function StatusListTitle({ children }: { children: React.ReactNode }) {
-  return <div className={cls.title}>{children}</div>;
+StatusList.Title = function StatusListTitle({ id, children }: { id?: string; children: React.ReactNode }) {
+  return (
+    <div id={id} className={cls.title}>
+      {children}
+    </div>
+  );
 };

@@ -9,7 +9,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
-import { ResolveDifferencesAction } from "@/types/generated/openapi";
+import { DataEntryStatusName } from "@/types/generated/openapi";
 
 import { usePollingStationDataEntryDifferences } from "../hooks/usePollingStationDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
@@ -18,19 +18,27 @@ import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 export function ResolveDifferencesPage() {
   const navigate = useNavigate();
-  const afterSave = (action: ResolveDifferencesAction) => {
-    let url = `/elections/${election.id}/status`;
-    switch (action) {
-      case "keep_first_entry":
-      case "keep_second_entry":
-        url += `#data-entry-kept-${pollingStation.id}`;
+  const afterSave = (status: DataEntryStatusName) => {
+    let nextPage = `/elections/${election.id}/status`;
+    let message = "";
+
+    switch (status) {
+      case "first_entry_has_errors":
+        nextPage = `/elections/${election.id}/status/${pollingStationId}/resolve-errors`;
         break;
-      case "discard_both_entries":
-        url += `#data-entries-discarded-${pollingStation.id}`;
+      case "second_entry_not_started":
+        message = `#data-entry-kept-${pollingStation.id}`;
+        break;
+      case "first_entry_not_started":
+        message = `#data-entries-discarded-${pollingStation.id}`;
+        break;
+      default:
         break;
     }
-    void navigate(url);
+
+    void navigate(nextPage + message);
   };
+
   const pollingStationId = useNumericParam("pollingStationId");
   const {
     pollingStation,

@@ -1,10 +1,30 @@
 import * as React from "react";
 
+import { IconWarningSquare } from "@/components/generated/icons";
+import { tx } from "@/i18n/translate";
 import { deformatNumber, formatNumber, validateNumberString } from "@/utils/format";
+
+import { Icon } from "../Icon/Icon";
+import { Tooltip } from "../Tooltip/Tooltip";
+
+function ellipsis(text: string, maxLength: number = 20): string {
+  // Normalize whitespace: replace newlines and multiple spaces with single spaces
+  // (newlines are converted to line breaks in the i18n code)
+  const normalizedText = text.replace(/\s+/g, " ").trim();
+
+  if (normalizedText.length <= maxLength) {
+    return normalizedText;
+  }
+
+  return normalizedText.substring(0, maxLength - 3) + "...";
+}
 
 export type NumberInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 export function NumberInput({ id, ...inputProps }: NumberInputProps) {
+  const [tooltipInvalidValue, setTooltipInvalidValue] = React.useState<string | null>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
   const props = {
     className: "font-number",
     maxLength: 9,
@@ -14,24 +34,38 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
     type: "text",
   };
 
+  const hideTooltip = React.useCallback(() => {
+    setTooltipInvalidValue(null);
+  }, []);
+
   const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback((event) => {
     const pastedInput = event.clipboardData.getData("text/plain");
     if (!validateNumberString(pastedInput)) {
       event.preventDefault();
-      //TODO: show tooltip
+      setTooltipInvalidValue(pastedInput);
     }
   }, []);
 
+  const tooltipContent = tooltipInvalidValue ? (
+    <div className="tooltip-content">
+      <Icon color="warning" icon={<IconWarningSquare />} />
+      <span>{tx("invalid_paste_content", undefined, { value: ellipsis(tooltipInvalidValue) })}</span>
+    </div>
+  ) : null;
+
   return (
-    <input
-      {...props}
-      onPaste={onPaste}
-      onFocus={onFocus}
-      onBlur={onBlur(props.onChange)}
-      onKeyDown={onKeyDown}
-      id={id}
-      name={props.name || id}
-    />
+    <Tooltip content={tooltipContent} onClose={hideTooltip}>
+      <input
+        {...props}
+        ref={inputRef}
+        onPaste={onPaste}
+        onFocus={onFocus}
+        onBlur={onBlur(props.onChange)}
+        onInput={onInput}
+        id={id}
+        name={props.name || id}
+      />
+    </Tooltip>
   );
 }
 
@@ -49,6 +83,7 @@ function onFocus(event: React.FocusEvent<HTMLInputElement>) {
     input.setSelectionRange(0, event.currentTarget.value.length);
   }
 }
+
 //format number on blur and call onChange if provided
 function onBlur(onChange?: React.ChangeEventHandler<HTMLInputElement>) {
   return function (event: React.FocusEvent<HTMLInputElement>) {
@@ -66,69 +101,7 @@ function onBlur(onChange?: React.ChangeEventHandler<HTMLInputElement>) {
 }
 
 //only accept numbers
-function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-  //allow keyboard shortcuts and navigation (e.g. copy and paste, select all, arrow keys)
-  if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) {
-    return;
-  }
-  if (event.key.length === 1 && isNaN(parseInt(event.key))) {
-    event.preventDefault();
-  }
+function onInput(event: React.FormEvent<HTMLInputElement>) {
+  const input = event.currentTarget;
+  input.value = input.value.replace(/[^0-9]/g, "");
 }
-
-/**
- Archived for potential future use
-
-function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-  let caretPosition = event.target.selectionStart;
-  const inputValue = event.target.value;
-  const newValue = formatNumber(inputValue);
-
-  if (caretPosition) {
-    caretPosition += newValue.length - inputValue.length;
-  }
-  event.target.value = formatNumber(event.target.value);
-  //restore caret position
-  event.target.setSelectionRange(caretPosition, caretPosition);
-}
-
-function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-  if (event.key !== "Delete" && event.key !== "Backspace" && event.key !== "ArrowLeft" && event.key !== "ArrowRight")
-    return;
-  const inputValue = event.currentTarget.value;
-  let caretPosition = event.currentTarget.selectionStart || 0;
-  let selectionEnd = event.currentTarget.selectionEnd || caretPosition;
-
-  if (event.key === "Backspace") {
-    if (inputValue.charAt(caretPosition - 1) === ".") {
-      //remove an extra char
-      event.currentTarget.setSelectionRange(caretPosition - 1, caretPosition - 1);
-    }
-  } else if (event.key === "Delete") {
-    if (inputValue.charAt(caretPosition) === ".") {
-      //remove an extra char
-      event.currentTarget.setSelectionRange(caretPosition + 1, caretPosition + 1);
-    }
-
-    // ArrowLeft and ArrowRight selection
-  } else {
-    console.log("S:", caretPosition, "E:", selectionEnd);
-    if (event.key === "ArrowLeft") {
-      if (inputValue.charAt(caretPosition - 1) === ".") {
-        caretPosition -= 1;
-      }
-      //event.key === ArrowRight
-    } else {
-      if (inputValue.charAt(selectionEnd) === ".") {
-        selectionEnd += 1;
-      }
-    }
-
-    if (event.shiftKey) {
-      event.currentTarget.setSelectionRange(caretPosition, selectionEnd);
-    } else {
-      event.currentTarget.setSelectionRange(caretPosition, caretPosition);
-    }
-  }
-}
- */

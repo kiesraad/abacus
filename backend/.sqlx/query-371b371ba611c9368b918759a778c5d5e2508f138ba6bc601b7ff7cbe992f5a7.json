@@ -1,0 +1,80 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                json(event) as \"event!: Json<AuditEvent>\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                ip as \"ip: String\",\n                user_id as \"user_id: u32\",\n                username,\n                user_fullname,\n                user_role as \"user_role: Role\"\n            FROM audit_log\n            ORDER BY time DESC\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "time: _",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "event!: Json<AuditEvent>",
+        "ordinal": 2,
+        "type_info": "Null"
+      },
+      {
+        "name": "event_level: _",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "message",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "workstation: _",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "ip: String",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_id: u32",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "username",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_fullname",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_role: Role",
+        "ordinal": 10,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      null,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "371b371ba611c9368b918759a778c5d5e2508f138ba6bc601b7ff7cbe992f5a7"
+}

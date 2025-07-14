@@ -6,7 +6,10 @@ use std::{
 };
 
 use abacus::{
-    committee_session::{CommitteeSessionCreateRequest, repository::CommitteeSessions},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
+    },
+    create_sqlite_pool,
     data_entry::{
         CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
         VotersCounts, VotesCounts,
@@ -18,7 +21,6 @@ use abacus::{
         PoliticalGroup, repository::Elections,
     },
     eml::{EML110, EML230, EMLDocument},
-    fixtures,
     pdf_gen::models::{ModelNa31_2Input, PdfModel},
     polling_station::{
         PollingStation, PollingStationRequest, PollingStationType, repository::PollingStations,
@@ -28,7 +30,7 @@ use abacus::{
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use clap::Parser;
 use rand::seq::IndexedRandom;
-use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
+
 #[cfg(feature = "dev-database")]
 use tracing::info;
 use tracing::level_filters::LevelFilter;
@@ -37,10 +39,6 @@ use tracing_subscriber::EnvFilter;
 /// Abacus API and asset server
 #[derive(Parser, Debug)]
 struct Args {
-    /// Server port, optional
-    #[arg(short, long, default_value_t = 8080)]
-    port: u16,
-
     /// Location of the database file, will be created if it doesn't exist
     #[arg(short, long, default_value = "db.sqlite")]
     database: String,
@@ -137,7 +135,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // load arguments, setup database
     let args = Args::parse();
-    let pool = create_sqlite_pool(&args).await?;
+    let pool = create_sqlite_pool(
+        &args.database,
+        #[cfg(feature = "dev-database")]
+        args.reset_database,
+        #[cfg(feature = "dev-database")]
+        args.seed_data,
+    )
+    .await?;
     let mut rng = rand::rng();
 
     // generate and store the election
@@ -148,7 +153,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // generate the committee session for the election
     let cs_repo = CommitteeSessions::new(pool.clone());
-    cs_repo
+    let committee_session = cs_repo
         .create(CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
@@ -168,6 +173,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let data_entry_completed = if args.with_data_entry {
         let data_entries_repo = PollingStationDataEntries::new(pool.clone());
         let (_, second_entries) = generate_data_entry(
+            &committee_session,
             &election,
             &polling_stations,
             &mut rng,
@@ -348,6 +354,7 @@ async fn generate_polling_stations(
 
 /// Generate and store data entries for the given election based on arguments
 async fn generate_data_entry(
+    committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     rng: &mut impl rand::Rng,
@@ -400,7 +407,7 @@ async fn generate_data_entry(
                 });
 
                 data_entries_repo
-                    .make_definitive(ps.id, &state, &results)
+                    .make_definitive(ps.id, committee_session.id, &state, &results)
                     .await
                     .expect("Could not create definitive data entry");
                 generated_second_entries += 1;
@@ -412,7 +419,7 @@ async fn generate_data_entry(
                     first_entry_finished_at: ts,
                 });
                 data_entries_repo
-                    .upsert(ps.id, &state)
+                    .upsert(ps.id, committee_session.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;
@@ -655,30 +662,4 @@ async fn export_election(
     }
 
     info!("Files written successfully");
-}
-
-/// Create a SQLite database if needed, then connect to it and run migrations.
-/// Return a connection pool.
-async fn create_sqlite_pool(
-    #[cfg_attr(not(feature = "dev-database"), allow(unused_variables))] args: &Args,
-) -> Result<SqlitePool, Box<dyn Error>> {
-    let db = format!("sqlite://{}", &args.database);
-    let opts = SqliteConnectOptions::from_str(&db)?.create_if_missing(true);
-
-    #[cfg(feature = "dev-database")]
-    if args.reset_database {
-        // remove the file, ignoring any errors that occurred (such as the file not existing)
-        let _ = tokio::fs::remove_file(opts.get_filename()).await;
-        info!("removed database file");
-    }
-
-    let pool = SqlitePool::connect_with(opts).await?;
-    sqlx::migrate!().run(&pool).await?;
-
-    #[cfg(feature = "dev-database")]
-    if args.seed_data {
-        fixtures::seed_fixture_data(&pool).await?;
-    }
-
-    Ok(pool)
 }

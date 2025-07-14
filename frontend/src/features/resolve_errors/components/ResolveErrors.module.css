@@ -6,11 +6,6 @@
     line-height: 1.5rem;
   }
 
-  aside {
-    flex: 0 0 19.5rem;
-    display: flex;
-  }
-
   form {
     margin-bottom: 2rem;
   }

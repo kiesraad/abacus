@@ -123,6 +123,6 @@ describe("UI component: CommitteeSessionCard", () => {
 
     expect(screen.getByRole("button", { name: "Resultaten en documenten" }));
     expect(screen.queryByRole("button", { name: "Steminvoer bekijken" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Details van de zitting" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Details van de zitting" }));
   });
 });

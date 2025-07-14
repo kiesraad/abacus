@@ -116,9 +116,8 @@ export function CommitteeSessionCard({
       }
       break;
   }
-  if (committeeSession.start_date === "" || committeeSession.start_time === "" || committeeSession.location === "") {
-    buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" }); // TODO: issue #1750 add link
-  }
+  buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" }); // TODO: issue #1750 add link
+
   return (
     <Card icon={icon} label={label} status={status} date={date} button={button} {...props}>
       {buttonLinks.length > 0 && <ButtonLinkList buttonLinks={buttonLinks} firstRowBold={currentSession} />}

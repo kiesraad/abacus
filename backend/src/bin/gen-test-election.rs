@@ -18,7 +18,7 @@ use abacus::{
     },
     election::{
         CandidateGender, ElectionCategory, ElectionWithPoliticalGroups, NewElection,
-        PoliticalGroup, repository::Elections,
+        PoliticalGroup, VoteCountingMethod, repository::Elections,
     },
     eml::{EML110, EML230, EMLDocument},
     pdf_gen::models::{ModelNa31_2Input, PdfModel},
@@ -248,6 +248,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
+        counting_method: VoteCountingMethod::CSO,
         domain_id: abacus::test_data_gen::domain_id(rng),
         election_id,
         location: locality,

@@ -3573,6 +3573,7 @@
         "required": [
           "id",
           "name",
+          "counting_method",
           "election_id",
           "location",
           "domain_id",
@@ -3585,6 +3586,9 @@
         "properties": {
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod"
           },
           "domain_id": {
             "type": "string"
@@ -3932,6 +3936,7 @@
         "required": [
           "id",
           "name",
+          "counting_method",
           "election_id",
           "location",
           "domain_id",
@@ -3945,6 +3950,9 @@
         "properties": {
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod"
           },
           "domain_id": {
             "type": "string"
@@ -4234,6 +4242,7 @@
         "description": "Election request",
         "required": [
           "name",
+          "counting_method",
           "election_id",
           "location",
           "domain_id",
@@ -4247,6 +4256,9 @@
         "properties": {
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod"
           },
           "domain_id": {
             "type": "string"
@@ -5186,6 +5198,13 @@
             }
           }
         }
+      },
+      "VoteCountingMethod": {
+        "type": "string",
+        "enum": [
+          "CSO",
+          "DSO"
+        ]
       },
       "VotersCounts": {
         "type": "object",

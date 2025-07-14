@@ -480,6 +480,7 @@ export interface DifferencesCounts {
  */
 export interface Election {
   category: ElectionCategory;
+  counting_method: VoteCountingMethod;
   domain_id: string;
   election_date: string;
   election_id: string;
@@ -606,6 +607,7 @@ export interface ElectionSummary {
  */
 export interface ElectionWithPoliticalGroups {
   category: ElectionCategory;
+  counting_method: VoteCountingMethod;
   domain_id: string;
   election_date: string;
   election_id: string;
@@ -731,6 +733,7 @@ export interface LoginResponse {
  */
 export interface NewElection {
   category: ElectionCategory;
+  counting_method: VoteCountingMethod;
   domain_id: string;
   election_date: string;
   election_id: string;
@@ -1051,6 +1054,8 @@ export interface ValidationResults {
   errors: ValidationResult[];
   warnings: ValidationResult[];
 }
+
+export type VoteCountingMethod = "CSO" | "DSO";
 
 /**
  * Voters counts, part of the polling station results.

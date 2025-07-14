@@ -678,7 +678,10 @@ mod tests {
     use super::*;
     use crate::{
         data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts},
-        election::{Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup},
+        election::{
+            Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup,
+            VoteCountingMethod,
+        },
         polling_station::{PollingStation, PollingStationType},
     };
 
@@ -729,6 +732,7 @@ mod tests {
         ElectionWithPoliticalGroups {
             id: 1,
             name: "Test election".to_string(),
+            counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2025".to_string(),
             location: "Test location".to_string(),
             domain_id: "0000".to_string(),

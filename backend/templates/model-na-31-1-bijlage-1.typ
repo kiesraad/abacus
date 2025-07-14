@@ -94,7 +94,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 === Heeft het gemeentelijk stembureau/stembureau voor het openbaar lichaam het aantal toegelaten kiezers opnieuw geteld? Schrijf dan die aantallen op. Neem anders de aantallen over die het stembureau heeft opgeschreven in het proces-verbaal.
 
 #sum(
-  letterbox("A", value: 6)[Stempassen],
-  letterbox("B")[Volmachtbewijzen],
-  letterbox("D", light: false)[Totaal toegelaten kiezers (A+B)]
+  empty_letterbox("A")[Stempassen],
+  empty_letterbox("B")[Volmachtbewijzen],
+  empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B)]
 )

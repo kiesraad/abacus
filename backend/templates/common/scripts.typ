@@ -57,7 +57,7 @@
   thousands-sep: ".",
   zero: "-"
 ) = {
-  if (integer == 0) {
+  if (integer == 0 or integer == none) {
     return zero
   }
 
@@ -65,29 +65,43 @@
 }
 
 /// Display a box with a prefixed label and a value
-#let letterbox(letter, value: int, light: true, content) = {
+#let letterbox(letter, value: none, light: true, content) = {
   let bg = if light { luma(213) } else { black }
   let fill = if light { black } else { white }
-
-  let number_value = if value == int {
-    grid(
-      columns: (1em, 1em, 1em, 1em, 1em),
-      rows: 1em,
-      ..range(5).map(v => grid.cell(stroke: 1pt + black, ""))
-    )
-  } else {
-    grid.cell(align: right, stroke: 0.5pt + black, text(number-width: "tabular", fmt-number(value)))
-  }
 
   grid(
     columns: (8em, 4em, 1fr),
     align: (center, right),
     inset: 9pt,
-    grid.cell(align: right, stroke: 0.5pt + black, text(number-width: "tabular", number_value)),
+    grid.cell(align: right, stroke: 0.5pt + black, text(number-width: "tabular", fmt-number(value))),
     grid.cell(stroke: 0.5pt + black, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
     grid.cell(align: horizon + left, content),
   )
 }
+
+#let empty_letterbox(letter, cells: 5, light: true, content) = {
+  let bg = if light { luma(213) } else { black }
+  let fill = if light { black } else { white }
+
+  grid(
+    inset: 9pt,
+    columns: range(0, cells).map((_) => 2em) + (4em, 1fr),
+    align: (center, right),
+    grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
+    ..range(0, cells).map((cell) => {
+      grid.cell(
+        stroke: (
+          y: 0.5pt + black,
+          x: (paint: black, thickness: 0.5pt, dash: "densely-dotted"),
+        ), " ")
+    }),
+    grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
+    grid.cell(stroke: 0.5pt + black, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
+    grid.cell(align: horizon + left, content),
+  )
+}
+
+
 
 // Mathematical addition layout
 #let sum(..boxes, sum_box) = {

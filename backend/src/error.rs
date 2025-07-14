@@ -17,7 +17,7 @@ use zip::result::ZipError;
 use crate::{
     MAX_BODY_SIZE_MB, apportionment::ApportionmentError,
     authentication::error::AuthenticationError, data_entry::DataError, eml::EMLImportError,
-    pdf_gen::PdfGenError,
+    pdf_gen::PdfGenError, report::ReportError,
 };
 
 /// Error reference used to show the corresponding error message to the end-user
@@ -26,6 +26,7 @@ pub enum ErrorReference {
     AirgapViolation,
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
+    CommitteeSessionNotFinalised,
     DatabaseError,
     DataEntryAlreadyClaimed,
     DataEntryAlreadyFinalised,
@@ -88,6 +89,7 @@ pub enum APIError {
     JsonRejection(JsonRejection),
     NotFound(String, ErrorReference),
     PdfGenError(PdfGenError),
+    Report(ReportError),
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
     StdError(Box<dyn Error>),
@@ -328,6 +330,20 @@ impl IntoResponse for APIError {
                         to_error(
                             "No votes on candidates cast",
                             ErrorReference::ZeroVotesCast,
+                            false,
+                        ),
+                    ),
+                }
+            }
+            APIError::Report(err) => {
+                error!("Report error: {:?}", err);
+
+                match err {
+                    ReportError::CommitteeSessionNotFinalised => (
+                        StatusCode::PRECONDITION_FAILED,
+                        to_error(
+                            "Committee session data entry first needs to be finalised",
+                            ErrorReference::CommitteeSessionNotFinalised,
                             false,
                         ),
                     ),

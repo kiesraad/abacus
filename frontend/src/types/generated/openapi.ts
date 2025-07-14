@@ -647,6 +647,7 @@ export type ErrorReference =
   | "AirgapViolation"
   | "AllListsExhausted"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
+  | "CommitteeSessionNotFinalised"
   | "DatabaseError"
   | "DataEntryAlreadyClaimed"
   | "DataEntryAlreadyFinalised"

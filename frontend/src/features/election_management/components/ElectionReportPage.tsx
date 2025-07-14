@@ -3,7 +3,6 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
-import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t, tx } from "@/i18n/translate";
 
 import cls from "./ElectionManagement.module.css";
@@ -46,12 +45,11 @@ async function downloadFrom(url: string) {
 }
 
 export function ElectionReportPage() {
-  const { election } = useElection();
-  const { statuses } = useElectionStatus();
+  const { committeeSession, election } = useElection();
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
-  if (statuses.some((s) => s.status !== "definitive")) {
-    throw new Error("Election not ready for finalisation");
+  if (committeeSession.status !== "data_entry_finished") {
+    throw new Error(t("error.api_error.CommitteeSessionNotFinalised"));
   }
 
   function downloadPdfResults() {

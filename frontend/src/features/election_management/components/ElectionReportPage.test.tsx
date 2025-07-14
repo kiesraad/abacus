@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
@@ -14,7 +15,7 @@ import { ElectionReportPage } from "./ElectionReportPage";
 
 describe("ElectionReportPage", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler);
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
   });
 
   test("Error when election is not ready", async () => {
@@ -35,12 +36,7 @@ describe("ElectionReportPage", () => {
       },
     ]);
 
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { id: 1, status: "not_started" },
-        { id: 2, status: "definitive" },
-      ],
-    });
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
 
     await router.navigate("/elections/1/report");
 
@@ -50,12 +46,7 @@ describe("ElectionReportPage", () => {
   });
 
   test("Shows button", async () => {
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { id: 1, status: "definitive" },
-        { id: 2, status: "definitive" },
-      ],
-    });
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
 
     render(
       <ElectionProvider electionId={1}>

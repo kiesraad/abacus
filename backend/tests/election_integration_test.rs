@@ -197,9 +197,11 @@ async fn test_election_details_not_found(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_pdf_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/download_pdf_results");
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)

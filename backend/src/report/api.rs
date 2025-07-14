@@ -6,6 +6,7 @@ use zip::{result::ZipError, write::SimpleFileOptions};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::Coordinator,
+    committee_session::{repository::CommitteeSessions, status::CommitteeSessionStatus},
     data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
     election::{ElectionWithPoliticalGroups, repository::Elections},
     eml::{EML510, EMLDocument, EmlHash, axum::Eml},
@@ -16,6 +17,18 @@ use crate::{
     polling_station::{repository::PollingStations, structs::PollingStation},
     summary::ElectionSummary,
 };
+
+/// Errors that can occur during report generation
+#[derive(Debug, PartialEq, Eq)]
+pub enum ReportError {
+    CommitteeSessionNotFinalised,
+}
+
+impl From<ReportError> for APIError {
+    fn from(err: ReportError) -> Self {
+        APIError::Report(err)
+    }
+}
 
 impl From<ZipError> for APIError {
     fn from(err: ZipError) -> Self {
@@ -133,11 +146,19 @@ impl ResultsInput {
 )]
 async fn election_download_zip_results(
     _user: Coordinator,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(id)
+        .await?;
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+        return Err(APIError::Report(ReportError::CommitteeSessionNotFinalised));
+    }
+
     use std::io::Write;
 
     let input = ResultsInput::new(
@@ -202,11 +223,19 @@ async fn election_download_zip_results(
 )]
 async fn election_download_pdf_results(
     _user: Coordinator,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(id)
+        .await?;
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+        return Err(APIError::Report(ReportError::CommitteeSessionNotFinalised));
+    }
+
     let input = ResultsInput::new(
         id,
         elections_repo,
@@ -245,11 +274,19 @@ async fn election_download_pdf_results(
 )]
 async fn election_download_xml_results(
     _user: Coordinator,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
 ) -> Result<Eml<EML510>, APIError> {
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(id)
+        .await?;
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+        return Err(APIError::Report(ReportError::CommitteeSessionNotFinalised));
+    }
+
     let input = ResultsInput::new(
         id,
         elections_repo,

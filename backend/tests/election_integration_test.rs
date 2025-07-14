@@ -34,7 +34,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.committee_sessions[1].number, 2);
     assert_eq!(
         body.committee_sessions[1].status,
-        CommitteeSessionStatus::Created
+        CommitteeSessionStatus::DataEntryInProgress
     );
     assert_eq!(body.elections.len(), 2);
 }

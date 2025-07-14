@@ -45,12 +45,12 @@ async fn test_polling_station_listing(pool: SqlitePool) {
     )
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_6", "users"))))]
 async fn test_polling_station_creation_for_committee_session_with_created_status(pool: SqlitePool) {
     let committee_sessions_repo = CommitteeSessions::new(pool.clone());
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 3;
+    let election_id = 6;
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
 
     let committee_session = committee_sessions_repo
@@ -112,7 +112,10 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
         .get_election_committee_session(election_id)
         .await
         .unwrap();
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryInProgress
+    );
     committee_sessions_repo
         .delete(committee_session.id)
         .await

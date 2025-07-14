@@ -103,7 +103,9 @@ async fn polling_station_create(
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     elections_repo.get(election_id).await?;
-    let committee_session = committee_sessions_repo.get(election_id).await?;
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await?;
 
     let polling_station = polling_stations_repo
         .create(election_id, new_polling_station)
@@ -228,7 +230,9 @@ async fn polling_station_delete(
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     elections_repo.get(election_id).await?;
-    let committee_session = committee_sessions_repo.get(election_id).await?;
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await?;
 
     let polling_station = polling_stations_repo
         .get_for_election(election_id, polling_station_id)

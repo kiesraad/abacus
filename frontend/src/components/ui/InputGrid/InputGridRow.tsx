@@ -47,11 +47,17 @@ export function InputGridRow({
   const errorMessage =
     errorMessageId || (hasError ? "feedback-error" : hasUnacceptedWarning ? "feedback-warning" : undefined);
 
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
   React.useEffect(() => {
     if (errorMessageId) {
-      document.getElementById(id)?.focus();
+      inputRef.current?.focus();
+      // calling scrollIntoView directly doesn't always scroll properly
+      requestAnimationFrame(() => {
+        inputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
     }
-  }, [errorMessageId, id]);
+  }, [errorMessageId]);
 
   const children: [React.ReactElement, React.ReactElement, React.ReactElement] = [
     <td key={`${id}-1`} id={`field-${id}`}>
@@ -73,6 +79,7 @@ export function InputGridRow({
             aria-labelledby={`field-${id} title-${id}`}
             aria-invalid={errorMessage !== undefined}
             aria-errormessage={errorMessage}
+            ref={inputRef}
           />
         )}
       </FormField>

@@ -14,6 +14,13 @@ export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
 export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
 
+// /api/committee_sessions/{committee_session_id}/status
+export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${number}/status`;
+export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
+
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
@@ -385,6 +392,13 @@ export type CommitteeSessionStatus =
   | "data_entry_in_progress"
   | "data_entry_paused"
   | "data_entry_finished";
+
+/**
+ * Committee session status change request
+ */
+export interface CommitteeSessionStatusChangeRequest {
+  status: CommitteeSessionStatus;
+}
 
 /**
  * Committee session update request

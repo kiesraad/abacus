@@ -41,7 +41,6 @@ export function ElectionStatusPage() {
   }
 
   function finishInput() {
-    // TODO: Add call to endpoint that changes status of committee session to "data_entry_finished" in issue #1650
     void navigate("../report");
   }
 
@@ -82,17 +81,15 @@ export function ElectionStatusPage() {
           </p>
         </Alert>
       )}
-      {committeeSession.status !== "data_entry_finished" &&
-        statuses.length > 0 &&
-        statuses.every((s) => s.status === "definitive") && (
-          <Alert type="success">
-            <h2>{t("election_status.definitive.title")}</h2>
-            <p>{t("election_status.definitive.message")}</p>
-            <Button onClick={finishInput} size="md">
-              {t("election_status.definitive.finish_button")}
-            </Button>
-          </Alert>
-        )}
+      {committeeSession.status === "data_entry_finished" && (
+        <Alert type="success">
+          <h2>{t("election_status.definitive.title")}</h2>
+          <p>{t("election_status.definitive.message")}</p>
+          <Button onClick={finishInput} size="md">
+            {t("election_status.definitive.finish_button")}
+          </Button>
+        </Alert>
+      )}
       <main>
         <ElectionStatus
           election={election}

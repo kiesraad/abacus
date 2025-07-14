@@ -1,5 +1,6 @@
 import {
   ClaimDataEntryResponse,
+  CommitteeSessionStatusChangeRequest,
   DataEntry,
   NewElection,
   PollingStationRequest,
@@ -62,6 +63,10 @@ export const electionRequest: NewElection = {
       ],
     },
   ],
+};
+
+export const committeeSessionStatusChangeRequest: CommitteeSessionStatusChangeRequest = {
+  status: "data_entry_in_progress",
 };
 
 export const pollingStationRequests: PollingStationRequest[] = [

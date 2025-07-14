@@ -38,6 +38,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_committee_session_list))
         .routes(routes!(committee_session_create))
         .routes(routes!(committee_session_update))
+        .routes(routes!(committee_session_status_change))
 }
 
 /// Committee session list response
@@ -150,12 +151,13 @@ pub async fn committee_session_update(
 /// Change the status of a [CommitteeSession].
 #[utoipa::path(
     put,
-    path = "/api/committee_sessions/{committee_session_id}",
+    path = "/api/committee_sessions/{committee_session_id}/status",
     request_body = CommitteeSessionStatusChangeRequest,
     responses(
         (status = 200, description = "Committee session status changed successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(

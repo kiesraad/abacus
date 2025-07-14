@@ -262,9 +262,8 @@ Voer de controle uit volgens de stappen in het controleprotocol.
     continue
   }
 
-  title[Lijst #political_group.number #election_political_group.name]
-
   votes_table(
+    title: [#political_group.number #election_political_group.name],
     headers: ("Kandidaat", "", "Stemmen"),
     total: political_group.total,
     values: political_group.candidate_votes.map(candidate => (

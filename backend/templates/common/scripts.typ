@@ -70,7 +70,7 @@
   let fill = if light { black } else { white }
 
   grid(
-    columns: (8em, 4em, 1fr),
+    columns: (8em, 3.5em, 1fr),
     align: (center, right),
     inset: 9pt,
     grid.cell(align: right, stroke: 0.5pt + black, text(number-width: "tabular", fmt-number(value))),
@@ -85,7 +85,7 @@
 
   grid(
     inset: 9pt,
-    columns: range(0, cells).map((_) => 2em) + (4em, 1fr),
+    columns: range(0, cells).map((_) => 2em) + (3.5em, 1fr),
     align: (center, right),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
     ..range(0, cells).map((cell) => {
@@ -261,6 +261,7 @@
 // View a votes table, values should be a dictionary with the keys "name", "number" and "votes"
 #let votes_table(
   headers: ("", "", ""),
+  title: "",
   total: 0,
   values: (),
   continue_on_next_page: "",
@@ -282,6 +283,8 @@
   // Max rows per table / column
   let break_count = (25, 25, 15, 15)
   let total_rows = values.len()
+
+  text(size: 14pt, weight: "semibold", "Lijst " + title)
 
   set text(size: 8pt)
 
@@ -341,7 +344,17 @@
           v(8pt)
           align(right, text(weight: "bold", continue_on_next_page))
         }
+
         colbreak()
+
+        if (column == 2) {
+          place(
+            top + left,
+            scope: "parent",
+            float: true,
+            text(size: 14pt, weight: "semibold", "Vervolg lijst " + title)
+          )
+        }
       }
     }
   })

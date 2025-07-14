@@ -379,9 +379,15 @@ describe("Election create pages", () => {
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    // upload election and set hash, and continue
+    // update election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+
+    // Wait for the candidate page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
 
     // upload candidate file, set hash and continue
     await uploadCandidateDefinition(file);
@@ -397,6 +403,7 @@ describe("Election create pages", () => {
 
     const router = renderWithRouter();
     const user = userEvent.setup();
+
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
@@ -404,7 +411,7 @@ describe("Election create pages", () => {
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
 
-    // Wait for the candidate page to be loaded
+    // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
@@ -722,7 +729,6 @@ describe("Election create pages", () => {
 
     const router = renderWithRouter();
     const user = userEvent.setup();
-
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 

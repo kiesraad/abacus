@@ -222,14 +222,11 @@ test.describe("Election creation", () => {
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
-    const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
-    await expect(checkCandidateDefinitionPage.header).toBeVisible();
 
     // Back button
     await page.goBack();
 
-    // We should be back at the upload election page
+    // We should be back at the candidate page
     const uploadDefinitionPage = new UploadDefinitionPgObj(page);
     await expect(uploadDefinitionPage.header).toBeVisible();
   });

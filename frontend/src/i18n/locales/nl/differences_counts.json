@@ -1,6 +1,7 @@
 {
   "form_title": "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
   "short_title": "Verschillen",
+  "section_number": "B1-3.3",
   "differences_counts": {
     "more_ballots_count": "Stembiljetten méér geteld",
     "fewer_ballots_count": "Stembiljetten minder geteld",

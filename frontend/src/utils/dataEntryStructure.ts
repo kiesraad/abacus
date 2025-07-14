@@ -61,6 +61,7 @@ export const createVotersAndVotesSection = (recounted: boolean): DataEntrySectio
     id: "voters_votes_counts",
     title: t("voters_votes_counts.form_title"),
     short_title: t("voters_votes_counts.short_title"),
+    sectionNumber: t("voters_votes_counts.section_number"),
     subsections: [
       {
         type: "inputGrid",
@@ -85,6 +86,7 @@ export const differencesSection: DataEntrySection = {
   id: "differences_counts",
   title: t("differences_counts.form_title"),
   short_title: t("differences_counts.short_title"),
+  sectionNumber: t("differences_counts.section_number"),
   subsections: [
     {
       type: "inputGrid",

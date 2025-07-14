@@ -10,7 +10,9 @@ Logging van acties in de applicatie kan helpen bij het oplossen van problemen en
 
 __Niveau:__ gebruikersdoel, zee  (🌊)
 
-De applicatie logt acties. Van elke gelogde actie is in elk geval de volgende informatie beschikaar:
+De applicatie logt de interactie van gebruikers met de applicatie, zoals het uploaden van definities, aanmaken en wijzigen van gebruikers, opslaan van invoer etc.  
+
+Van elke gelogde actie is in elk geval de volgende informatie beschikaar:
 
 - actie: de gebeurtenis of handeling die heeft plaatsgevonden,
 - object: waarop de gebeurtenis of handeling effect had (bijv. welk bestand, proces of systeem),
@@ -19,10 +21,6 @@ De applicatie logt acties. Van elke gelogde actie is in elk geval de volgende in
 - actor: identificatie van de persoon+rol die, of het proces dat de gebeurtenis in gang heeft gezet
 - tijdstempel: datum en tijdstip waarop de gebeurtenis of handeling plaatsvond.
 
-### Open punten
-
-- welke gebeurtenissen vragen om melding aan de gebruiker en/of directe actie?
-- Is de logging nuttig en/of nodig bij het oplossen van problemen met het gebruik van de applicatie?
 
 ## De beheerder / coördinator bekijkt de logging om het gebruik te monitoren (zee)
 
@@ -30,19 +28,11 @@ __Niveau:__ gebruikersdoel, zee  (🌊)
 
 De beheerder / coördinator bekijkt de gelogde acties om het gebruik te monitoren. Ze kunnen de logging filteren op eigenschappen van de gelogde acties.
 
-### Open punten
-
-- Welke statistiek is relevant voor het monitoren van gebruik?
-
 ## De Kiesraad bekijkt de logging bij het afhandelen van een incident (zee)
 
 __Niveau:__ gebruikersdoel, zee  (🌊)
 
-De Kiesraad gebruikt de logging als informatiebron bij het afhandelen van een incident
-
-### Open punten
-
-- Is er een manier om de compleetheid van de logs te beoordelen?
+De Kiesraad gebruikt de logging als informatiebron bij het afhandelen van een incident. 
 
 ## Out of scope
 
@@ -54,7 +44,3 @@ De beheerder / coördinator bekijkt de statistieken over het gebruik van de appl
 - het maken van de capaciteitsplanning
 - het bepalen van doorlooptijden
 - het gebruiken als input voor procesverbetering
-
-#### Open punten
-
-- Deze informatie kan persoonlijk zijn

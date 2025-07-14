@@ -4,7 +4,6 @@ module.exports = {
   importOrder: [
     "^react.*$", // anything react
     "<THIRD_PARTY_MODULES>", // node_modules
-    "^ladle/.*$", // ladle
     "^@/.*$", // app
     "^@kiesraad/.*$", // lib
     "^(\\.||\\.\\.)/.*$", // local imports

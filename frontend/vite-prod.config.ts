@@ -5,10 +5,6 @@ import path from "path";
 import { defineConfig, UserConfig } from "vite";
 
 import pkgjson from "./package.json";
-import tsConfig from "./tsconfig.json";
-
-const mapObj = <V0, V>(obj: Record<string, V0>, kf: (t: string) => string, vf: (t: V0) => V): Record<string, V> =>
-  Object.fromEntries(Object.entries(obj).map(([k, v]) => [kf(k), vf(v)]));
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -62,14 +58,7 @@ export default defineConfig(({ command }) => {
     },
     optimizeDeps: { exclude: ["msw"] },
     resolve: {
-      alias: mapObj(
-        tsConfig.compilerOptions.paths,
-        (k) => k.replace("/*", ""),
-        (paths) => {
-          if (!paths[0]) throw new Error("No path found");
-          return path.resolve(__dirname, paths[0].replace("/*", ""));
-        },
-      ),
+      alias: [{ find: "@", replacement: path.resolve(__dirname, "./src") }],
     },
   } satisfies UserConfig;
 });

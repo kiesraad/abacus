@@ -51,9 +51,6 @@ npm run test
 Browser tests using Playwright:
 
 ```sh
-# tests for ui components using ladle:
-npm run test:ladle
-
 # tests for frontend with backend and database
 # tests use database at backend/target/debug/playwright.sqlite
 # build frontend, build backend, setup fresh seeded database:
@@ -65,15 +62,17 @@ npm run test:e2e-dev
 npx playwright show-report <path-to-unzipped-report-folder>
 ```
 
-### UI Component development
-
-Develop and test UI components in isolation:
+### Component Development with Storybook
 
 ```sh
-npm run ladle
+# Start Storybook development server
+npm run storybook
+
+# Run Storybook tests
+npm run test -- --project storybook
 ```
 
-And open Ladle at http://localhost:61000/.
+Storybook runs on [http://localhost:6006](http://localhost:6006) and provides an interactive component library for developing and testing UI components in isolation.
 
 ## Production build
 
@@ -111,7 +110,6 @@ The application uses the following dependencies:
 
 - `typescript`: Strongly typed layer on top of JavaScript
 - `msw`: Mock Service Worker for mocking the server, client side
-- `ladle`: simple development and test environment for UI components
 - `lefthook`: git hook automation
 - `cross-env`: for building on Windows
 

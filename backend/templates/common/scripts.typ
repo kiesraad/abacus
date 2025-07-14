@@ -55,7 +55,7 @@
 #let fmt-number(
   integer,
   thousands-sep: ".",
-  zero: "-"
+  zero: "-",
 ) = {
   if (integer == 0 or integer == none) {
     return zero
@@ -85,15 +85,17 @@
 
   grid(
     inset: 9pt,
-    columns: range(0, cells).map((_) => 2em) + (3.5em, 1fr),
+    columns: range(0, cells).map(_ => 2em) + (3.5em, 1fr),
     align: (center, right),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
-    ..range(0, cells).map((cell) => {
+    ..range(0, cells).map(cell => {
       grid.cell(
         stroke: (
           y: 0.5pt + black,
           x: (paint: black, thickness: 0.5pt, dash: "densely-dotted"),
-        ), " ")
+        ),
+        " ",
+      )
     }),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
     grid.cell(stroke: 0.5pt + black, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
@@ -258,6 +260,19 @@
     .flatten())
 }
 
+#let empty_grid(cells: 4) = {
+  grid(
+    inset: 9pt,
+    columns: range(0, cells).map(_ => 2em),
+    align: (center, right),
+    ..range(0, cells - 1).map(_ => (
+        grid.cell(" "),
+        grid.vline(stroke: (paint: black, thickness: 0.5pt, dash: "densely-dotted")),
+    )).flatten(),
+    grid.cell(" "),
+  )
+}
+
 // View a votes table, values should be a dictionary with the keys "name", "number" and "votes"
 #let votes_table(
   headers: ("", "", ""),
@@ -314,7 +329,11 @@
               weight: "bold",
               [#c.number],
             )),
-            table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes))),
+            if c.votes == none {
+              table.cell(inset: 0pt, empty_grid())
+            } else {
+              table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes)))
+            },
           )
 
           if calc.rem(column_row, break_count.at(column, default: 15)) == 0 {
@@ -325,12 +344,17 @@
           table.hline(stroke: 1pt + black),
           // Empty line
           table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 0pt, []),
-          table.cell(colspan: 3, fill: white, align: center, {
+          table.cell(colspan: 3, fill: white, align: center, inset: 0pt, {
             // Increment the column counter
             column += 1
 
             // Caller defined render of column totals
-            column_total(column, votes)
+            if column_total == function {
+              column_total(column, votes)
+            } else {
+              column_total
+              empty_grid()
+            }
 
             // Reset the votes per column counter
             votes = 0
@@ -348,12 +372,11 @@
         colbreak()
 
         if (column == 2) {
-          place(
-            top + left,
-            scope: "parent",
-            float: true,
-            text(size: 14pt, weight: "semibold", "Vervolg lijst " + title)
-          )
+          place(top + left, scope: "parent", float: true, text(
+            size: 14pt,
+            weight: "semibold",
+            "Vervolg lijst " + title,
+          ))
         }
       }
     }
@@ -369,7 +392,11 @@
     )
       .map(str)
       .join(" + ")))),
-    grid.cell(stroke: 0.5pt + black)[#fmt-number(total, zero: 0)],
+    if total == none {
+      grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5))
+    } else {
+      grid.cell(stroke: 0.5pt + black, fmt-number(total, zero: 0))
+    },
   ))
 
   pagebreak(weak: true)

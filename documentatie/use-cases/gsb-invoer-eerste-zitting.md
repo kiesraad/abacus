@@ -35,13 +35,6 @@ __Uitbreidingen:__
 
 6a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
 
-
-### Open punten
-
-- Hoe ziet het stoppen/blokkeren van invoer er precies uit?
-- CSO: invoerders vullen gegevens van Bijlage 1 in. DSO: invoerders vullen gegevens van N 10-1 en evt. Na 14-1 in. => input-/output-bestanden?
-
-
 ### Niet in scope
 
 - Controles op gemeenteniveau nadat alle stembureaus zijn ingevoerd:
@@ -78,8 +71,6 @@ __Uitbreidingen:__
   - Nieuw model GSB PV heeft drie vinkjes: toegelaten kiezers opnieuw vastgesteld, onderzocht vanwege andere redenen, stembiljetten (deels) herteld.
   - De SB PVs verschillen hierin tussen DSO en CSO.
   - Als de applicatie dit moet doen, moeten de invoerders dit over kunnen nemen van het SB PV.
-  - De applicatie gaat nog uit van de oude modellen, met alleen de vraag "Is er herteld?"
-
 
 ## De invoerders vullen de resultaten van de tellingen in (vlieger)
 
@@ -139,11 +130,10 @@ __Hoofdscenario:__
 
 1. De invoerder selecteert het stembureau van het PV in de applicatie.
 2. De applicatie stelt vast dat er geen eerdere invoer voor het stembureau is opgeslagen.
-3. De invoerder voert in of er herteld is.
-4. De invoerder vult de resultaten van de telling in.
-5. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
+3. De invoerder vult de resultaten van de telling in.
+4. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
    de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten) en de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
-6. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
+5. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
 
 __Uitbreidingen:__  
 1a. De invoerder kan het stembureau op het PV niet in de applicatie vinden:  
@@ -166,19 +156,16 @@ __Uitbreidingen:__
 2a. De applicatie stelt vast dat de invoerder eerdere invoer voor het stembureau heeft opgeslagen:  
 &emsp; 2a1. De applicatie laadt de eerder ingevoerde data.
 
-5a. De invoer voldoet niet aan de validatieregels voor fouten of aan de plausibiliteitschecks:  
-&emsp; 5a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel en een waarschuwing voor elke gefaalde plausibiliteitscheck. 
-&emsp; 5a2. [De invoerder handelt de fout(en) en/of waarschuwing(en) af.](#de-invoerder-handelt-de-fouten-en-of-waarschuwingen-af-vis)
+4a. De invoer voldoet niet aan de validatieregels voor fouten of aan de plausibiliteitschecks:  
+&emsp; 4a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel en een waarschuwing voor elke gefaalde plausibiliteitscheck. 
+&emsp; 4a2. [De invoerder handelt de fout(en) en/of waarschuwing(en) af.](#de-invoerder-handelt-de-fouten-en-of-waarschuwingen-af-vis)
 
-6a. De invoerder breekt de invoer af en bewaart de invoer:  
-&emsp; 6a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  
-&emsp; 6a2. De applicatie laadt de pagina voor het selecteren van een stembureau.  
-6b. De invoerder breekt de invoer af en bewaart de invoer niet:  
-&emsp; 6b1. De applicatie verwijdert de invoer voor het stembureau.  
-&emsp; 6b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
-
-### Open punten
-- De use case beschrijft de oude modellen, met daarin alleen de vraag "Is er herteld?" In de nieuwe modellen zijn er drie vragen.
+5a. De invoerder breekt de invoer af en bewaart de invoer:  
+&emsp; 5a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  
+&emsp; 5a2. De applicatie laadt de pagina voor het selecteren van een stembureau.  
+5b. De invoerder breekt de invoer af en bewaart de invoer niet:  
+&emsp; 5b1. De applicatie verwijdert de invoer voor het stembureau.  
+&emsp; 5b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
 
 
 ## De coördinator GSB beoordeelt de verschillen tussen de twee invoeren (zee)
@@ -246,8 +233,3 @@ Voor elke fout of waarschuwing:
 __Uitbreidingen:__  
 2a. De invoerder constateert dat hij/zij een fout heeft gemaakt in de invoer.  
 &emsp; 2a1. De invoerder corrigeert de fout in de invoer.  
-
-### Open punten
-
-- De eerste stap van invoer is aangeven of er herteld is vanwege een verschil tussen aantal toegelaten kiezers en aantal uitgebrachte stemmen. Hoe verhoudt de invoer van die stap zich tot het oplossen van waarschuwingen over aantallen toegelaten kiezers en uitgebrachte stemmen?
-- Als de coördinator GSB het PV terugstuurt in het proces, naar welk punt dan precies?

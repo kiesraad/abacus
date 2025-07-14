@@ -30,7 +30,6 @@ function renderForm() {
 
 function getDefaultFormState(): FormState {
   return {
-    current: "differences_counts",
     furthest: "save",
     sections: {
       recounted: getDefaultFormSection("recounted", 1),
@@ -71,13 +70,13 @@ const pollingStationResults = {
 describe("Test DataEntryProgress", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler);
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1" });
+    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });
   });
 
   test("shows different states for entries", async () => {
+    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
     const formState = getDefaultFormState();
 
-    formState.current = "political_group_votes_2";
     formState.furthest = "political_group_votes_2";
     formState.sections.voters_votes_counts.acceptErrorsAndWarnings = false;
     formState.sections.differences_counts.acceptErrorsAndWarnings = true;
@@ -135,9 +134,9 @@ describe("Test DataEntryProgress", () => {
   });
 
   test("Prioritise errors over warnings", async () => {
+    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
     const formState = getDefaultFormState();
 
-    formState.current = "political_group_votes_2";
     formState.furthest = "political_group_votes_2";
 
     formState.sections.voters_votes_counts.errors = new ValidationResultSet([validationResultMockData.F201]);
@@ -167,9 +166,9 @@ describe("Test DataEntryProgress", () => {
   });
 
   test("shows links to other pages when on last page", async () => {
+    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "save" });
     const formState = getDefaultFormState();
 
-    formState.current = "save";
     formState.furthest = "save";
 
     overrideServerClaimDataEntryResponse({
@@ -223,9 +222,9 @@ describe("Test DataEntryProgress", () => {
   });
 
   test("shows links when navigating to earlier page", async () => {
+    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_1" });
     const formState = getDefaultFormState();
 
-    formState.current = "political_group_votes_1";
     formState.furthest = "save";
 
     overrideServerClaimDataEntryResponse({
@@ -267,11 +266,11 @@ describe("Test DataEntryProgress", () => {
   });
 
   test("Mismatch between election data and formState", async () => {
+    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });
     const formState = getDefaultFormState();
     delete formState.sections.political_group_votes_2;
     formState.sections.political_group_votes_3 = getDefaultFormSection("political_group_votes_3", 6);
     formState.sections.save = getDefaultFormSection("save", 7);
-    formState.current = "differences_counts";
     formState.furthest = "differences_counts";
 
     overrideServerClaimDataEntryResponse({

@@ -185,7 +185,7 @@ mod test {
 
         let audit_service = AuditService::new(
             AuditLog::new(pool.clone()),
-            user.clone(),
+            Some(user.clone()),
             Some(Ipv4Addr::new(203, 0, 113, 0).into()),
         );
 

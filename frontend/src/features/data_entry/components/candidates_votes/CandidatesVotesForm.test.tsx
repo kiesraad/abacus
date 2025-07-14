@@ -1,3 +1,5 @@
+import { useParams } from "react-router";
+
 import { UserEvent, userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
@@ -30,6 +32,7 @@ import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
 
 vi.mock("@/hooks/user/useUser");
+vi.mock("react-router");
 
 const testUser: LoginResponse = {
   username: "test-user-1",
@@ -39,9 +42,11 @@ const testUser: LoginResponse = {
 };
 
 function renderForm({ election, groupNumber }: { election?: ElectionWithPoliticalGroups; groupNumber?: number } = {}) {
+  vi.mocked(useParams).mockReturnValue({ sectionId: `political_group_votes_${groupNumber || 1}` });
+
   return render(
     <DataEntryProvider election={election || electionMockData} pollingStationId={1} entryNumber={1}>
-      <DataEntrySection sectionId={`political_group_votes_${groupNumber || 1}`} />;
+      <DataEntrySection />
     </DataEntryProvider>,
   );
 }

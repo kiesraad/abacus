@@ -14,16 +14,13 @@ import {
 } from "@/types/generated/openapi";
 
 import { DataEntryApiClient } from "./helpers-utils/api-clients";
-import {
-  completePollingStationDataEntries,
-  completePollingStationDataEntriesWithDifferences,
-  loginAs,
-} from "./helpers-utils/e2e-test-api-helpers";
+import { completePollingStationDataEntries, loginAs } from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import {
+  dataEntryRequest,
+  dataEntryWithDifferencesRequest,
+  dataEntryWithErrorRequest,
   electionRequest,
-  emptyRequest,
-  noRecountNoDifferencesRequest,
   pollingStationRequests,
 } from "./test-data/request-response-templates";
 
@@ -53,6 +50,8 @@ type Fixtures = {
   pollingStationDefinitive: PollingStation;
   // First polling station of the election with differences between the first and second data entry
   pollingStationEntriesDifferent: PollingStation;
+  // First polling station of the election with second data entry that has errors and is therefore different
+  pollingStationEntriesDifferentWithErrors: PollingStation;
   // Election with polling stations and two completed data entries for each
   completedElection: Election;
   // Newly created User
@@ -129,7 +128,7 @@ export const test = base.extend<Fixtures>({
 
     const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
     await firstDataEntry.claim();
-    await firstDataEntry.save(noRecountNoDifferencesRequest);
+    await firstDataEntry.save(dataEntryRequest);
     await firstDataEntry.finalise();
 
     await use(pollingStation);
@@ -139,7 +138,7 @@ export const test = base.extend<Fixtures>({
 
     const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
     await firstDataEntry.claim();
-    await firstDataEntry.save(emptyRequest);
+    await firstDataEntry.save(dataEntryWithErrorRequest);
     await firstDataEntry.finalise();
 
     await use(pollingStation);
@@ -150,7 +149,18 @@ export const test = base.extend<Fixtures>({
     await use(pollingStation);
   },
   pollingStationEntriesDifferent: async ({ request, pollingStation }, use) => {
-    await completePollingStationDataEntriesWithDifferences(request, pollingStation.id);
+    await completePollingStationDataEntries(
+      request,
+      pollingStation.id,
+      dataEntryRequest,
+      dataEntryWithDifferencesRequest,
+    );
+
+    await use(pollingStation);
+  },
+  pollingStationEntriesDifferentWithErrors: async ({ request, pollingStation }, use) => {
+    await completePollingStationDataEntries(request, pollingStation.id, dataEntryRequest, dataEntryWithErrorRequest);
+
     await use(pollingStation);
   },
   completedElection: async ({ request, election }, use) => {

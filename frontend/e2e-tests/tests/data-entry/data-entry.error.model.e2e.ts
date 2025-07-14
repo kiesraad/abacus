@@ -238,32 +238,32 @@ test.describe("Data entry model test - errors", () => {
           recountedPageErrorSubmitted: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
           },
           recountedPageChangedToErrorSubmitted: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
           },
           recountedPageFilledError: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("nog niet afgerond");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("nog niet afgerond");
           },
           recountedPageChangedToErrorDiscarded: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
           recountedPageCorrected: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
         };
         const recountedPageEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
-            await recountedPage.navPanel.votersAndVotes.click();
+            await recountedPage.progressList.votersAndVotes.click();
           },
         };
         const votersVotesPageStates = {
@@ -377,10 +377,10 @@ test.describe("Data entry model test - errors", () => {
             await votersAndVotesPage.navBar.clickElection(election.election.location, election.election.name);
           },
           GO_TO_RECOUNTED_PAGE: async () => {
-            await votersAndVotesPage.navPanel.recounted.click();
+            await votersAndVotesPage.progressList.recounted.click();
           },
           GO_TO_DIFFERENCES_PAGE: async () => {
-            await votersAndVotesPage.navPanel.differences.click();
+            await votersAndVotesPage.progressList.differences.click();
           },
           SAVE_UNSUBMITTED_CHANGES: async () => {
             await votersAndVotesPage.unsavedChangesModal.saveInput.click();
@@ -393,20 +393,20 @@ test.describe("Data entry model test - errors", () => {
         const differencesPageStates = {
           differencesPageValid: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
           differencesPageCorrected: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
           differencesPageError: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
+            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
           },
         };
         const differencesPageEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
-            await differencesPage.navPanel.votersAndVotes.click();
+            await differencesPage.progressList.votersAndVotes.click();
           },
         };
 

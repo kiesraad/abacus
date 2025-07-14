@@ -3,12 +3,14 @@ import {
   uploadCandidatesAndInputHash,
   uploadElectionAndInputHash,
 } from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
+import { AbortModalPgObj } from "e2e-tests/page-objects/election/create/AbortModalPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
-import { CheckDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckDefinitionPgObj";
+import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
 import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
+import { NavBar } from "e2e-tests/page-objects/NavBarPgObj";
 
 import { test } from "../fixtures";
 import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
@@ -22,7 +24,7 @@ test.describe("Election creation", () => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
     const initialElectionCount = await overviewPage.elections.count();
-    // const initialReadyStateCount = await overviewPage.electionsInReadyState.count();
+    const initialCreatedStateCount = await overviewPage.electionsCreatedState.count();
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -39,9 +41,8 @@ test.describe("Election creation", () => {
     await expect(overviewPage.header).toBeVisible();
     // Check if the amount of elections by this title is greater than before the import
     expect(await overviewPage.elections.count()).toBeGreaterThan(initialElectionCount);
-    // TODO: Uncomment this when issue #1649 is finished
-    // // Check if the amount of "Klaar voor invoer states" is greater than before the import
-    // expect(await overviewPage.electionsInReadyState.count()).toBeGreaterThan(initialReadyStateCount);
+    // Check if the amount of "Voorbereiden" states is greater than before the import
+    expect(await overviewPage.electionsCreatedState.count()).toBeGreaterThan(initialCreatedStateCount);
   });
 
   test("it fails on incorrect hash", async ({ page }) => {
@@ -55,7 +56,7 @@ test.describe("Election creation", () => {
     await uploadDefinitionPage.uploadFile(page, eml110a.path);
 
     // Wrong hash
-    const checkDefinitionPage = new CheckDefinitionPgObj(page);
+    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
     await checkDefinitionPage.inputHash("1234", "abcd");
     await expect(checkDefinitionPage.error).toBeVisible();
   });
@@ -107,7 +108,82 @@ test.describe("Election creation", () => {
     await expect(uploadCandidateDefinitionPage.error).toBeVisible();
   });
 
-  test("after election upload, moving back to election page resets election", async ({ page }) => {
+  test("warning modal close button should stay on page", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new OverviewPgObj(page);
+    await overviewPage.create.click();
+
+    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
+    await expect(uploadDefinitionPage.header).toBeVisible();
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
+
+    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
+    await expect(checkDefinitionPage.header).toBeVisible();
+
+    // Menu button back to election overview
+    const navBarPage = new NavBar(page);
+    await navBarPage.electionOverviewButton.click();
+
+    // Abort modal should have stopped navigation
+    const abortModal = new AbortModalPgObj(page);
+    await expect(abortModal.header).toBeVisible();
+
+    // Click close, assert we are still on the election create page
+    await abortModal.closeButton.click();
+    await expect(checkDefinitionPage.header).toBeVisible();
+  });
+
+  test("warning modal cancel button should stay on page", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new OverviewPgObj(page);
+    await overviewPage.create.click();
+
+    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
+    await expect(uploadDefinitionPage.header).toBeVisible();
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
+
+    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
+    await expect(checkDefinitionPage.header).toBeVisible();
+
+    // Menu button back to election overview
+    const navBarPage = new NavBar(page);
+    await navBarPage.electionOverviewButton.click();
+
+    // Abort modal should have stopped navigation
+    const abortModal = new AbortModalPgObj(page);
+    await expect(abortModal.header).toBeVisible();
+
+    // Click cancel, assert we are still on the election create page
+    await abortModal.cancelButton.click();
+    await expect(checkDefinitionPage.header).toBeVisible();
+  });
+
+  test("warning modal delete button should continue navigation", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new OverviewPgObj(page);
+    await overviewPage.create.click();
+
+    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
+    await expect(uploadDefinitionPage.header).toBeVisible();
+    await uploadDefinitionPage.uploadFile(page, eml110a.path);
+
+    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
+    await expect(checkDefinitionPage.header).toBeVisible();
+
+    // Menu button back to election overview
+    const navBarPage = new NavBar(page);
+    await navBarPage.electionOverviewButton.click();
+
+    // Abort modal should have stopped navigation
+    const abortModal = new AbortModalPgObj(page);
+    await expect(abortModal.header).toBeVisible();
+
+    // Click delete, assert we are back at the overview
+    await abortModal.deleteButton.click();
+    await expect(overviewPage.header).toBeVisible();
+  });
+
+  test("uploading a candidate list, then navigating should trigger the modal", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
     await overviewPage.create.click();
@@ -119,15 +195,37 @@ test.describe("Election creation", () => {
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
     await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
-    const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
-    await expect(checkCandidateDefinitionPage.header).toBeVisible();
+
+    // Menu button back to election overview
+    const navBarPage = new NavBar(page);
+    await navBarPage.electionOverviewButton.click();
+
+    // Abort modal should have stopped navigation
+    const AbortModal = new AbortModalPgObj(page);
+    await expect(AbortModal.header).toBeVisible();
+  });
+
+  test("after election upload, moving back to election page resets election", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new OverviewPgObj(page);
+    await overviewPage.create.click();
+
+    // upload election and check hash
+    await uploadElectionAndInputHash(page);
+
+    // upload candidates list and check hash
+    await uploadCandidatesAndInputHash(page);
+
+    // Now we should be at the check and save page
+    const checkAndSavePage = new CheckAndSavePgObj(page);
+    await expect(checkAndSavePage.header).toBeVisible();
 
     // Back button
     await page.goBack();
 
-    // We should be back at the upload election page
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
+    // We should be back at the candidate page
+    const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
+    await expect(uploadCandidateDefinitionPage.header).toBeVisible();
   });
 
   test("after candidate upload, moving back to candidate page resets candidates", async ({ page }) => {

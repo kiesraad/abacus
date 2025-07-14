@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, user_fullname, user_role, ip)\n            VALUES (jsonb(?), ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 10
+    },
+    "nullable": []
+  },
+  "hash": "2434c35baf0d1114357671c0ebc89eb51b75dbc7daec5cf6358a3ed7b6cdcc18"
+}

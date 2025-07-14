@@ -9,7 +9,7 @@ export class OverviewPgObj {
   readonly alert: Locator;
   readonly create: Locator;
   readonly elections: Locator;
-  readonly electionsInReadyState: Locator;
+  readonly electionsCreatedState: Locator;
 
   constructor(protected readonly page: Page) {
     this.navBar = new NavBar(page);
@@ -18,6 +18,6 @@ export class OverviewPgObj {
     this.alert = page.getByRole("heading", { name: "Je account is ingesteld" });
     this.create = page.getByRole("link", { name: "Verkiezing toevoegen" });
     this.elections = page.getByTestId("overview").locator("tbody").getByRole("row");
-    this.electionsInReadyState = this.elections.filter({ hasText: "Klaar voor invoer" });
+    this.electionsCreatedState = this.elections.filter({ hasText: "Voorbereiden" });
   }
 }

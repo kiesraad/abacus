@@ -3,14 +3,13 @@ import { Dispatch } from "react";
 import { AnyApiError } from "@/api/ApiResult";
 import {
   ClaimDataEntryResponse,
-  DataEntryStatus,
+  DataEntryStatusResponse,
   ElectionWithPoliticalGroups,
   PollingStationResults,
   ValidationResults,
 } from "@/types/generated/openapi";
 import { DataEntryStructure, FormSectionId, SectionValues } from "@/types/types";
-
-import { ValidationResultSet } from "../../../utils/ValidationResults";
+import { ValidationResultSet } from "@/utils/ValidationResults";
 
 export interface DataEntryState {
   // state from providers
@@ -35,12 +34,15 @@ export interface DataEntryState {
 
 export interface DataEntryStateAndActions extends DataEntryState {
   dispatch: DataEntryDispatch;
-  onSubmitForm: (currentValues: SectionValues, options?: SubmitCurrentFormOptions) => Promise<boolean>;
+  onSubmitForm: (
+    sectionId: FormSectionId,
+    currentValues: SectionValues,
+    options?: SubmitCurrentFormOptions,
+  ) => Promise<boolean>;
   onDeleteDataEntry: () => Promise<boolean>;
-  onFinaliseDataEntry: () => Promise<DataEntryStatus | undefined>;
-  register: (formSectionId: FormSectionId) => void;
+  onFinaliseDataEntry: () => Promise<DataEntryStatusResponse | undefined>;
   setCache: (cache: TemporaryCache) => void;
-  updateFormSection: (partialFormSection: Partial<FormSection>) => void;
+  updateFormSection: (sectionId: FormSectionId, partialFormSection: Partial<FormSection>) => void;
 }
 
 export interface DataEntryStateAndActionsLoaded extends DataEntryStateAndActions {
@@ -70,12 +72,18 @@ export type DataEntryAction =
       type: "FORM_SAVED";
       data: PollingStationResults;
       validationResults: ValidationResults;
+      sectionId: FormSectionId;
       aborting: boolean;
       continueToNextSection: boolean;
     }
   | {
       type: "SET_STATUS";
-      status: Status;
+      status: "saving";
+      sectionId: FormSectionId;
+    }
+  | {
+      type: "SET_STATUS";
+      status: Exclude<Status, "saving">;
     }
   | {
       type: "SET_CACHE";
@@ -83,14 +91,11 @@ export type DataEntryAction =
     }
   | {
       type: "UPDATE_FORM_SECTION";
+      sectionId: FormSectionId;
       partialFormSection: Partial<FormSection>;
     }
   | {
       type: "RESET_TARGET_FORM_SECTION";
-    }
-  | {
-      type: "REGISTER_CURRENT_FORM";
-      formSectionId: FormSectionId;
     };
 
 export interface SubmitCurrentFormOptions {
@@ -120,8 +125,6 @@ export interface ClientState {
 export interface FormState {
   // the furthest form section that the user has reached
   furthest: FormSectionId;
-  // the form section that the user is currently working on
-  current: FormSectionId;
   sections: Record<FormSectionId, FormSection>;
 }
 

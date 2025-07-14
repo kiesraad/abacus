@@ -658,7 +658,7 @@ impl Display for DataEntryTransitionError {
             }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
             DataEntryTransitionError::ValidatorError(data_error) => {
-                write!(f, "Validator error: {}", data_error)
+                write!(f, "Validator error: {data_error}")
             }
             DataEntryTransitionError::ValidationError(_) => write!(f, "Validation errors"),
         }
@@ -932,8 +932,7 @@ mod tests {
             .expect("should be Ok");
         assert!(
             matches!(next, DataEntryStatus::FirstEntryHasErrors(_)),
-            "actual: {:?}",
-            next
+            "actual: {next:?}"
         );
     }
 
@@ -1314,7 +1313,7 @@ mod tests {
         if let DataEntryStatus::SecondEntryNotStarted(kept_entry) = next {
             assert_eq!(kept_entry.finalised_first_entry, second_entry);
         } else {
-            panic!("{:?}", next)
+            panic!("{next:?}")
         };
     }
 
@@ -1340,7 +1339,7 @@ mod tests {
         if let DataEntryStatus::FirstEntryHasErrors(kept_entry) = next {
             assert_eq!(kept_entry.finalised_first_entry, second_entry);
         } else {
-            panic!("{:?}", next)
+            panic!("{next:?}")
         };
     }
 

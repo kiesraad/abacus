@@ -354,6 +354,12 @@ impl From<serde_json::Error> for APIError {
     }
 }
 
+impl From<PdfGenError> for APIError {
+    fn from(err: PdfGenError) -> Self {
+        APIError::PdfGenError(err)
+    }
+}
+
 impl From<sqlx::Error> for APIError {
     fn from(err: sqlx::Error) -> Self {
         match &err {

@@ -35,14 +35,18 @@ __Uitbreidingen:__
 
 6a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
 
-### Niet in scope
-- Verschillende fases in de applicatie, zoals inrichten, invoer, voorbereiden PV. Reden hiervoor is dat we de coördinator GSB niet willen beperken in wat deze wanneer kan doen. We zouden fases kunnen implementeren waartussen de coördinator GSB vrij kan bewegen, maar dan is het gebruiksvriendelijker om bij bepaalde acties een waarschuwing te laten zien. De coördinator GSB heeft wel de mogelijkheid om invoer open te zetten en te stoppen. Eventueel ook om invoer te pauzeren.
 
 ### Open punten
 
-- Welke controles willen we nog nadat de invoer is afgesloten? Of zijn die controles onderdeel van het afsluiten?
 - Hoe ziet het stoppen/blokkeren van invoer er precies uit?
 - CSO: invoerders vullen gegevens van Bijlage 1 in. DSO: invoerders vullen gegevens van N 10-1 en evt. Na 14-1 in. => input-/output-bestanden?
+
+
+### Niet in scope
+
+- Controles op gemeenteniveau nadat alle stembureaus zijn ingevoerd:
+  - Controle "mogelijke omwissel van kandidaatstemmen"
+  - Controle "verschilpercentage van 50% of hoger"
 
 
 ## De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in. (zee)

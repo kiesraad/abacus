@@ -1,8 +1,9 @@
+import { useParams } from "react-router";
+
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { dataEntryStatusDifferences, firstEntryHasErrorsStatus } from "@/testing/api-mocks/DataEntryMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionRequestHandler,
@@ -13,6 +14,7 @@ import {
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, spyOnHandler, within } from "@/testing/test-utils";
+import { DataEntryStatusResponse } from "@/types/generated/openapi";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import { getDefaultDataEntryState, getEmptyDataEntryRequest, getInitialValues } from "../../testing/mock-data";
@@ -21,15 +23,19 @@ import { FormState } from "../../types/types";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
+vi.mock("react-router");
+
 function customFormState(): FormState {
   return {
     ...getDefaultDataEntryState().formState,
-    current: "save",
     furthest: "save",
   };
 }
 
 function renderForm() {
+  // Mock useParams to provide the sectionId
+  vi.mocked(useParams).mockReturnValue({ sectionId: "save" });
+
   return renderReturningRouter(
     <ElectionProvider electionId={1}>
       <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
@@ -73,7 +79,9 @@ describe("Test CheckAndSaveForm", () => {
 
     // set up a listener to check if the finalisation request is made
     const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, dataEntryStatusDifferences);
+
+    const response: DataEntryStatusResponse = { status: "entries_different" };
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, response);
 
     // click the save button
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
@@ -92,7 +100,9 @@ describe("Test CheckAndSaveForm", () => {
 
     // set up a listener to check if the finalisation request is made
     const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, firstEntryHasErrorsStatus);
+
+    const response: DataEntryStatusResponse = { status: "first_entry_has_errors" };
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, response);
 
     // click the save button
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));

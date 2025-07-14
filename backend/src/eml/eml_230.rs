@@ -1,8 +1,12 @@
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 use super::{
     EMLBase, EMLDocument,
-    common::{Candidate, ContestIdentifier, EMLImportError, ElectionIdentifier, ManagingAuthority},
+    common::{
+        Candidate, ContestIdentifier, EMLImportError, ElectionCategory, ElectionDomain,
+        ElectionIdentifier, ManagingAuthority,
+    },
 };
 
 use crate::{
@@ -42,6 +46,14 @@ impl EML230 {
         &self.election().contest
     }
 
+    fn election_identifier(&self) -> &ElectionIdentifier {
+        &self.election().election_identifier
+    }
+
+    fn election_domain(&self) -> Option<&ElectionDomain> {
+        self.election_identifier().election_domain.as_ref()
+    }
+
     pub fn add_candidate_lists(
         &self,
         mut election: NewElection,
@@ -51,16 +63,44 @@ impl EML230 {
             return Err(EMLImportError::Needs230b);
         }
 
-        // TODO: uncomment when we have new test files
-        //
+        // we need a managing authority
+        if self.managing_authority.is_none() {
+            return Err(EMLImportError::MissingManagingAuthority);
+        }
+
+        // we currently only support GR elections
+        let ElectionCategory::GR = self.election_identifier().election_category else {
+            return Err(EMLImportError::OnlyMunicipalSupported);
+        };
+
         // make sure candidate list election matches election definition
-        //if election.election_id != self.election().election_identifier.election_name {
-        //    return Err(EMLImportError::MismatchElectionIdentifier);
-        //}
+        if election.election_id != self.election().election_identifier.id {
+            return Err(EMLImportError::MismatchElection);
+        }
 
-        // TODO: more validation see issue #1589
+        // we need the election domain
+        let Some(election_domain) = self.election_domain() else {
+            return Err(EMLImportError::MissingElectionDomain);
+        };
 
-        // extract initial listing of political groups
+        // make sure election domain id matches
+        if election.domain_id != election_domain.id {
+            return Err(EMLImportError::MismatchElectionDomain);
+        }
+
+        // parse the election date
+        let Ok(election_date) =
+            NaiveDate::parse_from_str(&self.election_identifier().election_date, "%Y-%m-%d")
+        else {
+            return Err(EMLImportError::InvalidDateFormat);
+        };
+
+        // make sure election date matches
+        if election.election_date != election_date {
+            return Err(EMLImportError::MismatchElectionDate);
+        }
+
+        // extract initial listing of political groups with candidates
         election.political_groups = self
             .contest()
             .affiliations
@@ -154,19 +194,27 @@ impl EML230 {
                                                 CandidateGender::X => Gender::Unknown,
                                             },
                                         ),
-                                        qualifying_address: QualifyingAddress {
-                                            data: if let Some(country) = &candidate.country_code {
-                                                QualifyingAddressData::Country(Country {
-                                                    country_name_code: country.clone(),
-                                                    locality: Locality {
+                                        qualifying_address: if candidate.locality.trim().is_empty()
+                                        {
+                                            None
+                                        } else {
+                                            Some(QualifyingAddress {
+                                                data: if let Some(country) = &candidate.country_code
+                                                {
+                                                    QualifyingAddressData::Country(Country {
+                                                        country_name_code: country.clone(),
+                                                        locality: Locality {
+                                                            locality_name: candidate
+                                                                .locality
+                                                                .clone(),
+                                                        },
+                                                    })
+                                                } else {
+                                                    QualifyingAddressData::Locality(Locality {
                                                         locality_name: candidate.locality.clone(),
-                                                    },
-                                                })
-                                            } else {
-                                                QualifyingAddressData::Locality(Locality {
-                                                    locality_name: candidate.locality.clone(),
-                                                })
-                                            },
+                                                    })
+                                                },
+                                            })
                                         },
                                     })
                                     .collect(),
@@ -251,28 +299,177 @@ pub struct ListData {
 
 #[cfg(test)]
 mod tests {
-    use crate::eml::{EML230, EMLDocument};
+    use crate::eml::{EML110, EML230, EMLDocument, EMLImportError};
+    use quick_xml::DeError;
 
     #[test]
     fn test_deserialize_eml230b() {
         let data = include_str!("./tests/eml230b_test.eml.xml");
         let doc = EML230::from_str(data).unwrap();
-        assert_eq!(doc.creation_date_time, "2022-02-03T15:16:47.122");
+        assert_eq!(doc.creation_date_time, "2022-02-04T11:16:26.827");
         let affiliations = doc.affiliations();
         assert_eq!(affiliations.len(), 3);
         let first_pg = affiliations.first().unwrap();
         assert_eq!(first_pg.candidates.len(), 12);
         let candidate = first_pg.candidates.first().unwrap();
         assert_eq!(
-            candidate.qualifying_address.locality_name(),
+            candidate
+                .qualifying_address
+                .as_ref()
+                .unwrap()
+                .locality_name(),
             "Heemdamseburg"
         );
-        assert_eq!(candidate.qualifying_address.country_name_code(), None);
+        assert_eq!(
+            candidate
+                .qualifying_address
+                .as_ref()
+                .unwrap()
+                .country_name_code(),
+            None
+        );
 
         let candidate = affiliations.get(1).unwrap().candidates.get(3).unwrap();
         assert_eq!(
             candidate.candidate_full_name.person_name.first_name,
             Some("Frédérique".into())
         );
+    }
+
+    #[test]
+    fn test_import_without_candidate_addresses() {
+        let data = include_str!("./tests/eml230b_test_without_addresses.eml.xml");
+        let doc = EML230::from_str(data).unwrap();
+        let affiliations = doc.affiliations();
+        assert_eq!(affiliations.len(), 3);
+        let first_pg = affiliations.first().unwrap();
+        assert_eq!(first_pg.candidates.len(), 12);
+        let candidate = first_pg.candidates.first().unwrap();
+        assert!(candidate.qualifying_address.is_none());
+    }
+
+    #[test]
+    fn test_add_candidates_for_correct_election() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data = include_str!("./tests/eml230b_test.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        candidates.add_candidate_lists(new_election).unwrap();
+    }
+
+    #[test]
+    fn test_add_candidates_for_wrong_document_type() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data = include_str!("./tests/eml230b_invalid_document_type.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        let res = candidates.add_candidate_lists(new_election).unwrap_err();
+
+        assert!(matches!(res, EMLImportError::Needs230b));
+    }
+
+    #[test]
+    fn test_add_candidates_for_incorrect_election() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data = include_str!("./tests/eml230b_invalid_incorrect_election.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        let res = candidates.add_candidate_lists(new_election).unwrap_err();
+
+        assert!(matches!(res, EMLImportError::MismatchElection));
+    }
+
+    #[test]
+    fn test_add_candidates_with_missing_authority() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data = include_str!("./tests/eml230b_invalid_missing_authority.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        let res = candidates.add_candidate_lists(new_election).unwrap_err();
+
+        assert!(matches!(res, EMLImportError::MissingManagingAuthority));
+    }
+
+    #[test]
+    fn test_add_candidates_with_wrong_election_type() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data = include_str!("./tests/eml230b_invalid_missing_authority.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        let res = candidates.add_candidate_lists(new_election).unwrap_err();
+
+        assert!(matches!(res, EMLImportError::MissingManagingAuthority));
+    }
+
+    #[test]
+    fn test_add_candidates_with_missing_election_domain() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data =
+            include_str!("./tests/eml230b_invalid_missing_election_domain.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        let res = candidates.add_candidate_lists(new_election).unwrap_err();
+
+        assert!(matches!(res, EMLImportError::MissingElectionDomain));
+    }
+
+    #[test]
+    fn test_add_candidates_with_incorrect_election_domain() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data =
+            include_str!("./tests/eml230b_invalid_incorrect_election_domain.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        let res = candidates.add_candidate_lists(new_election).unwrap_err();
+
+        assert!(matches!(res, EMLImportError::MismatchElectionDomain));
+    }
+
+    #[test]
+    fn test_add_candidates_with_incorrect_election_date() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data =
+            include_str!("./tests/eml230b_invalid_incorrect_election_date.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        let res = candidates.add_candidate_lists(new_election).unwrap_err();
+
+        assert!(matches!(res, EMLImportError::MismatchElectionDate));
+    }
+
+    #[test]
+    fn test_add_candidates_with_empty_affiliated() {
+        let candidate_data = include_str!("./tests/eml230b_invalid_empty_affiliates.eml.xml");
+
+        // This error is caught by the parser
+        let doc = EML230::from_str(candidate_data).unwrap_err();
+
+        assert!(matches!(doc, DeError::Custom(_)));
+    }
+
+    #[test]
+    fn test_add_candidates_with_empty_candidates() {
+        let candidate_data = include_str!("./tests/eml230b_invalid_empty_candidates.eml.xml");
+
+        // This error is caught by the parser
+        let doc = EML230::from_str(candidate_data).unwrap_err();
+
+        assert!(matches!(doc, DeError::Custom(_)));
     }
 }

@@ -5,6 +5,7 @@ import { t, tx } from "@/i18n/translate";
 import { Role } from "@/types/generated/openapi";
 import { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
+import { dottedCode } from "@/utils/ValidationResults";
 
 import { AlertIcon } from "../Icon/AlertIcon";
 import cls from "./Feedback.module.css";
@@ -27,7 +28,7 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
     data?.map(
       (code: ClientValidationResultCode): FeedbackItem => ({
         title: t(`feedback.${code}.${role}.title`),
-        code: `${code[0]}.${code.slice(1)}`,
+        code: dottedCode(code),
         content: tx(`feedback.${code}.${role}.content`, { link }),
         action: role === "typist" && code === "F101" ? tx(`feedback.F101.${role}.action`, {}) : undefined,
       }),

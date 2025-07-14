@@ -1,5 +1,6 @@
 import { To, useLocation, useNavigate } from "react-router";
 
+import { CommitteeSessionStatusWithIcon } from "@/components/committee_session_status_with_icon/CommitteeSessionStatusWithIcon";
 import { Footer } from "@/components/footer/Footer";
 import { IconPlus } from "@/components/generated/icons";
 import { NavBar } from "@/components/navbar/NavBar";
@@ -16,7 +17,7 @@ import { Election } from "@/types/generated/openapi";
 export function OverviewPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { electionList } = useElectionList();
+  const { committeeSessionList, electionList } = useElectionList();
   const { isAdministrator, isCoordinator } = useUserRole();
 
   const isNewAccount = location.hash === "#new-account";
@@ -26,8 +27,22 @@ export function OverviewPage() {
     if (isAdminOrCoordinator) {
       return `/elections/${election.id}`;
     }
-
     return `/elections/${election.id}/data-entry`;
+  }
+
+  function getCommitteeSessionStatus(election_id: number) {
+    const committeeSession = committeeSessionList.find(
+      (committeeSession) => committeeSession.election_id === election_id,
+    );
+    if (committeeSession) {
+      return (
+        <CommitteeSessionStatusWithIcon
+          status={committeeSession.status}
+          userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
+        />
+      );
+    }
+    return <></>;
   }
 
   function closeNewAccountAlert() {
@@ -82,13 +97,7 @@ export function OverviewPage() {
                   <Table.LinkRow key={election.id} to={electionLink(election)}>
                     <Table.Cell className="fs-body">{election.name}</Table.Cell>
                     <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
-                    <Table.Cell>
-                      {/* TODO: Re-add status to Election Overview in issue #1649 */}
-                      {/*<CommitteeSessionStatusWithIcon*/}
-                      {/*  status={election.status}*/}
-                      {/*  userRole={isAdminOrCoordinator ? "coordinator" : "typist"}*/}
-                      {/*/>*/}
-                    </Table.Cell>
+                    <Table.Cell>{getCommitteeSessionStatus(election.id)}</Table.Cell>
                   </Table.LinkRow>
                 ))}
               </Table.Body>

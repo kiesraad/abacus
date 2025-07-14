@@ -11,13 +11,14 @@ import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  PollingStationDataEntryGetDifferencesHandler,
   PollingStationDataEntryResolveDifferencesHandler,
-  PollingStationDataEntryStatusEntriesDifferentHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
+import { overrideOnce, server } from "@/testing/server";
 import { screen, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { DataEntryStatusName } from "@/types/generated/openapi";
 
 import { ResolveDifferencesPage } from "./ResolveDifferencesPage";
 
@@ -44,14 +45,18 @@ const renderPage = async () => {
   expect(await screen.findByRole("table")).toBeInTheDocument();
 };
 
+function overrideResponseStatus(status: DataEntryStatusName) {
+  overrideOnce("post", "/api/polling_stations/3/data_entries/resolve_differences", 200, { status });
+}
+
 describe("ResolveDifferencesPage", () => {
   beforeEach(() => {
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
+      PollingStationDataEntryGetDifferencesHandler,
       PollingStationDataEntryResolveDifferencesHandler,
-      PollingStationDataEntryStatusEntriesDifferentHandler,
       UserListRequestHandler,
     );
   });
@@ -112,6 +117,7 @@ describe("ResolveDifferencesPage", () => {
     await user.click(submit);
     expect(resolve).not.toHaveBeenCalled();
 
+    overrideResponseStatus("second_entry_not_started");
     await user.click(await screen.findByLabelText(/De eerste invoer/));
     await user.click(submit);
     expect(resolve).toHaveBeenCalledWith("keep_first_entry");
@@ -125,6 +131,7 @@ describe("ResolveDifferencesPage", () => {
     await renderPage();
     expect(getElectionStatus).toHaveBeenCalledTimes(1);
 
+    overrideResponseStatus("second_entry_not_started");
     await user.click(await screen.findByLabelText(/De tweede invoer/));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
@@ -137,9 +144,22 @@ describe("ResolveDifferencesPage", () => {
 
     await renderPage();
 
+    overrideResponseStatus("first_entry_not_started");
     await user.click(await screen.findByLabelText(/Geen van beide/));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entries-discarded-3");
+  });
+
+  test("should navigate to resolve errors page after keeping second entry which has errors", async () => {
+    const user = userEvent.setup();
+
+    await renderPage();
+
+    overrideResponseStatus("first_entry_has_errors");
+    await user.click(await screen.findByLabelText(/De tweede invoer/));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status/3/resolve-errors");
   });
 });

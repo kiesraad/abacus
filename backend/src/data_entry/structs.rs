@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, types::Json};
 use utoipa::ToSchema;
 
-use super::status::DataEntryStatus;
+use super::status::{DataEntryStatus, DataEntryStatusName};
 use crate::{
     APIError,
     audit_log::DataEntryDetails,
@@ -16,6 +16,7 @@ use crate::{
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]
 pub struct PollingStationDataEntry {
     pub polling_station_id: u32,
+    pub committee_session_id: u32,
     #[schema(value_type = DataEntryStatus)]
     pub state: Json<DataEntryStatus>,
     #[schema(value_type = String)]
@@ -40,6 +41,7 @@ impl From<PollingStationDataEntry> for DataEntryDetails {
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResultsEntry {
     pub polling_station_id: u32,
+    pub committee_session_id: u32,
     pub data: PollingStationResults,
     pub created_at: DateTime<Utc>,
 }
@@ -313,5 +315,18 @@ mod tests {
         assert_eq!(curr_votes.proxy_certificate_count, 5);
         assert_eq!(curr_votes.voter_card_count, 7);
         assert_eq!(curr_votes.total_admitted_voters_count, 14);
+    }
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct DataEntryStatusResponse {
+    pub status: DataEntryStatusName,
+}
+
+impl From<PollingStationDataEntry> for DataEntryStatusResponse {
+    fn from(data_entry: PollingStationDataEntry) -> Self {
+        DataEntryStatusResponse {
+            status: data_entry.state.0.status_name(),
+        }
     }
 }

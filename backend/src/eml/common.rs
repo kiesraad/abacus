@@ -186,9 +186,12 @@ pub enum EMLImportError {
     InvalidCandidate,
     InvalidDateFormat,
     InvalidVotingMethod,
+    MismatchElection,
+    MismatchElectionDate,
+    MismatchElectionDomain,
     MismatchNumberOfSeats,
-    MismatchElectionIdentifier,
     MismatchPreferenceThreshold,
+    MissingManagingAuthority,
     MissingNumberOfSeats,
     MissingNominationDate,
     MissingPreferenceThreshold,
@@ -196,7 +199,7 @@ pub enum EMLImportError {
     MissingSubcategory,
     MissingElectionTree,
     MissingElectionDomain,
-    Needs101a,
+    Needs110a,
     Needs230b,
     NumberOfSeatsNotInRange,
     OnlyMunicipalSupported,
@@ -234,7 +237,8 @@ pub struct Candidate {
     pub candidate_full_name: CandidateFullName,
     #[serde(skip_serializing_if = "Option::is_none", default)]
     pub gender: Option<Gender>,
-    pub qualifying_address: QualifyingAddress,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub qualifying_address: Option<QualifyingAddress>,
 }
 
 impl TryFrom<Candidate> for structs::Candidate {
@@ -254,11 +258,16 @@ impl TryFrom<Candidate> for structs::Candidate {
             first_name: parsed.candidate_full_name.person_name.first_name,
             last_name_prefix: parsed.candidate_full_name.person_name.name_prefix,
             last_name: parsed.candidate_full_name.person_name.last_name,
-            locality: parsed.qualifying_address.locality_name().to_string(),
+            locality: parsed
+                .qualifying_address
+                .as_ref()
+                .map(|qa| qa.locality_name().to_string())
+                .unwrap_or_default(),
             country_code: parsed
                 .qualifying_address
-                .country_name_code()
-                .map(|s| s.to_string()),
+                .as_ref()
+                .map(|qa| qa.country_name_code())
+                .and_then(|code| code.map(|s| s.to_string())),
             gender: match parsed.gender {
                 None => None,
                 Some(gender) => match gender {

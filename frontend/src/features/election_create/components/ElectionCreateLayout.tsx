@@ -8,6 +8,7 @@ import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 
+import { AbortModal } from "./AbortModal";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 import cls from "./ElectionCreateLayout.module.css";
 import { ElectionHeader } from "./ElectionHeader";
@@ -43,6 +44,7 @@ export function ElectionCreateLayout() {
       <PageTitle title={`${t("election.create")} - Abacus`} />
       <NavBar location={location} />
       <ElectionHeader />
+      <AbortModal />
       <main>
         <StickyNav>
           <ProgressList>

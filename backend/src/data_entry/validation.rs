@@ -105,7 +105,7 @@ impl FieldPath {
         path.components
             .last_mut()
             .expect("FieldPath constructed with no components")
-            .push_str(&format!("[{}]", index));
+            .push_str(&format!("[{index}]"));
         path
     }
 
@@ -122,7 +122,7 @@ impl fmt::Display for FieldPath {
             if i > 0 {
                 write!(f, ".")?;
             }
-            write!(f, "{}", component)?;
+            write!(f, "{component}")?;
         }
 
         Ok(())

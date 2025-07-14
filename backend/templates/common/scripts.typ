@@ -125,13 +125,13 @@
   let date = datetime(year: int(dp.at(0)), month: int(dp.at(1)), day: int(dp.at(2)))
 
   let weekdays = (
-    "zondag",
     "maandag",
     "dinsdag",
     "woensdag",
     "donderdag",
     "vrijdag",
     "zaterdag",
+    "zondag",
   )
 
   let months = (
@@ -149,7 +149,7 @@
     "december",
   )
 
-  weekdays.at(date.weekday())
+  weekdays.at(date.weekday() - 1)
   date.display(" [day padding:none] ")
   months.at(date.month() - 1)
   date.display(" [year]")

@@ -1,0 +1,29 @@
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-header-body);
+  font-size: 1.25rem;
+  font-weight: bold;
+  line-height: 1.875rem;
+  color: var(--text-color-header);
+}
+
+.title {
+  margin: 0;
+}
+
+.badge {
+  font-family: var(--font-text);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.875rem;
+  padding: 0 0.5rem;
+  border-radius: 0.25rem;
+  background: var(--blue-300);
+  color: var(--base-black);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}

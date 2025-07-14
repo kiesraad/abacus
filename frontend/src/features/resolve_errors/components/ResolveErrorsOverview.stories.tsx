@@ -1,4 +1,4 @@
-import type { Story } from "@ladle/react";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 
 import { ResolveErrorsOverview } from "@/features/resolve_errors/components/ResolveErrorsOverview";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
@@ -6,18 +6,14 @@ import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMo
 import { ValidationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-export default {
-  title: "App / Resolve Errors",
-};
-
 const structure = getDataEntryStructure(electionMockData);
 const results: ValidationResults = {
   errors: [validationResultMockData.F201, validationResultMockData.F401],
   warnings: [validationResultMockData.W201, validationResultMockData.W001],
 };
 
-export const ResolveErrorsOverviewStory: Story = () => (
+export const ResolveErrorsOverviewStory: StoryFn = () => (
   <ResolveErrorsOverview structure={structure} results={results} />
 );
 
-ResolveErrorsOverviewStory.storyName = "ResolveErrorsOverview";
+export default {} satisfies Meta;

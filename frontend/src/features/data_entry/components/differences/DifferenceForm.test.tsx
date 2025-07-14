@@ -121,7 +121,7 @@ describe("Test DifferencesForm", () => {
 
       const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
       expect(moreBallotsCount.closest("fieldset")).toHaveAccessibleName(
-        "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+        "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen B1-3.3",
       );
       expect(moreBallotsCount).toHaveAccessibleName("I Stembiljetten méér geteld");
       expect(moreBallotsCount).toHaveFocus();

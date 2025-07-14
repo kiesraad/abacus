@@ -21,31 +21,30 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 - [Playwright][playwright]: Test framework inclusief runner tegen browser-engine
 - [Mock Service Worker][mock-service-worker]: Mock server
 - [React Testing Library][react-testing-library]: Library voor het testen van React componenten
-- [Ladle][ladle]: Library voor het ontwikkelen en testen van alleenstaande componenten (alternatief voor Storybook)
+- [Storybook][storybook]: Library voor het ontwikkelen en testen van alleenstaande componenten
 
 ### Tests voor presentatiecomponenten
 
-Omdat presentatiecomponenten puur de data weergeven die ze krijgen, kunnen ze met Ladle getest worden. Ze hebben geen backend of mock server nodig.
+Omdat presentatiecomponenten puur de data weergeven die ze krijgen, kunnen ze met Storybook getest worden. Ze hebben geen backend of mock server nodig.
 
 ```mermaid
 ---
 title: Presentatiecomponenten
 ---
 flowchart LR
-    rtl([React Testing Library])
-    playwright([Playwright])
+    vitest([Vitest])
     component(Component)
 
-    subgraph ladle-story [Ladle story]
+    subgraph storybook-story [Storybook story]
         component
     end
 
-    style ladle-story fill:#ececff,stroke:#c5b9de
+    style storybook-story fill:#ececff,stroke:#c5b9de
 
-    rtl --> component
-    playwright --> component
+    vitest --> component
 ```
-Voor de tests met Playwright of een browser, wordt de story geserved door de ladle dev server.
+
+We gebruiken hiervoor de [Storybook interaction tests](https://storybook.js.org/docs/writing-tests/interaction-testing).
 
 ---
 
@@ -145,8 +144,9 @@ Nog te bepalen.
 
 - Opties:
     - [Google Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/)
-    - [Axe](https://github.com/dequelabs/axe-core) (ondersteund door [Ladle][ladle])
+    - [Axe](https://github.com/dequelabs/axe-core)
     - [Pa11y](https://pa11y.org/)
+    - [Storybook accessibility tests](https://storybook.js.org/docs/writing-tests/accessibility-testing)
 
 
 
@@ -156,7 +156,6 @@ Nog te bepalen.
 [github-code-scanning]: https://docs.github.com/en/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning
 [github-dependabot]: https://docs.github.com/en/code-security/dependabot/dependabot-security-updates/about-dependabot-security-updates
 [github-secret-scanning]: https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning
-[ladle]: https://ladle.dev
 [mock-service-worker]: https://mswjs.io
 [playwright]: https://playwright.dev/
 [prettier]: https://prettier.io/
@@ -164,4 +163,5 @@ Nog te bepalen.
 [reqwest]: https://crates.io/crates/reqwest
 [rustfmt]: https://github.com/rust-lang/rustfmt
 [rust-compiler]: https://rustc-dev-guide.rust-lang.org/overview.html
+[storybook]: https://storybook.js.org/
 [vitest]: https://vitest.dev

@@ -50,6 +50,10 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         electionDefinitionRedactedHash: action.response.hash,
         electionDefinitionData: action.electionDefinitionData,
         electionDefinitionFileName: action.electionDefinitionFileName,
+        electionDefinitionHash: undefined,
+        candidateDefinitionRedactedHash: undefined,
+        candidateDefinitionData: undefined,
+        candidateDefinitionFileName: undefined,
       };
     case "SET_ELECTION_DEFINITION_HASH":
       return {
@@ -63,6 +67,7 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         candidateDefinitionRedactedHash: action.response.hash,
         candidateDefinitionData: action.candidateDefinitionData,
         candidateDefinitionFileName: action.candidateDefinitionFileName,
+        candidateDefinitionHash: undefined,
       };
     case "SET_CANDIDATES_DEFINITION_HASH":
       return {

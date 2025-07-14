@@ -1,12 +1,20 @@
 import { describe, expect, test } from "vitest";
 
+import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { render, screen } from "@/testing/test-utils";
 
-import { DefaultCommitteeSessionCard } from "./CommitteeSessionCard.stories";
+import { CommitteeSessionCard } from "./CommitteeSessionCard";
 
 describe("UI component: CommitteeSessionCard", () => {
   test("The card renders with status created committee session number 1", () => {
-    render(<DefaultCommitteeSessionCard number={1} status="created" startDate="" startTime="" currentSession={true} />);
+    const committeeSession = getCommitteeSessionMockData({
+      number: 1,
+      status: "created",
+      start_date: "",
+      start_time: "",
+      location: "Juinen",
+    });
+    render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Voorbereiden")).toBeInTheDocument();
@@ -15,7 +23,14 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status created committee session number 2", () => {
-    render(<DefaultCommitteeSessionCard number={2} status="created" startDate="" startTime="" currentSession={true} />);
+    const committeeSession = getCommitteeSessionMockData({
+      number: 2,
+      status: "created",
+      start_date: "",
+      start_time: "",
+      location: "Juinen",
+    });
+    render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Tweede zitting")).toBeVisible();
     expect(screen.getByText("— Voorbereiden")).toBeVisible();
@@ -25,15 +40,14 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_not_started", () => {
-    render(
-      <DefaultCommitteeSessionCard
-        number={1}
-        status="data_entry_not_started"
-        startDate=""
-        startTime=""
-        currentSession={true}
-      />,
-    );
+    const committeeSession = getCommitteeSessionMockData({
+      number: 1,
+      status: "data_entry_not_started",
+      start_date: "",
+      start_time: "",
+      location: "Juinen",
+    });
+    render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Klaar voor invoer")).toBeVisible();
@@ -42,15 +56,14 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_in_progress", () => {
-    render(
-      <DefaultCommitteeSessionCard
-        number={1}
-        status="data_entry_in_progress"
-        startDate=""
-        startTime=""
-        currentSession={true}
-      />,
-    );
+    const committeeSession = getCommitteeSessionMockData({
+      number: 1,
+      status: "data_entry_in_progress",
+      start_date: "",
+      start_time: "",
+      location: "Juinen",
+    });
+    render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Invoerders bezig")).toBeVisible();
@@ -61,15 +74,14 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_paused", () => {
-    render(
-      <DefaultCommitteeSessionCard
-        number={1}
-        status="data_entry_paused"
-        startDate=""
-        startTime=""
-        currentSession={true}
-      />,
-    );
+    const committeeSession = getCommitteeSessionMockData({
+      number: 1,
+      status: "data_entry_paused",
+      start_date: "",
+      start_time: "",
+      location: "Juinen",
+    });
+    render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Invoer gepauzeerd")).toBeVisible();
@@ -78,15 +90,14 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_finished", () => {
-    render(
-      <DefaultCommitteeSessionCard
-        number={1}
-        status="data_entry_finished"
-        startDate=""
-        startTime=""
-        currentSession={true}
-      />,
-    );
+    const committeeSession = getCommitteeSessionMockData({
+      number: 1,
+      status: "data_entry_finished",
+      start_date: "",
+      start_time: "",
+      location: "Juinen",
+    });
+    render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Invoerders klaar")).toBeVisible();
@@ -97,15 +108,14 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_finished not current session and details already saved", () => {
-    render(
-      <DefaultCommitteeSessionCard
-        number={1}
-        status="data_entry_finished"
-        startDate="2025-11-09"
-        startTime="09:15"
-        currentSession={false}
-      />,
-    );
+    const committeeSession = getCommitteeSessionMockData({
+      number: 1,
+      status: "data_entry_finished",
+      start_date: "2025-11-09",
+      start_time: "09:15",
+      location: "Juinen",
+    });
+    render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={false} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Invoerders klaar")).toBeVisible();

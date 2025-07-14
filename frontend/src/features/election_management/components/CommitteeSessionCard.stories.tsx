@@ -1,4 +1,4 @@
-import { Story } from "@ladle/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { CommitteeSessionStatus } from "@/types/generated/openapi";
@@ -13,23 +13,31 @@ type Props = {
   currentSession: boolean;
 };
 
-export const DefaultCommitteeSessionCard: Story<Props> = ({ number, status, startDate, startTime, currentSession }) => {
-  const committeeSession = getCommitteeSessionMockData({
-    number: number,
-    status: status,
-    start_date: startDate,
-    start_time: startTime,
-    location: "Juinen",
-  });
-  return <CommitteeSessionCard committeeSession={committeeSession} currentSession={currentSession} />;
+export const DefaultCommitteeSessionCard: StoryObj<Props> = {
+  render: ({ number, status, startDate, startTime, currentSession }) => {
+    const committeeSession = getCommitteeSessionMockData({
+      number: number,
+      status: status,
+      start_date: startDate,
+      start_time: startTime,
+      location: "Juinen",
+    });
+    return <CommitteeSessionCard committeeSession={committeeSession} currentSession={currentSession} />;
+  },
 };
 
 export default {
+  args: {
+    number: 1,
+    status: "data_entry_in_progress",
+    startDate: "2025-11-08",
+    startTime: "09:15",
+    currentSession: true,
+  },
   argTypes: {
     number: {
       options: [1, 2, 3],
       control: { type: "radio" },
-      defaultValue: 1,
     },
     status: {
       options: [
@@ -40,25 +48,21 @@ export default {
         "data_entry_finished",
       ],
       control: { type: "radio" },
-      defaultValue: "data_entry_in_progress",
     },
     startDate: {
       control: { type: "text" },
-      defaultValue: "2025-11-08",
     },
     startTime: {
       control: { type: "text" },
-      defaultValue: "09:15",
     },
     currentSession: {
       options: [true, false],
-      defaultValue: true,
       control: { type: "radio" },
     },
-    background: {
-      control: { type: "background" },
-      options: ["#f9fafb"],
-      defaultValue: "#f9fafb",
+  },
+  parameters: {
+    backgrounds: {
+      light: { name: "light", value: "#f9fafb" },
     },
   },
-};
+} satisfies Meta;

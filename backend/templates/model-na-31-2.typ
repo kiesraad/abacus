@@ -135,11 +135,7 @@ Bijvoorbeeld over het ongeldig verklaren van een stembiljet. Schrijf geen namen 
   rows: 10,
 )
 
-<<<<<<< HEAD
 === Andere *bijzonderheden* die mogelijk invloed hebben op het telproces of de resultaten van het #location_type.
-=======
-=== Andere *bijzonderheden* die mogelijk invloed hebben op het telproces of de resultaten van het gemeentelijk stembureau/stembureau voor het openbaar lichaam.
->>>>>>> main
 
 Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georganiseerd en een stembiljet in de verkeerde stembus zat.
 
@@ -229,11 +225,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Verschillen tussen aantal kiezers en uitgebrachte stemmen
 
-<<<<<<< HEAD
 === Is bij *alle afzonderlijke stembureaus* in #this_location het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
-=======
-=== Is bij alle afzonderlijke stembureaus in #this_location het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
->>>>>>> main
 
 #checkbox[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>)*]
 

@@ -41,10 +41,6 @@ __Uitbreidingen:__
 &emsp; 7a1. Het GSB stelt het bezwaar vast.  
 &emsp; 7a2. Het GSB gaat over tot hertelling.
 
-### Open punten
-- We willen zoveel mogelijk van het PV in de applicatie invoeren. Dus idealiter worden alleen de handtekeningen van de GSB-leden met pen gezet. Dat is niet wat er op dit moment in de use cases staat.
-
-
 ## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
@@ -83,7 +79,5 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- 'leeg' corrigendum is geen heel goede term
-    - Moet je kunnen selecteren welke lijsten er opgenomen moeten worden in het 'lege' corrigendum? Nee, want nieuwe modellen: corrigendum bevat aantallen modellen vorige zitting (niet: eerste zitting tenzij dat de vorige zitting is), dus handig om alle lijsten in corrigendum te hebben.
 - Hoe expliciet willen we zijn over de verschillende momenten waarop welke onderdelen van het corrigendum afgedrukt kunnen worden?
-- Als de coördinator GSB de overige bladzijdes afrdukt, vult deze dan op dat moment ook al de resultaten van het onderzoek in?
+- Als de coördinator GSB de overige bladzijdes afdrukt, vult deze dan op dat moment ook al de resultaten van het onderzoek in?

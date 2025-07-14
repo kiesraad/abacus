@@ -10,7 +10,7 @@ Logging van acties in de applicatie kan helpen bij het oplossen van problemen en
 
 __Niveau:__ gebruikersdoel, zee  (🌊)
 
-De applicatie logt de interactie van gebruikers met de applicatie, zoals het uploaden van definities, aanmaken en wijzigen van gebruikers, opslaan van invoer etc.  
+De applicatie logt de interactie van gebruikers dwz alle belangrijke stappen in het proces, accountbeheer, het inrichten van de applicatie, etc.
 
 Van elke gelogde actie is in elk geval de volgende informatie beschikaar:
 

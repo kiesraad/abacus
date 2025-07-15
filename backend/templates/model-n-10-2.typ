@@ -14,8 +14,8 @@
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 
-#show: doc => conf(doc, header: [Stembureau #polling_station_number], footer: [Proces-verbaal van een stembureau \ 
-Model N 10-1 decentrale stemopneming])
+#show: doc => conf(doc, header: [Stembureau #polling_station_number], footer: [Proces-verbaal van een stembureau \
+  Model N 10-1 decentrale stemopneming])
 
 #set heading(numbering: none)
 
@@ -34,9 +34,9 @@ Model N 10-1 decentrale stemopneming])
 Kieskring \<nummer> #sym.arrow.r #location_name #sym.arrow.r Stembureau #polling_station_number
 
 \<Plaats> \<tijdstip aanvang zitting> \
-\<tijd:van> - \<tot> \<naam stembureau> \ 
-\<Adresregel 1> \ 
-\<Adresregel 2>  \ 
+\<tijd:van> - \<tot> \<naam stembureau> \
+\<Adresregel 1> \
+\<Adresregel 2>  \
 
 #input.election.location #format_date(input.election.election_date)
 
@@ -172,7 +172,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
   #sum(
     empty_letterbox("A")[Stempassen],
     empty_letterbox(
-      "B"
+      "B",
     )[Volmachtbewijzen (schriftelijk of via ingevulde stempas of kiezerspas)],
     empty_letterbox("C")[Kiezerspassen],
     empty_letterbox(
@@ -259,16 +259,10 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === #is_municipality[Twee][Vier] leden van het #location_type
 
-#stack(
-  spacing: 0.5em,
-  ..range(0, 2).map(_ => textbox[Naam:][Handtekening:])
-)
+#stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
 === Extra ondertekening: (niet verplicht)
 
-#stack(
-  spacing: 0.5em,
-  ..range(0, 4).map(_ => textbox[Naam:][Handtekening:])
-)
+#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))

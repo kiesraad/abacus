@@ -14,6 +14,7 @@ use crate::audit_log::ElectionDetails;
 pub struct Election {
     pub id: u32,
     pub name: String,
+    pub counting_method: VoteCountingMethod,
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
@@ -31,6 +32,7 @@ pub struct Election {
 pub struct ElectionWithPoliticalGroups {
     pub id: u32,
     pub name: String,
+    pub counting_method: VoteCountingMethod,
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
@@ -95,6 +97,7 @@ impl IntoResponse for ElectionWithPoliticalGroups {
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
 pub struct NewElection {
     pub name: String,
+    pub counting_method: VoteCountingMethod,
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
@@ -123,6 +126,17 @@ impl ElectionCategory {
             ElectionCategory::Municipal => "GR",
         }
     }
+}
+
+#[derive(
+    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
+)]
+#[strum(serialize_all = "lowercase")]
+pub enum VoteCountingMethod {
+    /// centralized vote counting method
+    CSO,
+    /// decentralized vote counting method
+    DSO,
 }
 
 pub type PGNumber = u32;
@@ -206,6 +220,7 @@ pub(crate) mod tests {
         ElectionWithPoliticalGroups {
             id: 1,
             name: "Test".to_string(),
+            counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2023".to_string(),
             location: "Test".to_string(),
             domain_id: "0000".to_string(),

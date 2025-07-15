@@ -223,6 +223,7 @@ async fn test_election_apportionment_error_apportionment_not_available_no_pollin
         .header("cookie", cookie)
         .json(&serde_json::json!({
             "name": "Test Election",
+            "counting_method": "CSO",
             "election_id": "TestElection_2026",
             "location": "Test Location",
             "domain_id": "0000",

@@ -1329,6 +1329,7 @@ export const election_summary: ElectionSummary = {
 export const election: ElectionWithPoliticalGroups = {
   id: 2,
   name: "Test Election >= 19 seats",
+  counting_method: "CSO",
   election_id: "TestLocation_2026",
   location: "Test Location",
   domain_id: "0000",

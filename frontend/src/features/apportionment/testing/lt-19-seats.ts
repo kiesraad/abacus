@@ -1659,6 +1659,7 @@ export const political_group_1: PoliticalGroup = {
 export const election: ElectionWithPoliticalGroups = {
   id: 3,
   name: "Test Election < 19 seats",
+  counting_method: "CSO",
   election_id: "TestLocation_2026",
   location: "Test Location",
   domain_id: "0000",

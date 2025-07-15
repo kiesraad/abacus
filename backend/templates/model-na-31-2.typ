@@ -306,14 +306,16 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === #is_municipality[Twee][Vier] eden van het #location_type
 
-#for i in range(0, is_municipality(2, 4)) {
-  textbox[Naam:][Handtekening:]
-}
+#stack(
+  spacing: 0.5em,
+  ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:])
+)
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
 === Extra ondertekening: (niet verplicht)
 
-#for i in range(0, 5) {
-  textbox[Naam:][Handtekening:]
-}
+#stack(
+  spacing: 0.5em,
+  ..range(0, 5).map(_ => textbox[Naam:][Handtekening:])
+)

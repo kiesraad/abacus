@@ -244,7 +244,7 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     election_data: String,
     candidate_hash: [String; crate::eml::hash::CHUNK_COUNT],
     candidate_data: String,
-    polling_station_data: String,
+    polling_station_data: Option<String>,
 }
 
 /// Uploads election definition, validates it, saves it to the database, and returns the created election
@@ -276,18 +276,25 @@ pub async fn election_import(
 
     let mut new_election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
     new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
-    new_election =
-        EML110::from_str(&edu.polling_station_data)?.update_number_of_voters(new_election)?;
 
-    let polling_places = EML110::from_str(&edu.polling_station_data)?.get_polling_stations()?;
+    // Process polling stations
+    let mut polling_places = None;
+    if let Some(polling_station_data) = edu.polling_station_data.clone() {
+        new_election =
+            EML110::from_str(&polling_station_data)?.update_number_of_voters(new_election)?;
+
+        polling_places = Some(EML110::from_str(&polling_station_data)?.get_polling_stations()?);
+    }
 
     // Create new election
     let election = elections_repo.create(new_election.clone()).await?;
 
     // Create polling stations
-    polling_stations_repo
-        .create_many(election.id, polling_places)
-        .await?;
+    if let Some(places) = polling_places {
+        polling_stations_repo
+            .create_many(election.id, places)
+            .await?;
+    }
 
     // Create first committee session for the election
     let committee_session = committee_sessions_repo

@@ -3664,8 +3664,7 @@
           "election_hash",
           "election_data",
           "candidate_hash",
-          "candidate_data",
-          "polling_station_data"
+          "candidate_data"
         ],
         "properties": {
           "candidate_data": {
@@ -3687,7 +3686,10 @@
             }
           },
           "polling_station_data": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },

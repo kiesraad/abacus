@@ -15,7 +15,7 @@
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 
 #show: doc => conf(doc, header: [Stembureau #polling_station_number], footer: [Proces-verbaal van een stembureau \
-  Model N 10-1 decentrale stemopneming])
+  Model N 10-2 centrale stemopneming])
 
 #set heading(numbering: none)
 
@@ -24,7 +24,7 @@
   "",
   [#input.election.name #format_date(input.election.election_date)],
   [
-    Verslag en telresultaten per lijst en kandidaat \
+    Verslag en telresultaten per lijst \
     Model N 10-2
   ],
 )

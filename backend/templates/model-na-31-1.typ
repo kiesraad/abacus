@@ -39,13 +39,13 @@ Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een v
 
 #emph_block[
   In #this_location is gekozen voor *decentrale stemopneming*.
-  Ieder stembureau heeft direct na het stemmen geteld hoeveelstemmen elke lijst en elke kandidaat kreeg. Het *#location_type* telt daarna de resultaten van alle stembureaus bij elkaar op.
+  Ieder stembureau heeft direct na het stemmen geteld hoeveel stemmen elke lijst en elke kandidaat kreeg. Het *#location_type* telt daarna de resultaten van alle stembureaus bij elkaar op.
 ]
 
 == Inhoudsopgave
 
 - Deel 1 - *Verslag van de zitting* (het verloop van het tellen en optellen)
-- Deel 2 - *Telresultaten* van de/het hele gemeente/openbaar lichaam
+- Deel 2 - *Telresultaten* van #is_municipality[de gemeente][het openbaar lichaam]
 - Deel 3 - *Ondertekening* door de leden van het #location_type
 
 #pagebreak(weak: true)
@@ -298,7 +298,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[Twee][Vier] eden van het #location_type
+=== #is_municipality[Twee][Vier] leden van het #location_type
 
 #for i in range(0, is_municipality(2, 4)) {
   textbox[Naam:][Handtekening:]

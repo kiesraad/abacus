@@ -6,6 +6,8 @@
   input.election.category == "Municipal"
 ) { municipal } else { public_body }
 
+#let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+
 #show: doc => conf(doc, header: [Stembureau \<nummer>], footer: [
   Model Na 31-2 centrale stemopneming
 ])
@@ -24,13 +26,13 @@
 
 == Over deze bijlage
 
-Het stembureau heeft op de dag van de verkiezingen de stemmen per lijst geteld. Het gemeentelijk stembureau/stembureau voor het openbaar lichaam heeft later op een centrale tellocatie geteld hoeveel stemmen elke kandidaat heeft gekregen. De telresultaten van het gemeentelijk stembureau/stembureau voor het openbaar lichaam zijn vergeleken met de eerdere tellingen door het stembureau. Alle telresultaten staan in deze bijlage.
+Het stembureau heeft op de dag van de verkiezingen de stemmen per lijst geteld. Het #location_type heeft later op een centrale tellocatie geteld hoeveel stemmen elke kandidaat heeft gekregen. De telresultaten van het #location_type zijn vergeleken met de eerdere tellingen door het stembureau. Alle telresultaten staan in deze bijlage.
 
 #show: doc => attachement_numbering(doc, "B1")
 
-= Alleen bij extra onderzoek: opmerkingen gemeentelijk stembureau/stembureau voor het openbaar lichaam
+= Alleen bij extra onderzoek: opmerkingen #location_type
 
-=== Heeft het gemeentelijk stembureau/stembureau voor het openbaar lichaam extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?
+=== Heeft het #location_type extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?
 
 #checkbox[Ja]
 #checkbox[Nee]
@@ -52,7 +54,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 === Was er in de telresultaten van het *stembureau* (rubriek 2.3 van het proces-verbaal van het stembureau) een onverklaard verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers?
 
-#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (stempassen, kiezerspassen en volmachten)*, en noteer de uitkomsten bij rubriek 3.1]
+#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (#is_municipality[stempassen en volmachten][stempassen, kiezerspassen en volmachten])*, en noteer de uitkomsten bij rubriek 3.1]
 #checkbox[Nee]
 
 == Tel de stembiljetten
@@ -63,7 +65,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 == Tellingen op lijstniveau
 
-=== Is er een verschil tussen het totaal aantal getelde stemmen (vak H van rubriek 2.2) zoals eerder vastgesteld door het *stembureau* en zoals door u geteld op het *gemeentelijk stembureau/stembureau voor het openbaar lichaam*?
+=== Is er een verschil tussen het totaal aantal getelde stemmen (vak H van rubriek 2.2) zoals eerder vastgesteld door het *stembureau* en zoals door u geteld op het *#location_type*?
 
 #checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (tenzij dat bij de vorige vraag al gedaan is)*, en noteer de uitkomsten bij rubriek 3.1]
 #checkbox[Nee]
@@ -72,7 +74,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 == Lijsten met verschillen
 
-=== Noteer alle lijsten waar de telling door het *stembureau* afwijkt van de telling van vandaag door het *gemeentelijk stembureau/stembureau voor het openbaar lichaam*.
+=== Noteer alle lijsten waar de telling door het *stembureau* afwijkt van de telling van vandaag door het *#location_type*.
 
 #empty_table(
   columns: (auto, auto, auto, auto, 26em),
@@ -100,7 +102,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 == Toegelaten kiezers <admitted_voters>
 
-=== Heeft het gemeentelijk stembureau/stembureau voor het openbaar lichaam het aantal toegelaten kiezers opnieuw geteld? Schrijf dan die aantallen op. Neem anders de aantallen over die het stembureau heeft opgeschreven in het proces-verbaal.
+=== Heeft het #location_type het aantal toegelaten kiezers opnieuw geteld? Schrijf dan die aantallen op. Neem anders de aantallen over die het stembureau heeft opgeschreven in het proces-verbaal.
 
 #is_municipality[
   #sum(empty_letterbox("A")[Stempassen], empty_letterbox("B")[Volmachtbewijzen], empty_letterbox(

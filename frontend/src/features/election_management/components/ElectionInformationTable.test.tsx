@@ -11,6 +11,7 @@ describe("ElectionInformationTable", () => {
         election={{
           id: 1,
           name: "Gemeenteraadsverkiezingen 2026",
+          counting_method: "DSO",
           election_id: "Heemdamseburg_2024",
           location: "Heemdamseburg",
           domain_id: "0035",
@@ -49,7 +50,7 @@ describe("ElectionInformationTable", () => {
       ["Aantal kiesgerechtigden", "Nog invullen"],
       ["Invoer doen voor", ""],
       ["Stembureaus", "1 stembureau"],
-      ["Type stemopneming", ""],
+      ["Type stemopneming", "Decentrale stemopneming"],
     ]);
   });
 });

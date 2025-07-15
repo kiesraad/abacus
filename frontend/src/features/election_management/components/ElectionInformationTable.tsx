@@ -78,7 +78,7 @@ export function ElectionInformationTable({ election, numberOfPollingStations }: 
           <Table.HeaderCell scope="row" className="normal">
             {t("counting_method_type")}
           </Table.HeaderCell>
-          <Table.Cell></Table.Cell>
+          <Table.Cell>{t(election.counting_method)}</Table.Cell>
         </Table.Row>
       </Table.Body>
     </Table>

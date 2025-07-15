@@ -53,7 +53,7 @@ describe("ElectionHomePage", () => {
       ["Aantal kiesgerechtigden", "100"],
       ["Invoer doen voor", ""],
       ["Stembureaus", "5 stembureaus"],
-      ["Type stemopneming", ""],
+      ["Type stemopneming", "Centrale stemopneming"],
     ]);
   });
 });

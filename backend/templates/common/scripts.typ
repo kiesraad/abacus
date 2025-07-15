@@ -347,7 +347,7 @@
           table.hline(stroke: 1pt + black),
           // Empty line
           table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 0pt, []),
-          if column_total == function {
+          if type(column_total) == function {
             table.cell(colspan: 3, fill: white, align: center, {
               // Increment the column counter
               column += 1
@@ -395,22 +395,25 @@
     }
   })
 
-  align(if total == none { left } else { bottom }, grid(
-    columns: (1fr, 8em),
-    align: (right, right),
-    inset: 8pt,
-    grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(context range(
-      1,
-      column + 1,
-    )
-      .map(str)
-      .join(" + ")))),
-    if total == none {
-      grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5))
-    } else {
-      grid.cell(stroke: 0.5pt + black, fmt-number(total, zero: 0))
-    },
-  ))
+  align(
+    if total == none { left } else { bottom },
+    grid(
+      columns: (1fr, 8em),
+      align: (right, right),
+      inset: 8pt,
+      grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(context range(
+        1,
+        column + 1,
+      )
+        .map(str)
+        .join(" + ")))),
+      if total == none {
+        grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5))
+      } else {
+        grid.cell(stroke: 0.5pt + black, fmt-number(total, zero: 0))
+      },
+    ),
+  )
 
   if total == none {
     align(right, text(

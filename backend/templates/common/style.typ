@@ -89,7 +89,7 @@
   #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: "")
 
   #show heading: it => [
-      #prefix - #counter(heading).display(it.numbering) #it.body
+    #prefix - #counter(heading).display(it.numbering) #it.body
   ]
 
   #show heading.where(level: 3): it => [
@@ -97,7 +97,7 @@
       stroke: (left: 1pt),
       outset: (left: 6pt, top: 3pt, bottom: 3pt),
     )[
-      #prefix - *#counter(heading).display(it.numbering))*
+      #prefix - *#counter(heading).display(it.numbering)*
       #it.body
     ]
   ]

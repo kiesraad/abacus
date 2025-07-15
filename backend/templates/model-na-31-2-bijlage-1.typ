@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, attachement_numbering
+#import "common/style.typ": attachement_numbering, conf
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
 
@@ -43,6 +43,8 @@ Het stembureau heeft op de dag van de verkiezingen de stemmen per lijst geteld. 
 Licht hieronder toe wat de reden van het extra onderzoek was
 
 #empty_lines(3)
+
+#pagebreak(weak: true)
 
 = Verschillen met telresultaten stembureau
 
@@ -89,7 +91,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
     ],
   ),
   values: ("", "", "", "", ""),
-  rows: 25
+  rows: 25,
 )
 
 #pagebreak(weak: true)
@@ -101,17 +103,16 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 === Heeft het gemeentelijk stembureau/stembureau voor het openbaar lichaam het aantal toegelaten kiezers opnieuw geteld? Schrijf dan die aantallen op. Neem anders de aantallen over die het stembureau heeft opgeschreven in het proces-verbaal.
 
 #is_municipality[
-  #sum(
-    empty_letterbox("A")[Stempassen],
-    empty_letterbox("B")[Volmachtbewijzen],
-    empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B)]
-  )
+  #sum(empty_letterbox("A")[Stempassen], empty_letterbox("B")[Volmachtbewijzen], empty_letterbox(
+    "D",
+    light: false,
+  )[Totaal toegelaten kiezers (A+B)])
 ][
   #sum(
     empty_letterbox("A")[Stempassen],
     empty_letterbox("B")[Volmachtbewijzen],
     empty_letterbox("C")[Kiezerspassen],
-    empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B+C)]
+    empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B+C)],
   )
 ]
 
@@ -123,7 +124,6 @@ Licht hieronder toe wat de reden van het extra onderzoek was
   #sum(
     sum(
       ..input.election.political_groups.map(list => {
-
         empty_letterbox([E.#list.number])[Totaal lijst #list.number - #list.name]
       }),
       empty_letterbox(
@@ -150,19 +150,21 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 #checkbox[H is groter is dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 
-#box(
-  inset: (left: 3em, bottom: 1em),
-  empty_letterbox("I", cells: 3, light: false)[Aantal méér getelde stemmen (bereken: H min D)]
-)
+#box(inset: (left: 3em, bottom: 1em), empty_letterbox(
+  "I",
+  cells: 3,
+  light: false,
+)[Aantal méér getelde stemmen (bereken: H min D)])
 
 #checkbox[H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)]
 
-#box(
-  inset: (left: 3em, bottom: 1em),
-  empty_letterbox("J", cells: 3, light: false)[Aantal minder getelde stemmen (bereken: D min H)]
-)
+#box(inset: (left: 3em, bottom: 1em), empty_letterbox(
+  "J",
+  cells: 3,
+  light: false,
+)[Aantal minder getelde stemmen (bereken: D min H)])
 
-=== Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H *volledig* verklaren? 
+=== Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H *volledig* verklaren?
 
 _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming, vraag 1.2.2)_
 
@@ -198,7 +200,7 @@ _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
-    total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.]
+    total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
   )
 }
 

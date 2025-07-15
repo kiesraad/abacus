@@ -3,6 +3,7 @@ import { RouterProvider } from "react-router";
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { ApiResponseStatus } from "@/api/ApiResult";
 import { useElection } from "@/hooks/election/useElection";
 import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
@@ -35,6 +36,12 @@ describe("AbortDataEntryControl", () => {
       election: electionMockData,
       pollingStations: [],
       pollingStation: undefined,
+      refetch: () =>
+        Promise.resolve({
+          status: ApiResponseStatus.Success,
+          code: 200,
+          data: { committee_session: committeeSessionMockData, election: electionMockData, polling_stations: [] },
+        }),
     });
   });
 

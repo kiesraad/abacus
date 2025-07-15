@@ -2,6 +2,7 @@ import { StaticRouter } from "react-router";
 
 import type { Preview } from "@storybook/react-vite";
 
+import { ApiResponseStatus } from "@/api/ApiResult";
 import { ElectionProviderContext } from "@/hooks/election/ElectionProviderContext";
 import { UsersProviderContext } from "@/hooks/user/UsersProviderContext";
 import { t } from "@/i18n/translate";
@@ -46,6 +47,8 @@ const preview: Preview = {
             election: election ?? electionDetailsMockResponse.election,
             pollingStations: pollingStations ?? electionDetailsMockResponse.polling_stations,
             committeeSession: electionDetailsMockResponse.committee_session,
+            refetch: () =>
+              Promise.resolve({ status: ApiResponseStatus.Success, code: 200, data: electionDetailsMockResponse }),
           }}
         >
           <Story />

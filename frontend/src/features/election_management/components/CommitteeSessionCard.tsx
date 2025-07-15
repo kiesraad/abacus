@@ -1,11 +1,16 @@
 import { Fragment, HTMLAttributes, ReactNode } from "react";
 import { To, useNavigate } from "react-router";
 
+import { useApiClient } from "@/api/useApiClient";
 import { CommitteeSessionStatusLabel } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";
 import { CommitteeSessionStatusIcon } from "@/components/ui/Icon/CommitteeSessionStatusIcon";
 import { t } from "@/i18n/translate";
-import { CommitteeSession } from "@/types/generated/openapi";
+import {
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
+  CommitteeSession,
+} from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatFullDateWithoutTimezone } from "@/utils/format";
@@ -80,6 +85,17 @@ export function CommitteeSessionCard({
   currentSession,
   ...props
 }: CommitteeSessionCardProps & DivProps) {
+  const client = useApiClient();
+  const navigate = useNavigate();
+
+  function handleStart() {
+    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
+    void client.putRequest(url, body).then(() => {
+      void navigate("status");
+    });
+  }
+
   const icon = CommitteeSessionStatusIcon({ status: committeeSession.status, size: "xl" });
   const label = committeeSessionLabel(committeeSession.number);
   const status = CommitteeSessionStatusLabel(committeeSession.status, "coordinator");
@@ -95,6 +111,11 @@ export function CommitteeSessionCard({
       }
       break;
     case "data_entry_not_started":
+      button = (
+        <Button variant="primary" size="sm" onClick={handleStart}>
+          {t("election_management.start_data_entry")}
+        </Button>
+      );
       break;
     case "data_entry_in_progress":
       button = (

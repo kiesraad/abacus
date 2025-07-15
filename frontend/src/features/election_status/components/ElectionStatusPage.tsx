@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
+import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -16,9 +18,20 @@ import { ElectionStatus } from "./ElectionStatus";
 export function ElectionStatusPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { committeeSession, election, pollingStations } = useElection();
+  const { committeeSession, election, pollingStations, refetch } = useElection();
   const { statuses } = useElectionStatus();
   const { getName } = useUsers();
+
+  // re-fetch election when component mounts
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    void refetch(abortController);
+
+    return () => {
+      abortController.abort(DEFAULT_CANCEL_REASON);
+    };
+  }, [refetch]);
 
   const showDataEntryKeptAlert = location.hash.startsWith("#data-entry-kept-") ? location.hash : null;
   const showDataEntriesDiscardedAlert = location.hash.startsWith("#data-entries-discarded-") ? location.hash : null;
@@ -40,7 +53,8 @@ export function ElectionStatusPage() {
     typist = getName(typistId);
   }
 
-  function finishInput() {
+  function finishDataEntry() {
+    // TODO: Go to page that changes status of committee session to "data_entry_finished"
     void navigate("../report");
   }
 
@@ -81,15 +95,17 @@ export function ElectionStatusPage() {
           </p>
         </Alert>
       )}
-      {committeeSession.status === "data_entry_finished" && (
-        <Alert type="success">
-          <h2>{t("election_status.definitive.title")}</h2>
-          <p>{t("election_status.definitive.message")}</p>
-          <Button onClick={finishInput} size="md">
-            {t("election_status.definitive.finish_button")}
-          </Button>
-        </Alert>
-      )}
+      {committeeSession.status !== "data_entry_finished" &&
+        statuses.length > 0 &&
+        statuses.every((s) => s.status === "definitive") && (
+          <Alert type="success">
+            <h2>{t("election_status.definitive.title")}</h2>
+            <p>{t("election_status.definitive.message")}</p>
+            <Button onClick={finishDataEntry} size="md">
+              {t("election_status.definitive.finish_button")}
+            </Button>
+          </Alert>
+        )}
       <main>
         <ElectionStatus
           election={election}

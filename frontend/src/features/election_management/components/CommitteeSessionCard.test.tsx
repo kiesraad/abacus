@@ -53,6 +53,8 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("— Klaar voor invoer")).toBeVisible();
 
     expect(screen.getByRole("button", { name: "Details van de zitting" }));
+
+    expect(screen.getByRole("button", { name: "Start steminvoer" }));
   });
 
   test("The card renders with status data_entry_in_progress", () => {

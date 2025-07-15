@@ -64,7 +64,6 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input visible when data entry has finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "definitive" },
@@ -76,6 +75,21 @@ describe("ElectionStatusPage", () => {
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
     expect(screen.getByRole("button", { name: "Invoerfase afronden" })).toBeVisible();
+  });
+
+  test("Finish input not visible when election is finished", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [
+        { id: 1, status: "definitive" },
+        { id: 2, status: "definitive" },
+      ],
+    });
+
+    await renderPage();
+
+    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
   });
 
   test("Data entry kept alert works", async () => {

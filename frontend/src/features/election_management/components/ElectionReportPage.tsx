@@ -12,8 +12,8 @@ import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
+import { formatFullDateWithoutTimezone } from "@/utils/format";
 
-import { formatFullDateWithoutTimezone } from "../../../utils/format";
 import cls from "./ElectionManagement.module.css";
 
 // Prompt the user to 'download' (i.e. save) a file

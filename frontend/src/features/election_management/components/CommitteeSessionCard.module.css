@@ -30,7 +30,6 @@
   font-size: var(--font-size-md);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   width: 100%;
 
   .border {
@@ -41,11 +40,10 @@
   button {
     all: unset;
     text-align: left;
-    padding-left: 0;
-    padding-right: 1.5rem;
+    padding: 0.5rem 1.5rem 0.5rem 0.5rem;
     background-image: url("../../../assets/icons/chevronRight.svg");
     background-size: 1.25rem;
-    background-position: center right 0;
+    background-position: center right 0.2rem;
     background-repeat: no-repeat;
     cursor: pointer;
 

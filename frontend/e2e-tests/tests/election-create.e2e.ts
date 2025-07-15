@@ -8,6 +8,7 @@ import { AbortModalPgObj } from "e2e-tests/page-objects/election/create/AbortMod
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
+import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
@@ -37,6 +38,36 @@ test.describe("Election creation", () => {
 
     // upload polling stations
     await uploadPollingStations(page);
+
+    // Now we should be at the check and save page
+    const checkAndSavePage = new CheckAndSavePgObj(page);
+    await expect(checkAndSavePage.header).toBeVisible();
+    await checkAndSavePage.save.click();
+
+    await expect(overviewPage.header).toBeVisible();
+    // Check if the amount of elections by this title is greater than before the import
+    expect(await overviewPage.elections.count()).toBeGreaterThan(initialElectionCount);
+    // Check if the amount of "Voorbereiden" states is greater than before the import
+    expect(await overviewPage.electionsCreatedState.count()).toBeGreaterThan(initialCreatedStateCount);
+  });
+
+  test("it uploads an election file, candidate list but skips polling stations", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new OverviewPgObj(page);
+    const initialElectionCount = await overviewPage.elections.count();
+    const initialCreatedStateCount = await overviewPage.electionsCreatedState.count();
+    await overviewPage.create.click();
+
+    // upload election and check hash
+    await uploadElectionAndInputHash(page);
+
+    // upload candidates list and check
+    await uploadCandidatesAndInputHash(page);
+
+    // skip polling stations
+    const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadDefinitionPage.header).toBeVisible();
+    await uploadDefinitionPage.skipButton.click();
 
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
@@ -347,5 +378,31 @@ test.describe("Election creation", () => {
     await uploadDefinitionPage.uploadFile(page, eml110a.path);
     await expect(uploadDefinitionPage.main).toContainText(eml110a.filename);
     await expect(uploadDefinitionPage.error).toBeVisible();
+  });
+
+  test("show more button should show full list of polling stations", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new OverviewPgObj(page);
+    await overviewPage.create.click();
+
+    // upload election and check hash
+    await uploadElectionAndInputHash(page);
+
+    // upload candidates list and check hash
+    await uploadCandidatesAndInputHash(page);
+
+    const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadDefinitionPage.header).toBeVisible();
+    await uploadDefinitionPage.uploadFile(page, eml110b.path);
+    await expect(uploadDefinitionPage.main).toContainText(eml110b.filename);
+
+    const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
+    await expect(checkDefinitionPage.header).toBeVisible();
+
+    // Could rows
+
+    // CLick button
+
+    // Count rows again
   });
 });

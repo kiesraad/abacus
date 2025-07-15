@@ -130,7 +130,7 @@ export function CommitteeSessionCard({
       buttonLinks.push({
         id: committeeSession.id,
         label: t("election_management.results_and_documents"),
-        to: "report", // TODO: change link when reports are linked to committee sessions
+        to: "report/download", // TODO: change link when reports are linked to committee sessions
       });
       if (currentSession) {
         buttonLinks.push({ id: committeeSession.id, label: t("election_management.view_data_entry"), to: "status" });

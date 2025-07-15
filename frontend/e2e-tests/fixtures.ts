@@ -1,6 +1,7 @@
 import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
 
 import {
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
   Election,
   ELECTION_CREATE_REQUEST_PATH,
@@ -18,7 +19,6 @@ import { DataEntryApiClient } from "./helpers-utils/api-clients";
 import { completePollingStationDataEntries, loginAs } from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import {
-  committeeSessionStatusChangeRequest,
   dataEntryRequest,
   dataEntryWithDifferencesRequest,
   dataEntryWithErrorRequest,
@@ -116,7 +116,8 @@ export const test = base.extend<Fixtures>({
     // Set committee session status to DataEntryInProgress
     await loginAs(request, "coordinator1");
     const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${response.committee_session.id}/status`;
-    const statusChangeResponse = await request.put(statusChangeUrl, { data: committeeSessionStatusChangeRequest });
+    const data: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
+    const statusChangeResponse = await request.put(statusChangeUrl, { data: data });
     expect(statusChangeResponse.ok()).toBeTruthy();
 
     await use(response);

@@ -138,6 +138,7 @@ impl ResultsInput {
         ),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 412, description = "ZIP results download is not yet available", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -215,6 +216,7 @@ async fn election_download_zip_results(
         ),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 412, description = "PDF results download is not yet available", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -266,6 +268,7 @@ async fn election_download_pdf_results(
         ),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 412, description = "XML results download is not yet available", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(

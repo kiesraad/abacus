@@ -8,7 +8,6 @@ use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService},
     committee_session::{CommitteeSession, repository::CommitteeSessions},
-    data_entry::repository::PollingStationResultsEntries,
     polling_station::repository::PollingStations,
 };
 
@@ -71,16 +70,7 @@ pub async fn change_committee_session_status(
         }
         CommitteeSessionStatus::DataEntryPaused => committee_session.status.pause_data_entry()?,
         CommitteeSessionStatus::DataEntryFinished => {
-            let polling_station_results_entries_repo =
-                PollingStationResultsEntries::new(pool.clone());
-            committee_session
-                .status
-                .finish_data_entry(
-                    committee_session,
-                    polling_stations_repo,
-                    polling_station_results_entries_repo,
-                )
-                .await?
+            committee_session.status.finish_data_entry().await?
         }
     };
 
@@ -172,35 +162,17 @@ impl CommitteeSessionStatus {
         }
     }
 
-    pub async fn finish_data_entry(
-        self,
-        committee_session: CommitteeSession,
-        polling_stations_repo: PollingStations,
-        polling_station_results_entries_repo: PollingStationResultsEntries,
-    ) -> Result<Self, CommitteeSessionTransitionError> {
+    pub async fn finish_data_entry(self) -> Result<Self, CommitteeSessionTransitionError> {
         match self {
             CommitteeSessionStatus::Created => Err(CommitteeSessionTransitionError::Invalid),
             CommitteeSessionStatus::DataEntryNotStarted => {
                 Err(CommitteeSessionTransitionError::Invalid)
             }
             CommitteeSessionStatus::DataEntryInProgress => {
-                let polling_station_results = polling_station_results_entries_repo
-                    .list_with_polling_stations(
-                        polling_stations_repo.clone(),
-                        committee_session.election_id,
-                    )
-                    .await?;
-                let polling_stations = polling_stations_repo
-                    .list(committee_session.election_id)
-                    .await?;
-                if polling_station_results.len() == polling_stations.len() {
-                    Ok(CommitteeSessionStatus::DataEntryFinished)
-                } else {
-                    Err(CommitteeSessionTransitionError::Invalid)
-                }
+                Ok(CommitteeSessionStatus::DataEntryFinished)
             }
             CommitteeSessionStatus::DataEntryPaused => {
-                Err(CommitteeSessionTransitionError::Invalid)
+                Ok(CommitteeSessionStatus::DataEntryFinished)
             }
             CommitteeSessionStatus::DataEntryFinished => Ok(self),
         }

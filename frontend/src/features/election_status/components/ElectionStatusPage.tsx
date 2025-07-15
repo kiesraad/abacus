@@ -54,7 +54,6 @@ export function ElectionStatusPage() {
   }
 
   function finishDataEntry() {
-    // TODO: Go to page that changes status of committee session to "data_entry_finished"
     void navigate("../report");
   }
 

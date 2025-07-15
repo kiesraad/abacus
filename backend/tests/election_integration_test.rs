@@ -4,7 +4,7 @@ use crate::{shared::create_result, utils::serve_api};
 #[cfg(feature = "dev-database")]
 use abacus::election::Election;
 use abacus::{
-    committee_session::status::CommitteeSessionStatus,
+    committee_session::{repository::CommitteeSessions, status::CommitteeSessionStatus},
     election::{ElectionDetailsResponse, ElectionListResponse},
 };
 use axum::http::StatusCode;
@@ -196,10 +196,15 @@ async fn test_election_details_not_found(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_pdf_download(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
+    let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
+    committee_sessions_repo
+        .change_status(2, CommitteeSessionStatus::DataEntryFinished)
+        .await
+        .unwrap();
 
     let url = format!("http://{addr}/api/elections/2/download_pdf_results");
     let response = reqwest::Client::new()
@@ -228,10 +233,15 @@ async fn test_election_pdf_download(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_xml_download(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
+    let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
+    committee_sessions_repo
+        .change_status(2, CommitteeSessionStatus::DataEntryFinished)
+        .await
+        .unwrap();
 
     let url = format!("http://{addr}/api/elections/2/download_xml_results");
     let response = reqwest::Client::new()
@@ -253,10 +263,15 @@ async fn test_election_xml_download(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_zip_download(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
+    let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
+    committee_sessions_repo
+        .change_status(2, CommitteeSessionStatus::DataEntryFinished)
+        .await
+        .unwrap();
 
     let url = format!("http://{addr}/api/elections/2/download_zip_results");
     let response = reqwest::Client::new()

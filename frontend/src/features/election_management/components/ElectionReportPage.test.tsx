@@ -38,14 +38,14 @@ describe("ElectionReportPage", () => {
 
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
 
-    await router.navigate("/elections/1/report");
+    await router.navigate("/elections/1/report/download");
 
     rtlRender(<Providers router={router} />);
 
     await expectErrorPage();
   });
 
-  test("Shows button", async () => {
+  test("Shows buttons", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
 
     render(
@@ -57,9 +57,13 @@ describe("ElectionReportPage", () => {
     );
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Steminvoer huidige zitting afronden" })).toBeVisible();
-    expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
+    ).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Steminvoer hervatten" })).toBeVisible();
   });
 });

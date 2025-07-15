@@ -371,7 +371,7 @@ Veld markeren: F
 
 Veld markeren: G
 
-#### W.203: Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter of gelijk aan 2% en groter of gelijk aan 15
+#### W.203: Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
 
 - 2% of meer: abs(toegelaten kiezers - getelde stembiljetten) / getelde stembiljetten \>= 0.02
 - 15 of meer: abs(toegelaten kiezers - getelde stembiljetten) \>= 15

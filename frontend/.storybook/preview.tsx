@@ -20,10 +20,6 @@ const preview: Preview = {
       },
     },
   },
-  initialGlobals: {
-    // 👇 Set the initial background color
-    backgrounds: { value: "light" },
-  },
   decorators: [
     // Router decorator - make things using react-router work
     (Story, context) => {

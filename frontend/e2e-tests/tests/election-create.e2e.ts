@@ -16,7 +16,7 @@ import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
 import { NavBar } from "e2e-tests/page-objects/NavBarPgObj";
 
 import { test } from "../fixtures";
-import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
+import { eml110a, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
 
 test.use({
   storageState: "e2e-tests/state/admin.json",
@@ -396,13 +396,44 @@ test.describe("Election creation", () => {
     await uploadDefinitionPage.uploadFile(page, eml110b.path);
     await expect(uploadDefinitionPage.main).toContainText(eml110b.filename);
 
+    // Check list of polling stations
     const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
 
-    // Could rows
+    // Check the overview table
+    await expect(checkDefinitionPage.table).toBeVisible();
+    expect(await checkDefinitionPage.stations.count()).toBe(10);
 
-    // CLick button
+    // Click button
+    await checkDefinitionPage.showMore.click();
+    expect(await checkDefinitionPage.stations.count()).toBeGreaterThan(10);
+  });
 
-    // Count rows again
+  test("no show more button should be visible is <10 polling stations", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new OverviewPgObj(page);
+    await overviewPage.create.click();
+
+    // upload election and check hash
+    await uploadElectionAndInputHash(page);
+
+    // upload candidates list and check hash
+    await uploadCandidatesAndInputHash(page);
+
+    const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadDefinitionPage.header).toBeVisible();
+    await uploadDefinitionPage.uploadFile(page, eml110b_short.path);
+    await expect(uploadDefinitionPage.main).toContainText(eml110b_short.filename);
+
+    // Check list of polling stations
+    const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
+    await expect(checkDefinitionPage.header).toBeVisible();
+
+    // Check the overview table
+    await expect(checkDefinitionPage.table).toBeVisible();
+    expect(await checkDefinitionPage.stations.count()).toBe(9);
+
+    // Click button should not exist
+    await expect(checkDefinitionPage.showMore).toBeHidden();
   });
 });

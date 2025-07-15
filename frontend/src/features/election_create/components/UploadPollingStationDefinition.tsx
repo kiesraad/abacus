@@ -99,8 +99,8 @@ export function UploadPollingStationDefinition() {
           })}
         </p>
 
-        {showAllPollingPlaces && (
-          <Table className={"table"}>
+        {(showAllPollingPlaces || state.pollingStations.length <= 10) && (
+          <Table className={"table"} id="overview">
             <Table.Body>
               {state.pollingStations.map((pollingStation: PollingStationRequest) => (
                 <Table.Row key={pollingStation.number}>
@@ -112,9 +112,9 @@ export function UploadPollingStationDefinition() {
           </Table>
         )}
 
-        {!showAllPollingPlaces && (
+        {!showAllPollingPlaces && state.pollingStations.length > 10 && (
           <>
-            <Table className={"table"}>
+            <Table className={"table"} id="overview">
               <Table.Body>
                 {state.pollingStations.slice(0, 10).map((pollingStation: PollingStationRequest) => (
                   <Table.Row key={pollingStation.number}>
@@ -125,7 +125,7 @@ export function UploadPollingStationDefinition() {
               </Table.Body>
             </Table>
             <p className="mt-lg">
-              <button className={cls.button} onClick={showAll}>
+              <button id="show-more" className={cls.button} onClick={showAll}>
                 {t("election.polling_stations.show_all", { num: state.pollingStations.length })}
               </button>
             </p>

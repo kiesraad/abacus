@@ -1,9 +1,10 @@
 button {
-  line-height: 1.5rem;
-  color: var(--Interactive-Default, #155eef);
   background-color: transparent;
   border: none;
+  color: var(--Interactive-Default);
   cursor: pointer;
+  line-height: 1.5rem;
+
   &:hover {
     text-decoration: underline;
   }

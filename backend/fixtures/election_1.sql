@@ -806,8 +806,8 @@ VALUES (1, 'Gemeenteraad 2026', 'CSO', 'Juinen_2024', 'Juinen', '0000', 3500, 'M
          }
        ]');
 
-INSERT INTO committee_sessions (id, number, election_id, location, start_date, start_time)
-VALUES (1, 1, 1, '', '', '');
+INSERT INTO committee_sessions (id, number, election_id, status, location, start_date, start_time)
+VALUES (1, 1, 1, 'data_entry_in_progress', '', '', '');
 
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)

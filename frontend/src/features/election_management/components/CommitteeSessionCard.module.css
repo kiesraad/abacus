@@ -1,0 +1,54 @@
+.card {
+  width: 25.33rem;
+  background-color: var(--base-white);
+  padding: 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  align-items: flex-start;
+  align-self: flex-start;
+}
+
+.labelStatusDateSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.label {
+  line-height: 1.75rem;
+}
+
+.date {
+  color: var(--gray-600);
+}
+
+.buttonLinks {
+  font-size: var(--font-size-md);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .border {
+    height: 1px;
+    background-color: var(--bg-gray-darkest);
+  }
+
+  button {
+    all: unset;
+    text-align: left;
+    padding: 0.5rem 1.5rem 0.5rem 0.5rem;
+    background-image: url("../../../assets/icons/chevronRight.svg");
+    background-size: 1.25rem;
+    background-position: center right 0.2rem;
+    background-repeat: no-repeat;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--color-hover);
+    }
+  }
+}

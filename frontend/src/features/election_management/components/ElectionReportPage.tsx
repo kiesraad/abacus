@@ -6,7 +6,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t, tx } from "@/i18n/translate";
 
-import cls from "./ElectionReportPage.module.css";
+import cls from "./ElectionManagement.module.css";
 
 // Prompt the user to 'download' (i.e. save) a file
 function offerDownload(blob: Blob, filename: string) {

@@ -1,5 +1,4 @@
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
-import { t } from "@/i18n/translate";
 import type { CheckboxesSubsection, SectionValues } from "@/types/types";
 
 export interface CheckboxesSubsectionProps {
@@ -21,7 +20,7 @@ export function CheckboxesSubsectionComponent({
     <div className="radio-form">
       <ChoiceList>
         {errorsAndWarnings?.get(`data.${subsection.error_path}`) && (
-          <ChoiceList.Error id={`${subsection.error_path}-error`}>{t(subsection.error_message)}</ChoiceList.Error>
+          <ChoiceList.Error id={`${subsection.error_path}-error`}>{subsection.error_message}</ChoiceList.Error>
         )}
         {subsection.options.map((option) => (
           <ChoiceList.Checkbox
@@ -33,7 +32,7 @@ export function CheckboxesSubsectionComponent({
             onChange={(e) => {
               setValues(option.path, e.target.checked ? "true" : "false");
             }}
-            label={t(option.label)}
+            label={option.label}
             autoFocus={option.autoFocusInput}
             hasError={errorsAndWarnings?.get(`data.${option.path}`) === "error"}
             disabled={readOnly}

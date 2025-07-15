@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 
+import { t } from "@/i18n/translate";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { render, screen } from "@/testing/test-utils";
 import { PollingStationResults } from "@/types/generated/openapi";
@@ -87,20 +88,20 @@ describe("ResolveDifferencesTables", () => {
         subsections: [
           {
             type: "checkboxes",
-            short_title: "recounted.short_title",
+            short_title: t("recounted.short_title"),
             error_path: "recounted",
             error_message: "recounted.error",
             options: [
               // fake paths for testing, real PollingStationResults has only one boolean
               {
                 path: "recounted.yes" as PollingStationResultsPath,
-                label: "recounted.yes",
-                short_label: "recounted.yes",
+                label: t("recounted.yes"),
+                short_label: t("recounted.yes"),
               },
               {
                 path: "recounted.no" as PollingStationResultsPath,
-                label: "recounted.no",
-                short_label: "recounted.no",
+                label: t("recounted.no"),
+                short_label: t("recounted.no"),
               },
             ],
           },

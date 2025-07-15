@@ -17,23 +17,23 @@ export const recountedSection: DataEntrySection = {
   subsections: [
     {
       type: "message",
-      message: "recounted.message",
+      message: t("recounted.message"),
       className: "form-paragraph md",
     },
     {
       type: "radio",
-      short_title: "recounted.short_title",
+      short_title: t("recounted.short_title"),
       path: "recounted",
-      error: "recounted.error",
+      error: t("recounted.error"),
       valueType: "boolean",
       options: [
         {
           value: "true",
-          label: "recounted.recounted_yes",
-          short_label: "recounted.yes",
+          label: t("recounted.recounted_yes"),
+          short_label: t("recounted.yes"),
           autoFocusInput: true,
         },
-        { value: "false", label: "recounted.recounted_no", short_label: "recounted.no" },
+        { value: "false", label: t("recounted.recounted_no"), short_label: t("recounted.no") },
       ],
     },
   ],
@@ -43,11 +43,11 @@ export const createVotersAndVotesSection = (recounted: boolean): DataEntrySectio
   const recountedVotersSubsections: DataEntrySubsection[] = [
     {
       type: "heading",
-      title: "voters_votes_counts.admitted_voters_after_recount",
+      title: t("voters_votes_counts.admitted_voters_after_recount"),
     },
     {
       type: "inputGrid",
-      headers: ["field", "counted_number", "description"],
+      headers: [t("field"), t("counted_number"), t("description")],
       rows: [
         {
           code: "A.2",
@@ -82,7 +82,7 @@ export const createVotersAndVotesSection = (recounted: boolean): DataEntrySectio
     subsections: [
       {
         type: "inputGrid",
-        headers: ["field", "counted_number", "description"],
+        headers: [t("field"), t("counted_number"), t("description")],
         rows: [
           {
             code: "A",
@@ -143,7 +143,7 @@ export const differencesSection: DataEntrySection = {
   subsections: [
     {
       type: "inputGrid",
-      headers: ["field", "counted_number", "description"],
+      headers: [t("field"), t("counted_number"), t("description")],
       rows: [
         {
           code: "I",
@@ -222,7 +222,7 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title.singular"],
+          headers: [t("number"), t("vote_count"), t("candidate.title.singular")],
           zebra: true,
           rows,
         },

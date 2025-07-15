@@ -1,5 +1,3 @@
-import { TranslationPath } from "@/i18n/i18n.types";
-
 import { PollingStationResults } from "./generated/openapi";
 
 export type FormSectionId =
@@ -28,29 +26,29 @@ export type SectionValues = Record<string, string>;
 // Data Entry Section Types
 export interface HeadingSubsection {
   type: "heading";
-  title: TranslationPath;
+  title: string;
 }
 
 export interface MessageSubsection {
   type: "message";
-  message: TranslationPath;
+  message: string;
   className?: string;
 }
 
 export interface RadioSubsectionOption {
   value: string;
   /** Label for data entry form view */
-  label: TranslationPath;
+  label: string;
   /** Short label for differences view */
-  short_label: TranslationPath;
+  short_label: string;
   autoFocusInput?: boolean;
 }
 
 export interface RadioSubsection {
   type: "radio";
   /** Short title for differences view */
-  short_title: TranslationPath;
-  error: TranslationPath;
+  short_title: string;
+  error: string;
   path: PollingStationResultsPath;
   options: RadioSubsectionOption[];
   valueType?: "string" | "boolean";
@@ -59,20 +57,20 @@ export interface RadioSubsection {
 export interface CheckboxesSubsectionOption {
   path: PollingStationResultsPath;
   /** Label for data entry form view */
-  label: TranslationPath;
+  label: string;
   /** Short label for differences view */
-  short_label: TranslationPath;
+  short_label: string;
   autoFocusInput?: boolean;
 }
 
 export interface CheckboxesSubsection {
   type: "checkboxes";
   /** Short title for differences view */
-  short_title: TranslationPath;
+  short_title: string;
   /** Path in results object that will indicate an error */
   error_path: PollingStationResultsPath;
   /** Error message to be shown when there is an error for error_path */
-  error_message: TranslationPath;
+  error_message: string;
   options: CheckboxesSubsectionOption[];
 }
 
@@ -88,7 +86,7 @@ export interface InputGridSubsectionRow {
 
 export interface InputGridSubsection {
   type: "inputGrid";
-  headers: [TranslationPath, TranslationPath, TranslationPath];
+  headers: [string, string, string];
   zebra?: boolean;
   rows: InputGridSubsectionRow[];
 }

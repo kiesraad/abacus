@@ -1,7 +1,7 @@
 button {
   background-color: transparent;
   border: none;
-  color: var(--Interactive-Default);
+  color: var(--interactive-default);
   cursor: pointer;
   line-height: 1.5rem;
 

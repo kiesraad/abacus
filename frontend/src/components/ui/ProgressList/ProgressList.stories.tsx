@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
@@ -15,11 +15,26 @@ const style: React.CSSProperties = {
   alignItems: "stretch",
 };
 
+const meta = {} satisfies Meta;
+export default meta;
+
 type Props = {
   active: number;
 };
 
 export const DefaultProgressList: StoryObj<Props> = {
+  args: {
+    active: 0,
+  },
+  argTypes: {
+    active: {
+      control: {
+        type: "number",
+        min: 0,
+        max: 9,
+      },
+    },
+  },
   render: ({ active }) => (
     <div style={style}>
       <ProgressList>
@@ -65,35 +80,23 @@ export const DefaultProgressList: StoryObj<Props> = {
   ),
 };
 
-const structure = getDataEntryStructure(electionMockData);
-
-export const OverviewProgressList: StoryFn = () => (
-  <ProgressList>
-    <ProgressList.Fixed>
-      {structure.map((section, i) => (
-        <ProgressList.OverviewItem
-          key={section.id}
-          status={i === 1 || i === 4 ? "warning" : "idle"}
-          addSpace={section.id === "political_group_votes_1"}
-        >
-          <span>{section.short_title}</span>
-        </ProgressList.OverviewItem>
-      ))}
-    </ProgressList.Fixed>
-  </ProgressList>
-);
-
-export default {
-  args: {
-    active: 0,
+export const OverviewProgressList: StoryObj = {
+  render: function Render() {
+    const structure = getDataEntryStructure(electionMockData);
+    return (
+      <ProgressList>
+        <ProgressList.Fixed>
+          {structure.map((section, i) => (
+            <ProgressList.OverviewItem
+              key={section.id}
+              status={i === 1 || i === 4 ? "warning" : "idle"}
+              addSpace={section.id === "political_group_votes_1"}
+            >
+              <span>{section.short_title}</span>
+            </ProgressList.OverviewItem>
+          ))}
+        </ProgressList.Fixed>
+      </ProgressList>
+    );
   },
-  argTypes: {
-    active: {
-      control: {
-        type: "number",
-        min: 0,
-        max: 9,
-      },
-    },
-  },
-} satisfies Meta<Props>;
+};

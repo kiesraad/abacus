@@ -114,7 +114,3 @@ __Hoofdscenario:__
 3. De coördinator GSB genereert het [PV en het digitale bestand](./input-output-bestanden.md#gsb).
 4. De coördinator GSB voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
 
-__Uitbreidingen:__  
-1a. Niet alle stembureaus hebben definitieve invoer:  
-
-2a. De invoer is nog niet compleet

@@ -265,10 +265,12 @@
     inset: 9pt,
     columns: range(0, cells).map(_ => 2em),
     align: (center, right),
-    ..range(0, cells - 1).map(_ => (
+    ..range(0, cells - 1)
+      .map(_ => (
         grid.cell(" "),
         grid.vline(stroke: (paint: black, thickness: 0.5pt, dash: "densely-dotted")),
-    )).flatten(),
+      ))
+      .flatten(),
     grid.cell(" "),
   )
 }
@@ -282,6 +284,7 @@
   continue_on_next_page: "",
   column_total: (c, v) => [#c: #v],
   sum_total: [(#columns)],
+  total_instruction: "",
 ) = {
   // Counter that keeps track of the column number
   let column = 0
@@ -344,22 +347,32 @@
           table.hline(stroke: 1pt + black),
           // Empty line
           table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 0pt, []),
-          table.cell(colspan: 3, fill: white, align: center, inset: 0pt, {
-            // Increment the column counter
-            column += 1
+          if column_total == function {
+            table.cell(colspan: 3, fill: white, align: center, {
+              // Increment the column counter
+              column += 1
 
-            // Caller defined render of column totals
-            if column_total == function {
+              // Caller defined render of column totals
               column_total(column, votes)
-            } else {
-              column_total
-              empty_grid()
-            }
 
-            // Reset the votes per column counter
-            votes = 0
-            column_row = 0
-          }),
+              // Reset the votes per column counter
+              votes = 0
+              column_row = 0
+            })
+          } else {
+            table.cell(colspan: 3, fill: white, inset: 0pt, {
+              column += 1
+
+              grid(
+                columns: (1fr, 10em),
+                grid.cell(inset: 9pt, align: center)[#column_total #column],
+                grid.cell(empty_grid(cells: 5)),
+              )
+
+              votes = 0
+              column_row = 0
+            })
+          },
         ),
       )
 
@@ -382,7 +395,7 @@
     }
   })
 
-  align(bottom, grid(
+  align(if total == none { left } else { bottom }, grid(
     columns: (1fr, 8em),
     align: (right, right),
     inset: 8pt,
@@ -398,6 +411,14 @@
       grid.cell(stroke: 0.5pt + black, fmt-number(total, zero: 0))
     },
   ))
+
+  if total == none {
+    align(right, text(
+      size: 10pt,
+      weight: "bold",
+      total_instruction,
+    ))
+  }
 
   pagebreak(weak: true)
 }

@@ -117,7 +117,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 #pagebreak(weak: true)
 
-== Uitgebranchte stemmen
+== Uitgebranchte stemmen <cast_votes>
 
 #if input.election.political_groups.len() > 0 [
   #sum(
@@ -198,5 +198,7 @@ _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
+    total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.]
   )
 }
+

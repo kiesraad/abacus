@@ -302,7 +302,7 @@
   let break_count = (25, 25, 15, 15)
   let total_rows = values.len()
 
-  text(size: 14pt, weight: "semibold", "Lijst " + title)
+  text(size: 14pt, weight: "semibold")[Lijst #title]
 
   set text(size: 8pt)
 
@@ -326,7 +326,7 @@
           column_row += 1
 
           (
-            table.cell(align: horizon, text(top-edge: 5pt, c.name)),
+            table.cell(align: horizon, text(top-edge: 5pt, [#c.name])),
             table.cell(fill: luma(213), align: center + horizon, text(
               number-width: "tabular",
               weight: "bold",
@@ -388,8 +388,7 @@
           place(top + left, scope: "parent", float: true, text(
             size: 14pt,
             weight: "semibold",
-            "Vervolg lijst " + title,
-          ))
+          )[Vervolg lijst #title])
         }
       }
     }
@@ -401,7 +400,7 @@
       columns: (1fr, 8em),
       align: (right, right),
       inset: 8pt,
-      grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(context range(
+      grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(range(
         1,
         column + 1,
       )
@@ -410,7 +409,7 @@
       if total == none {
         grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5))
       } else {
-        grid.cell(stroke: 0.5pt + black, fmt-number(total, zero: 0))
+        grid.cell(stroke: 0.5pt + black, fmt-number(total, zero: "0"))
       },
     ),
   )

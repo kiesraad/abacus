@@ -25,7 +25,7 @@ __Uitbreidingen:__
 
 2c. (DSO) Er zijn controles op de telresultaten van het stembureau uitgevoerd:  
 &emsp; 2c1. Het GSB vult het inlegvel in.  
-&emsp; 2c2. Het GSB voegt het inlegvel toe aan het proces verbaal.  
+&emsp; 2c2. Het GSB voegt het inlegvel toe aan het proces-verbaal.  
 
 2-3a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
 &emsp; 2-3a1. De coördinator GSB pauzeert de invoer.  
@@ -42,7 +42,7 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- Komt het inlegvel uit Abacus of is het onderdeel van de toolkit? (N10-1 wordt als typst template gemaakt dus het kan) -> kan beiden, afhankelijk van het proces en de mogelijkheden van de gemeente
+- Komt het inlegvel uit Abacus of is het onderdeel van de toolkit? (N10-1 wordt als typst template gemaakt dus het kan) -> kan beide, afhankelijk van het proces en de mogelijkheden van de gemeente
 - Hoe ziet het stoppen/blokkeren van invoer er precies uit?
 - CSO: invoerders vullen gegevens van Bijlage 1 in. DSO: invoerders vullen gegevens van N 10-1 en evt. Na 14-1 in. => input-/output-bestanden?
 

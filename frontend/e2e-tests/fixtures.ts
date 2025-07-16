@@ -29,6 +29,8 @@ export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
 // Regular fixtures need to be passed into the test's arguments.
 type Fixtures = {
   // page and request fixture for coordinator
+  adminOne: { page: Page; request: APIRequestContext };
+  // page and request fixture for coordinator
   coordinator: { page: Page; request: APIRequestContext };
   // page and request fixture for typist one
   typistOne: { page: Page; request: APIRequestContext };
@@ -59,6 +61,12 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
+  adminOne: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/admin.json" });
+    const page = await context.newPage();
+    await use({ page: page, request: context.request });
+    await context.close();
+  },
   coordinator: async ({ browser }, use) => {
     const context = await browser.newContext({ storageState: "e2e-tests/state/coordinator.json" });
     const page = await context.newPage();

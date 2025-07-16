@@ -340,7 +340,7 @@ async fn generate_polling_stations(
                     number_of_voters: Some(ps_num_voters.into()),
                     polling_station_type: Some(PollingStationType::FixedLocation),
                     address: abacus::test_data_gen::address(rng),
-                    postal_code: Some(abacus::test_data_gen::postal_code(rng)),
+                    postal_code: abacus::test_data_gen::postal_code(rng),
                     locality: abacus::test_data_gen::locality(rng).to_owned(),
                 },
             )

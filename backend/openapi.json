@@ -4522,6 +4522,7 @@
           "name",
           "number",
           "address",
+          "postal_code",
           "locality"
         ],
         "properties": {
@@ -4556,10 +4557,7 @@
             "$ref": "#/components/schemas/PollingStationType"
           },
           "postal_code": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           }
         }
       },
@@ -4571,6 +4569,7 @@
           "pollingStationName",
           "pollingStationNumber",
           "pollingStationAddress",
+          "pollingStationPostalCode",
           "pollingStationLocality"
         ],
         "properties": {
@@ -4605,10 +4604,7 @@
             "format": "int64"
           },
           "pollingStationPostalCode": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "pollingStationType": {
             "type": "string"
@@ -4637,6 +4633,7 @@
           "name",
           "number",
           "address",
+          "postal_code",
           "locality"
         ],
         "properties": {
@@ -4661,10 +4658,7 @@
             "$ref": "#/components/schemas/PollingStationType"
           },
           "postal_code": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           }
         }
       },

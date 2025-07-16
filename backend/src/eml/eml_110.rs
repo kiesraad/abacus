@@ -343,10 +343,8 @@ impl EML110 {
                                                 locality_type: None,
                                                 code: None,
                                             },
-                                            postal_code: ps.postal_code.as_ref().map(|code| {
-                                                PostalCode {
-                                                    postal_code_number: code.to_string(),
-                                                }
+                                            postal_code: Some(PostalCode {
+                                                postal_code_number: ps.postal_code.clone(),
                                             }),
                                         },
                                     },
@@ -476,8 +474,8 @@ impl TryInto<PollingStationRequest> for &PollingPlace {
             polling_station_type: None,
             address: "".to_string(),
             postal_code: match self.physical_location.address.locality.postal_code.clone() {
-                Some(code) => Some(code.postal_code_number),
-                None => None,
+                Some(code) => code.postal_code_number,
+                None => "".to_string(),
             },
             locality: "".to_string(),
         })

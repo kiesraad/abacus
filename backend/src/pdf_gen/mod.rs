@@ -47,7 +47,7 @@ pub(crate) mod tests {
                 },
                 polling_station_type: Some(PollingStationType::Special),
                 address: "Teststraat 2a".to_string(),
-                postal_code: Some("1234 QY".to_string()),
+                postal_code: "1234 QY".to_string(),
                 locality: "Testdorp".to_string(),
             });
         }

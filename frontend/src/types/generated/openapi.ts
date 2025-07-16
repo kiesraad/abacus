@@ -832,7 +832,7 @@ export interface PollingStation {
   number: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
-  postal_code?: string | null;
+  postal_code: string;
 }
 
 export interface PollingStationDetails {
@@ -843,7 +843,7 @@ export interface PollingStationDetails {
   pollingStationName: string;
   pollingStationNumber: number;
   pollingStationNumberOfVoters?: number | null;
-  pollingStationPostalCode?: string | null;
+  pollingStationPostalCode: string;
   pollingStationType?: string;
 }
 
@@ -864,7 +864,7 @@ export interface PollingStationRequest {
   number: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
-  postal_code?: string | null;
+  postal_code: string;
 }
 
 /**

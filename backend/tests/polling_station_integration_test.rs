@@ -59,7 +59,7 @@ async fn test_polling_station_creation(pool: SqlitePool) {
             number_of_voters: Some(426),
             polling_station_type: Some(PollingStationType::FixedLocation),
             address: "Teststraat 2a".to_string(),
-            postal_code: Some("1234 QY".to_string()),
+            postal_code: "1234 QY".to_string(),
             locality: "Heemdamseburg".to_string(),
         })
         .header("cookie", cookie)
@@ -120,7 +120,7 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
             number_of_voters: Some(2000),
             polling_station_type: Some(PollingStationType::Special),
             address: "Teststraat 2a".to_string(),
-            postal_code: Some("1234 QY".to_string()),
+            postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         })
         .header("cookie", &cookie)
@@ -153,7 +153,7 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
             number_of_voters: Some(2000),
             polling_station_type: None,
             address: "Teststraat 2a".to_string(),
-            postal_code: Some("1234 QY".to_string()),
+            postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         })
         .header("cookie", &cookie)
@@ -186,7 +186,7 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
             number_of_voters: Some(2000),
             polling_station_type: Some(PollingStationType::Special),
             address: "Teststraat 2a".to_string(),
-            postal_code: Some("1234 QY".to_string()),
+            postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         })
         .header("cookie", cookie)
@@ -317,7 +317,7 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
             number_of_voters: None,
             polling_station_type: Some(PollingStationType::FixedLocation),
             address: "Teststraat 2a".to_string(),
-            postal_code: Some("1234 QY".to_string()),
+            postal_code: "1234 QY".to_string(),
             locality: "Heemdamseburg".to_string(),
         })
         .header("cookie", cookie)

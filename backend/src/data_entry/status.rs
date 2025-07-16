@@ -720,7 +720,7 @@ mod tests {
             number_of_voters: None,
             polling_station_type: Some(PollingStationType::FixedLocation),
             address: "Test street".to_string(),
-            postal_code: "1234 YQ".to_string(),
+            postal_code: Some("1234 YQ".to_string()),
             locality: "Test city".to_string(),
         }
     }

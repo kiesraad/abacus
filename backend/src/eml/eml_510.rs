@@ -245,10 +245,10 @@ impl ReportingUnitVotes {
         ReportingUnitVotes {
             reporting_unit_identifier: ReportingUnitIdentifier {
                 id: format!("{authority_id}::SB{}", polling_station.number),
-                name: format!(
-                    "{} (postcode: {})",
-                    polling_station.name, polling_station.postal_code
-                ),
+                name: match &polling_station.postal_code {
+                    Some(code) => format!("{} (postcode: {})", polling_station.name, code),
+                    None => polling_station.name.to_string(),
+                },
             },
             selections: Selection::from_political_group_votes(
                 election,

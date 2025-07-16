@@ -72,7 +72,7 @@ pub struct PollingStationDetails {
     #[schema(nullable = false)]
     pub polling_station_type: Option<String>,
     pub polling_station_address: String,
-    pub polling_station_postal_code: String,
+    pub polling_station_postal_code: Option<String>,
     pub polling_station_locality: String,
 }
 

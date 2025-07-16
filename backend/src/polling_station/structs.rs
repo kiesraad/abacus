@@ -23,7 +23,7 @@ pub struct PollingStation {
     #[schema(nullable = false)]
     pub polling_station_type: Option<PollingStationType>,
     pub address: String,
-    pub postal_code: String,
+    pub postal_code: Option<String>,
     pub locality: String,
 }
 
@@ -62,7 +62,7 @@ pub struct PollingStationRequest {
     #[schema(nullable = false)]
     pub polling_station_type: Option<PollingStationType>,
     pub address: String,
-    pub postal_code: String,
+    pub postal_code: Option<String>,
     pub locality: String,
 }
 
@@ -103,7 +103,7 @@ pub(crate) mod tests {
             number_of_voters,
             polling_station_type: Some(PollingStationType::Special),
             address: "Teststraat 2a".to_string(),
-            postal_code: "1234 QY".to_string(),
+            postal_code: Some("1234 QY".to_string()),
             locality: "Testdorp".to_string(),
         }
     }

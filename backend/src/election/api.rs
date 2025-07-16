@@ -224,7 +224,7 @@ pub async fn election_import_validate(
 
     // parse and validate polling stations, and update number of voters
     let polling_stations;
-    if let Some(data) = edu.polling_station_data.clone() {
+    if let Some(data) = edu.polling_station_data {
         polling_stations = Some(EML110::from_str(&data)?.get_polling_stations()?);
         election = EML110::from_str(&data)?.update_number_of_voters(election)?;
     } else {
@@ -279,7 +279,7 @@ pub async fn election_import(
 
     // Process polling stations
     let mut polling_places = None;
-    if let Some(polling_station_data) = edu.polling_station_data.clone() {
+    if let Some(polling_station_data) = edu.polling_station_data {
         new_election =
             EML110::from_str(&polling_station_data)?.update_number_of_voters(new_election)?;
 

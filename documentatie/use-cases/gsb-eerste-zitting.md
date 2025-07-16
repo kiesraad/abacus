@@ -110,7 +110,7 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Hoofdscenario:__  
 1. De applicatie stelt vast dat alle stembureaus definitieve invoer hebben
-2. De coordinator GSB sluit de invoerfase af
+2. De coördinator GSB sluit de invoerfase af
 3. De coördinator GSB genereert het [PV en het digitale bestand](./input-output-bestanden.md#gsb).
 4. De coördinator GSB voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
 

@@ -3,7 +3,7 @@ import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite";
 import { IconPlus } from "@/components/generated/icons";
 
 import { Button } from "../Button/Button";
-import { Toolbar, ToolbarSection } from "./Toolbar";
+import { Toolbar } from "./Toolbar";
 
 type Props = {
   pos: "start" | "center" | "end";
@@ -28,11 +28,11 @@ export const BasicToolbar: StoryObj<Props> = {
 
 export const ExampleToolbar: StoryFn = () => (
   <Toolbar id="example-toolbar">
-    <ToolbarSection pos="start">
+    <Toolbar.Section pos="start">
       <Button variant="secondary" size="sm">
         Toolbar button
       </Button>
-    </ToolbarSection>
+    </Toolbar.Section>
     <Toolbar.Section pos="end">
       <Button leftIcon={<IconPlus />} variant="secondary" size="sm">
         Lijst exporteren

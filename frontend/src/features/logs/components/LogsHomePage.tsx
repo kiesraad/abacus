@@ -6,7 +6,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { Pagination } from "@/components/ui/Pagination/Pagination";
-import { Toolbar, ToolbarSection } from "@/components/ui/Toolbar/Toolbar";
+import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/i18n/translate";
 import { AuditLogEvent } from "@/types/generated/openapi";
 
@@ -59,7 +59,7 @@ export function LogsHomePage() {
         <article>
           <Toolbar>
             {!showFilter && (
-              <ToolbarSection>
+              <Toolbar.Section>
                 <Button
                   variant="secondary"
                   size="sm"
@@ -69,12 +69,12 @@ export function LogsHomePage() {
                 >
                   <IconFilter /> {t("log.action.filter")}
                 </Button>
-              </ToolbarSection>
+              </Toolbar.Section>
             )}
             {pagination && pagination.totalPages > 1 && (
-              <ToolbarSection pos="end">
+              <Toolbar.Section pos="end">
                 <Pagination page={pagination.page} totalPages={pagination.totalPages} onPageChange={onPageChange} />
-              </ToolbarSection>
+              </Toolbar.Section>
             )}
           </Toolbar>
           <LogsTable events={events} setDetails={setDetails} />

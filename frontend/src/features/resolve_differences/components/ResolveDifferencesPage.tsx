@@ -56,7 +56,7 @@ export function ResolveDifferencesPage() {
   const { getName } = useUsers();
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
-  if (committeeSession.status !== "data_entry_in_progress") {
+  if (committeeSession.status !== "data_entry_in_progress" && committeeSession.status !== "data_entry_paused") {
     throw new Error(t("error.api_error.CommitteeSessionNotInProgress"));
   }
 

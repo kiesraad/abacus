@@ -7,11 +7,12 @@ import { extendedPollingStationMockData } from "@/testing/api-mocks/PollingStati
 import { ElectionStatus } from "./ElectionStatus";
 
 interface StoryProps {
+  addLinks: boolean;
   navigate: (path: string) => void;
 }
 
 export const DefaultElectionStatus: StoryObj<StoryProps> = {
-  render: ({ navigate }) => {
+  render: ({ addLinks, navigate }) => {
     const today = new Date();
     today.setHours(10, 20);
 
@@ -74,6 +75,7 @@ export const DefaultElectionStatus: StoryObj<StoryProps> = {
         ]}
         election={electionMockData}
         pollingStations={extendedPollingStationMockData}
+        addLinks={addLinks}
         navigate={navigate}
       />
     );
@@ -81,16 +83,27 @@ export const DefaultElectionStatus: StoryObj<StoryProps> = {
 };
 
 export const Empty: StoryObj<StoryProps> = {
-  render: ({ navigate }) => (
-    <ElectionStatus statuses={[]} election={electionMockData} pollingStations={[]} navigate={navigate} />
+  render: ({ addLinks, navigate }) => (
+    <ElectionStatus
+      statuses={[]}
+      election={electionMockData}
+      pollingStations={[]}
+      addLinks={addLinks}
+      navigate={navigate}
+    />
   ),
 };
 
 export default {
   args: {
+    addLinks: true,
     navigate: fn(),
   },
   argTypes: {
+    addLinks: {
+      options: [true, false],
+      control: { type: "radio" },
+    },
     navigate: { action: "navigate" },
   },
   parameters: {

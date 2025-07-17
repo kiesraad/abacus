@@ -500,7 +500,9 @@ async fn polling_station_data_entry_get_errors(
         .get(polling_station_id, committee_session.id)
         .await?;
 
-    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
+    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
+        && committee_session.status != CommitteeSessionStatus::DataEntryPaused
+    {
         return Err(APIError::DataEntry(
             DataEntryTransitionError::CommitteeSessionNotInProgress,
         ));
@@ -562,7 +564,9 @@ async fn polling_station_data_entry_resolve_errors(
         .get_or_default(polling_station_id, committee_session.id)
         .await?;
 
-    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
+    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
+        && committee_session.status != CommitteeSessionStatus::DataEntryPaused
+    {
         return Err(APIError::DataEntry(
             DataEntryTransitionError::CommitteeSessionNotInProgress,
         ));
@@ -620,7 +624,9 @@ async fn polling_station_data_entry_get_differences(
         .get(polling_station_id, committee_session.id)
         .await?;
 
-    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
+    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
+        && committee_session.status != CommitteeSessionStatus::DataEntryPaused
+    {
         return Err(APIError::DataEntry(
             DataEntryTransitionError::CommitteeSessionNotInProgress,
         ));
@@ -679,7 +685,9 @@ async fn polling_station_data_entry_resolve_differences(
         .get_or_default(polling_station_id, committee_session.id)
         .await?;
 
-    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
+    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
+        && committee_session.status != CommitteeSessionStatus::DataEntryPaused
+    {
         return Err(APIError::DataEntry(
             DataEntryTransitionError::CommitteeSessionNotInProgress,
         ));

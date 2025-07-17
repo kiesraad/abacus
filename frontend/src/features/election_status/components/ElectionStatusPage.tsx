@@ -9,6 +9,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
 import { committeeSessionLabel } from "@/utils/committeeSession";
@@ -20,6 +21,7 @@ export function ElectionStatusPage() {
   const location = useLocation();
   const { committeeSession, election, pollingStations, refetch } = useElection();
   const { statuses } = useElectionStatus();
+  const { isCoordinator } = useUserRole();
   const { getName } = useUsers();
 
   // re-fetch election when component mounts
@@ -110,6 +112,10 @@ export function ElectionStatusPage() {
           election={election}
           pollingStations={pollingStations}
           statuses={statuses}
+          addLinks={
+            isCoordinator &&
+            (committeeSession.status === "data_entry_in_progress" || committeeSession.status === "data_entry_paused")
+          }
           navigate={(path) => void navigate(path)}
         />
       </main>

@@ -27,7 +27,9 @@ async function fillForm(user: UserEvent, testPollingStation: PollingStation | Om
   await user.type(inputs.number, testPollingStation.number.toString());
   await user.type(inputs.name, testPollingStation.name.toString());
   await user.type(inputs.address, testPollingStation.address.toString());
-  await user.type(inputs.postalCode, testPollingStation.postal_code.toString());
+  if (testPollingStation.postal_code) {
+    await user.type(inputs.postalCode, testPollingStation.postal_code.toString());
+  }
   await user.type(inputs.locality, testPollingStation.locality.toString());
   await user.type(inputs.numberOfVoters, String(testPollingStation.number_of_voters?.toString()));
 

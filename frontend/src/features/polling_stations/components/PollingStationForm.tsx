@@ -207,7 +207,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 fieldWidth="narrowest"
                 margin="mb-md-lg"
                 label={t("polling_station.postal_code")}
-                defaultValue={pollingStation?.postal_code}
+                defaultValue={pollingStation && pollingStation.postal_code ? pollingStation.postal_code : undefined}
                 error={validationResult.postal_code ? t(`form_errors.${validationResult.postal_code}`) : undefined}
               />
               <InputField

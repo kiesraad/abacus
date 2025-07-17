@@ -3732,6 +3732,7 @@
         "required": [
           "electionId",
           "electionName",
+          "electionCountingMethod",
           "electionElectionId",
           "electionLocation",
           "electionDomainId",
@@ -3743,6 +3744,9 @@
         ],
         "properties": {
           "electionCategory": {
+            "type": "string"
+          },
+          "electionCountingMethod": {
             "type": "string"
           },
           "electionDomainId": {

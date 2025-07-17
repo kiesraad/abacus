@@ -177,7 +177,7 @@ mod tests {
 
     /// Tests that polling station results with equal data and no differences counts are correctly identified as equal.
     #[test]
-    fn test_polling_station_results_comparison_equal_no_differences_counts() {
+    fn test_equal_no_differences_counts() {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             voters_counts: VotersCounts {
@@ -205,7 +205,7 @@ mod tests {
 
     /// Tests that polling station results with equal data and with differences counts are correctly identified as equal.
     #[test]
-    fn test_polling_station_results_comparison_equal_with_differences_counts() {
+    fn test_equal_with_differences_counts() {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             voters_counts: VotersCounts {
@@ -241,7 +241,7 @@ mod tests {
 
     /// Tests that polling station results with equal data and no differences counts are correctly identified as equal.
     #[test]
-    fn test_polling_station_results_comparison_equal_no_differences_counts_variant() {
+    fn test_equal_no_differences_counts_variant() {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             voters_counts: VotersCounts {
@@ -269,7 +269,7 @@ mod tests {
 
     /// Tests that polling station results with equal data and with differences counts are correctly identified as equal.
     #[test]
-    fn test_polling_station_results_comparison_equal_with_differences_counts_variant() {
+    fn test_equal_with_differences_counts_variant() {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             voters_counts: VotersCounts {
@@ -305,7 +305,7 @@ mod tests {
 
     /// Tests that polling station results with voters count differences are correctly identified as not equal.
     #[test]
-    fn test_polling_station_results_comparison_not_equal_voters_counts_differences() {
+    fn test_not_equal_voters_counts_differences() {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             voters_counts: VotersCounts {
@@ -333,7 +333,7 @@ mod tests {
 
     /// Tests that polling station results with voters count differences are correctly identified as not equal.
     #[test]
-    fn test_polling_station_results_comparison_not_equal_voters_counts_differences_variant() {
+    fn test_not_equal_voters_counts_differences_variant() {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             voters_counts: VotersCounts {
@@ -361,7 +361,7 @@ mod tests {
 
     /// Tests that polling station results with differences in differences counts are correctly identified as not equal.
     #[test]
-    fn test_polling_station_results_comparison_not_equal_differences_counts_differences() {
+    fn test_not_equal_differences_counts_differences() {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             voters_counts: VotersCounts {
@@ -418,8 +418,7 @@ mod tests {
 
     /// Tests that polling station results with differences in both voters counts and votes counts are correctly identified as not equal.
     #[test]
-    fn test_polling_station_results_comparison_not_equal_voters_counts_and_votes_counts_differences()
-     {
+    fn test_not_equal_voters_counts_and_votes_counts_differences() {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             voters_counts: VotersCounts {
@@ -482,7 +481,7 @@ mod tests {
 
     /// Tests that polling station results with differences in political group votes are correctly identified as not equal.
     #[test]
-    fn test_polling_station_results_comparison_not_equal_political_group_votes_differences() {
+    fn test_not_equal_political_group_votes_differences() {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             voters_counts: VotersCounts {

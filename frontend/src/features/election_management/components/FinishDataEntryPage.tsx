@@ -17,18 +17,16 @@ import { committeeSessionLabel } from "@/utils/committeeSession";
 import cls from "./ElectionManagement.module.css";
 
 export function FinishDataEntryPage() {
-  const { committeeSession } = useElection();
+  const { committeeSession, election, refetch } = useElection();
   const client = useApiClient();
   const navigate = useNavigate();
 
   useEffect(() => {
     // Redirect to report download if committee session data entry phase is already finished
     if (committeeSession.status === "data_entry_finished") {
-      // TODO: download is added twice to the url
-      void navigate("download");
-      return;
+      void navigate(`/elections/${election.id}/report/download`);
     }
-  }, [committeeSession, navigate]);
+  }, [committeeSession, election, navigate]);
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
   if (committeeSession.status === "created" || committeeSession.status === "data_entry_not_started") {
@@ -38,9 +36,8 @@ export function FinishDataEntryPage() {
   function handleFinish() {
     const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
-    void client.putRequest(url, body).then(() => {
-      // TODO: The navigate is too fast and the report download page shows the error
-      void navigate("download");
+    void client.putRequest(url, body).then(async () => {
+      await refetch();
     });
   }
 

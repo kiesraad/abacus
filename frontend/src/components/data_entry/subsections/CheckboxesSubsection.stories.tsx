@@ -10,8 +10,8 @@ import { CheckboxesSubsectionComponent } from "./CheckboxesSubsection";
 const checkboxesSubsection: CheckboxesSubsection = {
   type: "checkboxes",
   short_title: "voters_votes_counts.short_title",
-  error_path: "recounted",
-  error_message: "recounted.error",
+  error_path: "voters_counts.poll_card_count",
+  error_message: "form_errors.FORM_VALIDATION_RESULT_REQUIRED",
   options: [
     {
       path: "voters_counts.poll_card_count",
@@ -22,11 +22,6 @@ const checkboxesSubsection: CheckboxesSubsection = {
       path: "voters_counts.proxy_certificate_count",
       label: "voters_votes_counts.voters_counts.proxy_certificate_count",
       short_label: "voters_votes_counts.voters_counts.proxy_certificate_count",
-    },
-    {
-      path: "voters_counts.voter_card_count",
-      label: "voters_votes_counts.voters_counts.voter_card_count",
-      short_label: "voters_votes_counts.voters_counts.voter_card_count",
     },
   ],
 };
@@ -52,7 +47,7 @@ const meta = {
       options: ["no errors or warnings", "error"],
       mapping: {
         "no errors or warnings": undefined,
-        error: new Map([["data.recounted", "error"]]),
+        error: new Map([["data.voters_counts.poll_card_count", "error"]]),
       },
     },
   },
@@ -77,11 +72,10 @@ export const Checkboxes: Story = {
   play: async ({ canvas, step }) => {
     await step("Test initial state", async () => {
       const checkboxes = canvas.getAllByRole("checkbox");
-      await expect(checkboxes).toHaveLength(3);
+      await expect(checkboxes).toHaveLength(2);
 
       await expect(checkboxes[0]).not.toBeChecked();
       await expect(checkboxes[1]).toBeChecked();
-      await expect(checkboxes[2]).not.toBeChecked();
     });
 
     await step("Test checkbox interactions", async () => {
@@ -92,7 +86,6 @@ export const Checkboxes: Story = {
 
       await expect(checkboxes[0]).toBeChecked();
       await expect(checkboxes[1]).not.toBeChecked();
-      await expect(checkboxes[2]).toBeChecked();
     });
 
     await step("Reset to initial state", async () => {
@@ -103,7 +96,6 @@ export const Checkboxes: Story = {
 
       await expect(checkboxes[0]).not.toBeChecked();
       await expect(checkboxes[1]).toBeChecked();
-      await expect(checkboxes[2]).not.toBeChecked();
     });
   },
 };

@@ -11,7 +11,6 @@ describe("Resolve differences, differences util", () => {
   const structure = getDataEntryStructureForDifferences(electionMockData, first, second);
 
   test.each([
-    { sectionId: "recounted", expected: true },
     { sectionId: "voters_votes_counts", expected: true },
     { sectionId: "differences_counts", expected: false },
     { sectionId: "political_group_votes_1", expected: true },

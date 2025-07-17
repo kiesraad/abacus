@@ -6,7 +6,6 @@
   "voters_counts": {
     "poll_card_count": "Stempassen",
     "proxy_certificate_count": "Volmachtbewijzen",
-    "voter_card_count": "Kiezerspassen",
     "total_admitted_voters_count": "Totaal toegelaten kiezers"
   },
   "votes_counts": {
@@ -18,7 +17,6 @@
   "voters_recounts": {
     "poll_card_count": "Stempassen",
     "proxy_certificate_count": "Volmachtbewijzen",
-    "voter_card_count": "Kiezerspassen",
     "total_admitted_voters_count": "Totaal toegelaten kiezers"
   }
 }

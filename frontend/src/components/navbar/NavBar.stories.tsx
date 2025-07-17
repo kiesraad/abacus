@@ -23,7 +23,7 @@ const locations: { pathname: string; userRole: Role }[] = [
   { pathname: "/elections/1", userRole: "typist" },
   { pathname: "/elections/1/data-entry", userRole: "typist" },
   { pathname: "/elections/1/data-entry/1/1", userRole: "typist" },
-  { pathname: "/elections/1/data-entry/1/1/recounted", userRole: "typist" },
+  { pathname: "/elections/1/data-entry/1/1/voters-votes-counts", userRole: "typist" },
   { pathname: "/elections/1/data-entry/1/1/voters-and-votes", userRole: "typist" },
   { pathname: "/elections/1/data-entry/1/1/list/1", userRole: "typist" },
   { pathname: "/elections/1/data-entry/1/1/save", userRole: "typist" },

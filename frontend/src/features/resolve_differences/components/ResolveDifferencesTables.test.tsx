@@ -1,10 +1,9 @@
 import { describe, expect, test } from "vitest";
 
-import { t } from "@/i18n/translate";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { render, screen } from "@/testing/test-utils";
 import { PollingStationResults } from "@/types/generated/openapi";
-import { DataEntrySection, PollingStationResultsPath } from "@/types/types";
+import { DataEntrySection, FormSectionId, PollingStationResultsPath } from "@/types/types";
 import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
@@ -18,15 +17,6 @@ describe("ResolveDifferencesTables", () => {
   test("renders the resolve differences tables", async () => {
     render(<ResolveDifferencesTables first={first} second={second} structure={structure} />);
 
-    const recountedTable = await screen.findByRole("table", {
-      name: "Is het selectievakje op de eerste pagina aangevinkt?",
-    });
-    expect(recountedTable).toBeVisible();
-    expect(recountedTable).toHaveTableContent([
-      ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
-      ["", "Ja", "Nee", "Is er herteld?"],
-    ]);
-
     const votersVotesCountsTable = await screen.findByRole("table", {
       name: "Toegelaten kiezers en uitgebrachte stemmen",
     });
@@ -36,18 +26,6 @@ describe("ResolveDifferencesTables", () => {
       ["E", "42", "44", "Stemmen op kandidaten"],
       [""],
       ["H", "42", "44", "Totaal uitgebrachte stemmen"],
-    ]);
-
-    const votersVotesRecountsTable = await screen.findByRole("table", {
-      name: "Toegelaten kiezers na hertelling door Gemeentelijk Stembureau",
-    });
-    expect(votersVotesRecountsTable).toBeVisible();
-    expect(votersVotesRecountsTable).toHaveTableContent([
-      ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
-      ["A.2", "43", "—", "Stempassen"],
-      ["B.2", "1", "—", "Volmachtbewijzen"],
-      [""],
-      ["D.2", "44", "—", "Totaal toegelaten kiezers"],
     ]);
 
     const differencesCountsTable = screen.queryByRole("table", {
@@ -82,26 +60,25 @@ describe("ResolveDifferencesTables", () => {
     // Helper function to create a checkbox section for testing
     const createCheckboxesSection = (): DataEntrySection => {
       return {
-        id: "recounted",
-        title: "recounted",
-        short_title: "recounted",
+        id: "test" as FormSectionId,
+        title: "test",
+        short_title: "test",
         subsections: [
           {
             type: "checkboxes",
-            short_title: t("recounted.short_title"),
-            error_path: "recounted",
+            short_title: "short title",
+            error_path: "test" as PollingStationResultsPath,
             error_message: "recounted.error",
             options: [
-              // fake paths for testing, real PollingStationResults has only one boolean
               {
-                path: "recounted.yes" as PollingStationResultsPath,
-                label: t("recounted.yes"),
-                short_label: t("recounted.yes"),
+                path: "test.yes" as PollingStationResultsPath,
+                label: "yes",
+                short_label: "yes",
               },
               {
-                path: "recounted.no" as PollingStationResultsPath,
-                label: t("recounted.no"),
-                short_label: t("recounted.no"),
+                path: "test.no" as PollingStationResultsPath,
+                label: "no",
+                short_label: "no",
               },
             ],
           },
@@ -111,7 +88,7 @@ describe("ResolveDifferencesTables", () => {
 
     const createFirstResults = () =>
       ({
-        recounted: {
+        test: {
           yes: true,
           no: false,
         },
@@ -119,7 +96,7 @@ describe("ResolveDifferencesTables", () => {
 
     const createSecondResults = () =>
       ({
-        recounted: {
+        test: {
           yes: false,
           no: true,
         },
@@ -136,7 +113,7 @@ describe("ResolveDifferencesTables", () => {
         />,
       );
 
-      const table = screen.queryByRole("table", { name: "recounted" });
+      const table = screen.queryByRole("table", { name: "test" });
       expect(table).not.toBeInTheDocument();
     });
 
@@ -151,10 +128,10 @@ describe("ResolveDifferencesTables", () => {
         />,
       );
 
-      const table = screen.queryByRole("table", { name: "recounted" });
+      const table = screen.queryByRole("table", { name: "test" });
       expect(table).toHaveTableContent([
         ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
-        ["", "Ja", "Nee", "Is er herteld?"],
+        ["", "yes", "no", "short title"],
       ]);
     });
 
@@ -162,14 +139,14 @@ describe("ResolveDifferencesTables", () => {
       const checkboxSection = createCheckboxesSection();
 
       const firstResults = {
-        recounted: {
+        test: {
           yes: true,
           no: true,
         },
       } as unknown as PollingStationResults;
 
       const secondResults = {
-        recounted: {
+        test: {
           yes: false,
           no: false,
         },
@@ -177,10 +154,10 @@ describe("ResolveDifferencesTables", () => {
 
       render(<ResolveDifferencesTables first={firstResults} second={secondResults} structure={[checkboxSection]} />);
 
-      const table = screen.queryByRole("table", { name: "recounted" });
+      const table = screen.queryByRole("table", { name: "test" });
       expect(table).toHaveTableContent([
         ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
-        ["", "Ja, Nee", "-", "Is er herteld?"],
+        ["", "yes, no", "-", "short title"],
       ]);
     });
   });

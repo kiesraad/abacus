@@ -30,11 +30,9 @@ export function _getInitialValues(
   defaultValues?: Partial<PollingStationResults>,
 ): PollingStationResults {
   return {
-    recounted: undefined,
     voters_counts: {
       poll_card_count: 0,
       proxy_certificate_count: 0,
-      voter_card_count: 0,
       total_admitted_voters_count: 0,
     },
     votes_counts: {
@@ -43,7 +41,6 @@ export function _getInitialValues(
       invalid_votes_count: 0,
       total_votes_cast_count: 0,
     },
-    voters_recounts: undefined,
     differences_counts: {
       more_ballots_count: 0,
       fewer_ballots_count: 0,
@@ -121,9 +118,9 @@ test("should handle SET_CACHE", () => {
   const action: DataEntryAction = {
     type: "SET_CACHE",
     cache: {
-      key: "recounted",
+      key: "voters_votes_counts",
       data: {
-        recounted: "true",
+        "voters_counts.poll_card_count": "100",
       },
     },
   };
@@ -174,7 +171,7 @@ test("should handle FORM_SAVED", () => {
       errors: [],
       warnings: [],
     },
-    sectionId: "recounted",
+    sectionId: "voters_votes_counts",
     aborting: false,
     continueToNextSection: true,
   };
@@ -183,7 +180,7 @@ test("should handle FORM_SAVED", () => {
   expect(state.error).toBeNull();
   expect(state.pollingStationResults).toEqual(action.data);
   expect(state.targetFormSectionId).toBeDefined();
-  expect(state.targetFormSectionId).toEqual("voters_votes_counts");
+  expect(state.targetFormSectionId).toEqual("differences_counts");
 });
 
 test("should handle RESET_TARGET_FORM_SECTION", () => {
@@ -205,7 +202,7 @@ describe("onSubmitForm", () => {
 
     const submit = onSubmitForm(client, "", dispatch, getDefaultDataEntryState());
 
-    const result = await submit("recounted", {}, { showAcceptErrorsAndWarnings: true });
+    const result = await submit("voters_votes_counts", {}, { showAcceptErrorsAndWarnings: true });
     expect(result).toBe(false);
     expect(dispatch).toHaveBeenCalledTimes(0);
   });
@@ -253,7 +250,6 @@ describe("onSubmitForm", () => {
         data: {
           "voters_counts.poll_card_count": "1",
           "voters_counts.proxy_certificate_count": "2",
-          "voters_counts.voter_card_count": "3",
           "voters_counts.total_admitted_voters_count": "4",
           "votes_counts.votes_candidates_count": "5",
           "votes_counts.blank_votes_count": "6",
@@ -289,7 +285,6 @@ describe("onSubmitForm", () => {
       voters_counts: {
         poll_card_count: 1,
         proxy_certificate_count: 2,
-        voter_card_count: 3,
         total_admitted_voters_count: 4,
       },
       votes_counts: {

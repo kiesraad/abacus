@@ -4,8 +4,7 @@
     "voters_counts": {
       "poll_card_count": "Stempassen",
       "proxy_certificate_count": "Volmachtbewijzen",
-      "total_admitted_voters_count": "Totaal toegelaten kiezers",
-      "voter_card_count": "Kiezerspassen"
+      "total_admitted_voters_count": "Totaal toegelaten kiezers"
     },
     "votes_counts": {
       "blank_votes_count": "Blanco stemmen",
@@ -16,8 +15,7 @@
     "voters_recounts": {
       "poll_card_count": "Stempassen",
       "proxy_certificate_count": "Volmachtbewijzen",
-      "total_admitted_voters_count": "Totaal toegelaten kiezers",
-      "voter_card_count": "Kiezerspassen"
+      "total_admitted_voters_count": "Totaal toegelaten kiezers"
     },
     "differences_counts": {
       "fewer_ballots_count": "Stembiljetten minder geteld",

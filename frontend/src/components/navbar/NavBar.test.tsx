@@ -63,7 +63,7 @@ describe("NavBar", () => {
 
   test.each([
     { pathname: "/elections/1/data-entry/1/1" },
-    { pathname: "/elections/1/data-entry/1/1/recounted" },
+    { pathname: "/elections/1/data-entry/1/1/voters-votes-counts" },
     { pathname: "/elections/1/data-entry/1/1/voters-and-votes" },
     { pathname: "/elections/1/data-entry/1/1/list/1" },
     { pathname: "/elections/1/data-entry/1/1/save" },

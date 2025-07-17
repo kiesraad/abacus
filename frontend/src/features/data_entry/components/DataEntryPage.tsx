@@ -20,8 +20,13 @@ import { DataEntrySection } from "./DataEntrySection";
 export function DataEntryPage() {
   const pollingStationId = useNumericParam("pollingStationId");
   const entryNumber = useNumericParam("entryNumber");
-  const { election, pollingStation } = useElection(pollingStationId);
+  const { committeeSession, election, pollingStation } = useElection(pollingStationId);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
+
+  // Safeguard so users cannot circumvent the check via the browser's address bar
+  if (committeeSession.status !== "data_entry_in_progress") {
+    throw new Error(t("error.api_error.CommitteeSessionNotInProgress"));
+  }
 
   if (!pollingStation) {
     throw new NotFoundError("error.polling_station_not_found");

@@ -184,9 +184,9 @@ pub async fn committee_session_status_change(
 
 #[cfg(test)]
 pub mod tests {
-    use crate::committee_session::status::CommitteeSessionStatus;
     use crate::committee_session::{
         CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
+        status::CommitteeSessionStatus,
     };
     use sqlx::SqlitePool;
 

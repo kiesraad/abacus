@@ -6,6 +6,7 @@ import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
+import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
@@ -51,7 +52,13 @@ export function ResolveDifferencesPage() {
     onSubmit,
     validationError,
   } = usePollingStationDataEntryDifferences(pollingStationId, afterSave);
+  const { committeeSession } = useElection();
   const { getName } = useUsers();
+
+  // Safeguard so users cannot circumvent the check via the browser's address bar
+  if (committeeSession.status !== "data_entry_in_progress") {
+    throw new Error(t("error.api_error.CommitteeSessionNotInProgress"));
+  }
 
   if (loading || differences === null || dataEntryStructure === null) {
     return <Loader />;

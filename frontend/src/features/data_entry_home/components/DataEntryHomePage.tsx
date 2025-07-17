@@ -15,7 +15,7 @@ import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { election, pollingStations } = useElection();
+  const { committeeSession, election, pollingStations } = useElection();
   const { statuses, refetch } = useElectionStatus();
 
   // re-fetch statuses when component mounts
@@ -28,6 +28,11 @@ export function DataEntryHomePage() {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
   }, [refetch]);
+
+  // Safeguard so users cannot circumvent the check via the browser's address bar
+  if (committeeSession.status !== "data_entry_in_progress") {
+    throw new Error(t("error.api_error.CommitteeSessionNotInProgress"));
+  }
 
   const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved") ? location.hash : null;
   const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved") ? location.hash : null;

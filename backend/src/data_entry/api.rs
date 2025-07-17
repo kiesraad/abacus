@@ -770,11 +770,10 @@ pub mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::committee_session::tests::change_status_committee_session;
     use crate::{
         audit_log::AuditLog,
         authentication::Role,
-        committee_session::tests::create_committee_session,
+        committee_session::tests::{change_status_committee_session, create_committee_session},
         data_entry::{DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts},
     };
 

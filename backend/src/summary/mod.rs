@@ -101,7 +101,7 @@ impl ElectionSummary {
                 ));
             }
 
-            // add voters and votes to the total, using the voters recount if available
+            // add voters and votes to the total
             totals.voters_counts += &result.voters_counts;
             totals.votes_counts += &result.votes_counts;
 

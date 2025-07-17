@@ -57,11 +57,9 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
 
     let request_body = json!({
       "data": {
-        "recounted": false,
         "voters_counts": {
-          "poll_card_count": 1,
+          "poll_card_count": 4,
           "proxy_certificate_count": 2,
-          "voter_card_count": 3,
           "total_admitted_voters_count": 4
         },
         "votes_counts": {
@@ -70,7 +68,6 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
           "invalid_votes_count": 7,
           "total_votes_cast_count": 8
         },
-        "voters_recounts": null,
         "differences_counts": {
           "more_ballots_count": 4,
           "fewer_ballots_count": 0,
@@ -136,7 +133,6 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         vec![
             "data.voters_counts.poll_card_count",
             "data.voters_counts.proxy_certificate_count",
-            "data.voters_counts.voter_card_count",
             "data.voters_counts.total_admitted_voters_count",
         ]
     );

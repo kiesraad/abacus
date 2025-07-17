@@ -58,12 +58,12 @@ describe("DataEntrySection", () => {
 
     test.each([
       {
-        sectionId: "recounted",
-        expectedTitle: "Is het selectievakje op de eerste pagina aangevinkt?",
-      },
-      {
         sectionId: "political_group_votes_1",
         expectedTitle: "Lijst 1 - Vurige Vleugels Partij",
+      },
+      {
+        sectionId: "political_group_votes_2",
+        expectedTitle: "Lijst 2 - Wijzen van Water en Wind",
       },
     ])("does not display badge for $sectionId", async ({ sectionId, expectedTitle }) => {
       renderComponent(sectionId);

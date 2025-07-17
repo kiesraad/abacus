@@ -51,11 +51,9 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     DataEntry {
         progress: 60,
         data: PollingStationResults {
-            recounted: Some(false),
             voters_counts: VotersCounts {
-                poll_card_count: 100,
+                poll_card_count: 102,
                 proxy_certificate_count: 2,
-                voter_card_count: 2,
                 total_admitted_voters_count: 104,
             },
             votes_counts: VotesCounts {
@@ -64,7 +62,6 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,
             },
-            voters_recounts: None,
             differences_counts: differences_counts_zero(),
             political_group_votes: vec![
                 political_group_votes_from_test_data_auto(1, &[40, 20]),

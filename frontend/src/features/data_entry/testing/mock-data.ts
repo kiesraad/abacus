@@ -15,7 +15,6 @@ export function getInitialValues(): PollingStationResults {
     voters_counts: {
       poll_card_count: 0,
       proxy_certificate_count: 0,
-      voter_card_count: 0,
       total_admitted_voters_count: 0,
     },
     votes_counts: {
@@ -70,16 +69,15 @@ export function getDefaultDataEntryState(): DataEntryState {
     entryNumber: 1,
     dataEntryStructure: getDataEntryStructure(electionMockData),
     formState: {
-      furthest: "recounted",
+      furthest: "voters_votes_counts",
       sections: {
-        recounted: getDefaultFormSection("recounted", 1),
-        voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
-        differences_counts: getDefaultFormSection("differences_counts", 3),
-        political_group_votes_1: getDefaultFormSection("political_group_votes_1", 4),
-        save: getDefaultFormSection("save", 5),
+        voters_votes_counts: getDefaultFormSection("voters_votes_counts", 0),
+        differences_counts: getDefaultFormSection("differences_counts", 1),
+        political_group_votes_1: getDefaultFormSection("political_group_votes_1", 2),
+        save: getDefaultFormSection("save", 3),
       },
     },
-    targetFormSectionId: "recounted",
+    targetFormSectionId: "voters_votes_counts",
     status: "idle",
     cache: null,
   };

@@ -32,18 +32,16 @@ function getDefaultFormState(): FormState {
   return {
     furthest: "save",
     sections: {
-      recounted: getDefaultFormSection("recounted", 1),
-      voters_votes_counts: getDefaultFormSection("voters_votes_counts", 2),
-      differences_counts: getDefaultFormSection("differences_counts", 3),
-      political_group_votes_1: getDefaultFormSection("political_group_votes_1", 4),
-      political_group_votes_2: getDefaultFormSection("political_group_votes_2", 5),
-      save: getDefaultFormSection("save", 6),
+      voters_votes_counts: getDefaultFormSection("voters_votes_counts", 1),
+      differences_counts: getDefaultFormSection("differences_counts", 2),
+      political_group_votes_1: getDefaultFormSection("political_group_votes_1", 3),
+      political_group_votes_2: getDefaultFormSection("political_group_votes_2", 4),
+      save: getDefaultFormSection("save", 5),
     },
   };
 }
 
 const pollingStationResults = {
-  recounted: false,
   differences_counts: {
     more_ballots_count: 5,
     fewer_ballots_count: 0,
@@ -86,32 +84,26 @@ describe("Test DataEntryProgress", () => {
       pollingStationResults: pollingStationResults,
       continueToNextSection: false,
       validationResults: {
-        errors: [validationResultMockData.F101],
+        errors: [validationResultMockData.F201],
         warnings: [validationResultMockData.W201, validationResultMockData.W301],
       },
     });
     renderForm();
 
     await waitFor(() => {
-      expect(screen.getByText("Is er herteld?")).toBeVisible();
+      expect(screen.getByText("Aantal kiezers en stemmen")).toBeVisible();
     });
 
-    const recounted = screen.getByTestId("list-item-recounted");
     const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
     const differences = screen.getByTestId("list-item-differences_counts");
     const list1 = screen.getByTestId("list-item-political_group_votes_1");
     const list2 = screen.getByTestId("list-item-political_group_votes_2");
     const checkAndSave = screen.getByTestId("list-item-save");
 
-    expect(recounted).toHaveClass("error");
-    expect(recounted).toHaveAttribute("aria-current", "false");
-    const recountedIcon = within(recounted).getByRole("img");
-    expect(recountedIcon).toHaveAccessibleName("bevat een fout");
-
-    expect(votersAndVotes).toHaveClass("warning");
+    expect(votersAndVotes).toHaveClass("error");
     expect(votersAndVotes).toHaveAttribute("aria-current", "false");
-    const votersAndVotesicon = within(votersAndVotes).getByRole("img");
-    expect(votersAndVotesicon).toHaveAccessibleName("bevat een waarschuwing");
+    const votersAndVotesIcon = within(votersAndVotes).getByRole("img");
+    expect(votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
 
     expect(differences).toHaveClass("accept");
     expect(differences).toHaveAttribute("aria-current", "false");
@@ -154,7 +146,7 @@ describe("Test DataEntryProgress", () => {
     renderForm();
 
     await waitFor(() => {
-      expect(screen.getByText("Is er herteld?")).toBeVisible();
+      expect(screen.getByText("Aantal kiezers en stemmen")).toBeVisible();
     });
 
     const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
@@ -180,10 +172,9 @@ describe("Test DataEntryProgress", () => {
     renderForm();
 
     await waitFor(() => {
-      expect(screen.getByText("Is er herteld?")).toBeVisible();
+      expect(screen.getByText("Aantal kiezers en stemmen")).toBeVisible();
     });
 
-    const recounted = screen.getByTestId("list-item-recounted");
     const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
     const differences = screen.getByTestId("list-item-differences_counts");
     const list1 = screen.getByTestId("list-item-political_group_votes_1");
@@ -191,13 +182,6 @@ describe("Test DataEntryProgress", () => {
     const electionId = 1;
     const pollingStationId = 1;
     const entryNumber = 1;
-
-    const recountedLink = within(recounted).getByRole("link", { name: "Is er herteld?" });
-    expect(recountedLink).toBeVisible();
-    expect(recountedLink).toHaveAttribute(
-      "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/recounted`,
-    );
 
     const votersAndVotesLink = within(votersAndVotes).getByRole("link", { name: "Aantal kiezers en stemmen" });
     expect(votersAndVotesLink).toBeVisible();
@@ -236,7 +220,7 @@ describe("Test DataEntryProgress", () => {
     renderForm();
 
     await waitFor(() => {
-      expect(screen.getByText("Is er herteld?")).toBeVisible();
+      expect(screen.getByText("Aantal kiezers en stemmen")).toBeVisible();
     });
 
     const list1 = screen.getByTestId("list-item-political_group_votes_1");
@@ -280,7 +264,7 @@ describe("Test DataEntryProgress", () => {
     renderForm();
 
     await waitFor(() => {
-      expect(screen.getByText("Is er herteld?")).toBeVisible();
+      expect(screen.getByText("Aantal kiezers en stemmen")).toBeVisible();
     });
 
     const list1 = screen.getByTestId("list-item-political_group_votes_1");

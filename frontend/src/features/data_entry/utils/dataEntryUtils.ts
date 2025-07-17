@@ -68,8 +68,6 @@ export function isFormSectionEmpty(section: FormSection, values: PollingStationR
       );
     case "differences_counts":
       return objectHasOnlyEmptyValues({ ...values.differences_counts });
-    case "recounted":
-      return values.recounted === undefined;
     default:
       return true;
   }

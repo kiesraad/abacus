@@ -21,8 +21,6 @@ pub struct ElectionSummary {
     pub votes_counts: VotesCounts,
     /// The differences between voters and votes
     pub differences_counts: SummaryDifferencesCounts,
-    /// A list of polling stations that were recounted
-    pub recounted_polling_stations: Vec<i64>,
     /// The summary votes for each political group (and each candidate within)
     pub political_group_votes: Vec<PoliticalGroupVotes>,
 }
@@ -34,7 +32,6 @@ impl ElectionSummary {
             voters_counts: VotersCounts {
                 poll_card_count: 0,
                 proxy_certificate_count: 0,
-                voter_card_count: 0,
                 total_admitted_voters_count: 0,
             },
             votes_counts: VotesCounts {
@@ -44,7 +41,6 @@ impl ElectionSummary {
                 total_votes_cast_count: 0,
             },
             differences_counts: SummaryDifferencesCounts::zero(),
-            recounted_polling_stations: vec![],
             political_group_votes: vec![],
         }
     }
@@ -105,21 +101,14 @@ impl ElectionSummary {
                 ));
             }
 
-            // add voters and votes to the total, using the voters recount if available
-            totals.voters_counts += result.latest_voters_counts();
+            // add voters and votes to the total
+            totals.voters_counts += &result.voters_counts;
             totals.votes_counts += &result.votes_counts;
 
             // add any differences noted to the total
             totals
                 .differences_counts
                 .add_polling_station_results(polling_station, &result.differences_counts);
-
-            // if this polling station was recounted, add it to the list
-            if result.recounted == Some(true) {
-                totals
-                    .recounted_polling_stations
-                    .push(polling_station.number);
-            }
 
             // add votes for each political group to the total
             for pg in result.political_group_votes.iter() {
@@ -230,11 +219,9 @@ mod tests {
 
     fn polling_station_results_fixture_a() -> PollingStationResults {
         PollingStationResults {
-            recounted: Some(false),
             voters_counts: VotersCounts {
-                poll_card_count: 20,
+                poll_card_count: 30,
                 proxy_certificate_count: 5,
-                voter_card_count: 10,
                 total_admitted_voters_count: 35,
             },
             votes_counts: VotesCounts {
@@ -243,7 +230,6 @@ mod tests {
                 invalid_votes_count: 3,
                 total_votes_cast_count: 36,
             },
-            voters_recounts: None,
             differences_counts: {
                 let mut tmp = DifferencesCounts::zero();
                 tmp.more_ballots_count = 1;
@@ -258,11 +244,9 @@ mod tests {
 
     fn polling_station_results_fixture_b() -> PollingStationResults {
         PollingStationResults {
-            recounted: Some(false),
             voters_counts: VotersCounts {
-                poll_card_count: 39,
+                poll_card_count: 49,
                 proxy_certificate_count: 1,
-                voter_card_count: 10,
                 total_admitted_voters_count: 50,
             },
             votes_counts: VotesCounts {
@@ -271,7 +255,6 @@ mod tests {
                 invalid_votes_count: 0,
                 total_votes_cast_count: 48,
             },
-            voters_recounts: None,
             differences_counts: {
                 let mut tmp = DifferencesCounts::zero();
                 tmp.fewer_ballots_count = 2;
@@ -325,9 +308,6 @@ mod tests {
         ];
         let totals = ElectionSummary::from_results(&election, &results).unwrap();
 
-        // check that the recounted polling stations list is empty
-        assert!(totals.recounted_polling_stations.is_empty());
-
         // check values in the differences counts
         assert_eq!(totals.differences_counts.more_ballots_count.count, 1);
         // should be ps1 number in here
@@ -360,9 +340,8 @@ mod tests {
 
         // tests for voters counts
         assert_eq!(totals.voters_counts.total_admitted_voters_count, 85);
-        assert_eq!(totals.voters_counts.poll_card_count, 59);
+        assert_eq!(totals.voters_counts.poll_card_count, 79);
         assert_eq!(totals.voters_counts.proxy_certificate_count, 6);
-        assert_eq!(totals.voters_counts.voter_card_count, 20);
 
         // tests for votes counts
         assert_eq!(totals.votes_counts.total_votes_cast_count, 84);
@@ -389,44 +368,9 @@ mod tests {
     }
 
     #[test]
-    fn test_voters_recounts_addition() {
-        let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
-        let ps1_results = polling_station_results_fixture_a();
-        let mut ps2_results = polling_station_results_fixture_b();
-
-        ps2_results.recounted = Some(true);
-        ps2_results.voters_counts = VotersCounts {
-            poll_card_count: 50,
-            proxy_certificate_count: 0,
-            voter_card_count: 0,
-            total_admitted_voters_count: 50,
-        };
-        ps2_results.voters_recounts = Some(VotersCounts {
-            poll_card_count: 48,
-            proxy_certificate_count: 1,
-            voter_card_count: 1,
-            total_admitted_voters_count: 50,
-        });
-
-        let results = vec![(ps[0].clone(), ps1_results), (ps[1].clone(), ps2_results)];
-        let totals = ElectionSummary::from_results(&election, &results).unwrap();
-
-        // check that the recounted polling stations list is complete
-        assert_eq!(totals.recounted_polling_stations, vec![32]);
-
-        // check that the voters_recounts are added to voters_counts in the totals
-        assert_eq!(totals.voters_counts.poll_card_count, 68);
-        assert_eq!(totals.voters_counts.proxy_certificate_count, 6);
-        assert_eq!(totals.voters_counts.voter_card_count, 11);
-        assert_eq!(totals.voters_counts.total_admitted_voters_count, 85);
-    }
-
-    #[test]
     fn test_adding_zero_polling_stations() {
         let election = election_fixture(&[10, 20, 18]);
         let totals = ElectionSummary::from_results(&election, &[]).unwrap();
-        assert_eq!(totals.recounted_polling_stations, Vec::<i64>::new());
         assert_eq!(totals.voters_counts.total_admitted_voters_count, 0);
         assert_eq!(totals.votes_counts.total_votes_cast_count, 0);
     }
@@ -442,7 +386,6 @@ mod tests {
             .collect::<Vec<_>>();
         let totals = ElectionSummary::from_results(&election, &results).unwrap();
 
-        assert_eq!(totals.recounted_polling_stations.len(), 0);
         assert_eq!(totals.voters_counts.total_admitted_voters_count, 21000);
         assert_eq!(totals.votes_counts.total_votes_cast_count, 21600);
         assert_eq!(totals.political_group_votes[0].total, 12600);
@@ -471,7 +414,6 @@ mod tests {
         ps_results.votes_counts.invalid_votes_count = 0;
         ps_results.voters_counts.poll_card_count = 999_999_998;
         ps_results.voters_counts.proxy_certificate_count = 0;
-        ps_results.voters_counts.voter_card_count = 0;
         ps_results.voters_counts.total_admitted_voters_count = 999_999_998;
         ps_results.differences_counts.more_ballots_count = 0;
 

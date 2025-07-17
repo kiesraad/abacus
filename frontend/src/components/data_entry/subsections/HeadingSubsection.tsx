@@ -1,4 +1,3 @@
-import { t } from "@/i18n/translate";
 import { HeadingSubsection } from "@/types/types";
 
 export interface HeadingSubsectionProps {
@@ -6,5 +5,5 @@ export interface HeadingSubsectionProps {
 }
 
 export function HeadingSubsectionComponent({ subsection }: HeadingSubsectionProps) {
-  return <h2 className="mt-lg">{t(subsection.title)}</h2>;
+  return <h2 className="mt-lg">{subsection.title}</h2>;
 }

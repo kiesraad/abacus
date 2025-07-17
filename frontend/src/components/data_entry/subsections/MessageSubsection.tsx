@@ -1,4 +1,3 @@
-import { t } from "@/i18n/translate";
 import { MessageSubsection } from "@/types/types";
 
 export interface MessageSubsectionProps {
@@ -6,5 +5,5 @@ export interface MessageSubsectionProps {
 }
 
 export function MessageSubsectionComponent({ subsection }: MessageSubsectionProps) {
-  return <p className={subsection.className}>{t(subsection.message)}</p>;
+  return <p className={subsection.className}>{subsection.message}</p>;
 }

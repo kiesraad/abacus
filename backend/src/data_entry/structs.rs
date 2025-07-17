@@ -55,19 +55,10 @@ pub struct PollingStationResultsEntry {
 /// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResults {
-    /// Recounted ("Is er herteld? - See form for official long description of the checkbox")
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub recounted: Option<bool>,
     /// Voters counts ("1. Aantal toegelaten kiezers")
     pub voters_counts: VotersCounts,
     /// Votes counts ("2. Aantal getelde stembiljetten")
     pub votes_counts: VotesCounts,
-    /// Voters recounts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    /// When filled in, this field should replace `voters_counts` when using the results.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub voters_recounts: Option<VotersCounts>,
     /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
     pub differences_counts: DifferencesCounts,
     /// Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat")
@@ -75,11 +66,6 @@ pub struct PollingStationResults {
 }
 
 impl PollingStationResults {
-    /// This returns the recounts if those are available, otherwise it returns the normal voters counts
-    pub fn latest_voters_counts(&self) -> &VotersCounts {
-        self.voters_recounts.as_ref().unwrap_or(&self.voters_counts)
-    }
-
     /// Create a default value for `political_group_votes` (type `Vec<PoliticalGroup>`)
     /// for the given political groups, with all votes set to 0.
     pub fn default_political_group_votes(
@@ -114,9 +100,6 @@ pub struct VotersCounts {
     /// Number of valid proxy certificates ("Aantal geldige volmachtbewijzen")
     #[schema(value_type = u32)]
     pub proxy_certificate_count: Count,
-    /// Number of valid voter cards ("Aantal geldige kiezerspassen")
-    #[schema(value_type = u32)]
-    pub voter_card_count: Count,
     /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
     #[schema(value_type = u32)]
     pub total_admitted_voters_count: Count,
@@ -126,7 +109,6 @@ impl AddAssign<&VotersCounts> for VotersCounts {
     fn add_assign(&mut self, other: &Self) {
         self.poll_card_count += other.poll_card_count;
         self.proxy_certificate_count += other.proxy_certificate_count;
-        self.voter_card_count += other.voter_card_count;
         self.total_admitted_voters_count += other.total_admitted_voters_count;
     }
 }
@@ -300,20 +282,17 @@ mod tests {
         let mut curr_votes = VotersCounts {
             poll_card_count: 2,
             proxy_certificate_count: 3,
-            voter_card_count: 4,
             total_admitted_voters_count: 9,
         };
 
         curr_votes += &VotersCounts {
             poll_card_count: 1,
             proxy_certificate_count: 2,
-            voter_card_count: 3,
             total_admitted_voters_count: 5,
         };
 
         assert_eq!(curr_votes.poll_card_count, 3);
         assert_eq!(curr_votes.proxy_certificate_count, 5);
-        assert_eq!(curr_votes.voter_card_count, 7);
         assert_eq!(curr_votes.total_admitted_voters_count, 14);
     }
 }

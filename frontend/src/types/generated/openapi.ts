@@ -594,8 +594,6 @@ export interface ElectionSummary {
   differences_counts: SummaryDifferencesCounts;
   /** The summary votes for each political group (and each candidate within) */
   political_group_votes: PoliticalGroupVotes[];
-  /** A list of polling stations that were recounted */
-  recounted_polling_stations: number[];
   /** The total number of voters */
   voters_counts: VotersCounts;
   /** The total number of votes */
@@ -881,13 +879,8 @@ export interface PollingStationResults {
   differences_counts: DifferencesCounts;
   /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
   political_group_votes: PoliticalGroupVotes[];
-  /** Recounted ("Is er herteld? - See form for official long description of the checkbox") */
-  recounted?: boolean;
   /** Voters counts ("1. Aantal toegelaten kiezers") */
   voters_counts: VotersCounts;
-  /** Voters recounts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-When filled in, this field should replace `voters_counts` when using the results. */
-  voters_recounts?: VotersCounts;
   /** Votes counts ("2. Aantal getelde stembiljetten") */
   votes_counts: VotesCounts;
 }
@@ -1025,10 +1018,8 @@ export interface ValidationResult {
 }
 
 export type ValidationResultCode =
-  | "F101"
   | "F201"
   | "F202"
-  | "F203"
   | "F204"
   | "F301"
   | "F302"
@@ -1041,12 +1032,9 @@ export type ValidationResultCode =
   | "W201"
   | "W202"
   | "W203"
-  | "W204"
   | "W205"
   | "W206"
-  | "W207"
   | "W208"
-  | "W209"
   | "W301"
   | "W302";
 
@@ -1067,8 +1055,6 @@ export interface VotersCounts {
   proxy_certificate_count: number;
   /** Total number of admitted voters ("Totaal aantal toegelaten kiezers") */
   total_admitted_voters_count: number;
-  /** Number of valid voter cards ("Aantal geldige kiezerspassen") */
-  voter_card_count: number;
 }
 
 /**

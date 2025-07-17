@@ -1,90 +1,43 @@
 import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { Candidate, ElectionWithPoliticalGroups, PollingStationResults } from "@/types/generated/openapi";
+import { Candidate, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 
 import {
   createPoliticalGroupSections,
-  createVotersAndVotesSection,
   differencesSection,
   getDataEntryStructure,
-  recountedSection,
+  votersAndVotesSection,
 } from "./dataEntryStructure";
 
-describe("recountedSection", () => {
+describe("votersAndVotesSection", () => {
   test("should have correct structure", () => {
-    expect(recountedSection.id).toBe("recounted");
-    expect(recountedSection.subsections).toHaveLength(2);
-    expect(recountedSection.subsections[0]?.type).toBe("message");
-    expect(recountedSection.subsections[1]?.type).toBe("radio");
-  });
+    expect(votersAndVotesSection.id).toBe("voters_votes_counts");
+    expect(votersAndVotesSection.subsections).toHaveLength(1);
+    expect(votersAndVotesSection.subsections[0]?.type).toBe("inputGrid");
 
-  test("should have radio subsection with boolean valueType", () => {
-    const radioSubsection = recountedSection.subsections[1];
-    if (radioSubsection?.type === "radio") {
-      expect(radioSubsection.valueType).toBe("boolean");
-      expect(radioSubsection.path).toBe("recounted");
-      expect(radioSubsection.options).toHaveLength(2);
-      expect(radioSubsection.options[0]?.value).toBe("true");
-      expect(radioSubsection.options[1]?.value).toBe("false");
-    }
-  });
-});
-
-describe("createVotersAndVotesSection", () => {
-  test("should create section without recount subsections when recounted is false", () => {
-    const section = createVotersAndVotesSection(false);
-
-    expect(section.id).toBe("voters_votes_counts");
-    expect(section.subsections).toHaveLength(1);
-    expect(section.subsections[0]?.type).toBe("inputGrid");
-
-    if (section.subsections[0]?.type === "inputGrid") {
-      expect(section.subsections[0].rows).toHaveLength(8);
+    if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
+      expect(votersAndVotesSection.subsections[0].rows).toHaveLength(7);
       // Check that it has the basic voter and vote count rows
-      expect(section.subsections[0].rows.some((row) => row.path === "voters_counts.poll_card_count")).toBe(true);
-      expect(section.subsections[0].rows.some((row) => row.path === "votes_counts.total_votes_cast_count")).toBe(true);
-    }
-  });
-
-  test("should create section with recount subsections when recounted is true", () => {
-    const section = createVotersAndVotesSection(true);
-
-    expect(section.id).toBe("voters_votes_counts");
-    expect(section.subsections).toHaveLength(3); // Voters and votes counts inputGrid inputGrid + heading + recount inputGrid
-
-    // Check for heading subsection
-    expect(section.subsections[1]?.type).toBe("heading");
-
-    // Check for recount inputGrid
-    expect(section.subsections[2]?.type).toBe("inputGrid");
-    if (section.subsections[2]?.type === "inputGrid") {
-      expect(section.subsections[2].rows.some((row) => row.path === "voters_recounts.poll_card_count")).toBe(true);
       expect(
-        section.subsections[2].rows.some((row) => row.path === "voters_recounts.total_admitted_voters_count"),
+        votersAndVotesSection.subsections[0].rows.some((row) => row.path === "voters_counts.poll_card_count"),
+      ).toBe(true);
+      expect(
+        votersAndVotesSection.subsections[0].rows.some((row) => row.path === "votes_counts.total_votes_cast_count"),
       ).toBe(true);
     }
   });
 
   test("should have autoFocusInput on first row", () => {
-    const section = createVotersAndVotesSection(false);
-
-    if (section.subsections[0]?.type === "inputGrid") {
-      expect(section.subsections[0].rows[0]?.autoFocusInput).toBe(true);
+    if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
+      expect(votersAndVotesSection.subsections[0].rows[0]?.autoFocusInput).toBe(true);
     }
   });
 
   test("should have correct row codes", () => {
-    const section = createVotersAndVotesSection(true);
-
-    if (section.subsections[0]?.type === "inputGrid") {
-      const codes = section.subsections[0].rows.map((row) => row.code);
-      expect(codes).toEqual(["A", "B", "C", "D", "E", "F", "G", "H"]);
-    }
-
-    if (section.subsections[2]?.type === "inputGrid") {
-      const recountCodes = section.subsections[2].rows.map((row) => row.code);
-      expect(recountCodes).toEqual(["A.2", "B.2", "C.2", "D.2"]);
+    if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
+      const codes = votersAndVotesSection.subsections[0].rows.map((row) => row.code);
+      expect(codes).toEqual(["A", "B", "D", "E", "F", "G", "H"]);
     }
   });
 });
@@ -178,7 +131,7 @@ describe("createPoliticalGroupSections", () => {
 
   test("should add separators every 25 candidates", () => {
     // Create a mock election with many candidates
-    const manyCapabilitiesElection: ElectionWithPoliticalGroups = {
+    const manyCandidatesElection: ElectionWithPoliticalGroups = {
       ...electionMockData,
       political_groups: [
         {
@@ -199,7 +152,7 @@ describe("createPoliticalGroupSections", () => {
       ],
     };
 
-    const sections = createPoliticalGroupSections(manyCapabilitiesElection);
+    const sections = createPoliticalGroupSections(manyCandidatesElection);
 
     if (sections[0]?.subsections[0]?.type === "inputGrid") {
       const rows = sections[0].subsections[0].rows;
@@ -247,89 +200,15 @@ describe("getDataEntryStructure", () => {
   test("should return all sections in correct order", () => {
     const structure = getDataEntryStructure(electionMockData);
 
-    const expectedLength = 3 + electionMockData.political_groups.length; // recounted + voters_votes + differences + political groups
+    const expectedLength = 2 + electionMockData.political_groups.length; // voters_votes + differences + political groups
     expect(structure).toHaveLength(expectedLength);
 
-    expect(structure[0]?.id).toBe("recounted");
-    expect(structure[1]?.id).toBe("voters_votes_counts");
-    expect(structure[2]?.id).toBe("differences_counts");
+    expect(structure[0]?.id).toBe("voters_votes_counts");
+    expect(structure[1]?.id).toBe("differences_counts");
 
     // Check political group sections
     for (let i = 0; i < electionMockData.political_groups.length; i++) {
-      expect(structure[3 + i]?.id).toBe(`political_group_votes_${electionMockData.political_groups[i]?.number}`);
+      expect(structure[2 + i]?.id).toBe(`political_group_votes_${electionMockData.political_groups[i]?.number}`);
     }
-  });
-
-  test("should pass recounted flag to voters and votes section", () => {
-    const pollingStationResults: PollingStationResults = {
-      recounted: true,
-      voters_counts: {
-        poll_card_count: 0,
-        proxy_certificate_count: 0,
-        voter_card_count: 0,
-        total_admitted_voters_count: 0,
-      },
-      votes_counts: {
-        votes_candidates_count: 0,
-        blank_votes_count: 0,
-        invalid_votes_count: 0,
-        total_votes_cast_count: 0,
-      },
-      differences_counts: {
-        more_ballots_count: 0,
-        fewer_ballots_count: 0,
-        unreturned_ballots_count: 0,
-        too_few_ballots_handed_out_count: 0,
-        too_many_ballots_handed_out_count: 0,
-        other_explanation_count: 0,
-        no_explanation_count: 0,
-      },
-      political_group_votes: [],
-    };
-
-    const structure = getDataEntryStructure(electionMockData, pollingStationResults);
-    const votersVotesSection = structure.find((s) => s.id === "voters_votes_counts");
-
-    expect(votersVotesSection?.subsections).toHaveLength(3); // Voters and votes counts inputGrid + heading + recount
-  });
-
-  test("should work without polling station results", () => {
-    const structure = getDataEntryStructure(electionMockData);
-    const votersVotesSection = structure.find((s) => s.id === "voters_votes_counts");
-
-    expect(votersVotesSection?.subsections).toHaveLength(1); // Only voters and votes counts inputGrid
-  });
-
-  test("should work with recounted false", () => {
-    const pollingStationResults: PollingStationResults = {
-      recounted: false,
-      voters_counts: {
-        poll_card_count: 0,
-        proxy_certificate_count: 0,
-        voter_card_count: 0,
-        total_admitted_voters_count: 0,
-      },
-      votes_counts: {
-        votes_candidates_count: 0,
-        blank_votes_count: 0,
-        invalid_votes_count: 0,
-        total_votes_cast_count: 0,
-      },
-      differences_counts: {
-        more_ballots_count: 0,
-        fewer_ballots_count: 0,
-        unreturned_ballots_count: 0,
-        too_few_ballots_handed_out_count: 0,
-        too_many_ballots_handed_out_count: 0,
-        other_explanation_count: 0,
-        no_explanation_count: 0,
-      },
-      political_group_votes: [],
-    };
-
-    const structure = getDataEntryStructure(electionMockData, pollingStationResults);
-    const votersVotesSection = structure.find((s) => s.id === "voters_votes_counts");
-
-    expect(votersVotesSection?.subsections).toHaveLength(1); // Only voters and votes counts inputGrid
   });
 });

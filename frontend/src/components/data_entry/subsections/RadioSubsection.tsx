@@ -1,5 +1,4 @@
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
-import { t } from "@/i18n/translate";
 import { RadioSubsection, SectionValues } from "@/types/types";
 
 export interface RadioSubsectionProps {
@@ -24,7 +23,7 @@ export function RadioSubsectionComponent({
     <div className="radio-form">
       <ChoiceList>
         {defaultProps.errorsAndWarnings?.get(`data.${subsection.path}`) && (
-          <ChoiceList.Error id={`${subsection.path}-error`}>{t(subsection.error)}</ChoiceList.Error>
+          <ChoiceList.Error id={`${subsection.path}-error`}>{subsection.error}</ChoiceList.Error>
         )}
         {subsection.options.map((option) => (
           <ChoiceList.Radio
@@ -37,7 +36,7 @@ export function RadioSubsectionComponent({
             onChange={() => {
               setValues(subsection.path, option.value);
             }}
-            label={t(option.label)}
+            label={option.label}
             disabled={readOnly}
           />
         ))}

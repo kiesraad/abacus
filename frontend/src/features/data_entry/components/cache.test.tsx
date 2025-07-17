@@ -38,7 +38,6 @@ describe("Data Entry cache behavior", () => {
     const cacheData: SectionValues = {
       "voters_counts.poll_card_count": "100",
       "voters_counts.proxy_certificate_count": "200",
-      "voters_counts.voter_card_count": "300",
       "voters_counts.total_admitted_voters_count": "600",
       "votes_counts.votes_candidates_count": "400",
       "votes_counts.blank_votes_count": "500",
@@ -68,9 +67,6 @@ describe("Data Entry cache behavior", () => {
 
     const proxyCertificates = screen.getByRole("textbox", { name: "B Volmachtbewijzen" });
     expect(proxyCertificates).toHaveValue("200");
-
-    const voterCards = screen.getByRole("textbox", { name: "C Kiezerspassen" });
-    expect(voterCards).toHaveValue("300");
 
     const totalAdmittedVoters = screen.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
     expect(totalAdmittedVoters).toHaveValue("600");

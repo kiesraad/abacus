@@ -1,6 +1,5 @@
 import { expect } from "@playwright/test";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
-import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 
@@ -19,7 +18,7 @@ test.describe("data entry - api error responses", () => {
   }) => {
     const { page } = typistTwo;
     const pollingStation = pollingStationFirstEntryClaimed;
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
@@ -37,7 +36,7 @@ test.describe("data entry - api error responses", () => {
     pollingStationFirstEntryDone,
   }) => {
     await page.goto(
-      `/elections/${pollingStationFirstEntryDone.election_id}/data-entry/${pollingStationFirstEntryDone.id}/1/recounted`,
+      `/elections/${pollingStationFirstEntryDone.election_id}/data-entry/${pollingStationFirstEntryDone.id}/1`,
     );
 
     const dataEntryHomePage = new DataEntryHomePage(page);
@@ -53,9 +52,7 @@ test.describe("data entry - api error responses", () => {
     page,
     pollingStationDefinitive,
   }) => {
-    await page.goto(
-      `/elections/${pollingStationDefinitive.election_id}/data-entry/${pollingStationDefinitive.id}/1/recounted`,
-    );
+    await page.goto(`/elections/${pollingStationDefinitive.election_id}/data-entry/${pollingStationDefinitive.id}/1`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
@@ -72,7 +69,7 @@ test.describe("data entry - api error responses", () => {
   }) => {
     const pollingStation = pollingStationFirstEntryClaimed;
 
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`);
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
@@ -98,17 +95,13 @@ test.describe("data entry - api error responses", () => {
   });
 
   test("4xx non-fatal response results in error shown", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
-
-    const recountedPage = new RecountedPage(page);
-    await recountedPage.checkNoAndClickNext();
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     const voters: VotersCounts = {
       poll_card_count: 99,
       proxy_certificate_count: 1,
-      voter_card_count: 0,
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
@@ -143,17 +136,13 @@ test.describe("data entry - api error responses", () => {
   });
 
   test("5xx fatal response results in error shown", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
-
-    const recountedPage = new RecountedPage(page);
-    await recountedPage.checkNoAndClickNext();
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     const voters: VotersCounts = {
       poll_card_count: 99,
       proxy_certificate_count: 1,
-      voter_card_count: 0,
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {

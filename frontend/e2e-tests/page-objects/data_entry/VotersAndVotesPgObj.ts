@@ -9,7 +9,6 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   readonly headingRecount: Locator;
   readonly pollCardCount: Locator;
   readonly proxyCertificateCount: Locator;
-  readonly voterCardCount: Locator;
   readonly totalAdmittedVotersCount: Locator;
   readonly votesCandidatesCount: Locator;
   readonly blankVotesCount: Locator;
@@ -18,10 +17,6 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   readonly acceptErrorsAndWarnings: Locator;
   readonly acceptErrorsAndWarningsReminder: Locator;
   readonly next: Locator;
-  readonly pollCardRecount: Locator;
-  readonly proxyCertificateRecount: Locator;
-  readonly voterCardRecount: Locator;
-  readonly totalAdmittedVotersRecount: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -38,7 +33,6 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     // voters counts
     this.pollCardCount = page.getByRole("textbox", { name: "A Stempassen" });
     this.proxyCertificateCount = page.getByRole("textbox", { name: "B Volmachtbewijzen" });
-    this.voterCardCount = page.getByRole("textbox", { name: "C Kiezerspassen" });
     this.totalAdmittedVotersCount = page.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
 
     // votes counts
@@ -46,12 +40,6 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     this.blankVotesCount = page.getByRole("textbox", { name: "F Blanco stemmen" });
     this.invalidVotesCount = page.getByRole("textbox", { name: "G Ongeldige stemmen" });
     this.totalVotesCastCount = page.getByRole("textbox", { name: "H Totaal uitgebrachte stemmen" });
-
-    // voters recounts
-    this.pollCardRecount = page.getByRole("textbox", { name: "A.2 Stempassen" });
-    this.proxyCertificateRecount = page.getByRole("textbox", { name: "B.2 Volmachtbewijzen" });
-    this.voterCardRecount = page.getByRole("textbox", { name: "C.2 Kiezerspassen" });
-    this.totalAdmittedVotersRecount = page.getByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" });
 
     this.acceptErrorsAndWarnings = page.getByLabel(
       "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
@@ -66,7 +54,6 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   async inputVotersCounts(votersCounts: VotersCounts) {
     await this.pollCardCount.fill(votersCounts.poll_card_count.toString());
     await this.proxyCertificateCount.fill(votersCounts.proxy_certificate_count.toString());
-    await this.voterCardCount.fill(votersCounts.voter_card_count.toString());
     await this.totalAdmittedVotersCount.fill(votersCounts.total_admitted_voters_count.toString());
   }
 
@@ -75,7 +62,6 @@ export class VotersAndVotesPage extends DataEntryBasePage {
       // using Number() so that "" is parsed to 0
       poll_card_count: Number(await this.pollCardCount.inputValue()),
       proxy_certificate_count: Number(await this.proxyCertificateCount.inputValue()),
-      voter_card_count: Number(await this.voterCardCount.inputValue()),
       total_admitted_voters_count: Number(await this.totalAdmittedVotersCount.inputValue()),
     };
   }
@@ -104,19 +90,9 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     };
   }
 
-  async inputVotersRecounts(votersRecounts: VotersCounts) {
-    await this.pollCardRecount.fill(votersRecounts.poll_card_count.toString());
-    await this.proxyCertificateRecount.fill(votersRecounts.proxy_certificate_count.toString());
-    await this.voterCardRecount.fill(votersRecounts.voter_card_count.toString());
-    await this.totalAdmittedVotersRecount.fill(votersRecounts.total_admitted_voters_count.toString());
-  }
-
-  async fillInPageAndClickNext(votersCounts: VotersCounts, votesCounts: VotesCounts, votersRecounts?: VotersCounts) {
+  async fillInPageAndClickNext(votersCounts: VotersCounts, votesCounts: VotesCounts) {
     await this.inputVotersCounts(votersCounts);
     await this.inputVotesCounts(votesCounts);
-    if (votersRecounts) {
-      await this.inputVotersRecounts(votersRecounts);
-    }
     await this.next.click();
   }
 

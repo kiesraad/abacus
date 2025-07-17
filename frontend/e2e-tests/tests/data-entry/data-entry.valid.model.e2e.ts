@@ -3,7 +3,6 @@ import { createTestModel } from "@xstate/graph";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
-import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { createMachine } from "xstate";
 
@@ -44,22 +43,6 @@ const dataEntryMachineDefinition = {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChanged",
       },
     },
-    recountedPageEmpty: {},
-    recountedPageSaved: {
-      on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageChangedSubmitted",
-      },
-    },
-    recountedPageDiscarded: {
-      on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageSubmitted",
-      },
-    },
-    recountedPageCached: {
-      on: {
-        GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageCached",
-      },
-    },
     voterVotesPageCached: {
       on: {
         SUBMIT: "differencesPage",
@@ -70,7 +53,6 @@ const dataEntryMachineDefinition = {
         FILL_WITH_VALID_DATA: "votersVotesPageFilled",
         CLICK_ABORT: "abortInputModalEmpty",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModalEmpty",
-        GO_TO_RECOUNTED_PAGE: "recountedPageEmpty",
       },
     },
     votersVotesPageFilled: {
@@ -78,7 +60,6 @@ const dataEntryMachineDefinition = {
         SUBMIT: "differencesPage",
         CLICK_ABORT: "abortInputModalFilled",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModalFilled",
-        GO_TO_RECOUNTED_PAGE: "recountedPageCached",
       },
     },
     votersVotesPageSubmitted: {
@@ -92,7 +73,6 @@ const dataEntryMachineDefinition = {
         SUBMIT: "differencesPage",
         CLICK_ABORT: "abortInputModalChanged",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModalChanged",
-        GO_TO_RECOUNTED_PAGE: "unsavedChangesModalChanged",
       },
     },
     votersVotesPageAfterResumeSaved: {},
@@ -121,12 +101,6 @@ const dataEntryMachineDefinition = {
         DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
-    unsavedChangesModalChanged: {
-      on: {
-        SAVE_UNSUBMITTED_CHANGES: "recountedPageSaved",
-        DISCARD_UNSUBMITTED_CHANGES: "recountedPageDiscarded",
-      },
-    },
   },
 };
 
@@ -136,21 +110,18 @@ const { machineStates, machineEvents } = getStatesAndEventsFromMachineDefinition
 const voters: VotersCounts = {
   poll_card_count: 90,
   proxy_certificate_count: 10,
-  voter_card_count: 0,
   total_admitted_voters_count: 100,
 };
 
 const votersChanged: VotersCounts = {
   poll_card_count: 80,
   proxy_certificate_count: 20,
-  voter_card_count: 0,
   total_admitted_voters_count: 100,
 };
 
 const votersEmpty: VotersCounts = {
   poll_card_count: 0,
   proxy_certificate_count: 0,
-  voter_card_count: 0,
   total_admitted_voters_count: 0,
 };
 
@@ -179,7 +150,6 @@ test.describe("Data entry model test - valid data", () => {
       // eslint-disable-next-line playwright/valid-title
       test(path.description, async ({ page, pollingStation, election }) => {
         const dataEntryHomePage = new DataEntryHomePage(page);
-        const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
         const abortModal = new AbortInputModal(page);
@@ -212,37 +182,6 @@ test.describe("Data entry model test - valid data", () => {
         const PollingStationsPageEvents = {
           RESUME_DATA_ENTRY: async () => {
             await dataEntryHomePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
-          },
-        };
-
-        const recountedPageStates = {
-          recountedPageEmpty: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-          },
-          recountedPageSaved: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-          },
-          recountedPageDiscarded: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-          },
-          recountedPageCached: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-          },
-          unsavedChangesModalChanged: async () => {
-            await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
-          },
-        };
-
-        const recountedPageEvents = {
-          SAVE_UNSUBMITTED_CHANGES: async () => {
-            await recountedPage.unsavedChangesModal.saveInput.click();
-          },
-          DISCARD_UNSUBMITTED_CHANGES: async () => {
-            await recountedPage.unsavedChangesModal.discardInput.click();
           },
         };
 
@@ -308,9 +247,6 @@ test.describe("Data entry model test - valid data", () => {
           NAV_TO_POLLING_STATION_PAGE: async () => {
             await votersAndVotesPage.navBar.clickElection(election.election.location, election.election.name);
           },
-          GO_TO_RECOUNTED_PAGE: async () => {
-            await votersAndVotesPage.progressList.recounted.click();
-          },
           SUBMIT: async () => {
             await votersAndVotesPage.next.click();
           },
@@ -351,27 +287,14 @@ test.describe("Data entry model test - valid data", () => {
         // check that events and states used by the machine are equal to
         // the events and states specified in the test
         const { states, events } = getStatesAndEventsFromTest(
-          [
-            pollingStationsPageStates,
-            recountedPageStates,
-            votersVotesPageStates,
-            differencesPageStates,
-            abortInputModalStates,
-          ],
-          [
-            PollingStationsPageEvents,
-            recountedPageEvents,
-            votersAndVotesPageEvents,
-            differencesPageEvents,
-            abortInputModalEvents,
-          ],
+          [pollingStationsPageStates, votersVotesPageStates, differencesPageStates, abortInputModalStates],
+          [PollingStationsPageEvents, votersAndVotesPageEvents, differencesPageEvents, abortInputModalEvents],
         );
         expect(new Set(states)).toEqual(new Set(machineStates));
         expect(new Set(events)).toEqual(new Set(machineEvents));
 
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
         await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
-        await recountedPage.checkNoAndClickNext();
 
         type MachineStates = typeof dataEntryMachineDefinition.states;
         type MachineStateKey = keyof MachineStates;
@@ -384,14 +307,12 @@ test.describe("Data entry model test - valid data", () => {
         await path.test({
           states: {
             ...pollingStationsPageStates,
-            ...recountedPageStates,
             ...votersVotesPageStates,
             ...differencesPageStates,
             ...abortInputModalStates,
           } satisfies Record<MachineStateKey, () => void>,
           events: {
             ...votersAndVotesPageEvents,
-            ...recountedPageEvents,
             ...differencesPageEvents,
             ...abortInputModalEvents,
             ...PollingStationsPageEvents,

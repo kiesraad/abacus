@@ -2,8 +2,6 @@ import { type Locator, type Page } from "@playwright/test";
 
 export class ProgressList {
   readonly navElement: Locator;
-  readonly recounted: Locator;
-  readonly recountedIcon: Locator;
   readonly votersAndVotes: Locator;
   readonly votersAndVotesIcon: Locator;
   readonly differences: Locator;
@@ -14,8 +12,6 @@ export class ProgressList {
   constructor(protected readonly page: Page) {
     this.navElement = page.getByRole("navigation");
 
-    this.recounted = this.navElement.getByRole("listitem").filter({ hasText: "Is er herteld?" });
-    this.recountedIcon = this.recounted.getByRole("img");
     this.votersAndVotes = this.navElement.getByRole("listitem").filter({ hasText: "Aantal kiezers en stemmen" });
     this.votersAndVotesIcon = this.votersAndVotes.getByRole("img");
     this.differences = this.navElement.getByRole("listitem").filter({ hasText: "Verschillen" });

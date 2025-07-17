@@ -1,6 +1,5 @@
 import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
-import { t } from "@/i18n/translate";
 import { InputGridSubsection, InputGridSubsectionRow, SectionValues } from "@/types/types";
 
 export interface InputGridSubsectionProps {
@@ -26,9 +25,9 @@ export function InputGridSubsectionComponent({
   return (
     <InputGrid zebra={subsection.zebra}>
       <InputGrid.Header>
-        <th>{t(subsection.headers[0])}</th>
-        <th>{t(subsection.headers[1])}</th>
-        <th>{t(subsection.headers[2])}</th>
+        <th>{subsection.headers[0]}</th>
+        <th>{subsection.headers[1]}</th>
+        <th>{subsection.headers[2]}</th>
       </InputGrid.Header>
       <InputGrid.Body>
         {subsection.rows.map((row: InputGridSubsectionRow) => (

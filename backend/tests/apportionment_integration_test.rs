@@ -33,11 +33,9 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
     let data_entry = DataEntry {
         progress: 100,
         data: PollingStationResults {
-            recounted: Some(false),
             voters_counts: VotersCounts {
-                poll_card_count: 1200,
+                poll_card_count: 1203,
                 proxy_certificate_count: 2,
-                voter_card_count: 3,
                 total_admitted_voters_count: 1205,
             },
             votes_counts: VotesCounts {
@@ -46,7 +44,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
                 invalid_votes_count: 2,
                 total_votes_cast_count: 1205,
             },
-            voters_recounts: None,
+
             differences_counts: differences_counts_zero(),
             political_group_votes: vec![
                 political_group_votes_from_test_data_auto(
@@ -92,11 +90,10 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     let data_entry = DataEntry {
         progress: 100,
         data: PollingStationResults {
-            recounted: Some(false),
             voters_counts: VotersCounts {
-                poll_card_count: 1200,
+                poll_card_count: 1203,
                 proxy_certificate_count: 2,
-                voter_card_count: 3,
+
                 total_admitted_voters_count: 1205,
             },
             votes_counts: VotesCounts {
@@ -105,7 +102,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
                 invalid_votes_count: 2,
                 total_votes_cast_count: 1205,
             },
-            voters_recounts: None,
+
             differences_counts: differences_counts_zero(),
             political_group_votes: vec![
                 political_group_votes_from_test_data_auto(
@@ -171,11 +168,10 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
     let data_entry = DataEntry {
         progress: 100,
         data: PollingStationResults {
-            recounted: Some(false),
             voters_counts: VotersCounts {
-                poll_card_count: 100,
+                poll_card_count: 102,
                 proxy_certificate_count: 2,
-                voter_card_count: 2,
+
                 total_admitted_voters_count: 104,
             },
             votes_counts: VotesCounts {
@@ -184,7 +180,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,
             },
-            voters_recounts: None,
+
             differences_counts: differences_counts_zero(),
             political_group_votes: vec![
                 political_group_votes_from_test_data_auto(1, &[30, 21]),

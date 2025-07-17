@@ -437,7 +437,6 @@ fn generate_polling_station_results(
     group_weights: &[f64],
     candidate_distribution_slope: f64,
 ) -> PollingStationResults {
-    let is_recount = rng.random_bool(0.05);
     // generate a small percentage of blank votes
     #[allow(clippy::cast_possible_truncation)]
     let blank_votes = (number_of_votes as f64 * rng.random_range(0.0..0.02)) as u32;
@@ -451,11 +450,9 @@ fn generate_polling_station_results(
     // distribute the remaining votes for this polling station randomly according to a power law distribution
     let pg_votes = distribute_fill_weights(rng, group_weights, remaining_votes, false);
     PollingStationResults {
-        recounted: Some(is_recount),
         voters_counts: VotersCounts {
             poll_card_count: number_of_votes,
             proxy_certificate_count: 0,
-            voter_card_count: 0,
             total_admitted_voters_count: number_of_votes,
         },
         votes_counts: VotesCounts {
@@ -463,16 +460,6 @@ fn generate_polling_station_results(
             blank_votes_count: blank_votes,
             invalid_votes_count: invalid_votes,
             total_votes_cast_count: number_of_votes,
-        },
-        voters_recounts: if is_recount {
-            Some(VotersCounts {
-                poll_card_count: number_of_votes,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: number_of_votes,
-            })
-        } else {
-            None
         },
         differences_counts: DifferencesCounts::zero(),
         political_group_votes: political_groups

@@ -4,7 +4,6 @@ import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSave
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
-import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
@@ -24,16 +23,12 @@ export async function selectPollingStationForDataEntry(page: Page, pollingStatio
   await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
   await dataEntryHomePage.clickStart();
 
-  const recountedPage = new RecountedPage(page);
-  await expect(recountedPage.fieldset).toBeVisible();
-  return recountedPage;
+  const votersAndVotesPage = new VotersAndVotesPage(page);
+  await expect(votersAndVotesPage.fieldset).toBeVisible();
+  return votersAndVotesPage;
 }
 
 export async function fillDataEntryPages(page: Page, results: PollingStationResults) {
-  const recountedPage = new RecountedPage(page);
-  await expect(recountedPage.fieldset).toBeVisible();
-  await recountedPage.fillInPageAndClickNext(results.recounted ? results.recounted : false);
-
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();
   await votersAndVotesPage.fillInPageAndClickNext(results.voters_counts, results.votes_counts);

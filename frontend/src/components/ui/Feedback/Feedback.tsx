@@ -2,19 +2,19 @@ import { ReactElement, useEffect, useRef } from "react";
 import { Link } from "react-router";
 
 import { t, tx } from "@/i18n/translate";
-import { Role } from "@/types/generated/openapi";
+import { Role, ValidationResultCode } from "@/types/generated/openapi";
 import { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { dottedCode } from "@/utils/ValidationResults";
 
 import { AlertIcon } from "../Icon/AlertIcon";
 import cls from "./Feedback.module.css";
-import { ClientValidationResultCode, FeedbackItem } from "./Feedback.types";
+import { FeedbackItem } from "./Feedback.types";
 
 interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
-  data?: ClientValidationResultCode[];
+  data?: ValidationResultCode[];
   userRole: Role;
   shouldFocus?: boolean;
 }
@@ -26,11 +26,11 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
   const role = userRole === "administrator" ? "coordinator" : userRole;
   const feedbackList: FeedbackItem[] =
     data?.map(
-      (code: ClientValidationResultCode): FeedbackItem => ({
+      (code: ValidationResultCode): FeedbackItem => ({
         title: t(`feedback.${code}.${role}.title`),
         code: dottedCode(code),
         content: tx(`feedback.${code}.${role}.content`, { link }),
-        action: role === "typist" && code === "F101" ? tx(`feedback.F101.${role}.action`, {}) : undefined,
+        action: undefined,
       }),
     ) || [];
 

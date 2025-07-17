@@ -1,9 +1,7 @@
 import { describe, expect, test } from "vitest";
 
-import { emptyData } from "@/testing/api-mocks/DataEntryMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
-import { PollingStationResults } from "@/types/generated/openapi";
 
 import { getDataEntryStructure } from "./dataEntryStructure";
 import {
@@ -62,11 +60,7 @@ describe("mapValidationResultSetsToFields", () => {
 
 describe("doesValidationResultApplyToSection", () => {
   test("should return true when validation result applies to section", () => {
-    const results: PollingStationResults = {
-      ...emptyData,
-      recounted: true,
-    };
-    const dataEntryStructure = getDataEntryStructure(electionMockData, results);
+    const dataEntryStructure = getDataEntryStructure(electionMockData);
 
     const votersVotesSection = dataEntryStructure.find((s) => s.id === "voters_votes_counts")!;
     expect(doesValidationResultApplyToSection(validationResultMockData.F201, votersVotesSection)).toBe(true);
@@ -98,11 +92,7 @@ describe("doesValidationResultApplyToSection", () => {
 // TODO: clean up these tests
 describe("getValidationResultSetForSection", () => {
   test("should return validation results for specific section", () => {
-    const results: PollingStationResults = {
-      ...emptyData,
-      recounted: true,
-    };
-    const dataEntryStructure = getDataEntryStructure(electionMockData, results);
+    const dataEntryStructure = getDataEntryStructure(electionMockData);
     const votersVotesSection = dataEntryStructure.find((s) => s.id === "voters_votes_counts")!;
 
     const validationResults = [
@@ -127,14 +117,14 @@ describe("getValidationResultSetForSection", () => {
 
   test("should return empty set when no validation results match section", () => {
     const dataEntryStructure = getDataEntryStructure(electionMockData);
-    const recountedSection = dataEntryStructure.find((s) => s.id === "recounted")!;
+    const votersVotesSection = dataEntryStructure.find((s) => s.id === "voters_votes_counts")!;
 
     const validationResults = [
       validationResultMockData.F301, // differences_counts
       validationResultMockData.F401, // political_group_votes
     ];
 
-    const resultSet = getValidationResultSetForSection(validationResults, recountedSection);
+    const resultSet = getValidationResultSetForSection(validationResults, votersVotesSection);
 
     expect(resultSet.isEmpty()).toBe(true);
   });
@@ -161,6 +151,6 @@ describe("getValidationResultSetForSection", () => {
 describe("dottedCode", () => {
   test("should insert a dot in between validation result code letter and number", () => {
     expect(dottedCode("F301")).toBe("F.301");
-    expect(dottedCode("W204")).toBe("W.204");
+    expect(dottedCode("W203")).toBe("W.203");
   });
 });

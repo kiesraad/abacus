@@ -19,7 +19,6 @@ import messages from "./messages.json";
 import polling_station from "./polling_station.json";
 import polling_station_choice from "./polling_station_choice.json";
 import polling_station_results from "./polling_station_results.json";
-import recounted from "./recounted.json";
 import resolve_differences from "./resolve_differences.json";
 import resolve_errors from "./resolve_errors.json";
 import status from "./status.json";
@@ -49,7 +48,6 @@ const nl = {
   polling_station,
   polling_station_choice,
   polling_station_results,
-  recounted,
   resolve_differences,
   resolve_errors,
   status,

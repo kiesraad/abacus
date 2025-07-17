@@ -12,7 +12,6 @@ const pollingStationResults: PollingStationResults = {
   voters_counts: {
     poll_card_count: 185,
     proxy_certificate_count: 12,
-    voter_card_count: 8,
     total_admitted_voters_count: 205,
   },
   votes_counts: {
@@ -57,7 +56,6 @@ const pollingStationResults: PollingStationResults = {
       ],
     },
   ],
-  recounted: false,
 };
 
 const dataEntryStructure = getDataEntryStructure(electionMockData, pollingStationResults);

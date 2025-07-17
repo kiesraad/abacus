@@ -158,7 +158,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Toegelaten kiezers
 
-#is_municipality[
+#if not "voter_card_count" in input.summary.voters_counts [
   Tel het aantal geldige stempassen en volmachtbewijzen
 
   #sum(
@@ -173,7 +173,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
       value: input.summary.voters_counts.total_admitted_voters_count,
     )[Totaal toegelaten kiezers (A+B)],
   )
-][
+] else [
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
 
   #sum(

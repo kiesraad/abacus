@@ -755,7 +755,6 @@ export const election_summary: ElectionSummary = {
   voters_counts: {
     poll_card_count: 60,
     proxy_certificate_count: 1,
-    voter_card_count: 0,
     total_admitted_voters_count: 61,
   },
   votes_counts: {
@@ -794,7 +793,6 @@ export const election_summary: ElectionSummary = {
       polling_stations: [],
     },
   },
-  recounted_polling_stations: [],
   political_group_votes: [
     {
       number: 1,

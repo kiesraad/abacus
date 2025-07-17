@@ -3,7 +3,6 @@ import { createTestModel } from "@xstate/graph";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
-import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { createMachine } from "xstate";
 
@@ -34,13 +33,6 @@ const dataEntryMachineDefinition = {
       },
     },
     pollingStationsPageDiscarded: {},
-    recountedPageWarningSubmitted: {
-      on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageWarningSubmitted",
-      },
-    },
-    recountedPageChangedToWarningSubmitted: {},
-    recountedPageChangedToWarningDiscarded: {},
     pollingStationsPageChangedToWarningSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChangedToWarning",
@@ -63,7 +55,6 @@ const dataEntryMachineDefinition = {
         ACCEPT_WARNING: "voterVotesPageWarningAccepted",
         CORRECT_WARNING: "voterVotesPageWarningCorrected",
         CHANGE_TO_ERROR_AND_SUBMIT: "votersVotesPageError",
-        GO_TO_RECOUNTED_PAGE: "recountedPageWarningSubmitted",
         CLICK_ABORT: "abortInputModalWarning",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModalWarning",
       },
@@ -92,7 +83,6 @@ const dataEntryMachineDefinition = {
     votersVotesPageChangedToWarning: {
       on: {
         SUBMIT: "votersVotesPageChangedToWarningSubmitted",
-        GO_TO_RECOUNTED_PAGE: "unsavedChangesModalChangedToWarning",
       },
     },
     votersVotesPageChangedToWarningSubmitted: {
@@ -108,12 +98,6 @@ const dataEntryMachineDefinition = {
     votersVotesPageError: {},
     votersVotesPageAfterResumeWarning: {},
     votersVotesPageAfterResumeChangedToWarning: {},
-    unsavedChangesModalChangedToWarning: {
-      on: {
-        SAVE_UNSUBMITTED_CHANGES: "recountedPageChangedToWarningSubmitted",
-        DISCARD_UNSUBMITTED_CHANGES: "recountedPageChangedToWarningDiscarded",
-      },
-    },
     differencesPageWarningAccepted: {
       on: {
         GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageWarningAccepted",
@@ -140,21 +124,18 @@ const { machineStates, machineEvents } = getStatesAndEventsFromMachineDefinition
 const voters: VotersCounts = {
   poll_card_count: 90,
   proxy_certificate_count: 10,
-  voter_card_count: 0,
   total_admitted_voters_count: 100,
 };
 
 const votersEmpty: VotersCounts = {
   poll_card_count: 0,
   proxy_certificate_count: 0,
-  voter_card_count: 0,
   total_admitted_voters_count: 0,
 };
 
 const votersError: VotersCounts = {
   poll_card_count: 70,
   proxy_certificate_count: 30,
-  voter_card_count: 0,
   total_admitted_voters_count: 90, // incorrect total
 };
 
@@ -190,7 +171,6 @@ test.describe("Data entry model test - warnings", () => {
       // eslint-disable-next-line playwright/valid-title
       test(path.description, async ({ page, pollingStation, election }) => {
         const dataEntryHomePage = new DataEntryHomePage(page);
-        const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
         const abortModal = new AbortInputModal(page);
@@ -216,29 +196,6 @@ test.describe("Data entry model test - warnings", () => {
         const PollingStationsPageEvents = {
           RESUME_DATA_ENTRY: async () => {
             await dataEntryHomePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
-          },
-        };
-
-        const recountedPageStates = {
-          recountedPageWarningSubmitted: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
-          },
-          recountedPageChangedToWarningSubmitted: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
-          },
-          recountedPageChangedToWarningDiscarded: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
-          },
-        };
-        const recountedPageEvents = {
-          GO_TO_VOTERS_VOTES_PAGE: async () => {
-            await recountedPage.progressList.votersAndVotes.click();
           },
         };
 
@@ -343,9 +300,6 @@ test.describe("Data entry model test - warnings", () => {
           abortInputModalWarning: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
-          unsavedChangesModalChangedToWarning: async () => {
-            await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
-          },
         };
 
         const votersAndVotesPageEvents = {
@@ -381,9 +335,6 @@ test.describe("Data entry model test - warnings", () => {
             await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
             await votersAndVotesPage.next.click();
           },
-          GO_TO_RECOUNTED_PAGE: async () => {
-            await votersAndVotesPage.progressList.recounted.click();
-          },
           CLICK_ABORT: async () => {
             await votersAndVotesPage.abortInput.click();
           },
@@ -394,26 +345,20 @@ test.describe("Data entry model test - warnings", () => {
           NAV_TO_POLLING_STATION_PAGE: async () => {
             await votersAndVotesPage.navBar.clickElection(election.election.location, election.election.name);
           },
-          SAVE_UNSUBMITTED_CHANGES: async () => {
-            await votersAndVotesPage.unsavedChangesModal.saveInput.click();
-          },
-          DISCARD_UNSUBMITTED_CHANGES: async () => {
-            await votersAndVotesPage.unsavedChangesModal.discardInput.click();
-          },
         };
 
         const differencesPageStates = {
           differencesPageWarningAccepted: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
           differencesPageCorrected: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
           differencesPageValidSubmitted: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
         };
         const differencesPageEvents = {
@@ -444,27 +389,14 @@ test.describe("Data entry model test - warnings", () => {
         };
 
         const { states, events } = getStatesAndEventsFromTest(
-          [
-            pollingStationsPageStates,
-            recountedPageStates,
-            votersVotesPageStates,
-            differencesPageStates,
-            abortInputModalStates,
-          ],
-          [
-            PollingStationsPageEvents,
-            recountedPageEvents,
-            votersAndVotesPageEvents,
-            differencesPageEvents,
-            abortInputModalEvents,
-          ],
+          [pollingStationsPageStates, votersVotesPageStates, differencesPageStates, abortInputModalStates],
+          [PollingStationsPageEvents, votersAndVotesPageEvents, differencesPageEvents, abortInputModalEvents],
         );
         expect(new Set(states)).toEqual(new Set(machineStates));
         expect(new Set(events)).toEqual(new Set(machineEvents));
 
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
         await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
-        await recountedPage.checkNoAndClickNext();
 
         type MachineStates = typeof dataEntryMachineDefinition.states;
         type MachineStateKey = keyof MachineStates;
@@ -477,14 +409,12 @@ test.describe("Data entry model test - warnings", () => {
         await path.test({
           states: {
             ...pollingStationsPageStates,
-            ...recountedPageStates,
             ...votersVotesPageStates,
             ...differencesPageStates,
             ...abortInputModalStates,
           } satisfies Record<MachineStateKey, () => void>,
           events: {
             ...votersAndVotesPageEvents,
-            ...recountedPageEvents,
             ...differencesPageEvents,
             ...abortInputModalEvents,
             ...PollingStationsPageEvents,

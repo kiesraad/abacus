@@ -145,9 +145,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
 
       renderForm();
@@ -169,9 +167,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
 
       renderForm();
@@ -187,9 +183,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
 
       renderForm();
@@ -217,9 +211,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
       renderForm();
 
@@ -465,9 +457,7 @@ describe("Test CandidatesVotesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
       renderForm();
 
@@ -498,9 +488,7 @@ describe("Test CandidatesVotesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
       renderForm();
 
@@ -533,9 +521,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
       renderForm();
 

@@ -175,10 +175,6 @@ impl TotalVotes {
                     summary.voters_counts.proxy_certificate_count as u64,
                 ),
                 UncountedVotes::new(
-                    UncountedVotesReason::VoterCard,
-                    summary.voters_counts.voter_card_count as u64,
-                ),
-                UncountedVotes::new(
                     UncountedVotesReason::TotalAdmittedVoters,
                     summary.voters_counts.total_admitted_voters_count as u64,
                 ),
@@ -269,19 +265,15 @@ impl ReportingUnitVotes {
             uncounted_votes: vec![
                 UncountedVotes::new(
                     UncountedVotesReason::PollCard,
-                    results.latest_voters_counts().poll_card_count as u64,
+                    results.voters_counts.poll_card_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::ProxyCertificate,
-                    results.latest_voters_counts().proxy_certificate_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::VoterCard,
-                    results.latest_voters_counts().voter_card_count as u64,
+                    results.voters_counts.proxy_certificate_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::TotalAdmittedVoters,
-                    results.latest_voters_counts().total_admitted_voters_count as u64,
+                    results.voters_counts.total_admitted_voters_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::MoreBallots,

@@ -5,7 +5,7 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ClientState, DataEntryAction, DataEntryState } from "../types/types";
 import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
 
-export const INITIAL_FORM_SECTION_ID: FormSectionId = "recounted";
+export const INITIAL_FORM_SECTION_ID: FormSectionId = "voters_votes_counts";
 
 export function getInitialState(
   election: ElectionWithPoliticalGroups,
@@ -34,7 +34,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
 
   switch (action.type) {
     case "DATA_ENTRY_CLAIMED": {
-      const dataEntryStructure = getDataEntryStructure(state.election, action.dataEntry.data);
+      const dataEntryStructure = getDataEntryStructure(state.election);
       if (action.dataEntry.client_state) {
         const { formState, targetFormSectionId } = buildFormState(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -98,7 +98,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         error: action.error,
       };
     case "FORM_SAVED": {
-      const dataEntryStructure = getDataEntryStructure(state.election, action.data);
+      const dataEntryStructure = getDataEntryStructure(state.election);
 
       const formState = updateFormStateAfterSubmit(
         dataEntryStructure,

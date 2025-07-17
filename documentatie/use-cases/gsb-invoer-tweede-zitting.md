@@ -9,7 +9,7 @@ __Niveau:__ hoog-over, vlieger, 🪁
 __Precondities:__
 
 - [De beheerder richt de applicatie in](./beheerder.md#de-beheerder-richt-de-applicatie-in-wolk)
-- [Het GSB heeft de eerste zitting afgerond](./gsb-eerste-zitting.md)
+- [Het GSB heeft de eerste zitting afgerond](./gsb-eerste-zitting.md#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-eerste-zitting-wolk)
 - [Het GSB behandelt een verzoek tot hertelling](./gsb-tweede-zitting.md#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
 
 ### Hoofdscenario en uitbreidingen

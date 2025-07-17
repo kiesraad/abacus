@@ -1454,6 +1454,16 @@
               }
             }
           },
+          "412": {
+            "description": "Data entry is not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -1533,6 +1543,16 @@
               }
             }
           },
+          "412": {
+            "description": "Data entry is not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "JSON error or invalid data (Unprocessable Content)",
             "content": {
@@ -1596,6 +1616,16 @@
           },
           "404": {
             "description": "No data entry with accepted errors found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -1675,6 +1705,16 @@
           },
           "409": {
             "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -1785,6 +1825,16 @@
               }
             }
           },
+          "412": {
+            "description": "Data entry is not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "JSON error or invalid data (Unprocessable Content)",
             "content": {
@@ -1868,6 +1918,16 @@
               }
             }
           },
+          "412": {
+            "description": "Data entry is not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -1932,6 +1992,16 @@
           },
           "409": {
             "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -2014,6 +2084,16 @@
           },
           "409": {
             "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -4140,6 +4220,7 @@
           "AllListsExhausted",
           "ApportionmentNotAvailableUntilDataEntryFinalised",
           "CommitteeSessionNotFinalised",
+          "CommitteeSessionNotInProgress",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",

@@ -15,9 +15,13 @@ use utoipa::ToSchema;
 use zip::result::ZipError;
 
 use crate::{
-    MAX_BODY_SIZE_MB, apportionment::ApportionmentError,
-    authentication::error::AuthenticationError, data_entry::DataError, eml::EMLImportError,
-    pdf_gen::PdfGenError, report::ReportError,
+    MAX_BODY_SIZE_MB,
+    apportionment::ApportionmentError,
+    authentication::error::AuthenticationError,
+    data_entry::{DataError, status::DataEntryTransitionError},
+    eml::EMLImportError,
+    pdf_gen::PdfGenError,
+    report::ReportError,
 };
 
 /// Error reference used to show the corresponding error message to the end-user
@@ -27,6 +31,7 @@ pub enum ErrorReference {
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     CommitteeSessionNotFinalised,
+    CommitteeSessionNotInProgress,
     DatabaseError,
     DataEntryAlreadyClaimed,
     DataEntryAlreadyFinalised,
@@ -82,6 +87,7 @@ pub enum APIError {
     BadRequest(String, ErrorReference),
     Conflict(String, ErrorReference),
     ContentTooLarge(String, ErrorReference),
+    DataEntry(DataEntryTransitionError),
     EmlImportError(EMLImportError),
     InvalidData(DataError),
     InvalidHeaderValue,
@@ -330,6 +336,46 @@ impl IntoResponse for APIError {
                         to_error(
                             "No votes on candidates cast",
                             ErrorReference::ZeroVotesCast,
+                            false,
+                        ),
+                    ),
+                }
+            }
+            APIError::DataEntry(err) => {
+                error!("Data entry error: {:?}", err);
+
+                match err {
+                    DataEntryTransitionError::CommitteeSessionNotInProgress => (
+                        StatusCode::PRECONDITION_FAILED,
+                        to_error(
+                            "Committee session data entry needs to be in progress",
+                            ErrorReference::CommitteeSessionNotInProgress,
+                            false,
+                        ),
+                    ),
+                    DataEntryTransitionError::FirstEntryAlreadyClaimed
+                    | DataEntryTransitionError::SecondEntryAlreadyClaimed => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Data entry is already claimed",
+                            ErrorReference::DataEntryAlreadyClaimed,
+                            false,
+                        ),
+                    ),
+                    DataEntryTransitionError::FirstEntryAlreadyFinalised
+                    | DataEntryTransitionError::SecondEntryAlreadyFinalised => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Data entry is already finalised",
+                            ErrorReference::DataEntryAlreadyFinalised,
+                            false,
+                        ),
+                    ),
+                    _ => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Invalid data entry action performed",
+                            ErrorReference::InvalidStateTransition,
                             false,
                         ),
                     ),

@@ -648,6 +648,7 @@ export type ErrorReference =
   | "AllListsExhausted"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "CommitteeSessionNotFinalised"
+  | "CommitteeSessionNotInProgress"
   | "DatabaseError"
   | "DataEntryAlreadyClaimed"
   | "DataEntryAlreadyFinalised"

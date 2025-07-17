@@ -184,6 +184,7 @@ pub async fn committee_session_status_change(
 
 #[cfg(test)]
 pub mod tests {
+    use crate::committee_session::status::CommitteeSessionStatus;
     use crate::committee_session::{
         CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
     };
@@ -199,6 +200,17 @@ pub mod tests {
                 number,
                 election_id,
             })
+            .await
+            .unwrap()
+    }
+
+    pub async fn change_status_committee_session(
+        pool: SqlitePool,
+        committee_session_id: u32,
+        status: CommitteeSessionStatus,
+    ) -> CommitteeSession {
+        CommitteeSessions::new(pool.clone())
+            .change_status(committee_session_id, status)
             .await
             .unwrap()
     }

@@ -106,9 +106,10 @@ export function CommitteeSessionCard({
   let button = undefined;
   switch (committeeSession.status) {
     case "created":
-      if (committeeSession.number > 1) {
-        buttonLinks.push({ id: committeeSession.id, label: t("election_management.select_polling_stations"), to: "" }); // TODO: issue #1716 add link
-      }
+      // TODO: Add in issue #1716 with link
+      // if (committeeSession.number > 1 && currentSession) {
+      //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.select_polling_stations"), to: "" });
+      // }
       break;
     case "data_entry_not_started":
       button = (
@@ -137,7 +138,8 @@ export function CommitteeSessionCard({
       }
       break;
   }
-  buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" }); // TODO: issue #1750 add link
+  // TODO: Add in issue #1750 with link
+  // buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" });
 
   return (
     <Card icon={icon} label={label} status={status} date={date} button={button} {...props}>

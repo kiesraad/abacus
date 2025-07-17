@@ -322,41 +322,23 @@ mod tests {
             differences_counts: DifferencesCounts::zero(),
             political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
         };
-        let second_entry = first_entry.clone();
+        let mut second_entry = first_entry.clone();
+        second_entry.voters_counts.poll_card_count = 101;
+        second_entry.voters_counts.total_admitted_voters_count = 106;
         second_entry.compare(
             &first_entry,
             &mut different_fields,
             &"polling_station_results".into(),
         );
-        assert_eq!(different_fields.len(), 0);
-    }
-
-    /// Tests that polling station results with voters count differences are correctly identified as not equal.
-    #[test]
-    fn test_not_equal_voters_counts_differences_variant() {
-        let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults {
-            voters_counts: VotersCounts {
-                poll_card_count: 100,
-                proxy_certificate_count: 2,
-                total_admitted_voters_count: 105,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_count: 100,
-                blank_votes_count: 3,
-                invalid_votes_count: 2,
-                total_votes_cast_count: 105,
-            },
-            differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
-        };
-        let second_entry = first_entry.clone();
-        second_entry.compare(
-            &first_entry,
-            &mut different_fields,
-            &"polling_station_results".into(),
+        assert_eq!(different_fields.len(), 2);
+        assert_eq!(
+            different_fields[0],
+            "polling_station_results.voters_counts.poll_card_count"
         );
-        assert_eq!(different_fields.len(), 0);
+        assert_eq!(
+            different_fields[1],
+            "polling_station_results.voters_counts.total_admitted_voters_count"
+        );
     }
 
     /// Tests that polling station results with differences in differences counts are correctly identified as not equal.

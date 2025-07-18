@@ -61,7 +61,12 @@
     return zero
   }
 
-  return str(integer).clusters().rev().chunks(3).map(c => c.join("")).join(thousands-sep).rev()
+  let formatted = str(integer).clusters().rev().chunks(3).map(c => c.join("")).join(thousands-sep).rev()
+
+  text(
+    number-width: "tabular",
+    formatted,
+  )
 }
 
 /// Display a box with a prefixed label and a value

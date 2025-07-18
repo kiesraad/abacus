@@ -772,11 +772,6 @@ async fn election_status(
 
 #[cfg(test)]
 pub mod tests {
-    use axum::http::StatusCode;
-    use http_body_util::BodyExt;
-    use sqlx::{SqlitePool, query, query_as};
-    use test_log::test;
-
     use super::*;
     use crate::{
         audit_log::AuditLog,
@@ -784,6 +779,10 @@ pub mod tests {
         committee_session::tests::{change_status_committee_session, create_committee_session},
         data_entry::{DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts},
     };
+    use axum::http::StatusCode;
+    use http_body_util::BodyExt;
+    use sqlx::{SqlitePool, query, query_as};
+    use test_log::test;
 
     pub fn example_data_entry() -> DataEntry {
         DataEntry {
@@ -954,9 +953,26 @@ pub mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_claim_data_entry_committee_session_status_not_data_entry_in_progress(
+        pool: SqlitePool,
+    ) {
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
+            .await;
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+
+        // Check that no row was created
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 0);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_create_data_entry(pool: SqlitePool) {
-        let mut request_body = example_data_entry();
-        request_body.data.voters_counts.poll_card_count = 100; // incorrect value
+        let request_body = example_data_entry();
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -975,6 +991,37 @@ pub mod tests {
             .await
             .unwrap();
         assert_eq!(row_count.count, 1);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_create_data_entry_committee_session_status_not_data_entry_in_progress(
+        pool: SqlitePool,
+    ) {
+        let request_body = example_data_entry();
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
+            .await;
+
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+
+        // Check that the row was not updated
+        let polling_station_data_entries = PollingStationDataEntries::new(pool.clone());
+        let data_entry = polling_station_data_entries.get_row(1, 2).await.unwrap();
+        let data: DataEntryStatus = data_entry.state.0;
+        let DataEntryStatus::FirstEntryInProgress(state) = data else {
+            panic!("Expected entry to be in FirstEntryInProgress state");
+        };
+        assert_ne!(state.first_entry, request_body.data);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1027,43 +1074,6 @@ pub mod tests {
         .expect("No data found");
         assert_eq!(data[0].committee_session_id, 2);
         assert_eq!(data[1].committee_session_id, committee_session.id);
-    }
-
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_first_entry_finalise_with_errors(pool: SqlitePool) {
-        let mut request_body = example_data_entry();
-        request_body.data.voters_counts.poll_card_count = 100; // incorrect value
-
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-        let response = save(
-            pool.clone(),
-            request_body.clone(),
-            1,
-            EntryNumber::FirstEntry,
-        )
-        .await;
-        assert_eq!(response.status(), StatusCode::OK);
-
-        // Check that finalise with errors results in FirstEntryHasErrors
-        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let DataEntryStatusResponse { status } = serde_json::from_slice(&body).unwrap();
-
-        assert_eq!(status, DataEntryStatusName::FirstEntryHasErrors);
-
-        // Check that it has been logged in the audit log
-        let audit_log_row =
-            query!(r#"SELECT event_name, json(event) as "event: serde_json::Value" FROM audit_log ORDER BY id DESC LIMIT 1"#)
-                .fetch_one(&pool)
-                .await
-                .expect("should have audit log row");
-        assert_eq!(audit_log_row.event_name, "DataEntryFinalised");
-
-        let event: serde_json::Value = serde_json::to_value(&audit_log_row.event).unwrap();
-        assert_eq!(event["dataEntryStatus"], "first_entry_has_errors");
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1121,6 +1131,67 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_finalise_data_entry_committee_session_status_not_data_entry_in_progress(
+        pool: SqlitePool,
+    ) {
+        let request_body = example_data_entry();
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
+            .await;
+
+        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_first_entry_finalise_with_errors(pool: SqlitePool) {
+        let mut request_body = example_data_entry();
+        request_body.data.voters_counts.poll_card_count = 100; // incorrect value
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Check that finalise with errors results in FirstEntryHasErrors
+        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let DataEntryStatusResponse { status } = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(status, DataEntryStatusName::FirstEntryHasErrors);
+
+        // Check that it has been logged in the audit log
+        let audit_log_row =
+          query!(r#"SELECT event_name, json(event) as "event: serde_json::Value" FROM audit_log ORDER BY id DESC LIMIT 1"#)
+            .fetch_one(&pool)
+            .await
+            .expect("should have audit log row");
+        assert_eq!(audit_log_row.event_name, "DataEntryFinalised");
+
+        let event: serde_json::Value = serde_json::to_value(&audit_log_row.event).unwrap();
+        assert_eq!(event["dataEntryStatus"], "first_entry_has_errors");
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1276,6 +1347,39 @@ pub mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_polling_station_data_entry_delete_committee_session_status_not_data_entry_in_progress(
+        pool: SqlitePool,
+    ) {
+        // create data entry
+        let request_body = example_data_entry();
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
+            .await;
+
+        // delete data entry
+        let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+
+        // Check if entry is still in FirstEntryInProgress state
+        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
+          .fetch_one(&pool)
+          .await
+          .expect("One row should exist");
+        let status: DataEntryStatus = row.state.0;
+        assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entry_delete_nonexistent(pool: SqlitePool) {
         let user = User::test_user(Role::Typist, 1);
         // check that deleting a non-existing data entry returns 404
@@ -1326,7 +1430,9 @@ pub mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_differences_keep_first(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
-        resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepFirstEntry).await;
+        let response =
+            resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepFirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
 
         let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)
@@ -1346,7 +1452,13 @@ pub mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_differences_keep_second(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
-        resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepSecondEntry).await;
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
+            .await;
+
+        let response =
+            resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepSecondEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
 
         let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)
@@ -1366,12 +1478,13 @@ pub mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_differences_discard_both(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
-        resolve_differences(
+        let response = resolve_differences(
             pool.clone(),
             1,
             ResolveDifferencesAction::DiscardBothEntries,
         )
         .await;
+        assert_eq!(response.status(), StatusCode::OK);
 
         let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)
@@ -1379,5 +1492,28 @@ pub mod tests {
             .expect("One row should exist");
         let status: DataEntryStatus = row.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryNotStarted));
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_data_entry_resolve_differences_committee_session_status_not_ok(pool: SqlitePool) {
+        finalise_different_entries(pool.clone()).await;
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
+            .await;
+
+        let response = resolve_differences(
+            pool.clone(),
+            1,
+            ResolveDifferencesAction::DiscardBothEntries,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+
+        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
+          .fetch_one(&pool)
+          .await
+          .expect("One row should exist");
+        let status: DataEntryStatus = row.state.0;
+        assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
     }
 }

@@ -55,22 +55,27 @@
 #let fmt-number(
   integer,
   thousands-sep: ".",
-  zero: "-"
+  zero: "-",
 ) = {
-  if (integer == 0) {
+  if (integer == 0 or integer == none) {
     return zero
   }
 
-  return str(integer).clusters().rev().chunks(3).map(c => c.join("")).join(thousands-sep).rev()
+  let formatted = str(integer).clusters().rev().chunks(3).map(c => c.join("")).join(thousands-sep).rev()
+
+  text(
+    number-width: "tabular",
+    formatted,
+  )
 }
 
 /// Display a box with a prefixed label and a value
-#let letterbox(letter, value: int, light: true, content) = {
+#let letterbox(letter, value: none, light: true, content) = {
   let bg = if light { luma(213) } else { black }
   let fill = if light { black } else { white }
 
   grid(
-    columns: (8em, 4em, 1fr),
+    columns: (8em, 3.5em, 1fr),
     align: (center, right),
     inset: 9pt,
     grid.cell(align: right, stroke: 0.5pt + black, text(number-width: "tabular", fmt-number(value))),
@@ -78,6 +83,32 @@
     grid.cell(align: horizon + left, content),
   )
 }
+
+#let empty_letterbox(letter, cells: 5, light: true, content) = {
+  let bg = if light { luma(213) } else { black }
+  let fill = if light { black } else { white }
+
+  grid(
+    inset: 9pt,
+    columns: range(0, cells).map(_ => 2em) + (3.5em, 1fr),
+    align: (center, right),
+    grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
+    ..range(0, cells).map(cell => {
+      grid.cell(
+        stroke: (
+          y: 0.5pt + black,
+          x: (paint: black, thickness: 0.5pt, dash: "densely-dotted"),
+        ),
+        " ",
+      )
+    }),
+    grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
+    grid.cell(stroke: 0.5pt + black, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
+    grid.cell(align: horizon + left, content),
+  )
+}
+
+
 
 // Mathematical addition layout
 #let sum(..boxes, sum_box) = {
@@ -234,14 +265,31 @@
     .flatten())
 }
 
+#let empty_grid(cells: 4, paint: black, thickness: 1pt) = {
+  grid(
+    inset: 9pt,
+    columns: range(0, cells).map(_ => 2em),
+    align: (center, right),
+    ..range(0, cells - 1)
+      .map(_ => (
+        grid.cell(" "),
+        grid.vline(stroke: (paint: paint, thickness: thickness, dash: "densely-dotted")),
+      ))
+      .flatten(),
+    grid.cell(" "),
+  )
+}
+
 // View a votes table, values should be a dictionary with the keys "name", "number" and "votes"
 #let votes_table(
   headers: ("", "", ""),
+  title: "",
   total: 0,
   values: (),
   continue_on_next_page: "",
   column_total: (c, v) => [#c: #v],
   sum_total: [(#columns)],
+  total_instruction: "",
 ) = {
   // Counter that keeps track of the column number
   let column = 0
@@ -259,13 +307,17 @@
   let break_count = (25, 25, 15, 15)
   let total_rows = values.len()
 
+  text(size: 14pt, weight: "semibold")[Lijst #title]
+
   set text(size: 8pt)
 
   columns(2, {
     while rc < total_rows {
+      let rows_in_column = calc.min(break_count.at(column, default: 15), total_rows - rc)
+
       table(
         columns: (1fr, 2.5em, auto),
-        rows: 23pt,
+        rows: (auto,) + range(0, rows_in_column).map(_ => 23pt) + (8pt, 23pt),
         inset: 8pt,
         stroke: 0.5pt + silver,
         fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
@@ -281,34 +333,53 @@
           column_row += 1
 
           (
-            table.cell(align: horizon, text(top-edge: 5pt, c.name)),
+            table.cell(align: horizon, text(top-edge: 5pt, [#c.name])),
             table.cell(fill: luma(213), align: center + horizon, text(
               number-width: "tabular",
               weight: "bold",
               [#c.number],
             )),
-            table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes))),
+            if c.votes == none {
+              table.cell(inset: 0pt, empty_grid(paint: luma(213)))
+            } else {
+              table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes)))
+            },
           )
 
           if calc.rem(column_row, break_count.at(column, default: 15)) == 0 {
             break
           }
         }.flatten(),
+        table.hline(stroke: 1pt + black),
         table.footer(
-          table.hline(stroke: 1pt + black),
           // Empty line
           table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 0pt, []),
-          table.cell(colspan: 3, fill: white, align: center, {
-            // Increment the column counter
-            column += 1
+          if type(column_total) == function {
+            table.cell(colspan: 3, fill: white, align: center, {
+              // Increment the column counter
+              column += 1
 
-            // Caller defined render of column totals
-            column_total(column, votes)
+              // Caller defined render of column totals
+              column_total(column, votes)
 
-            // Reset the votes per column counter
-            votes = 0
-            column_row = 0
-          }),
+              // Reset the votes per column counter
+              votes = 0
+              column_row = 0
+            })
+          } else {
+            table.cell(colspan: 3, fill: white, inset: 0pt, {
+              column += 1
+
+              grid(
+                columns: (1fr, 10em),
+                grid.cell(inset: 9pt, align: center)[#column_total #column],
+                grid.cell(empty_grid(cells: 5, paint: luma(213)), align: center, inset: 0pt),
+              )
+
+              votes = 0
+              column_row = 0
+            })
+          },
         ),
       )
 
@@ -317,7 +388,15 @@
           v(8pt)
           align(right, text(weight: "bold", continue_on_next_page))
         }
+
         colbreak()
+
+        if (column == 2) {
+          place(top + left, scope: "parent", float: true, text(
+            size: 14pt,
+            weight: "semibold",
+          )[Vervolg lijst #title])
+        }
       }
     }
   })
@@ -326,14 +405,26 @@
     columns: (1fr, 8em),
     align: (right, right),
     inset: 8pt,
-    grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(context range(
+    grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(range(
       1,
       column + 1,
     )
       .map(str)
       .join(" + ")))),
-    grid.cell(stroke: 0.5pt + black)[#fmt-number(total, zero: 0)],
+    if total == none {
+      grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5, thickness: 0.5pt))
+    } else {
+      grid.cell(stroke: 0.5pt + black, fmt-number(total, zero: "0"))
+    },
   ))
+
+  if total == none {
+    align(right, text(
+      size: 10pt,
+      weight: "bold",
+      total_instruction,
+    ))
+  }
 
   pagebreak(weak: true)
 }

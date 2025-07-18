@@ -238,32 +238,28 @@ async fn polling_station_delete(
         .get_for_election(election_id, polling_station_id)
         .await?;
 
-    let deleted = polling_stations_repo
+    polling_stations_repo
         .delete(election_id, polling_station_id)
         .await?;
 
-    if deleted {
-        audit_service
-            .log(
-                &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
-                None,
-            )
-            .await?;
+    audit_service
+        .log(
+            &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
+            None,
+        )
+        .await?;
 
-        if polling_stations_repo.list(election_id).await?.is_empty() {
-            change_committee_session_status(
-                committee_session.id,
-                CommitteeSessionStatus::Created,
-                pool.clone(),
-                audit_service,
-            )
-            .await?;
-        }
-
-        Ok(StatusCode::OK)
-    } else {
-        Ok(StatusCode::NOT_FOUND)
+    if polling_stations_repo.list(election_id).await?.is_empty() {
+        change_committee_session_status(
+            committee_session.id,
+            CommitteeSessionStatus::Created,
+            pool.clone(),
+            audit_service,
+        )
+        .await?;
     }
+
+    Ok(StatusCode::OK)
 }
 
 #[cfg(test)]

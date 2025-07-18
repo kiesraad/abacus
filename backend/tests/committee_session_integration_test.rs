@@ -138,7 +138,7 @@ async fn test_committee_session_status_change_works(pool: SqlitePool) {
         .put(&url)
         .header("cookie", coordinator_cookie)
         .json(&CommitteeSessionStatusChangeRequest {
-            status: CommitteeSessionStatus::DataEntryPaused,
+            status: CommitteeSessionStatus::DataEntryFinished,
         })
         .send()
         .await

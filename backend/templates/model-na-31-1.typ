@@ -20,7 +20,7 @@
 #title_page(
   is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
-  [#input.election.name #format_date(input.election.election_date)],
+  [Gemeenteraad - #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst en kandidaat \
     Model Na 31-1
@@ -150,7 +150,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Toegelaten kiezers
 
-#is_municipality[
+#if not "voter_card_count" in input.summary.voters_counts [
   Tel het aantal geldige stempassen en volmachtbewijzen
 
   #sum(
@@ -165,7 +165,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
       value: input.summary.voters_counts.total_admitted_voters_count,
     )[Totaal toegelaten kiezers (A+B)],
   )
-][
+] else [
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
 
   #sum(
@@ -272,7 +272,7 @@ Voer de controle uit volgens de stappen in het controleprotocol.
       votes: candidate.votes,
     )),
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
-    column_total: (c, v) => [Subtotaal kolom #c: #fmt-number(v)],
+    column_total: (c, v) => [Subtotaal kolom #c: #fmt-number(v, zero: "0")],
     sum_total: columns => [Totaal lijst (kolom #columns)],
   )
 }
@@ -306,4 +306,4 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === Extra ondertekening: (niet verplicht)
 
-#stack(spacing: 0.5em, ..range(0, 5).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))

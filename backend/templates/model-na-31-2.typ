@@ -20,7 +20,7 @@
 #title_page(
   is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
-  [#input.election.name #format_date(input.election.election_date)],
+  [Gemeenteraad - #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst en kandidaat \
     Model Na 31-2
@@ -46,12 +46,12 @@ Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een v
 == Inhoudsopgave
 
 - Deel 1 - *Verslag van de zitting* (het verloop van het tellen en optellen)
-- Deel 2 - *Telresultaten* van de/het hele gemeente/openbaar lichaam
+- Deel 2 - *Telresultaten* van #is_municipality[de hele gemeente][het hele openbaar lichaam]
 - Deel 3 - *Ondertekening* door de leden van het #location_type
 
 \
 
-- Bijlage 1: Telresultaten van alle stembureaus in de/het gemeente/openbaar lichaam
+- Bijlage 1: Telresultaten van alle stembureaus in #is_municipality[de gemeente][het openbaar lichaam]
 - Bijlage 2: Overzicht van alle bezwaren die op de stembureaus zijn gemaakt
 
 #pagebreak(weak: true)
@@ -156,7 +156,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Toegelaten kiezers
 
-#is_municipality[
+#if not "voter_card_count" in input.summary.voters_counts [
   Tel het aantal geldige stempassen en volmachtbewijzen
 
   #sum(
@@ -171,7 +171,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
       value: input.summary.voters_counts.total_admitted_voters_count,
     )[Totaal toegelaten kiezers (A+B)],
   )
-][
+] else [
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
 
   #sum(
@@ -312,4 +312,4 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === Extra ondertekening: (niet verplicht)
 
-#stack(spacing: 0.5em, ..range(0, 5).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))

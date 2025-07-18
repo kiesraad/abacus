@@ -13,6 +13,7 @@
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
+#let location = is_municipality[gemeente][openbaar lichaam]
 
 #show: doc => conf(doc, header: [Stembureau #polling_station_number], footer: [Proces-verbaal van een stembureau \
   Model N 10-2 centrale stemopneming])
@@ -31,7 +32,11 @@
 
 == Details van het #if is_mobile { "mobiel stembureau" } else { "stembureau" }
 
+#TODO
+
 Kieskring \<nummer> #sym.arrow.r #location_name #sym.arrow.r Stembureau #polling_station_number
+
+#TODO
 
 \<Plaats> \<tijdstip aanvang zitting> \
 \<tijd:van> - \<tot> \<naam stembureau> \
@@ -47,7 +52,7 @@ Kieskring \<nummer> #sym.arrow.r #location_name #sym.arrow.r Stembureau #polling
 Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het stemmen en het tellen van de stemmen is verlopen
 
 #emph_block[
-  In #this_location is gekozen voor centrale stemopneming. Het stembureau telt na het stemmen het aantal kiezers, en hoeveel stemmen elke lijst heeft gekregen. Het gemeentelijk stembureau/stembureau voor het openbaar lichaam telt 1 of 2 dagen later de stemmen per kandidaat op een centrale tellocatie. Die telresultaten staan in het verslag van het gemeentelijk stembureau/stembureau voor het openbaar lichaam.
+  In #this_location is gekozen voor centrale stemopneming. Het stembureau telt na het stemmen het aantal kiezers, en hoeveel stemmen elke lijst heeft gekregen. Het #location_type telt 1 of 2 dagen later de stemmen per kandidaat op een centrale tellocatie. Die telresultaten staan in het verslag van het #location_type.
 ]
 
 == Inhoudsopgave
@@ -94,7 +99,7 @@ Schrijf geen namen of andere persoonsgegevens op. Schrijf alle bezwaren op, ook 
 
 === Schrijf gedurende de dag alles op wat tijdens het tellen van de stemmen *verschillen tussen het aantal toegelaten kiezers en de uitgebrachte stemmen* kan verklaren.
 
-Denk aan kiezers die het stembiljet niet in de stembusstoppen maar meenemen. Of kiezers die één stempas inleverden en twee stembiljetten kregen.
+Denk aan kiezers die het stembiljet niet in de stembus stoppen maar meenemen. Of kiezers die één stempas inleverden en twee stembiljetten kregen.
 
 #empty_table(
   columns: (7em, 1fr),
@@ -105,7 +110,7 @@ Denk aan kiezers die het stembiljet niet in de stembusstoppen maar meenemen. Of 
 
 === Andere *bijzonderheden* die mogelijk invloed hebben op het stemproces of de resultaten van dit stembureau.
 
-Denk aan stembureauleden die te laat waren, niet werkende techniek of stembussen die vol waren. Of een stembureaulid dat met een stempas uit een andere gemeente/openbaar lichaam in dit stembureau heeft gestemd.
+Denk aan stembureauleden die te laat waren, niet werkende techniek of stembussen die vol waren. Of een stembureaulid dat met een stempas uit een andere #location in dit stembureau heeft gestemd.
 
 #empty_table(
   columns: (7em, 1fr),

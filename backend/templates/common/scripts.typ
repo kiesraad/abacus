@@ -260,7 +260,7 @@
     .flatten())
 }
 
-#let empty_grid(cells: 4) = {
+#let empty_grid(cells: 4, paint: black, thickness: 1pt) = {
   grid(
     inset: 9pt,
     columns: range(0, cells).map(_ => 2em),
@@ -268,7 +268,7 @@
     ..range(0, cells - 1)
       .map(_ => (
         grid.cell(" "),
-        grid.vline(stroke: (paint: black, thickness: 0.5pt, dash: "densely-dotted")),
+        grid.vline(stroke: (paint: paint, thickness: thickness, dash: "densely-dotted")),
       ))
       .flatten(),
     grid.cell(" "),
@@ -308,9 +308,11 @@
 
   columns(2, {
     while rc < total_rows {
+      let rows_in_column = calc.min(break_count.at(column, default: 15), total_rows - rc)
+
       table(
         columns: (1fr, 2.5em, auto),
-        rows: 23pt,
+        rows: (auto,) + range(0, rows_in_column).map(_ => 23pt) + (8pt, 23pt),
         inset: 8pt,
         stroke: 0.5pt + silver,
         fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
@@ -333,7 +335,7 @@
               [#c.number],
             )),
             if c.votes == none {
-              table.cell(inset: 0pt, empty_grid())
+              table.cell(inset: 0pt, empty_grid(paint: luma(213)))
             } else {
               table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes)))
             },
@@ -343,8 +345,8 @@
             break
           }
         }.flatten(),
+        table.hline(stroke: 1pt + black),
         table.footer(
-          table.hline(stroke: 1pt + black),
           // Empty line
           table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 0pt, []),
           if type(column_total) == function {
@@ -366,7 +368,7 @@
               grid(
                 columns: (1fr, 10em),
                 grid.cell(inset: 9pt, align: center)[#column_total #column],
-                grid.cell(empty_grid(cells: 5)),
+                grid.cell(empty_grid(cells: 5, paint: luma(213)), align: center, inset: 0pt),
               )
 
               votes = 0
@@ -394,25 +396,22 @@
     }
   })
 
-  align(
-    if total == none { left } else { bottom },
-    grid(
-      columns: (1fr, 8em),
-      align: (right, right),
-      inset: 8pt,
-      grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(range(
-        1,
-        column + 1,
-      )
-        .map(str)
-        .join(" + ")))),
-      if total == none {
-        grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5))
-      } else {
-        grid.cell(stroke: 0.5pt + black, fmt-number(total, zero: "0"))
-      },
-    ),
-  )
+  align(bottom, grid(
+    columns: (1fr, 8em),
+    align: (right, right),
+    inset: 8pt,
+    grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(range(
+      1,
+      column + 1,
+    )
+      .map(str)
+      .join(" + ")))),
+    if total == none {
+      grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5, thickness: 0.5pt))
+    } else {
+      grid.cell(stroke: 0.5pt + black, fmt-number(total, zero: "0"))
+    },
+  ))
 
   if total == none {
     align(right, text(

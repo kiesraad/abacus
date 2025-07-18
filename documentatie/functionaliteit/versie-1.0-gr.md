@@ -11,7 +11,7 @@ De eerste versie van Abacus bevat de functionaliteit voor het GSB bij de Gemeent
 ### Gebruikers en rollen
 
 - Gebruikers kunnen lokaal worden aangemaakt met eenvoudige authenticatie, dus alleen een gebruikersnaam en wachtwoord.
-- Gebruikers hebben verschillende autorisatieniveaus op basis van de toegewezen rol: Beheerder, Coördinator GSB.
+- Gebruikers hebben verschillende autorisatieniveaus op basis van de toegewezen rol: Beheerder, Coördinator GSB en Invoerder GSB.
 
 ### Inrichting van de applicatie
 

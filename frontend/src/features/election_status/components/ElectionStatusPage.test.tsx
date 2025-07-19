@@ -1,7 +1,6 @@
-import { waitForElementToBeRemoved } from "@testing-library/dom";
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
@@ -18,6 +17,13 @@ import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
 import { electionStatusRoutes } from "../routes";
+
+const navigate = vi.fn();
+
+vi.mock("react-router", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useNavigate: () => navigate,
+}));
 
 async function renderPage() {
   // Set up router and navigate to the election data entry status page
@@ -64,6 +70,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input visible when data entry has finished", async () => {
+    const user = userEvent.setup();
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "definitive" },
@@ -74,7 +81,12 @@ describe("ElectionStatusPage", () => {
     await renderPage();
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Invoerfase afronden" })).toBeVisible();
+    const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
+    expect(finishButton).toBeVisible();
+
+    await user.click(finishButton);
+
+    expect(navigate).toHaveBeenCalledWith("../report");
   });
 
   test("Finish input not visible when election is finished", async () => {
@@ -104,10 +116,9 @@ describe("ElectionStatusPage", () => {
     await router.navigate({ hash: "data-entry-kept-1" });
     expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
 
-    // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
+    // Close the alert and expect the hash to be removed from the url
     await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
-    await alertClosed;
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
   test("Both data entries discarded alert works", async () => {
@@ -122,10 +133,9 @@ describe("ElectionStatusPage", () => {
     await router.navigate({ hash: "data-entries-discarded-1" });
     expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
 
-    // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
+    // Close the alert and expect the hash to be removed from the url
     await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
-    await alertClosed;
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
   test("First data entry resumed alert works", async () => {
@@ -140,10 +150,9 @@ describe("ElectionStatusPage", () => {
     await router.navigate({ hash: "data-entry-resumed-4" });
     expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
 
-    // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
+    // Close the alert and expect the hash to be removed from the url
     await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
-    await alertClosed;
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
   test("First data entry discarded alert works", async () => {
@@ -161,9 +170,8 @@ describe("ElectionStatusPage", () => {
     await router.navigate({ hash: "data-entry-discarded-4" });
     expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
 
-    // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
+    // Close the alert and expect the hash to be removed from the url
     await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
-    await alertClosed;
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 });

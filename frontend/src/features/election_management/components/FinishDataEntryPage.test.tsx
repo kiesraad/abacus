@@ -42,7 +42,7 @@ describe("FinishDataEntryPage", () => {
     server.use(CommitteeSessionStatusChangeRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
   });
 
-  test("Error when election is not ready", async () => {
+  test("Error when committee session is not in the correct state", async () => {
     // Since we test what happens after an error, we want vitest to ignore them
     vi.spyOn(console, "error").mockImplementation(() => {
       /* do nothing */
@@ -71,7 +71,7 @@ describe("FinishDataEntryPage", () => {
 
   test("Shows page and click on finish data entry phase", async () => {
     const user = userEvent.setup();
-    const status_change = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
 
     await renderPage();
@@ -86,13 +86,13 @@ describe("FinishDataEntryPage", () => {
     expect(finishButton).toBeVisible();
     await user.click(finishButton);
 
-    expect(status_change).toHaveBeenCalledWith({ status: "data_entry_finished" });
+    expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_finished" });
     expect(navigate).toHaveBeenCalledWith("/elections/1/report/download");
   });
 
   test("Shows page and click on stay in data entry phase", async () => {
     const user = userEvent.setup();
-    const status_change = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
 
     const router = await renderPage();
@@ -105,7 +105,7 @@ describe("FinishDataEntryPage", () => {
     expect(cancelButton).toBeVisible();
     await user.click(cancelButton);
 
-    expect(status_change).not.toHaveBeenCalled();
+    expect(statusChange).not.toHaveBeenCalled();
     expect(router.state.location.pathname).toEqual("/status");
   });
 

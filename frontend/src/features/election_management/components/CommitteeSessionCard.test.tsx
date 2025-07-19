@@ -1,11 +1,25 @@
-import { describe, expect, test } from "vitest";
+import { userEvent } from "@testing-library/user-event";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
-import { render, screen } from "@/testing/test-utils";
+import { CommitteeSessionStatusChangeRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { server } from "@/testing/server";
+import { render, renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
 
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 
+const navigate = vi.fn();
+
+vi.mock("react-router", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useNavigate: () => navigate,
+}));
+
 describe("UI component: CommitteeSessionCard", () => {
+  beforeEach(() => {
+    server.use(CommitteeSessionStatusChangeRequestHandler);
+  });
+
   test("The card renders with status created committee session number 1", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
@@ -34,7 +48,9 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("— Voorbereiden")).toBeVisible();
   });
 
-  test("The card renders with status data_entry_not_started", () => {
+  test("The card renders with status data_entry_not_started", async () => {
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_not_started",
@@ -47,10 +63,18 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Klaar voor invoer")).toBeVisible();
 
-    expect(screen.getByRole("button", { name: "Start steminvoer" }));
+    const startButton = screen.getByRole("button", { name: "Start steminvoer" });
+    expect(startButton).toBeVisible();
+
+    await user.click(startButton);
+
+    expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_in_progress" });
+    expect(navigate).toHaveBeenCalledWith("status");
   });
 
-  test("The card renders with status data_entry_in_progress", () => {
+  test("The card renders with status data_entry_in_progress", async () => {
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_in_progress",
@@ -58,12 +82,20 @@ describe("UI component: CommitteeSessionCard", () => {
       start_time: "",
       location: "Juinen",
     });
-    render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
+    const router = renderReturningRouter(
+      <CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />,
+    );
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Invoerders bezig")).toBeVisible();
 
-    expect(screen.getByRole("link", { name: "Bekijk voortgang" }));
+    const statusButton = screen.getByRole("link", { name: "Bekijk voortgang" });
+    expect(statusButton).toBeVisible();
+
+    await user.click(statusButton);
+
+    expect(statusChange).not.toHaveBeenCalled();
+    expect(router.state.location.pathname).toEqual("/status");
   });
 
   test("The card renders with status data_entry_paused", () => {
@@ -80,7 +112,9 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("— Invoer gepauzeerd")).toBeVisible();
   });
 
-  test("The card renders with status data_entry_finished", () => {
+  test("The card renders with status data_entry_finished", async () => {
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_finished",
@@ -94,10 +128,19 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("— Invoerders klaar")).toBeVisible();
 
     expect(screen.getByRole("button", { name: "Resultaten en documenten" }));
-    expect(screen.getByRole("button", { name: "Steminvoer bekijken" }));
+
+    const viewStatusButton = screen.getByRole("button", { name: "Steminvoer bekijken" });
+    expect(viewStatusButton).toBeVisible();
+
+    await user.click(viewStatusButton);
+
+    expect(statusChange).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith("status");
   });
 
-  test("The card renders with status data_entry_finished not current session and details already saved", () => {
+  test("The card renders with status data_entry_finished not current session and details already saved", async () => {
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_finished",
@@ -111,7 +154,14 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("— Invoerders klaar")).toBeVisible();
     expect(screen.getByText("zondag 9 november 2025 09:15")).toBeVisible();
 
-    expect(screen.getByRole("button", { name: "Resultaten en documenten" }));
     expect(screen.queryByRole("button", { name: "Steminvoer bekijken" })).not.toBeInTheDocument();
+
+    const reportButton = screen.getByRole("button", { name: "Resultaten en documenten" });
+    expect(reportButton).toBeVisible();
+
+    await user.click(reportButton);
+
+    expect(statusChange).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith("report/download");
   });
 });

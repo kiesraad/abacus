@@ -69,7 +69,7 @@ describe("ResolveErrorsPage", () => {
         errorElement: <ErrorBoundary />,
         children: [
           {
-            path: "elections/:electionId/status/resolve-errors",
+            path: "elections/:electionId/status/:pollingStationId/resolve-errors",
             children: resolveErrorsRoutes,
           },
         ],
@@ -78,7 +78,7 @@ describe("ResolveErrorsPage", () => {
 
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
 
-    await router.navigate("/elections/1/status/resolve-errors");
+    await router.navigate("/elections/1/status/1/resolve-errors");
 
     rtlRender(<Providers router={router} />);
 

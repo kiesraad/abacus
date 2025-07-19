@@ -76,7 +76,7 @@ describe("ResolveDifferencesPage", () => {
         errorElement: <ErrorBoundary />,
         children: [
           {
-            path: "elections/:electionId/status/resolve-differences",
+            path: "elections/:electionId/status/:pollingStationId/resolve-differences",
             children: resolveDifferencesRoutes,
           },
         ],
@@ -85,7 +85,7 @@ describe("ResolveDifferencesPage", () => {
 
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
 
-    await router.navigate("/elections/1/status/resolve-differences");
+    await router.navigate("/elections/1/status/1/resolve-differences");
 
     rtlRender(<Providers router={router} />);
 

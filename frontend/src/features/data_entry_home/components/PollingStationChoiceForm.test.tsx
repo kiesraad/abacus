@@ -103,8 +103,6 @@ describe("Test PollingStationChoiceForm", () => {
     });
 
     test.each([
-      // TODO add tests for:
-      // "second_entry_not_started" 1st entry by same user => not handled on submit, PollingStationUserStatus.SecondEntryNotAllowed
       {
         testDescription: "invalid",
         pollingStationInput: "abc",
@@ -199,7 +197,6 @@ describe("Test PollingStationChoiceForm", () => {
     });
 
     test("Submitting an empty or invalid polling station shows alert", async () => {
-      // TODO: split test in (1) submitting empty and (2) resetting alerts when typing
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
       await renderPollingStationChoiceForm();

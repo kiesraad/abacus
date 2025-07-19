@@ -105,8 +105,8 @@ describe("Test PollingStationChoiceForm", () => {
     test.each([
       // TODO add tests for:
       // "first_entry_in_progress" by other user => invalid, PollingStationUserStatus.InProgressOtherUser
-      // "first_entry_has_errors" => invalid, PollingStationUserStatus.HasErrors
-      // "second_entry_not_started" 1st entry by same user => invalid, PollingStationUserStatus.SecondEntryNotAllowed
+      // "first_entry_has_errors" => not handled on submit, PollingStationUserStatus.HasErrors
+      // "second_entry_not_started" 1st entry by same user => not handled on submit, PollingStationUserStatus.SecondEntryNotAllowed
       {
         testDescription: "invalid",
         pollingStationInput: "abc",
@@ -136,6 +136,13 @@ describe("Test PollingStationChoiceForm", () => {
         pollingStationInput: "36", // status: "second_entry_in_progress"
         selectorFeedback: "Een andere invoerder is bezig met stembureau 36",
         submitFeedback: "Een andere invoerder is bezig met stembureau 36 (Testbuurthuis)",
+      },
+      // polling station 37: "first_entry_has_errors"
+      {
+        testDescription: "first entry in progress",
+        pollingStationInput: "38", // status: "first_entry_in_progress"
+        selectorFeedback: "Een andere invoerder is bezig met stembureau 38",
+        submitFeedback: "Een andere invoerder is bezig met stembureau 38 (Testmuseum)",
       },
     ])(
       "Entering a $testDescription polling station shows feedback and alert",

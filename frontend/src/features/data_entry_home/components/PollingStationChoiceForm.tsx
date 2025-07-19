@@ -104,6 +104,16 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       return;
     }
 
+    if (pollingStation.userStatus === PollingStationUserStatus.HasErrors) {
+      setAlert(
+        t("polling_station_choice.has_errors", {
+          nr: pollingStation.number,
+        }),
+      );
+      setLoading(false);
+      return;
+    }
+
     void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStation.statusEntry.status));
   };
 

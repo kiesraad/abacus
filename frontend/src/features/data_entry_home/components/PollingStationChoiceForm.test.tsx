@@ -104,8 +104,6 @@ describe("Test PollingStationChoiceForm", () => {
 
     test.each([
       // TODO add tests for:
-      // "first_entry_in_progress" by other user => invalid, PollingStationUserStatus.InProgressOtherUser
-      // "first_entry_has_errors" => not handled on submit, PollingStationUserStatus.HasErrors
       // "second_entry_not_started" 1st entry by same user => not handled on submit, PollingStationUserStatus.SecondEntryNotAllowed
       {
         testDescription: "invalid",
@@ -137,7 +135,12 @@ describe("Test PollingStationChoiceForm", () => {
         selectorFeedback: "Een andere invoerder is bezig met stembureau 36",
         submitFeedback: "Een andere invoerder is bezig met stembureau 36 (Testbuurthuis)",
       },
-      // polling station 37: "first_entry_has_errors"
+      {
+        testDescription: "second entry in progress",
+        pollingStationInput: "37", // status: "first_entry_has_errors"
+        selectorFeedback: "Stembureau 37 ligt ter beoordeling bij de coördinator",
+        submitFeedback: "Stembureau 37 ligt ter beoordeling bij de coördinator",
+      },
       {
         testDescription: "first entry in progress",
         pollingStationInput: "38", // status: "first_entry_in_progress"

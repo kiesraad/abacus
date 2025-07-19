@@ -147,6 +147,12 @@ describe("Test PollingStationChoiceForm", () => {
         selectorFeedback: "Een andere invoerder is bezig met stembureau 38",
         submitFeedback: "Een andere invoerder is bezig met stembureau 38 (Testmuseum)",
       },
+      {
+        testDescription: "second entry not started",
+        pollingStationInput: "39", // status: "second_entry_not_started"
+        selectorFeedback: "Je mag stembureau 39 niet nog een keer invoeren",
+        submitFeedback: "Je mag stembureau 39 niet nog een keer invoeren",
+      },
     ])(
       "Entering a $testDescription polling station shows feedback and alert",
       async ({ pollingStationInput, selectorFeedback, submitFeedback }) => {

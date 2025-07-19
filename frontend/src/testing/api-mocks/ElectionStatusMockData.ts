@@ -35,11 +35,16 @@ export const statusResponseMock: ElectionStatusResponse = {
       first_entry_progress: 100,
     },
     {
-      // TODO: will this break other tests?
       polling_station_id: 6,
       status: "first_entry_in_progress",
       first_entry_user_id: 2,
       first_entry_progress: 50,
+    },
+    {
+      polling_station_id: 7,
+      status: "second_entry_not_started",
+      first_entry_user_id: 1,
+      first_entry_progress: 100,
     },
   ],
 };

@@ -67,10 +67,6 @@ export const pollingStationMockData: PollingStation[] = [
     postal_code: "1234 QY",
     locality: "Testdorp",
   },
-];
-
-export const extendedPollingStationMockData: PollingStation[] = [
-  ...pollingStationMockData,
   {
     id: 7,
     election_id: 1,
@@ -82,6 +78,10 @@ export const extendedPollingStationMockData: PollingStation[] = [
     postal_code: "1234 AB",
     locality: "Teststad",
   },
+];
+
+export const extendedPollingStationMockData: PollingStation[] = [
+  ...pollingStationMockData,
   {
     id: 8,
     election_id: 1,

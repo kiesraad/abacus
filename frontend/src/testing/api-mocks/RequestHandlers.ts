@@ -10,6 +10,9 @@ import {
   AUDIT_LOG_LIST_USERS_REQUEST_PATH,
   AuditLogListResponse,
   ClaimDataEntryResponse,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
   CommitteeSessionListResponse,
   DataEntryGetDifferencesResponse,
   DataEntryGetErrorsResponse,
@@ -145,6 +148,14 @@ export const ElectionCommitteeSessionListRequestHandler = http.get<
   CommitteeSessionListResponse | ErrorResponse,
   ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH
 >("/api/elections/1/committee_sessions", () => HttpResponse.json(committeeSessionListMockResponse, { status: 200 }));
+
+// committee session status change handler
+export const CommitteeSessionStatusChangeRequestHandler = http.put<
+  ParamsToString<COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS>,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
+  null,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH
+>("/api/committee_sessions/1/status", () => HttpResponse.json(null, { status: 200 }));
 
 // get election list handler
 export const ElectionListRequestHandler = http.get<

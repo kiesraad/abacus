@@ -60,7 +60,7 @@ export function FinishDataEntryPage() {
             {tx("election_management.data_entry_finish_steps_explanation")}
           </div>
           <FormLayout.Controls>
-            <Button type="button" onClick={handleFinish}>
+            <Button type="submit" onClick={handleFinish}>
               {t("election.title.finish_data_entry")}
             </Button>
             <Button.Link type="button" variant="secondary" to="../status">

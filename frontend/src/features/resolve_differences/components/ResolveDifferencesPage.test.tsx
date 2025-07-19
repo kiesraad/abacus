@@ -1,12 +1,14 @@
 import { within } from "@testing-library/dom";
-import { render } from "@testing-library/react";
+import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import cls from "@/features/resolve_differences/components/ResolveDifferences.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -15,19 +17,21 @@ import {
   PollingStationDataEntryResolveDifferencesHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
-import { screen, spyOnHandler } from "@/testing/test-utils";
+import { expectErrorPage, render, screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { DataEntryStatusName } from "@/types/generated/openapi";
 
+import { resolveDifferencesRoutes } from "../routes";
 import { ResolveDifferencesPage } from "./ResolveDifferencesPage";
 
 const navigate = vi.fn();
 
-vi.mock("react-router", () => ({
+vi.mock("react-router", async (importOriginal) => ({
+  ...(await importOriginal()),
   useNavigate: () => navigate,
   useParams: () => ({ pollingStationId: "3" }),
-  useLocation: () => ({ pathname: "/" }),
 }));
 
 const renderPage = async () => {
@@ -59,6 +63,33 @@ describe("ResolveDifferencesPage", () => {
       PollingStationDataEntryResolveDifferencesHandler,
       UserListRequestHandler,
     );
+  });
+
+  test("Error when committee session is not in the correct state", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
+    const router = setupTestRouter([
+      {
+        Component: null,
+        errorElement: <ErrorBoundary />,
+        children: [
+          {
+            path: "elections/:electionId/status/resolve-differences",
+            children: resolveDifferencesRoutes,
+          },
+        ],
+      },
+    ]);
+
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+
+    await router.navigate("/elections/1/status/resolve-differences");
+
+    rtlRender(<Providers router={router} />);
+
+    await expectErrorPage();
   });
 
   test("should render the overview list and table with differences", async () => {

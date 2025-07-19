@@ -21,10 +21,11 @@ export interface ElectionStatusProps {
   statuses: ElectionStatusResponseEntry[];
   election: Required<Election>;
   pollingStations: PollingStation[];
+  addLinks: boolean;
   navigate: (path: string) => void;
 }
 
-export function ElectionStatus({ statuses, election, pollingStations, navigate }: ElectionStatusProps) {
+export function ElectionStatus({ statuses, election, pollingStations, addLinks, navigate }: ElectionStatusProps) {
   const { progressBarData, categoryCounts, pollingStationWithStatusAndTypist, tableCategories } = useElectionStatus(
     statuses,
     pollingStations,
@@ -85,7 +86,7 @@ export function ElectionStatus({ statuses, election, pollingStations, navigate }
                       {pollingStationWithStatusAndTypist
                         .filter((ps) => ps.status !== undefined && statusesForCategory[cat].includes(ps.status))
                         .map((ps) => (
-                          <CategoryRow key={`${cat}-${ps.id}`} category={cat} pollingStation={ps} />
+                          <CategoryRow key={`${cat}-${ps.id}`} category={cat} pollingStation={ps} addLink={addLinks} />
                         ))}
                     </Table.Body>
                   </Table>

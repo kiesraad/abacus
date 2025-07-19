@@ -18,8 +18,6 @@ describe("UI component: CommitteeSessionCard", () => {
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Voorbereiden")).toBeInTheDocument();
-
-    expect(screen.getByRole("button", { name: "Details van de zitting" }));
   });
 
   test("The card renders with status created committee session number 2", () => {
@@ -34,9 +32,6 @@ describe("UI component: CommitteeSessionCard", () => {
 
     expect(screen.getByText("Tweede zitting")).toBeVisible();
     expect(screen.getByText("— Voorbereiden")).toBeVisible();
-
-    expect(screen.getByRole("button", { name: "Selecteer stembureaus" }));
-    expect(screen.getByRole("button", { name: "Details van de zitting" }));
   });
 
   test("The card renders with status data_entry_not_started", () => {
@@ -52,7 +47,7 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Klaar voor invoer")).toBeVisible();
 
-    expect(screen.getByRole("button", { name: "Details van de zitting" }));
+    expect(screen.getByRole("button", { name: "Start steminvoer" }));
   });
 
   test("The card renders with status data_entry_in_progress", () => {
@@ -67,8 +62,6 @@ describe("UI component: CommitteeSessionCard", () => {
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Invoerders bezig")).toBeVisible();
-
-    expect(screen.getByRole("button", { name: "Details van de zitting" }));
 
     expect(screen.getByRole("link", { name: "Bekijk voortgang" }));
   });
@@ -85,8 +78,6 @@ describe("UI component: CommitteeSessionCard", () => {
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Invoer gepauzeerd")).toBeVisible();
-
-    expect(screen.getByRole("button", { name: "Details van de zitting" }));
   });
 
   test("The card renders with status data_entry_finished", () => {
@@ -104,7 +95,6 @@ describe("UI component: CommitteeSessionCard", () => {
 
     expect(screen.getByRole("button", { name: "Resultaten en documenten" }));
     expect(screen.getByRole("button", { name: "Steminvoer bekijken" }));
-    expect(screen.getByRole("button", { name: "Details van de zitting" }));
   });
 
   test("The card renders with status data_entry_finished not current session and details already saved", () => {
@@ -123,6 +113,5 @@ describe("UI component: CommitteeSessionCard", () => {
 
     expect(screen.getByRole("button", { name: "Resultaten en documenten" }));
     expect(screen.queryByRole("button", { name: "Steminvoer bekijken" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Details van de zitting" }));
   });
 });

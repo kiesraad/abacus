@@ -12,6 +12,7 @@ import { PollingStationWithStatusAndTypist, StatusCategory } from "../hooks/useE
 interface CategoryRowProps {
   category: StatusCategory;
   pollingStation: PollingStationWithStatusAndTypist;
+  addLink: boolean;
 }
 
 const SHOW_BADGE: DataEntryStatusName[] = [
@@ -21,8 +22,11 @@ const SHOW_BADGE: DataEntryStatusName[] = [
   "first_entry_has_errors",
 ];
 
-export function CategoryRow({ category, pollingStation }: CategoryRowProps): ReactNode {
-  if (pollingStation.status === "entries_different" || pollingStation.status === "first_entry_has_errors") {
+export function CategoryRow({ category, pollingStation, addLink }: CategoryRowProps): ReactNode {
+  if (
+    addLink &&
+    (pollingStation.status === "entries_different" || pollingStation.status === "first_entry_has_errors")
+  ) {
     return (
       <Table.LinkRow
         to={
@@ -43,7 +47,12 @@ export function CategoryRow({ category, pollingStation }: CategoryRowProps): Rea
   );
 }
 
-function CategoryRowContent({ category, pollingStation }: CategoryRowProps): ReactNode {
+interface CategoryRowContentProps {
+  category: StatusCategory;
+  pollingStation: PollingStationWithStatusAndTypist;
+}
+
+function CategoryRowContent({ category, pollingStation }: CategoryRowContentProps): ReactNode {
   return (
     <>
       <Table.NumberCell key={`${pollingStation.id}-number`}>{pollingStation.number}</Table.NumberCell>

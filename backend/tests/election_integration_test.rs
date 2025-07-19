@@ -4,7 +4,7 @@ use crate::{shared::create_result, utils::serve_api};
 #[cfg(feature = "dev-database")]
 use abacus::election::Election;
 use abacus::{
-    committee_session::CommitteeSessionStatus,
+    committee_session::{repository::CommitteeSessions, status::CommitteeSessionStatus},
     election::{ElectionDetailsResponse, ElectionListResponse},
 };
 use axum::http::StatusCode;
@@ -34,7 +34,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.committee_sessions[1].number, 2);
     assert_eq!(
         body.committee_sessions[1].status,
-        CommitteeSessionStatus::Created
+        CommitteeSessionStatus::DataEntryInProgress
     );
     assert_eq!(body.elections.len(), 2);
 }
@@ -57,7 +57,7 @@ async fn test_election_details_works(pool: SqlitePool) {
     let body: ElectionDetailsResponse = response.json().await.unwrap();
     assert_eq!(
         body.committee_session.status,
-        CommitteeSessionStatus::Created
+        CommitteeSessionStatus::DataEntryInProgress
     );
     assert_eq!(body.election.name, "Municipal Election");
     assert_eq!(body.polling_stations.len(), 2);
@@ -195,11 +195,18 @@ async fn test_election_details_not_found(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_election_pdf_download(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
+async fn test_election_pdf_download_works(pool: SqlitePool) {
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
+    committee_sessions_repo
+        .change_status(2, CommitteeSessionStatus::DataEntryFinished)
+        .await
+        .unwrap();
 
     let url = format!("http://{addr}/api/elections/2/download_pdf_results");
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
@@ -225,11 +232,35 @@ async fn test_election_pdf_download(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_election_xml_download(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
+async fn test_election_pdf_download_wrong_committee_session_state(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_pdf_results");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_xml_download_works(pool: SqlitePool) {
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
+    committee_sessions_repo
+        .change_status(2, CommitteeSessionStatus::DataEntryFinished)
+        .await
+        .unwrap();
 
     let url = format!("http://{addr}/api/elections/2/download_xml_results");
     let response = reqwest::Client::new()
@@ -250,11 +281,35 @@ async fn test_election_xml_download(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_election_zip_download(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
+async fn test_election_xml_download_wrong_committee_session_state(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_xml_results");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_zip_download_works(pool: SqlitePool) {
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
+    committee_sessions_repo
+        .change_status(2, CommitteeSessionStatus::DataEntryFinished)
+        .await
+        .unwrap();
 
     let url = format!("http://{addr}/api/elections/2/download_zip_results");
     let response = reqwest::Client::new()
@@ -266,6 +321,7 @@ async fn test_election_zip_download(pool: SqlitePool) {
     let content_disposition = response.headers().get("Content-Disposition");
     let content_type = response.headers().get("Content-Type");
 
+    // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
     assert_eq!(content_type.unwrap(), "application/zip");
 
@@ -291,4 +347,23 @@ async fn test_election_zip_download(pool: SqlitePool) {
             .unwrap();
         assert!(pdf_file.size() > 0);
     }
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_zip_download_wrong_committee_session_state(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_zip_results");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
 }

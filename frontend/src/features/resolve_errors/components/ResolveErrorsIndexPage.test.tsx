@@ -1,9 +1,12 @@
+import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -12,10 +15,12 @@ import {
   PollingStationDataEntryResolveErrorsHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
-import { render, screen, spyOnHandler } from "@/testing/test-utils";
+import { Providers } from "@/testing/Providers";
+import { overrideOnce, server } from "@/testing/server";
+import { expectErrorPage, render, screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
+import { resolveErrorsRoutes } from "../routes";
 import { ResolveErrorsIndexPage } from "./ResolveErrorsIndexPage";
 
 const navigate = vi.fn();
@@ -24,7 +29,6 @@ vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => navigate,
   useParams: () => ({ pollingStationId: "5" }),
-  useLocation: () => ({ pathname: "/" }),
 }));
 
 const renderPage = async () => {
@@ -54,10 +58,54 @@ describe("ResolveErrorsPage", () => {
     );
   });
 
+  test("Error when committee session is not in the correct state", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
+    const router = setupTestRouter([
+      {
+        Component: null,
+        errorElement: <ErrorBoundary />,
+        children: [
+          {
+            path: "elections/:electionId/status/resolve-errors",
+            children: resolveErrorsRoutes,
+          },
+        ],
+      },
+    ]);
+
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+
+    await router.navigate("/elections/1/status/resolve-errors");
+
+    rtlRender(<Providers router={router} />);
+
+    await expectErrorPage();
+  });
+
   test("should render the page", async () => {
     await renderPage();
 
-    // TODO: Issue #1512 Add checks for rendering errors and warnings
+    expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
+
+    const recounted = screen.queryByRole("region", { name: "Is het selectievakje op de eerste pagina aangevinkt?" });
+    expect(recounted).toBeInTheDocument();
+
+    const voters_votes_counts = screen.queryByRole("region", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
+    expect(voters_votes_counts).toBeInTheDocument();
+
+    const differences_counts = screen.queryByRole("region", {
+      name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+    });
+    expect(differences_counts).toBeInTheDocument();
+
+    const political_group_votes_1 = screen.queryByRole("region", { name: "Lijst 1 - Vurige Vleugels Partij" });
+    expect(political_group_votes_1).not.toBeInTheDocument();
+
+    const political_group_votes_2 = screen.queryByRole("region", { name: "Lijst 2 - Wijzen van Water en Wind" });
+    expect(political_group_votes_2).not.toBeInTheDocument();
 
     expect(
       await screen.findByRole("heading", { level: 3, name: "Wat wil je doen met de invoer in Abacus?" }),

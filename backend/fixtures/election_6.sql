@@ -1,6 +1,5 @@
 INSERT INTO elections (id, name, counting_method, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date, political_groups)
--- number_of_seats explicitly set to a value less than 19, to be used in elections with less than 19 seats
-VALUES (2, 'Municipal Election', 'CSO', 'Heemdamseburg_2024', 'Heemdamseburg', '0000', 100, 'Municipal', 15, '2024-11-30', '2024-11-1',
+VALUES (6, 'Nieuwe Verkiezing', 'CSO','KleinDorp_2024', 'KleinDorp', '0123', 100, 'Municipal', 29, '2024-12-31', '2024-12-1',
         '[
           {
             "number": 1,
@@ -47,10 +46,5 @@ VALUES (2, 'Municipal Election', 'CSO', 'Heemdamseburg_2024', 'Heemdamseburg', '
           }
         ]');
 
-INSERT INTO committee_sessions (id, number, election_id, status, location, start_date, start_time)
-VALUES (2, 1, 2, 'data_entry_in_progress', '', '', '');
-
-INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
-                              postal_code, locality)
-VALUES (1, 2, 'Op Rolletjes', 33, NULL, 'Mobile', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
-       (2, 2, 'Testplek', 34, 1000, 'Special', 'Teststraat 2b', '1234 QY', 'Testdorp');
+INSERT INTO committee_sessions (id, number, election_id, location, start_date, start_time)
+VALUES (7, 1, 6,'', '', '');

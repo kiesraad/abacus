@@ -132,6 +132,80 @@
         }
       }
     },
+    "/api/committee_sessions/{committee_session_id}/status": {
+      "put": {
+        "summary": "Change the status of a [CommitteeSession].",
+        "operationId": "committee_session_status_change",
+        "parameters": [
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "description": "Committee session database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitteeSessionStatusChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Committee session status changed successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Committee session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/elections": {
       "get": {
         "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election",
@@ -597,6 +671,16 @@
               }
             }
           },
+          "412": {
+            "description": "PDF results download is not yet available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -646,6 +730,16 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "XML results download is not yet available",
             "content": {
               "application/json": {
                 "schema": {
@@ -711,6 +805,16 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "ZIP results download is not yet available",
             "content": {
               "application/json": {
                 "schema": {
@@ -1350,6 +1454,16 @@
               }
             }
           },
+          "412": {
+            "description": "Data entry is not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -1429,6 +1543,16 @@
               }
             }
           },
+          "412": {
+            "description": "Data entry is not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "JSON error or invalid data (Unprocessable Content)",
             "content": {
@@ -1492,6 +1616,16 @@
           },
           "404": {
             "description": "No data entry with accepted errors found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -1571,6 +1705,16 @@
           },
           "409": {
             "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -1681,6 +1825,16 @@
               }
             }
           },
+          "412": {
+            "description": "Data entry is not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "JSON error or invalid data (Unprocessable Content)",
             "content": {
@@ -1764,6 +1918,16 @@
               }
             }
           },
+          "412": {
+            "description": "Data entry is not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -1828,6 +1992,16 @@
           },
           "409": {
             "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -1910,6 +2084,16 @@
           },
           "409": {
             "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -3307,6 +3491,18 @@
           "data_entry_finished"
         ]
       },
+      "CommitteeSessionStatusChangeRequest": {
+        "type": "object",
+        "description": "Committee session status change request",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/CommitteeSessionStatus"
+          }
+        }
+      },
       "CommitteeSessionUpdateRequest": {
         "type": "object",
         "description": "Committee session update request",
@@ -4023,6 +4219,8 @@
           "AirgapViolation",
           "AllListsExhausted",
           "ApportionmentNotAvailableUntilDataEntryFinalised",
+          "CommitteeSessionNotFinalised",
+          "CommitteeSessionNotInProgress",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",

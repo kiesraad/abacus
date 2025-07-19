@@ -2,6 +2,7 @@ import { StaticRouter } from "react-router";
 
 import type { Preview } from "@storybook/react-vite";
 
+import { ApiResponseStatus } from "@/api/ApiResult";
 import { ElectionProviderContext } from "@/hooks/election/ElectionProviderContext";
 import { UsersProviderContext } from "@/hooks/user/UsersProviderContext";
 import { t } from "@/i18n/translate";
@@ -9,7 +10,7 @@ import "@/styles/index.css";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { ElectionWithPoliticalGroups, PollingStation, Role } from "@/types/generated/openapi";
+import { ElectionDetailsResponse, ElectionWithPoliticalGroups, PollingStation, Role } from "@/types/generated/openapi";
 
 const preview: Preview = {
   parameters: {
@@ -40,12 +41,19 @@ const preview: Preview = {
         return <Story />;
       }
 
+      const data: ElectionDetailsResponse = {
+        election: election ?? electionDetailsMockResponse.election,
+        polling_stations: pollingStations ?? electionDetailsMockResponse.polling_stations,
+        committee_session: electionDetailsMockResponse.committee_session,
+      };
+
       return (
         <ElectionProviderContext.Provider
           value={{
-            election: election ?? electionDetailsMockResponse.election,
-            pollingStations: pollingStations ?? electionDetailsMockResponse.polling_stations,
-            committeeSession: electionDetailsMockResponse.committee_session,
+            election: data.election,
+            pollingStations: data.polling_stations,
+            committeeSession: data.committee_session,
+            refetch: () => Promise.resolve({ status: ApiResponseStatus.Success, code: 200, data: data }),
           }}
         >
           <Story />

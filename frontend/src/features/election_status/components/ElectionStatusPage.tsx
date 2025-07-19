@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
+import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -7,6 +9,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
 import { committeeSessionLabel } from "@/utils/committeeSession";
@@ -16,9 +19,21 @@ import { ElectionStatus } from "./ElectionStatus";
 export function ElectionStatusPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { committeeSession, election, pollingStations } = useElection();
+  const { committeeSession, election, pollingStations, refetch } = useElection();
   const { statuses } = useElectionStatus();
+  const { isCoordinator } = useUserRole();
   const { getName } = useUsers();
+
+  // re-fetch election when component mounts
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    void refetch(abortController);
+
+    return () => {
+      abortController.abort(DEFAULT_CANCEL_REASON);
+    };
+  }, [refetch]);
 
   const showDataEntryKeptAlert = location.hash.startsWith("#data-entry-kept-") ? location.hash : null;
   const showDataEntriesDiscardedAlert = location.hash.startsWith("#data-entries-discarded-") ? location.hash : null;
@@ -40,8 +55,7 @@ export function ElectionStatusPage() {
     typist = getName(typistId);
   }
 
-  function finishInput() {
-    // TODO: Add call to endpoint that changes status of committee session to "data_entry_finished" in issue #1650
+  function finishDataEntry() {
     void navigate("../report");
   }
 
@@ -88,7 +102,7 @@ export function ElectionStatusPage() {
           <Alert type="success">
             <h2>{t("election_status.definitive.title")}</h2>
             <p>{t("election_status.definitive.message")}</p>
-            <Button onClick={finishInput} size="md">
+            <Button onClick={finishDataEntry} size="md">
               {t("election_status.definitive.finish_button")}
             </Button>
           </Alert>
@@ -98,6 +112,10 @@ export function ElectionStatusPage() {
           election={election}
           pollingStations={pollingStations}
           statuses={statuses}
+          addLinks={
+            isCoordinator &&
+            (committeeSession.status === "data_entry_in_progress" || committeeSession.status === "data_entry_paused")
+          }
           navigate={(path) => void navigate(path)}
         />
       </main>

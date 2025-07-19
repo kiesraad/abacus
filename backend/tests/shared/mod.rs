@@ -2,12 +2,10 @@
 
 use std::net::SocketAddr;
 
-use axum::http::{HeaderValue, StatusCode};
-use hyper::header::CONTENT_TYPE;
-use reqwest::{Body, Client, Response};
-use serde_json::json;
-
 use abacus::{
+    committee_session::{
+        CommitteeSession, repository::CommitteeSessions, status::CommitteeSessionStatus,
+    },
     data_entry::{
         CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
         PoliticalGroupVotes, PollingStationResults, VotersCounts, VotesCounts,
@@ -15,6 +13,11 @@ use abacus::{
     },
     election::{CandidateNumber, PGNumber},
 };
+use axum::http::{HeaderValue, StatusCode};
+use hyper::header::CONTENT_TYPE;
+use reqwest::{Body, Client, Response};
+use serde_json::json;
+use sqlx::SqlitePool;
 
 pub fn differences_counts_zero() -> DifferencesCounts {
     DifferencesCounts {
@@ -217,6 +220,17 @@ pub async fn create_result_with_non_example_data_entry(
     complete_data_entry(addr, &typist2_cookie, polling_station_id, 2, data_entry).await;
     check_data_entry_status_is_definitive(addr, &typist2_cookie, polling_station_id, election_id)
         .await;
+}
+
+pub async fn change_status_committee_session(
+    pool: SqlitePool,
+    committee_session_id: u32,
+    status: CommitteeSessionStatus,
+) -> CommitteeSession {
+    CommitteeSessions::new(pool.clone())
+        .change_status(committee_session_id, status)
+        .await
+        .unwrap()
 }
 
 /// Calls the login endpoint for an Admin user and returns the session cookie

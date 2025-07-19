@@ -1,6 +1,8 @@
 import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
 
 import {
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
   Election,
   ELECTION_CREATE_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PATH,
@@ -109,9 +111,16 @@ export const test = base.extend<Fixtures>({
     const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${emptyElection.id}`;
     const electionResponse = await request.get(electionUrl);
     expect(electionResponse.ok()).toBeTruthy();
-    const election = (await electionResponse.json()) as ElectionDetailsResponse;
+    const response = (await electionResponse.json()) as ElectionDetailsResponse;
 
-    await use(election);
+    // Set committee session status to DataEntryInProgress
+    await loginAs(request, "coordinator1");
+    const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${response.committee_session.id}/status`;
+    const data: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
+    const statusChangeResponse = await request.put(statusChangeUrl, { data: data });
+    expect(statusChangeResponse.ok()).toBeTruthy();
+
+    await use(response);
   },
   pollingStation: async ({ request, election }, use) => {
     await loginAs(request, "admin1");

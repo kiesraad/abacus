@@ -2,7 +2,7 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    election::PoliticalGroup,
+    election::{PoliticalGroup, VoteCountingMethod},
     eml::common::{AuthorityAddress, AuthorityIdentifier},
 };
 
@@ -166,6 +166,7 @@ impl EML110 {
         // construct the election
         let election = crate::election::NewElection {
             name: self.election_identifier().election_name.clone(),
+            counting_method: VoteCountingMethod::CSO,
             election_id: self.election_identifier().id.clone(),
             location: election_domain.name.clone(),
             domain_id: election_domain.id.clone(),

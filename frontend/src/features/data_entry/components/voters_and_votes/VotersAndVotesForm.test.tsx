@@ -12,13 +12,9 @@ import {
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, userTypeInputs, waitFor } from "@/testing/test-utils";
-import {
-  ClaimDataEntryResponse,
-  LoginResponse,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-} from "@/types/generated/openapi";
+import { LoginResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
 
-import { getDefaultDataEntryState, getEmptyDataEntryRequest, getInitialValues } from "../../testing/mock-data";
+import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
@@ -26,7 +22,6 @@ import {
   expectFieldsToNotHaveIcon,
   overrideServerClaimDataEntryResponse,
 } from "../../testing/test.utils";
-import { getClientState } from "../../utils/dataEntryUtils";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
 
@@ -53,7 +48,6 @@ function renderForm() {
 const votersFieldIds = {
   pollCardCount: "data.voters_counts.poll_card_count",
   proxyCertificateCount: "data.voters_counts.proxy_certificate_count",
-  voterCardCount: "data.voters_counts.voter_card_count",
   totalAdmittedVotersCount: "data.voters_counts.total_admitted_voters_count",
 };
 
@@ -62,13 +56,6 @@ const votesFieldIds = {
   blankVotesCount: "data.votes_counts.blank_votes_count",
   invalidVotesCount: "data.votes_counts.invalid_votes_count",
   totalVotesCastCount: "data.votes_counts.total_votes_cast_count",
-};
-
-const recountFieldIds = {
-  pollCardRecount: "data.voters_recounts.poll_card_count",
-  proxyCertificateRecount: "data.voters_recounts.proxy_certificate_count",
-  voterCardRecount: "data.voters_recounts.voter_card_count",
-  totalAdmittedVotersRecount: "data.voters_recounts.total_admitted_voters_count",
 };
 
 describe("Test VotersAndVotesForm", () => {
@@ -129,14 +116,14 @@ describe("Test VotersAndVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: true,
-        },
+        pollingStationResults: {},
       });
       renderForm();
 
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
-      expect(pollCards.closest("fieldset")).toHaveAccessibleName("Toegelaten kiezers en uitgebrachte stemmen");
+      expect(pollCards.closest("fieldset")).toHaveAccessibleName(
+        "Toegelaten kiezers en uitgebrachte stemmen B1-3.1 en 3.2",
+      );
       expect(pollCards).toHaveAccessibleName("A Stempassen");
       expect(pollCards).toHaveFocus();
 
@@ -149,13 +136,6 @@ describe("Test VotersAndVotesForm", () => {
       expect(proxyCertificates).toHaveFocus();
       await user.paste("6789");
       expect(proxyCertificates).toHaveValue("6789");
-
-      await user.keyboard("{enter}");
-
-      const voterCards = screen.getByRole("textbox", { name: "C Kiezerspassen" });
-      expect(voterCards).toHaveFocus();
-      await user.type(voterCards, "123");
-      expect(voterCards).toHaveValue("123");
 
       await user.keyboard("{enter}");
 
@@ -195,47 +175,19 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const pollCardsRecount = screen.getByRole("textbox", { name: "A.2 Stempassen" });
-      expect(pollCardsRecount).toHaveFocus();
-      await user.type(pollCardsRecount, "700");
-      expect(pollCardsRecount).toHaveValue("700");
-
-      await user.keyboard("{enter}");
-
-      const proxyCertificatesRecount = screen.getByRole("textbox", { name: "B.2 Volmachtbewijzen" });
-      expect(proxyCertificatesRecount).toHaveFocus();
-      await user.type(proxyCertificatesRecount, "140");
-      expect(proxyCertificatesRecount).toHaveValue("140");
-
-      await user.keyboard("{enter}");
-
-      const voterCardsRecount = screen.getByRole("textbox", { name: "C.2 Kiezerspassen" });
-      expect(voterCardsRecount).toHaveFocus();
-      await user.type(voterCardsRecount, "160");
-      expect(voterCardsRecount).toHaveValue("160");
-
-      await user.keyboard("{enter}");
-
-      const totalAdmittedVotersRecount = screen.getByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" });
-      expect(totalAdmittedVotersRecount).toHaveFocus();
-      await user.type(totalAdmittedVotersRecount, "1000");
-      expect(totalAdmittedVotersRecount).toHaveValue("1000");
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
     });
   });
 
   describe("VotersAndVotesForm API request and response", () => {
-    test("VotersAndVotesForm without recount: request body is equal to the form data", async () => {
+    test("VotersAndVotesForm request body is equal to the form data", async () => {
       const expectedRequest = {
         data: {
           ...getEmptyDataEntryRequest().data,
-          recounted: false,
           voters_counts: {
-            poll_card_count: 1,
+            poll_card_count: 4,
             proxy_certificate_count: 2,
-            voter_card_count: 3,
             total_admitted_voters_count: 6,
           },
           votes_counts: {
@@ -251,70 +203,12 @@ describe("Test VotersAndVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
       renderForm();
 
       await userTypeInputs(user, expectedRequest.data.voters_counts, "data.voters_counts.");
       await userTypeInputs(user, expectedRequest.data.votes_counts, "data.votes_counts.");
-
-      const spy = vi.spyOn(global, "fetch");
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      expect(spy).toHaveBeenCalled();
-      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-
-      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
-      expect(method).toEqual("POST");
-      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
-      expect(request_body.data).toEqual(expectedRequest.data);
-    });
-
-    //TODO: fix which mock to use, confusing via ./form/testHelperFunctions and ./test.util
-    test("VotersAndVotesForm with recount: request body is equal to the form data", async () => {
-      const expectedRequest = {
-        data: {
-          ...getEmptyDataEntryRequest().data,
-          recounted: true,
-          voters_counts: {
-            poll_card_count: 1,
-            proxy_certificate_count: 2,
-            voter_card_count: 3,
-            total_admitted_voters_count: 6,
-          },
-          voters_recounts: {
-            poll_card_count: 7,
-            proxy_certificate_count: 8,
-            voter_card_count: 9,
-            total_admitted_voters_count: 24,
-          },
-          votes_counts: {
-            votes_candidates_count: 4,
-            blank_votes_count: 5,
-            invalid_votes_count: 6,
-            total_votes_cast_count: 15,
-          },
-        },
-        client_state: {},
-      };
-
-      const user = userEvent.setup();
-      overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: true,
-        },
-      });
-
-      renderForm();
-
-      await userTypeInputs(user, expectedRequest.data.voters_counts, "data.voters_counts.");
-      await userTypeInputs(user, expectedRequest.data.votes_counts, "data.votes_counts.");
-      await userTypeInputs(user, expectedRequest.data.voters_recounts, "data.voters_recounts.");
 
       const spy = vi.spyOn(global, "fetch");
 
@@ -346,7 +240,6 @@ describe("Test VotersAndVotesForm", () => {
                 "data.voters_counts.total_admitted_voters_count",
                 "data.voters_counts.poll_card_count",
                 "data.voters_counts.proxy_certificate_count",
-                "data.voters_counts.voter_card_count",
               ],
               code: "F201",
             },
@@ -384,7 +277,6 @@ describe("Test VotersAndVotesForm", () => {
                 "data.voters_counts.total_admitted_voters_count",
                 "data.voters_counts.poll_card_count",
                 "data.voters_counts.proxy_certificate_count",
-                "data.voters_counts.voter_card_count",
               ],
               code: "F201",
             },
@@ -397,13 +289,12 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
       ];
       const expectedValidFieldIds = [
@@ -444,56 +335,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
-      ];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
-    });
-
-    test("F.203 IncorrectTotal Voters recounts", async () => {
-      const user = userEvent.setup();
-      overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: true,
-        },
-      });
-      renderForm();
-
-      await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [validationResultMockData.F203],
-          warnings: [],
-        },
-      });
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackMessage =
-        "Controleer hertelde toegelaten kiezersF.203De invoer bij A.2, B.2, C.2 of D.2 klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
-      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
-      expect(screen.queryByTestId("feedback-warning")).toBeNull();
-
-      const expectedInvalidFieldIds = [
-        recountFieldIds.pollCardRecount,
-        recountFieldIds.proxyCertificateRecount,
-        recountFieldIds.voterCardRecount,
-        recountFieldIds.totalAdmittedVotersRecount,
-      ];
-      const expectedValidFieldIds = [
-        votersFieldIds.pollCardCount,
-        votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
-        votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
-        votesFieldIds.blankVotesCount,
-        votesFieldIds.invalidVotesCount,
-        votesFieldIds.totalVotesCastCount,
       ];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
@@ -525,7 +367,6 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.votesCandidatesCount,
         votesFieldIds.invalidVotesCount,
@@ -611,7 +452,6 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.votesCandidatesCount,
         votesFieldIds.invalidVotesCount,
@@ -647,7 +487,6 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.votesCandidatesCount,
         votesFieldIds.blankVotesCount,
@@ -680,52 +519,9 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
         votesFieldIds.votesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
-      ];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
-    });
-
-    test("W.204 votes counts and voters recounts difference above threshold", async () => {
-      const user = userEvent.setup();
-      overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: true,
-        },
-      });
-      renderForm();
-
-      await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [validationResultMockData.W204] },
-      });
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackMessage =
-        "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezersW.204Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
-      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-
-      const expectedInvalidFieldIds = [votesFieldIds.totalVotesCastCount, recountFieldIds.totalAdmittedVotersRecount];
-      const expectedValidFieldIds = [
-        votersFieldIds.pollCardCount,
-        votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
-        votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
-        votesFieldIds.blankVotesCount,
-        votesFieldIds.invalidVotesCount,
-        recountFieldIds.pollCardRecount,
-        recountFieldIds.proxyCertificateRecount,
-        recountFieldIds.voterCardRecount,
       ];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
@@ -754,7 +550,6 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.votesCandidatesCount,
         votesFieldIds.blankVotesCount,
@@ -787,51 +582,9 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
         votesFieldIds.votesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
-      ];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
-    });
-
-    test("W.207 total votes cast and total admitted voters recount should not exceed polling stations number of eligible voters", async () => {
-      const user = userEvent.setup();
-      overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: true,
-        },
-      });
-      renderForm();
-
-      await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [validationResultMockData.W207] },
-      });
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackMessage =
-        "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezersW.207Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten kiezers (D.2) is hoger dan het aantal kiesgerechtigden voor dit stembureau.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
-      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFieldIds = [votesFieldIds.totalVotesCastCount, recountFieldIds.totalAdmittedVotersRecount];
-      const expectedValidFieldIds = [
-        votersFieldIds.pollCardCount,
-        votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
-        votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
-        votesFieldIds.blankVotesCount,
-        votesFieldIds.invalidVotesCount,
-        recountFieldIds.pollCardRecount,
-        recountFieldIds.proxyCertificateRecount,
-        recountFieldIds.voterCardRecount,
       ];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
@@ -860,66 +613,12 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.votesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
-    });
-
-    test("W.209 EqualInput voters recounts and votes counts", async () => {
-      const user = userEvent.setup();
-      overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: true,
-        },
-      });
-      overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
-        client_state: getClientState(getDefaultDataEntryState().formState, "voters_votes_counts", false, true),
-        data: {
-          ...getInitialValues(),
-          recounted: true,
-        },
-        validation_results: { errors: [], warnings: [] },
-      } satisfies ClaimDataEntryResponse);
-      renderForm();
-
-      await screen.findByTestId("voters_votes_counts_form");
-
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [validationResultMockData.W209] },
-      });
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackMessage =
-        "Controleer E t/m H en A.2 t/m D.2W.209De getallen bij E t/m H zijn precies hetzelfde als A.2 t/m D.2.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
-      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFieldIds = [
-        votesFieldIds.votesCandidatesCount,
-        votesFieldIds.blankVotesCount,
-        votesFieldIds.invalidVotesCount,
-        votesFieldIds.totalVotesCastCount,
-        recountFieldIds.pollCardRecount,
-        recountFieldIds.proxyCertificateRecount,
-        recountFieldIds.voterCardRecount,
-        recountFieldIds.totalAdmittedVotersRecount,
-      ];
-      const expectedValidFieldIds = [
-        votersFieldIds.pollCardCount,
-        votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
-        votersFieldIds.totalAdmittedVotersCount,
-      ];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
@@ -1016,58 +715,12 @@ describe("Test VotersAndVotesForm", () => {
       await userEvent.click(submitButton);
 
       const errorFeedbackMessage =
-        "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       const warningFeedbackMessage =
         "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(errorFeedbackMessage);
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(warningFeedbackMessage);
-    });
-  });
-
-  describe("recounted voters subsection", () => {
-    test("doesn't show when recounted=false", async () => {
-      overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
-      });
-      renderForm();
-
-      // wait for form to render
-      await screen.findByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
-
-      // make sure recounted subsection is not shown
-      expect(
-        screen.queryByRole("group", { name: "Toegelaten kiezers na hertelling door Gemeentelijk Stembureau" }),
-      ).not.toBeInTheDocument();
-      expect(screen.queryByRole("textbox", { name: "A.2 Stempassen" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("textbox", { name: "B.2 Volmachtbewijzen" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("textbox", { name: "C.2 Kiezerspassen" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" })).not.toBeInTheDocument();
-    });
-
-    test("does show when recounted=true", async () => {
-      overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: true,
-        },
-      });
-      renderForm();
-
-      // wait for form to render
-      await screen.findByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
-
-      // make sure recounted subsection is shown
-      expect(
-        screen.queryByRole("heading", { name: "Toegelaten kiezers na hertelling door Gemeentelijk Stembureau" }),
-      ).toBeVisible();
-      expect(screen.queryByRole("textbox", { name: "A.2 Stempassen" })).toBeVisible();
-      expect(screen.queryByRole("textbox", { name: "B.2 Volmachtbewijzen" })).toBeVisible();
-      expect(screen.queryByRole("textbox", { name: "C.2 Kiezerspassen" })).toBeVisible();
-      expect(screen.queryByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" })).toBeVisible();
     });
   });
 });

@@ -1781,7 +1781,6 @@ export const election_summary: ElectionSummary = {
   voters_counts: {
     poll_card_count: 15001,
     proxy_certificate_count: 1,
-    voter_card_count: 0,
     total_admitted_voters_count: 15002,
   },
   votes_counts: {
@@ -1820,7 +1819,6 @@ export const election_summary: ElectionSummary = {
       polling_stations: [],
     },
   },
-  recounted_polling_stations: [],
   political_group_votes: [
     {
       number: 1,
@@ -2012,6 +2010,7 @@ export const election_summary: ElectionSummary = {
 export const election: ElectionWithPoliticalGroups = {
   id: 5,
   name: "Test Election >= 19 seats & Absolute Majority Change",
+  counting_method: "CSO",
   election_id: "TestLocation_2026",
   location: "Test Location",
   domain_id: "0000",

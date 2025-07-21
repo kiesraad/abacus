@@ -14,7 +14,7 @@ impl Elections {
 
     pub async fn list(&self) -> Result<Vec<Election>, Error> {
         let elections: Vec<Election> = query_as(
-            "SELECT id, name, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date FROM elections",
+            "SELECT id, name, counting_method, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date FROM elections",
         )
         .fetch_all(&self.0)
         .await?;
@@ -38,6 +38,7 @@ impl Elections {
             r#"
             INSERT INTO elections (
               name,
+              counting_method,
               election_id,
               location,
               domain_id,
@@ -47,10 +48,11 @@ impl Elections {
               election_date,
               nomination_date,
               political_groups
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
               id,
               name,
+              counting_method,
               election_id,
               location,
               domain_id,
@@ -63,6 +65,7 @@ impl Elections {
             "#,
         )
         .bind(election.name)
+        .bind(election.counting_method)
         .bind(election.election_id)
         .bind(election.location)
         .bind(election.domain_id)

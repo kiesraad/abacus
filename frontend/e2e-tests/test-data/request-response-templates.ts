@@ -9,6 +9,7 @@ import {
 
 export const electionRequest: NewElection = {
   name: "Test Election",
+  counting_method: "CSO",
   election_id: "TestLocation_2026",
   location: "Test Location",
   domain_id: "0000",
@@ -88,7 +89,6 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
     voters_counts: {
       poll_card_count: 0,
       proxy_certificate_count: 0,
-      voter_card_count: 0,
       total_admitted_voters_count: 0,
     },
     votes_counts: {
@@ -141,11 +141,9 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
 };
 
 export const noRecountNoDifferencesDataEntry: PollingStationResults = {
-  recounted: false,
   voters_counts: {
-    poll_card_count: 803,
+    poll_card_count: 879,
     proxy_certificate_count: 50,
-    voter_card_count: 76,
     total_admitted_voters_count: 929,
   },
   votes_counts: {
@@ -196,7 +194,7 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
 };
 
 export const dataEntryRequest: DataEntry = {
-  progress: 83,
+  progress: 80,
   data: noRecountNoDifferencesDataEntry,
   client_state: {
     furthest: "political_group_votes_2",
@@ -211,9 +209,8 @@ export const dataEntryWithErrorRequest: DataEntry = {
   data: {
     ...noRecountNoDifferencesDataEntry,
     voters_counts: {
-      poll_card_count: 10800,
+      poll_card_count: 10875,
       proxy_certificate_count: 50,
-      voter_card_count: 75,
       total_admitted_voters_count: 925,
     },
   },

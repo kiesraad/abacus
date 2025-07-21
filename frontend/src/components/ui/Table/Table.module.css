@@ -39,6 +39,12 @@
     }
   }
 
+  tr.increasedPadding > th[scope="row"],
+  tr.increasedPadding > td {
+    height: 5rem;
+    padding-top: 1.5rem;
+  }
+
   /* Vertical center child inline-blocks */
   td > * {
     vertical-align: middle;

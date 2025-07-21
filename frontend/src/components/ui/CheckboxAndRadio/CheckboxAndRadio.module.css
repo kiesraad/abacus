@@ -99,6 +99,7 @@
     /* Disabled input styling */
     &:disabled {
       background-color: var(--checkbox-radio-color-bg-disabled);
+      cursor: default;
       &:hover {
         border-width: 1px;
         background-color: var(--checkbox-radio-color-bg-disabled);
@@ -155,5 +156,10 @@
     div:global(.description) {
       color: var(--color-help-text);
     }
+  }
+
+  /* Use regular cursor for label when input is disabled */
+  &:has(input:disabled) > div:global(.labels) label {
+    cursor: default;
   }
 }

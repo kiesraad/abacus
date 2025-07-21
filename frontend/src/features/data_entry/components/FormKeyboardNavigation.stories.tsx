@@ -1,12 +1,12 @@
 import { FormEvent, useState } from "react";
 
-import type { Story } from "@ladle/react";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 
 import { Form } from "@/components/ui/Form/Form";
 
 import { useFormKeyboardNavigation } from "../hooks/useFormKeyboardNavigation";
 
-export const FormKeyboardNavigation: Story = () => {
+export const FormKeyboardNavigation: StoryFn = () => {
   const ref = useFormKeyboardNavigation();
 
   const [keyboardFormSubmitted, setKeyboardFormSubmitted] = useState(false);
@@ -18,7 +18,7 @@ export const FormKeyboardNavigation: Story = () => {
 
   return (
     <>
-      <p className="mb-lg">
+      <div className="mb-lg">
         <Form title="Form with keyboard navigation" ref={ref} onSubmit={handleKeyboardFormSubmit}>
           <input id="inp1" />
           <br />
@@ -29,7 +29,9 @@ export const FormKeyboardNavigation: Story = () => {
           <button type="submit">Submit</button>
         </Form>
         {keyboardFormSubmitted && "Submitted!"}
-      </p>
+      </div>
     </>
   );
 };
+
+export default {} satisfies Meta;

@@ -1,3 +1,4 @@
+import { CheckboxesSubsectionComponent } from "@/components/data_entry/subsections/CheckboxesSubsection";
 import { HeadingSubsectionComponent } from "@/components/data_entry/subsections/HeadingSubsection";
 import { InputGridSubsectionComponent } from "@/components/data_entry/subsections/InputGridSubsection";
 import { MessageSubsectionComponent } from "@/components/data_entry/subsections/MessageSubsection";
@@ -48,11 +49,21 @@ export function DataEntrySubsections({
               <InputGridSubsectionComponent
                 key={`input-grid-${subsectionIdx}`}
                 subsection={subsection}
-                sectionId={section.id}
                 currentValues={currentValues}
                 setValues={setValues}
                 defaultProps={defaultProps}
                 missingTotalError={missingTotalError}
+                readOnly={readOnly}
+              />
+            );
+          case "checkboxes":
+            return (
+              <CheckboxesSubsectionComponent
+                key={`checkboxes-${subsectionIdx}`}
+                subsection={subsection}
+                currentValues={currentValues}
+                setValues={setValues}
+                errorsAndWarnings={defaultProps.errorsAndWarnings}
                 readOnly={readOnly}
               />
             );

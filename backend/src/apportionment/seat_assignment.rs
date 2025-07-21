@@ -953,7 +953,7 @@ fn step_assign_remainder_using_largest_remainder(
         } else {
             // We've now even exhausted unique highest average seats: every group that qualified
             // got a largest remainder seat, and every group also had at least a single residual seat
-            // assigned to them. We now allow any residual seats to be assigned using the largest
+            // assigned to them. We now allow any residual seats to be assigned using the highest
             // averages procedure
             debug!("Assign residual seat using highest averages method");
             step_assign_remainder_using_highest_averages(

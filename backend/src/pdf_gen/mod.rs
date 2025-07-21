@@ -22,7 +22,10 @@ pub(crate) mod tests {
 
     use super::*;
     use crate::{
-        election::{ElectionCategory, ElectionWithPoliticalGroups, tests::election_fixture},
+        election::{
+            ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
+            tests::election_fixture,
+        },
         pdf_gen::models::PdfModel,
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
@@ -60,6 +63,7 @@ pub(crate) mod tests {
             election: ElectionWithPoliticalGroups {
                 id: 1,
                 name: "Municipal Election".to_string(),
+                counting_method: VoteCountingMethod::CSO,
                 election_id: "MunicipalElection_2025".to_string(),
                 location: "Heemdamseburg".to_string(),
                 domain_id: "0000".to_string(),

@@ -63,9 +63,10 @@ describe("NavBar", () => {
 
   test.each([
     { pathname: "/elections/1/data-entry/1/1" },
-    { pathname: "/elections/1/data-entry/1/1/recounted" },
-    { pathname: "/elections/1/data-entry/1/1/voters-and-votes" },
-    { pathname: "/elections/1/data-entry/1/1/list/1" },
+    { pathname: "/elections/1/data-entry/1/1/voters_votes_counts" },
+    { pathname: "/elections/1/data-entry/1/1/differences_counts" },
+    { pathname: "/elections/1/data-entry/1/1/political_group_votes_1" },
+    { pathname: "/elections/1/data-entry/1/1/political_group_votes_2" },
     { pathname: "/elections/1/data-entry/1/1/save" },
   ])("elections link and current election link for $pathname", async (location) => {
     await renderNavBar(location, "typist");
@@ -113,7 +114,7 @@ describe("NavBar", () => {
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Statusoverzicht" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Eerste zitting" })).toBeVisible();
   });
 
   test.each([

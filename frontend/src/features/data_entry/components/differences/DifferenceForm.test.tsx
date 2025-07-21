@@ -67,9 +67,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
       renderForm();
 
@@ -88,9 +86,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
 
       renderForm();
@@ -113,15 +109,13 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
       renderForm();
 
       const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
       expect(moreBallotsCount.closest("fieldset")).toHaveAccessibleName(
-        "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+        "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen B1-3.3",
       );
       expect(moreBallotsCount).toHaveAccessibleName("I Stembiljetten méér geteld");
       expect(moreBallotsCount).toHaveFocus();
@@ -186,7 +180,6 @@ describe("Test DifferencesForm", () => {
         voters_counts: {
           poll_card_count: 50,
           proxy_certificate_count: 1,
-          voter_card_count: 2,
           total_admitted_voters_count: 53,
         },
         votes_counts: {
@@ -247,9 +240,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
       renderForm();
 
@@ -284,9 +275,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: true,
-        },
+        pollingStationResults: {},
       });
       renderForm();
 
@@ -322,9 +311,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
 
       renderForm();
@@ -361,9 +348,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: true,
-        },
+        pollingStationResults: {},
       });
 
       renderForm();
@@ -400,9 +385,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
 
       renderForm();
@@ -441,9 +424,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
 
       renderForm();
@@ -501,9 +482,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
 
       renderForm();
@@ -540,9 +519,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
-          recounted: false,
-        },
+        pollingStationResults: {},
       });
 
       renderForm();

@@ -256,6 +256,9 @@ pub async fn election_import(
     new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
 
     let election = elections_repo.create(new_election).await?;
+    audit_service
+        .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
+        .await?;
 
     // Create first committee session for the election
     let committee_session = committee_sessions_repo

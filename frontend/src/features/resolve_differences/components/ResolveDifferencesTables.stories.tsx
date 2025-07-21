@@ -1,4 +1,4 @@
-import { Story } from "@ladle/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Alert } from "@/components/ui/Alert/Alert";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
@@ -17,26 +17,25 @@ const first = pollingStationResultsMockData(true);
 const second = pollingStationResultsMockData(false);
 const structure = getDataEntryStructureForDifferences(electionMockData, first, second);
 
+export const DefaultResolveDifferencesTables: StoryObj<Props> = {
+  render: ({ action }) => {
+    return (
+      <>
+        <Alert type="notify" small>
+          <p>Previewing the result of an action can be seen using the Controls below</p>
+        </Alert>
+
+        <ResolveDifferencesTables first={first} second={second} action={action} structure={structure} />
+      </>
+    );
+  },
+};
+
 export default {
-  title: "App / Resolve Differences",
   argTypes: {
     action: {
       options: actions,
       control: { type: "radio" },
     },
   },
-};
-
-export const DefaultResolveDifferencesTables: Story<Props> = ({ action }) => {
-  return (
-    <>
-      <Alert type="notify" small>
-        <p>Previewing the result of an action can be seen using the Controls below</p>
-      </Alert>
-
-      <ResolveDifferencesTables first={first} second={second} action={action} structure={structure} />
-    </>
-  );
-};
-
-DefaultResolveDifferencesTables.storyName = "ResolveDifferencesTables";
+} satisfies Meta<Props>;

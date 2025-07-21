@@ -1,54 +1,117 @@
 import { describe, expect, test } from "vitest";
 
 import { PollingStationResults } from "@/types/generated/openapi";
-import { DataEntrySection } from "@/types/types";
+import { DataEntrySection, FormSectionId, PollingStationResultsPath } from "@/types/types";
 
 import { mapResultsToSectionValues, mapSectionValues } from "./dataEntryMapping";
-import { createVotersAndVotesSection, differencesSection, recountedSection } from "./dataEntryStructure";
+import { differencesSection, votersAndVotesSection } from "./dataEntryStructure";
+
+// Helper function to create a base PollingStationResults object for testing
+const createBasePollingStationResults = (): PollingStationResults => ({
+  differences_counts: {
+    more_ballots_count: 0,
+    fewer_ballots_count: 0,
+    unreturned_ballots_count: 0,
+    too_few_ballots_handed_out_count: 0,
+    too_many_ballots_handed_out_count: 0,
+    other_explanation_count: 0,
+    no_explanation_count: 0,
+  },
+  political_group_votes: [],
+  voters_counts: {
+    poll_card_count: 0,
+    proxy_certificate_count: 0,
+    total_admitted_voters_count: 0,
+  },
+  votes_counts: {
+    votes_candidates_count: 0,
+    blank_votes_count: 0,
+    invalid_votes_count: 0,
+    total_votes_cast_count: 0,
+  },
+});
+
+// Helper function to create a checkbox section for testing
+const createCheckboxesSection = (): DataEntrySection => {
+  // Use TypeScript `as` for testing
+  return {
+    id: "test" as FormSectionId,
+    title: "test",
+    short_title: "test",
+    subsections: [
+      {
+        type: "checkboxes",
+        short_title: "test",
+        error_path: "test" as PollingStationResultsPath,
+        error_message: "error",
+        options: [
+          {
+            path: "test.yes" as PollingStationResultsPath,
+            label: "yes",
+            short_label: "yes",
+          },
+          {
+            path: "test.no" as PollingStationResultsPath,
+            label: "no",
+            short_label: "no",
+          },
+        ],
+      },
+    ],
+  };
+};
+
+// Helper function to create a radio section for testing
+const createRadioSection = (): DataEntrySection => {
+  // Use TypeScript `as` for testing
+  return {
+    id: "test" as FormSectionId,
+    title: "test",
+    short_title: "test",
+    subsections: [
+      {
+        type: "radio",
+        short_title: "test",
+        error: "error",
+        path: "test" as PollingStationResultsPath,
+        valueType: "boolean",
+        options: [
+          {
+            value: "true",
+            label: "yes",
+            short_label: "yes",
+          },
+          {
+            value: "false",
+            label: "no",
+            short_label: "no",
+          },
+        ],
+      },
+    ],
+  };
+};
 
 describe("mapSectionValues", () => {
-  const createBasePollingStationResults = (): PollingStationResults => ({
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
-    political_group_votes: [],
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      votes_candidates_count: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-  });
-
   test.each([
     { input: "true", expected: true, description: "true" },
     { input: "false", expected: false, description: "false" },
     { input: "", expected: undefined, description: "empty" },
-  ])("should handle recounted as $description", ({ input, expected }) => {
+  ])("should handle radio $description", ({ input, expected }) => {
+    const radioSection = createRadioSection();
     const current = createBasePollingStationResults();
-    const formValues = { recounted: input };
+    const formValues = { test: input };
 
-    const result = mapSectionValues(current, formValues, recountedSection);
+    const result = mapSectionValues(current, formValues, radioSection);
 
-    expect(result.recounted).toBe(expected);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    expect((result as any).test).toBe(expected);
   });
 
   test("should use section info to distinguish radio vs inputGrid fields", () => {
     const current = createBasePollingStationResults();
     const formValues = {
-      recounted: "true", // Radio field - should become boolean
+      test: "true", // Radio field - should become boolean
       "voters_counts.poll_card_count": "456", // InputGrid field - should be deformatted to number
     };
 
@@ -57,25 +120,19 @@ describe("mapSectionValues", () => {
       title: "Test Section",
       short_title: "Test",
       subsections: [
-        {
-          type: "radio",
-          short_title: "recounted.short_title",
-          path: "recounted",
-          valueType: "boolean",
-          error: "recounted.error",
-          options: [],
-        },
+        ...createRadioSection().subsections,
         {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
-          rows: [{ code: "A", path: "voters_counts.poll_card_count" }],
+          rows: [{ code: "A", path: "voters_counts.poll_card_count", title: "Test Title" }],
         },
       ],
     };
 
     const result = mapSectionValues(current, formValues, testSection);
 
-    expect(result.recounted).toBe(true); // Radio recounted field becomes boolean
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    expect((result as any).test).toBe(true); // Radio test field becomes boolean
     expect(result.voters_counts.poll_card_count).toBe(456); // InputGrid field gets deformatted to number
   });
 
@@ -95,8 +152,8 @@ describe("mapSectionValues", () => {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
-            { code: "A", path: "voters_counts.poll_card_count" },
-            { code: "B", path: "voters_counts.proxy_certificate_count" },
+            { code: "A", path: "voters_counts.poll_card_count", title: "Test Title" },
+            { code: "B", path: "voters_counts.proxy_certificate_count", title: "Test Title" },
           ],
         },
       ],
@@ -111,7 +168,7 @@ describe("mapSectionValues", () => {
   test("should handle mixed field types when section is provided", () => {
     const current = createBasePollingStationResults();
     const formValues = {
-      recounted: "true", // Boolean field - special case
+      test: "true", // Boolean field - special case
       "voters_counts.poll_card_count": "1.234", // Numeric value - should be deformatted
       "differences_counts.more_ballots_count": "5", // Another numeric value
     };
@@ -121,20 +178,13 @@ describe("mapSectionValues", () => {
       title: "Mixed Section",
       short_title: "Mixed",
       subsections: [
-        {
-          type: "radio",
-          short_title: "recounted.short_title",
-          path: "recounted",
-          valueType: "boolean",
-          error: "recounted.error",
-          options: [],
-        },
+        ...createRadioSection().subsections,
         {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
-            { code: "A", path: "voters_counts.poll_card_count" },
-            { code: "B", path: "differences_counts.more_ballots_count" },
+            { code: "A", path: "voters_counts.poll_card_count", title: "Test Title" },
+            { code: "B", path: "differences_counts.more_ballots_count", title: "Test Title" },
           ],
         },
       ],
@@ -142,7 +192,8 @@ describe("mapSectionValues", () => {
 
     const result = mapSectionValues(current, formValues, mixedSection);
 
-    expect(result.recounted).toBe(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    expect((result as any).test).toBe(true);
     expect(result.voters_counts.poll_card_count).toBe(1234);
     expect(result.differences_counts.more_ballots_count).toBe(5);
   });
@@ -152,7 +203,6 @@ describe("mapSectionValues", () => {
     const formValues = {
       "voters_counts.poll_card_count": "123",
       "voters_counts.proxy_certificate_count": "45",
-      "voters_counts.voter_card_count": "67",
       "voters_counts.total_admitted_voters_count": "235",
     };
 
@@ -165,10 +215,9 @@ describe("mapSectionValues", () => {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
-            { code: "A", path: "voters_counts.poll_card_count" },
-            { code: "B", path: "voters_counts.proxy_certificate_count" },
-            { code: "C", path: "voters_counts.voter_card_count" },
-            { code: "D", path: "voters_counts.total_admitted_voters_count" },
+            { code: "A", path: "voters_counts.poll_card_count", title: "Test Title" },
+            { code: "B", path: "voters_counts.proxy_certificate_count", title: "Test Title" },
+            { code: "D", path: "voters_counts.total_admitted_voters_count", title: "Test Title" },
           ],
         },
       ],
@@ -178,7 +227,6 @@ describe("mapSectionValues", () => {
 
     expect(result.voters_counts.poll_card_count).toBe(123);
     expect(result.voters_counts.proxy_certificate_count).toBe(45);
-    expect(result.voters_counts.voter_card_count).toBe(67);
     expect(result.voters_counts.total_admitted_voters_count).toBe(235);
   });
 
@@ -200,10 +248,10 @@ describe("mapSectionValues", () => {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
-            { code: "A", path: "votes_counts.votes_candidates_count" },
-            { code: "B", path: "votes_counts.blank_votes_count" },
-            { code: "C", path: "votes_counts.invalid_votes_count" },
-            { code: "D", path: "votes_counts.total_votes_cast_count" },
+            { code: "A", path: "votes_counts.votes_candidates_count", title: "Test Title" },
+            { code: "B", path: "votes_counts.blank_votes_count", title: "Test Title" },
+            { code: "C", path: "votes_counts.invalid_votes_count", title: "Test Title" },
+            { code: "D", path: "votes_counts.total_votes_cast_count", title: "Test Title" },
           ],
         },
       ],
@@ -215,41 +263,6 @@ describe("mapSectionValues", () => {
     expect(result.votes_counts.blank_votes_count).toBe(5);
     expect(result.votes_counts.invalid_votes_count).toBe(3);
     expect(result.votes_counts.total_votes_cast_count).toBe(208);
-  });
-
-  test("should handle voters_recounts fields", () => {
-    const current = createBasePollingStationResults();
-    const formValues = {
-      "voters_recounts.poll_card_count": "120",
-      "voters_recounts.proxy_certificate_count": "44",
-      "voters_recounts.voter_card_count": "66",
-      "voters_recounts.total_admitted_voters_count": "230",
-    };
-
-    const votersRecountsSection: DataEntrySection = {
-      id: "voters_votes_counts",
-      title: "Voters Recounts Section",
-      short_title: "Voters Recounts",
-      subsections: [
-        {
-          type: "inputGrid",
-          headers: ["field", "counted_number", "description"],
-          rows: [
-            { code: "A", path: "voters_recounts.poll_card_count" },
-            { code: "B", path: "voters_recounts.proxy_certificate_count" },
-            { code: "C", path: "voters_recounts.voter_card_count" },
-            { code: "D", path: "voters_recounts.total_admitted_voters_count" },
-          ],
-        },
-      ],
-    };
-
-    const result = mapSectionValues(current, formValues, votersRecountsSection);
-
-    expect(result.voters_recounts?.poll_card_count).toBe(120);
-    expect(result.voters_recounts?.proxy_certificate_count).toBe(44);
-    expect(result.voters_recounts?.voter_card_count).toBe(66);
-    expect(result.voters_recounts?.total_admitted_voters_count).toBe(230);
   });
 
   test("should handle differences_counts fields", () => {
@@ -273,13 +286,13 @@ describe("mapSectionValues", () => {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
-            { code: "A", path: "differences_counts.more_ballots_count" },
-            { code: "B", path: "differences_counts.fewer_ballots_count" },
-            { code: "C", path: "differences_counts.unreturned_ballots_count" },
-            { code: "D", path: "differences_counts.too_few_ballots_handed_out_count" },
-            { code: "E", path: "differences_counts.too_many_ballots_handed_out_count" },
-            { code: "F", path: "differences_counts.other_explanation_count" },
-            { code: "G", path: "differences_counts.no_explanation_count" },
+            { code: "A", path: "differences_counts.more_ballots_count", title: "Test Title" },
+            { code: "B", path: "differences_counts.fewer_ballots_count", title: "Test Title" },
+            { code: "C", path: "differences_counts.unreturned_ballots_count", title: "Test Title" },
+            { code: "D", path: "differences_counts.too_few_ballots_handed_out_count", title: "Test Title" },
+            { code: "E", path: "differences_counts.too_many_ballots_handed_out_count", title: "Test Title" },
+            { code: "F", path: "differences_counts.other_explanation_count", title: "Test Title" },
+            { code: "G", path: "differences_counts.no_explanation_count", title: "Test Title" },
           ],
         },
       ],
@@ -314,14 +327,14 @@ describe("mapSectionValues", () => {
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title"],
+          headers: ["number", "vote_count", "candidate.title.singular"],
           rows: [
-            { code: "A", path: "political_group_votes[0].candidate_votes[0].votes" },
-            { code: "B", path: "political_group_votes[0].candidate_votes[1].votes" },
-            { code: "C", path: "political_group_votes[0].total" },
-            { code: "D", path: "political_group_votes[1].candidate_votes[0].votes" },
-            { code: "E", path: "political_group_votes[1].candidate_votes[1].votes" },
-            { code: "F", path: "political_group_votes[1].total" },
+            { code: "A", path: "political_group_votes[0].candidate_votes[0].votes", title: "Test Title" },
+            { code: "B", path: "political_group_votes[0].candidate_votes[1].votes", title: "Test Title" },
+            { code: "C", path: "political_group_votes[0].total", title: "Test Title" },
+            { code: "D", path: "political_group_votes[1].candidate_votes[0].votes", title: "Test Title" },
+            { code: "E", path: "political_group_votes[1].candidate_votes[1].votes", title: "Test Title" },
+            { code: "F", path: "political_group_votes[1].total", title: "Test Title" },
           ],
         },
       ],
@@ -354,10 +367,10 @@ describe("mapSectionValues", () => {
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title"],
+          headers: ["number", "vote_count", "candidate.title.singular"],
           rows: [
-            { code: "A", path: "political_group_votes[2].candidate_votes[5].votes" },
-            { code: "B", path: "political_group_votes[2].total" },
+            { code: "A", path: "political_group_votes[2].candidate_votes[5].votes", title: "Test Title" },
+            { code: "B", path: "political_group_votes[2].total", title: "Test Title" },
           ],
         },
       ],
@@ -388,9 +401,9 @@ describe("mapSectionValues", () => {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
-            { code: "A", path: "voters_counts.poll_card_count" },
-            { code: "B", path: "votes_counts.votes_candidates_count" },
-            { code: "C", path: "political_group_votes[0].candidate_votes[0].votes" },
+            { code: "A", path: "voters_counts.poll_card_count", title: "Test Title" },
+            { code: "B", path: "votes_counts.votes_candidates_count", title: "Test Title" },
+            { code: "C", path: "political_group_votes[0].candidate_votes[0].votes", title: "Test Title" },
           ],
         },
       ],
@@ -419,8 +432,8 @@ describe("mapSectionValues", () => {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
-            { code: "A", path: "voters_counts.poll_card_count" },
-            { code: "B", path: "votes_counts.blank_votes_count" },
+            { code: "A", path: "voters_counts.poll_card_count", title: "Test Title" },
+            { code: "B", path: "votes_counts.blank_votes_count", title: "Test Title" },
           ],
         },
       ],
@@ -430,60 +443,6 @@ describe("mapSectionValues", () => {
 
     expect(result.voters_counts.poll_card_count).toBe(0);
     expect(result.votes_counts.blank_votes_count).toBe(0);
-  });
-
-  test.each([
-    {
-      description: "should not override existing voters_recounts when recounted is true",
-      recounted: "true",
-      shouldPreserve: true,
-    },
-    {
-      description: "should not set voters_recounts when recounted is false",
-      recounted: "false",
-      shouldPreserve: false,
-    },
-  ])("$description", ({ recounted, shouldPreserve }) => {
-    const current = createBasePollingStationResults();
-    if (shouldPreserve) {
-      current.voters_recounts = {
-        poll_card_count: 100,
-        proxy_certificate_count: 50,
-        voter_card_count: 75,
-        total_admitted_voters_count: 225,
-      };
-    }
-    const formValues = { recounted };
-
-    const recountedPreservationSection: DataEntrySection = {
-      id: "recounted",
-      title: "Recounted Preservation Section",
-      short_title: "Recounted",
-      subsections: [
-        {
-          type: "radio",
-          short_title: "recounted.short_title",
-          path: "recounted",
-          valueType: "boolean",
-          error: "recounted.error",
-          options: [],
-        },
-      ],
-    };
-
-    const result = mapSectionValues(current, formValues, recountedPreservationSection);
-
-    expect(result.recounted).toBe(recounted === "true");
-    if (shouldPreserve) {
-      expect(result.voters_recounts).toEqual({
-        poll_card_count: 100,
-        proxy_certificate_count: 50,
-        voter_card_count: 75,
-        total_admitted_voters_count: 225,
-      });
-    } else {
-      expect(result.voters_recounts).toBeUndefined();
-    }
   });
 
   test("should preserve existing data when mapping new values", () => {
@@ -511,8 +470,8 @@ describe("mapSectionValues", () => {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
-            { code: "A", path: "voters_counts.proxy_certificate_count" },
-            { code: "B", path: "political_group_votes[0].candidate_votes[1].votes" },
+            { code: "A", path: "voters_counts.proxy_certificate_count", title: "Test Title" },
+            { code: "B", path: "political_group_votes[0].candidate_votes[1].votes", title: "Test Title" },
           ],
         },
       ],
@@ -530,52 +489,60 @@ describe("mapSectionValues", () => {
     expect(result.voters_counts.proxy_certificate_count).toBe(25);
     expect(result.political_group_votes[0]?.candidate_votes[1]?.votes).toBe(30);
   });
+
+  test("should handle checkboxes subsection", () => {
+    const current = createBasePollingStationResults();
+    const formValues = {
+      "test.yes": "true",
+      "test.no": "false",
+    };
+
+    // use `any` because real PollingStationResults doesn't have recounted.yes/recounted.no
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result: any = mapSectionValues(current, formValues, createCheckboxesSection());
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    expect(result.test.yes).toBe(true);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    expect(result.test.no).toBe(false);
+  });
 });
 
 describe("mapResultsToSectionValues", () => {
-  const createBasePollingStationResults = (): PollingStationResults => ({
-    recounted: false,
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
-    political_group_votes: [],
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      votes_candidates_count: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-  });
-
   test.each([
     { input: true, expected: "true", description: "true" },
     { input: false, expected: "false", description: "false" },
     { input: undefined, expected: "", description: "undefined" },
-  ])("should handle recounted as $description", ({ input, expected }) => {
+  ])("should handle radio as $description", ({ input, expected }) => {
     const results = createBasePollingStationResults();
-    results.recounted = input;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (results as any).test = input;
 
-    const formValues = mapResultsToSectionValues(recountedSection, results);
+    const testSectionWithRadio: DataEntrySection = {
+      id: "test_section" as FormSectionId,
+      title: "Test Section",
+      short_title: "Test",
+      subsections: [
+        {
+          type: "radio",
+          short_title: "test",
+          path: "test" as PollingStationResultsPath,
+          valueType: "boolean",
+          error: "error",
+          options: [],
+        },
+      ],
+    };
 
-    expect(formValues["recounted"]).toBe(expected);
+    const formValues = mapResultsToSectionValues(testSectionWithRadio, results);
+
+    expect(formValues["test"]).toBe(expected);
   });
 
   test("should format only inputGrid values, not radio values", () => {
     const results = createBasePollingStationResults();
     results.voters_counts.poll_card_count = 1234; // Should be formatted
-    results.recounted = true; // Should stay as string when converted
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (results as any).test = true; // Should stay as string when converted
 
     const testSection: DataEntrySection = {
       id: "voters_votes_counts",
@@ -584,23 +551,23 @@ describe("mapResultsToSectionValues", () => {
       subsections: [
         {
           type: "radio",
-          short_title: "recounted.short_title",
-          path: "recounted",
+          short_title: "test.short_title",
+          path: "test" as PollingStationResultsPath,
           valueType: "boolean",
-          error: "recounted.error",
+          error: "test.error",
           options: [],
         },
         {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
-          rows: [{ code: "A", path: "voters_counts.poll_card_count" }],
+          rows: [{ code: "A", path: "voters_counts.poll_card_count", title: "Test Title" }],
         },
       ],
     };
 
     const formValues = mapResultsToSectionValues(testSection, results);
 
-    expect(formValues["recounted"]).toBe("true"); // Radio value stays as string
+    expect(formValues["test"]).toBe("true"); // Radio value stays as string
     expect(formValues["voters_counts.poll_card_count"]).toBe("1.234"); // InputGrid value gets formatted
   });
 
@@ -609,7 +576,6 @@ describe("mapResultsToSectionValues", () => {
     results.voters_counts = {
       poll_card_count: 123,
       proxy_certificate_count: 45,
-      voter_card_count: 67,
       total_admitted_voters_count: 235,
     };
     results.votes_counts = {
@@ -618,19 +584,12 @@ describe("mapResultsToSectionValues", () => {
       invalid_votes_count: 3,
       total_votes_cast_count: 208,
     };
-    results.voters_recounts = {
-      poll_card_count: 120,
-      proxy_certificate_count: 44,
-      voter_card_count: 66,
-      total_admitted_voters_count: 230,
-    };
 
-    const formValues = mapResultsToSectionValues(createVotersAndVotesSection(true), results);
+    const formValues = mapResultsToSectionValues(votersAndVotesSection, results);
 
     // Check voters_counts fields
     expect(formValues["voters_counts.poll_card_count"]).toBe("123");
     expect(formValues["voters_counts.proxy_certificate_count"]).toBe("45");
-    expect(formValues["voters_counts.voter_card_count"]).toBe("67");
     expect(formValues["voters_counts.total_admitted_voters_count"]).toBe("235");
 
     // Check votes_counts fields
@@ -638,40 +597,6 @@ describe("mapResultsToSectionValues", () => {
     expect(formValues["votes_counts.blank_votes_count"]).toBe("5");
     expect(formValues["votes_counts.invalid_votes_count"]).toBe("3");
     expect(formValues["votes_counts.total_votes_cast_count"]).toBe("208");
-
-    // Check voters_recounts fields
-    expect(formValues["voters_recounts.poll_card_count"]).toBe("120");
-    expect(formValues["voters_recounts.proxy_certificate_count"]).toBe("44");
-    expect(formValues["voters_recounts.voter_card_count"]).toBe("66");
-    expect(formValues["voters_recounts.total_admitted_voters_count"]).toBe("230");
-  });
-
-  test("should handle missing voters_recounts in voters_votes_counts section", () => {
-    const results = createBasePollingStationResults();
-    results.voters_counts = {
-      poll_card_count: 123,
-      proxy_certificate_count: 45,
-      voter_card_count: 67,
-      total_admitted_voters_count: 235,
-    };
-    results.votes_counts = {
-      votes_candidates_count: 200,
-      blank_votes_count: 5,
-      invalid_votes_count: 3,
-      total_votes_cast_count: 208,
-    };
-
-    const formValues = mapResultsToSectionValues(createVotersAndVotesSection(false), results);
-
-    // voters_recounts fields should be undefined
-    expect(formValues["voters_recounts.poll_card_count"]).toBeUndefined();
-    expect(formValues["voters_recounts.proxy_certificate_count"]).toBeUndefined();
-    expect(formValues["voters_recounts.voter_card_count"]).toBeUndefined();
-    expect(formValues["voters_recounts.total_admitted_voters_count"]).toBeUndefined();
-
-    // Other fields should still work
-    expect(formValues["voters_counts.poll_card_count"]).toBe("123");
-    expect(formValues["votes_counts.votes_candidates_count"]).toBe("200");
   });
 
   test("should extract differences_counts section fields", () => {
@@ -725,11 +650,11 @@ describe("mapResultsToSectionValues", () => {
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title"],
+          headers: ["number", "vote_count", "candidate.title.singular"],
           rows: [
-            { path: "political_group_votes[0].candidate_votes[0].votes" },
-            { path: "political_group_votes[0].candidate_votes[1].votes" },
-            { path: "political_group_votes[0].total" },
+            { path: "political_group_votes[0].candidate_votes[0].votes", title: "Test Title" },
+            { path: "political_group_votes[0].candidate_votes[1].votes", title: "Test Title" },
+            { path: "political_group_votes[0].total", title: "Test Title" },
           ],
         },
       ],
@@ -752,11 +677,11 @@ describe("mapResultsToSectionValues", () => {
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title"],
+          headers: ["number", "vote_count", "candidate.title.singular"],
           rows: [
-            { path: "political_group_votes[0].candidate_votes[0].votes" },
-            { path: "political_group_votes[0].candidate_votes[1].votes" },
-            { path: "political_group_votes[0].total" },
+            { path: "political_group_votes[0].candidate_votes[0].votes", title: "Test Title" },
+            { path: "political_group_votes[0].candidate_votes[1].votes", title: "Test Title" },
+            { path: "political_group_votes[0].total", title: "Test Title" },
           ],
         },
       ],
@@ -786,10 +711,10 @@ describe("mapResultsToSectionValues", () => {
       subsections: [
         {
           type: "inputGrid",
-          headers: ["number", "vote_count", "candidate.title"],
+          headers: ["number", "vote_count", "candidate.title.singular"],
           rows: [
-            { path: "political_group_votes[2].candidate_votes[5].votes" },
-            { path: "political_group_votes[2].total" },
+            { path: "political_group_votes[2].candidate_votes[5].votes", title: "Test Title" },
+            { path: "political_group_votes[2].total", title: "Test Title" },
           ],
         },
       ],
@@ -806,7 +731,7 @@ describe("mapResultsToSectionValues", () => {
     results.voters_counts.poll_card_count = 1234;
     results.votes_counts.votes_candidates_count = 5678;
 
-    const formValues = mapResultsToSectionValues(createVotersAndVotesSection(false), results);
+    const formValues = mapResultsToSectionValues(votersAndVotesSection, results);
 
     expect(formValues["voters_counts.poll_card_count"]).toBe("1.234");
     expect(formValues["votes_counts.votes_candidates_count"]).toBe("5.678");
@@ -815,7 +740,7 @@ describe("mapResultsToSectionValues", () => {
   test("should handle zero values", () => {
     const results = createBasePollingStationResults();
 
-    const formValues = mapResultsToSectionValues(createVotersAndVotesSection(false), results);
+    const formValues = mapResultsToSectionValues(votersAndVotesSection, results);
 
     expect(formValues["voters_counts.poll_card_count"]).toBe("");
     expect(formValues["votes_counts.blank_votes_count"]).toBe("");
@@ -824,7 +749,7 @@ describe("mapResultsToSectionValues", () => {
   test("should handle section with empty subsections", () => {
     const results = createBasePollingStationResults();
     const emptySubsectionsSection: DataEntrySection = {
-      id: "recounted",
+      id: "voters_votes_counts",
       title: "Test Section",
       short_title: "Test",
       subsections: [],
@@ -838,7 +763,7 @@ describe("mapResultsToSectionValues", () => {
   test("should handle section with only message and heading components", () => {
     const results = createBasePollingStationResults();
     const messageSection: DataEntrySection = {
-      id: "recounted",
+      id: "voters_votes_counts",
       title: "Test Section",
       short_title: "Test",
       subsections: [
@@ -860,28 +785,22 @@ describe("mapResultsToSectionValues", () => {
 
   test("should handle mixed subsections components", () => {
     const results = createBasePollingStationResults();
-    results.recounted = true;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (results as any).test = true;
     results.voters_counts.poll_card_count = 100;
 
     const mixedSection: DataEntrySection = {
-      id: "recounted",
-      title: "Recounted",
-      short_title: "Recounted",
+      id: "test" as FormSectionId,
+      title: "test",
+      short_title: "test",
       subsections: [
         { type: "message", message: "description" },
-        {
-          type: "radio",
-          short_title: "recounted.short_title",
-          error: "contains_error",
-          path: "recounted",
-          valueType: "boolean",
-          options: [],
-        },
+        ...createRadioSection().subsections,
         { type: "heading", title: "description" },
         {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
-          rows: [{ path: "voters_counts.poll_card_count" }],
+          rows: [{ path: "voters_counts.poll_card_count", title: "Test Title" }],
         },
       ],
     };
@@ -889,7 +808,36 @@ describe("mapResultsToSectionValues", () => {
     const formValues = mapResultsToSectionValues(mixedSection, results);
 
     expect(Object.keys(formValues).length).toBe(2);
-    expect(formValues["recounted"]).toBe("true");
+    expect(formValues["test"]).toBe("true");
     expect(formValues["voters_counts.poll_card_count"]).toBe("100");
+  });
+
+  test("should extract checkboxes boolean values to string form", () => {
+    const results = createBasePollingStationResults();
+    const checkboxesSection = createCheckboxesSection();
+
+    // Test with both true values
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (results as any).test = { yes: true, no: true };
+
+    let formValues = mapResultsToSectionValues(checkboxesSection, results);
+    expect(formValues["test.yes"]).toBe("true");
+    expect(formValues["test.no"]).toBe("true");
+
+    // Test with both false values
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (results as any).test = { yes: false, no: false };
+
+    formValues = mapResultsToSectionValues(checkboxesSection, results);
+    expect(formValues["test.yes"]).toBe("false");
+    expect(formValues["test.no"]).toBe("false");
+
+    // Test with mixed values
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (results as any).test = { yes: true, no: false };
+
+    formValues = mapResultsToSectionValues(checkboxesSection, results);
+    expect(formValues["test.yes"]).toBe("true");
+    expect(formValues["test.no"]).toBe("false");
   });
 });

@@ -19,7 +19,7 @@ export interface ToolbarSectionProps extends React.HTMLAttributes<HTMLElement> {
   pos?: "start" | "center" | "end";
   children: React.ReactNode;
 }
-export function ToolbarSection({ children, pos = "start", ...htmlProps }: ToolbarSectionProps) {
+function ToolbarSection({ children, pos = "start", ...htmlProps }: ToolbarSectionProps) {
   return (
     <section className={cn(cls.toolbarSection, cls[pos])} {...htmlProps}>
       {children}

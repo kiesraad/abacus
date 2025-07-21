@@ -1,10 +1,10 @@
 import { FormEvent, useState } from "react";
 
-import type { Story } from "@ladle/react";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 
 import { Form } from "./Form";
 
-export const DefaultForm: Story = () => {
+export const DefaultForm: StoryFn = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   function handleFormSubmit(event: FormEvent) {
@@ -14,7 +14,7 @@ export const DefaultForm: Story = () => {
 
   return (
     <>
-      <p className="mb-lg">
+      <div className="mb-lg">
         <Form title="Form" onSubmit={handleFormSubmit}>
           <input id="inp1" />
           <br />
@@ -25,7 +25,9 @@ export const DefaultForm: Story = () => {
           <button type="submit">Submit</button>
         </Form>
         {formSubmitted && "Submitted!"}
-      </p>
+      </div>
     </>
   );
 };
+
+export default {} satisfies Meta;

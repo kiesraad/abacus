@@ -16,6 +16,7 @@ import { KeyboardKey } from "@/types/ui";
 
 import { useDataEntryFormSection } from "../hooks/useDataEntryFormSection";
 import { DataEntryNavigation } from "./DataEntryNavigation";
+import cls from "./DataEntrySection.module.css";
 
 export function DataEntrySection() {
   const user = useUser();
@@ -33,6 +34,8 @@ export function DataEntrySection() {
     showAcceptErrorsAndWarnings,
     sectionId,
   } = useDataEntryFormSection();
+  const acceptCheckboxRef = React.useRef<HTMLInputElement>(null);
+
   const section = dataEntryStructure.find((s) => s.id === sectionId);
 
   if (!section) {
@@ -60,13 +63,27 @@ export function DataEntrySection() {
   );
   const memoizedWarningCodes = React.useMemo(() => formSection.warnings.getCodes(), [formSection.warnings]);
 
+  // Scroll unaccepted warnings/errors checkbox into view when error for it is triggered
+  React.useEffect(() => {
+    if (formSection.acceptErrorsAndWarningsError) {
+      acceptCheckboxRef.current?.focus();
+      requestAnimationFrame(() => {
+        acceptCheckboxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
+  }, [formSection.acceptErrorsAndWarningsError]);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     void onSubmit();
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id={formId} title={section.title}>
+    <Form onSubmit={handleSubmit} ref={formRef} id={formId}>
+      <legend className={cls.titleContainer}>
+        <span className={cls.title}>{section.title}</span>
+        {section.sectionNumber && <span className={cls.badge}>{section.sectionNumber}</span>}
+      </legend>
       <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && memoizedErrorCodes.length > 0 && (
@@ -112,6 +129,7 @@ export function DataEntrySection() {
           <BottomBar.Row>
             <Checkbox
               id={"acceptWarningsCheckbox"}
+              ref={acceptCheckboxRef}
               checked={formSection.acceptErrorsAndWarnings}
               hasError={formSection.acceptErrorsAndWarningsError}
               onChange={(e) => {

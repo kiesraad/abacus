@@ -3,7 +3,6 @@ import { createTestModel } from "@xstate/graph";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
-import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { createMachine } from "xstate";
 
@@ -39,15 +38,6 @@ const dataEntryMachineDefinition = {
       },
     },
     pollingStationsPageDiscarded: {},
-    recountedPageErrorSubmitted: {
-      on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageErrorSubmitted",
-      },
-    },
-    recountedPageChangedToErrorSubmitted: {},
-    recountedPageChangedToErrorDiscarded: {},
-    recountedPageFilledError: {},
-    recountedPageCorrected: {},
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilledValid",
@@ -68,13 +58,11 @@ const dataEntryMachineDefinition = {
       on: {
         SUBMIT: "votersVotesPageChangedToErrorSubmitted",
         CLICK_ABORT: "abortInputModalChangedToErrorSubmitted",
-        GO_TO_RECOUNTED_PAGE: "unsavedChangesModalChangedToError",
       },
     },
     VotersVotesPageFilledError: {
       on: {
         SUBMIT: "votersVotesPageErrorSubmitted",
-        GO_TO_RECOUNTED_PAGE: "recountedPageFilledError",
       },
     },
     votersVotesPageErrorSubmitted: {
@@ -83,7 +71,6 @@ const dataEntryMachineDefinition = {
         CHANGE_TO_WARNING_AND_SUBMIT: "votersVotesPageWarningSubmitted",
         CLICK_ABORT: "abortInputModalErrorSubmitted",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModalErrorSubmitted",
-        GO_TO_RECOUNTED_PAGE: "recountedPageErrorSubmitted",
         // no GO_TO_DIFFERENCES_PAGE, because unreachable
       },
     },
@@ -104,7 +91,6 @@ const dataEntryMachineDefinition = {
     votersVotesPageCorrectBackToValid: {
       on: {
         SUBMIT: "differencesPageCorrected",
-        GO_TO_RECOUNTED_PAGE: "unsavedChangesModalCorrectBackToValid",
       },
     },
     votersVotesPageWarningSubmitted: {},
@@ -129,17 +115,6 @@ const dataEntryMachineDefinition = {
         DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
-    unsavedChangesModalChangedToError: {
-      on: {
-        SAVE_UNSUBMITTED_CHANGES: "recountedPageChangedToErrorSubmitted",
-        DISCARD_UNSUBMITTED_CHANGES: "recountedPageChangedToErrorDiscarded",
-      },
-    },
-    unsavedChangesModalCorrectBackToValid: {
-      on: {
-        SAVE_UNSUBMITTED_CHANGES: "recountedPageCorrected",
-      },
-    },
   },
 };
 
@@ -149,28 +124,24 @@ const { machineStates, machineEvents } = getStatesAndEventsFromMachineDefinition
 const voters: VotersCounts = {
   poll_card_count: 90,
   proxy_certificate_count: 10,
-  voter_card_count: 0,
   total_admitted_voters_count: 100,
 };
 
 const votersChanged: VotersCounts = {
   poll_card_count: 80,
   proxy_certificate_count: 20,
-  voter_card_count: 0,
   total_admitted_voters_count: 100,
 };
 
 const votersEmpty: VotersCounts = {
   poll_card_count: 0,
   proxy_certificate_count: 0,
-  voter_card_count: 0,
   total_admitted_voters_count: 0,
 };
 
 const votersError: VotersCounts = {
   poll_card_count: 70,
   proxy_certificate_count: 30,
-  voter_card_count: 0,
   total_admitted_voters_count: 90, // incorrect total
 };
 
@@ -206,7 +177,6 @@ test.describe("Data entry model test - errors", () => {
       // eslint-disable-next-line playwright/valid-title
       test(path.description, async ({ page, pollingStation, election }) => {
         const dataEntryHomePage = new DataEntryHomePage(page);
-        const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
         const abortModal = new AbortInputModal(page);
@@ -232,38 +202,6 @@ test.describe("Data entry model test - errors", () => {
         const PollingStationsPageEvents = {
           RESUME_DATA_ENTRY: async () => {
             await dataEntryHomePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
-          },
-        };
-        const recountedPageStates = {
-          recountedPageErrorSubmitted: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
-          },
-          recountedPageChangedToErrorSubmitted: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
-          },
-          recountedPageFilledError: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("nog niet afgerond");
-          },
-          recountedPageChangedToErrorDiscarded: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
-          },
-          recountedPageCorrected: async () => {
-            await expect(recountedPage.fieldset).toBeVisible();
-            await expect(recountedPage.no).toBeChecked();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
-          },
-        };
-        const recountedPageEvents = {
-          GO_TO_VOTERS_VOTES_PAGE: async () => {
-            await recountedPage.progressList.votersAndVotes.click();
           },
         };
         const votersVotesPageStates = {
@@ -297,7 +235,7 @@ test.describe("Data entry model test - errors", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
             await expect(votersAndVotesPage.error).toContainText(
-              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
+              "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.",
             );
           },
           votersVotesPageChangedToErrorSubmitted: async () => {
@@ -305,7 +243,7 @@ test.describe("Data entry model test - errors", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
             await expect(votersAndVotesPage.error).toContainText(
-              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
+              "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.",
             );
           },
           votersVotesPageCorrected: async () => {
@@ -329,7 +267,7 @@ test.describe("Data entry model test - errors", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
             await expect(votersAndVotesPage.error).toContainText(
-              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
+              "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.",
             );
           },
           votersVotesPageWarningSubmitted: async () => {
@@ -339,12 +277,6 @@ test.describe("Data entry model test - errors", () => {
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.",
             );
-          },
-          unsavedChangesModalChangedToError: async () => {
-            await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
-          },
-          unsavedChangesModalCorrectBackToValid: async () => {
-            await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
           },
         };
         const votersAndVotesPageEvents = {
@@ -376,32 +308,23 @@ test.describe("Data entry model test - errors", () => {
           NAV_TO_POLLING_STATION_PAGE: async () => {
             await votersAndVotesPage.navBar.clickElection(election.election.location, election.election.name);
           },
-          GO_TO_RECOUNTED_PAGE: async () => {
-            await votersAndVotesPage.progressList.recounted.click();
-          },
           GO_TO_DIFFERENCES_PAGE: async () => {
             await votersAndVotesPage.progressList.differences.click();
-          },
-          SAVE_UNSUBMITTED_CHANGES: async () => {
-            await votersAndVotesPage.unsavedChangesModal.saveInput.click();
-          },
-          DISCARD_UNSUBMITTED_CHANGES: async () => {
-            await votersAndVotesPage.unsavedChangesModal.discardInput.click();
           },
         };
 
         const differencesPageStates = {
           differencesPageValid: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
           differencesPageCorrected: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+            await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
           differencesPageError: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
-            await expect(recountedPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
+            await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
           },
         };
         const differencesPageEvents = {
@@ -430,27 +353,14 @@ test.describe("Data entry model test - errors", () => {
         // check that events and states used by the machine are equal to
         // the events and states specified in the test
         const { states, events } = getStatesAndEventsFromTest(
-          [
-            pollingStationsPageStates,
-            recountedPageStates,
-            votersVotesPageStates,
-            differencesPageStates,
-            abortInputModalStates,
-          ],
-          [
-            PollingStationsPageEvents,
-            recountedPageEvents,
-            votersAndVotesPageEvents,
-            differencesPageEvents,
-            abortInputModalEvents,
-          ],
+          [pollingStationsPageStates, votersVotesPageStates, differencesPageStates, abortInputModalStates],
+          [PollingStationsPageEvents, votersAndVotesPageEvents, differencesPageEvents, abortInputModalEvents],
         );
         expect(new Set(states)).toEqual(new Set(machineStates));
         expect(new Set(events)).toEqual(new Set(machineEvents));
 
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
         await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
-        await recountedPage.checkNoAndClickNext();
 
         type MachineStates = typeof dataEntryMachineDefinition.states;
         type MachineStateKey = keyof MachineStates;
@@ -463,14 +373,12 @@ test.describe("Data entry model test - errors", () => {
         await path.test({
           states: {
             ...pollingStationsPageStates,
-            ...recountedPageStates,
             ...votersVotesPageStates,
             ...differencesPageStates,
             ...abortInputModalStates,
           } satisfies Record<MachineStateKey, () => void>,
           events: {
             ...votersAndVotesPageEvents,
-            ...recountedPageEvents,
             ...differencesPageEvents,
             ...abortInputModalEvents,
             ...PollingStationsPageEvents,

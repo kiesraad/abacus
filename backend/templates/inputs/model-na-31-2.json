@@ -2544,7 +2544,6 @@
         "voters_counts": {
             "poll_card_count": 93477,
             "proxy_certificate_count": 0,
-            "voter_card_count": 0,
             "total_admitted_voters_count": 93477
         },
         "votes_counts": {

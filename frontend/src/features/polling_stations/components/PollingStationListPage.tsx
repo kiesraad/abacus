@@ -32,7 +32,7 @@ export function PollingStationListPage() {
 
   return (
     <>
-      <PageTitle title={`${t("polling_stations")} - Abacus`} />
+      <PageTitle title={`${t("polling_station.title.plural")} - Abacus`} />
       <header>
         <section>
           <h1>{t("polling_station.title.plural")}</h1>
@@ -48,21 +48,17 @@ export function PollingStationListPage() {
             <p className="mb-lg">{t("polling_station.message.no_polling_stations")}</p>
 
             <Toolbar>
-              <Toolbar.Section pos="start">
-                <Button.Link variant="secondary" size="sm" to="./create">
-                  <IconPlus /> {t("manual_input")}
-                </Button.Link>
-              </Toolbar.Section>
+              <Button.Link variant="secondary" size="sm" to="./create">
+                <IconPlus /> {t("manual_input")}
+              </Button.Link>
             </Toolbar>
           </article>
         ) : (
           <article>
             <Toolbar>
-              <Toolbar.Section pos="end">
-                <Button.Link variant="secondary" size="sm" to="./create">
-                  <IconPlus /> {t("polling_station.form.create")}
-                </Button.Link>
-              </Toolbar.Section>
+              <Button.Link variant="secondary" size="sm" to="./create">
+                <IconPlus /> {t("polling_station.form.create")}
+              </Button.Link>
             </Toolbar>
 
             <Table id="polling_stations">

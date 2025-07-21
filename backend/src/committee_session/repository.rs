@@ -29,6 +29,7 @@ impl CommitteeSessions {
               start_time
             FROM committee_sessions
             WHERE election_id = ?
+            ORDER BY number DESC
             "#,
             election_id
         )

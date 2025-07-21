@@ -4,20 +4,13 @@
     "voters_counts": {
       "poll_card_count": "Stempassen",
       "proxy_certificate_count": "Volmachtbewijzen",
-      "total_admitted_voters_count": "Totaal toegelaten kiezers",
-      "voter_card_count": "Kiezerspassen"
+      "total_admitted_voters_count": "Totaal toegelaten kiezers"
     },
     "votes_counts": {
       "blank_votes_count": "Blanco stemmen",
       "invalid_votes_count": "Ongeldige stemmen",
       "total_votes_cast_count": "Totaal uitgebrachte stemmen",
       "votes_candidates_count": "Stemmen op kandidaten"
-    },
-    "voters_recounts": {
-      "poll_card_count": "Stempassen",
-      "proxy_certificate_count": "Volmachtbewijzen",
-      "total_admitted_voters_count": "Totaal toegelaten kiezers",
-      "voter_card_count": "Kiezerspassen"
     },
     "differences_counts": {
       "fewer_ballots_count": "Stembiljetten minder geteld",

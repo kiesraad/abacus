@@ -85,6 +85,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm ci
+      - name: Install Playwright Chromium Browser
+        run: npx playwright install --with-deps chromium
       - name: Run Vite build to report bundle size
         run: npx vite build --config vite.config.ts
         env:

@@ -27,16 +27,11 @@ describe("ResolveErrorsOverview", () => {
         validationResultMockData.F401, // political_group_votes[0]
       ],
       warnings: [
-        validationResultMockData.W001, // recounted
         validationResultMockData.W201, // votes_counts
       ],
     };
 
     render(<ResolveErrorsOverview structure={structure} results={results} />);
-
-    const recounted = screen.queryByRole("region", { name: "Is het selectievakje op de eerste pagina aangevinkt?" });
-    expect(recounted).toBeInTheDocument();
-    expect(getValidationResults(recounted)).toEqual(["W.001"]);
 
     const voters_votes_counts = screen.queryByRole("region", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
     expect(voters_votes_counts).toBeInTheDocument();

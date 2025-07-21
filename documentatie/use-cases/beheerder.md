@@ -20,11 +20,6 @@ __Uitbreidingen:__
 
 - Inlezen totalenlijst (kandidatenlijst met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
 
-### Open punten
-- Hoe precies krijgt de beheerder de beschikking over de verkiezingsdefinitie (met hash-code) en de kandidatenlijst (met hash-code)?
-  - Zowel de verkiezingsdefinitie als de kandidatenlijst worden door het CSB aangemaakt met OSV KS.
-
-
 ## De beheerder installeert de applicatie (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊

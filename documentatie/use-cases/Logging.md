@@ -12,6 +12,13 @@ __Niveau:__ gebruikersdoel, zee  (🌊)
 
 De applicatie logt de interactie van gebruikers dwz alle belangrijke stappen in het proces, accountbeheer, het inrichten van de applicatie, etc.
 
+Een niet-uitputtende lijst van te loggen acties: 
+
+- foutmeldingen
+- in- en uitloggen
+- im- en exporteren van eml-bestanden
+- aanmaken, aanpassen, verwijderen van records in de database zoals verkiezingen, zittingen, gebruikers, stembureaus
+
 Van elke gelogde actie is in elk geval de volgende informatie beschikaar:
 
 - actie: de gebeurtenis of handeling die heeft plaatsgevonden,

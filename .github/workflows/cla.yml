@@ -21,7 +21,7 @@ jobs:
           contributors-repository-name: abacus
           contributors-file: contributors.yml
       - if: failure() && steps.check.outputs.missing
-        uses: marocchino/sticky-pull-request-comment@d2ad0de260ae8b0235ce059e63f2949ba9e05943 # v2
+        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405 # v2
         with:
           message: |
             Hi ${{steps.check.outputs.missing}}!
@@ -31,6 +31,6 @@ jobs:
             Please [review the CLA](https://github.com/kiesraad/abacus/blob/main/CLA.md), and send your signed copy to abacus[@]kiesraad.nl. Thanks!
 
       - if: success()
-        uses: marocchino/sticky-pull-request-comment@d2ad0de260ae8b0235ce059e63f2949ba9e05943 # v2
+        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405 # v2
         with:
           delete: true

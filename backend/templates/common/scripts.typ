@@ -38,9 +38,9 @@
 }
 
 /// Display a checkbox, optionally already checked when the `checked` parameter is set to `true`
-#let checkbox(checked: none, content) = {
+#let checkbox(checked: none, small: false, content) = {
   let has_content = content != none and content != ""
-  let size = if checked == true or checked == none { 14pt } else { 10pt }
+  let size = if checked == true or checked == none and not small { 14pt } else { 10pt }
 
   grid(
     columns: if has_content { (14pt, 6pt, auto) } else { (size) },

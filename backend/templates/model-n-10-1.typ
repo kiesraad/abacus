@@ -111,7 +111,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid o
 #empty_table(
   columns: (8em, 1fr, 1fr, 1fr, 7em, 7em),
   headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig (van - tot)", "Aanwezig bij stemmen", "Aanwezig bij tellen"),
-  values: ("", "", "", "-", checkbox(large: false)[], checkbox(large: false)[]),
+  values: ("", "", "", "-", checkbox(small: true)[], checkbox(small: true)[]),
   rows: 22,
 )
 

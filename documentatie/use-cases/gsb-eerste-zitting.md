@@ -97,6 +97,11 @@ __Hoofdscenario 2:__
 2. De coördinator GSB corrigeert de stembureaus in de applicatie.
 3. De applicatie vraagt om een verklaring van de wijziging. Deze verklaring wordt opgenomen in het proces-verbaal.
 
+__Uitbreidingen__
+
+2a. De coördinator GSB verwijdert het laatste stembureau  
+&emsp; 2a1. De applicatie gaat terug naar de start van de zitting  
+
 ### Niet in scope
 
 - Het opnemen van andere bijzonderheden i.v.m. stembureaus in het proces-verbaal, bijv. stembureau dat halverwege de dag werd gesloten. Dit hoort in de bezwaren en bijzonderheden van dat betreffende stembureau.

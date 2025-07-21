@@ -117,42 +117,42 @@ describe("Test PollingStationChoiceForm", () => {
       },
       {
         testDescription: "finalized",
-        pollingStationInput: "34", // status: "definitive"
+        pollingStationInput: "34",
         selectorFeedback: "Stembureau 34 (Testplek) is al twee keer ingevoerd",
         submitFeedback: "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
       },
       {
-        testDescription: "different entries",
-        pollingStationInput: "35", // status: "entries_different"
+        testDescription: "entries different",
+        pollingStationInput: "35",
         selectorFeedback: "Stembureau 35 (Testschool) is al twee keer ingevoerd",
         submitFeedback: "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
       },
       {
-        testDescription: "second entry in progress",
-        pollingStationInput: "36", // status: "second_entry_in_progress"
+        testDescription: "second entry in progress by other",
+        pollingStationInput: "36",
         selectorFeedback: "Een andere invoerder is bezig met stembureau 36",
         submitFeedback: "Een andere invoerder is bezig met stembureau 36 (Testbuurthuis)",
       },
       {
-        testDescription: "second entry in progress",
-        pollingStationInput: "37", // status: "first_entry_has_errors"
+        testDescription: "first entry has errors",
+        pollingStationInput: "37",
         selectorFeedback: "Stembureau 37 ligt ter beoordeling bij de coördinator",
         submitFeedback: "Stembureau 37 ligt ter beoordeling bij de coördinator",
       },
       {
-        testDescription: "first entry in progress",
-        pollingStationInput: "38", // status: "first_entry_in_progress"
+        testDescription: "first entry in progress by other",
+        pollingStationInput: "38",
         selectorFeedback: "Een andere invoerder is bezig met stembureau 38",
         submitFeedback: "Een andere invoerder is bezig met stembureau 38 (Testmuseum)",
       },
       {
-        testDescription: "second entry not started",
-        pollingStationInput: "39", // status: "second_entry_not_started"
+        testDescription: "first entry done by same user",
+        pollingStationInput: "39",
         selectorFeedback: "Je mag stembureau 39 niet nog een keer invoeren",
         submitFeedback: "Je mag stembureau 39 niet nog een keer invoeren",
       },
     ])(
-      "Entering a $testDescription polling station shows feedback and alert",
+      "Inputting and submitting an invalid polling station shows feedback and alert: $testDescription",
       async ({ pollingStationInput, selectorFeedback, submitFeedback }) => {
         overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
         overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);

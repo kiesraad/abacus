@@ -254,7 +254,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
 
-#checkbox[D en H zijn gelijk #sym.arrow.r *Ga door naar #ref(<candidate_votes>)*]
+#checkbox(checked: true)[D en H zijn gelijk #sym.arrow.r *Ga door naar #ref(<candidate_votes>)*]
 
 #checkbox[H is groter is dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 

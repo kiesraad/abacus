@@ -29,26 +29,41 @@
 
 /// Display a checkmark for usage in a checkbox
 #let checkmark() = {
-  box(width: 8pt, height: 8pt, clip: true, curve(
-    stroke: black,
+  box(width: 8pt, height: 8pt, clip: false, curve(
+    stroke: (thickness: 2pt, cap: "round", join: "miter", paint: white),
     curve.move((0%, 50%)),
     curve.line((40%, 90%)),
-    curve.line((100%, 0%)),
+    curve.line((90%, 0%)),
   ))
 }
 
 /// Display a checkbox, optionally already checked when the `checked` parameter is set to `true`
 #let checkbox(checked: false, large: true, content) = {
-  let size = if large { 14pt } else { 10pt }
+  let size = if large { 12pt } else { 10pt }
 
   grid(
-    columns: (size + 6pt, auto),
+    columns: (20pt, auto),
     align: horizon,
-    box(width: size, height: size, inset: 3pt, stroke: 0.5pt, clip: true, if checked {
-      checkmark()
-    }),
+    box(
+      width: size,
+      height: size,
+      inset: 2.5pt,
+      stroke: if checked { 3pt + black } else { (thickness: 0.5pt, dash: "densely-dotted", cap: "square") },
+      clip: true,
+      fill: if checked { black } else { white },
+      if checked { checkmark() }
+    ),
     content,
   )
+}
+
+/// Add dashes to a text every `every` characters
+#let add-dashes(text, every: 4) = {
+  if text == none {
+    return
+  }
+
+  text.clusters().chunks(every).map((c) => c.join("")).join("-")
 }
 
 /// Format a number with thousands separator
@@ -340,7 +355,7 @@
               [#c.number],
             )),
             if c.votes == none {
-              table.cell(inset: 0pt, empty_grid(paint: luma(213)))
+              table.cell(inset: 1pt, empty_grid(paint: luma(213)))
             } else {
               table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes)))
             },

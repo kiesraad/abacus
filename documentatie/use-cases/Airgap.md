@@ -16,7 +16,7 @@ __Uitbreidingen:__
 &emsp; 1a4. De applicatie toont op alle andere clients een paginavullende foutmelding.  
 &emsp; 1a5. De foutmeldingen verdwijnen zodra bij de eerstvolgende check blijkt dat het probleem is verholpen.  
 
-1b. Een client stelt vast dat er een internetverbinding is:  
+1b. Een client stelt vast dat er een internetverbinding is:  _(could have versie 1.0 GSB)_  
 &emsp; 1b1. De betreffende client stuurt een melding naar de server.  
 &emsp; 1b2. De server blokkeert de invoer en aanpassingen aan de configuratie.  
 &emsp; 1b3. De server logt alle details met betrekking tot de geconstateerde internetverbinding.  

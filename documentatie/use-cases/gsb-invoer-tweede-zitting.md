@@ -8,7 +8,7 @@ __Niveau:__ hoog-over, vlieger, 🪁
 
 __Precondities:__
 
-- [De beheerder richt de applicatie in](./beheerder.md#de-beheerder-richt-de-applicatie-in-wolk)
+- [De beheerder richt de applicatie in](./beheerder.md#de-beheerder-richt-de-applicatie-in-voor-GSB-en/of-CSB-wolk)
 - [Het GSB voert de PV's en eventuele SB corrigenda (DSO) in de applicatie in](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-pvs-en-eventuele-sb-corrigenda-dso-in-de-applicatie-in-vlieger)
 
 ### Hoofdscenario en uitbreidingen

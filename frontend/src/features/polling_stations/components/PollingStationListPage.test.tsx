@@ -35,6 +35,7 @@ describe("PollingStationListPage", () => {
       ["37", "Dansschool Oeps nou deed ik het weer", "Bijzonder"],
       ["38", "Testmuseum", "Bijzonder"],
       ["39", "Test gemeentehuis", "Vaste locatie"],
+      ["40", "Test kerk", "Vaste locatie"],
     ]);
   });
 

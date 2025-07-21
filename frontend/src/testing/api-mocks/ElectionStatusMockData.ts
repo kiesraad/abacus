@@ -46,5 +46,6 @@ export const statusResponseMock: ElectionStatusResponse = {
       first_entry_user_id: 1,
       first_entry_progress: 100,
     },
+    { polling_station_id: 8, status: "first_entry_not_started" },
   ],
 };

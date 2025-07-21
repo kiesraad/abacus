@@ -247,7 +247,9 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 #checkbox(checked: false)[Er zijn geen verschillen geconstateerd.]
 
-#checkbox(checked: false)[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
+#checkbox(
+  checked: false,
+)[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
 
 #empty_lines(5)
 
@@ -307,3 +309,12 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 === Extra ondertekening: (niet verplicht)
 
 #stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
+
+
+#pagebreak(weak: true)
+
+#set heading(numbering: none)
+
+#checkbox(checked: none)[none none none none none none none none none]
+#checkbox(checked: true)[true true true true true true true true true]
+#checkbox(checked: false)[false false false false false false false false false false]

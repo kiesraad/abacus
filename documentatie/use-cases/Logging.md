@@ -39,7 +39,7 @@ De beheerder / coördinator bekijkt de gelogde acties om het gebruik te monitore
 
 __Niveau:__ gebruikersdoel, zee  (🌊)
 
-De Kiesraad gebruikt de logging als informatiebron bij het afhandelen van een incident. 
+De Kiesraad gebruikt de logging als informatiebron bij het afhandelen van een incident. Hiervoor kan de volledige database van de betreffende installatie worden opgevraagd.
 
 ## Out of scope
 

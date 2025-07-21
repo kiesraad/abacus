@@ -21,9 +21,9 @@ test.describe("election results zip", () => {
     await finishDataEntryPage.finishDataEntry.click();
 
     const electionReportPage = new ElectionReport(page);
-    await electionReportPage.downloadZip.click();
     const responsePromise = page.waitForResponse(`/api/elections/${completedElection.id}/download_zip_results`);
     const downloadPromise = page.waitForEvent("download");
+    await electionReportPage.downloadZip.click();
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);

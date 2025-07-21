@@ -21,9 +21,9 @@ test.describe("pdf rendering", () => {
     await finishDataEntryPage.finishDataEntry.click();
 
     const electionReportPage = new ElectionReport(page);
-    await electionReportPage.downloadPdf.click();
     const responsePromise = page.waitForResponse(`/api/elections/${completedElection.id}/download_pdf_results`);
     const downloadPromise = page.waitForEvent("download");
+    await electionReportPage.downloadPdf.click();
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);

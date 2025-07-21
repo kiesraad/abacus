@@ -12,11 +12,6 @@
       "total_votes_cast_count": "Totaal uitgebrachte stemmen",
       "votes_candidates_count": "Stemmen op kandidaten"
     },
-    "voters_recounts": {
-      "poll_card_count": "Stempassen",
-      "proxy_certificate_count": "Volmachtbewijzen",
-      "total_admitted_voters_count": "Totaal toegelaten kiezers"
-    },
     "differences_counts": {
       "fewer_ballots_count": "Stembiljetten minder geteld",
       "more_ballots_count": "Stembiljetten méér geteld",

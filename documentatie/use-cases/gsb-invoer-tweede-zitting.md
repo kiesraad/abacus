@@ -21,6 +21,11 @@ __Hoofdscenario:__
 2. De invoerders vullen de resultaten van de gecorrigeerde tellingen (alleen de gewijzigde aantallen) in.
 
 __Uitbreidingen:__  
+
+1a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
+&emsp; 1a1. De coördinator GSB pauzeert de invoer.  
+&emsp; 1a2. De applicatie blokkeert verdere invoer.  
+
 2a. Er zijn verschillen tussen de eerste en de tweede invoer:  
 &emsp; 2a1. De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.
 

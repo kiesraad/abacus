@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -27,7 +28,9 @@ const renderLayout = () => {
     <TestUserProvider userRole="coordinator">
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <ResolveErrorsLayout />
+          <MessagesProvider>
+            <ResolveErrorsLayout />
+          </MessagesProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,

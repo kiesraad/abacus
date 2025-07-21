@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import cls from "@/features/resolve_differences/components/ResolveDifferences.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   ElectionListRequestHandler,
@@ -30,6 +31,8 @@ vi.mock("react-router", () => ({
   useLocation: () => ({ pathname: "/" }),
 }));
 
+vi.mock("@/hooks/messages/useMessages");
+
 const renderPage = async () => {
   render(
     <TestUserProvider userRole="coordinator">
@@ -50,7 +53,11 @@ function overrideResponseStatus(status: DataEntryStatusName) {
 }
 
 describe("ResolveDifferencesPage", () => {
+  const pushMessage = vi.fn();
+
   beforeEach(() => {
+    vi.mocked(useMessages).mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
+
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
@@ -159,6 +166,10 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByLabelText(/De tweede invoer/));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau 35",
+      text: "Let op: het proces-verbaal bevat fouten die moeten worden opgelost",
+    });
     expect(navigate).toHaveBeenCalledWith("/elections/1/status/3/resolve-errors");
   });
 });

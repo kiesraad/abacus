@@ -6,6 +6,7 @@ import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
@@ -17,6 +18,7 @@ import { ResolveDifferencesOverview } from "./ResolveDifferencesOverview";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 export function ResolveDifferencesPage() {
+  const { pushMessage } = useMessages();
   const navigate = useNavigate();
   const afterSave = (status: DataEntryStatusName) => {
     let nextPage = `/elections/${election.id}/status`;
@@ -24,6 +26,10 @@ export function ResolveDifferencesPage() {
 
     switch (status) {
       case "first_entry_has_errors":
+        pushMessage({
+          title: t("resolve_errors.differences_resolved", { number: pollingStation.number }),
+          text: t("resolve_errors.alert_contains_errors"),
+        });
         nextPage = `/elections/${election.id}/status/${pollingStationId}/resolve-errors`;
         break;
       case "second_entry_not_started":

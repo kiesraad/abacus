@@ -43,11 +43,7 @@
   let size = if checked == true or checked == none { 14pt } else { 10pt }
 
   grid(
-    columns: if has_content {
-      (14pt, 8pt, auto)
-    } else {
-      (size)
-    },
+    columns: if has_content { (14pt, 6pt, auto) } else { (size) },
     align: horizon + center,
     box(
       width: size,
@@ -60,10 +56,8 @@
       fill: if checked == true { black } else { white },
       if checked == true { checkmark() },
     ),
-    if has_content {
-      " "
-    },
-    content
+    if has_content { " " },
+    if has_content { align(left, content) },
   )
 }
 

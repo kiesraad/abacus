@@ -16,6 +16,13 @@ pub struct UserLoggedInDetails {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
+pub struct UserLoginFailedDetails {
+    pub username: String,
+    pub user_agent: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UserLoggedOutDetails {
     pub session_duration: u64,
 }
@@ -121,6 +128,7 @@ impl ErrorDetails {
 pub enum AuditEvent {
     // authentication and account events
     UserLoggedIn(UserLoggedInDetails),
+    UserLoginFailed(UserLoginFailedDetails),
     UserLoggedOut(UserLoggedOutDetails),
     UserAccountUpdated(UserDetails),
     UserSessionExtended,
@@ -175,6 +183,7 @@ impl AuditEvent {
     pub fn level(&self) -> AuditEventLevel {
         match self {
             AuditEvent::UserLoggedIn(_) => AuditEventLevel::Success,
+            AuditEvent::UserLoginFailed(_) => AuditEventLevel::Warning,
             AuditEvent::UserLoggedOut(_) => AuditEventLevel::Success,
             AuditEvent::UserSessionExtended => AuditEventLevel::Info,
             AuditEvent::UserAccountUpdated(_) => AuditEventLevel::Success,

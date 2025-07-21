@@ -232,6 +232,7 @@ export interface AccountUpdateRequest {
 
 export type AuditEvent =
   | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
+  | (UserLoginFailedDetails & { eventType: "UserLoginFailed" })
   | (UserLoggedOutDetails & { eventType: "UserLoggedOut" })
   | (UserDetails & { eventType: "UserAccountUpdated" })
   | { eventType: "UserSessionExtended" }
@@ -1011,6 +1012,11 @@ export interface UserLoggedInDetails {
 
 export interface UserLoggedOutDetails {
   sessionDuration: number;
+}
+
+export interface UserLoginFailedDetails {
+  userAgent: string;
+  username: string;
 }
 
 export interface ValidationResult {

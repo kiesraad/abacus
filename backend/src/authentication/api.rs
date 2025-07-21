@@ -19,7 +19,10 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse,
-    audit_log::{AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails},
+    audit_log::{
+        AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
+        UserLoginFailedDetails,
+    },
     error::ErrorReference,
 };
 
@@ -110,20 +113,29 @@ async fn login(
     Json(credentials): Json<Credentials>,
 ) -> Result<impl IntoResponse, APIError> {
     let Credentials { username, password } = credentials;
+    let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
 
     // Check the username + password combination, do not leak information about usernames etc.
-    let user = users
-        .authenticate(&username, &password)
-        .await
-        .map_err(|e| match e {
-            AuthenticationError::UserNotFound => AuthenticationError::InvalidUsernameOrPassword,
-            AuthenticationError::InvalidPassword => AuthenticationError::InvalidUsernameOrPassword,
-            e => e,
-        })?;
+    // Log when the attempt fails
+    let user = match users.authenticate(&username, &password).await {
+        Ok(u) => Ok(u),
+        Err(AuthenticationError::UserNotFound) | Err(AuthenticationError::InvalidPassword) => {
+            audit_service
+                .log(
+                    &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
+                        username,
+                        user_agent: user_agent.clone(),
+                    }),
+                    None,
+                )
+                .await?;
+            Err(AuthenticationError::InvalidUsernameOrPassword)
+        }
+        e => e,
+    }?;
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
     sessions.delete_expired_sessions().await?;
-    let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
 
     // Create a new session and cookie
     let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;

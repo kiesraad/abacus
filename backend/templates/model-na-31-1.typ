@@ -309,12 +309,3 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 === Extra ondertekening: (niet verplicht)
 
 #stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
-
-
-#pagebreak(weak: true)
-
-#set heading(numbering: none)
-
-#checkbox(checked: none)[none none none none none none none none none]
-#checkbox(checked: true)[true true true true true true true true true]
-#checkbox(checked: false)[false false false false false false false false false false]

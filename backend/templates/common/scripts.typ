@@ -39,10 +39,15 @@
 
 /// Display a checkbox, optionally already checked when the `checked` parameter is set to `true`
 #let checkbox(checked: none, content) = {
+  let has_content = content != none and content != ""
   let size = if checked == true or checked == none { 14pt } else { 10pt }
 
   grid(
-    columns: (14pt, 8pt, auto),
+    columns: if has_content {
+      (14pt, 8pt, auto)
+    } else {
+      (size)
+    },
     align: horizon + center,
     box(
       width: size,
@@ -55,8 +60,10 @@
       fill: if checked == true { black } else { white },
       if checked == true { checkmark() },
     ),
-    " ",
-    content,
+    if has_content {
+      " "
+    },
+    content
   )
 }
 

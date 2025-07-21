@@ -50,6 +50,7 @@ pub enum ErrorReference {
     PollingStationRepeated,
     PollingStationValidationErrors,
     RequestPayloadTooLarge,
+    Forbidden,
     Unauthorized,
     UsernameNotUnique,
     UserNotFound,
@@ -259,6 +260,10 @@ impl IntoResponse for APIError {
                     AuthenticationError::Unauthorized | AuthenticationError::Unauthenticated => (
                         StatusCode::UNAUTHORIZED,
                         to_error("Unauthorized", ErrorReference::Unauthorized, false),
+                    ),
+                    AuthenticationError::Forbidden => (
+                        StatusCode::FORBIDDEN,
+                        to_error("Forbidden", ErrorReference::Forbidden, true),
                     ),
                     AuthenticationError::PasswordRejection => (
                         StatusCode::BAD_REQUEST,

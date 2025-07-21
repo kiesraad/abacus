@@ -4047,6 +4047,7 @@
           "PollingStationRepeated",
           "PollingStationValidationErrors",
           "RequestPayloadTooLarge",
+          "Forbidden",
           "Unauthorized",
           "UsernameNotUnique",
           "UserNotFound",

@@ -239,13 +239,12 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     ),
 )]
 pub async fn election_import(
-    user: Admin,
+    _user: Admin,
     State(elections_repo): State<Elections>,
     State(committee_sessions_repo): State<CommitteeSessions>,
     audit_service: AuditService,
     Json(edu): Json<ElectionAndCandidatesDefinitionImportRequest>,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
-    let audit_service = audit_service.with_user(user.0.clone());
     if edu.election_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
         return Err(APIError::InvalidHashError);
     }

@@ -22,7 +22,6 @@ pub(crate) mod test_helpers {
             voters_counts: VotersCounts {
                 poll_card_count: total_votes,
                 proxy_certificate_count: 0,
-                voter_card_count: 0,
                 total_admitted_voters_count: total_votes,
             },
             votes_counts: VotesCounts {
@@ -32,7 +31,6 @@ pub(crate) mod test_helpers {
                 total_votes_cast_count: total_votes,
             },
             differences_counts: SummaryDifferencesCounts::zero(),
-            recounted_polling_stations: vec![],
             political_group_votes,
         }
     }

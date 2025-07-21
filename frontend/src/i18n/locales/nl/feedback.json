@@ -1,23 +1,12 @@
 {
-  "F101": {
-    "typist": {
-      "title": "Controleer het papieren proces-verbaal",
-      "content": "Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?",
-      "action": "<ul><li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li><li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li><li>Geen vinkje? Kies dan 'nee'.</li></ul>"
-    },
-    "coordinator": {
-      "title": "Controleer het papieren proces-verbaal",
-      "content": "Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?"
-    }
-  },
   "F201": {
     "typist": {
       "title": "Controleer toegelaten kiezers",
-      "content": "De invoer bij A, B, C of D klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "content": "De invoer bij A, B of D klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     },
     "coordinator": {
       "title": "Controleer toegelaten kiezers",
-      "content": "De invoer bij A, B, C of D klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "content": "De invoer bij A, B of D klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     }
   },
   "F202": {
@@ -28,16 +17,6 @@
     "coordinator": {
       "title": "Controleer uitgebrachte stemmen",
       "content": "De invoer bij E, F, G of H klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    }
-  },
-  "F203": {
-    "typist": {
-      "title": "Controleer hertelde toegelaten kiezers",
-      "content": "De invoer bij A.2, B.2, C.2 of D.2 klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    },
-    "coordinator": {
-      "title": "Controleer hertelde toegelaten kiezers",
-      "content": "De invoer bij A.2, B.2, C.2 of D.2 klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     }
   },
   "F204": {
@@ -160,16 +139,6 @@
       "content": "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     }
   },
-  "W204": {
-    "typist": {
-      "title": "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezers",
-      "content": "Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    },
-    "coordinator": {
-      "title": "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezers",
-      "content": "Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    }
-  },
   "W205": {
     "typist": {
       "title": "Controleer aantal uitgebrachte stemmen",
@@ -190,16 +159,6 @@
       "content": "Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is hoger dan het aantal kiesgerechtigden voor dit stembureau.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     }
   },
-  "W207": {
-    "typist": {
-      "title": "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezers",
-      "content": "Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten kiezers (D.2) is hoger dan het aantal kiesgerechtigden voor dit stembureau.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    },
-    "coordinator": {
-      "title": "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezers",
-      "content": "Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten kiezers (D.2) is hoger dan het aantal kiesgerechtigden voor dit stembureau.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    }
-  },
   "W208": {
     "typist": {
       "title": "Controleer A t/m D en E t/m H",
@@ -208,16 +167,6 @@
     "coordinator": {
       "title": "Controleer A t/m D en E t/m H",
       "content": "De getallen bij A t/m D zijn precies hetzelfde als E t/m H.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    }
-  },
-  "W209": {
-    "typist": {
-      "title": "Controleer E t/m H en A.2 t/m D.2",
-      "content": "De getallen bij E t/m H zijn precies hetzelfde als A.2 t/m D.2.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    },
-    "coordinator": {
-      "title": "Controleer E t/m H en A.2 t/m D.2",
-      "content": "De getallen bij E t/m H zijn precies hetzelfde als A.2 t/m D.2.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     }
   },
   "W301": {

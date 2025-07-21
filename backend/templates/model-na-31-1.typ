@@ -97,9 +97,9 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
             #polling_station.postal_code #polling_station.locality
           ]
         ],
-        align(center, checkbox(large: false)[]),
-        align(center, checkbox(large: false)[]),
-        align(center, checkbox(large: false)[]),
+        align(center, checkbox(checked: false)[]),
+        align(center, checkbox(checked: false)[]),
+        align(center, checkbox(checked: false)[]),
       )
     })
     .flatten(),
@@ -221,9 +221,9 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 === Is bij *alle afzonderlijke stembureaus* in #this_location het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
 
-#checkbox[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>)*]
+#checkbox(checked: false)[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>)*]
 
-#checkbox[Nee, er zijn stembureaus met een verschil]
+#checkbox(checked: false)[Nee, er zijn stembureaus met een verschil]
 
 === Voor de stembureaus met de nummers #input.summary.differences_counts.more_ballots_count.polling_stations.map(str).join(", ") zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
@@ -245,9 +245,9 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 === Kruis aan wat van toepassing is:
 
-#checkbox[Er zijn geen verschillen geconstateerd.]
+#checkbox(checked: false)[Er zijn geen verschillen geconstateerd.]
 
-#checkbox[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
+#checkbox(checked: false)[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
 
 #empty_lines(5)
 

@@ -38,8 +38,8 @@
 }
 
 /// Display a checkbox, optionally already checked when the `checked` parameter is set to `true`
-#let checkbox(checked: false, large: true, content) = {
-  let size = if large { 12pt } else { 10pt }
+#let checkbox(checked: none, content) = {
+  let size = if checked == true or checked == none { 12pt } else { 10pt }
 
   grid(
     columns: (20pt, auto),
@@ -48,10 +48,12 @@
       width: size,
       height: size,
       inset: 2.5pt,
-      stroke: if checked { 3.5pt + black } else { (thickness: 0.45pt, dash: "densely-dotted", cap: "square") },
+      stroke: if checked == none { 0.5pt + black } else if checked { 3.5pt + black } else {
+        (thickness: 0.45pt, dash: "densely-dotted", cap: "square")
+      },
       clip: true,
-      fill: if checked { black } else { white },
-      if checked { checkmark() }
+      fill: if checked == true { black } else { white },
+      if checked == true { checkmark() },
     ),
     content,
   )
@@ -63,7 +65,7 @@
     return
   }
 
-  text.clusters().chunks(every).map((c) => c.join("")).join("-")
+  text.clusters().chunks(every).map(c => c.join("")).join("-")
 }
 
 /// Format a number with thousands separator

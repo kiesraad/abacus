@@ -26,7 +26,8 @@ impl CommitteeSessions {
               status as "status: _",
               location,
               start_date,
-              start_time
+              start_time,
+              number_of_voters as "number_of_voters: u32"
             FROM committee_sessions
             WHERE election_id = ?
             ORDER BY number DESC
@@ -51,7 +52,8 @@ impl CommitteeSessions {
               status as "status: _",
               location,
               start_date,
-              start_time
+              start_time,
+              number_of_voters as "number_of_voters: u32"
             FROM committee_sessions
             WHERE election_id = ?
             ORDER BY number DESC 
@@ -76,7 +78,8 @@ impl CommitteeSessions {
               status as "status: _",
               location,
               start_date,
-              start_time
+              start_time,
+              number_of_voters as "number_of_voters: u32"
             FROM (
               SELECT
                 id,
@@ -86,6 +89,7 @@ impl CommitteeSessions {
                 location,
                 start_date,
                 start_time,
+                number_of_voters,
               row_number() over (
                 PARTITION BY election_id
                 ORDER BY number DESC
@@ -118,7 +122,8 @@ impl CommitteeSessions {
               status as "status: _",
               location,
               start_date,
-              start_time
+              start_time,
+              number_of_voters as "number_of_voters: u32"
             "#,
             committee_session.number,
             committee_session.election_id,
@@ -151,7 +156,8 @@ impl CommitteeSessions {
               status as "status: _",
               location,
               start_date,
-              start_time
+              start_time,
+              number_of_voters as "number_of_voters: u32"
             "#,
             committee_session_update.location,
             committee_session_update.start_date,

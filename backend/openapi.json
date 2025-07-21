@@ -3188,7 +3188,8 @@
           "location",
           "start_date",
           "start_time",
-          "status"
+          "status",
+          "number_of_voters"
         ],
         "properties": {
           "election_id": {
@@ -3205,6 +3206,11 @@
             "type": "string"
           },
           "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -3249,7 +3255,8 @@
           "sessionLocation",
           "sessionStartDate",
           "sessionStartTime",
-          "sessionStatus"
+          "sessionStatus",
+          "sessionNumberOfVoters"
         ],
         "properties": {
           "sessionElectionId": {
@@ -3266,6 +3273,11 @@
             "type": "string"
           },
           "sessionNumber": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "sessionNumberOfVoters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -3577,7 +3589,6 @@
           "election_id",
           "location",
           "domain_id",
-          "number_of_voters",
           "category",
           "number_of_seats",
           "election_date",
@@ -3616,11 +3627,6 @@
             "format": "date"
           },
           "number_of_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -3736,7 +3742,6 @@
           "electionElectionId",
           "electionLocation",
           "electionDomainId",
-          "electionNumberOfVoters",
           "electionCategory",
           "electionNumberOfSeats",
           "electionElectionDate",
@@ -3775,11 +3780,6 @@
             "format": "date"
           },
           "electionNumberOfSeats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "electionNumberOfVoters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -3935,7 +3935,6 @@
           "election_id",
           "location",
           "domain_id",
-          "number_of_voters",
           "category",
           "number_of_seats",
           "election_date",
@@ -3975,11 +3974,6 @@
             "format": "date"
           },
           "number_of_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -4241,7 +4235,6 @@
           "election_id",
           "location",
           "domain_id",
-          "number_of_voters",
           "category",
           "number_of_seats",
           "election_date",
@@ -4276,11 +4269,6 @@
             "format": "date"
           },
           "number_of_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0

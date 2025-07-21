@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
 
-import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/gte-19-seats";
+import { candidate_nomination, committee_session, election_summary, seat_assignment } from "../testing/gte-19-seats";
 import { ElectionSummaryTable } from "./ElectionSummaryTable";
 
 describe("ElectionSummaryTable", () => {
@@ -12,7 +12,7 @@ describe("ElectionSummaryTable", () => {
         votesCounts={election_summary.votes_counts}
         seats={seat_assignment.seats}
         quota={seat_assignment.quota}
-        numberOfVoters={election.number_of_voters}
+        numberOfVoters={committee_session.number_of_voters}
         preferenceThreshold={candidate_nomination.preference_threshold}
       />,
     );

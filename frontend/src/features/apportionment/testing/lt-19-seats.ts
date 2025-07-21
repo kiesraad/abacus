@@ -1,5 +1,6 @@
 import {
   CandidateNominationResult,
+  CommitteeSession,
   ElectionSummary,
   ElectionWithPoliticalGroups,
   PoliticalGroup,
@@ -1654,6 +1655,17 @@ export const political_group_1: PoliticalGroup = {
   ],
 };
 
+export const committee_session: CommitteeSession = {
+  id: 3,
+  number: 1,
+  election_id: 3,
+  status: "data_entry_finished",
+  location: "",
+  start_date: "",
+  start_time: "",
+  number_of_voters: 2000,
+};
+
 export const election: ElectionWithPoliticalGroups = {
   id: 3,
   name: "Test Election < 19 seats",
@@ -1661,7 +1673,6 @@ export const election: ElectionWithPoliticalGroups = {
   election_id: "TestLocation_2026",
   location: "Test Location",
   domain_id: "0000",
-  number_of_voters: 2000,
   category: "Municipal",
   number_of_seats: 15,
   election_date: "2026-03-18",

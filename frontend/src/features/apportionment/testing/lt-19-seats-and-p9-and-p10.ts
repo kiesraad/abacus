@@ -1,5 +1,6 @@
 import {
   CandidateNominationResult,
+  CommitteeSession,
   ElectionSummary,
   ElectionWithPoliticalGroups,
   SeatAssignmentResult,
@@ -1523,6 +1524,17 @@ export const election_summary: ElectionSummary = {
   ],
 };
 
+export const committee_session: CommitteeSession = {
+  id: 4,
+  number: 1,
+  election_id: 4,
+  status: "data_entry_finished",
+  location: "",
+  start_date: "",
+  start_time: "",
+  number_of_voters: 6000,
+};
+
 export const election: ElectionWithPoliticalGroups = {
   id: 4,
   name: "Test Election Absolute Majority Change and List Exhaustion",
@@ -1530,7 +1542,6 @@ export const election: ElectionWithPoliticalGroups = {
   election_id: "TestLocation_2026",
   location: "Test Location",
   domain_id: "0000",
-  number_of_voters: 6000,
   category: "Municipal",
   number_of_seats: 15,
   election_date: "2026-03-18",

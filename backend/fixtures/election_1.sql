@@ -1,5 +1,5 @@
-INSERT INTO elections (id, name, counting_method, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date, political_groups)
-VALUES (1, 'Gemeenteraad 2026', 'CSO', 'Juinen_2024', 'Juinen', '0000', 3500, 'Municipal', 29, '2024-11-30', '2024-11-1', '[
+INSERT INTO elections (id, name, counting_method, election_id, location, domain_id, category, number_of_seats, election_date, nomination_date, political_groups)
+VALUES (1, 'Gemeenteraad 2026', 'CSO', 'Juinen_2024', 'Juinen', '0000', 'Municipal', 29, '2024-11-30', '2024-11-1', '[
          {
            "number": 1,
            "name": "Lijst Hekking",

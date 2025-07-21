@@ -346,6 +346,7 @@ export interface CommitteeSession {
   id: number;
   location: string;
   number: number;
+  number_of_voters: number;
   start_date: string;
   start_time: string;
   status: CommitteeSessionStatus;
@@ -364,6 +365,7 @@ export interface CommitteeSessionDetails {
   sessionId: number;
   sessionLocation: string;
   sessionNumber: number;
+  sessionNumberOfVoters: number;
   sessionStartDate: string;
   sessionStartTime: string;
   sessionStatus: string;
@@ -489,7 +491,6 @@ export interface Election {
   name: string;
   nomination_date: string;
   number_of_seats: number;
-  number_of_voters: number;
 }
 
 export interface ElectionAndCandidateDefinitionValidateRequest {
@@ -536,7 +537,6 @@ export interface ElectionDetails {
   electionName: string;
   electionNominationDate: string;
   electionNumberOfSeats: number;
-  electionNumberOfVoters: number;
 }
 
 /**
@@ -615,7 +615,6 @@ export interface ElectionWithPoliticalGroups {
   name: string;
   nomination_date: string;
   number_of_seats: number;
-  number_of_voters: number;
   political_groups: PoliticalGroup[];
 }
 
@@ -740,7 +739,6 @@ export interface NewElection {
   name: string;
   nomination_date: string;
   number_of_seats: number;
-  number_of_voters: number;
   political_groups: PoliticalGroup[];
 }
 

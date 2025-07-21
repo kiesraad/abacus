@@ -13,7 +13,6 @@ export const electionRequest: NewElection = {
   election_id: "TestLocation_2026",
   location: "Test Location",
   domain_id: "0000",
-  number_of_voters: 100,
   category: "Municipal",
   number_of_seats: 29,
   election_date: "2026-01-01",

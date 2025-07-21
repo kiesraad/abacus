@@ -52,6 +52,7 @@ impl From<Election> for ElectionDetails {
         Self {
             election_id: value.id,
             election_name: value.name,
+            election_counting_method: value.counting_method.to_string(),
             election_election_id: value.election_id,
             election_location: value.location,
             election_domain_id: value.domain_id,
@@ -69,6 +70,7 @@ impl From<ElectionWithPoliticalGroups> for ElectionDetails {
         Self {
             election_id: value.id,
             election_name: value.name,
+            election_counting_method: value.counting_method.to_string(),
             election_election_id: value.election_id,
             election_location: value.location,
             election_domain_id: value.domain_id,

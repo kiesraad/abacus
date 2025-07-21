@@ -527,6 +527,7 @@ export interface ElectionDefinitionValidateResponse {
 
 export interface ElectionDetails {
   electionCategory: string;
+  electionCountingMethod: string;
   electionDomainId: string;
   electionElectionDate: string;
   electionElectionId: string;

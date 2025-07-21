@@ -48,7 +48,7 @@
       width: size,
       height: size,
       inset: 2.5pt,
-      stroke: if checked { 3pt + black } else { (thickness: 0.5pt, dash: "densely-dotted", cap: "square") },
+      stroke: if checked { 3.5pt + black } else { (thickness: 0.45pt, dash: "densely-dotted", cap: "square") },
       clip: true,
       fill: if checked { black } else { white },
       if checked { checkmark() }

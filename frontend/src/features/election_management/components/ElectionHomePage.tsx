@@ -2,6 +2,7 @@ import { Navigate } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
+import { Table } from "@/components/ui/Table/Table";
 import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
@@ -15,6 +16,10 @@ import cls from "./ElectionManagement.module.css";
 export function ElectionHomePage() {
   const { isTypist } = useUserRole();
   const { election, pollingStations } = useElection();
+
+  const downloadNa31_2Bijlage1 = () => {
+    // TODO
+  };
 
   if (isTypist) {
     return <Navigate to="data-entry" />;
@@ -42,10 +47,26 @@ export function ElectionHomePage() {
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>
           <div className="mb-xl">
-            <div>
-              <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.about_this_election")}</h3>
-              <ElectionInformationTable election={election} numberOfPollingStations={pollingStations.length} />
-            </div>
+            <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.about_this_election")}</h3>
+            <ElectionInformationTable election={election} numberOfPollingStations={pollingStations.length} />
+          </div>
+          <div className="mb-xl">
+            <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.empty_models")}</h3>
+            <section className="md">
+              <p>{t("election_management.empty_models_description")}</p>
+            </section>
+            <Table>
+              <Table.Header>
+                <Table.HeaderCell scope="col">{t("election_management.model_name")}</Table.HeaderCell>
+                <Table.HeaderCell scope="col">{t("election_management.model_purpose")}</Table.HeaderCell>
+              </Table.Header>
+              <Table.Body>
+                <Table.ClickRow onClick={downloadNa31_2Bijlage1}>
+                  <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
+                  <Table.Cell>{t("election_management.na_31_2_bijlage_1")}</Table.Cell>
+                </Table.ClickRow>
+              </Table.Body>
+            </Table>
           </div>
         </article>
       </main>

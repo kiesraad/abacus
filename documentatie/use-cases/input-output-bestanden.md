@@ -66,7 +66,7 @@ EML_NL 210 (kandidatenlijst voor een politieke groepering) wordt niet gebruikt, 
 #### N5: Overdrachtsdocument GSB
 
 - niet gegenereerd door Abacus; uit verkiezingentoolkit of door gemeente zelf gemaakt
-- document voor de overdracht van het stembescheiden van de burgemeester aan het GSB
+- document voor de overdracht van de stembescheiden van de burgemeester aan het GSB
 
 #### Na 31-2 Bijlage 1 (CSO): Telresultaten op SB-niveau
 

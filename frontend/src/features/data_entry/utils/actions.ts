@@ -74,18 +74,6 @@ export function onSubmitForm(
       }
     }
 
-    if (data.recounted === false) {
-      // remove recount if recount has changed to no
-      data.voters_recounts = undefined;
-    } else if (data.recounted === true && data.voters_recounts === undefined) {
-      data.voters_recounts = {
-        poll_card_count: 0,
-        proxy_certificate_count: 0,
-        voter_card_count: 0,
-        total_admitted_voters_count: 0,
-      };
-    }
-
     // prepare data to send to server
     const clientState = getClientState(
       state.formState,

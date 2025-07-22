@@ -2544,7 +2544,6 @@
         "voters_counts": {
             "poll_card_count": 93477,
             "proxy_certificate_count": 0,
-            "voter_card_count": 0,
             "total_admitted_voters_count": 93477
         },
         "votes_counts": {
@@ -5632,6 +5631,6 @@
             "locality": "Hovenerwoud"
         }
     ],
-    "hash": "0000",
+    "hash": "dedf17b4684e1214fcabb770925dc75c624be3380bd3464729c37a80a37940ad",
     "creation_date_time": "24-06-2025 10:07"
 }

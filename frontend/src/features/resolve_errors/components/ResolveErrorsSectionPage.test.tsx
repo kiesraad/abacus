@@ -22,7 +22,7 @@ import { ResolveErrorsSectionPage } from "./ResolveErrorsSectionPage";
 vi.mock("react-router", async (importOriginal) => {
   return {
     ...(await importOriginal()),
-    useParams: () => ({ electionId: "1", pollingStationId: "5", sectionId: "recounted" }),
+    useParams: () => ({ electionId: "1", pollingStationId: "5", sectionId: "voters_votes_counts" }),
   };
 });
 
@@ -78,11 +78,12 @@ describe("ResolveErrorsSectionPage", () => {
   test("renders read-only section with valid section id", async () => {
     renderSectionPage();
 
+    // Verify the section renders with the correct title
     expect(
-      await screen.findByRole("group", { name: "Is het selectievakje op de eerste pagina aangevinkt?" }),
+      await screen.findByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen" }),
     ).toBeInTheDocument();
 
-    expect(screen.getByRole("radio", { name: "Ja, er was een hertelling" })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: "Nee, er was geen hertelling" })).toBeInTheDocument();
+    // Verify some expected content is present
+    expect(screen.getByText("Controleer toegelaten kiezers")).toBeInTheDocument();
   });
 });

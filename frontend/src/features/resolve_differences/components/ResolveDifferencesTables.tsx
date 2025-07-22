@@ -40,7 +40,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
         switch (subsection.type) {
           case "heading":
             // override previous title
-            title = t(subsection.title);
+            title = subsection.title;
             return;
           case "message":
             // message is not rendered
@@ -57,7 +57,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
               code: "",
               first: mapRadioValue(firstValues[subsection.path], subsection.options),
               second: mapRadioValue(secondValues[subsection.path], subsection.options),
-              description: t(subsection.short_title),
+              description: subsection.short_title,
             };
 
             return (
@@ -81,7 +81,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
             const getSelectedOptions = (values: SectionValues) => {
               return subsection.options
                 .filter((option) => values[option.path] === "true")
-                .map((option) => t(option.short_label))
+                .map((option) => option.short_label)
                 .join(", ");
             };
 
@@ -89,7 +89,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
               code: "",
               first: getSelectedOptions(firstValues) || "-",
               second: getSelectedOptions(secondValues) || "-",
-              description: t(subsection.short_title),
+              description: subsection.short_title,
             };
 
             return (
@@ -104,10 +104,10 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
           }
           case "inputGrid": {
             const headers = [
-              t(subsection.headers[0]),
+              subsection.headers[0],
               t("resolve_differences.headers.first_entry"),
               t("resolve_differences.headers.second_entry"),
-              t(subsection.headers[2]),
+              subsection.headers[2],
             ];
 
             const rows = subsection.rows.map((row) => ({
@@ -136,5 +136,5 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
 function mapRadioValue(value: string | undefined, options: RadioSubsectionOption[]): string {
   if (!value) return "";
   const option = options.find((option) => option.value === value);
-  return option ? t(option.short_label) : value;
+  return option ? option.short_label : value;
 }

@@ -26,7 +26,7 @@ export function ResolveErrorsSectionPage() {
     return <Loader />;
   }
 
-  const structure = getDataEntryStructure(election, dataEntry.finalised_first_entry);
+  const structure = getDataEntryStructure(election);
   const section = structure.find((s) => s.id === sectionId);
 
   if (!section) {

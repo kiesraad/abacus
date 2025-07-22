@@ -24,7 +24,6 @@ describe("ResolveErrorsNavigation", () => {
 
   const mockValidationResultsWithErrors: ValidationResults = {
     errors: [
-      validationResultMockData.F101, // recounted field
       validationResultMockData.F201, // voters_counts fields
     ],
     warnings: [
@@ -49,7 +48,6 @@ describe("ResolveErrorsNavigation", () => {
     renderNavigation(mockValidationResultsNoErrors);
 
     expect(screen.getByRole("link", { name: "Fouten en waarschuwingen" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Is er herteld?" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Verschillen" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ })).toBeInTheDocument();
@@ -64,9 +62,6 @@ describe("ResolveErrorsNavigation", () => {
 
   test("shows correct status based on validation results", () => {
     renderNavigation(mockValidationResultsWithErrors);
-
-    const recountedItem = screen.getByRole("link", { name: "Is er herteld?" }).closest("li")!;
-    expect(within(recountedItem).getByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
 
     const votersAndVotesItem = screen.getByRole("link", { name: "Aantal kiezers en stemmen" }).closest("li")!;
     expect(within(votersAndVotesItem).getByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
@@ -123,9 +118,6 @@ describe("ResolveErrorsNavigation", () => {
 
     const overviewLink = screen.getByRole("link", { name: "Fouten en waarschuwingen" });
     expect(overviewLink).toHaveAttribute("href", "/elections/1/status/5/resolve-errors");
-
-    const herteldLink = screen.getByRole("link", { name: "Is er herteld?" });
-    expect(herteldLink).toHaveAttribute("href", "/elections/1/status/5/resolve-errors/recounted");
 
     const kiezersLink = screen.getByRole("link", { name: "Aantal kiezers en stemmen" });
     expect(kiezersLink).toHaveAttribute("href", "/elections/1/status/5/resolve-errors/voters_votes_counts");

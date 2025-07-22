@@ -20,7 +20,6 @@ export const emptyData: PollingStationResults = {
   voters_counts: {
     poll_card_count: 0,
     proxy_certificate_count: 0,
-    voter_card_count: 0,
     total_admitted_voters_count: 0,
   },
   votes_counts: {
@@ -62,11 +61,9 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
   first_entry_user_id: 3,
   second_entry_user_id: 4,
   first_entry: {
-    recounted: false,
     voters_counts: {
       poll_card_count: 2,
       proxy_certificate_count: 0,
-      voter_card_count: 0,
       total_admitted_voters_count: 2,
     },
     votes_counts: {
@@ -110,11 +107,9 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
     ],
   },
   second_entry: {
-    recounted: false,
     voters_counts: {
       poll_card_count: 2,
       proxy_certificate_count: 0,
-      voter_card_count: 0,
       total_admitted_voters_count: 2,
     },
     votes_counts: {
@@ -164,7 +159,7 @@ export const dataEntryGetErrorsMockResponse: DataEntryGetErrorsResponse = {
   first_entry_finished_at: "",
   first_entry_user_id: 1,
   validation_results: {
-    errors: [validationResultMockData.F101],
-    warnings: [validationResultMockData.W201, validationResultMockData.W301],
+    errors: [validationResultMockData.F201],
+    warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W301],
   },
 };

@@ -6,11 +6,9 @@ import { PollingStationResults } from "@/types/generated/openapi";
  */
 export function pollingStationResultsMockData(first: boolean): PollingStationResults {
   return {
-    recounted: first,
     voters_counts: {
       poll_card_count: 42,
       proxy_certificate_count: 0,
-      voter_card_count: 0,
       total_admitted_voters_count: 42,
     },
     votes_counts: {
@@ -19,14 +17,6 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
       invalid_votes_count: 0,
       total_votes_cast_count: first ? 42 : 44,
     },
-    voters_recounts: first
-      ? {
-          poll_card_count: 43,
-          proxy_certificate_count: 1,
-          voter_card_count: 0,
-          total_admitted_voters_count: 44,
-        }
-      : undefined,
     differences_counts: {
       more_ballots_count: 0,
       fewer_ballots_count: 0,

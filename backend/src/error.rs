@@ -15,13 +15,9 @@ use utoipa::ToSchema;
 use zip::result::ZipError;
 
 use crate::{
-    MAX_BODY_SIZE_MB,
-    apportionment::ApportionmentError,
-    authentication::error::AuthenticationError,
-    data_entry::{DataError, status::DataEntryTransitionError},
-    eml::EMLImportError,
+    MAX_BODY_SIZE_MB, apportionment::ApportionmentError,
+    authentication::error::AuthenticationError, data_entry::DataError, eml::EMLImportError,
     pdf_gen::PdfGenError,
-    report::ReportError,
 };
 
 /// Error reference used to show the corresponding error message to the end-user
@@ -30,8 +26,6 @@ pub enum ErrorReference {
     AirgapViolation,
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
-    CommitteeSessionNotFinalised,
-    CommitteeSessionNotInProgress,
     DatabaseError,
     DataEntryAlreadyClaimed,
     DataEntryAlreadyFinalised,
@@ -39,6 +33,7 @@ pub enum ErrorReference {
     EmlImportError,
     EntryNotFound,
     EntryNotUnique,
+    Forbidden,
     InternalServerError,
     InvalidData,
     InvalidHash,
@@ -56,7 +51,6 @@ pub enum ErrorReference {
     PollingStationRepeated,
     PollingStationValidationErrors,
     RequestPayloadTooLarge,
-    Forbidden,
     Unauthorized,
     UsernameNotUnique,
     UserNotFound,
@@ -88,7 +82,6 @@ pub enum APIError {
     BadRequest(String, ErrorReference),
     Conflict(String, ErrorReference),
     ContentTooLarge(String, ErrorReference),
-    DataEntry(DataEntryTransitionError),
     EmlImportError(EMLImportError),
     InvalidData(DataError),
     InvalidHeaderValue,
@@ -96,7 +89,6 @@ pub enum APIError {
     JsonRejection(JsonRejection),
     NotFound(String, ErrorReference),
     PdfGenError(PdfGenError),
-    Report(ReportError),
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
     StdError(Box<dyn Error>),
@@ -341,60 +333,6 @@ impl IntoResponse for APIError {
                         to_error(
                             "No votes on candidates cast",
                             ErrorReference::ZeroVotesCast,
-                            false,
-                        ),
-                    ),
-                }
-            }
-            APIError::DataEntry(err) => {
-                error!("Data entry error: {:?}", err);
-
-                match err {
-                    DataEntryTransitionError::CommitteeSessionNotInProgress => (
-                        StatusCode::PRECONDITION_FAILED,
-                        to_error(
-                            "Committee session data entry needs to be in progress",
-                            ErrorReference::CommitteeSessionNotInProgress,
-                            false,
-                        ),
-                    ),
-                    DataEntryTransitionError::FirstEntryAlreadyClaimed
-                    | DataEntryTransitionError::SecondEntryAlreadyClaimed => (
-                        StatusCode::CONFLICT,
-                        to_error(
-                            "Data entry is already claimed",
-                            ErrorReference::DataEntryAlreadyClaimed,
-                            false,
-                        ),
-                    ),
-                    DataEntryTransitionError::FirstEntryAlreadyFinalised
-                    | DataEntryTransitionError::SecondEntryAlreadyFinalised => (
-                        StatusCode::CONFLICT,
-                        to_error(
-                            "Data entry is already finalised",
-                            ErrorReference::DataEntryAlreadyFinalised,
-                            false,
-                        ),
-                    ),
-                    _ => (
-                        StatusCode::CONFLICT,
-                        to_error(
-                            "Invalid data entry action performed",
-                            ErrorReference::InvalidStateTransition,
-                            false,
-                        ),
-                    ),
-                }
-            }
-            APIError::Report(err) => {
-                error!("Report error: {:?}", err);
-
-                match err {
-                    ReportError::CommitteeSessionNotFinalised => (
-                        StatusCode::PRECONDITION_FAILED,
-                        to_error(
-                            "Committee session data entry first needs to be finalised",
-                            ErrorReference::CommitteeSessionNotFinalised,
                             false,
                         ),
                     ),

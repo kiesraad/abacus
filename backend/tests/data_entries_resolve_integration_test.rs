@@ -159,7 +159,7 @@ async fn test_polling_station_data_entry_errors_wrong_committee_session_state(po
     .await;
 
     let res = get_resolve_errors(&addr, &coordinator, 1).await;
-    assert_eq!(res.status(), StatusCode::PRECONDITION_FAILED);
+    assert_eq!(res.status(), StatusCode::FORBIDDEN);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -250,7 +250,7 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_committee_session_
     .await;
 
     let response = resolve_errors(&addr, &coordinator, 1, "discard_first_entry").await;
-    assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -327,7 +327,7 @@ async fn test_polling_station_data_entry_differences_wrong_committee_session_sta
     .await;
 
     let res = get_resolve_differences(&addr, &coordinator, 1).await;
-    assert_eq!(res.status(), StatusCode::PRECONDITION_FAILED);
+    assert_eq!(res.status(), StatusCode::FORBIDDEN);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

@@ -10,7 +10,6 @@ use crate::{election::ElectionWithPoliticalGroups, polling_station::PollingStati
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DataEntryTransitionError {
-    CommitteeSessionNotInProgress,
     Invalid,
     FirstEntryAlreadyClaimed,
     SecondEntryAlreadyClaimed,
@@ -636,9 +635,6 @@ impl DataEntryStatus {
 impl Display for DataEntryTransitionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DataEntryTransitionError::CommitteeSessionNotInProgress => {
-                write!(f, "Committee session data entry is not in progress.")
-            }
             DataEntryTransitionError::FirstEntryAlreadyClaimed => {
                 write!(f, "First entry already claimed")
             }

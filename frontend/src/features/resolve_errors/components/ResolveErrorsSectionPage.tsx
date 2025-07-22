@@ -1,9 +1,9 @@
 import { useParams } from "react-router";
 
+import { ApiResponseStatus, FatalApiError } from "@/api/ApiResult";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/i18n/translate";
 import { FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
@@ -19,7 +19,12 @@ export function ResolveErrorsSectionPage() {
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
   if (committeeSession.status !== "data_entry_in_progress" && committeeSession.status !== "data_entry_paused") {
-    throw new Error(t("error.api_error.CommitteeSessionNotInProgress"));
+    throw new FatalApiError(
+      ApiResponseStatus.ClientError,
+      403,
+      "Committee session should have status DataEntryInProgress or DataEntryPaused",
+      "Forbidden",
+    );
   }
 
   if (loading || dataEntry === null) {

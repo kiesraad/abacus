@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router";
 
+import { ApiResponseStatus, FatalApiError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -60,7 +61,12 @@ export function ElectionReportPage() {
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
   if (committeeSession.status !== "data_entry_finished") {
-    throw new Error(t("error.api_error.CommitteeSessionNotFinalised"));
+    throw new FatalApiError(
+      ApiResponseStatus.ClientError,
+      403,
+      "Committee session should have status DataEntryFinished",
+      "Forbidden",
+    );
   }
 
   function downloadPdfResults() {

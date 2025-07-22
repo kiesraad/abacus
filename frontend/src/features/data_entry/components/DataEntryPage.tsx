@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 
-import { NotFoundError } from "@/api/ApiResult";
+import { ApiResponseStatus, FatalApiError, NotFoundError } from "@/api/ApiResult";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { Badge } from "@/components/ui/Badge/Badge";
@@ -25,7 +25,12 @@ export function DataEntryPage() {
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
   if (committeeSession.status !== "data_entry_in_progress") {
-    throw new Error(t("error.api_error.CommitteeSessionNotInProgress"));
+    throw new FatalApiError(
+      ApiResponseStatus.ClientError,
+      403,
+      "Committee session should have status DataEntryInProgress",
+      "Forbidden",
+    );
   }
 
   if (!pollingStation) {

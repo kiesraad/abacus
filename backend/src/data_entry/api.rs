@@ -24,7 +24,7 @@ use super::{
 use crate::{
     APIError, AppState,
     audit_log::{AuditEvent, AuditService},
-    authentication::{Coordinator, Typist, User},
+    authentication::{Coordinator, Typist, User, error::AuthenticationError},
     committee_session::{
         CommitteeSession, repository::CommitteeSessions, status::CommitteeSessionStatus,
     },
@@ -41,7 +41,17 @@ impl From<DataError> for APIError {
 
 impl From<DataEntryTransitionError> for APIError {
     fn from(err: DataEntryTransitionError) -> Self {
-        APIError::DataEntry(err)
+        match err {
+            DataEntryTransitionError::FirstEntryAlreadyClaimed
+            | DataEntryTransitionError::SecondEntryAlreadyClaimed => {
+                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyClaimed)
+            }
+            DataEntryTransitionError::FirstEntryAlreadyFinalised
+            | DataEntryTransitionError::SecondEntryAlreadyFinalised => {
+                APIError::Conflict(err.to_string(), ErrorReference::DataEntryAlreadyFinalised)
+            }
+            _ => APIError::Conflict(err.to_string(), ErrorReference::InvalidStateTransition),
+        }
     }
 }
 
@@ -122,7 +132,6 @@ impl ResolveDifferencesAction {
         (status = 200, description = "Data entry claimed successfully", body = ClaimDataEntryResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 412, description = "Data entry is not available", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -146,9 +155,7 @@ async fn polling_station_data_entry_claim(
         .await?;
 
     if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
-        return Err(APIError::DataEntry(
-            DataEntryTransitionError::CommitteeSessionNotInProgress,
-        ));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     let new_data_entry = CurrentDataEntry {
@@ -235,7 +242,6 @@ impl IntoResponse for SaveDataEntryResponse {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 412, description = "Data entry is not available", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -260,9 +266,7 @@ async fn polling_station_data_entry_save(
         .await?;
 
     if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
-        return Err(APIError::DataEntry(
-            DataEntryTransitionError::CommitteeSessionNotInProgress,
-        ));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     let current_data_entry = CurrentDataEntry {
@@ -307,7 +311,6 @@ async fn polling_station_data_entry_save(
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 412, description = "Data entry is not available", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -331,9 +334,7 @@ async fn polling_station_data_entry_delete(
         .await?;
 
     if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
-        return Err(APIError::DataEntry(
-            DataEntryTransitionError::CommitteeSessionNotInProgress,
-        ));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     let new_state = match entry_number {
@@ -365,7 +366,6 @@ async fn polling_station_data_entry_delete(
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 412, description = "Data entry is not available", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -390,9 +390,7 @@ async fn polling_station_data_entry_finalise(
         .await?;
 
     if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
-        return Err(APIError::DataEntry(
-            DataEntryTransitionError::CommitteeSessionNotInProgress,
-        ));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     match entry_number {
@@ -483,7 +481,6 @@ pub struct DataEntryGetErrorsResponse {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with accepted errors found", body = ErrorResponse),
-        (status = 412, description = "Data entry is not available", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -506,9 +503,7 @@ async fn polling_station_data_entry_get_errors(
     if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
         && committee_session.status != CommitteeSessionStatus::DataEntryPaused
     {
-        return Err(APIError::DataEntry(
-            DataEntryTransitionError::CommitteeSessionNotInProgress,
-        ));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     match state.clone() {
@@ -545,7 +540,6 @@ async fn polling_station_data_entry_get_errors(
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 412, description = "Data entry is not available", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -571,9 +565,7 @@ async fn polling_station_data_entry_resolve_errors(
     if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
         && committee_session.status != CommitteeSessionStatus::DataEntryPaused
     {
-        return Err(APIError::DataEntry(
-            DataEntryTransitionError::CommitteeSessionNotInProgress,
-        ));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     let new_state = match action {
@@ -609,7 +601,6 @@ pub struct DataEntryGetDifferencesResponse {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with differences found", body = ErrorResponse),
-        (status = 412, description = "Data entry is not available", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -632,9 +623,7 @@ async fn polling_station_data_entry_get_differences(
     if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
         && committee_session.status != CommitteeSessionStatus::DataEntryPaused
     {
-        return Err(APIError::DataEntry(
-            DataEntryTransitionError::CommitteeSessionNotInProgress,
-        ));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     match state {
@@ -668,7 +657,6 @@ async fn polling_station_data_entry_get_differences(
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 412, description = "Data entry is not available", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -694,9 +682,7 @@ async fn polling_station_data_entry_resolve_differences(
     if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
         && committee_session.status != CommitteeSessionStatus::DataEntryPaused
     {
-        return Err(APIError::DataEntry(
-            DataEntryTransitionError::CommitteeSessionNotInProgress,
-        ));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     let new_state = match action {
@@ -963,7 +949,7 @@ pub mod tests {
             .await;
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
 
         // Check that no row was created
         let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
@@ -1015,7 +1001,7 @@ pub mod tests {
             EntryNumber::FirstEntry,
         )
         .await;
-        assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
 
         // Check that the row was not updated
         let polling_station_data_entries = PollingStationDataEntries::new(pool.clone());
@@ -1157,7 +1143,7 @@ pub mod tests {
             .await;
 
         let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1371,7 +1357,7 @@ pub mod tests {
 
         // delete data entry
         let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
 
         // Check if entry is still in FirstEntryInProgress state
         let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
@@ -1510,7 +1496,7 @@ pub mod tests {
             ResolveDifferencesAction::DiscardBothEntries,
         )
         .await;
-        assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
 
         let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
           .fetch_one(&pool)

@@ -761,16 +761,6 @@
               }
             }
           },
-          "412": {
-            "description": "PDF results download is not yet available",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -830,16 +820,6 @@
           },
           "404": {
             "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "XML results download is not yet available",
             "content": {
               "application/json": {
                 "schema": {
@@ -915,16 +895,6 @@
           },
           "404": {
             "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "ZIP results download is not yet available",
             "content": {
               "application/json": {
                 "schema": {
@@ -1624,16 +1594,6 @@
               }
             }
           },
-          "412": {
-            "description": "Data entry is not available",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -1723,16 +1683,6 @@
               }
             }
           },
-          "412": {
-            "description": "Data entry is not available",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "422": {
             "description": "JSON error or invalid data (Unprocessable Content)",
             "content": {
@@ -1806,16 +1756,6 @@
           },
           "404": {
             "description": "No data entry with accepted errors found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -1905,16 +1845,6 @@
           },
           "409": {
             "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -2035,16 +1965,6 @@
               }
             }
           },
-          "412": {
-            "description": "Data entry is not available",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "422": {
             "description": "JSON error or invalid data (Unprocessable Content)",
             "content": {
@@ -2138,16 +2058,6 @@
               }
             }
           },
-          "412": {
-            "description": "Data entry is not available",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -2222,16 +2132,6 @@
           },
           "409": {
             "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -2324,16 +2224,6 @@
           },
           "409": {
             "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "Data entry is not available",
             "content": {
               "application/json": {
                 "schema": {
@@ -4514,8 +4404,6 @@
           "AirgapViolation",
           "AllListsExhausted",
           "ApportionmentNotAvailableUntilDataEntryFinalised",
-          "CommitteeSessionNotFinalised",
-          "CommitteeSessionNotInProgress",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
@@ -4523,6 +4411,7 @@
           "EmlImportError",
           "EntryNotFound",
           "EntryNotUnique",
+          "Forbidden",
           "InternalServerError",
           "InvalidData",
           "InvalidHash",
@@ -4540,7 +4429,6 @@
           "PollingStationRepeated",
           "PollingStationValidationErrors",
           "RequestPayloadTooLarge",
-          "Forbidden",
           "Unauthorized",
           "UsernameNotUnique",
           "UserNotFound",

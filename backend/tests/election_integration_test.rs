@@ -247,7 +247,7 @@ async fn test_election_pdf_download_wrong_committee_session_state(pool: SqlitePo
         .unwrap();
 
     // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -296,7 +296,7 @@ async fn test_election_xml_download_wrong_committee_session_state(pool: SqlitePo
         .unwrap();
 
     // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -365,5 +365,5 @@ async fn test_election_zip_download_wrong_committee_session_state(pool: SqlitePo
         .unwrap();
 
     // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }

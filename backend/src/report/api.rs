@@ -5,7 +5,7 @@ use zip::{result::ZipError, write::SimpleFileOptions};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    authentication::Coordinator,
+    authentication::{Coordinator, error::AuthenticationError},
     committee_session::{repository::CommitteeSessions, status::CommitteeSessionStatus},
     data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
     election::{ElectionWithPoliticalGroups, repository::Elections},
@@ -17,18 +17,6 @@ use crate::{
     polling_station::{repository::PollingStations, structs::PollingStation},
     summary::ElectionSummary,
 };
-
-/// Errors that can occur during report generation
-#[derive(Debug, PartialEq, Eq)]
-pub enum ReportError {
-    CommitteeSessionNotFinalised,
-}
-
-impl From<ReportError> for APIError {
-    fn from(err: ReportError) -> Self {
-        APIError::Report(err)
-    }
-}
 
 impl From<ZipError> for APIError {
     fn from(err: ZipError) -> Self {
@@ -139,7 +127,6 @@ impl ResultsInput {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 412, description = "ZIP results download is not yet available", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -158,7 +145,7 @@ async fn election_download_zip_results(
         .get_election_committee_session(id)
         .await?;
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
-        return Err(APIError::Report(ReportError::CommitteeSessionNotFinalised));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     use std::io::Write;
@@ -218,7 +205,6 @@ async fn election_download_zip_results(
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 412, description = "PDF results download is not yet available", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -237,7 +223,7 @@ async fn election_download_pdf_results(
         .get_election_committee_session(id)
         .await?;
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
-        return Err(APIError::Report(ReportError::CommitteeSessionNotFinalised));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     let input = ResultsInput::new(
@@ -271,7 +257,6 @@ async fn election_download_pdf_results(
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 412, description = "XML results download is not yet available", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -290,7 +275,7 @@ async fn election_download_xml_results(
         .get_election_committee_session(id)
         .await?;
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
-        return Err(APIError::Report(ReportError::CommitteeSessionNotFinalised));
+        return Err(APIError::from(AuthenticationError::Forbidden));
     }
 
     let input = ResultsInput::new(

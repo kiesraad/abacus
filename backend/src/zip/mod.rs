@@ -27,10 +27,8 @@ impl ZipResponse {
             )
             .unix_permissions(0o644);
 
-        let slugified = slugify_filename(filename);
-
         Self {
-            filename: format!("{slugified}.zip"),
+            filename: slugify_filename(filename),
             options,
         }
     }

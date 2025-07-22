@@ -49,7 +49,7 @@ async fn election_download_na_31_2_bijlage1(
     let election = elections_repo.get(id).await?;
     let polling_stations = polling_stations_repo.list(election.id).await?;
     let response = ZipResponse::with_name(&format!(
-        "{}{}_{}_na_31_2_bijlage1",
+        "{}{}_{}_na_31_2_bijlage1.zip",
         election.category.to_eml_code(),
         election.election_date.year(),
         election.location

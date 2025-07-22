@@ -34,76 +34,73 @@ Het doel is dat Abacus zoveel mogelijk in de modellen invult en er dus zo weinig
 
 EML_NL 210 (kandidatenlijst voor een politieke groepering) wordt niet gebruikt, want alleen relevant binnen het kandidaatstellingsproces.
 
-
-
 ## GSB
 
 ### Modellen
 
-| Model(onderdeel)  | DSO  | CSO  | Doel                          | 'leeg' model uit Abacus | input voor Abacus | output van Abacus |
-| ----------------- | :--: | :--: | ----------------------------- | :---------------------: | :---------------: | :---------------: |
-| N 10-1            |  X   |      | PV SB                         |           (x)           |         X         |                   |
-| Na 14-1 versie 1  |  X   |      | Corrigendum SB - 1ste zitting |            X            |         X         |                   |
-| N 10-2            |      |  X   | PV SB                         |           (x)           |         X         |                   |
-| Na 31-2 Bijlage 1 |      |  X   | Telresultaten SB              |           (x)           |         X         |                   |
-| Na 31-2 Bijlage 2 |      |  X   | Bezwaren SB's                 |           (x)           |                   |                   |
-| Na 31-1           |  X   |      | PV GSB - 1ste zitting         |                         |                   |         X         |
-| Na 31-2           |      |  X   | PV GSB - 1ste zitting         |                         |                   |         X         |
-| Na 14-1 versie 2  |  X   |      | Corrigendum SB - 2de zitting  |            X            |         X         |                   |
-| Na 14-2 Bijlage 1 |      |  X   | Corrigendum SB - 2de zitting  |            X            |         X         |                   |
-| Na 14-2           |  X   |  X   | Corrigendum GSB - 2de zitting |                         |                   |         X         |
-| P 2a              |  X   |  X   | Verslag 2de zitting           |                         |                   |         X         |
-| N 5               |  X   |  X   | Overdrachtsdocument GSB       |           (x)           |                   |                   |
-
-De (x)-en geven aan dat deze 'lege' modellen door Abacus gegenereerd moeten kunnen worden, maar dat we niet verwachten dat deze functionaliteit veel gebruikt zal worden.
+| Model(onderdeel)  | DSO  | CSO  | Doel                               | 'leeg' model uit Abacus | input voor Abacus | output van Abacus |
+| ----------------- | :--: | :--: | ---------------------------------- | :---------------------: | :---------------: | :---------------: |
+| N 10-1            |  X   |      | PV SB                              |            X            |         X         |                   |
+| Na 14-1 versie 1  |  X   |      | Corrigendum SB - eerste zitting    |            X            |         X         |                   |
+| N 10-2            |      |  X   | PV SB                              |            X            |         X         |                   |
+| N 5               |  X   |  X   | Overdrachtsdocument GSB            |                         |                   |                   |
+| Na 31-2 Bijlage 1 |      |  X   | Telresultaten SB                   |            X            |         X         |                   |
+| Na 31-2 Bijlage 2 |      |  X   | Bezwaren SB's                      |                         |                   |                   |
+| Na 31-1           |  X   |      | PV GSB - eerste zitting            |                         |                   |         X         |
+| Na 31-2           |      |  X   | PV GSB - eerste zitting            |                         |                   |         X         |
+| Na 14-1 versie 2  |  X   |      | Corrigendum SB - volgende zitting  |            X            |         X         |                   |
+| Na 14-2 Bijlage 1 |      |  X   | Corrigendum SB - volgende zitting  |            X            |         X         |                   |
+| Na 14-2           |  X   |  X   | Corrigendum GSB - volgende zitting |                         |                   |         X         |
+| P 2a              |  X   |  X   | Verslag volgende zitting           |                         |                   |         X         |
 
 #### N 10-1 (DSO) en N 10-2 (CSO): PV op SB-niveau
 
-- door gemeente ruim op voorhand aangemaakt met eigen huisstijl, voorblad, etc.
+- door grotere gemeenten vaak op voorhand aangemaakt met eigen huisstijl, voorblad, etc.
+- voor kleinere gemeenten wel 'leeg' laten genereren door Abacus
 - worden met de hand ingevuld en dan ingevoerd in Abacus
-
 
 #### Na 14-1 versie 1 (DSO): Corrigendum eerste zitting
-- wordt gegenereerd door Abacus, met de hand ingevuld, dan ingevoerd in Abacus
 
-
-#### Na 31-2 Bijlage 1 (CSO): Telresultaten op SB-niveau
-- door gemeente ruim op voorhand aangemaakt met eigen huisstijl, voorblad, etc.
-- worden met de hand ingevuld en dan ingevoerd in Abacus
-
-
-#### Na 31-2 Bijlage 2 (CSO): Bezwaren SB's
-- niet gegenereerd door Abacus; uit toolkit of door gemeente zelf gemaakt
-- typist (niet invoerder) neemt deze over van SB PV's, buiten Abacus om
-
-
-#### Na 31-1 (DSO) en Na 31-2 (CSO): PV op GSB-niveau voor eerste zitting
-- gegenereerd door Abacus
-
-
-#### Na 14-1 versie 2 (DSO): Corrigendum op SB-niveau voor tweede zitting
-- gegenereerd door Abacus met aanleiding van het onderzoek en resultaten vorige telling gevuld
-- wordt afgedrukt en handmatig ingevuld met resultaten onderzoek en eventuele hertelling, dan ingevoerd in Abacus
-
-
-#### Na 14-2 Bijlage 1 (CSO): Corrigendum op SB-niveau voor tweede zitting
-- gegenereerd door Abacus met aanleiding van het onderzoek en resultaten vorige telling gevuld
-- wordt afgedrukt en handmatig ingevuld met resultaten onderzoek en eventuele hertelling, dan ingevoerd in Abacus
-
-
-#### Na 14-2 (DSO en CSO): Corrigendum op GSB-niveau voor tweede zitting
-- gegenereerd door Abacus, alleen als hertellingen tot een ander resultaat leidden
-- input voor CSB
-
-
-#### P 2a (DSO en CSO): Verslag tweede zitting
-- gegenereerd door Abacus, alleen als er een tweede zitting is
-
+- wordt 'leeg' gegenereerd door Abacus, met de hand ingevuld, dan ingevoerd in Abacus
 
 #### N5: Overdrachtsdocument GSB
 
+- niet gegenereerd door Abacus; uit verkiezingentoolkit of door gemeente zelf gemaakt
 - document voor de overdracht van het stembescheiden van de burgemeester aan het GSB
 
+#### Na 31-2 Bijlage 1 (CSO): Telresultaten op SB-niveau
+
+- door grotere gemeenten vaak op voorhand aangemaakt met eigen huisstijl, voorblad, etc.
+- voor kleinere gemeenten wel 'leeg' laten genereren door Abacus
+- worden met de hand ingevuld en dan ingevoerd in Abacus
+
+#### Na 31-2 Bijlage 2 (CSO): Bezwaren SB's
+
+- niet gegenereerd door Abacus; uit verkiezingentoolkit of door gemeente zelf gemaakt
+- typist (niet invoerder) neemt deze over van SB PV's, buiten Abacus om
+
+#### Na 31-1 (DSO) en Na 31-2 (CSO): PV op GSB-niveau voor eerste zitting
+
+- gegenereerd door Abacus
+
+#### Na 14-1 versie 2 (DSO): Corrigendum op SB-niveau voor volgende zitting
+
+- gegenereerd door Abacus met aanleiding van het onderzoek en resultaten vorige telling gevuld
+- wordt afgedrukt en handmatig ingevuld met resultaten onderzoek en eventuele hertelling, dan ingevoerd in Abacus
+
+#### Na 14-2 Bijlage 1 (CSO): Corrigendum op SB-niveau voor volgende zitting
+
+- gegenereerd door Abacus met aanleiding van het onderzoek en resultaten vorige telling gevuld
+- wordt afgedrukt en handmatig ingevuld met resultaten onderzoek en eventuele hertelling, dan ingevoerd in Abacus
+
+#### Na 14-2 (DSO en CSO): Corrigendum op GSB-niveau voor volgende zitting
+
+- gegenereerd door Abacus, alleen als hertellingen tot een ander resultaat leidden
+- input voor CSB
+
+#### P 2a (DSO en CSO): Verslag volgende zitting
+
+- gegenereerd door Abacus, alleen als er een volgende zitting is
 
 ### Tellingsbestanden
 

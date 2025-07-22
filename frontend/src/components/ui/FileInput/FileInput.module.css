@@ -10,3 +10,14 @@ label.selectedFile {
   padding-left: 1rem;
   color: var(--gray-600);
 }
+
+.fileInputBtn {
+  display: inline-block;
+}
+
+.fileInputBtn:focus-within {
+  outline: 2px solid blue;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  border-radius: var(--rounded-default);
+}

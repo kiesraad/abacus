@@ -26,6 +26,10 @@ export function ErrorBoundary() {
     return <FatalErrorPage message={error.message} />;
   }
 
+  if (error instanceof FatalApiError && error.reference === "Forbidden") {
+    return <FatalErrorPage title="error.forbidden" reference={error.reference} code={error.code} />;
+  }
+
   if (error instanceof ApiError || error instanceof FatalApiError) {
     return <FatalErrorPage message={error.message} reference={error.reference} code={error.code} />;
   }

@@ -13,11 +13,13 @@ label.selectedFile {
 
 .fileInputBtn {
   display: inline-block;
-}
-
-.fileInputBtn:focus-within {
-  outline: 2px solid blue;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
   border-radius: var(--rounded-default);
+
+  &:focus-within {
+    --button-border-width: 2px;
+    border-color: var(--border-color-focus);
+    background-color: var(--button-color-primary-focus);
+    box-shadow: 0 0 0 4px var(--shadow-color-focus);
+    outline: none;
+  }
 }

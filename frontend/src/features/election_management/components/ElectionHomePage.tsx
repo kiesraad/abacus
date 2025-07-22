@@ -56,7 +56,7 @@ export function ElectionHomePage() {
             <section className="md">
               <p>{t("election_management.empty_models_description")}</p>
             </section>
-            <Table>
+            <Table className={cn(cls.electionInformationTable)}>
               <Table.Header>
                 <Table.HeaderCell scope="col">{t("election_management.model_name")}</Table.HeaderCell>
                 <Table.HeaderCell scope="col">{t("election_management.model_purpose")}</Table.HeaderCell>

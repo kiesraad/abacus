@@ -48,8 +48,12 @@ async fn election_download_na_31_2_bijlage1(
 ) -> Result<Attachment<Vec<u8>>, APIError> {
     let election = elections_repo.get(id).await?;
     let polling_stations = polling_stations_repo.list(election.id).await?;
-
-    let response = ZipResponse::with_name(&format!("{}_na_31_2_bijlage1", election.name));
+    let response = ZipResponse::with_name(&format!(
+        "{}{}_{}_na_31_2_bijlage1",
+        election.category.to_eml_code(),
+        election.election_date.year(),
+        election.location
+    ));
 
     if polling_stations.is_empty() {
         return Err(APIError::NotFound(
@@ -75,7 +79,7 @@ async fn election_download_na_31_2_bijlage1(
         .zip(polling_stations.iter())
         .map(|(pdf, polling_station)| {
             let name = format!(
-                "Model_Na31-2_{}_{}_Stembureau_{}_Bijlage_1.pdf",
+                "Model_Na31-2_{}{}_Stembureau_{}_Bijlage_1.pdf",
                 election.category.to_eml_code(),
                 election.election_date.year(),
                 polling_station.number

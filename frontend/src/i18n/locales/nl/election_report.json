@@ -1,9 +1,9 @@
 {
   "back_to_overview": "Terug naar overzicht",
+  "committee_session_started": "De zitting begon op {date} om {time}",
   "counting_results": "Telresultaten",
   "download_report": "Download los proces-verbaal",
   "download_zip": "Download proces-verbaal met telbestand",
-  "committee_session_started": "De zitting begon op {date} om {time}",
   "resume_data_entry": "Steminvoer hervatten",
   "there_was_counting_method": "Er was sprake van een {method}"
 }

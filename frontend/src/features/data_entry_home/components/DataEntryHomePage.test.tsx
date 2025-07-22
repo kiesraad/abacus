@@ -1,7 +1,7 @@
 import { waitForElementToBeRemoved } from "@testing-library/dom";
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
@@ -17,19 +17,13 @@ import {
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter, within } from "@/testing/test-utils";
-import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
+import { getTypistUser } from "@/testing/user-mock-data";
+import { ElectionStatusResponse } from "@/types/generated/openapi";
 
 import { dataEntryHomeRoutes } from "../routes";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
 vi.mock("@/hooks/user/useUser");
-
-const testUser: LoginResponse = {
-  username: "test-user-1",
-  user_id: 1,
-  role: "typist",
-  needs_password_change: false,
-};
 
 const renderDataEntryHomePage = () =>
   render(
@@ -42,7 +36,7 @@ const renderDataEntryHomePage = () =>
 
 describe("DataEntryHomePage", () => {
   beforeEach(() => {
-    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
+    vi.mocked(useUser).mockReturnValue(getTypistUser());
     server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   });
@@ -116,7 +110,7 @@ describe("DataEntryHomePage", () => {
   test("Resume input visible when some are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { polling_station_id: 1, status: "first_entry_in_progress", first_entry_user_id: testUser.user_id },
+        { polling_station_id: 1, status: "first_entry_in_progress", first_entry_user_id: getTypistUser().user_id },
         { polling_station_id: 2, status: "first_entry_not_started" },
       ],
     } satisfies ElectionStatusResponse);

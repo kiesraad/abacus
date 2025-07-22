@@ -2,6 +2,7 @@ import { Locator, Page } from "@playwright/test";
 
 export class ElectionReport {
   readonly downloadPdf: Locator;
+
   readonly downloadZip: Locator;
 
   constructor(protected readonly page: Page) {

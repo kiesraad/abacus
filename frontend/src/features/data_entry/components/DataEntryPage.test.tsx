@@ -1,5 +1,5 @@
 import { render as rtlRender } from "@testing-library/react";
-import { beforeEach, describe, Mock, test, vi } from "vitest";
+import { beforeEach, describe, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { useUser } from "@/hooks/user/useUser";
@@ -12,22 +12,15 @@ import {
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { expectErrorPage, setupTestRouter } from "@/testing/test-utils";
-import { LoginResponse } from "@/types/generated/openapi";
+import { getTypistUser } from "@/testing/user-mock-data";
 
 import { dataEntryRoutes } from "../routes";
 
 vi.mock("@/hooks/user/useUser");
 
-const testUser: LoginResponse = {
-  username: "test-user-1",
-  user_id: 1,
-  role: "typist",
-  needs_password_change: false,
-};
-
 describe("DataEntryPage", () => {
   beforeEach(() => {
-    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
+    vi.mocked(useUser).mockReturnValue(getTypistUser());
     server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   });

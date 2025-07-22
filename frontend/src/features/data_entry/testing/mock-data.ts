@@ -1,9 +1,5 @@
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import {
-  LoginResponse,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationResults,
-} from "@/types/generated/openapi";
+import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@/types/generated/openapi";
 import { DataEntryStructure, FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
@@ -90,15 +86,6 @@ export function getEmptyDataEntryRequest(): POLLING_STATION_DATA_ENTRY_SAVE_REQU
     client_state: {
       test: "test",
     },
-  };
-}
-
-export function getTypistUser(): LoginResponse {
-  return {
-    needs_password_change: false,
-    role: "typist",
-    user_id: 1,
-    username: "testuser",
   };
 }
 

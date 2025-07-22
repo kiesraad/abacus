@@ -5,6 +5,7 @@ import { useApiClient } from "@/api/useApiClient";
 import { CommitteeSessionStatusLabel } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";
 import { CommitteeSessionStatusIcon } from "@/components/ui/Icon/CommitteeSessionStatusIcon";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
@@ -87,6 +88,7 @@ export function CommitteeSessionCard({
 }: CommitteeSessionCardProps & DivProps) {
   const client = useApiClient();
   const navigate = useNavigate();
+  const { isCoordinator } = useUserRole();
 
   function handleStart() {
     const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
@@ -112,11 +114,13 @@ export function CommitteeSessionCard({
       // }
       break;
     case "data_entry_not_started":
-      button = (
-        <Button variant="primary" size="sm" onClick={handleStart}>
-          {t("election_management.start_data_entry")}
-        </Button>
-      );
+      if (isCoordinator) {
+        button = (
+          <Button variant="primary" size="sm" onClick={handleStart}>
+            {t("election_management.start_data_entry")}
+          </Button>
+        );
+      }
       break;
     case "data_entry_in_progress":
       button = (
@@ -128,18 +132,22 @@ export function CommitteeSessionCard({
     case "data_entry_paused":
       break;
     case "data_entry_finished":
-      buttonLinks.push({
-        id: committeeSession.id,
-        label: t("election_management.results_and_documents"),
-        to: "report/download", // TODO: change link when reports are linked to committee sessions
-      });
+      if (isCoordinator) {
+        buttonLinks.push({
+          id: committeeSession.id,
+          label: t("election_management.results_and_documents"),
+          to: "report/download", // TODO: change link when reports are linked to committee sessions
+        });
+      }
       if (currentSession) {
         buttonLinks.push({ id: committeeSession.id, label: t("election_management.view_data_entry"), to: "status" });
       }
       break;
   }
   // TODO: Add in issue #1750 with link
-  // buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" });
+  // if (isCoordinator) {
+  //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" });
+  // }
 
   return (
     <Card icon={icon} label={label} status={status} date={date} button={button} {...props}>

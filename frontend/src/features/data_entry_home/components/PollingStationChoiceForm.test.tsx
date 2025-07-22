@@ -102,6 +102,80 @@ describe("Test PollingStationChoiceForm", () => {
       expect(await within(pollingStationFeedback).findByText(/Testplek/)).toBeVisible();
     });
 
+    test.each([
+      {
+        testDescription: "invalid",
+        pollingStationInput: "abc",
+        selectorFeedback: "Geen stembureau gevonden met nummer abc",
+        submitFeedback: "Voer een geldig nummer van een stembureau in om te beginnen",
+      },
+      {
+        testDescription: "non-existing",
+        pollingStationInput: "987654",
+        selectorFeedback: "Geen stembureau gevonden met nummer 987654",
+        submitFeedback: "Voer een geldig nummer van een stembureau in om te beginnen",
+      },
+      {
+        testDescription: "finalized",
+        pollingStationInput: "34",
+        selectorFeedback: "Stembureau 34 (Testplek) is al twee keer ingevoerd",
+        submitFeedback: "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
+      },
+      {
+        testDescription: "entries different",
+        pollingStationInput: "35",
+        selectorFeedback: "Stembureau 35 (Testschool) is al twee keer ingevoerd",
+        submitFeedback: "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
+      },
+      {
+        testDescription: "second entry in progress by other",
+        pollingStationInput: "36",
+        selectorFeedback: "Een andere invoerder is bezig met stembureau 36",
+        submitFeedback: "Een andere invoerder is bezig met stembureau 36 (Testbuurthuis)",
+      },
+      {
+        testDescription: "first entry has errors",
+        pollingStationInput: "37",
+        selectorFeedback: "Stembureau 37 ligt ter beoordeling bij de coördinator",
+        submitFeedback: "Stembureau 37 ligt ter beoordeling bij de coördinator",
+      },
+      {
+        testDescription: "first entry in progress by other",
+        pollingStationInput: "38",
+        selectorFeedback: "Een andere invoerder is bezig met stembureau 38",
+        submitFeedback: "Een andere invoerder is bezig met stembureau 38 (Testmuseum)",
+      },
+      {
+        testDescription: "first entry done by same user",
+        pollingStationInput: "39",
+        selectorFeedback: "Je mag stembureau 39 niet nog een keer invoeren",
+        submitFeedback: "Je mag stembureau 39 niet nog een keer invoeren",
+      },
+    ])(
+      "Inputting and submitting an invalid polling station shows feedback and alert: $testDescription",
+      async ({ pollingStationInput, selectorFeedback, submitFeedback }) => {
+        overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+        overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
+
+        const user = userEvent.setup();
+        await renderPollingStationChoiceForm();
+
+        const pollingStation = await screen.findByTestId("pollingStation");
+        await user.type(pollingStation, pollingStationInput);
+
+        const pollingStationSelectFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+        await waitFor(() => {
+          expect(pollingStationSelectFeedback).toHaveTextContent(selectorFeedback);
+        });
+
+        const submitButton = screen.getByRole("button", { name: "Beginnen" });
+        await user.click(submitButton);
+
+        const pollingStationSubmitFeedback = await screen.findByTestId("pollingStationSubmitFeedback");
+        expect(pollingStationSubmitFeedback).toHaveTextContent(submitFeedback);
+      },
+    );
+
     test("Selecting a non-existing polling station", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
@@ -150,76 +224,6 @@ describe("Test PollingStationChoiceForm", () => {
       expect(
         within(screen.getByTestId("pollingStationSubmitFeedback")).getByText(
           "Voer een geldig nummer van een stembureau in om te beginnen",
-        ),
-      ).toBeVisible();
-    });
-
-    test("Selecting a valid, but finalised polling station shows alert", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
-      const user = userEvent.setup();
-      render(
-        <ElectionProvider electionId={1}>
-          <ElectionStatusProvider electionId={1}>
-            <PollingStationChoiceForm anotherEntry />
-          </ElectionStatusProvider>
-        </ElectionProvider>,
-      );
-
-      const submitButton = await screen.findByRole("button", { name: "Beginnen" });
-      const pollingStation = screen.getByTestId("pollingStation");
-
-      // Test if the polling station name is shown
-      await user.type(pollingStation, "34");
-
-      // Click submit and see that the alert appears
-      await user.click(submitButton);
-
-      // Test if the warning message is shown correctly
-      await waitFor(() => {
-        expect(screen.getByTestId("pollingStationSelectorFeedback").textContent).toBe(
-          "Stembureau 34 (Testplek) is al twee keer ingevoerd",
-        );
-      });
-
-      expect(
-        within(screen.getByTestId("pollingStationSubmitFeedback")).getByText(
-          "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
-        ),
-      ).toBeVisible();
-    });
-
-    test("Selecting a valid, but with different entries polling station shows alert", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-      overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
-      const user = userEvent.setup();
-      render(
-        <ElectionProvider electionId={1}>
-          <ElectionStatusProvider electionId={1}>
-            <PollingStationChoiceForm anotherEntry />
-          </ElectionStatusProvider>
-        </ElectionProvider>,
-      );
-
-      const submitButton = await screen.findByRole("button", { name: "Beginnen" });
-      const pollingStation = screen.getByTestId("pollingStation");
-
-      // Test if the polling station name is shown
-      await user.type(pollingStation, "35");
-
-      // Click submit and see that the alert appears
-      await user.click(submitButton);
-
-      // Test if the warning message is shown correctly
-      await waitFor(() => {
-        expect(screen.getByTestId("pollingStationSelectorFeedback").textContent).toBe(
-          "Stembureau 35 (Testschool) is al twee keer ingevoerd",
-        );
-      });
-
-      expect(
-        within(screen.getByTestId("pollingStationSubmitFeedback")).getByText(
-          "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
         ),
       ).toBeVisible();
     });

@@ -450,7 +450,9 @@ test.describe("second data entry", () => {
     await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
     await dataEntryHomePage.clickStart();
 
-    await expect(page).toHaveURL(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2`);
+    await expect(page).toHaveURL(
+      `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/voters_votes_counts`,
+    );
 
     await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
 
@@ -548,7 +550,9 @@ test.describe("second data entry", () => {
     await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
     await dataEntryHomePage.clickStart();
 
-    await expect(typistPage).toHaveURL(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2`);
+    await expect(typistPage).toHaveURL(
+      `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/voters_votes_counts`,
+    );
 
     // fill form with data that is different from first data entry
     const votersAndVotesPage = new VotersAndVotesPage(typistPage);

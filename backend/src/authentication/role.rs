@@ -105,7 +105,7 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
-        Admin::try_from(user).map_err(|_| AuthenticationError::Unauthorized.into())
+        Admin::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
     }
 }
 
@@ -119,7 +119,7 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
-        Coordinator::try_from(user).map_err(|_| AuthenticationError::Unauthorized.into())
+        Coordinator::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
     }
 }
 
@@ -133,7 +133,7 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
-        Typist::try_from(user).map_err(|_| AuthenticationError::Unauthorized.into())
+        Typist::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
     }
 }
 
@@ -147,6 +147,6 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
-        AdminOrCoordinator::try_from(user).map_err(|_| AuthenticationError::Unauthorized.into())
+        AdminOrCoordinator::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
     }
 }

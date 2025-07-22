@@ -29,7 +29,7 @@ use abacus::{
 };
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use clap::Parser;
-use rand::seq::IndexedRandom;
+use rand::{Rng, seq::IndexedRandom};
 
 #[cfg(feature = "dev-database")]
 use tracing::info;
@@ -161,8 +161,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await
         .expect("Failed to create committee session");
 
-    // TODO: Add number of voters to committee session
-    // number_of_voters: rng.random_range(&args.voters.clone());
+    cs_repo
+        .change_number_of_voters(committee_session.id, rng.random_range(args.voters.clone()))
+        .await
+        .expect("Failed to update number of voters of committee session");
 
     // generate the polling stations for the election
     let ps_repo = PollingStations::new(pool.clone());

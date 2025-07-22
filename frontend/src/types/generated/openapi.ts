@@ -14,6 +14,13 @@ export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
 export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
 
+// /api/committee_sessions/{committee_session_id}/voters
+export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${number}/voters`;
+export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSessionNumberOfVotersChangeRequest;
+
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
@@ -376,6 +383,13 @@ export interface CommitteeSessionDetails {
  */
 export interface CommitteeSessionListResponse {
   committee_sessions: CommitteeSession[];
+}
+
+/**
+ * Committee session number of voters change request
+ */
+export interface CommitteeSessionNumberOfVotersChangeRequest {
+  number_of_voters: number;
 }
 
 /**

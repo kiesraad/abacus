@@ -167,6 +167,34 @@ impl CommitteeSessions {
         .fetch_one(&self.0)
         .await
     }
+
+    pub async fn change_number_of_voters(
+        &self,
+        committee_session_id: u32,
+        number_of_voters: u32,
+    ) -> Result<CommitteeSession, Error> {
+        query_as!(
+            CommitteeSession,
+            r#"
+            UPDATE committee_sessions
+            SET number_of_voters = ?
+            WHERE id = ?
+            RETURNING
+              id as "id: u32",
+              number as "number: u32",
+              election_id as "election_id: u32",
+              status as "status: _",
+              location,
+              start_date,
+              start_time,
+              number_of_voters as "number_of_voters: u32"
+            "#,
+            number_of_voters,
+            committee_session_id,
+        )
+        .fetch_one(&self.0)
+        .await
+    }
 }
 
 impl FromRef<AppState> for CommitteeSessions {

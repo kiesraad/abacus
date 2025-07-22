@@ -58,6 +58,12 @@ pub struct CommitteeSessionUpdateRequest {
     pub start_time: String,
 }
 
+/// Committee session number of voters change request
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+pub struct CommitteeSessionNumberOfVotersChangeRequest {
+    pub number_of_voters: u32,
+}
+
 /// Committee session status
 #[derive(
     Serialize,

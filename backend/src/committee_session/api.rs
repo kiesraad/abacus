@@ -9,8 +9,8 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
-    repository::CommitteeSessions,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
+    CommitteeSessionUpdateRequest, repository::CommitteeSessions,
 };
 use crate::{
     APIError, AppState, ErrorResponse,
@@ -24,6 +24,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_committee_session_list))
         .routes(routes!(committee_session_create))
         .routes(routes!(committee_session_update))
+        .routes(routes!(committee_session_number_of_voters_change))
 }
 
 /// Committee session list response
@@ -121,6 +122,45 @@ pub async fn committee_session_update(
 ) -> Result<StatusCode, APIError> {
     let committee_session = committee_sessions_repo
         .update(committee_session_id, committee_session_request)
+        .await?;
+
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
+            None,
+        )
+        .await?;
+
+    Ok(StatusCode::OK)
+}
+
+/// Change the number of voters of a [CommitteeSession].
+#[utoipa::path(
+    put,
+    path = "/api/committee_sessions/{committee_session_id}/voters",
+    request_body = CommitteeSessionNumberOfVotersChangeRequest,
+    responses(
+        (status = 200, description = "Committee session number of voters changed successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("committee_session_id" = u32, description = "Committee session database id"),
+    ),
+)]
+pub async fn committee_session_number_of_voters_change(
+    _user: Coordinator,
+    State(committee_sessions_repo): State<CommitteeSessions>,
+    audit_service: AuditService,
+    Path(committee_session_id): Path<u32>,
+    Json(committee_session_request): Json<CommitteeSessionNumberOfVotersChangeRequest>,
+) -> Result<StatusCode, APIError> {
+    let committee_session = committee_sessions_repo
+        .change_number_of_voters(
+            committee_session_id,
+            committee_session_request.number_of_voters,
+        )
         .await?;
 
     audit_service

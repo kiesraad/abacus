@@ -9,6 +9,7 @@ import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 
+import { downloadFrom } from "../utils/download";
 import { CommitteeSessionCards } from "./CommitteeSessionCards";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
@@ -18,7 +19,7 @@ export function ElectionHomePage() {
   const { election, pollingStations } = useElection();
 
   const downloadNa31_2Bijlage1 = () => {
-    // TODO
+    void downloadFrom(`/api/elections/${election.id}/download_na_31_2_bijlage_1`);
   };
 
   if (isTypist) {

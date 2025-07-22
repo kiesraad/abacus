@@ -28,6 +28,7 @@ pub mod audit_log;
 pub mod authentication;
 pub mod committee_session;
 pub mod data_entry;
+pub mod document;
 pub mod election;
 pub mod eml;
 mod error;
@@ -39,6 +40,7 @@ pub mod report;
 pub mod summary;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
+pub mod zip;
 
 pub use error::{APIError, ErrorResponse};
 
@@ -64,6 +66,7 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
         .merge(election::router())
         .merge(polling_station::router())
         .merge(report::router())
+        .merge(document::router())
 }
 
 /// Axum router for the application

@@ -100,13 +100,13 @@ impl ResultsInput {
     }
 
     fn into_pdf_model(self, xml_hash: impl Into<String>) -> PdfModel {
-        PdfModel::ModelNa31_2(ModelNa31_2Input {
+        PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
             polling_stations: self.polling_stations,
             summary: self.summary,
             election: self.election,
             hash: xml_hash.into(),
             creation_date_time: self.creation_date_time.format("%d-%m-%Y %H:%M").to_string(),
-        })
+        }))
     }
 }
 
@@ -168,6 +168,7 @@ async fn election_download_zip_results(
                 .expect("Timestamp should be inside zip timestamp range"),
         )
         .unix_permissions(0o644);
+
     zip.start_file(xml_filename, options)?;
     zip.write_all(xml_string.as_bytes()).map_err(ZipError::Io)?;
     zip.start_file(pdf_filename, options)?;

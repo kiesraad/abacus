@@ -59,7 +59,7 @@ pub(crate) mod tests {
 
     #[tokio::test]
     async fn it_generates_a_pdf() {
-        let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
+        let content = generate_pdf(PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
             election: ElectionWithPoliticalGroups {
                 id: 1,
                 name: "Municipal Election".to_string(),
@@ -79,7 +79,7 @@ pub(crate) mod tests {
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),
-        }))
+        })))
         .await
         .unwrap();
 
@@ -89,14 +89,14 @@ pub(crate) mod tests {
     #[tokio::test]
     async fn it_generates_a_pdf_with_polling_stations() {
         let election = election_fixture(&[2, 3]);
-        let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
+        let content = generate_pdf(PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
             polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
             election,
             summary: ElectionSummary::zero(),
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),
-        }))
+        })))
         .await
         .unwrap();
 

@@ -14,6 +14,7 @@ import { NavBar } from "e2e-tests/page-objects/NavBarPgObj";
 
 import { test } from "../fixtures";
 import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
+import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 
 test.use({
   storageState: "e2e-tests/state/admin.json",
@@ -33,6 +34,10 @@ test.describe("Election creation", () => {
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
 
+    const countingMethodType = new CountingMethodTypePgObj(page);
+    await expect(countingMethodType.header).toBeVisible();
+    await countingMethodType.next.click();
+    
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
@@ -216,6 +221,10 @@ test.describe("Election creation", () => {
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
 
+    const countingMethodType = new CountingMethodTypePgObj(page);
+    await expect(countingMethodType.header).toBeVisible();
+    await countingMethodType.next.click();
+
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
@@ -238,6 +247,10 @@ test.describe("Election creation", () => {
 
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
+
+    const countingMethodType = new CountingMethodTypePgObj(page);
+    await expect(countingMethodType.header).toBeVisible();
+    await countingMethodType.next.click();
 
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
@@ -280,6 +293,10 @@ test.describe("Election creation", () => {
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
 
+    const countingMethodType = new CountingMethodTypePgObj(page);
+    await expect(countingMethodType.header).toBeVisible();
+    await countingMethodType.next.click();
+
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
@@ -307,6 +324,10 @@ test.describe("Election creation", () => {
 
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
+
+    const countingMethodType = new CountingMethodTypePgObj(page);
+    await expect(countingMethodType.header).toBeVisible();
+    await countingMethodType.next.click();
 
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);

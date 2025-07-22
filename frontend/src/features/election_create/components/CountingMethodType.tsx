@@ -36,9 +36,16 @@ export function CountingMethodType() {
           location: state.election.location,
         })}
       </p>
-      <Form onSubmit={void handleSubmit}>
+      <Form onSubmit={(e) => void handleSubmit(e)}>
         <ChoiceList>
-          <ChoiceList.Radio id="cso" label={t("election.voting_method_type.cso")} readOnly>
+          <ChoiceList.Radio
+            id="cso"
+            label={t("election.voting_method_type.cso")}
+            checked={true}
+            onChange={() => {/*
+              We need this to suppress an error because we explicitly set the `checked` property.
+              We'll actually implement this handler once we support DSO
+            */}}>
             {t("election.voting_method_type.cso_description")}
           </ChoiceList.Radio>
           <ChoiceList.Radio

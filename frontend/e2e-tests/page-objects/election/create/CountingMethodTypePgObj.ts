@@ -5,7 +5,7 @@ export class CountingMethodTypePgObj {
   readonly next: Locator;
 
   constructor(protected readonly page: Page) {
-    this.header = page.getByRole("heading", { level: 2, name: "Type stempopneming in Amsterdam" });
+    this.header = page.getByRole("heading", { level: 2, name: "Type stemopneming in Amsterdam" });
     this.next = page.getByRole("button", { name: "Volgende" });
   }
 }

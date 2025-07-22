@@ -369,6 +369,7 @@ describe("Election create pages", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" })).toBeVisible();
 
     // We want this to fail when we do have support for DSO, so we can implement the test then
+    expect(await screen.findByTestId("cso")).toBeChecked();
     expect(await screen.findByTestId("dso")).toBeDisabled();
 
     await user.click(screen.getByText("Volgende"));

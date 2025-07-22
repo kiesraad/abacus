@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
+import { ApiResponseStatus, FatalApiError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -30,7 +31,12 @@ export function FinishDataEntryPage() {
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
   if (committeeSession.status === "created" || committeeSession.status === "data_entry_not_started") {
-    throw new Error(t("error.api_error.InvalidStateTransition"));
+    throw new FatalApiError(
+      ApiResponseStatus.ClientError,
+      403,
+      "Committee session should not have status Created or DataEntryNotStarted",
+      "Forbidden",
+    );
   }
 
   function handleFinish() {

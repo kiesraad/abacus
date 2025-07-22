@@ -129,6 +129,7 @@ impl ResolveDifferencesAction {
     responses(
         (status = 200, description = "Data entry claimed successfully", body = ClaimDataEntryResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -236,6 +237,7 @@ impl IntoResponse for SaveDataEntryResponse {
     responses(
         (status = 200, description = "Data entry saved successfully", body = SaveDataEntryResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -300,6 +302,7 @@ async fn polling_station_data_entry_save(
     responses(
         (status = 204, description = "Data entry deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -349,6 +352,7 @@ async fn polling_station_data_entry_delete(
     responses(
         (status = 200, description = "Data entry finalised successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -460,6 +464,7 @@ pub struct DataEntryGetErrorsResponse {
     responses(
         (status = 200, description = "Data entry with errors and warnings to be resolved", body = DataEntryGetErrorsResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with accepted errors found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -510,6 +515,7 @@ async fn polling_station_data_entry_get_errors(
     responses(
         (status = 200, description = "Errors resolved successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -565,6 +571,7 @@ pub struct DataEntryGetDifferencesResponse {
     responses(
         (status = 200, description = "Data entry differences to be resolved", body = DataEntryGetDifferencesResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with differences found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -612,6 +619,7 @@ async fn polling_station_data_entry_get_differences(
     responses(
         (status = 200, description = "Differences resolved successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),

@@ -45,6 +45,7 @@ impl IntoResponse for CommitteeSessionListResponse {
   responses(
         (status = 200, description = "Committee session list", body = CommitteeSessionListResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
@@ -74,6 +75,7 @@ pub async fn election_committee_session_list(
         (status = 201, description = "Committee session created", body = CommitteeSession),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -105,6 +107,7 @@ pub async fn committee_session_create(
     responses(
         (status = 200, description = "Committee session updated successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Committee session not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),

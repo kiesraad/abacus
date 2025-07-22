@@ -125,6 +125,7 @@ pub async fn election_details(
         (status = 201, description = "Election created", body = ElectionWithPoliticalGroups),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -187,6 +188,7 @@ pub struct ElectionDefinitionValidateResponse {
         (status = 200, description = "Election validated", body = ElectionDefinitionValidateResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -235,6 +237,7 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
         (status = 201, description = "Election imported", body = ElectionWithPoliticalGroups),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]

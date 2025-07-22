@@ -98,6 +98,7 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     responses(
         (status = 200, description = "The logged in user id and user name", body = LoginResponse),
         (status = 401, description = "Invalid credentials", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -286,6 +287,7 @@ pub struct UserListResponse {
     responses(
         (status = 200, description = "User list", body = UserListResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -327,6 +329,7 @@ pub struct UpdateUserRequest {
     responses(
         (status = 201, description = "User created", body = User),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -360,6 +363,7 @@ pub async fn user_create(
     responses(
         (status = 200, description = "User found", body = User),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -384,6 +388,7 @@ async fn user_get(
     responses(
         (status = 200, description = "User updated", body = User),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -427,6 +432,7 @@ pub async fn user_update(
     responses(
         (status = 200, description = "User deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),

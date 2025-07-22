@@ -7,18 +7,18 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev:mock": "cross-env API_MODE=mock vite",
-    "dev": "npm run check-server && vite",
-    "build": "vite build --config vite-prod.config.ts",
-    "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
-    "lint": "tsc && cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "dev:mock": "cross-env API_MODE=mock rsbuild",
+    "dev": "npm run check-server && rsbuild",
+    "build": "rsbuild build",
+    "build:msw": "cross-env API_MODE=mock rsbuild build && cp mockServiceWorker.js dist/",
+    "lint": "tsc && cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --no-warn-ignored --max-warnings 0",
     "prettier": "prettier --ignore-unknown --write .",
-    "preview": "vite preview",
+    "preview": "rsbuild preview",
     "test": "vitest",
     "test:e2e": "cross-env LOCAL_CI=true RUST_LOG=tower_http-warning playwright test -c playwright.e2e.config.ts",
     "test:e2e-dev": "cross-env RUST_LOG=tower_http-warning playwright test -c playwright.e2e.config.ts",
     "test:e2e-ui": "cross-env LOCAL_CI=true playwright test -c playwright.e2e.config.ts --ui",
-    "start:msw": "cross-env API_MODE=mock vite",
+    "start:msw": "cross-env API_MODE=mock rsbuild",
     "gen:icons": "node scripts/gen_icons.js",
     "gen:openapi": "vite-node scripts/gen_openapi.ts",
     "gen:po": "vite-node scripts/gen_po.js",
@@ -29,12 +29,13 @@
     "build:storybook": "storybook build -o dist/storybook"
   },
   "dependencies": {
+    "@rsbuild/core": "^1.4.8",
+    "@rsbuild/plugin-react": "^1.3.4",
     "browserslist": "^4.25.1",
     "lightningcss": "^1.30.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router": "^7.7.0",
-    "vite": "^6.3.5"
+    "react-router": "^7.7.0"
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",

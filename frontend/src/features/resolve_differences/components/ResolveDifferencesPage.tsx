@@ -21,33 +21,29 @@ export function ResolveDifferencesPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
   const afterSave = (status: DataEntryStatusName, firstEntryUserId: number | undefined) => {
-    let nextPage = `/elections/${election.id}/status`;
-
     switch (status) {
       case "first_entry_has_errors":
         pushMessage({
           title: t("resolve_errors.differences_resolved", { number: pollingStation.number }),
           text: t("resolve_errors.alert_contains_errors"),
         });
-        nextPage = `/elections/${election.id}/status/${pollingStationId}/resolve-errors`;
+        void navigate(`/elections/${election.id}/status/${pollingStationId}/resolve-errors`);
         break;
       case "second_entry_not_started":
         pushMessage({
           title: t("election_status.success.differences_resolved", { nr: pollingStation.number }),
           text: t("election_status.success.data_entry_kept", { typist: getName(firstEntryUserId) }),
         });
+        void navigate(`/elections/${election.id}/status`);
         break;
       case "first_entry_not_started":
         pushMessage({
           title: t("election_status.success.differences_resolved", { nr: pollingStation.number }),
           text: t("election_status.success.data_entries_discarded", { nr: pollingStation.number }),
         });
-        break;
-      default:
+        void navigate(`/elections/${election.id}/status`);
         break;
     }
-
-    void navigate(nextPage);
   };
 
   const pollingStationId = useNumericParam("pollingStationId");

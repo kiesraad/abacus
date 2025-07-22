@@ -396,15 +396,6 @@ impl From<Box<dyn Error>> for APIError {
     }
 }
 
-#[derive(Debug, Serialize)]
-pub struct JsonResponse<T>(T);
-
-impl<T: Serialize> IntoResponse for JsonResponse<T> {
-    fn into_response(self) -> Response {
-        Json(self).into_response()
-    }
-}
-
 /// Map common internal errors to user-friendly error messages
 pub async fn map_error_response(response: Response) -> Response {
     if response.status() == StatusCode::PAYLOAD_TOO_LARGE {

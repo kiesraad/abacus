@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Navigate } from "react-router";
 
+import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
@@ -14,7 +16,18 @@ import cls from "./ElectionManagement.module.css";
 
 export function ElectionHomePage() {
   const { isTypist } = useUserRole();
-  const { election, pollingStations } = useElection();
+  const { election, pollingStations, refetch } = useElection();
+
+  // re-fetch election when component mounts
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    void refetch(abortController);
+
+    return () => {
+      abortController.abort(DEFAULT_CANCEL_REASON);
+    };
+  }, [refetch]);
 
   if (isTypist) {
     return <Navigate to="data-entry" />;

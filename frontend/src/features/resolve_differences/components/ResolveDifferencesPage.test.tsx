@@ -179,7 +179,7 @@ describe("ResolveDifferencesPage", () => {
     });
   });
 
-  test("should navigate to election status page after submit with correct hash", async () => {
+  test("should navigate to election status page after submit and push message", async () => {
     const user = userEvent.setup();
 
     await renderPage();
@@ -188,7 +188,11 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByLabelText(/Geen van beide/));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entries-discarded-3");
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau 35",
+      text: "Omdat beide invoeren zijn verwijderd, moet stembureau 35 twee keer opnieuw ingevoerd worden.",
+    });
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
   test("should navigate to resolve errors page after keeping second entry which has errors", async () => {

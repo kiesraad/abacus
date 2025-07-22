@@ -21,11 +21,9 @@ export function ElectionStatusPage() {
   const { statuses } = useElectionStatus();
   const { getName } = useUsers();
 
-  const showDataEntriesDiscardedAlert = location.hash.startsWith("#data-entries-discarded-") ? location.hash : null;
   const showFirstEntryResumedAlert = location.hash.startsWith("#data-entry-resumed-") ? location.hash : null;
   const showFirstEntryDiscardedAlert = location.hash.startsWith("#data-entry-discarded-") ? location.hash : null;
-  const successAlert =
-    showDataEntriesDiscardedAlert || showFirstEntryResumedAlert || showFirstEntryDiscardedAlert || undefined;
+  const successAlert = showFirstEntryResumedAlert || showFirstEntryDiscardedAlert || undefined;
 
   let pollingStationNumber = 0;
   let typist = "";
@@ -65,14 +63,14 @@ export function ElectionStatusPage() {
               ? t("election_status.success.data_entry_discarded", { nr: pollingStationNumber })
               : showFirstEntryResumedAlert
                 ? t("election_status.success.data_entry_resumed", { nr: pollingStationNumber, typist: typist })
-                : t("election_status.success.differences_resolved", { nr: pollingStationNumber })}
+                : null}
           </h2>
           <p>
             {showFirstEntryDiscardedAlert
               ? t("election_status.success.polling_station_can_be_filled_again")
               : showFirstEntryResumedAlert
                 ? t("election_status.success.typist_can_continue_data_entry")
-                : t("election_status.success.data_entries_discarded", { nr: pollingStationNumber })}
+                : null}
           </p>
         </Alert>
       )}

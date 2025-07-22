@@ -92,24 +92,6 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
   });
 
-  test("Both data entries discarded alert works", async () => {
-    const user = userEvent.setup();
-    const router = await renderPage();
-
-    // Expect the alert to not be visible
-    const alertHeading = "Verschil opgelost voor stembureau 33";
-    expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
-
-    // Set the hash to show the alert and expect it to be visible
-    await router.navigate({ hash: "data-entries-discarded-1" });
-    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
-
-    // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
-    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
-    await alertClosed;
-  });
-
   test("First data entry resumed alert works", async () => {
     const user = userEvent.setup();
     const router = await renderPage();

@@ -22,7 +22,6 @@ export function ResolveDifferencesPage() {
   const navigate = useNavigate();
   const afterSave = (status: DataEntryStatusName, firstEntryUserId: number | undefined) => {
     let nextPage = `/elections/${election.id}/status`;
-    let message = "";
 
     switch (status) {
       case "first_entry_has_errors":
@@ -39,13 +38,16 @@ export function ResolveDifferencesPage() {
         });
         break;
       case "first_entry_not_started":
-        message = `#data-entries-discarded-${pollingStation.id}`;
+        pushMessage({
+          title: t("election_status.success.differences_resolved", { nr: pollingStation.number }),
+          text: t("election_status.success.data_entries_discarded", { nr: pollingStation.number }),
+        });
         break;
       default:
         break;
     }
 
-    void navigate(nextPage + message);
+    void navigate(nextPage);
   };
 
   const pollingStationId = useNumericParam("pollingStationId");

@@ -66,6 +66,7 @@ pub struct LogFilterQuery {
     responses(
         (status = 200, description = "Audit log event list", body = AuditLogListResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -107,6 +108,7 @@ pub struct AuditLogUser {
     responses(
         (status = 200, description = "Audit log list of all users", body = Vec<AuditLogUser>),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]

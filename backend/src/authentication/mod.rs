@@ -44,7 +44,7 @@ mod tests {
     use tower::ServiceExt;
 
     use crate::{
-        AppState,
+        AppState, ErrorResponse,
         airgap::AirgapDetection,
         authentication::{
             api::{AccountUpdateRequest, Credentials, UserListResponse},
@@ -53,6 +53,7 @@ mod tests {
             session::Sessions,
             *,
         },
+        error::ErrorReference,
     };
 
     fn create_app(pool: SqlitePool) -> Router {
@@ -517,5 +518,32 @@ mod tests {
         assert_eq!(result.username(), "admin1");
         assert_eq!(result.fullname().unwrap(), "Test Full Name".to_string());
         assert_eq!(result.role(), Role::Administrator);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_forbidden_on_wrong_user_role(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+        let sessions = Sessions::new(pool);
+        // user id 5 is a typist
+        let session = sessions.create(5, SESSION_LIFE_TIME).await.unwrap();
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/user")
+                    .header("cookie", &cookie.encoded().to_string())
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::Forbidden);
     }
 }

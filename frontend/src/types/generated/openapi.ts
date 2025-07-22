@@ -672,6 +672,7 @@ export type ErrorReference =
   | "PollingStationRepeated"
   | "PollingStationValidationErrors"
   | "RequestPayloadTooLarge"
+  | "Forbidden"
   | "Unauthorized"
   | "UsernameNotUnique"
   | "UserNotFound"

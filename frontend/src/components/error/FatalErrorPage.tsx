@@ -16,12 +16,12 @@ interface FatalErrorPageProps {
   error?: Error;
 }
 
-export function FatalErrorPage({ title, message, code, reference, error }: FatalErrorPageProps) {
+export function FatalErrorPage({ title = "error.title", message, code, reference, error }: FatalErrorPageProps) {
   return (
     <AppLayout>
       {/* Show NavBar for / to avoid call to useElection outside ElectionProvider */}
       <NavBar location={{ pathname: "/" }} />
-      <Error title={title ? t(title) : t("error.title")} error={error}>
+      <Error title={t(title)} error={error}>
         {(code || reference) && (
           <p>
             {code && <strong>{code}</strong>}

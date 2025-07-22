@@ -145,6 +145,7 @@ pub async fn committee_session_update(
     responses(
         (status = 200, description = "Committee session number of voters changed successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Committee session not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),

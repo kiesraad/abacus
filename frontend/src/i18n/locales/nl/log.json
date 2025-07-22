@@ -50,7 +50,7 @@
     "UserCreated": "Gebruiker aangemaakt",
     "UserDeleted": "Gebruiker verwijderd",
     "UserLoggedIn": "Gebruiker ingelogd",
-    "UserLoginFailed": "Inlog door gebruiker mislukt",
+    "UserLoginFailed": "Mislukte inlogpoging",
     "UserLoggedOut": "Gebruiker uitgelogd",
     "UserSessionExtended": "Gebruikerssessie verlengd",
     "UserUpdated": "Gebruiker bijgewerkt",

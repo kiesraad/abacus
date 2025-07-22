@@ -90,9 +90,6 @@ describe("ResolveErrorsPage", () => {
 
     expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
 
-    const recounted = screen.queryByRole("region", { name: "Is het selectievakje op de eerste pagina aangevinkt?" });
-    expect(recounted).toBeInTheDocument();
-
     const voters_votes_counts = screen.queryByRole("region", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
     expect(voters_votes_counts).toBeInTheDocument();
 

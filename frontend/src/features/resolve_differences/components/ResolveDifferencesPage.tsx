@@ -20,7 +20,7 @@ import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 export function ResolveDifferencesPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
-  const afterSave = (status: DataEntryStatusName) => {
+  const afterSave = (status: DataEntryStatusName, firstEntryUserId: number | undefined) => {
     let nextPage = `/elections/${election.id}/status`;
     let message = "";
 
@@ -33,7 +33,10 @@ export function ResolveDifferencesPage() {
         nextPage = `/elections/${election.id}/status/${pollingStationId}/resolve-errors`;
         break;
       case "second_entry_not_started":
-        message = `#data-entry-kept-${pollingStation.id}`;
+        pushMessage({
+          title: t("election_status.success.differences_resolved", { nr: pollingStation.number }),
+          text: t("election_status.success.data_entry_kept", { typist: getName(firstEntryUserId) }),
+        });
         break;
       case "first_entry_not_started":
         message = `#data-entries-discarded-${pollingStation.id}`;

@@ -127,7 +127,7 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByLabelText(/De eerste invoer/));
     await user.click(submit);
     expect(resolve).toHaveBeenCalledWith("keep_first_entry");
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-kept-3");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
   test("should refresh election status and navigate to election status page after submit", async () => {
@@ -142,7 +142,41 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-kept-3");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
+  });
+
+  test("should show the first data entry user in the message after keeping the first entry", async () => {
+    const user = userEvent.setup();
+
+    await renderPage();
+    overrideResponseStatus("second_entry_not_started");
+    await user.click(await screen.findByLabelText("De eerste invoer (Gebruiker01)"));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau 35",
+      text: [
+        "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden.",
+        "Kies hiervoor een andere invoerder dan Gebruiker01.",
+      ].join(" "),
+    });
+  });
+
+  test("should show the second data entry user in the message after keeping the second entry", async () => {
+    const user = userEvent.setup();
+
+    await renderPage();
+    overrideResponseStatus("second_entry_not_started");
+    await user.click(await screen.findByLabelText("De tweede invoer (Gebruiker02)"));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau 35",
+      text: [
+        "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden.",
+        "Kies hiervoor een andere invoerder dan Gebruiker02.",
+      ].join(" "),
+    });
   });
 
   test("should navigate to election status page after submit with correct hash", async () => {

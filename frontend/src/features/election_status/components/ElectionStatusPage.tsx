@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router";
 
 import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
+import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -20,16 +21,11 @@ export function ElectionStatusPage() {
   const { statuses } = useElectionStatus();
   const { getName } = useUsers();
 
-  const showDataEntryKeptAlert = location.hash.startsWith("#data-entry-kept-") ? location.hash : null;
   const showDataEntriesDiscardedAlert = location.hash.startsWith("#data-entries-discarded-") ? location.hash : null;
   const showFirstEntryResumedAlert = location.hash.startsWith("#data-entry-resumed-") ? location.hash : null;
   const showFirstEntryDiscardedAlert = location.hash.startsWith("#data-entry-discarded-") ? location.hash : null;
   const successAlert =
-    showDataEntryKeptAlert ||
-    showDataEntriesDiscardedAlert ||
-    showFirstEntryResumedAlert ||
-    showFirstEntryDiscardedAlert ||
-    undefined;
+    showDataEntriesDiscardedAlert || showFirstEntryResumedAlert || showFirstEntryDiscardedAlert || undefined;
 
   let pollingStationNumber = 0;
   let typist = "";
@@ -76,12 +72,11 @@ export function ElectionStatusPage() {
               ? t("election_status.success.polling_station_can_be_filled_again")
               : showFirstEntryResumedAlert
                 ? t("election_status.success.typist_can_continue_data_entry")
-                : showDataEntryKeptAlert
-                  ? t("election_status.success.data_entry_kept", { typist: typist })
-                  : t("election_status.success.data_entries_discarded", { nr: pollingStationNumber })}
+                : t("election_status.success.data_entries_discarded", { nr: pollingStationNumber })}
           </p>
         </Alert>
       )}
+      <Messages />
       {committeeSession.status !== "data_entry_finished" &&
         statuses.length > 0 &&
         statuses.every((s) => s.status === "definitive") && (

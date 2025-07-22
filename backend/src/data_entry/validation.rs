@@ -58,7 +58,6 @@ pub enum ValidationResultCode {
     W202,
     W203,
     W205,
-    W206,
     W208,
     W301,
     W302,
@@ -293,31 +292,6 @@ impl Validate for PollingStationResults {
                 ],
                 code: ValidationResultCode::W203,
             });
-        }
-
-        if let Some(number_of_voters) = polling_station.number_of_voters {
-            // W.206 validate that total votes count and total voters count are not exceeding polling stations number of eligible voters
-            let mut fields = vec![];
-            if i64::from(total_votes_count) > number_of_voters {
-                fields.push(
-                    votes_counts_path
-                        .field("total_votes_cast_count")
-                        .to_string(),
-                );
-            }
-            if i64::from(total_voters_count) > number_of_voters {
-                fields.push(
-                    voters_counts_path
-                        .field("total_admitted_voters_count")
-                        .to_string(),
-                );
-            }
-            if !fields.is_empty() {
-                validation_results.warnings.push(ValidationResult {
-                    fields,
-                    code: ValidationResultCode::W206,
-                });
-            }
         }
 
         if total_voters_count < total_votes_count {
@@ -1414,50 +1388,6 @@ mod tests {
             vec![
                 "polling_station_results.votes_counts.votes_candidates_count",
                 "polling_station_results.political_group_votes"
-            ]
-        );
-    }
-
-    /// Tests validation warning W.206 when voters or votes exceed the eligible voter count.
-    #[test]
-    fn test_eligible_voters_threshold() {
-        let polling_station_results = PollingStationResults {
-            voters_counts: VotersCounts {
-                poll_card_count: 50,
-                proxy_certificate_count: 1,
-                total_admitted_voters_count: 51, // W.206 should not exceed polling stations eligible voters
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_count: 51,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 51, // W.206 should not exceed polling stations eligible voters
-            },
-            differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[51])],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(Some(i64::from(50)));
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 0);
-        assert_eq!(validation_results.warnings.len(), 1);
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W206
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
-                "polling_station_results.voters_counts.total_admitted_voters_count",
             ]
         );
     }

@@ -149,16 +149,6 @@
       "content": "Het totaal aantal uitgebrachte stemmen (H) is nul.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     }
   },
-  "W206": {
-    "typist": {
-      "title": "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
-      "content": "Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is hoger dan het aantal kiesgerechtigden voor dit stembureau.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    },
-    "coordinator": {
-      "title": "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
-      "content": "Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is hoger dan het aantal kiesgerechtigden voor dit stembureau.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    }
-  },
   "W208": {
     "typist": {
       "title": "Controleer A t/m D en E t/m H",

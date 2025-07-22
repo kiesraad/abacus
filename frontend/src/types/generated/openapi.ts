@@ -1053,7 +1053,6 @@ export type ValidationResultCode =
   | "W202"
   | "W203"
   | "W205"
-  | "W206"
   | "W208"
   | "W301"
   | "W302";

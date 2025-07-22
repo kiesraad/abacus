@@ -561,37 +561,6 @@ describe("Test VotersAndVotesForm", () => {
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
-    test("W.206 total admitted voters and total votes cast should not exceed polling stations number of eligible voters", async () => {
-      const user = userEvent.setup();
-
-      renderForm();
-
-      await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [validationResultMockData.W206] },
-      });
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackMessage =
-        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmenW.206Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is hoger dan het aantal kiesgerechtigden voor dit stembureau.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
-      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFieldIds = [votersFieldIds.totalAdmittedVotersCount, votesFieldIds.totalVotesCastCount];
-      const expectedValidFieldIds = [
-        votersFieldIds.pollCardCount,
-        votersFieldIds.proxyCertificateCount,
-        votesFieldIds.votesCandidatesCount,
-        votesFieldIds.blankVotesCount,
-        votesFieldIds.invalidVotesCount,
-      ];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
-    });
-
     test("W.208 EqualInput voters counts and votes counts", async () => {
       const user = userEvent.setup();
 

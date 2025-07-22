@@ -473,7 +473,7 @@ mod tests {
 
     use crate::authentication::{SECURE_COOKIES, api::set_default_cookie_properties};
 
-    #[test(sqlx::test)]
+    #[test(tokio::test)]
     async fn test_set_default_cookie_properties() {
         let mut cookie = Cookie::new("test-cookie", "");
 

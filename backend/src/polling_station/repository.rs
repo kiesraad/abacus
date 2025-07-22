@@ -4,7 +4,6 @@ use sqlx::{SqlitePool, query, query_as};
 use super::structs::{PollingStation, PollingStationRequest};
 use crate::AppState;
 
-#[derive(Clone)]
 pub struct PollingStations(SqlitePool);
 
 impl PollingStations {

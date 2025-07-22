@@ -1,4 +1,3 @@
-import { TranslationPath } from "@/i18n/i18n.types";
 import { ErrorResponse } from "@/types/generated/openapi";
 
 import { ApiErrorEvent, SessionExpirationEvent } from "./ApiEvents";
@@ -88,11 +87,10 @@ export class ApiClient extends EventTarget {
       const isError = isErrorResponse(body);
 
       // NOTE: the reference field references the error we should show to the user,
-      // We prefix it by `error.` to namespace the translation message.
+      // We prefix it by `error.api_error.` to get the translation key.
 
       if (response.status === 404 && isError) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        return new NotFoundError(`error.${body.reference}` as TranslationPath);
+        return new NotFoundError(`error.api_error.${body.reference}`);
       }
 
       if (response.status >= 400 && response.status <= 499 && isError) {

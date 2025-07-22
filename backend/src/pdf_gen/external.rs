@@ -1,4 +1,4 @@
-use std::{path::PathBuf, process::Command};
+use std::path::PathBuf;
 
 use rand::{Rng, distr::Alphanumeric};
 
@@ -6,18 +6,24 @@ use super::{PdfGenResult, models::PdfModel};
 use crate::APIError;
 
 pub async fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
-    Ok(
-        tokio::task::spawn_blocking(move || generate_pdf_internal(model))
-            .await
-            .map_err(PdfGenError::from)??,
-    )
+    Ok(generate_pdf_internal(model).await?)
+}
+
+pub async fn generate_pdfs(models: Vec<PdfModel>) -> Result<Vec<PdfGenResult>, APIError> {
+    let mut results = Vec::new();
+
+    for model in models {
+        results.push(generate_pdf_internal(model).await?);
+    }
+
+    Ok(results)
 }
 
 /// Uses environment variables `ABACUS_TYPST_BIN` (`typst` by default) and `ABACUS_TEMPLATES_DIR` (`./templates` by
 /// default) to generate a PDF using an external binary of typst.
-fn generate_pdf_internal(model: PdfModel) -> Result<PdfGenResult, PdfGenError> {
+async fn generate_pdf_internal(model: PdfModel) -> Result<PdfGenResult, PdfGenError> {
     // create a temporary copy of the template files
-    let tmp_path = prep_tmp_templates_dir()?;
+    let tmp_path = tokio::task::spawn_blocking(prep_tmp_templates_dir).await??;
 
     // write json data to model input file
     let json_path = {
@@ -26,11 +32,11 @@ fn generate_pdf_internal(model: PdfModel) -> Result<PdfGenResult, PdfGenError> {
         full_path
     };
     let json_data = model.get_input()?;
-    std::fs::write(json_path, json_data)?;
+    tokio::fs::write(json_path, json_data).await?;
 
     // construct the typst command to run
     let typst_binary = std::env::var("ABACUS_TYPST_BIN").unwrap_or("typst".into());
-    let mut command = Command::new(typst_binary);
+    let mut command = tokio::process::Command::new(typst_binary);
     command
         .args([
             "compile",
@@ -48,7 +54,7 @@ fn generate_pdf_internal(model: PdfModel) -> Result<PdfGenResult, PdfGenError> {
         .current_dir(&tmp_path);
 
     // get the command output
-    let res = command.output()?;
+    let res = command.output().await?;
 
     // remove the temporary directory
     std::fs::remove_dir_all(&tmp_path)?;

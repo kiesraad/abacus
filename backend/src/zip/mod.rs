@@ -4,37 +4,8 @@ use zip::{result::ZipError, write::SimpleFileOptions};
 
 use crate::APIError;
 
-fn slugify_filename(filename: &str) -> String {
+pub fn slugify_filename(filename: &str) -> String {
     filename.replace(" ", "_").replace("/", "-")
-}
-
-pub enum ZipContent {
-    Pdf(String, Vec<u8>),
-    Xml(String, Vec<u8>),
-}
-
-impl ZipContent {
-    pub fn filename(&self) -> String {
-        let filename = match self {
-            Self::Pdf(filename, _) => filename,
-            Self::Xml(filename, _) => filename,
-        };
-
-        // slugify the filename
-        let slugified = slugify_filename(filename);
-
-        match self {
-            Self::Pdf(_, _) => format!("{slugified}.pdf"),
-            Self::Xml(_, _) => format!("{slugified}.xml"),
-        }
-    }
-
-    pub fn content(self) -> Vec<u8> {
-        match self {
-            Self::Pdf(_, content) => content,
-            Self::Xml(_, content) => content,
-        }
-    }
 }
 
 pub struct ZipResponse {
@@ -43,6 +14,7 @@ pub struct ZipResponse {
 }
 
 impl ZipResponse {
+    /// Creates a new `ZipResponse` with the given filename.
     pub fn with_name(filename: &str) -> Self {
         let options = SimpleFileOptions::default()
             .compression_method(zip::CompressionMethod::DEFLATE)
@@ -63,14 +35,20 @@ impl ZipResponse {
         }
     }
 
-    pub fn create_zip(&self, files: Vec<ZipContent>) -> Result<Attachment<Vec<u8>>, APIError> {
+    /// Creates a zip archive containing the provided files.
+    /// Returns an `Attachment` with the zip data.
+    /// Returns an `APIError` if the zip creation fails.
+    pub fn create_zip(
+        &self,
+        files: Vec<(String, Vec<u8>)>,
+    ) -> Result<Attachment<Vec<u8>>, APIError> {
         let mut data = vec![];
         let mut cursor = std::io::Cursor::new(&mut data);
         let mut zip = zip::ZipWriter::new(&mut cursor);
 
-        for file in files.into_iter() {
-            zip.start_file(file.filename(), self.options)?;
-            zip.write_all(&file.content()).map_err(ZipError::Io)?;
+        for (name, content) in files.into_iter() {
+            zip.start_file(slugify_filename(&name), self.options)?;
+            zip.write_all(&content).map_err(ZipError::Io)?;
         }
 
         zip.finish()?;

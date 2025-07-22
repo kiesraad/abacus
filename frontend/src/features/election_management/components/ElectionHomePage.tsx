@@ -19,7 +19,7 @@ export function ElectionHomePage() {
   const { election, pollingStations } = useElection();
 
   const downloadNa31_2Bijlage1 = () => {
-    void downloadFrom(`/api/elections/${election.id}/download_na_31_2_bijlage_1`);
+    void downloadFrom(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
   };
 
   if (isTypist) {

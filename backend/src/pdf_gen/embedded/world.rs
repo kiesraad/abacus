@@ -9,6 +9,8 @@ use typst::{
     utils::LazyHash,
 };
 
+use crate::pdf_gen::PdfGenError;
+
 use super::super::models::PdfModel;
 
 /// Contains the context for rendering PDFs.
@@ -33,6 +35,7 @@ impl PdfWorld {
         let sources = load_sources();
         let (fonts, fontbook) = load_fonts();
         let assets = load_assets();
+
         PdfWorld {
             sources,
             fontbook: LazyHash::new(fontbook),
@@ -51,19 +54,26 @@ impl PdfWorld {
     ///
     /// The input model defines which template is being used and what the input
     /// for that template is.
-    pub fn set_input_model(&mut self, input: PdfModel) {
+    pub fn set_input_model(&mut self, input: PdfModel) -> Result<(), PdfGenError> {
         let main_source_path = input.as_template_path();
-        let main_source = self
+        let Some(main_source) = self
             .sources
             .iter()
             .find(|s| s.id().vpath().as_rootless_path() == main_source_path)
             .cloned()
-            .expect("could not find input model");
+        else {
+            return Err(PdfGenError::TemplateNotFound(
+                main_source_path.display().to_string(),
+            ));
+        };
+
         let input_path = input.as_input_path();
-        let input_data =
-            Bytes::from_string(input.get_input().expect("unable to parse JSON into model"));
+        let input_data = Bytes::from_string(input.get_input()?);
+
         self.main_source = main_source;
         self.input_data = (FileId::new(None, VirtualPath::new(input_path)), input_data);
+
+        Ok(())
     }
 }
 
@@ -159,6 +169,7 @@ fn load_sources() -> Vec<Source> {
         include_source!("common/style.typ"),
         include_source!("common/scripts.typ"),
         include_source!("model-na-31-2.typ"),
+        include_source!("model-na-31-2-bijlage1.typ"),
     ]
 }
 

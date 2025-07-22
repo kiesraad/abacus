@@ -545,9 +545,9 @@
         }
       }
     },
-    "/api/elections/{election_id}/download_na_31_2_bijlage_1": {
+    "/api/elections/{election_id}/download_na_31_2_bijlage1": {
       "get": {
-        "operationId": "election_download_na_31_2_bijlage_1",
+        "operationId": "election_download_na_31_2_bijlage1",
         "parameters": [
           {
             "name": "election_id",

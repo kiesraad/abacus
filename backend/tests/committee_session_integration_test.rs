@@ -7,8 +7,8 @@ use test_log::test;
 use crate::utils::serve_api;
 use abacus::committee_session::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionListResponse,
-    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-    status::CommitteeSessionStatus,
+    CommitteeSessionNumberOfVotersChangeRequest, CommitteeSessionStatusChangeRequest,
+    CommitteeSessionUpdateRequest, status::CommitteeSessionStatus,
 };
 
 pub mod shared;
@@ -188,6 +188,49 @@ async fn test_committee_session_status_change_not_found(pool: SqlitePool) {
         .await
         .unwrap();
 
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_committee_session_number_of_voters_change_works(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/committee_sessions/2/voters");
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .json(&CommitteeSessionNumberOfVotersChangeRequest {
+            number_of_voters: 12345,
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_committee_session_number_of_voters_change_not_found(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/committee_sessions/1/voters");
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .json(&CommitteeSessionNumberOfVotersChangeRequest {
+            number_of_voters: 0,
+        })
+        .send()
+        .await
+        .unwrap();
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }

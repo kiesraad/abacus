@@ -10,8 +10,8 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatusChangeRequest,
-    CommitteeSessionUpdateRequest,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
+    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
     repository::CommitteeSessions,
     status::{CommitteeSessionTransitionError, change_committee_session_status},
 };
@@ -38,6 +38,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_committee_session_list))
         .routes(routes!(committee_session_create))
         .routes(routes!(committee_session_update))
+        .routes(routes!(committee_session_number_of_voters_change))
         .routes(routes!(committee_session_status_change))
 }
 
@@ -151,6 +152,46 @@ pub async fn committee_session_update(
     Ok(StatusCode::OK)
 }
 
+/// Change the number of voters of a [CommitteeSession].
+#[utoipa::path(
+    put,
+    path = "/api/committee_sessions/{committee_session_id}/voters",
+    request_body = CommitteeSessionNumberOfVotersChangeRequest,
+    responses(
+        (status = 200, description = "Committee session number of voters changed successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("committee_session_id" = u32, description = "Committee session database id"),
+    ),
+)]
+pub async fn committee_session_number_of_voters_change(
+    _user: Coordinator,
+    State(committee_sessions_repo): State<CommitteeSessions>,
+    audit_service: AuditService,
+    Path(committee_session_id): Path<u32>,
+    Json(committee_session_request): Json<CommitteeSessionNumberOfVotersChangeRequest>,
+) -> Result<StatusCode, APIError> {
+    let committee_session = committee_sessions_repo
+        .change_number_of_voters(
+            committee_session_id,
+            committee_session_request.number_of_voters,
+        )
+        .await?;
+
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
+            None,
+        )
+        .await?;
+
+    Ok(StatusCode::OK)
+}
+
 /// Change the status of a [CommitteeSession].
 #[utoipa::path(
     put,
@@ -217,5 +258,19 @@ pub mod tests {
             .change_status(committee_session_id, status)
             .await
             .unwrap()
+    }
+
+    /// Create a test committee session.
+    pub fn committee_session_fixture(election_id: u32) -> CommitteeSession {
+        CommitteeSession {
+            id: 1,
+            number: 1,
+            election_id,
+            location: "Test location".to_string(),
+            start_date: "22-10-2025".to_string(),
+            start_time: "09:15".to_string(),
+            status: CommitteeSessionStatus::DataEntryFinished,
+            number_of_voters: 100,
+        }
     }
 }

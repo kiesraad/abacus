@@ -12,6 +12,7 @@ __Precondities:__
 - [Het GSB heeft de eerste zitting afgerond](./gsb-eerste-zitting.md#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-eerste-zitting-wolk)
 - [Het GSB behandelt een verzoek tot hertelling](./gsb-tweede-zitting.md#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
 
+
 ### Hoofdscenario en uitbreidingen
 
 __Trigger:__ Er is een corrigendum PV opgesteld.
@@ -23,4 +24,5 @@ __Hoofdscenario:__
 
 ### Open punten
 
+- Welke validaties moet de applicatie doen op de invoer? Zelfde als bij invoer eerste zitting.
 - Tekst foutmeldingen aanpassen? Om handelingsperspectief te geven als bijv. tellingen voor een kandidaat zijn aangepast, maar geen andere velden (totaal lijst, totaal geldige stemmen, etc).

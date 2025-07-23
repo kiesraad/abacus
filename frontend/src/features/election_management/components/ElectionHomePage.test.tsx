@@ -50,7 +50,7 @@ describe("ElectionHomePage", () => {
       ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
-      ["Aantal kiesgerechtigden", "100"],
+      ["Aantal kiesgerechtigden", "2.000"],
       ["Invoer doen voor", ""],
       ["Stembureaus", "8 stembureaus"],
       ["Type stemopneming", "Centrale stemopneming"],

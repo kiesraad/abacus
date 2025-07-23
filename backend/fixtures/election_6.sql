@@ -1,5 +1,5 @@
-INSERT INTO elections (id, name, counting_method, election_id, location, domain_id, number_of_voters, category, number_of_seats, election_date, nomination_date, political_groups)
-VALUES (6, 'Nieuwe Verkiezing', 'CSO','KleinDorp_2024', 'KleinDorp', '0123', 100, 'Municipal', 29, '2024-12-31', '2024-12-1',
+INSERT INTO elections (id, name, counting_method, election_id, location, domain_id, category, number_of_seats, election_date, nomination_date, political_groups)
+VALUES (6, 'Nieuwe Verkiezing', 'CSO','KleinDorp_2024', 'KleinDorp', '0123', 'Municipal', 29, '2024-12-31', '2024-12-1',
         '[
           {
             "number": 1,

@@ -16,7 +16,7 @@ import cls from "./ElectionManagement.module.css";
 
 export function ElectionHomePage() {
   const { isTypist } = useUserRole();
-  const { election, pollingStations, refetch } = useElection();
+  const { committeeSession, election, pollingStations, refetch } = useElection();
 
   // re-fetch election when component mounts
   useEffect(() => {
@@ -57,7 +57,11 @@ export function ElectionHomePage() {
           <div className="mb-xl">
             <div>
               <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.about_this_election")}</h3>
-              <ElectionInformationTable election={election} numberOfPollingStations={pollingStations.length} />
+              <ElectionInformationTable
+                election={election}
+                numberOfPollingStations={pollingStations.length}
+                numberOfVoters={committeeSession.number_of_voters}
+              />
             </div>
           </div>
         </article>

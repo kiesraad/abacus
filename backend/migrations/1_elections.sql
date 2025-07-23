@@ -6,7 +6,6 @@ CREATE TABLE elections
     election_id      TEXT                              NOT NULL,
     location         TEXT                              NOT NULL,
     domain_id        TEXT                              NOT NULL,
-    number_of_voters INTEGER                           NOT NULL,
     category         TEXT                              NOT NULL,
     number_of_seats  INTEGER                           NOT NULL,
     election_date    TEXT                              NOT NULL,

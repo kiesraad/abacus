@@ -174,7 +174,7 @@ pub struct ElectionAndCandidateDefinitionValidateRequest {
     candidate_data: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = Option<Vec<String>>, nullable = false)]
+    #[schema(value_type = Option<String>, nullable = false)]
     polling_station_data: Option<String>,
 }
 
@@ -246,6 +246,8 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     election_data: String,
     candidate_hash: [String; crate::eml::hash::CHUNK_COUNT],
     candidate_data: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = Option<Vec<String>>, nullable = false)]
     polling_station_data: Option<String>,
 }
 

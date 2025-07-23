@@ -61,7 +61,7 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
       return {
         ...state,
         election: action.response.election,
-        pollingStations: null,
+        pollingStations: undefined,
         electionDefinitionRedactedHash: action.response.hash,
         electionDefinitionData: action.electionDefinitionData,
         electionDefinitionFileName: action.electionDefinitionFileName,

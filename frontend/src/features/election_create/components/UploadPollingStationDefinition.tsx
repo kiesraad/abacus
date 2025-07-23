@@ -125,7 +125,7 @@ export function UploadPollingStationDefinition() {
               </Table.Body>
             </Table>
             <p className="mt-lg">
-              <button id="show-more" className={cls.button} onClick={showAll}>
+              <button id="show-more" className={cls.link} onClick={showAll}>
                 {t("election.polling_stations.show_all", { num: state.pollingStations.length })}
               </button>
             </p>
@@ -161,7 +161,7 @@ export function UploadPollingStationDefinition() {
       </FileInput>
 
       <p className="mt-lg">
-        <button className={cls.button} onClick={() => void skip()}>
+        <button className={cls.link} onClick={() => void skip()}>
           {t("election.polling_stations.skip_step")}
         </button>
       </p>

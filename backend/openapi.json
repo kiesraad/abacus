@@ -4218,6 +4218,12 @@
             "items": {
               "type": "string"
             }
+          },
+          "polling_station_data": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -4247,6 +4253,12 @@
             "items": {
               "type": "string"
             }
+          },
+          "polling_station_data": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -4289,6 +4301,15 @@
           },
           "hash": {
             "$ref": "#/components/schemas/RedactedEmlHash"
+          },
+          "polling_stations": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/PollingStationRequest"
+            }
           }
         }
       },

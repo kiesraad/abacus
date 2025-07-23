@@ -533,6 +533,7 @@ export interface ElectionAndCandidateDefinitionValidateRequest {
   candidate_hash?: string[];
   election_data: string;
   election_hash?: string[];
+  polling_station_data?: string[];
 }
 
 export interface ElectionAndCandidatesDefinitionImportRequest {
@@ -540,6 +541,7 @@ export interface ElectionAndCandidatesDefinitionImportRequest {
   candidate_hash: string[];
   election_data: string;
   election_hash: string[];
+  polling_station_data?: string | null;
 }
 
 /**
@@ -559,6 +561,7 @@ export type ElectionCategory = "Municipal";
 export interface ElectionDefinitionValidateResponse {
   election: NewElection;
   hash: RedactedEmlHash;
+  polling_stations?: PollingStationRequest[] | null;
 }
 
 export interface ElectionDetails {

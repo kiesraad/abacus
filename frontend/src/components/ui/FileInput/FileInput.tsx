@@ -12,8 +12,10 @@ interface FileInputProps extends InputProps {
 export function FileInput({ id, children, file, ...props }: FileInputProps) {
   return (
     <>
-      <Button.Label htmlFor={id}>{children}</Button.Label>
-      <input {...props} id={id} type="file" name={props.name || id} className={cls.fileInput} />
+      <div className={cls.fileInputBtn}>
+        <Button.Label htmlFor={id}>{children}</Button.Label>
+        <input {...props} id={id} type="file" name={props.name || id} className={cls.fileInput} />
+      </div>
       <label htmlFor={id} className={cls.selectedFile}>
         {file?.name || t("no_file_chosen")}
       </label>

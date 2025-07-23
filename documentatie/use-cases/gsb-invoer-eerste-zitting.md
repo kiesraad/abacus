@@ -39,14 +39,6 @@ __Uitbreidingen:__
 
 6a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
 
-
-### Open punten
-
-- Komt het inlegvel uit Abacus of is het onderdeel van de toolkit? (N10-1 wordt als typst template gemaakt dus het kan) -> kan beide, afhankelijk van het proces en de mogelijkheden van de gemeente
-- Hoe ziet het stoppen/blokkeren van invoer er precies uit?
-- CSO: invoerders vullen gegevens van Bijlage 1 in. DSO: invoerders vullen gegevens van N 10-1 en evt. Na 14-1 in. => input-/output-bestanden?
-
-
 ### Niet in scope
 
 - Controles op gemeenteniveau nadat alle stembureaus zijn ingevoerd:
@@ -243,6 +235,3 @@ __Uitbreidingen:__
 2a. De invoerder constateert dat hij/zij een fout heeft gemaakt in de invoer.  
 &emsp; 2a1. De invoerder corrigeert de fout in de invoer.  
 
-### Open punten
-
-- Als de coördinator GSB het PV terugstuurt in het proces, naar welk punt dan precies?

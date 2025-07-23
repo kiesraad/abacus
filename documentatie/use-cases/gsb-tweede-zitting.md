@@ -12,15 +12,16 @@ __Trigger:__ één of meer stembureaus moeten herteld worden n.a.v. verzoek CSB
 
 __Hoofdscenario:__  
 1. Het GSB ontvangt één of meerdere verzoeken tot onderzoek/hertelling van het CSB.
-2. Het GSB opent de zitting. (Wanneer dat gebeurt is een afweging van het GSB: liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten)
-3. De coördinator GSB geeft in de applicatie aan dat de zitting is geopend en voert de locatie en starttijd in. Hiermee wordt de vorige zitting in de applicatie gesloten.
-4. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
-5. De coördinator GSB maakt de GSB PVs en het EML_NL-bestand aan: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB).
-6. Het GSB voert de andere onderdelen van het GSB-corrigendum in.
-7. Het GSB leest de PV's voor: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
-8. Het GSB ondertekent de PV's.
-9. Het GSB sluit de zitting.
-10. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+2. [De coördinator GSB bereidt de documenten voor de zitting voor.](#de-coördinator-gsb-bereidt-de-documenten-voor-de-zitting-voor-zee)
+3. Het GSB opent de zitting. (Wanneer dat gebeurt is een afweging van het GSB: liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten)
+4. De coördinator GSB geeft in de applicatie aan dat de zitting is geopend en voert de locatie en starttijd in. Hiermee wordt de vorige zitting in de applicatie gesloten.
+5. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
+6. De coördinator GSB maakt de GSB PVs en het EML_NL-bestand aan: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB).
+7. Het GSB voert de andere onderdelen van het GSB-corrigendum in.
+8. Het GSB leest de PV's voor: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
+9. Het GSB ondertekent de PV's.
+10. Het GSB sluit de zitting.
+11. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 
 __Uitbreidingen:__
 
@@ -44,10 +45,9 @@ __Uitbreidingen:__
 ### Open punten
 - We willen zoveel mogelijk van het PV in de applicatie invoeren. Dus idealiter worden alleen de handtekeningen van de GSB-leden met pen gezet. Dat is niet wat er op dit moment in de use cases staat.
 
+## De coördinator GSB bereidt de documenten voor de zitting voor (zee)
 
-## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)
-
-__Niveau:__ hoog-over, vlieger, 🪁
+__Niveau:__ gebruikersdoel, zee, 🌊
 
 ### Hoofdscenario en uitbreidingen
 
@@ -56,15 +56,9 @@ __Hoofdscenario:__
 1. De coördinator GSB selecteert een stembureau en voert "Aanleiding van het onderzoek" (vrije tekst) in de applicatie in.
 2. De applicatie genereert een 'leeg' corrigendum, Na 14-1 versie 2 (DSO) of Bijlage 1 van Na 14-2 (CSO). ('leeg' == klaar om in te vullen: kandidatenlijst, oorspr. tellingen, verzoek CSB (aanleiding))
 3. De coördinator GSB drukt het 'lege' corrigendum af.
-4. Het GSB voert het onderzoek uit.
-5. Het GSB noteert de bevindingen op het corrigendum.
-6. Het GSB besluit dat er een hertelling nodig is.
-7. Het GSB stelt een ander resultaat vast in de hertelling.
-8. De coördinator voert de uitkomst van het onderzoek in de applicatie in.
-9. [De invoerders voeren de hertelling in de applicatie in.](./gsb-invoer-tweede-zitting.md#de-invoerders-voeren-de-hertelling-in-de-applicatie-in-vlieger)
-10. Het GSB voegt het corrigendum toe aan de PV's van de zitting.
 
 __Uitbreidingen:__  
+
 1a. Het GSB besluit om n.a.v. een verzoek additionele stembureaus te onderzoeken:  
 &emsp; 1a1. De coördinator GSB selecteert een stembureau en voert "Aanleiding van het onderzoek" (vrije tekst) in de applicatie in.  
 
@@ -79,17 +73,29 @@ __Uitbreidingen:__
 1d. De coördinator GSB ontdekt dat een stembureau ten onrechte is meegenomen in een eerdere zitting.  
 &emsp; 1d1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau.  
 
-6a. Het GSB besluit dat er geen hertelling nodig is:  
-&emsp; 6a1. De coördinator GSB voert de uitkomst van het onderzoek in de applicatie in.  
-&emsp; 6a2. Het GSB voegt het corrigendum toe aan de PV's van de zitting.  
 
-7a. Het GSB bevestigt het oorspronkelijke resultaat in de hertelling:  
-&emsp; 7a1. De coördinator GSB voert de uitkomst van het onderzoek in de applicatie in.  
-&emsp; 7a2. Het GSB voegt het corrigendum toe aan de PV's van de zitting.  
+## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)
 
-### Open punten
+__Niveau:__ hoog-over, vlieger, 🪁
 
-- 'leeg' corrigendum is geen heel goede term
-    - Moet je kunnen selecteren welke lijsten er opgenomen moeten worden in het 'lege' corrigendum? Nee, want nieuwe modellen: corrigendum bevat aantallen modellen vorige zitting (niet: eerste zitting tenzij dat de vorige zitting is), dus handig om alle lijsten in corrigendum te hebben.
-- Hoe expliciet willen we zijn over de verschillende momenten waarop welke onderdelen van het corrigendum afgedrukt kunnen worden?
-- Als de coördinator GSB de overige bladzijdes afdrukt, vult deze dan op dat moment ook al de resultaten van het onderzoek in?
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__  
+
+1. Het GSB voert het onderzoek uit.
+2. Het GSB noteert de bevindingen op het corrigendum.
+3. Het GSB besluit dat er een hertelling nodig is.
+4. Het GSB stelt een ander resultaat vast in de hertelling.
+5. De coördinator voert de uitkomst van het onderzoek in de applicatie in.
+6. De invoerders voeren de hertelling in de applicatie in volgens de systematiek die voor de eerste invoer wordt gebruikt.
+7. Het GSB voegt het corrigendum toe aan de PV's van de zitting.
+
+__Uitbreidingen:__  
+
+3a. Het GSB besluit dat er geen hertelling nodig is:  
+&emsp; 3a1. De coördinator GSB voert de uitkomst van het onderzoek in de applicatie in.  
+&emsp; 3a2. Het GSB voegt het corrigendum toe aan de PV's van de zitting.  
+
+4a. Het GSB bevestigt het oorspronkelijke resultaat in de hertelling:  
+&emsp; 4a1. De coördinator GSB voert de uitkomst van het onderzoek in de applicatie in.  
+&emsp; 4a2. Het GSB voegt het corrigendum toe aan de PV's van de zitting.  

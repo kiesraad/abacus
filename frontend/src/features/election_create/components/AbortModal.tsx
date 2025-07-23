@@ -78,7 +78,7 @@ export function AbortModal() {
           }}
           type="button"
         >
-          {t("election.abort.save_input")}
+          {t("election.abort.keep_input")}
         </Button>
       </nav>
     </Modal>

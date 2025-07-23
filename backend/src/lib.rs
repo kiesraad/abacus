@@ -10,7 +10,10 @@ use axum::{
     serve::ListenerExt,
 };
 use hyper::http::{HeaderName, HeaderValue, header};
-use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
+use sqlx::{
+    SqlitePool,
+    sqlite::{SqliteConnectOptions, SqliteJournalMode},
+};
 use tokio::{net::TcpListener, signal};
 use tower_http::{
     set_header::SetResponseHeaderLayer,
@@ -260,7 +263,9 @@ pub async fn create_sqlite_pool(
     #[cfg(feature = "dev-database")] seed_data: bool,
 ) -> Result<SqlitePool, Box<dyn Error>> {
     let db = format!("sqlite://{database}");
-    let opts = SqliteConnectOptions::from_str(&db)?.create_if_missing(true);
+    let opts = SqliteConnectOptions::from_str(&db)?
+        .create_if_missing(true)
+        .journal_mode(SqliteJournalMode::Wal);
 
     #[cfg(feature = "dev-database")]
     if reset_database {

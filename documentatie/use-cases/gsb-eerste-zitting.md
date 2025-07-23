@@ -51,32 +51,15 @@ __Uitbreidingen:__
 ### Niet in scope
 
 - "8a1. Het GSB stelt het bezwaar vast." Wat gebeurt hier precies?
-- Elektronische handtekening van documenten.
 - CSO: Invullen van "Bijlage 2: Bezwaren van aanwezigen op stembureaus" in de applicatie. Wordt wel handmatig toegevoegd aan het geprinte PV door coördinator GSB.
 - Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Dit gaan we niet faciliteren in de applicatie.
 - Invoeren van het resultaat controleprotocol (handmatige controle optellingen software). N.B. Als het controleprotocol verschillen oplevert, dan is er een probleem met het PV uit de applicatie en kan dat PV dus niet gebruikt worden.
-- Het GSB faciliteren in het berekenen van een voorlopige zetelverdeling. (nooit in scope)
 
 
 ### Open punten
 
-- We willen zoveel mogelijk van het PV in de applicatie invoeren. Dus idealiter worden alleen de handtekeningen van de GSB-leden met pen gezet. Dat is niet wat er op dit moment in de use cases staat.
-- Hoe ziet de overdracht van het EML_NL bestand van GSB naar CSB binnen de applicatie er precies uit?
-  - De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
-  - Proces via uitwisselplatform loopt parallel.
-- Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het PV?
 - Moet de applicatie een preview van het te genereren PV tonen, zodat de coördinator GSB die kan controleren en eventuele fouten kan herstellen?
   - Preview: bestand genereren met "concept" in watermerk en in bestandsnaam.
-- Zijn de invoervelden voor de tellingen van een stembureau voor DSO gelijk aan die van CSO?
-  - Waarschijnlijk niet, bijvoorbeeld geen "Is er herteld?" op SB PV.
-  - Nieuwe modellen op nalopen.
-- Is het wenselijk om een 'leeg' corrigendum (wel ingevuld: kandidatenlijsten (keuze welke lijsten), stembureau(?), gemeente, oorspronkelijke resultaten?) te kunnen genereren in applicatie?
-  - N 10-1 (PV SB DSO) en Na 14-1 versie 1 (corrigendum op PV SB DSO)
-  - Ja.
-  - Meerdere opties mogelijk:
-    - minimaal kandidatenlijst en gemeente
-    - extra: stembureau en oorspronkelijke resultaten SB
-
 
 ## De coördinator GSB bewerkt de stembureaus tijdens de eerste of nieuwe zitting (zee)
 
@@ -101,7 +84,6 @@ __Hoofdscenario 2:__
 
 - Het opnemen van andere bijzonderheden i.v.m. stembureaus in het proces-verbaal, bijv. stembureau dat halverwege de dag werd gesloten. Dit hoort in de bezwaren en bijzonderheden van dat betreffende stembureau.
 
-
 ## De coördinator GSB maakt het PV en het digitale bestand aan (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
@@ -109,8 +91,8 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__  
+
 1. De applicatie stelt vast dat alle stembureaus definitieve invoer hebben
 2. De coördinator GSB sluit de invoerfase af
 3. De coördinator GSB genereert het [PV en het digitale bestand](./input-output-bestanden.md#gsb).
 4. De coördinator GSB voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
-

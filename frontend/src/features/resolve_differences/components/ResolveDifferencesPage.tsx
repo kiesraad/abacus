@@ -6,6 +6,7 @@ import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
@@ -17,26 +18,32 @@ import { ResolveDifferencesOverview } from "./ResolveDifferencesOverview";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 export function ResolveDifferencesPage() {
+  const { pushMessage } = useMessages();
   const navigate = useNavigate();
-  const afterSave = (status: DataEntryStatusName) => {
-    let nextPage = `/elections/${election.id}/status`;
-    let message = "";
-
+  const afterSave = (status: DataEntryStatusName, firstEntryUserId: number | undefined) => {
     switch (status) {
       case "first_entry_has_errors":
-        nextPage = `/elections/${election.id}/status/${pollingStationId}/resolve-errors`;
+        pushMessage({
+          title: t("resolve_errors.differences_resolved", { number: pollingStation.number }),
+          text: t("resolve_errors.alert_contains_errors"),
+        });
+        void navigate(`/elections/${election.id}/status/${pollingStationId}/resolve-errors`);
         break;
       case "second_entry_not_started":
-        message = `#data-entry-kept-${pollingStation.id}`;
+        pushMessage({
+          title: t("election_status.success.differences_resolved", { nr: pollingStation.number }),
+          text: t("election_status.success.data_entry_kept", { typist: getName(firstEntryUserId) }),
+        });
+        void navigate(`/elections/${election.id}/status`);
         break;
       case "first_entry_not_started":
-        message = `#data-entries-discarded-${pollingStation.id}`;
-        break;
-      default:
+        pushMessage({
+          title: t("election_status.success.differences_resolved", { nr: pollingStation.number }),
+          text: t("election_status.success.data_entries_discarded", { nr: pollingStation.number }),
+        });
+        void navigate(`/elections/${election.id}/status`);
         break;
     }
-
-    void navigate(nextPage + message);
   };
 
   const pollingStationId = useNumericParam("pollingStationId");

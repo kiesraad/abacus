@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   ElectionListRequestHandler,
@@ -27,6 +28,8 @@ vi.mock("react-router", async (importOriginal) => ({
   useLocation: () => ({ pathname: "/" }),
 }));
 
+vi.mock("@/hooks/messages/useMessages");
+
 const renderPage = async () => {
   render(
     <TestUserProvider userRole="coordinator">
@@ -43,7 +46,10 @@ const renderPage = async () => {
 };
 
 describe("ResolveErrorsPage", () => {
+  const pushMessage = vi.fn();
+
   beforeEach(() => {
+    vi.mocked(useMessages).mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
@@ -62,9 +68,7 @@ describe("ResolveErrorsPage", () => {
     expect(
       await screen.findByRole("heading", { level: 3, name: "Wat wil je doen met de invoer in Abacus?" }),
     ).toBeVisible();
-    expect(
-      await screen.findByLabelText(/Invoer bewaren en correcties laten invoeren door Sanne Molenaar/),
-    ).toBeVisible();
+    expect(await screen.findByLabelText(/Invoer bewaren en correcties laten invoeren door Gebruiker01/)).toBeVisible();
     expect(await screen.findByLabelText(/Stembureau opnieuw laten invoeren/)).toBeVisible();
   });
 
@@ -82,7 +86,12 @@ describe("ResolveErrorsPage", () => {
     await user.click(submit);
 
     expect(resolve).toHaveBeenCalledWith("resume_first_entry");
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-resumed-5");
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Stembureau 37 teruggegeven aan Gebruiker01",
+      text: "De invoerder kan verder met invoeren",
+    });
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
   test("should refresh election status and navigate to election status page after submit", async () => {
@@ -96,6 +105,11 @@ describe("ResolveErrorsPage", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-discarded-5");
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Invoer stembureau 37 verwijderd",
+      text: "Het stembureau kan opnieuw ingevoerd worden",
+    });
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 });

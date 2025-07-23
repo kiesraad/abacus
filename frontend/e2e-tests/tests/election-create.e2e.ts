@@ -10,7 +10,7 @@ import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/c
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
 import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
-import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
+import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
 import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
 import { NavBar } from "e2e-tests/page-objects/NavBarPgObj";
@@ -87,9 +87,9 @@ test.describe("Election creation", () => {
     await overviewPage.create.click();
 
     // Upload election
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, eml110a.path);
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110a.path);
 
     // Wrong hash
     const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
@@ -104,10 +104,10 @@ test.describe("Election creation", () => {
     await overviewPage.create.click();
 
     // Incorrect file
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, eml110b.path);
-    await expect(uploadDefinitionPage.error).toBeVisible();
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110b.path);
+    await expect(uploadElectionDefinitionPage.error).toBeVisible();
   });
 
   test("it fails on incorrect hash for candidate list", async ({ page }) => {
@@ -150,9 +150,9 @@ test.describe("Election creation", () => {
     const overviewPage = new OverviewPgObj(page);
     await overviewPage.create.click();
 
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, eml110a.path);
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110a.path);
 
     const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
@@ -175,9 +175,9 @@ test.describe("Election creation", () => {
     const overviewPage = new OverviewPgObj(page);
     await overviewPage.create.click();
 
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, eml110a.path);
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110a.path);
 
     const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
@@ -200,9 +200,9 @@ test.describe("Election creation", () => {
     const overviewPage = new OverviewPgObj(page);
     await overviewPage.create.click();
 
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, eml110a.path);
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110a.path);
 
     const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
     await expect(checkDefinitionPage.header).toBeVisible();
@@ -257,9 +257,8 @@ test.describe("Election creation", () => {
     // Back button
     await page.goBack();
 
-    // We should be back at the candidate page
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
   });
 
   test("after candidate upload, moving back to candidate page resets candidates", async ({ page }) => {
@@ -289,16 +288,16 @@ test.describe("Election creation", () => {
     await page.goto("/elections/create/list-of-candidates");
 
     // Upload election
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
   });
 
   test("navigate to check-and-save should redirect to create", async ({ page }) => {
     await page.goto("/elections/create/check-and-save");
 
     // Upload election
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
   });
 
   // upload election and candidates, then go to start and upload new election,
@@ -319,14 +318,14 @@ test.describe("Election creation", () => {
     await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
 
     // Now upload a new election
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
     await page.goto("/elections/create");
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, eml110a.path);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110a.path);
 
     // Back button
     await page.goBack();
-    await expect(uploadDefinitionPage.header).toBeVisible();
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
   });
 
   test("after the successful creation of new election, the back button should redirect to the beginning", async ({
@@ -357,8 +356,8 @@ test.describe("Election creation", () => {
     await page.goBack();
 
     // We should be at the election upload page, not the check-and-save
-    const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
   });
 
   test("it fails on valid, but incorrect polling station file", async ({ page }) => {
@@ -373,11 +372,11 @@ test.describe("Election creation", () => {
     await uploadCandidatesAndInputHash(page);
 
     // upload wrong file
-    const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, eml110a.path);
-    await expect(uploadDefinitionPage.main).toContainText(eml110a.filename);
-    await expect(uploadDefinitionPage.error).toBeVisible();
+    const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110a.path);
+    await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
+    await expect(uploadElectionDefinitionPage.error).toBeVisible();
   });
 
   test("show more button should show full list of polling stations", async ({ page }) => {
@@ -391,10 +390,10 @@ test.describe("Election creation", () => {
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
 
-    const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, eml110b.path);
-    await expect(uploadDefinitionPage.main).toContainText(eml110b.filename);
+    const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110b.path);
+    await expect(uploadElectionDefinitionPage.main).toContainText(eml110b.filename);
 
     // Check list of polling stations
     const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
@@ -420,10 +419,10 @@ test.describe("Election creation", () => {
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
 
-    const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.uploadFile(page, eml110b_short.path);
-    await expect(uploadDefinitionPage.main).toContainText(eml110b_short.filename);
+    const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110b_short.path);
+    await expect(uploadElectionDefinitionPage.main).toContainText(eml110b_short.filename);
 
     // Check list of polling stations
     const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);

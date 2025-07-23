@@ -61,7 +61,7 @@ export function AbortModal() {
       {tx("election.abort.description")}
       <nav>
         <Button
-          size="lg"
+          size="xl"
           variant="primary-destructive"
           onClick={() => {
             onAbortModalDelete();

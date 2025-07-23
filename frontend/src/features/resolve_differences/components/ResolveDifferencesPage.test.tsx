@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import cls from "@/features/resolve_differences/components/ResolveDifferences.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   ElectionListRequestHandler,
@@ -31,6 +32,8 @@ vi.mock("react-router", async (importOriginal) => ({
   useLocation: () => ({ pathname: "/" }),
 }));
 
+vi.mock("@/hooks/messages/useMessages");
+
 const renderPage = async () => {
   render(
     <TestUserProvider userRole="coordinator">
@@ -51,7 +54,11 @@ function overrideResponseStatus(status: DataEntryStatusName) {
 }
 
 describe("ResolveDifferencesPage", () => {
+  const pushMessage = vi.fn();
+
   beforeEach(() => {
+    vi.mocked(useMessages).mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
+
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
@@ -121,7 +128,7 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByLabelText(/De eerste invoer/));
     await user.click(submit);
     expect(resolve).toHaveBeenCalledWith("keep_first_entry");
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-kept-3");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
   test("should refresh election status and navigate to election status page after submit", async () => {
@@ -136,10 +143,44 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-kept-3");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
-  test("should navigate to election status page after submit with correct hash", async () => {
+  test("should show the first data entry user in the message after keeping the first entry", async () => {
+    const user = userEvent.setup();
+
+    await renderPage();
+    overrideResponseStatus("second_entry_not_started");
+    await user.click(await screen.findByLabelText("De eerste invoer (Gebruiker01)"));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau 35",
+      text: [
+        "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden.",
+        "Kies hiervoor een andere invoerder dan Gebruiker01.",
+      ].join(" "),
+    });
+  });
+
+  test("should show the second data entry user in the message after keeping the second entry", async () => {
+    const user = userEvent.setup();
+
+    await renderPage();
+    overrideResponseStatus("second_entry_not_started");
+    await user.click(await screen.findByLabelText("De tweede invoer (Gebruiker02)"));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau 35",
+      text: [
+        "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden.",
+        "Kies hiervoor een andere invoerder dan Gebruiker02.",
+      ].join(" "),
+    });
+  });
+
+  test("should navigate to election status page after submit and push message", async () => {
     const user = userEvent.setup();
 
     await renderPage();
@@ -148,7 +189,11 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByLabelText(/Geen van beide/));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entries-discarded-3");
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau 35",
+      text: "Omdat beide invoeren zijn verwijderd, moet stembureau 35 twee keer opnieuw ingevoerd worden.",
+    });
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
   test("should navigate to resolve errors page after keeping second entry which has errors", async () => {
@@ -160,6 +205,10 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByLabelText(/De tweede invoer/));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau 35",
+      text: "Let op: het proces-verbaal bevat fouten die moeten worden opgelost",
+    });
     expect(navigate).toHaveBeenCalledWith("/elections/1/status/3/resolve-errors");
   });
 });

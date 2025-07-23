@@ -1,6 +1,7 @@
 import { Outlet } from "react-router";
 
 import { NotFoundError } from "@/api/ApiResult";
+import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { Badge } from "@/components/ui/Badge/Badge";
@@ -39,6 +40,7 @@ export function ResolveErrorsLayout() {
           <Badge type="first_entry_has_errors" />
         </section>
       </header>
+      <Messages />
       <main className={cls.resolveErrors}>
         <StickyNav>
           <ResolveErrorsNavigation structure={structure} validationResults={dataEntry.validation_results} />

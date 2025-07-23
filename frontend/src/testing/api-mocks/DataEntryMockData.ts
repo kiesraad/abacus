@@ -157,7 +157,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
 export const dataEntryGetErrorsMockResponse: DataEntryGetErrorsResponse = {
   finalised_first_entry: getEmptyDataEntryRequest().data,
   first_entry_finished_at: "",
-  first_entry_user_id: 1,
+  first_entry_user_id: 3,
   validation_results: {
     errors: [validationResultMockData.F201],
     warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W301],

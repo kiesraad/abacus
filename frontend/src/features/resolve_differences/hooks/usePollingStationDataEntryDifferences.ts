@@ -34,7 +34,7 @@ interface PollingStationDataEntryStatus {
 
 export function usePollingStationDataEntryDifferences(
   pollingStationId: number,
-  afterSave: (status: DataEntryStatusName) => void,
+  afterSave: (status: DataEntryStatusName, firstEntryUserId: number | undefined) => void,
 ): PollingStationDataEntryStatus {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
@@ -82,7 +82,13 @@ export function usePollingStationDataEntryDifferences(
     if (isSuccess(response)) {
       // reload the election status data then navigate according to new status
       await electionContext?.refetch();
-      afterSave(response.data.status);
+      let firstEntryUserId = undefined;
+      if (differences && action === "keep_first_entry") {
+        firstEntryUserId = differences.first_entry_user_id;
+      } else if (differences && action === "keep_second_entry") {
+        firstEntryUserId = differences.second_entry_user_id;
+      }
+      afterSave(response.data.status, firstEntryUserId);
     } else {
       setError(response);
     }

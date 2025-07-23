@@ -2719,6 +2719,27 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/UserLoginFailedDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserLoginFailed"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/UserLoggedOutDetails"
               },
               {
@@ -5406,6 +5427,21 @@
             "type": "integer",
             "format": "int64",
             "minimum": 0
+          }
+        }
+      },
+      "UserLoginFailedDetails": {
+        "type": "object",
+        "required": [
+          "username",
+          "userAgent"
+        ],
+        "properties": {
+          "userAgent": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
           }
         }
       },

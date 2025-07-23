@@ -38,7 +38,7 @@ mod tests {
         middleware,
     };
     use http_body_util::BodyExt;
-    use hyper::{Method, header::CONTENT_TYPE};
+    use hyper::{Method, header::CONTENT_TYPE, header::USER_AGENT};
     use sqlx::SqlitePool;
     use test_log::test;
     use tower::ServiceExt;
@@ -46,6 +46,7 @@ mod tests {
     use crate::{
         AppState, ErrorResponse,
         airgap::AirgapDetection,
+        audit_log::{AuditEvent, AuditLog, LogFilter, UserLoginFailedDetails},
         authentication::{
             api::{AccountUpdateRequest, Credentials, UserListResponse},
             middleware::extend_session,
@@ -133,6 +134,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_login_error(pool: SqlitePool) {
+        let audit_log = AuditLog::new(pool.clone());
         let app = create_app(pool);
 
         let response = app
@@ -141,6 +143,7 @@ mod tests {
                     .method(Method::POST)
                     .uri("/api/user/login")
                     .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, "Servo/1.0")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
                             username: "admin".to_string(),
@@ -154,6 +157,23 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+        let events = audit_log
+            .list(&LogFilter {
+                limit: 10,
+                ..Default::default()
+            })
+            .await
+            .unwrap();
+
+        assert_eq!(events.len(), 1);
+        assert_eq!(
+            events[0].event(),
+            &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
+                username: "admin".to_string(),
+                user_agent: "Servo/1.0".to_string(),
+            })
+        );
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

@@ -58,7 +58,6 @@ pub enum ValidationResultCode {
     W202,
     W203,
     W205,
-    W208,
     W301,
     W302,
 }
@@ -265,17 +264,6 @@ impl Validate for PollingStationResults {
             &voters_counts_path,
         )?;
 
-        // W.208 validate that the numbers in voters_counts and votes_counts are not the same
-        if identical_voters_counts_and_votes_counts(&self.voters_counts, &self.votes_counts) {
-            validation_results.warnings.push(ValidationResult {
-                fields: vec![
-                    voters_counts_path.to_string(),
-                    votes_counts_path.to_string(),
-                ],
-                code: ValidationResultCode::W208,
-            });
-        }
-
         // W.203 validate that the difference between total votes count and total voters count is not above threshold
         if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
             total_voters_count,
@@ -457,29 +445,6 @@ impl Validate for Count {
         }
         Ok(())
     }
-}
-
-/// Check if all voters counts and votes counts are equal to zero.
-/// Used in validations where this is an edge case that needs to be handled.
-fn all_zero_voters_counts_and_votes_counts(voters: &VotersCounts, votes: &VotesCounts) -> bool {
-    voters.poll_card_count == 0
-        && voters.proxy_certificate_count == 0
-        && voters.total_admitted_voters_count == 0
-        && votes.votes_candidates_count == 0
-        && votes.blank_votes_count == 0
-        && votes.invalid_votes_count == 0
-        && votes.total_votes_cast_count == 0
-}
-
-/// Check if the voters counts and votes counts are identical, which should result in a warning.
-///
-/// This is not implemented as Eq because there is no true equality relation
-/// between these two sets of numbers.
-fn identical_voters_counts_and_votes_counts(voters: &VotersCounts, votes: &VotesCounts) -> bool {
-    !all_zero_voters_counts_and_votes_counts(voters, votes)
-        && voters.poll_card_count == votes.votes_candidates_count
-        && voters.proxy_certificate_count == votes.blank_votes_count
-        && voters.total_admitted_voters_count == votes.total_votes_cast_count
 }
 
 impl Validate for VotersCounts {
@@ -1392,53 +1357,6 @@ mod tests {
         );
     }
 
-    /// Tests validation warning W.208 when voters counts and votes counts are identical.
-    #[test]
-    fn test_identical_counts_validation() {
-        let mut validation_results = ValidationResults::default();
-        // test W.208 equal input
-        let polling_station_results = PollingStationResults {
-            voters_counts: VotersCounts {
-                // W.208 equal input
-                poll_card_count: 1000,
-                proxy_certificate_count: 1,
-                total_admitted_voters_count: 1001,
-            },
-            votes_counts: VotesCounts {
-                // W.208 equal input
-                votes_candidates_count: 1000,
-                blank_votes_count: 1,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 1001,
-            },
-            differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[1000])],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 0);
-        assert_eq!(validation_results.warnings.len(), 1);
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W208
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.voters_counts",
-                "polling_station_results.votes_counts"
-            ]
-        );
-    }
-
     /// Tests validation of VotersCounts including out-of-range values and incorrect totals (F.201).
     #[test]
     fn test_voters_counts_validation() {
@@ -2010,36 +1928,6 @@ mod tests {
 
         assert!(!result2.has_warnings());
         assert!(!result2.has_errors());
-    }
-
-    /// Tests the all_zero_voters_counts_and_votes_counts helper function with various input combinations.
-    #[test]
-    fn test_all_zero_counts() {
-        let voters = VotersCounts {
-            poll_card_count: 100,
-            proxy_certificate_count: 2,
-            total_admitted_voters_count: 105,
-        };
-        let votes = VotesCounts {
-            votes_candidates_count: 100,
-            blank_votes_count: 2,
-            invalid_votes_count: 2,
-            total_votes_cast_count: 104,
-        };
-        assert!(!all_zero_voters_counts_and_votes_counts(&voters, &votes));
-
-        let voters = VotersCounts {
-            poll_card_count: 0,
-            proxy_certificate_count: 0,
-            total_admitted_voters_count: 0,
-        };
-        let votes = VotesCounts {
-            votes_candidates_count: 0,
-            blank_votes_count: 0,
-            invalid_votes_count: 0,
-            total_votes_cast_count: 0,
-        };
-        assert!(all_zero_voters_counts_and_votes_counts(&voters, &votes));
     }
 
     /// Tests that when more_ballots_count exactly matches the calculated difference, warning W.301 is avoided.

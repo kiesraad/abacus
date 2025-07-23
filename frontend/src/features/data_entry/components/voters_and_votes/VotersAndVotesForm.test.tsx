@@ -560,37 +560,6 @@ describe("Test VotersAndVotesForm", () => {
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
-
-    test("W.208 EqualInput voters counts and votes counts", async () => {
-      const user = userEvent.setup();
-
-      renderForm();
-
-      await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [validationResultMockData.W208] },
-      });
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackMessage =
-        "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
-      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-      // When all fields on a page are (potentially) invalid, we do not mark them as so
-      const expectedValidFieldIds = [
-        votersFieldIds.pollCardCount,
-        votersFieldIds.proxyCertificateCount,
-        votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
-        votesFieldIds.blankVotesCount,
-        votesFieldIds.invalidVotesCount,
-        votesFieldIds.totalVotesCastCount,
-      ];
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
-    });
   });
 
   describe("VotersAndVotesForm accept warnings", () => {

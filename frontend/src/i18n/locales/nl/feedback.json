@@ -149,16 +149,6 @@
       "content": "Het totaal aantal uitgebrachte stemmen (H) is nul.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     }
   },
-  "W208": {
-    "typist": {
-      "title": "Controleer A t/m D en E t/m H",
-      "content": "De getallen bij A t/m D zijn precies hetzelfde als E t/m H.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    },
-    "coordinator": {
-      "title": "Controleer A t/m D en E t/m H",
-      "content": "De getallen bij A t/m D zijn precies hetzelfde als E t/m H.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    }
-  },
   "W301": {
     "typist": {
       "title": "Controleer ingevulde verschillen",

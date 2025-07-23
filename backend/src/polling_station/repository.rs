@@ -1,5 +1,5 @@
 use axum::extract::FromRef;
-use sqlx::{SqlitePool, query, query_as};
+use sqlx::{QueryBuilder, SqlitePool, query, query_as};
 
 use super::structs::{PollingStation, PollingStationRequest};
 use crate::AppState;
@@ -129,6 +129,42 @@ impl PollingStations {
         )
         .fetch_one(&self.0)
         .await
+    }
+
+    /// Create many polling stations for an election
+    pub async fn create_many(
+        &self,
+        election_id: u32,
+        new_polling_stations: Vec<PollingStationRequest>,
+    ) -> Result<Vec<PollingStation>, sqlx::Error> {
+        // Max number of parameters for a statement
+        // See: https://www.sqlite.org/limits.html
+        const BIND_LIMIT: usize = 999;
+
+        let mut stations: Vec<PollingStation> = Vec::new();
+
+        let batches = new_polling_stations.chunks(BIND_LIMIT / 8);
+        for batch in batches {
+            let mut inserted: Vec<PollingStation> = QueryBuilder::new(
+                "INSERT INTO polling_stations (election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality) "
+              ).push_values(batch.iter(), |mut b, station| {
+                b.push_bind(election_id)
+                 .push_bind(station.name.clone())
+                 .push_bind(station.number)
+                 .push_bind(station.number_of_voters)
+                 .push_bind(station.polling_station_type.clone())
+                 .push_bind(station.address.clone())
+                 .push_bind(station.postal_code.clone())
+                 .push_bind(station.locality.clone());
+              })
+              .push(" RETURNING id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality")
+              .build_query_as()
+              .fetch_all(&self.0)
+              .await?;
+            stations.append(&mut inserted);
+        }
+
+        Ok(stations)
     }
 
     /// Update a single polling station for an election

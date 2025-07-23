@@ -4092,10 +4092,7 @@
             }
           },
           "polling_station_data": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "type": "string"
           }
         }
       },
@@ -4140,10 +4137,7 @@
             "$ref": "#/components/schemas/RedactedEmlHash"
           },
           "polling_stations": {
-            "type": [
-              "array",
-              "null"
-            ],
+            "type": "array",
             "items": {
               "$ref": "#/components/schemas/PollingStationRequest"
             }

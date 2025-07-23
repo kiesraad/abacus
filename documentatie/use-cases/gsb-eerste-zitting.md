@@ -93,7 +93,7 @@ __Hoofdscenario 1:__
 
 __Uitbreidingen__
 
-3a. De coördinator GSB verwijdert het laatste stembureau  
+3a. De coördinator GSB verwijdert het laatste stembureau:  
 &emsp; 3a1. Invoer is niet meer mogelijk, tot een nieuw stembureau is toegevoegd.  
 
 __Hoofdscenario 2:__
@@ -105,7 +105,7 @@ __Hoofdscenario 2:__
 __Uitbreidingen__
 
 
-2a. De coördinator GSB verwijdert het laatste stembureau  
+2a. De coördinator GSB verwijdert het laatste stembureau:  
 &emsp; 2a1. Invoer is niet meer mogelijk, tot een nieuw stembureau is toegevoegd.  
 
 ### Niet in scope

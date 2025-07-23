@@ -91,6 +91,11 @@ __Hoofdscenario 1:__
 3. De coördinator GSB verwijdert het stembureau.
 4. De applicatie vraagt om een verklaring van de wijziging. Deze verklaring wordt opgenomen in het proces-verbaal.
 
+__Uitbreidingen__
+
+3a. De coördinator GSB verwijdert het laatste stembureau  
+&emsp; 3a1. Invoer is niet meer mogelijk, tot een nieuw stembureau is toegevoegd.  
+
 __Hoofdscenario 2:__
 
 1. De coördinator GSB stelt vast dat de stembureaus in de applicatie niet kloppen met de gepubliceerde lijst.
@@ -99,8 +104,9 @@ __Hoofdscenario 2:__
 
 __Uitbreidingen__
 
+
 2a. De coördinator GSB verwijdert het laatste stembureau  
-&emsp; 2a1. De applicatie gaat terug naar de start van de zitting  
+&emsp; 2a1. Invoer is niet meer mogelijk, tot een nieuw stembureau is toegevoegd.  
 
 ### Niet in scope
 

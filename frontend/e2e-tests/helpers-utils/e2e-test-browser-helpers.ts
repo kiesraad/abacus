@@ -9,7 +9,7 @@ import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/c
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
 import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
-import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
+import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
 
 import { PollingStation, PollingStationResults } from "@/types/generated/openapi";
@@ -78,11 +78,11 @@ export async function fillDataEntryPagesAndSave(page: Page, results: PollingStat
 }
 
 export async function uploadElectionAndInputHash(page: Page) {
-  const uploadDefinitionPage = new UploadDefinitionPgObj(page);
-  await expect(uploadDefinitionPage.header).toBeVisible();
-  await uploadDefinitionPage.uploadFile(page, eml110a.path);
-  await expect(uploadDefinitionPage.main).toContainText(eml110a.filename);
-  await expect(uploadDefinitionPage.main).toContainText(eml110a.electionDate);
+  const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+  await expect(uploadElectionDefinitionPage.header).toBeVisible();
+  await uploadElectionDefinitionPage.uploadFile(page, eml110a.path);
+  await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
+  await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.electionDate);
 
   const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
@@ -102,10 +102,10 @@ export async function uploadCandidatesAndInputHash(page: Page) {
 }
 
 export async function uploadPollingStations(page: Page) {
-  const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-  await expect(uploadDefinitionPage.header).toBeVisible();
-  await uploadDefinitionPage.uploadFile(page, eml110b.path);
-  await expect(uploadDefinitionPage.main).toContainText(eml110b.filename);
+  const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+  await expect(uploadElectionDefinitionPage.header).toBeVisible();
+  await uploadElectionDefinitionPage.uploadFile(page, eml110b.path);
+  await expect(uploadElectionDefinitionPage.main).toContainText(eml110b.filename);
 
   const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();

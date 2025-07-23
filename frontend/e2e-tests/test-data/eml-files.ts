@@ -11,6 +11,11 @@ export const eml110b = {
   path: "../backend/src/eml/tests/eml110b_test.eml.xml",
 };
 
+export const eml110b_short = {
+  filename: "eml110b_less_than_10_stations.eml.xml",
+  path: "../backend/src/eml/tests/eml110b_less_than_10_stations.eml.xml",
+};
+
 export const eml230b = {
   filename: "eml230b_test.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test.eml.xml",

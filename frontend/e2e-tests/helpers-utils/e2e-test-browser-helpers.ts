@@ -7,12 +7,14 @@ import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgOb
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
+import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
+import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
 
 import { PollingStation, PollingStationResults } from "@/types/generated/openapi";
 
-import { eml110a, eml230b } from "../test-data/eml-files";
+import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
 
 export async function selectPollingStationForDataEntry(page: Page, pollingStation: PollingStation) {
   await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
@@ -76,29 +78,36 @@ export async function fillDataEntryPagesAndSave(page: Page, results: PollingStat
 }
 
 export async function uploadElectionAndInputHash(page: Page) {
-  // Upload election
   const uploadDefinitionPage = new UploadDefinitionPgObj(page);
   await expect(uploadDefinitionPage.header).toBeVisible();
   await uploadDefinitionPage.uploadFile(page, eml110a.path);
   await expect(uploadDefinitionPage.main).toContainText(eml110a.filename);
   await expect(uploadDefinitionPage.main).toContainText(eml110a.electionDate);
 
-  // Process hash
   const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
   await checkDefinitionPage.inputHash(eml110a.hashInput1, eml110a.hashInput2);
 }
 
 export async function uploadCandidatesAndInputHash(page: Page) {
-  // Candidate page
   const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
   await expect(uploadCandidateDefinitionPage.header).toBeVisible();
   await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
   await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b.filename);
   await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b.electionDate);
 
-  // Candidate check page
   const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
   await expect(checkCandidateDefinitionPage.header).toBeVisible();
   await checkCandidateDefinitionPage.inputHash(eml230b.hashInput1, eml230b.hashInput2);
+}
+
+export async function uploadPollingStations(page: Page) {
+  const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+  await expect(uploadDefinitionPage.header).toBeVisible();
+  await uploadDefinitionPage.uploadFile(page, eml110b.path);
+  await expect(uploadDefinitionPage.main).toContainText(eml110b.filename);
+
+  const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
+  await expect(checkDefinitionPage.header).toBeVisible();
+  await checkDefinitionPage.next.click();
 }

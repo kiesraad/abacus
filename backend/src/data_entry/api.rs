@@ -129,6 +129,7 @@ impl ResolveDifferencesAction {
     responses(
         (status = 200, description = "Data entry claimed successfully", body = ClaimDataEntryResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -157,10 +158,8 @@ async fn polling_station_data_entry_claim(
         progress: None,
         user_id: user.0.id(),
         entry: PollingStationResults {
-            recounted: None,
             voters_counts: Default::default(),
             votes_counts: Default::default(),
-            voters_recounts: None,
             differences_counts: Default::default(),
             political_group_votes: PollingStationResults::default_political_group_votes(
                 &election.political_groups,
@@ -236,6 +235,7 @@ impl IntoResponse for SaveDataEntryResponse {
     responses(
         (status = 200, description = "Data entry saved successfully", body = SaveDataEntryResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -300,6 +300,7 @@ async fn polling_station_data_entry_save(
     responses(
         (status = 204, description = "Data entry deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -349,6 +350,7 @@ async fn polling_station_data_entry_delete(
     responses(
         (status = 200, description = "Data entry finalised successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -460,6 +462,7 @@ pub struct DataEntryGetErrorsResponse {
     responses(
         (status = 200, description = "Data entry with errors and warnings to be resolved", body = DataEntryGetErrorsResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with accepted errors found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -510,6 +513,7 @@ async fn polling_station_data_entry_get_errors(
     responses(
         (status = 200, description = "Errors resolved successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -565,6 +569,7 @@ pub struct DataEntryGetDifferencesResponse {
     responses(
         (status = 200, description = "Data entry differences to be resolved", body = DataEntryGetDifferencesResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with differences found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -612,6 +617,7 @@ async fn polling_station_data_entry_get_differences(
     responses(
         (status = 200, description = "Differences resolved successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -732,11 +738,9 @@ pub mod tests {
         DataEntry {
             progress: 100,
             data: PollingStationResults {
-                recounted: Some(false),
                 voters_counts: VotersCounts {
-                    poll_card_count: 98,
+                    poll_card_count: 99,
                     proxy_certificate_count: 1,
-                    voter_card_count: 1,
                     total_admitted_voters_count: 100,
                 },
                 votes_counts: VotesCounts {
@@ -745,7 +749,6 @@ pub mod tests {
                     invalid_votes_count: 2,
                     total_votes_cast_count: 100,
                 },
-                voters_recounts: None,
                 differences_counts: DifferencesCounts::zero(),
                 political_group_votes: vec![
                     PoliticalGroupVotes::from_test_data_auto(1, &[36, 20]),
@@ -880,7 +883,7 @@ pub mod tests {
 
         // Save and finalise a different second data entry
         let mut request_body = example_data_entry();
-        request_body.data.voters_counts.poll_card_count = 99;
+        request_body.data.voters_counts.poll_card_count = 100;
         request_body.data.voters_counts.proxy_certificate_count = 0;
         let response = claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -1276,7 +1279,7 @@ pub mod tests {
         if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
             assert_eq!(
                 entry.finalised_first_entry.voters_counts.poll_card_count,
-                98
+                99
             )
         } else {
             panic!("invalid state")
@@ -1296,10 +1299,10 @@ pub mod tests {
         if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
             assert_eq!(
                 entry.finalised_first_entry.voters_counts.poll_card_count,
-                99
+                100
             )
         } else {
-            panic!("invalid state")
+            panic!("invalid state: {status:?}")
         }
     }
 

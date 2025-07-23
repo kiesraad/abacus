@@ -19,7 +19,7 @@ export function CommitteeSessionListProvider({ children, electionId }: Committee
       notFoundMessage="error.committee_session_not_found"
       isFoundCheck={(data) => typeof data === "object"}
       renderOnSuccess={(data) => (
-        <CommitteeSessionListProviderContext.Provider value={{ committeeSessions: data }}>
+        <CommitteeSessionListProviderContext.Provider value={{ committeeSessions: data.committee_sessions }}>
           {children}
         </CommitteeSessionListProviderContext.Provider>
       )}

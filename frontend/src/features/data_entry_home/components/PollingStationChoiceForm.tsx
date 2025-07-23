@@ -104,6 +104,26 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       return;
     }
 
+    if (pollingStation.userStatus === PollingStationUserStatus.HasErrors) {
+      setAlert(
+        t("polling_station_choice.has_errors", {
+          nr: pollingStation.number,
+        }),
+      );
+      setLoading(false);
+      return;
+    }
+
+    if (pollingStation.userStatus === PollingStationUserStatus.SecondEntryNotAllowed) {
+      setAlert(
+        t("polling_station_choice.second_entry_not_allowed", {
+          nr: pollingStation.number,
+        }),
+      );
+      setLoading(false);
+      return;
+    }
+
     void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStation.statusEntry.status));
   };
 
@@ -191,7 +211,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           <summary onClick={refetchStatuses}>
             {t("polling_station_choice.unknown_number")}
             <br />
-            <span id="openPollingStationList" className={cn(cls.underlined, cls.pointer)}>
+            <span id="openPollingStationList" className={cn("underlined", cls.pointer)}>
               {t("polling_station_choice.view_list")}
             </span>
           </summary>

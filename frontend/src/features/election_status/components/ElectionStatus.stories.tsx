@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { extendedPollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 
 import { ElectionStatus } from "./ElectionStatus";
 
@@ -73,7 +73,7 @@ export const DefaultElectionStatus: StoryObj<StoryProps> = {
           },
         ]}
         election={electionMockData}
-        pollingStations={extendedPollingStationMockData}
+        pollingStations={pollingStationMockData}
         navigate={navigate}
       />
     );

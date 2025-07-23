@@ -1118,9 +1118,8 @@ export const candidate_nomination: CandidateNominationResult = {
 
 export const election_summary: ElectionSummary = {
   voters_counts: {
-    poll_card_count: 1200,
+    poll_card_count: 1203,
     proxy_certificate_count: 2,
-    voter_card_count: 3,
     total_admitted_voters_count: 1205,
   },
   votes_counts: {
@@ -1159,7 +1158,6 @@ export const election_summary: ElectionSummary = {
       polling_stations: [],
     },
   },
-  recounted_polling_stations: [],
   political_group_votes: [
     {
       number: 1,
@@ -1329,6 +1327,7 @@ export const election_summary: ElectionSummary = {
 export const election: ElectionWithPoliticalGroups = {
   id: 2,
   name: "Test Election >= 19 seats",
+  counting_method: "CSO",
   election_id: "TestLocation_2026",
   location: "Test Location",
   domain_id: "0000",

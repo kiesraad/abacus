@@ -28,7 +28,7 @@ describe("formSectionComplete", () => {
     expect(
       formSectionComplete({
         index: 0,
-        id: "recounted",
+        id: "voters_votes_counts",
         isSaved: false,
         acceptErrorsAndWarnings: false,
         errors: new ValidationResultSet(),
@@ -41,7 +41,7 @@ describe("formSectionComplete", () => {
     expect(
       formSectionComplete({
         index: 0,
-        id: "recounted",
+        id: "voters_votes_counts",
         isSaved: true,
         acceptErrorsAndWarnings: false,
         errors: new ValidationResultSet(),
@@ -67,12 +67,12 @@ describe("resetFormSectionState", () => {
 describe("getNextSectionID", () => {
   test("should get next section ID", () => {
     const formState = getDefaultDataEntryState().formState;
-    formState.sections.recounted.isSaved = true;
-    formState.sections.recounted.isSubmitted = true;
+    formState.sections.voters_votes_counts.isSaved = true;
+    formState.sections.voters_votes_counts.isSubmitted = true;
 
-    const nextSection = getNextSectionID(formState, "recounted");
+    const nextSection = getNextSectionID(formState, "voters_votes_counts");
 
-    expect(nextSection).toBe("voters_votes_counts");
+    expect(nextSection).toBe("differences_counts");
   });
 });
 
@@ -134,21 +134,6 @@ describe("isFormSectionEmpty", () => {
     const section = getDefaultFormSection("differences_counts", 0);
     const values = getInitialValues();
     values.differences_counts.more_ballots_count = 5;
-
-    expect(isFormSectionEmpty(section, values)).toBeFalsy();
-  });
-
-  test("recounted form is empty", () => {
-    const section = getDefaultFormSection("recounted", 0);
-    const values = getInitialValues();
-
-    expect(isFormSectionEmpty(section, values)).toBeTruthy();
-  });
-
-  test("recounted form is not empty", () => {
-    const section = getDefaultFormSection("recounted", 0);
-    const values = getInitialValues();
-    values.recounted = false;
 
     expect(isFormSectionEmpty(section, values)).toBeFalsy();
   });

@@ -1,15 +1,14 @@
 import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite";
 
-import { Role } from "@/types/generated/openapi";
+import { Role, ValidationResultCode } from "@/types/generated/openapi";
 import { AlertType, FeedbackId } from "@/types/ui";
 
 import { Feedback } from "./Feedback";
-import { ClientValidationResultCode } from "./Feedback.types";
 
 type Props = {
   id: FeedbackId;
   type: AlertType;
-  data: ClientValidationResultCode[];
+  data: ValidationResultCode[];
   userRole: Role;
 };
 
@@ -18,7 +17,7 @@ export const SingleError: StoryFn = () => {
 };
 
 export const SingleErrorCustomAction: StoryFn = () => {
-  return <Feedback id="feedback-error" type="error" data={["F101"]} userRole="typist" />;
+  return <Feedback id="feedback-error" type="error" data={["F201"]} userRole="typist" />;
 };
 
 export const MultipleErrors: StoryFn = () => {
@@ -47,16 +46,14 @@ export const CustomizableWarnings: StoryObj<Props> = {
 
 export default {
   args: {
-    data: ["F101", "F201", "F202", "F203", "F204", "F301", "F302", "F303", "F304", "F305", "F401"],
+    data: ["F201", "F202", "F204", "F301", "F302", "F303", "F304", "F305", "F401"],
     userRole: "typist",
   },
   argTypes: {
     data: {
       options: [
-        "F101",
         "F201",
         "F202",
-        "F203",
         "F204",
         "F301",
         "F302",
@@ -68,12 +65,9 @@ export default {
         "W201",
         "W202",
         "W203",
-        "W204",
         "W205",
         "W206",
-        "W207",
         "W208",
-        "W209",
         "W301",
         "W302",
       ],

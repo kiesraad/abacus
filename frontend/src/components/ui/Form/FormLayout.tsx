@@ -12,7 +12,7 @@ export interface FormLayoutProps {
 
 export function FormLayout({ children, disabled, width }: FormLayoutProps) {
   return (
-    <div className={cn(cls.formLayout, width === "medium" ? cls.mediumWidth : undefined)}>
+    <div className={cn(cls.formLayout, width === "medium" && cls.mediumWidth)}>
       <fieldset disabled={disabled} className={cls.rootFieldset}>
         {children}
       </fieldset>

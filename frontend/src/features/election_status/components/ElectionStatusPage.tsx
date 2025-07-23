@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router";
 
-import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session_status_with_icon/CommitteeSessionStatusWithIcon";
+import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";

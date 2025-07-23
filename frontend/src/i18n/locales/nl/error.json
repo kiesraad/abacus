@@ -2,6 +2,7 @@
   "title": "Abacus is stuk",
   "label": "Fout",
   "not_found": "Pagina niet gevonden",
+  "forbidden": "Toegang geweigerd",
   "committee_session_not_found": "Zitting niet gevonden",
   "election_not_found": "Verkiezing niet gevonden",
   "elections_not_found": "Verkiezingen niet gevonden",
@@ -15,7 +16,7 @@
   },
   "airgap_violation": {
     "title": "Abacus zit op slot",
-    "content": "<p>Abacus is geblokkeerd omdat de applicatie is verbonden met het internet.</p><ul><li>Wijzigingen zijn niet mogelijk</li><li>Alle werkplekken zijn vergrendeld</li></ul><h3>Wat te doen?</h3><ul><li>Verbreek de internetverbinding</li><li><reload>Herlaad de pagina</reload></li></ul><p>Pas daarna kan de steminvoer worden hervat.</p>",
+    "content": "<p>Abacus is geblokkeerd omdat de applicatie is verbonden met het internet.</p><ul><li>Wijzigingen zijn niet mogelijk</li><li>Alle werkplekken zijn vergrendeld</li></ul><h3>Wat te doen?</h3><ul><li>Verbreek de internetverbinding</li><li><reload>Herlaad de pagina</reload></li></ul><p>Pas daarna kan Abacus weer gebruikt worden.</p>",
     "reload": "Probeer opnieuw"
   },
   "api_error": {
@@ -46,7 +47,8 @@
     "PollingStationRepeated": "Het stembureau is al ingevoerd",
     "PollingStationValidationErrors": "Er zijn fouten opgetreden bij het valideren van het stembureau",
     "RequestPayloadTooLarge": "Het bestand is groter dan toegestaan",
-    "Unauthorized": "Je hebt geen toestemming om deze actie uit te voeren",
+    "Forbidden": "Je hebt niet de juiste rechten om deze actie uit te voeren",
+    "Unauthorized": "Je bent niet ingelogd of je sessie is verlopen",
     "UserNotFound": "De gebruiker is niet gevonden",
     "UsernameNotUnique": "De gebruikersnaam is al in gebruik",
     "ZeroVotesCast": "Er zijn geen stemmen op kandidaten uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad."

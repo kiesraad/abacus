@@ -1,7 +1,6 @@
-import { TranslationPath } from "@/i18n/i18n.types";
 import { t } from "@/i18n/translate";
 import { PollingStationResults, ResolveDifferencesAction } from "@/types/generated/openapi";
-import { DataEntrySection, DataEntryStructure, RadioSubsectionOption } from "@/types/types";
+import { DataEntrySection, DataEntryStructure, RadioSubsectionOption, SectionValues } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 
 import { DifferencesTable } from "./DifferencesTable";
@@ -41,7 +40,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
         switch (subsection.type) {
           case "heading":
             // override previous title
-            title = t(subsection.title);
+            title = subsection.title;
             return;
           case "message":
             // message is not rendered
@@ -58,7 +57,39 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
               code: "",
               first: mapRadioValue(firstValues[subsection.path], subsection.options),
               second: mapRadioValue(secondValues[subsection.path], subsection.options),
-              description: t(subsection.short_title),
+              description: subsection.short_title,
+            };
+
+            return (
+              <DifferencesTable
+                key={`${section.id}-${subsectionIdx}`}
+                title={title}
+                headers={headers}
+                rows={[row]}
+                action={action}
+              />
+            );
+          }
+          case "checkboxes": {
+            const headers = [
+              t("resolve_differences.headers.field"),
+              t("resolve_differences.headers.first_entry"),
+              t("resolve_differences.headers.second_entry"),
+              t("resolve_differences.headers.description"),
+            ];
+
+            const getSelectedOptions = (values: SectionValues) => {
+              return subsection.options
+                .filter((option) => values[option.path] === "true")
+                .map((option) => option.short_label)
+                .join(", ");
+            };
+
+            const row = {
+              code: "",
+              first: getSelectedOptions(firstValues) || "-",
+              second: getSelectedOptions(secondValues) || "-",
+              description: subsection.short_title,
             };
 
             return (
@@ -73,18 +104,17 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
           }
           case "inputGrid": {
             const headers = [
-              t(subsection.headers[0]),
+              subsection.headers[0],
               t("resolve_differences.headers.first_entry"),
               t("resolve_differences.headers.second_entry"),
-              t(subsection.headers[2]),
+              subsection.headers[2],
             ];
 
             const rows = subsection.rows.map((row) => ({
               code: row.code,
               first: firstValues[row.path],
               second: secondValues[row.path],
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- dynamic title translation path cannot be typechecked
-              description: row.title || t(`${section.id}.${row.path}` as TranslationPath),
+              description: row.title,
             }));
 
             return (
@@ -106,5 +136,5 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
 function mapRadioValue(value: string | undefined, options: RadioSubsectionOption[]): string {
   if (!value) return "";
   const option = options.find((option) => option.value === value);
-  return option ? t(option.short_label) : value;
+  return option ? option.short_label : value;
 }

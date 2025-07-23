@@ -678,16 +678,17 @@ mod tests {
     use super::*;
     use crate::{
         data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts},
-        election::{Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup},
+        election::{
+            Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup,
+            VoteCountingMethod,
+        },
         polling_station::{PollingStation, PollingStationType},
     };
 
     fn polling_station_result() -> PollingStationResults {
         PollingStationResults {
-            recounted: Some(false),
             voters_counts: Default::default(),
             votes_counts: Default::default(),
-            voters_recounts: None,
             differences_counts: Default::default(),
             political_group_votes: vec![],
         }
@@ -729,6 +730,7 @@ mod tests {
         ElectionWithPoliticalGroups {
             id: 1,
             name: "Test election".to_string(),
+            counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2025".to_string(),
             location: "Test location".to_string(),
             domain_id: "0000".to_string(),
@@ -917,14 +919,27 @@ mod tests {
 
     #[test]
     fn finalise_first_entry_validation_error() {
+        // Create data with validation errors that will trigger FirstEntryHasErrors
+        let invalid_entry = PollingStationResults {
+            voters_counts: VotersCounts {
+                poll_card_count: 10,
+                proxy_certificate_count: 5,
+                total_admitted_voters_count: 20,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 10,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 20,
+            },
+            differences_counts: Default::default(),
+            political_group_votes: vec![],
+        };
+
         let initial = DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
             progress: 0,
             first_entry_user_id: 0,
-            first_entry: PollingStationResults {
-                // F.101
-                recounted: None,
-                ..polling_station_result()
-            },
+            first_entry: invalid_entry,
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
         });
         let next = initial
@@ -1095,16 +1110,24 @@ mod tests {
 
     #[test]
     fn second_entry_in_progress_finalise_not_equal_and_has_error() {
+        let first_entry = polling_station_result();
+        let different_second_entry = PollingStationResults {
+            votes_counts: VotesCounts {
+                votes_candidates_count: 0,
+                blank_votes_count: 1, // Different from first entry which has blank_votes_count: 0
+                invalid_votes_count: 0,
+                total_votes_cast_count: 1,
+            },
+            ..polling_station_result()
+        };
+
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
             progress: 0,
             second_entry_user_id: 0,
-            second_entry: PollingStationResults {
-                recounted: Some(true),
-                ..polling_station_result()
-            },
+            second_entry: different_second_entry,
             client_state: Default::default(),
             first_entry_user_id: 0,
-            finalised_first_entry: polling_station_result(),
+            finalised_first_entry: first_entry,
             first_entry_finished_at: Utc::now(),
         });
         let next = initial
@@ -1141,7 +1164,6 @@ mod tests {
                 voters_counts: VotersCounts {
                     poll_card_count: 1,
                     proxy_certificate_count: 0,
-                    voter_card_count: 0,
                     total_admitted_voters_count: 1,
                 },
                 votes_counts: VotesCounts {
@@ -1167,7 +1189,6 @@ mod tests {
                 voters_counts: VotersCounts {
                     poll_card_count: 1,
                     proxy_certificate_count: 0,
-                    voter_card_count: 0,
                     total_admitted_voters_count: 1,
                 },
                 votes_counts: VotesCounts {
@@ -1267,8 +1288,15 @@ mod tests {
     fn entries_different_to_second_entry_not_started_keep_first_entry() {
         // Create a difference, so we can check that we keep the right entry
         let first_entry = polling_station_result();
-        let mut second_entry = polling_station_result();
-        second_entry.recounted = Some(true);
+        let second_entry = PollingStationResults {
+            votes_counts: VotesCounts {
+                votes_candidates_count: 1,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 1,
+            },
+            ..polling_station_result()
+        };
 
         let initial = entries_different();
         let next = initial.keep_first_entry().unwrap();
@@ -1291,11 +1319,23 @@ mod tests {
 
     #[test]
     fn entries_different_to_second_entry_not_started_keep_second_entry() {
-        // Create a difference without errors, so we can check that we keep the right entry
+        // Create valid data without errors, so we transition to SecondEntryNotStarted
         let first_entry = polling_station_result();
-        let mut second_entry = polling_station_result();
-        second_entry.recounted = Some(true);
-        second_entry.voters_recounts = Some(Default::default());
+        let second_entry = PollingStationResults {
+            voters_counts: VotersCounts {
+                poll_card_count: 1,
+                proxy_certificate_count: 0,
+                total_admitted_voters_count: 1,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 0,
+                blank_votes_count: 1,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 1,
+            },
+            differences_counts: Default::default(),
+            political_group_votes: vec![],
+        };
 
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: first_entry.clone(),
@@ -1320,9 +1360,22 @@ mod tests {
     #[test]
     fn entries_different_to_second_entry_not_started_keep_second_entry_which_has_errors() {
         let first_entry = polling_station_result();
-        // Second entry is different and has error F.101
-        let mut second_entry = polling_station_result();
-        second_entry.recounted = None;
+        // Create second entry with validation errors that will trigger FirstEntryHasErrors
+        let second_entry = PollingStationResults {
+            voters_counts: VotersCounts {
+                poll_card_count: 5,
+                proxy_certificate_count: 3,
+                total_admitted_voters_count: 10,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 4,
+                blank_votes_count: 2,
+                invalid_votes_count: 1,
+                total_votes_cast_count: 10,
+            },
+            differences_counts: Default::default(),
+            political_group_votes: vec![],
+        };
 
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: first_entry.clone(),

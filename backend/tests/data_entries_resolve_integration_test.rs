@@ -13,8 +13,8 @@ pub mod utils;
 
 fn data_entry_with_error() -> DataEntry {
     let mut data_entry = shared::example_data_entry(None);
-    // Introduce error F.101
-    data_entry.data.recounted = None;
+    // Introduce error F.202
+    data_entry.data.votes_counts.invalid_votes_count = 10;
     data_entry
 }
 
@@ -117,8 +117,13 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
     assert_eq!(
         result["validation_results"]["errors"],
         serde_json::json!([{
-            "code": "F101",
-            "fields": ["data.recounted"]
+            "code": "F202",
+            "fields": [
+                "data.votes_counts.votes_candidates_count",
+                "data.votes_counts.blank_votes_count",
+                "data.votes_counts.invalid_votes_count",
+                "data.votes_counts.total_votes_cast_count",
+            ]
         }])
     );
     assert_eq!(

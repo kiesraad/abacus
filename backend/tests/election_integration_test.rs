@@ -80,6 +80,7 @@ async fn test_election_create_works(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "name": "Test Election",
+            "counting_method": "CSO",
             "election_id": "TestElection_2026",
             "location": "Test Location",
             "domain_id": "0000",

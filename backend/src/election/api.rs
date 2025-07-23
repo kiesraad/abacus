@@ -125,6 +125,7 @@ pub async fn election_details(
         (status = 201, description = "Election created", body = ElectionWithPoliticalGroups),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -187,6 +188,7 @@ pub struct ElectionDefinitionValidateResponse {
         (status = 200, description = "Election validated", body = ElectionDefinitionValidateResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -235,6 +237,7 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
         (status = 201, description = "Election imported", body = ElectionWithPoliticalGroups),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -256,6 +259,9 @@ pub async fn election_import(
     new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
 
     let election = elections_repo.create(new_election).await?;
+    audit_service
+        .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
+        .await?;
 
     // Create first committee session for the election
     let committee_session = committee_sessions_repo

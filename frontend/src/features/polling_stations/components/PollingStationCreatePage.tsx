@@ -28,7 +28,7 @@ export function PollingStationCreatePage() {
 
   return (
     <>
-      <PageTitle title={`${t("polling_stations")} - Abacus`} />
+      <PageTitle title={`${t("polling_station.title.plural")} - Abacus`} />
       <header>
         <section>
           <h1>{t("polling_station.create")}</h1>

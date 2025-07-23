@@ -65,9 +65,9 @@ test.describe("Election creation", () => {
     await uploadCandidatesAndInputHash(page);
 
     // skip polling stations
-    const uploadDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadDefinitionPage.header).toBeVisible();
-    await uploadDefinitionPage.skipButton.click();
+    const uploadPollingStationsPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadPollingStationsPage.header).toBeVisible();
+    await uploadPollingStationsPage.skipButton.click();
 
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);

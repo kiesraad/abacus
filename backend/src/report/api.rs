@@ -6,6 +6,7 @@ use zip::{result::ZipError, write::SimpleFileOptions};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::Coordinator,
+    committee_session::{CommitteeSession, repository::CommitteeSessions},
     data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
     election::{ElectionWithPoliticalGroups, repository::Elections},
     eml::{EML510, EMLDocument, EmlHash, axum::Eml},
@@ -31,6 +32,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 }
 
 struct ResultsInput {
+    committee_session: CommitteeSession,
     election: ElectionWithPoliticalGroups,
     polling_stations: Vec<PollingStation>,
     results: Vec<(PollingStation, PollingStationResults)>,
@@ -41,17 +43,22 @@ struct ResultsInput {
 impl ResultsInput {
     async fn new(
         election_id: u32,
+        committee_sessions_repo: CommitteeSessions,
         elections_repo: Elections,
         polling_stations_repo: PollingStations,
         polling_station_results_entries_repo: PollingStationResultsEntries,
     ) -> Result<ResultsInput, APIError> {
         let election = elections_repo.get(election_id).await?;
+        let committee_session = committee_sessions_repo
+            .get_election_committee_session(election_id)
+            .await?;
         let polling_stations = polling_stations_repo.list(election.id).await?;
         let results = polling_station_results_entries_repo
             .list_with_polling_stations(polling_stations_repo, election.id)
             .await?;
 
         Ok(ResultsInput {
+            committee_session,
             summary: ElectionSummary::from_results(&election, &results)?,
             creation_date_time: chrono::Local::now(),
             election,
@@ -101,6 +108,7 @@ impl ResultsInput {
 
     fn into_pdf_model(self, xml_hash: impl Into<String>) -> PdfModel {
         PdfModel::ModelNa31_2(ModelNa31_2Input {
+            committee_session: self.committee_session,
             polling_stations: self.polling_stations,
             summary: self.summary,
             election: self.election,
@@ -134,6 +142,7 @@ impl ResultsInput {
 )]
 async fn election_download_zip_results(
     _user: Coordinator,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
@@ -143,6 +152,7 @@ async fn election_download_zip_results(
 
     let input = ResultsInput::new(
         id,
+        committee_sessions_repo,
         elections_repo,
         polling_stations_repo,
         polling_station_results_entries_repo,
@@ -204,6 +214,7 @@ async fn election_download_zip_results(
 )]
 async fn election_download_pdf_results(
     _user: Coordinator,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
@@ -211,6 +222,7 @@ async fn election_download_pdf_results(
 ) -> Result<Attachment<Vec<u8>>, APIError> {
     let input = ResultsInput::new(
         id,
+        committee_sessions_repo,
         elections_repo,
         polling_stations_repo,
         polling_station_results_entries_repo,
@@ -248,6 +260,7 @@ async fn election_download_pdf_results(
 )]
 async fn election_download_xml_results(
     _user: Coordinator,
+    State(committee_sessions_repo): State<CommitteeSessions>,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
@@ -255,6 +268,7 @@ async fn election_download_xml_results(
 ) -> Result<Eml<EML510>, APIError> {
     let input = ResultsInput::new(
         id,
+        committee_sessions_repo,
         elections_repo,
         polling_stations_repo,
         polling_station_results_entries_repo,

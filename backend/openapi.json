@@ -4220,10 +4220,7 @@
             }
           },
           "polling_station_data": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "type": "string"
           }
         }
       },
@@ -4255,10 +4252,10 @@
             }
           },
           "polling_station_data": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

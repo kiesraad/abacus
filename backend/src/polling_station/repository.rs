@@ -149,13 +149,13 @@ impl PollingStations {
                 "INSERT INTO polling_stations (election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality) "
               ).push_values(batch.iter(), |mut b, station| {
                 b.push_bind(election_id)
-                 .push_bind(station.name.clone())
+                 .push_bind(&station.name)
                  .push_bind(station.number)
                  .push_bind(station.number_of_voters)
-                 .push_bind(station.polling_station_type.clone())
-                 .push_bind(station.address.clone())
-                 .push_bind(station.postal_code.clone())
-                 .push_bind(station.locality.clone());
+                 .push_bind(&station.polling_station_type)
+                 .push_bind(&station.address)
+                 .push_bind(&station.postal_code)
+                 .push_bind(&station.locality);
               })
               .push(" RETURNING id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality")
               .build_query_as()

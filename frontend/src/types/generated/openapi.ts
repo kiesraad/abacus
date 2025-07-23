@@ -533,7 +533,7 @@ export interface ElectionAndCandidateDefinitionValidateRequest {
   candidate_hash?: string[];
   election_data: string;
   election_hash?: string[];
-  polling_station_data?: string[];
+  polling_station_data?: string;
 }
 
 export interface ElectionAndCandidatesDefinitionImportRequest {
@@ -541,7 +541,7 @@ export interface ElectionAndCandidatesDefinitionImportRequest {
   candidate_hash: string[];
   election_data: string;
   election_hash: string[];
-  polling_station_data?: string | null;
+  polling_station_data?: string[];
 }
 
 /**

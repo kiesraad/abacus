@@ -61,7 +61,7 @@ function renderWithRouter() {
 
 function electionValidateResponse(
   election: NewElection,
-  polling_stations: PollingStationRequest[] | null = null,
+  polling_stations: PollingStationRequest[] | undefined = undefined,
 ): ElectionDefinitionValidateResponse {
   return {
     hash: {

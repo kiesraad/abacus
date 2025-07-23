@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 
-import { ApiResponseStatus, FatalApiError, NotFoundError } from "@/api/ApiResult";
+import { NotFoundError } from "@/api/ApiResult";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { Badge } from "@/components/ui/Badge/Badge";
@@ -20,18 +20,8 @@ import { DataEntrySection } from "./DataEntrySection";
 export function DataEntryPage() {
   const pollingStationId = useNumericParam("pollingStationId");
   const entryNumber = useNumericParam("entryNumber");
-  const { committeeSession, election, pollingStation } = useElection(pollingStationId);
+  const { election, pollingStation } = useElection(pollingStationId);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
-
-  // Safeguard so users cannot circumvent the check via the browser's address bar
-  if (committeeSession.status !== "data_entry_in_progress") {
-    throw new FatalApiError(
-      ApiResponseStatus.ClientError,
-      403,
-      "Committee session should have status DataEntryInProgress",
-      "Forbidden",
-    );
-  }
 
   if (!pollingStation) {
     throw new NotFoundError("error.polling_station_not_found");

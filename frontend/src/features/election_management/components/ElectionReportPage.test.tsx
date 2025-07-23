@@ -1,8 +1,6 @@
-import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
@@ -11,11 +9,9 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
-import { expectErrorPage, renderReturningRouter, screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
+import { renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
 
-import { electionManagementRoutes } from "../routes";
 import { ElectionReportPage } from "./ElectionReportPage";
 
 const navigate = vi.fn();
@@ -43,33 +39,6 @@ const renderPage = async () => {
 describe("ElectionReportPage", () => {
   beforeEach(() => {
     server.use(CommitteeSessionStatusChangeRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
-  });
-
-  test("Error when election is not ready", async () => {
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
-    const router = setupTestRouter([
-      {
-        Component: null,
-        errorElement: <ErrorBoundary />,
-        children: [
-          {
-            path: "elections/:electionId/report",
-            children: electionManagementRoutes,
-          },
-        ],
-      },
-    ]);
-
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
-
-    await router.navigate("/elections/1/report/download");
-
-    rtlRender(<Providers router={router} />);
-
-    await expectErrorPage();
   });
 
   test("Shows page and click on back to overview", async () => {

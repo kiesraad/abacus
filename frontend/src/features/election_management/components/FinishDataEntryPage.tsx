@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { ApiResponseStatus, FatalApiError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -28,16 +27,6 @@ export function FinishDataEntryPage() {
       void navigate(`/elections/${election.id}/report/download`);
     }
   }, [committeeSession, election, navigate]);
-
-  // Safeguard so users cannot circumvent the check via the browser's address bar
-  if (committeeSession.status === "created" || committeeSession.status === "data_entry_not_started") {
-    throw new FatalApiError(
-      ApiResponseStatus.ClientError,
-      403,
-      "Committee session should not have status Created or DataEntryNotStarted",
-      "Forbidden",
-    );
-  }
 
   function handleFinish() {
     const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;

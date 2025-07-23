@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
-import { ApiResponseStatus, FatalApiError } from "@/api/ApiResult";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -16,7 +15,7 @@ import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { committeeSession, election, pollingStations } = useElection();
+  const { election, pollingStations } = useElection();
   const { statuses, refetch } = useElectionStatus();
 
   // re-fetch statuses when component mounts
@@ -29,16 +28,6 @@ export function DataEntryHomePage() {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
   }, [refetch]);
-
-  // Safeguard so users cannot circumvent the check via the browser's address bar
-  if (committeeSession.status !== "data_entry_in_progress") {
-    throw new FatalApiError(
-      ApiResponseStatus.ClientError,
-      403,
-      "Committee session should have status DataEntryInProgress",
-      "Forbidden",
-    );
-  }
 
   const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved") ? location.hash : null;
   const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved") ? location.hash : null;

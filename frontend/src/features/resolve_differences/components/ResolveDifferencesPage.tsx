@@ -1,13 +1,11 @@
 import { useNavigate } from "react-router";
 
-import { ApiResponseStatus, FatalApiError } from "@/api/ApiResult";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
-import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
@@ -53,18 +51,7 @@ export function ResolveDifferencesPage() {
     onSubmit,
     validationError,
   } = usePollingStationDataEntryDifferences(pollingStationId, afterSave);
-  const { committeeSession } = useElection();
   const { getName } = useUsers();
-
-  // Safeguard so users cannot circumvent the check via the browser's address bar
-  if (committeeSession.status !== "data_entry_in_progress" && committeeSession.status !== "data_entry_paused") {
-    throw new FatalApiError(
-      ApiResponseStatus.ClientError,
-      403,
-      "Committee session should have status DataEntryInProgress or DataEntryPaused",
-      "Forbidden",
-    );
-  }
 
   if (loading || differences === null || dataEntryStructure === null) {
     return <Loader />;

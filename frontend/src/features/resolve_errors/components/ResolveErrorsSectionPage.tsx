@@ -1,6 +1,5 @@
 import { useParams } from "react-router";
 
-import { ApiResponseStatus, FatalApiError } from "@/api/ApiResult";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
@@ -14,18 +13,8 @@ export function ResolveErrorsSectionPage() {
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId;
   const pollingStationId = useNumericParam("pollingStationId");
-  const { committeeSession, election } = useElection(pollingStationId);
+  const { election } = useElection(pollingStationId);
   const { loading, dataEntry } = usePollingStationDataEntryErrors(pollingStationId);
-
-  // Safeguard so users cannot circumvent the check via the browser's address bar
-  if (committeeSession.status !== "data_entry_in_progress" && committeeSession.status !== "data_entry_paused") {
-    throw new FatalApiError(
-      ApiResponseStatus.ClientError,
-      403,
-      "Committee session should have status DataEntryInProgress or DataEntryPaused",
-      "Forbidden",
-    );
-  }
 
   if (loading || dataEntry === null) {
     return <Loader />;

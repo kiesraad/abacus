@@ -90,13 +90,13 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_creation_for_committee_session_with_finished_status(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 5;
+    let election_id = 2;
 
     shared::change_status_committee_session(
         &addr,
@@ -105,6 +105,12 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
         CommitteeSessionStatus::DataEntryFinished,
     )
     .await;
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryFinished
+    );
 
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
     let response = reqwest::Client::new()

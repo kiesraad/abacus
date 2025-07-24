@@ -46,7 +46,11 @@ export function ElectionStatusPage() {
         </section>
         <section>
           <div className="election_status">
-            <HeaderCommitteeSessionStatusWithIcon status={committeeSession.status} userRole="coordinator" />
+            <HeaderCommitteeSessionStatusWithIcon
+              status={committeeSession.status}
+              userRole="coordinator"
+              committeeSessionNumber={committeeSession.number}
+            />
           </div>
         </section>
       </header>

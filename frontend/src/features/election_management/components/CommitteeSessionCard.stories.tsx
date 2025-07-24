@@ -36,7 +36,7 @@ export default {
   },
   argTypes: {
     number: {
-      options: [1, 2, 3],
+      options: [1, 2, 3, 4, 5, 6],
       control: { type: "radio" },
     },
     status: {

@@ -35,7 +35,7 @@ describe("UI component: CommitteeSessionCard", () => {
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
-    expect(screen.getByText("— Voorbereiden")).toBeInTheDocument();
+    expect(screen.getByText("— Zitting voorbereiden")).toBeInTheDocument();
   });
 
   test("The card renders with status created committee session number 2", () => {
@@ -50,7 +50,7 @@ describe("UI component: CommitteeSessionCard", () => {
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Tweede zitting")).toBeVisible();
-    expect(screen.getByText("— Voorbereiden")).toBeVisible();
+    expect(screen.getByText("— Zitting voorbereiden")).toBeVisible();
   });
 
   test("The card renders with status data_entry_not_started for coordinator", async () => {
@@ -67,7 +67,7 @@ describe("UI component: CommitteeSessionCard", () => {
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
-    expect(screen.getByText("— Klaar voor invoer")).toBeVisible();
+    expect(screen.getByText("— Klaar voor steminvoer")).toBeVisible();
 
     const startButton = screen.getByRole("button", { name: "Start steminvoer" });
     expect(startButton).toBeVisible();
@@ -90,7 +90,7 @@ describe("UI component: CommitteeSessionCard", () => {
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
-    expect(screen.getByText("— Klaar voor invoer")).toBeVisible();
+    expect(screen.getByText("— Klaar voor steminvoer")).toBeVisible();
 
     expect(screen.queryByRole("button", { name: "Start steminvoer" })).not.toBeInTheDocument();
   });
@@ -111,7 +111,7 @@ describe("UI component: CommitteeSessionCard", () => {
     );
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
-    expect(screen.getByText("— Invoerders bezig")).toBeVisible();
+    expect(screen.getByText("— Steminvoer bezig")).toBeVisible();
 
     const statusButton = screen.getByRole("link", { name: "Bekijk voortgang" });
     expect(statusButton).toBeVisible();
@@ -134,7 +134,7 @@ describe("UI component: CommitteeSessionCard", () => {
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
-    expect(screen.getByText("— Invoer gepauzeerd")).toBeVisible();
+    expect(screen.getByText("— Steminvoer gepauzeerd")).toBeVisible();
   });
 
   test("The card renders with status data_entry_finished for coordinator", async () => {
@@ -151,7 +151,7 @@ describe("UI component: CommitteeSessionCard", () => {
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
-    expect(screen.getByText("— Invoerders klaar")).toBeVisible();
+    expect(screen.getByText("— Steminvoer afgerond")).toBeVisible();
 
     expect(screen.getByRole("button", { name: "Resultaten en documenten" }));
 
@@ -178,7 +178,7 @@ describe("UI component: CommitteeSessionCard", () => {
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
-    expect(screen.getByText("— Invoerders klaar")).toBeVisible();
+    expect(screen.getByText("— Steminvoer afgerond")).toBeVisible();
 
     expect(screen.queryByRole("button", { name: "Resultaten en documenten" })).not.toBeInTheDocument();
 
@@ -205,7 +205,7 @@ describe("UI component: CommitteeSessionCard", () => {
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={false} />);
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
-    expect(screen.getByText("— Invoerders klaar")).toBeVisible();
+    expect(screen.getByText("— Steminvoer afgerond")).toBeVisible();
     expect(screen.getByText("zondag 9 november 2025 09:15")).toBeVisible();
 
     expect(screen.queryByRole("button", { name: "Steminvoer bekijken" })).not.toBeInTheDocument();

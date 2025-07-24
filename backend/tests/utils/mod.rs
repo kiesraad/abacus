@@ -49,7 +49,7 @@ pub async fn serve_api_with_airgap_detection(pool: SqlitePool) -> SocketAddr {
         tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
     }
 
-    assert_eq!(violation_detected, true, "Airgap detection did not run");
+    assert!(violation_detected, "Airgap detection did not run");
 
     serve_api_inner(pool, airgap_detection).await
 }

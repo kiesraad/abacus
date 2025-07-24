@@ -44,10 +44,16 @@ export function UserDelete({ user, onDeleted, onError }: UserDeleteProps) {
         <Modal title={t("users.delete")} onClose={toggleModal}>
           <p>{t("users.delete_are_you_sure")}</p>
           <nav>
-            <Button variant="primary-destructive" size="lg" onClick={handleDelete} disabled={deleting}>
+            <Button
+              leftIcon={<IconTrash />}
+              variant="primary-destructive"
+              size="xl"
+              onClick={handleDelete}
+              disabled={deleting}
+            >
               {t("delete")}
             </Button>
-            <Button variant="secondary" size="lg" onClick={toggleModal} disabled={deleting}>
+            <Button variant="secondary" size="xl" onClick={toggleModal} disabled={deleting}>
               {t("cancel")}
             </Button>
           </nav>

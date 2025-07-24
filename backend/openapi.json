@@ -152,6 +152,90 @@
         }
       }
     },
+    "/api/committee_sessions/{committee_session_id}/status": {
+      "put": {
+        "summary": "Change the status of a [CommitteeSession].",
+        "operationId": "committee_session_status_change",
+        "parameters": [
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "description": "Committee session database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitteeSessionStatusChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Committee session status changed successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Committee session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/committee_sessions/{committee_session_id}/voters": {
       "put": {
         "summary": "Change the number of voters of a [CommitteeSession].",
@@ -3718,6 +3802,18 @@
           "data_entry_finished"
         ]
       },
+      "CommitteeSessionStatusChangeRequest": {
+        "type": "object",
+        "description": "Committee session status change request",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/CommitteeSessionStatus"
+          }
+        }
+      },
       "CommitteeSessionUpdateRequest": {
         "type": "object",
         "description": "Committee session update request",
@@ -4418,6 +4514,7 @@
           "EmlImportError",
           "EntryNotFound",
           "EntryNotUnique",
+          "Forbidden",
           "InternalServerError",
           "InvalidData",
           "InvalidHash",
@@ -4435,7 +4532,6 @@
           "PollingStationRepeated",
           "PollingStationValidationErrors",
           "RequestPayloadTooLarge",
-          "Forbidden",
           "Unauthorized",
           "UsernameNotUnique",
           "UserNotFound",

@@ -4,9 +4,9 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
-use strum::VariantNames;
 use utoipa::ToSchema;
 
+use super::status::CommitteeSessionStatus;
 use crate::audit_log::CommitteeSessionDetails;
 
 /// Committee session
@@ -64,65 +64,8 @@ pub struct CommitteeSessionNumberOfVotersChangeRequest {
     pub number_of_voters: u32,
 }
 
-/// Committee session status
-#[derive(
-    Serialize,
-    Deserialize,
-    VariantNames,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    Hash,
-    ToSchema,
-    Type,
-    strum::Display,
-)]
-#[serde(rename_all = "snake_case")]
-#[strum(serialize_all = "snake_case")]
-#[sqlx(rename_all = "snake_case")]
-pub enum CommitteeSessionStatus {
-    Created,
-    DataEntryNotStarted,
-    DataEntryInProgress,
-    DataEntryPaused,
-    DataEntryFinished,
-}
-
-#[cfg(test)]
-pub(crate) mod tests {
-    use crate::committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatus,
-        repository::CommitteeSessions,
-    };
-    use sqlx::SqlitePool;
-
-    /// Create a test committee session.
-    pub fn committee_session_fixture(election_id: u32) -> CommitteeSession {
-        CommitteeSession {
-            id: 1,
-            number: 1,
-            election_id,
-            location: "Test location".to_string(),
-            start_date: "22-10-2025".to_string(),
-            start_time: "09:15".to_string(),
-            status: CommitteeSessionStatus::DataEntryFinished,
-            number_of_voters: 100,
-        }
-    }
-
-    pub async fn create_committee_session(
-        pool: SqlitePool,
-        number: u32,
-        election_id: u32,
-    ) -> CommitteeSession {
-        CommitteeSessions::new(pool.clone())
-            .create(CommitteeSessionCreateRequest {
-                number,
-                election_id,
-            })
-            .await
-            .unwrap()
-    }
+/// Committee session status change request
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+pub struct CommitteeSessionStatusChangeRequest {
+    pub status: CommitteeSessionStatus,
 }

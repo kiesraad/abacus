@@ -66,9 +66,12 @@ export function ElectionInformationTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.to_do_data_entry_for")}
           </Table.HeaderCell>
-          <Table.Cell></Table.Cell>
+          <Table.Cell>
+            {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+            {t("GSB")}
+          </Table.Cell>
         </Table.Row>
-        <Table.LinkRow key={election.id} to={`polling-stations`}>
+        <Table.LinkRow key={election.id} to="polling-stations">
           <Table.HeaderCell scope="row" className="normal">
             {t("polling_station.title.plural")}
           </Table.HeaderCell>

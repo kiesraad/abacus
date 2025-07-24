@@ -1,74 +1,82 @@
-import { render as rtlRender } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
-import { Providers } from "@/testing/Providers";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import {
+  CommitteeSessionStatusChangeRequestHandler,
+  ElectionRequestHandler,
+  ElectionStatusRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
+import { renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
 
-import { electionManagementRoutes } from "../routes";
 import { ElectionReportPage } from "./ElectionReportPage";
+
+const navigate = vi.fn();
+
+vi.mock("react-router", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useNavigate: () => navigate,
+}));
+
+const renderPage = async () => {
+  const router = renderReturningRouter(
+    <ElectionProvider electionId={1}>
+      <ElectionStatusProvider electionId={1}>
+        <ElectionReportPage />
+      </ElectionStatusProvider>
+    </ElectionProvider>,
+  );
+  expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+  expect(
+    await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
+  ).toBeVisible();
+  return router;
+};
 
 describe("ElectionReportPage", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler);
+    server.use(CommitteeSessionStatusChangeRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
   });
 
-  test("Error when election is not ready", async () => {
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
-    const router = setupTestRouter([
-      {
-        Component: null,
-        errorElement: <ErrorBoundary />,
-        children: [
-          {
-            path: "elections/:electionId/report",
-            children: electionManagementRoutes,
-          },
-        ],
-      },
-    ]);
+  test("Shows page and click on back to overview", async () => {
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
 
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { id: 1, status: "not_started" },
-        { id: 2, status: "definitive" },
-      ],
-    });
+    const router = await renderPage();
 
-    await router.navigate("/elections/1/report");
-
-    rtlRender(<Providers router={router} />);
-
-    await expectErrorPage();
-  });
-
-  test("Shows button", async () => {
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { id: 1, status: "definitive" },
-        { id: 2, status: "definitive" },
-      ],
-    });
-
-    render(
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <ElectionReportPage />
-        </ElectionStatusProvider>
-      </ElectionProvider>,
-    );
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Steminvoer huidige zitting afronden" })).toBeVisible();
-    expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Steminvoer hervatten" })).toBeVisible();
+
+    const backButton = screen.getByRole("link", { name: "Terug naar overzicht" });
+    expect(backButton).toBeVisible();
+    await user.click(backButton);
+
+    expect(statusChange).not.toHaveBeenCalled();
+    expect(router.state.location.pathname).toEqual("/");
+  });
+
+  test("Shows page and click on resume data entry", async () => {
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+
+    await renderPage();
+
+    expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
+
+    const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });
+    expect(resumeButton).toBeVisible();
+    await user.click(resumeButton);
+
+    expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_in_progress" });
+    expect(navigate).toHaveBeenCalledWith("../../status");
   });
 });

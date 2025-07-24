@@ -25,7 +25,8 @@ import { ResolveDifferencesPage } from "./ResolveDifferencesPage";
 
 const navigate = vi.fn();
 
-vi.mock("react-router", () => ({
+vi.mock("react-router", async (importOriginal) => ({
+  ...(await importOriginal()),
   useNavigate: () => navigate,
   useParams: () => ({ pollingStationId: "3" }),
   useLocation: () => ({ pathname: "/" }),

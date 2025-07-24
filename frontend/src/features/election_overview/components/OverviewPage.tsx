@@ -1,4 +1,5 @@
-import { To, useLocation, useNavigate } from "react-router";
+import { ReactNode } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 import { CommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
@@ -23,26 +24,51 @@ export function OverviewPage() {
   const isNewAccount = location.hash === "#new-account";
   const isAdminOrCoordinator = isAdministrator || isCoordinator;
 
-  function electionLink(election: Election): To {
-    if (isAdminOrCoordinator) {
-      return `/elections/${election.id}`;
-    }
-    return `/elections/${election.id}/data-entry`;
+  interface ElectionRowProps {
+    election: Election;
   }
 
-  function getCommitteeSessionStatus(election_id: number) {
-    const committeeSession = committeeSessionList.find(
-      (committeeSession) => committeeSession.election_id === election_id,
-    );
-    if (committeeSession) {
+  function ElectionRow({ election }: ElectionRowProps): ReactNode {
+    function ElectionRowContent() {
       return (
+        <>
+          <Table.Cell className="fs-body">{election.name}</Table.Cell>
+          <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
+          <Table.Cell>{committeeSessionStatus}</Table.Cell>
+        </>
+      );
+    }
+    const committeeSession = committeeSessionList.find(
+      (committeeSession) => committeeSession.election_id === election.id,
+    );
+    let electionLink = null;
+    let committeeSessionStatus = <></>;
+    if (isAdminOrCoordinator) {
+      electionLink = `/elections/${election.id}`;
+    } else if (committeeSession && committeeSession.status === "data_entry_in_progress") {
+      electionLink = `/elections/${election.id}/data-entry`;
+    }
+    if (committeeSession) {
+      committeeSessionStatus = (
         <CommitteeSessionStatusWithIcon
           status={committeeSession.status}
           userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
         />
       );
     }
-    return <></>;
+    if (electionLink) {
+      return (
+        <Table.LinkRow key={election.id} to={electionLink}>
+          <ElectionRowContent />
+        </Table.LinkRow>
+      );
+    } else {
+      return (
+        <Table.Row>
+          <ElectionRowContent />
+        </Table.Row>
+      );
+    }
   }
 
   function closeNewAccountAlert() {
@@ -94,11 +120,7 @@ export function OverviewPage() {
               </Table.Header>
               <Table.Body className="fs-md">
                 {electionList.map((election) => (
-                  <Table.LinkRow key={election.id} to={electionLink(election)}>
-                    <Table.Cell className="fs-body">{election.name}</Table.Cell>
-                    <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
-                    <Table.Cell>{getCommitteeSessionStatus(election.id)}</Table.Cell>
-                  </Table.LinkRow>
+                  <ElectionRow key={election.id} election={election} />
                 ))}
               </Table.Body>
             </Table>

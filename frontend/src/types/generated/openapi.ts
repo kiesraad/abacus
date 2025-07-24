@@ -14,6 +14,13 @@ export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
 export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
 
+// /api/committee_sessions/{committee_session_id}/status
+export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${number}/status`;
+export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
+
 // /api/committee_sessions/{committee_session_id}/voters
 export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
   committee_session_id: number;
@@ -404,6 +411,13 @@ export type CommitteeSessionStatus =
   | "data_entry_finished";
 
 /**
+ * Committee session status change request
+ */
+export interface CommitteeSessionStatusChangeRequest {
+  status: CommitteeSessionStatus;
+}
+
+/**
  * Committee session update request
  */
 export interface CommitteeSessionUpdateRequest {
@@ -653,6 +667,7 @@ export type ErrorReference =
   | "EmlImportError"
   | "EntryNotFound"
   | "EntryNotUnique"
+  | "Forbidden"
   | "InternalServerError"
   | "InvalidData"
   | "InvalidHash"
@@ -670,7 +685,6 @@ export type ErrorReference =
   | "PollingStationRepeated"
   | "PollingStationValidationErrors"
   | "RequestPayloadTooLarge"
-  | "Forbidden"
   | "Unauthorized"
   | "UsernameNotUnique"
   | "UserNotFound"

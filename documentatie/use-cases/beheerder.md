@@ -33,7 +33,7 @@ __Hoofdscenario:__
 1. De beheerder bereidt één computer als Abacus-server voor.
 2. De beheerder downloadt de applicatie.
 3. De beheerder start de applicatie.
-4. De beheerder maakt een eerste account en password aan.
+4. De beheerder maakt een eerste account en wachtwoord aan.
 5. (voor elk invoerstation) De beheerder bereidt de computer als invoerstation voor.
 6. (voor elk invoerstation) De beheerder zorgt dat het invoerstation met de server kan verbinden.
 

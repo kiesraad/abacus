@@ -73,7 +73,7 @@ export const FormFieldWithWarning: Story = {
     hasWarning: true,
   },
   play: async ({ canvas, step }) => {
-    await step("only error icon is present", async () => {
+    await step("only warning icon is present", async () => {
       const errorIcon = canvas.queryByRole("img", { name: "bevat een fout" });
       await expect(errorIcon).not.toBeInTheDocument();
 

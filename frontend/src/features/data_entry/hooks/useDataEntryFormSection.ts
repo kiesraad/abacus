@@ -103,6 +103,6 @@ export function useDataEntryFormSection() {
     showAcceptErrorsAndWarnings,
     isSaving: status === "saving",
     election,
-    sectionId,
+    section,
   };
 }

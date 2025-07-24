@@ -22,6 +22,7 @@ pub(crate) mod tests {
 
     use super::*;
     use crate::{
+        committee_session::tests::committee_session_fixture,
         election::{
             ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
             tests::election_fixture,
@@ -60,6 +61,7 @@ pub(crate) mod tests {
     #[tokio::test]
     async fn it_generates_a_pdf() {
         let content = generate_pdf(PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
+            committee_session: committee_session_fixture(1),
             election: ElectionWithPoliticalGroups {
                 id: 1,
                 name: "Municipal Election".to_string(),
@@ -67,7 +69,6 @@ pub(crate) mod tests {
                 election_id: "MunicipalElection_2025".to_string(),
                 location: "Heemdamseburg".to_string(),
                 domain_id: "0000".to_string(),
-                number_of_voters: 100,
                 category: ElectionCategory::Municipal,
                 number_of_seats: 29,
                 election_date: Utc::now().date_naive(),
@@ -90,6 +91,7 @@ pub(crate) mod tests {
     async fn it_generates_a_pdf_with_polling_stations() {
         let election = election_fixture(&[2, 3]);
         let content = generate_pdf(PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
+            committee_session: committee_session_fixture(election.id),
             polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
             election,
             summary: ElectionSummary::zero(),

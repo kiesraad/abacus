@@ -26,27 +26,16 @@ export function DataEntrySection() {
     onSubmit,
     currentValues,
     setValues,
-    dataEntryStructure,
     formSection,
     status,
     setAcceptErrorsAndWarnings,
     defaultProps,
     showAcceptErrorsAndWarnings,
-    sectionId,
+    section,
   } = useDataEntryFormSection();
   const acceptCheckboxRef = React.useRef<HTMLInputElement>(null);
 
-  const section = dataEntryStructure.find((s) => s.id === sectionId);
-
-  if (!section) {
-    throw new Error(`Section with id ${sectionId} not found`);
-  }
-
-  if (!user) {
-    throw new Error("No user found");
-  }
-
-  const formId = sectionId + "_form";
+  const formId = section.id + "_form";
 
   const bottomBarType = section.subsections.some((subsection) => subsection.type === "inputGrid")
     ? "inputGrid"
@@ -77,6 +66,10 @@ export function DataEntrySection() {
     e.preventDefault();
     void onSubmit();
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id={formId}>

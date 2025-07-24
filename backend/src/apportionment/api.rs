@@ -47,6 +47,7 @@ pub struct ElectionApportionmentResponse {
   responses(
         (status = 200, description = "Election Apportionment", body = ElectionApportionmentResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 412, description = "Election apportionment is not yet available", body = ErrorResponse),
         (status = 422, description = "Election apportionment is not possible", body = ErrorResponse),

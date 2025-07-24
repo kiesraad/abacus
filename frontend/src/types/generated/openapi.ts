@@ -14,6 +14,13 @@ export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
 export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
 
+// /api/committee_sessions/{committee_session_id}/voters
+export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${number}/voters`;
+export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSessionNumberOfVotersChangeRequest;
+
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
@@ -238,6 +245,7 @@ export interface AccountUpdateRequest {
 
 export type AuditEvent =
   | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
+  | (UserLoginFailedDetails & { eventType: "UserLoginFailed" })
   | (UserLoggedOutDetails & { eventType: "UserLoggedOut" })
   | (UserDetails & { eventType: "UserAccountUpdated" })
   | { eventType: "UserSessionExtended" }
@@ -352,6 +360,7 @@ export interface CommitteeSession {
   id: number;
   location: string;
   number: number;
+  number_of_voters: number;
   start_date: string;
   start_time: string;
   status: CommitteeSessionStatus;
@@ -370,6 +379,7 @@ export interface CommitteeSessionDetails {
   sessionId: number;
   sessionLocation: string;
   sessionNumber: number;
+  sessionNumberOfVoters: number;
   sessionStartDate: string;
   sessionStartTime: string;
   sessionStatus: string;
@@ -380,6 +390,13 @@ export interface CommitteeSessionDetails {
  */
 export interface CommitteeSessionListResponse {
   committee_sessions: CommitteeSession[];
+}
+
+/**
+ * Committee session number of voters change request
+ */
+export interface CommitteeSessionNumberOfVotersChangeRequest {
+  number_of_voters: number;
 }
 
 /**
@@ -495,7 +512,6 @@ export interface Election {
   name: string;
   nomination_date: string;
   number_of_seats: number;
-  number_of_voters: number;
 }
 
 export interface ElectionAndCandidateDefinitionValidateRequest {
@@ -542,7 +558,6 @@ export interface ElectionDetails {
   electionName: string;
   electionNominationDate: string;
   electionNumberOfSeats: number;
-  electionNumberOfVoters: number;
 }
 
 /**
@@ -621,7 +636,6 @@ export interface ElectionWithPoliticalGroups {
   name: string;
   nomination_date: string;
   number_of_seats: number;
-  number_of_voters: number;
   political_groups: PoliticalGroup[];
 }
 
@@ -662,6 +676,7 @@ export type ErrorReference =
   | "PollingStationRepeated"
   | "PollingStationValidationErrors"
   | "RequestPayloadTooLarge"
+  | "Forbidden"
   | "Unauthorized"
   | "UsernameNotUnique"
   | "UserNotFound"
@@ -746,7 +761,6 @@ export interface NewElection {
   name: string;
   nomination_date: string;
   number_of_seats: number;
-  number_of_voters: number;
   political_groups: PoliticalGroup[];
 }
 
@@ -1017,6 +1031,11 @@ export interface UserLoggedInDetails {
 
 export interface UserLoggedOutDetails {
   sessionDuration: number;
+}
+
+export interface UserLoginFailedDetails {
+  userAgent: string;
+  username: string;
 }
 
 export interface ValidationResult {

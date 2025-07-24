@@ -16,6 +16,13 @@ pub struct UserLoggedInDetails {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
+pub struct UserLoginFailedDetails {
+    pub username: String,
+    pub user_agent: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UserLoggedOutDetails {
     pub session_duration: u64,
 }
@@ -40,7 +47,6 @@ pub struct ElectionDetails {
     pub election_election_id: String,
     pub election_location: String,
     pub election_domain_id: String,
-    pub election_number_of_voters: u32,
     pub election_category: String,
     pub election_number_of_seats: u32,
     #[schema(value_type = String, format = "date")]
@@ -59,6 +65,7 @@ pub struct CommitteeSessionDetails {
     pub session_start_date: String,
     pub session_start_time: String,
     pub session_status: String,
+    pub session_number_of_voters: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -121,6 +128,7 @@ impl ErrorDetails {
 pub enum AuditEvent {
     // authentication and account events
     UserLoggedIn(UserLoggedInDetails),
+    UserLoginFailed(UserLoginFailedDetails),
     UserLoggedOut(UserLoggedOutDetails),
     UserAccountUpdated(UserDetails),
     UserSessionExtended,
@@ -175,6 +183,7 @@ impl AuditEvent {
     pub fn level(&self) -> AuditEventLevel {
         match self {
             AuditEvent::UserLoggedIn(_) => AuditEventLevel::Success,
+            AuditEvent::UserLoginFailed(_) => AuditEventLevel::Warning,
             AuditEvent::UserLoggedOut(_) => AuditEventLevel::Success,
             AuditEvent::UserSessionExtended => AuditEventLevel::Info,
             AuditEvent::UserAccountUpdated(_) => AuditEventLevel::Success,

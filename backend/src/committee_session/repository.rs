@@ -26,7 +26,8 @@ impl CommitteeSessions {
               status as "status: _",
               location,
               start_date,
-              start_time
+              start_time,
+              number_of_voters as "number_of_voters: u32"
             FROM committee_sessions
             WHERE election_id = ?
             ORDER BY number DESC
@@ -51,7 +52,8 @@ impl CommitteeSessions {
               status as "status: _",
               location,
               start_date,
-              start_time
+              start_time,
+              number_of_voters as "number_of_voters: u32"
             FROM committee_sessions
             WHERE election_id = ?
             ORDER BY number DESC 
@@ -76,7 +78,8 @@ impl CommitteeSessions {
               status as "status: _",
               location,
               start_date,
-              start_time
+              start_time,
+              number_of_voters as "number_of_voters: u32"
             FROM (
               SELECT
                 id,
@@ -86,6 +89,7 @@ impl CommitteeSessions {
                 location,
                 start_date,
                 start_time,
+                number_of_voters,
               row_number() over (
                 PARTITION BY election_id
                 ORDER BY number DESC
@@ -118,7 +122,8 @@ impl CommitteeSessions {
               status as "status: _",
               location,
               start_date,
-              start_time
+              start_time,
+              number_of_voters as "number_of_voters: u32"
             "#,
             committee_session.number,
             committee_session.election_id,
@@ -151,11 +156,40 @@ impl CommitteeSessions {
               status as "status: _",
               location,
               start_date,
-              start_time
+              start_time,
+              number_of_voters as "number_of_voters: u32"
             "#,
             committee_session_update.location,
             committee_session_update.start_date,
             committee_session_update.start_time,
+            committee_session_id,
+        )
+        .fetch_one(&self.0)
+        .await
+    }
+
+    pub async fn change_number_of_voters(
+        &self,
+        committee_session_id: u32,
+        number_of_voters: u32,
+    ) -> Result<CommitteeSession, Error> {
+        query_as!(
+            CommitteeSession,
+            r#"
+            UPDATE committee_sessions
+            SET number_of_voters = ?
+            WHERE id = ?
+            RETURNING
+              id as "id: u32",
+              number as "number: u32",
+              election_id as "election_id: u32",
+              status as "status: _",
+              location,
+              start_date,
+              start_time,
+              number_of_voters as "number_of_voters: u32"
+            "#,
+            number_of_voters,
             committee_session_id,
         )
         .fetch_one(&self.0)

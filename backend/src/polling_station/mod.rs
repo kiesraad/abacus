@@ -77,6 +77,7 @@ async fn polling_station_list(
     responses(
         (status = 201, description = "Polling station created successfully", body = PollingStation),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Election not found", body = ErrorResponse),
         (status = 409, description = "Polling station already exists", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -146,6 +147,7 @@ async fn polling_station_get(
     responses(
         (status = 200, description = "Polling station updated successfully", body = PollingStation),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -181,6 +183,7 @@ async fn polling_station_update(
     responses(
         (status = 200, description = "Polling station deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),

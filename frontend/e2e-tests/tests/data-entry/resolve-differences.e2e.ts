@@ -96,6 +96,7 @@ test.describe("resolve differences then errors", () => {
 
     const resolveErrorsPage = new ResolveErrorsPgObj(page);
     await expect(resolveErrorsPage.title).toBeVisible();
+    await expect(resolveErrorsPage.alertDifferencesResolved).toBeVisible();
     await resolveErrorsPage.resumeFirstEntry.click();
     await resolveErrorsPage.save.click();
 

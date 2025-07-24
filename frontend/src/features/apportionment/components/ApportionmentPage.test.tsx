@@ -12,7 +12,13 @@ import { expectErrorPage, render, renderReturningRouter, screen, setupTestRouter
 import { ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { apportionmentRoutes } from "../routes";
-import { candidate_nomination, election, election_summary, seat_assignment } from "../testing/lt-19-seats";
+import {
+  candidate_nomination,
+  committee_session,
+  election,
+  election_summary,
+  seat_assignment,
+} from "../testing/lt-19-seats";
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 
@@ -34,7 +40,7 @@ const renderApportionmentPage = (withRouter: boolean) => {
 describe("ApportionmentPage", () => {
   test("Election summary and apportionment tables visible", async () => {
     const user = userEvent.setup();
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
@@ -120,7 +126,7 @@ describe("ApportionmentPage", () => {
 
   describe("Apportionment not yet available", () => {
     test("Not available until data entry is finalised", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
       overrideOnce("post", "/api/elections/1/apportionment", 412, {
         error: "Election data entry first needs to be finalised",
         fatal: false,
@@ -143,7 +149,7 @@ describe("ApportionmentPage", () => {
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
@@ -166,7 +172,7 @@ describe("ApportionmentPage", () => {
     });
 
     test("Not possible because all lists are exhausted", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "All lists are exhausted, not enough candidates to fill all seats",
         fatal: false,
@@ -191,7 +197,7 @@ describe("ApportionmentPage", () => {
     });
 
     test("Not possible because no votes on candidates cast", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "No votes on candidates cast",
         fatal: false,
@@ -233,7 +239,7 @@ describe("ApportionmentPage", () => {
         },
       ]);
 
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
       overrideOnce("post", "/api/elections/1/apportionment", 500, {
         error: "Internal Server Error",
         fatal: true,

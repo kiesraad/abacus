@@ -170,7 +170,6 @@ impl EML110 {
             election_id: self.election_identifier().id.clone(),
             location: election_domain.name.clone(),
             domain_id: election_domain.id.clone(),
-            number_of_voters: 0, // max votes is in 110b, so nothing for now
             category: crate::election::ElectionCategory::Municipal,
             number_of_seats,
             election_date,
@@ -251,6 +250,7 @@ impl EML110 {
     }
 
     pub fn polling_stations_from_election(
+        committee_session: &crate::committee_session::CommitteeSession,
         election: &crate::election::ElectionWithPoliticalGroups,
         polling_stations: &[crate::polling_station::PollingStation],
         transaction_id: &str,
@@ -277,7 +277,7 @@ impl EML110 {
                     contest: Contest {
                         contest_identifier: Some(ContestIdentifier::geen()),
                         voting_method: VotingMethod::Unknown,
-                        max_votes: Some(election.number_of_voters.to_string()),
+                        max_votes: Some(committee_session.number_of_voters.to_string()),
                         polling_places: polling_stations
                             .iter()
                             .map(|ps| PollingPlace {

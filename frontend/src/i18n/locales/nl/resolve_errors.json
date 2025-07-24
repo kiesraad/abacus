@@ -1,4 +1,6 @@
 {
+  "alert_contains_errors": "Let op: het proces-verbaal bevat fouten die moeten worden opgelost",
+  "differences_resolved": "Verschil opgelost voor stembureau {number}",
   "form_content": "In de invoer zijn fouten gevonden die wijzen op fouten in het papieren proces-verbaal. Als het om kleine verschrijvingen of optelfouten gaat, mag een lid van het Gemeentelijk Stembureau het proces-verbaal corrigeren. Je kan de invoer dan teruggeven aan de oorspronkelijke invoerder zodat die de fout ook in Abacus kan herstellen.",
   "form_question": "Wat wil je doen met de invoer in Abacus?",
   "options": {

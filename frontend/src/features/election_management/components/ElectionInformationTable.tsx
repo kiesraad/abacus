@@ -9,6 +9,7 @@ import cls from "./ElectionManagement.module.css";
 interface ElectionInformationTableProps {
   election: ElectionWithPoliticalGroups;
   numberOfPollingStations: number;
+  numberOfVoters: number;
 }
 
 function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
@@ -22,7 +23,11 @@ function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
   return label;
 }
 
-export function ElectionInformationTable({ election, numberOfPollingStations }: ElectionInformationTableProps) {
+export function ElectionInformationTable({
+  election,
+  numberOfPollingStations,
+  numberOfVoters,
+}: ElectionInformationTableProps) {
   return (
     <Table id="election-information-table" className={cn(cls.table, cls.electionInformationTable)}>
       <Table.Body>
@@ -54,9 +59,7 @@ export function ElectionInformationTable({ election, numberOfPollingStations }: 
             {t("number_of_voters")}
           </Table.HeaderCell>
           <Table.Cell>
-            {election.number_of_voters
-              ? formatNumber(election.number_of_voters)
-              : t("election_management.still_to_input")}
+            {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input")}
           </Table.Cell>
         </Table.Row>
         <Table.Row increasedPadding>

@@ -16,7 +16,7 @@ import cls from "./ElectionManagement.module.css";
 
 export function ElectionHomePage() {
   const { isTypist } = useUserRole();
-  const { election, pollingStations } = useElection();
+  const { committeeSession, election, pollingStations } = useElection();
 
   const downloadNa31_2Bijlage1 = () => {
     void downloadFrom(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
@@ -47,9 +47,13 @@ export function ElectionHomePage() {
             <CommitteeSessionCards />
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>
-          <div className="mb-xl">
+          <div>
             <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.about_this_election")}</h3>
-            <ElectionInformationTable election={election} numberOfPollingStations={pollingStations.length} />
+            <ElectionInformationTable
+              election={election}
+              numberOfPollingStations={pollingStations.length}
+              numberOfVoters={committeeSession.number_of_voters}
+            />
           </div>
           <div className="mb-xl">
             <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.empty_models")}</h3>

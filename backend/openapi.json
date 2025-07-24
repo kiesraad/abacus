@@ -55,6 +55,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -101,6 +111,90 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Committee session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/committee_sessions/{committee_session_id}/voters": {
+      "put": {
+        "summary": "Change the number of voters of a [CommitteeSession].",
+        "operationId": "committee_session_number_of_voters_change",
+        "parameters": [
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "description": "Committee session database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitteeSessionNumberOfVotersChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Committee session number of voters changed successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -213,6 +307,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -271,6 +375,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -321,6 +435,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -441,6 +565,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
             "content": {
@@ -514,6 +648,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -651,6 +795,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
             "content": {
@@ -700,6 +854,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -765,6 +929,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -895,6 +1069,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -1065,6 +1249,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Polling station not found",
             "content": {
@@ -1120,6 +1314,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -1312,6 +1516,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -1345,6 +1559,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -1396,6 +1620,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -1465,6 +1699,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -1554,6 +1798,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "No data entry with accepted errors found",
             "content": {
@@ -1615,6 +1869,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -1725,6 +1989,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
             "content": {
@@ -1800,6 +2074,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -1890,6 +2174,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409": {
             "description": "Request cannot be completed",
             "content": {
@@ -1954,6 +2248,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -2030,6 +2334,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -2068,6 +2382,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -2164,6 +2488,16 @@
           },
           "401": {
             "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -2282,6 +2616,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "User not found",
             "content": {
@@ -2350,6 +2694,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "User not found",
             "content": {
@@ -2393,6 +2747,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -2484,6 +2848,27 @@
                     "type": "string",
                     "enum": [
                       "UserLoggedIn"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserLoginFailedDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "UserLoginFailed"
                     ]
                   }
                 }
@@ -3252,7 +3637,8 @@
           "location",
           "start_date",
           "start_time",
-          "status"
+          "status",
+          "number_of_voters"
         ],
         "properties": {
           "election_id": {
@@ -3269,6 +3655,11 @@
             "type": "string"
           },
           "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -3313,7 +3704,8 @@
           "sessionLocation",
           "sessionStartDate",
           "sessionStartTime",
-          "sessionStatus"
+          "sessionStatus",
+          "sessionNumberOfVoters"
         ],
         "properties": {
           "sessionElectionId": {
@@ -3330,6 +3722,11 @@
             "type": "string"
           },
           "sessionNumber": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "sessionNumberOfVoters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -3357,6 +3754,20 @@
             "items": {
               "$ref": "#/components/schemas/CommitteeSession"
             }
+          }
+        }
+      },
+      "CommitteeSessionNumberOfVotersChangeRequest": {
+        "type": "object",
+        "description": "Committee session number of voters change request",
+        "required": [
+          "number_of_voters"
+        ],
+        "properties": {
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         }
       },
@@ -3641,7 +4052,6 @@
           "election_id",
           "location",
           "domain_id",
-          "number_of_voters",
           "category",
           "number_of_seats",
           "election_date",
@@ -3680,11 +4090,6 @@
             "format": "date"
           },
           "number_of_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -3800,7 +4205,6 @@
           "electionElectionId",
           "electionLocation",
           "electionDomainId",
-          "electionNumberOfVoters",
           "electionCategory",
           "electionNumberOfSeats",
           "electionElectionDate",
@@ -3839,11 +4243,6 @@
             "format": "date"
           },
           "electionNumberOfSeats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "electionNumberOfVoters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -3999,7 +4398,6 @@
           "election_id",
           "location",
           "domain_id",
-          "number_of_voters",
           "category",
           "number_of_seats",
           "election_date",
@@ -4039,11 +4437,6 @@
             "format": "date"
           },
           "number_of_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -4106,6 +4499,7 @@
           "PollingStationRepeated",
           "PollingStationValidationErrors",
           "RequestPayloadTooLarge",
+          "Forbidden",
           "Unauthorized",
           "UsernameNotUnique",
           "UserNotFound",
@@ -4305,7 +4699,6 @@
           "election_id",
           "location",
           "domain_id",
-          "number_of_voters",
           "category",
           "number_of_seats",
           "election_date",
@@ -4340,11 +4733,6 @@
             "format": "date"
           },
           "number_of_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -5179,6 +5567,21 @@
             "type": "integer",
             "format": "int64",
             "minimum": 0
+          }
+        }
+      },
+      "UserLoginFailedDetails": {
+        "type": "object",
+        "required": [
+          "username",
+          "userAgent"
+        ],
+        "properties": {
+          "userAgent": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
           }
         }
       },

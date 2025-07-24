@@ -1,9 +1,10 @@
 import { useEffect } from "react";
-import { Navigate } from "react-router";
+import { Link, Navigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
@@ -41,12 +42,22 @@ export function ElectionHomePage() {
           <h1>{election.name}</h1>
         </section>
       </header>
+      {pollingStations.length === 0 && (
+        <Alert type="warning">
+          <h2 id="noPollingStationsWarningAlertTitle">{t("election_management.no_polling_stations")}</h2>
+          <p id="noPollingStationsWarningAlertDescription">{t("election_management.add_polling_stations_first")}</p>
+          <p>
+            <Link to="polling-stations">{t("election_management.manage_polling_stations")}</Link> →
+          </p>
+        </Alert>
+      )}
       <main className={cls.electionHome}>
         <article>
           <div className="mb-xl">
             <div>
               <h2>
-                {election.domain_id} {election.location}
+                {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+                {t("GSB")} {election.domain_id} {election.location}
               </h2>
             </div>
           </div>

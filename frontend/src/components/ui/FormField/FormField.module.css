@@ -1,33 +1,27 @@
 .formField {
   position: relative;
+
   aside {
     position: absolute;
     left: 1.5rem;
     z-index: 4;
     top: 50%;
     margin-top: -0.75rem;
+
     svg {
       width: 1.5rem;
-      fill: var(--color-error-darker);
     }
   }
 
-  &:global(.hasWarning) {
-    aside {
-      svg {
-        fill: var(--color-warning);
-      }
-    }
+  aside ~ input {
+    padding-left: 3.5rem;
   }
+}
 
-  &:global(.hasError) {
-    input {
-      padding-left: 3.5rem !important;
-    }
-    aside {
-      svg {
-        fill: var(--color-error-darker);
-      }
-    }
-  }
+.errorIcon {
+  fill: var(--color-error-darker);
+}
+
+.warningIcon {
+  fill: var(--color-warning);
 }

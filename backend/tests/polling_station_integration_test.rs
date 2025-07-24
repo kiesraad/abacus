@@ -4,13 +4,10 @@ use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
 
-use crate::{
-    shared::{claim_data_entry, create_result, example_data_entry, save_data_entry},
-    utils::serve_api,
-};
+use crate::utils::serve_api;
 use abacus::{
     ErrorResponse,
-    committee_session::{repository::CommitteeSessions, status::CommitteeSessionStatus},
+    committee_session::status::CommitteeSessionStatus,
     polling_station::{
         PollingStation, PollingStationListResponse, PollingStationRequest, PollingStationType,
     },
@@ -47,18 +44,15 @@ async fn test_polling_station_listing(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_6", "users"))))]
 async fn test_polling_station_creation_for_committee_session_with_created_status(pool: SqlitePool) {
-    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 6;
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
 
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await
-        .unwrap();
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
     let response = reqwest::Client::new()
         .post(&url)
         .json(&PollingStationRequest {
@@ -70,7 +64,7 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
             postal_code: "1234 QY".to_string(),
             locality: "Heemdamseburg".to_string(),
         })
-        .header("cookie", cookie)
+        .header("cookie", &cookie)
         .send()
         .await
         .unwrap();
@@ -88,10 +82,8 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
         Some(PollingStationType::FixedLocation)
     );
 
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await
-        .unwrap();
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryNotStarted
@@ -102,33 +94,19 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
 async fn test_polling_station_creation_for_committee_session_with_finished_status(
     pool: SqlitePool,
 ) {
-    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
+
+    shared::change_status_committee_session(
+        &addr,
+        &cookie,
+        election_id,
+        CommitteeSessionStatus::DataEntryFinished,
+    )
+    .await;
+
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
-
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await
-        .unwrap();
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
-    );
-    committee_sessions_repo
-        .delete(committee_session.id)
-        .await
-        .expect("Second election committee session should be deleted");
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await
-        .unwrap();
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
-    );
-
     let response = reqwest::Client::new()
         .post(&url)
         .json(&PollingStationRequest {
@@ -140,7 +118,7 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
             postal_code: "1234 QY".to_string(),
             locality: "Heemdamseburg".to_string(),
         })
-        .header("cookie", cookie)
+        .header("cookie", &cookie)
         .send()
         .await
         .unwrap();
@@ -158,10 +136,8 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
         Some(PollingStationType::FixedLocation)
     );
 
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await
-        .unwrap();
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryInProgress
@@ -290,21 +266,18 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_delete_ok(pool: SqlitePool) {
-    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/2");
 
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await
-        .unwrap();
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryInProgress
     );
 
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/2");
     let response = reqwest::Client::new()
         .delete(&url)
         .header("cookie", cookie.clone())
@@ -318,10 +291,8 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await
-        .unwrap();
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryInProgress
@@ -355,10 +326,8 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await
-        .unwrap();
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 }
 
@@ -366,8 +335,15 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
 async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
-    claim_data_entry(&addr, &typist_cookie, 2, 1).await;
-    save_data_entry(&addr, &typist_cookie, 2, 1, example_data_entry(None)).await;
+    shared::claim_data_entry(&addr, &typist_cookie, 2, 1).await;
+    shared::save_data_entry(
+        &addr,
+        &typist_cookie,
+        2,
+        1,
+        shared::example_data_entry(None),
+    )
+    .await;
 
     let admin_cookie = shared::admin_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
@@ -391,7 +367,7 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
 async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = shared::admin_login(&addr).await;
-    create_result(&addr, 1, 2).await;
+    shared::create_result(&addr, 1, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/polling_stations/1");
     let response = reqwest::Client::new()

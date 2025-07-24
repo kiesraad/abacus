@@ -4,7 +4,8 @@ use std::net::SocketAddr;
 
 use abacus::{
     committee_session::{
-        CommitteeSession, repository::CommitteeSessions, status::CommitteeSessionStatus,
+        CommitteeSession, CommitteeSessionListResponse, CommitteeSessionStatusChangeRequest,
+        status::CommitteeSessionStatus,
     },
     data_entry::{
         CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
@@ -17,7 +18,6 @@ use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
 use reqwest::{Body, Client, Response};
 use serde_json::json;
-use sqlx::SqlitePool;
 
 pub fn differences_counts_zero() -> DifferencesCounts {
     DifferencesCounts {
@@ -219,15 +219,38 @@ pub async fn create_result_with_non_example_data_entry(
         .await;
 }
 
+pub async fn get_election_committee_session(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+) -> CommitteeSession {
+    let url = format!("http://{addr}/api/elections/{election_id}/committee_sessions");
+    let response = Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    let body: CommitteeSessionListResponse = response.json().await.unwrap();
+    body.committee_sessions.first().unwrap().clone()
+}
+
 pub async fn change_status_committee_session(
-    pool: SqlitePool,
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
     committee_session_id: u32,
     status: CommitteeSessionStatus,
-) -> CommitteeSession {
-    CommitteeSessions::new(pool.clone())
-        .change_status(committee_session_id, status)
+) {
+    let url = format!("http://{addr}/api/committee_sessions/{committee_session_id}/status");
+    let response = Client::new()
+        .put(&url)
+        .header("cookie", cookie)
+        .json(&CommitteeSessionStatusChangeRequest { status })
+        .send()
         .await
-        .unwrap()
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
 }
 
 /// Calls the login endpoint for an Admin user and returns the session cookie

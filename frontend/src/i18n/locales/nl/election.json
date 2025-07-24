@@ -15,6 +15,7 @@
   "check_eml": {
     "election_title": "Controleer verkiezingsdefinitie",
     "candidates_title": "Controleer kandidatenlijst",
+    "polling_station_title": "Controleer stembureaus",
     "election_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
     "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende kandidaten:",
     "list_name": "{location}, kandidatenlijst {name}",
@@ -52,11 +53,33 @@
     "singular": "Verkiezing"
   },
   "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
+  "import_eml": "Importeer verkiezingsdefinitie",
   "import_candidates_eml": "Importeer kandidatenlijst",
+  "import_polling_station_eml": "Importeer stembureaus gemeente {location}",
   "use_instructions_to_import_candidates_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de kandidatenlijst kunt downloaden. Zet het bestand op deze computer en importeer het.",
+  "use_instructions_to_import_polling_stations_eml": "Importeer het bestand met stembureaus. Heb je geen bestand met stembureaus? Je kan ze later nog handmatig invoeren. Sla deze stap dan over.",
+  "invalid_election_definition": {
+    "title": "Ongeldige verkiezingsdefinitie",
+    "description": "Het bestand <file>filename</file> bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
+    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte."
+  },
   "invalid_candidates_definition": {
     "title": "Ongeldige kandidatenlijst",
     "description": "Het bestand <file>filename</file> bevat geen geldige kandidatenlijst. Kies een bestand met een geldige definitie.",
     "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte."
+  },
+  "invalid_polling_station_definition": {
+    "title": "Ongeldig stembureaubestand",
+    "description": "Het bestand <file>filename</file> bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
+    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte."
+  },
+  "polling_stations": {
+    "check": {
+      "title": "Controleer stembureaus",
+      "description": "Het bestand <file>filename</file> is geïmporteerd en bevat de volgende stembureaus:"
+    },
+    "skip_step": "Stap overslaan en stembureaus later toevoegen",
+    "show_all": "Toon alle {num} stembureaus",
+    "added": "{num} stembureaus toegevoegd"
   }
 }

@@ -116,7 +116,7 @@ export function CommitteeSessionCard({
     case "data_entry_not_started":
       if (isCoordinator) {
         button = (
-          <Button variant="primary" size="sm" onClick={handleStart}>
+          <Button size="sm" onClick={handleStart}>
             {t("election_management.start_data_entry")}
           </Button>
         );
@@ -124,12 +124,19 @@ export function CommitteeSessionCard({
       break;
     case "data_entry_in_progress":
       button = (
-        <Button.Link variant="primary" size="sm" to="status">
+        <Button.Link size="sm" to="status">
           {t("election_management.view_progress")}
         </Button.Link>
       );
       break;
     case "data_entry_paused":
+      buttonLinks.push({
+        id: committeeSession.id,
+        label: isCoordinator
+          ? t("election_management.resume_or_check_progress")
+          : t("election_management.view_progress"),
+        to: "status",
+      });
       break;
     case "data_entry_finished":
       if (isCoordinator) {

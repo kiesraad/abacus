@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
+import { useApiClient } from "@/api/useApiClient";
 import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { Messages } from "@/components/messages/Messages";
@@ -12,11 +13,17 @@ import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
+import {
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
+  CommitteeSessionStatus,
+} from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 
 import { ElectionStatus } from "./ElectionStatus";
 
 export function ElectionStatusPage() {
+  const client = useApiClient();
   const navigate = useNavigate();
   const { committeeSession, election, pollingStations, refetch } = useElection();
   const { statuses } = useElectionStatus();
@@ -37,6 +44,66 @@ export function ElectionStatusPage() {
     void navigate("../report");
   }
 
+  function handleStatusChange(status: CommitteeSessionStatus) {
+    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: status };
+    void client.putRequest(url, body).then(async () => {
+      await refetch();
+    });
+  }
+
+  function getLinks() {
+    const links = [];
+    if (committeeSession.status === "data_entry_not_started") {
+      links.push(
+        <button
+          key="start"
+          className="link"
+          onClick={() => {
+            handleStatusChange("data_entry_in_progress");
+          }}
+        >
+          {t("election_status.start")}
+        </button>,
+      );
+    } else if (committeeSession.status === "data_entry_in_progress") {
+      links.push(
+        <button
+          key="pause"
+          className="link"
+          onClick={() => {
+            handleStatusChange("data_entry_paused");
+          }}
+        >
+          {t("election_status.pause")}
+        </button>,
+      );
+      links.push(
+        <Link key="finish" to="../report">
+          {t("complete")}
+        </Link>,
+      );
+    } else if (committeeSession.status === "data_entry_paused") {
+      links.push(
+        <button
+          key="resume"
+          className="link"
+          onClick={() => {
+            handleStatusChange("data_entry_in_progress");
+          }}
+        >
+          {t("election_status.resume")}
+        </button>,
+      );
+      links.push(
+        <Link key="finish" to="../report">
+          {t("complete")}
+        </Link>,
+      );
+    }
+    return links;
+  }
+
   return (
     <>
       <PageTitle title={`${t("election_status.title")} - Abacus`} />
@@ -51,6 +118,7 @@ export function ElectionStatusPage() {
               userRole="coordinator"
               committeeSessionNumber={committeeSession.number}
             />
+            {isCoordinator && getLinks()}
           </div>
         </section>
       </header>

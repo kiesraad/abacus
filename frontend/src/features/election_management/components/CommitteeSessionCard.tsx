@@ -1,11 +1,17 @@
 import { Fragment, HTMLAttributes, ReactNode } from "react";
 import { To, useNavigate } from "react-router";
 
+import { useApiClient } from "@/api/useApiClient";
 import { CommitteeSessionStatusLabel } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";
 import { CommitteeSessionStatusIcon } from "@/components/ui/Icon/CommitteeSessionStatusIcon";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import { CommitteeSession } from "@/types/generated/openapi";
+import {
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
+  CommitteeSession,
+} from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatFullDateWithoutTimezone } from "@/utils/format";
@@ -80,6 +86,18 @@ export function CommitteeSessionCard({
   currentSession,
   ...props
 }: CommitteeSessionCardProps & DivProps) {
+  const client = useApiClient();
+  const navigate = useNavigate();
+  const { isCoordinator } = useUserRole();
+
+  function handleStart() {
+    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
+    void client.putRequest(url, body).then(() => {
+      void navigate("status");
+    });
+  }
+
   const icon = CommitteeSessionStatusIcon({ status: committeeSession.status, size: "xl" });
   const label = committeeSessionLabel(committeeSession.number);
   const status = CommitteeSessionStatusLabel(committeeSession.status, "coordinator");
@@ -90,11 +108,19 @@ export function CommitteeSessionCard({
   let button = undefined;
   switch (committeeSession.status) {
     case "created":
-      if (committeeSession.number > 1) {
-        buttonLinks.push({ id: committeeSession.id, label: t("election_management.select_polling_stations"), to: "" }); // TODO: issue #1716 add link
-      }
+      // TODO: Add in issue #1716 with link
+      // if (committeeSession.number > 1 && currentSession) {
+      //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.select_polling_stations"), to: "" });
+      // }
       break;
     case "data_entry_not_started":
+      if (isCoordinator) {
+        button = (
+          <Button variant="primary" size="sm" onClick={handleStart}>
+            {t("election_management.start_data_entry")}
+          </Button>
+        );
+      }
       break;
     case "data_entry_in_progress":
       button = (
@@ -106,17 +132,22 @@ export function CommitteeSessionCard({
     case "data_entry_paused":
       break;
     case "data_entry_finished":
-      buttonLinks.push({
-        id: committeeSession.id,
-        label: t("election_management.results_and_documents"),
-        to: "report", // TODO: change link when reports are linked to committee sessions
-      });
+      if (isCoordinator) {
+        buttonLinks.push({
+          id: committeeSession.id,
+          label: t("election_management.results_and_documents"),
+          to: "report/download", // TODO: change link when reports are linked to committee sessions
+        });
+      }
       if (currentSession) {
         buttonLinks.push({ id: committeeSession.id, label: t("election_management.view_data_entry"), to: "status" });
       }
       break;
   }
-  buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" }); // TODO: issue #1750 add link
+  // TODO: Add in issue #1750 with link
+  // if (isCoordinator) {
+  //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" });
+  // }
 
   return (
     <Card icon={icon} label={label} status={status} date={date} button={button} {...props}>

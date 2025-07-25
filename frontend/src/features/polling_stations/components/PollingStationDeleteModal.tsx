@@ -1,5 +1,6 @@
 import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
+import { IconTrash } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
@@ -38,10 +39,16 @@ export function PollingStationDeleteModal({
     <Modal title={t("polling_station.delete")} onClose={onCancel}>
       <p>{t("polling_station.delete_are_you_sure")}</p>
       <nav>
-        <Button variant="primary-destructive" size="lg" onClick={handleDelete} disabled={deleting}>
+        <Button
+          leftIcon={<IconTrash />}
+          variant="primary-destructive"
+          size="xl"
+          onClick={handleDelete}
+          disabled={deleting}
+        >
           {t("delete")}
         </Button>
-        <Button variant="secondary" size="lg" onClick={onCancel} disabled={deleting}>
+        <Button variant="secondary" size="xl" onClick={onCancel} disabled={deleting}>
           {t("cancel")}
         </Button>
       </nav>

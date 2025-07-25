@@ -25,7 +25,6 @@ vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => navigate,
   useParams: () => ({ pollingStationId: "5" }),
-  useLocation: () => ({ pathname: "/" }),
 }));
 
 vi.mock("@/hooks/messages/useMessages");
@@ -63,7 +62,21 @@ describe("ResolveErrorsPage", () => {
   test("should render the page", async () => {
     await renderPage();
 
-    // TODO: Issue #1512 Add checks for rendering errors and warnings
+    expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
+
+    const voters_votes_counts = screen.queryByRole("region", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
+    expect(voters_votes_counts).toBeInTheDocument();
+
+    const differences_counts = screen.queryByRole("region", {
+      name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+    });
+    expect(differences_counts).toBeInTheDocument();
+
+    const political_group_votes_1 = screen.queryByRole("region", { name: "Lijst 1 - Vurige Vleugels Partij" });
+    expect(political_group_votes_1).not.toBeInTheDocument();
+
+    const political_group_votes_2 = screen.queryByRole("region", { name: "Lijst 2 - Wijzen van Water en Wind" });
+    expect(political_group_votes_2).not.toBeInTheDocument();
 
     expect(
       await screen.findByRole("heading", { level: 3, name: "Wat wil je doen met de invoer in Abacus?" }),

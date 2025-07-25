@@ -1,7 +1,10 @@
-import { Navigate } from "react-router";
+import { useEffect } from "react";
+import { Link, Navigate } from "react-router";
 
+import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { Table } from "@/components/ui/Table/Table";
 import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { useElection } from "@/hooks/election/useElection";
@@ -16,7 +19,18 @@ import cls from "./ElectionManagement.module.css";
 
 export function ElectionHomePage() {
   const { isTypist } = useUserRole();
-  const { committeeSession, election, pollingStations } = useElection();
+  const { committeeSession, election, pollingStations, refetch } = useElection();
+
+  // re-fetch election when component mounts
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    void refetch(abortController);
+
+    return () => {
+      abortController.abort(DEFAULT_CANCEL_REASON);
+    };
+  }, [refetch]);
 
   const downloadNa31_2Bijlage1 = () => {
     void downloadFrom(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
@@ -34,12 +48,22 @@ export function ElectionHomePage() {
           <h1>{election.name}</h1>
         </section>
       </header>
+      {pollingStations.length === 0 && (
+        <Alert type="warning">
+          <h2 id="noPollingStationsWarningAlertTitle">{t("election_management.no_polling_stations")}</h2>
+          <p id="noPollingStationsWarningAlertDescription">{t("election_management.add_polling_stations_first")}</p>
+          <p>
+            <Link to="polling-stations">{t("election_management.manage_polling_stations")}</Link> →
+          </p>
+        </Alert>
+      )}
       <main className={cls.electionHome}>
         <article>
           <div className="mb-xl">
             <div>
               <h2>
-                {election.domain_id} {election.location}
+                {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+                {t("GSB")} {election.domain_id} {election.location}
               </h2>
             </div>
           </div>
@@ -47,7 +71,7 @@ export function ElectionHomePage() {
             <CommitteeSessionCards />
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>
-          <div>
+          <div className="mb-xl">
             <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.about_this_election")}</h3>
             <ElectionInformationTable
               election={election}

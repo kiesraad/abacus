@@ -802,18 +802,19 @@ mod tests {
     #[test]
     fn first_entry_not_started_to_first_entry_in_progress() {
         // Happy path
-        let initial = DataEntryStatus::FirstEntryNotStarted;
-        let next = initial
-            .claim_first_entry(empty_current_data_entry())
-            .unwrap();
-        assert!(matches!(next, DataEntryStatus::FirstEntryInProgress(_)));
+        assert!(matches!(
+            DataEntryStatus::FirstEntryNotStarted.claim_first_entry(empty_current_data_entry()),
+            Ok(DataEntryStatus::FirstEntryInProgress(_))
+        ));
     }
 
     /// FirstEntryInProgress --> FirstEntryInProgress: claim with same user
     #[test]
     fn first_entry_in_progress_claim_first_entry_ok() {
-        let next = first_entry_in_progress().claim_first_entry(empty_current_data_entry());
-        assert!(matches!(next, Ok(DataEntryStatus::FirstEntryInProgress(_))));
+        assert!(matches!(
+            first_entry_in_progress().claim_first_entry(empty_current_data_entry()),
+            Ok(DataEntryStatus::FirstEntryInProgress(_))
+        ));
     }
 
     /// FirstEntryInProgress --> FirstEntryInProgress: claim with different user returns error
@@ -859,10 +860,8 @@ mod tests {
     #[test]
     fn first_entry_in_progress_to_first_entry_in_progress() {
         assert!(matches!(
-            first_entry_in_progress()
-                .update_first_entry(empty_current_data_entry())
-                .unwrap(),
-            DataEntryStatus::FirstEntryInProgress(_)
+            first_entry_in_progress().update_first_entry(empty_current_data_entry()),
+            Ok(DataEntryStatus::FirstEntryInProgress(_))
         ));
     }
 
@@ -1015,9 +1014,8 @@ mod tests {
     /// SecondEntryInProgress --> SecondEntryInProgress: claim with same user
     #[test]
     fn second_entry_in_progress_claim_second_entry_ok() {
-        let next = second_entry_in_progress().claim_second_entry(empty_current_data_entry());
         assert!(matches!(
-            next,
+            second_entry_in_progress().claim_second_entry(empty_current_data_entry()),
             Ok(DataEntryStatus::SecondEntryInProgress(_))
         ));
     }

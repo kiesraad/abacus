@@ -1,5 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
-import { beforeEach, describe, expect, test } from "vitest";
+import { userEvent } from "@testing-library/user-event";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
@@ -16,6 +17,13 @@ import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
 import { electionStatusRoutes } from "../routes";
+
+const navigate = vi.fn();
+
+vi.mock("react-router", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useNavigate: () => navigate,
+}));
 
 async function renderPage() {
   // Set up router and navigate to the election data entry status page
@@ -62,6 +70,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input visible when data entry has finished", async () => {
+    const user = userEvent.setup();
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "definitive" },
@@ -72,7 +81,12 @@ describe("ElectionStatusPage", () => {
     await renderPage();
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Invoerfase afronden" })).toBeVisible();
+    const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
+    expect(finishButton).toBeVisible();
+
+    await user.click(finishButton);
+
+    expect(navigate).toHaveBeenCalledWith("../report");
   });
 
   test("Finish input not visible when election is finished", async () => {

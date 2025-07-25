@@ -10,9 +10,9 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
+import { getTypistUser } from "@/testing/user-mock-data";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import { getTypistUser } from "../testing/mock-data";
 import { DataEntryProvider } from "./DataEntryProvider";
 import { DataEntrySection } from "./DataEntrySection";
 

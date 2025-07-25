@@ -48,7 +48,7 @@ describe("ElectionInformationTable", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
       ["Aantal kiesgerechtigden", "Nog invullen"],
-      ["Invoer doen voor", ""],
+      ["Invoer doen voor", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);

@@ -11,7 +11,7 @@ export interface ElectionProviderProps {
 }
 
 export function ElectionProvider({ children, electionId }: ElectionProviderProps) {
-  const { requestState } = useElectionDataRequest(electionId);
+  const { requestState, refetch } = useElectionDataRequest(electionId);
 
   return (
     <RequestStateHandler
@@ -24,6 +24,7 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
             committeeSession: data.committee_session,
             election: data.election,
             pollingStations: data.polling_stations,
+            refetch,
           }}
         >
           {children}

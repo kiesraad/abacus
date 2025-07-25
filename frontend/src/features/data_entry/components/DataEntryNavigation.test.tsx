@@ -5,13 +5,10 @@ import { describe, expect, test, vi } from "vitest";
 
 import { useUser } from "@/hooks/user/useUser";
 import { setupTestRouter } from "@/testing/test-utils";
+import { getTypistUser } from "@/testing/user-mock-data";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
-import {
-  getDefaultDataEntryState,
-  getDefaultDataEntryStateAndActionsLoaded,
-  getTypistUser,
-} from "../testing/mock-data";
+import { getDefaultDataEntryState, getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
 import { DataEntryStateAndActionsLoaded, Status, SubmitCurrentFormOptions } from "../types/types";
 import { DataEntryNavigation } from "./DataEntryNavigation";
 

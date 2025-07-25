@@ -88,6 +88,13 @@ section.md {
 }
 
 /* Link styling */
+.link {
+  all: unset;
+  text-decoration: underline;
+  cursor: pointer;
+  color: var(--link-default);
+}
+
 a {
   color: var(--link-default);
 

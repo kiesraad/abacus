@@ -142,8 +142,8 @@ test("should handle UPDATE_FORM_SECTION", () => {
   };
 
   const state = dataEntryReducer(oldState, action);
-  expect(state.formState.sections.voters_votes_counts.hasChanges).toBeDefined();
-  expect(state.formState.sections.voters_votes_counts.hasChanges).toEqual(true);
+  expect(state.formState.sections.voters_votes_counts!.hasChanges).toBeDefined();
+  expect(state.formState.sections.voters_votes_counts!.hasChanges).toEqual(true);
 });
 
 test("should handle FORM_SAVE_FAILED", () => {
@@ -219,7 +219,7 @@ describe("onSubmitForm", () => {
         sections: {
           ...defaultState.formState.sections,
           voters_votes_counts: {
-            ...defaultState.formState.sections.voters_votes_counts,
+            ...defaultState.formState.sections.voters_votes_counts!,
             acceptErrorsAndWarnings: false,
             warnings: new ValidationResultSet([validationResultMockData.W201]),
           },

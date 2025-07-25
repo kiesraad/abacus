@@ -8,18 +8,18 @@ import { RadioSubsectionComponent } from "./RadioSubsection";
 
 const radioSubsection: RadioSubsection = {
   type: "radio",
-  short_title: "voters_votes_counts.short_title",
-  error: "form_errors.FORM_VALIDATION_RESULT_REQUIRED",
-  path: "voters_counts.poll_card_count",
+  short_title: "radio",
+  error: "error",
+  path: "test.radio",
   options: [
     {
-      value: "yes",
+      value: "true",
       label: "yes",
       short_label: "yes",
       autoFocusInput: true,
     },
     {
-      value: "no",
+      value: "false",
       label: "no",
       short_label: "no",
     },

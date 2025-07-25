@@ -1,6 +1,6 @@
 import { t } from "@/i18n/translate";
 import { ElectionWithPoliticalGroups, PoliticalGroup, PollingStationResults } from "@/types/generated/openapi";
-import { DataEntrySection, DataEntryStructure, FormSectionId, InputGridSubsectionRow } from "@/types/types";
+import { DataEntrySection, DataEntryStructure, InputGridSubsectionRow } from "@/types/types";
 import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 
@@ -139,7 +139,7 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
 
     const title = formatPoliticalGroupName(politicalGroup);
     return {
-      id: `political_group_votes_${politicalGroup.number}` as FormSectionId,
+      id: `political_group_votes_${politicalGroup.number}`,
       title: title,
       short_title: title,
       subsections: [

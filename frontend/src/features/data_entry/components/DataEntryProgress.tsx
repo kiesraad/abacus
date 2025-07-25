@@ -37,7 +37,7 @@ export function DataEntryProgress() {
       if (furthestSection) {
         //check if section has been left empty
         if (formSection.index < furthestSection.index) {
-          if (isFormSectionEmpty(formSection, pollingStationResults)) {
+          if (isFormSectionEmpty(dataEntryStructure, formSection, pollingStationResults)) {
             return "empty";
           }
         }
@@ -49,7 +49,7 @@ export function DataEntryProgress() {
 
       return "idle";
     },
-    [formState, pollingStationResults],
+    [formState, pollingStationResults, dataEntryStructure],
   );
 
   const currentIndex = formState.sections[formState.furthest]?.index || 0;

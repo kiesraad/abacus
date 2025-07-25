@@ -1,22 +1,42 @@
-use std::path::PathBuf;
-
 use rand::{Rng, distr::Alphanumeric};
+use std::{io::Write, path::PathBuf};
+use zip::result::ZipError;
 
 use super::{PdfGenResult, models::PdfModel};
-use crate::APIError;
+use crate::{
+    APIError,
+    zip::{default_zip_options, slugify_filename},
+};
 
+/// Generates a PDF using an external typst binary.
+/// Uses environment variables `ABACUS_TYPST_BIN` (`typst` by default)
+/// and `ABACUS_TEMPLATES_DIR` (`./templates` by default) to
 pub async fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
     Ok(generate_pdf_internal(model).await?)
 }
 
-pub async fn generate_pdfs(models: Vec<PdfModel>) -> Result<Vec<PdfGenResult>, APIError> {
-    let mut results = Vec::new();
+/// Generates a ZIP file containing the PDFs for the provided models.
+pub async fn generate_pdfs_zip(models: Vec<PdfModel>) -> Result<Vec<u8>, APIError> {
+    Ok(generate_pdfs_zip_inner(models).await?)
+}
 
-    for model in models {
-        results.push(generate_pdf_internal(model).await?);
+/// Generates a zip file containing the PDFs for the provided models.
+pub async fn generate_pdfs_zip_inner(models: Vec<PdfModel>) -> Result<Vec<u8>, PdfGenError> {
+    let mut data = vec![];
+    let mut cursor = std::io::Cursor::new(&mut data);
+    let mut zip = zip::ZipWriter::new(&mut cursor);
+    let options = default_zip_options();
+
+    for model in models.into_iter() {
+        let file_name = model.get_filename();
+        let content = generate_pdf_internal(model).await?;
+        zip.start_file(slugify_filename(&file_name), options)?;
+        zip.write_all(&content.buffer).map_err(ZipError::Io)?;
     }
 
-    Ok(results)
+    zip.finish()?;
+
+    Ok(data)
 }
 
 /// Uses environment variables `ABACUS_TYPST_BIN` (`typst` by default) and `ABACUS_TEMPLATES_DIR` (`./templates` by
@@ -107,6 +127,7 @@ pub enum PdfGenError {
     Io(std::io::Error),
     Join(tokio::task::JoinError),
     Json(serde_json::Error),
+    ZipError(ZipError),
 }
 
 impl From<std::io::Error> for PdfGenError {
@@ -124,5 +145,11 @@ impl From<serde_json::Error> for PdfGenError {
 impl From<tokio::task::JoinError> for PdfGenError {
     fn from(err: tokio::task::JoinError) -> Self {
         PdfGenError::Join(err)
+    }
+}
+
+impl From<ZipError> for PdfGenError {
+    fn from(err: ZipError) -> Self {
+        PdfGenError::ZipError(err)
     }
 }

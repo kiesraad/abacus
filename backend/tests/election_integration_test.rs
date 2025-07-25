@@ -343,9 +343,7 @@ async fn test_election_na_31_2_bijlage1_download(pool: SqlitePool) {
 
     let bytes = response.bytes().await.unwrap();
 
-    // write to disk and print filename
-    std::fs::write("test_na_31_2_bijlage1.zip", &bytes).unwrap();
-    println!("Wrote test_na_31_2_bijlage1.zip");
+    println!("Received {} bytes", bytes.len());
 
     let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
 

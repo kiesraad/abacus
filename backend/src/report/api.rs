@@ -16,7 +16,7 @@ use crate::{
     },
     polling_station::{repository::PollingStations, structs::PollingStation},
     summary::ElectionSummary,
-    zip::{ZipResponse, slugify_filename},
+    zip::{create_zip, slugify_filename},
 };
 
 impl From<ZipError> for APIError {
@@ -108,14 +108,17 @@ impl ResultsInput {
     }
 
     fn into_pdf_model(self, xml_hash: impl Into<String>) -> PdfModel {
-        PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
-            committee_session: self.committee_session,
-            polling_stations: self.polling_stations,
-            summary: self.summary,
-            election: self.election,
-            hash: xml_hash.into(),
-            creation_date_time: self.creation_date_time.format("%d-%m-%Y %H:%M").to_string(),
-        }))
+        PdfModel::ModelNa31_2(
+            self.pdf_filename(),
+            Box::new(ModelNa31_2Input {
+                committee_session: self.committee_session,
+                polling_stations: self.polling_stations,
+                summary: self.summary,
+                election: self.election,
+                hash: xml_hash.into(),
+                creation_date_time: self.creation_date_time.format("%d-%m-%Y %H:%M").to_string(),
+            }),
+        )
     }
 }
 
@@ -166,12 +169,13 @@ async fn election_download_zip_results(
     let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model).await?;
 
-    let zip = ZipResponse::with_name(&zip_filename);
-
-    zip.create_zip(vec![
-        (pdf_filename, content.buffer),
-        (xml_filename, xml_string.into_bytes()),
-    ])
+    create_zip(
+        &zip_filename,
+        vec![
+            (pdf_filename, content.buffer),
+            (xml_filename, xml_string.into_bytes()),
+        ],
+    )
 }
 
 /// Download a generated PDF with election results

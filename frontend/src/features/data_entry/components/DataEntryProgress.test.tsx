@@ -55,7 +55,7 @@ const pollingStationResults = {
     {
       number: 1,
       total: 0,
-      candidate_votes: [{ number: 1, votes: 0 }],
+      candidate_votes: Array.from({ length: 29 }, (_, i) => ({ number: i, votes: 0 })),
     },
     {
       number: 2,
@@ -65,7 +65,7 @@ const pollingStationResults = {
   ],
 };
 
-describe("Test DataEntryProgress", () => {
+describe("DataEntryProgress", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler);
     vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });

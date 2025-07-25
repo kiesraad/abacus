@@ -5,30 +5,39 @@ import { deformatNumber, formatNumber } from "@/utils/format";
 type PathSegment = string | number;
 type PathValue = boolean | number | string | undefined;
 
-export function mapSectionValues<T>(current: T, formValues: SectionValues, section: DataEntrySection): T {
-  const mappedValues: T = structuredClone(current);
-
+/**
+ * Extracts all data field paths and their types from a DataEntrySection as a Map
+ * @param section The data entry section to extract field information from
+ * @returns Map where key is the field path and value is the field type
+ */
+export function extractFieldInfoFromSection(section: DataEntrySection): Map<string, "boolean" | "formattedNumber"> {
   const fieldInfoMap = new Map<string, "boolean" | "formattedNumber">();
+
   for (const subsection of section.subsections) {
     switch (subsection.type) {
-      case "radio": {
+      case "radio":
         fieldInfoMap.set(subsection.path, "boolean");
         break;
-      }
-      case "inputGrid": {
+      case "inputGrid":
         for (const row of subsection.rows) {
           fieldInfoMap.set(row.path, "formattedNumber");
         }
         break;
-      }
-      case "checkboxes": {
+      case "checkboxes":
         for (const option of subsection.options) {
           fieldInfoMap.set(option.path, "boolean");
         }
         break;
-      }
     }
   }
+
+  return fieldInfoMap;
+}
+
+export function mapSectionValues<T>(current: T, formValues: SectionValues, section: DataEntrySection): T {
+  const mappedValues: T = structuredClone(current);
+
+  const fieldInfoMap = extractFieldInfoFromSection(section);
 
   Object.entries(formValues).forEach(([path, value]) => {
     const valueType = fieldInfoMap.get(path);
@@ -41,28 +50,10 @@ export function mapSectionValues<T>(current: T, formValues: SectionValues, secti
 export function mapResultsToSectionValues(section: DataEntrySection, results: unknown): SectionValues {
   const formValues: SectionValues = {};
 
-  for (const subsection of section.subsections) {
-    switch (subsection.type) {
-      case "radio": {
-        const radioValue = getValueAtPath(results, subsection.path);
-        formValues[subsection.path] = valueToString(radioValue);
-        break;
-      }
-      case "inputGrid": {
-        for (const row of subsection.rows) {
-          const gridValue = getValueAtPath(results, row.path);
-          formValues[row.path] = valueToString(gridValue);
-        }
-        break;
-      }
-      case "checkboxes": {
-        for (const option of subsection.options) {
-          const checkboxValue = getValueAtPath(results, option.path);
-          formValues[option.path] = valueToString(checkboxValue);
-        }
-        break;
-      }
-    }
+  const fieldInfoMap = extractFieldInfoFromSection(section);
+  for (const path of fieldInfoMap.keys()) {
+    const value = getValueAtPath(results, path);
+    formValues[path] = valueToString(value);
   }
 
   return formValues;
@@ -111,7 +102,7 @@ function setValueAtPath(
   }
 }
 
-function getValueAtPath(obj: unknown, path: string): PathValue {
+export function getValueAtPath(obj: unknown, path: string): PathValue {
   const segments = parsePathSegments(path);
 
   const result = segments.reduce<unknown>((current, segment) => {

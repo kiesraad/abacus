@@ -1,6 +1,6 @@
 import { PollingStationResults } from "@/types/generated/openapi";
 import { DataEntrySection, SectionValues } from "@/types/types";
-import { deformatNumber, formatNumber } from "@/utils/format";
+import { parseIntUserInput } from "@/utils/strings";
 
 type PathSegment = string | number;
 type PathValue = boolean | number | string | undefined;
@@ -12,7 +12,7 @@ export function mapSectionValues(
 ): PollingStationResults {
   const mappedValues: PollingStationResults = structuredClone(current);
 
-  const fieldInfoMap = new Map<string, "string" | "boolean" | "formattedNumber">();
+  const fieldInfoMap = new Map<string, "string" | "boolean" | "number">();
   for (const subsection of section.subsections) {
     switch (subsection.type) {
       case "radio": {
@@ -23,7 +23,7 @@ export function mapSectionValues(
       }
       case "inputGrid": {
         for (const row of subsection.rows) {
-          fieldInfoMap.set(row.path, "formattedNumber");
+          fieldInfoMap.set(row.path, "number");
         }
         break;
       }
@@ -83,7 +83,7 @@ function setValueAtPath(
   obj: PollingStationResults,
   path: string,
   value: string,
-  valueType: "string" | "boolean" | "formattedNumber" | undefined,
+  valueType: "string" | "boolean" | "number" | undefined,
 ): void {
   const segments = parsePathSegments(path);
   const processedValue = processValue(value, valueType);
@@ -135,7 +135,7 @@ function getValueAtPath(obj: PollingStationResults, path: string): PathValue {
 
 function processValue(
   value: string,
-  valueType: "string" | "boolean" | "formattedNumber" | undefined,
+  valueType: "string" | "boolean" | "number" | undefined,
 ): boolean | number | string | undefined {
   if (valueType === "boolean") {
     if (value === "") {
@@ -144,24 +144,18 @@ function processValue(
     return value === "true";
   }
 
-  if (valueType === "formattedNumber") {
-    return deformatNumber(value);
+  if (valueType === "number") {
+    return parseIntUserInput(value) ?? 0;
   }
 
   return value;
 }
 
 function valueToString(value: PathValue): string {
-  if (value === undefined) {
+  if (value === undefined || value === 0) {
     return "";
   }
-  if (typeof value === "boolean") {
-    return value.toString();
-  }
-  if (typeof value === "string") {
-    return value;
-  }
-  return formatNumber(value);
+  return String(value);
 }
 
 function parsePathSegments(path: string): PathSegment[] {

@@ -2,10 +2,11 @@ import * as React from "react";
 
 import { IconWarningSquare } from "@/components/generated/icons";
 import { tx } from "@/i18n/translate";
-import { deformatNumber, formatNumber, validateNumberString } from "@/utils/format";
+import { formatNumber, validateNumberString } from "@/utils/format";
 
 import { Icon } from "../Icon/Icon";
 import { Tooltip } from "../Tooltip/Tooltip";
+import cls from "./NumberInput.module.css";
 
 function ellipsis(text: string, maxLength: number = 20): string {
   // Normalize whitespace: replace newlines and multiple spaces with single spaces
@@ -26,13 +27,15 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
   ref,
 ) {
   const [tooltipInvalidValue, setTooltipInvalidValue] = React.useState<string | null>(null);
+  const [formattedOverlay, setFormattedOverlay] = React.useState<string | undefined>(
+    inputProps.defaultValue ? formatNumber(inputProps.defaultValue) : "",
+  );
 
   const props = {
     className: "font-number",
     maxLength: 9,
     autoComplete: "off",
     ...inputProps,
-    defaultValue: inputProps.defaultValue ? formatNumber(inputProps.defaultValue) : undefined,
     type: "text",
   };
 
@@ -55,52 +58,38 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     </div>
   ) : null;
 
+  function onFocus() {
+    setFormattedOverlay(undefined);
+  }
+
+  function onBlur(event: React.FocusEvent<HTMLInputElement>) {
+    setFormattedOverlay(formatNumber(event.target.value));
+  }
+
   return (
     <Tooltip content={tooltipContent} onClose={hideTooltip}>
-      <input
-        {...props}
-        onPaste={onPaste}
-        onFocus={onFocus}
-        onBlur={onBlur(props.onChange)}
-        onInput={onInput}
-        id={id}
-        name={props.name || id}
-        ref={ref}
-      />
+      <div className={cls.container}>
+        <input
+          {...props}
+          onPaste={onPaste}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onInput={onInput}
+          id={id}
+          name={props.name || id}
+          ref={ref}
+        />
+        {formattedOverlay && (
+          <div className="formatted-overlay font-number">
+            <span id={`${id}-formatted-overlay`} data-testid={`${id}-formatted-overlay`}>
+              {formattedOverlay}
+            </span>
+          </div>
+        )}
+      </div>
     </Tooltip>
   );
 });
-
-//deformat number on focus
-function onFocus(event: React.FocusEvent<HTMLInputElement>) {
-  if (event.target.value === "") return;
-  const input = event.currentTarget;
-  const newValue = `${deformatNumber(event.target.value)}`;
-  const wasSelected = input.selectionStart === 0 && input.selectionEnd === input.value.length;
-
-  input.value = newValue;
-
-  //if text is selected, keep it selected
-  if (wasSelected) {
-    input.setSelectionRange(0, event.currentTarget.value.length);
-  }
-}
-
-//format number on blur and call onChange if provided
-function onBlur(onChange?: React.ChangeEventHandler<HTMLInputElement>) {
-  return function (event: React.FocusEvent<HTMLInputElement>) {
-    if (event.target.value === "") return;
-    const oldValue = event.target.value;
-    const newValue = formatNumber(event.target.value);
-    event.target.value = newValue;
-    if (onChange) {
-      //only call onChange if the value has changed
-      if (oldValue !== newValue) {
-        onChange(event);
-      }
-    }
-  };
-}
 
 //only accept numbers
 function onInput(event: React.FormEvent<HTMLInputElement>) {

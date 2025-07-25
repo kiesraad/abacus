@@ -109,7 +109,8 @@ describe("Test VotersAndVotesForm", () => {
       const proxyCertificates = screen.getByRole("textbox", { name: "B Volmachtbewijzen" });
       expect(proxyCertificates).toHaveFocus();
 
-      expect(pollCards).toHaveValue("12.345");
+      const pollCardsOverlay = await screen.findByTestId("data.voters_counts.poll_card_count-formatted-overlay");
+      expect(pollCardsOverlay).toHaveTextContent("12.345");
     });
 
     test("Form field entry and keybindings", async () => {

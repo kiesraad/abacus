@@ -1,0 +1,23 @@
+.container {
+  position: relative;
+
+  /* Global to be able to give custom styling */
+  :global(.formatted-overlay) {
+    position: absolute;
+    background: white;
+    pointer-events: none;
+
+    /* Same as input border */
+    inset: 2px;
+
+    /* Same as reset.css input */
+    padding: 1px 2px;
+
+    display: flex;
+    > span {
+      /* Vertical center, horizontal grow to be able to align right */
+      align-self: center;
+      flex-grow: 1;
+    }
+  }
+}

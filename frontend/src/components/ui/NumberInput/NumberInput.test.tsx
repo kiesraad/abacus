@@ -13,9 +13,8 @@ describe("UI Component: number input", () => {
 
   test("should format the number", () => {
     render(<NumberInput id="test" defaultValue={1200} />);
-    const input = screen.getByTestId("test");
-
-    expect(input).toHaveValue("1.200");
+    const formattedOverlay = screen.getByTestId("test-formatted-overlay");
+    expect(formattedOverlay).toHaveTextContent("1.200");
   });
 
   test("should deformat the number on focus", async () => {
@@ -23,7 +22,8 @@ describe("UI Component: number input", () => {
     const input = screen.getByTestId("test");
     const user = userEvent.setup();
     await user.click(input);
-    expect(input).toHaveValue("1200");
+    expect(input).toHaveFocus();
+    expect(screen.queryByTestId("test-formatted-overlay")).not.toBeInTheDocument();
   });
 
   test("should format the number on blur", async () => {
@@ -32,8 +32,13 @@ describe("UI Component: number input", () => {
     const user = userEvent.setup();
     await user.click(input);
     expect(input).toHaveValue("1200");
+    expect(input).toHaveFocus();
+    expect(screen.queryByTestId("test-formatted-overlay")).not.toBeInTheDocument();
+
     await user.tab();
-    expect(input).toHaveValue("1.200");
+    expect(input).not.toHaveFocus();
+    expect(input).toHaveValue("1200");
+    expect(await screen.findByTestId("test-formatted-overlay")).toHaveTextContent("1.200");
   });
 
   test("should only accept numbers", async () => {

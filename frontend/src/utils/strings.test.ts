@@ -18,6 +18,7 @@ describe("Strings util", () => {
     ["/123/456"],
     ["'123456'"],
     ["six"],
+    [""],
   ])("parseIntStrict %s", (input: string, expected: number | undefined = undefined) => {
     if (expected !== undefined) {
       expect(parseIntStrict(input)).toBe(expected);
@@ -58,6 +59,7 @@ describe("Strings util", () => {
     ["/123/456"],
     ["'123456'"],
     ["six"],
+    [""],
   ])("parseIntUserInput %s", (input: string, expected: number | undefined = undefined) => {
     if (expected !== undefined) {
       expect(parseIntUserInput(input)).toBe(expected);

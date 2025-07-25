@@ -33,7 +33,7 @@ const formFields: FormFields<PollingStationRequest> = {
   number: { required: true, type: "number", min: 1 },
   name: { required: true, type: "string" },
   polling_station_type: { type: "string", mapUndefined: true },
-  number_of_voters: { type: "number", isFormatted: true },
+  number_of_voters: { type: "number" },
   address: { type: "string" },
   postal_code: { type: "string" },
   locality: { type: "string" },

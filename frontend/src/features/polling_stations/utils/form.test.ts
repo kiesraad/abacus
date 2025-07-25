@@ -44,17 +44,6 @@ describe("Form", () => {
     [{ type: "number", min: 1 }, "2", undefined, 2],
     [{ type: "number", max: 3 }, "4", "FORM_VALIDATION_RESULT_MAX", undefined],
     [{ type: "number", max: 5 }, "4", undefined, 4],
-
-    // Number isFormatted valid
-    [{ type: "number", isFormatted: true }, "5", undefined, 5],
-    [{ type: "number", isFormatted: true }, "-5", undefined, -5],
-    [{ type: "number", isFormatted: true }, "005", undefined, 5],
-    [{ type: "number", isFormatted: true }, "5.005", undefined, 5005],
-    [{ type: "number", isFormatted: true }, "x", "FORM_VALIDATION_RESULT_INVALID_NUMBER", undefined],
-
-    // Number isFormatted required
-    [{ type: "number", isFormatted: true, required: true }, "", "FORM_VALIDATION_RESULT_REQUIRED", undefined],
-    [{ type: "number", isFormatted: true, required: false }, "", undefined, undefined],
   ])("processForm for field type %j with input %j should return %j, %j", (field, inputValue, error, value) => {
     type RequestObject = { field: FieldValue<typeof field> };
     const formFields: FormFields<RequestObject> = { field };

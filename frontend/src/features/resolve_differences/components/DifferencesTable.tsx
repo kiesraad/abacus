@@ -3,7 +3,7 @@ import { Fragment, ReactElement, useId } from "react";
 import { Table } from "@/components/ui/Table/Table";
 import { ResolveDifferencesAction } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { formatNumber } from "@/utils/format";
+import { formatNumber, validateNumberString } from "@/utils/format";
 
 import cls from "./ResolveDifferences.module.css";
 
@@ -14,20 +14,20 @@ interface DifferencesTableProps {
   action?: ResolveDifferencesAction;
 }
 
-function formatValue(value: string | number | undefined): string | ReactElement {
+function formatValue(value: string | undefined): string | ReactElement {
   if (!value) {
     return <span className={cls.zeroDash}>&mdash;</span>;
-  } else if (typeof value === "string") {
-    return value;
-  } else {
+  } else if (validateNumberString(value)) {
     return formatNumber(value);
+  } else {
+    return value;
   }
 }
 
 export interface DifferencesRow {
   code?: number | string;
-  first?: number | string;
-  second?: number | string;
+  first?: string;
+  second?: string;
   description?: string;
 }
 

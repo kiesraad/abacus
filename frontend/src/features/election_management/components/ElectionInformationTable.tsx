@@ -54,14 +54,14 @@ export function ElectionInformationTable({
           </Table.HeaderCell>
           <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
-        <Table.Row>
+        <Table.LinkRow to={"number-of-voters"}>
           <Table.HeaderCell scope="row" className="normal">
             {t("number_of_voters")}
           </Table.HeaderCell>
-          <Table.Cell>
+          <Table.Cell className="underlined">
             {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input")}
           </Table.Cell>
-        </Table.Row>
+        </Table.LinkRow>
         <Table.Row increasedPadding>
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.to_do_data_entry_for")}

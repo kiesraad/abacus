@@ -11,12 +11,14 @@
     }
 
     &:global(.narrowest),
-    &:global(.narrowest) ~ span {
+    &:global(.narrowest) ~ span,
+    &:global(.full-field-with-narrowest-input) input {
       width: 8rem;
     }
 
     &:global(.narrow),
-    &:global(.narrow) ~ span {
+    &:global(.narrow) ~ span,
+    &:global(.full-field-with-narrow-input) input {
       width: 10rem;
     }
 
@@ -28,14 +30,6 @@
     &:global(.full),
     &:global(.full) ~ span {
       width: 41.5rem;
-    }
-
-    &:global(.full-field-with-narrowest-input) {
-      width: 41.5rem;
-
-      input {
-        width: 8rem;
-      }
     }
   }
 

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
@@ -9,6 +9,7 @@ import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
+import { Modal } from "@/components/ui/Modal/Modal";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useUserRole } from "@/hooks/user/useUserRole";
@@ -28,6 +29,7 @@ export function ElectionStatusPage() {
   const { committeeSession, election, pollingStations, refetch } = useElection();
   const { statuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
+  const [showPauseModal, setShowPauseModal] = useState(false);
 
   // re-fetch election when component mounts
   useEffect(() => {
@@ -42,6 +44,10 @@ export function ElectionStatusPage() {
 
   function finishDataEntry() {
     void navigate("../report");
+  }
+
+  function togglePauseModal() {
+    setShowPauseModal(!showPauseModal);
   }
 
   function handleStatusChange(status: CommitteeSessionStatus) {
@@ -71,7 +77,7 @@ export function ElectionStatusPage() {
           key="pause"
           className="link"
           onClick={() => {
-            handleStatusChange("data_entry_paused");
+            togglePauseModal();
           }}
         >
           {t("election_status.pause")}
@@ -112,6 +118,27 @@ export function ElectionStatusPage() {
       </header>
 
       <Messages />
+
+      {showPauseModal && (
+        <Modal title={t("election_status.pause_session")} onClose={togglePauseModal}>
+          <p>{t("election_status.pause_are_you_sure")}</p>
+          <nav>
+            <Button
+              variant="primary"
+              size="xl"
+              onClick={() => {
+                handleStatusChange("data_entry_paused");
+                togglePauseModal();
+              }}
+            >
+              {t("election_status.pause")}
+            </Button>
+            <Button variant="secondary" size="xl" onClick={togglePauseModal}>
+              {t("cancel")}
+            </Button>
+          </nav>
+        </Modal>
+      )}
 
       {isCoordinator &&
       committeeSession.status !== "data_entry_finished" &&

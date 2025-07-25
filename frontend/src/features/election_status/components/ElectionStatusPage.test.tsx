@@ -1,4 +1,4 @@
-import { render as rtlRender } from "@testing-library/react";
+import { render as rtlRender, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -198,6 +198,20 @@ describe("ElectionStatusPage", () => {
     expect(pauseLink).toBeVisible();
 
     await user.click(pauseLink);
+    let modal = await screen.findByRole("dialog");
+
+    const cancelButtons = within(modal).getAllByRole("button", { name: "Annuleren" });
+    expect(cancelButtons[0]).toBeVisible();
+    expect(cancelButtons[1]).toBeVisible();
+    await user.click(cancelButtons[1]!);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+    await user.click(pauseLink);
+    modal = await screen.findByRole("dialog");
+
+    const pauseButton = within(modal).getByRole("button", { name: "Pauzeren" });
+    expect(pauseButton).toBeVisible();
+    await user.click(pauseButton);
 
     expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_paused" });
     expect(navigate).not.toHaveBeenCalled();

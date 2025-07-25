@@ -16,5 +16,10 @@
   "still_to_input": "Nog invullen",
   "to_do_data_entry_for": "Invoer doen voor",
   "view_data_entry": "Steminvoer bekijken",
-  "view_progress": "Bekijk voortgang"
+  "view_progress": "Bekijk voortgang",
+  "empty_models": "Lege modellen voor deze verkiezing",
+  "empty_models_description": "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+  "model_name": "Model",
+  "model_purpose": "Doel",
+  "na_31_2_bijlage_1": "Verslagen van tellingen van stembureau"
 }

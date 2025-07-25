@@ -63,6 +63,12 @@ export interface ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS {
 }
 export type ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
 
+// /api/elections/{election_id}/download_na_31_2_bijlage1
+export interface ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH = `/api/elections/${number}/download_na_31_2_bijlage1`;
+
 // /api/elections/{election_id}/download_pdf_results
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
   election_id: number;

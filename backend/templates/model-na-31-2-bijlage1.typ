@@ -1,6 +1,6 @@
 #import "common/style.typ": attachement_numbering, conf
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-31-2.json")
+#let input = json("inputs/model-na-31-2-bijlage1.json")
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"
@@ -8,7 +8,7 @@
 
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
-#show: doc => conf(doc, header: [Stembureau \<nummer>], footer: [
+#show: doc => conf(doc, header: [Stembureau #input.polling_station.number], footer: [
   Model Na 31-2 centrale stemopneming
 ])
 
@@ -20,7 +20,7 @@
 
 #pagebreak(weak: true)
 
-= Stembureau \<nummer> \  \<naam stembureau>
+= Stembureau #input.polling_station.number \ #input.polling_station.name
 
 #line(length: 100%)
 
@@ -181,21 +181,15 @@ _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming
 
 #pagebreak(weak: true)
 
-== Stemmen per lijst en per kantidaat
+== Stemmen per lijst en per kandidaat
 
-#for political_group in input.summary.political_group_votes {
-  let election_political_group = input.election.political_groups.find(pg => pg.number == political_group.number)
-
-  if election_political_group == none {
-    continue
-  }
-
+#for political_group in input.election.political_groups {
   votes_table(
-    title: [#political_group.number #election_political_group.name],
+    title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Stemmen"),
     total: none,
-    values: political_group.candidate_votes.map(candidate => (
-      name: candidate_name(election_political_group.candidates.find(c => c.number == candidate.number)),
+    values: political_group.candidates.map(candidate => (
+      name: candidate_name(candidate),
       number: candidate.number,
       votes: none,
     )),

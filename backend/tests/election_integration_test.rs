@@ -315,3 +315,51 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
         assert!(pdf_file.size() > 0);
     }
 }
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_na_31_2_bijlage1_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_na_31_2_bijlage1");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/zip");
+
+    let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    assert_eq!(
+        &content_disposition_string[21..],
+        "\"GR2024_Heemdamseburg_na_31_2_bijlage1.zip\""
+    );
+
+    let bytes = response.bytes().await.unwrap();
+
+    // write to disk and print filename
+    std::fs::write("test_na_31_2_bijlage1.zip", &bytes).unwrap();
+    println!("Wrote test_na_31_2_bijlage1.zip");
+
+    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
+
+    {
+        let pdf_file = archive
+            .by_name("Model_Na31-2_GR2024_Stembureau_33_Bijlage_1.pdf")
+            .unwrap();
+        assert!(pdf_file.size() > 0);
+    }
+
+    {
+        let pdf_file = archive
+            .by_name("Model_Na31-2_GR2024_Stembureau_34_Bijlage_1.pdf")
+            .unwrap();
+        assert!(pdf_file.size() > 0);
+    }
+}

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { useApiClient } from "@/api/useApiClient";
@@ -52,10 +52,9 @@ export function ElectionStatusPage() {
     });
   }
 
-  function getLinks() {
-    const links = [];
+  function getLink() {
     if (committeeSession.status === "data_entry_not_started") {
-      links.push(
+      return (
         <button
           key="start"
           className="link"
@@ -64,10 +63,10 @@ export function ElectionStatusPage() {
           }}
         >
           {t("election_status.start")}
-        </button>,
+        </button>
       );
     } else if (committeeSession.status === "data_entry_in_progress") {
-      links.push(
+      return (
         <button
           key="pause"
           className="link"
@@ -76,15 +75,10 @@ export function ElectionStatusPage() {
           }}
         >
           {t("election_status.pause")}
-        </button>,
-      );
-      links.push(
-        <Link key="finish" to="../report">
-          {t("complete")}
-        </Link>,
+        </button>
       );
     } else if (committeeSession.status === "data_entry_paused") {
-      links.push(
+      return (
         <button
           key="resume"
           className="link"
@@ -93,15 +87,9 @@ export function ElectionStatusPage() {
           }}
         >
           {t("election_status.resume")}
-        </button>,
-      );
-      links.push(
-        <Link key="finish" to="../report">
-          {t("complete")}
-        </Link>,
+        </button>
       );
     }
-    return links;
   }
 
   return (
@@ -118,24 +106,41 @@ export function ElectionStatusPage() {
               userRole="coordinator"
               committeeSessionNumber={committeeSession.number}
             />
-            {isCoordinator && getLinks()}
+            {isCoordinator && getLink()}
           </div>
         </section>
       </header>
 
       <Messages />
 
-      {committeeSession.status !== "data_entry_finished" &&
-        statuses.length > 0 &&
-        statuses.every((s) => s.status === "definitive") && (
-          <Alert type="success">
-            <h2>{t("election_status.definitive.title")}</h2>
-            <p>{t("election_status.definitive.message")}</p>
-            <Button onClick={finishDataEntry} size="md">
-              {t("election_status.definitive.finish_button")}
+      {isCoordinator &&
+      committeeSession.status !== "data_entry_finished" &&
+      statuses.length > 0 &&
+      statuses.every((s) => s.status === "definitive") ? (
+        <Alert type="success">
+          <h2>{t("election_status.definitive.title")}</h2>
+          <p>{t("election_status.definitive.message")}</p>
+          <Button onClick={finishDataEntry} size="md">
+            {t("election_status.definitive.finish_button")}
+          </Button>
+        </Alert>
+      ) : (
+        isCoordinator &&
+        committeeSession.status === "data_entry_paused" && (
+          <Alert type="warning">
+            <h2>{t("election_status.data_entry_is_paused")}</h2>
+            <p>{t("election_status.paused_status_information")}</p>
+            <Button
+              onClick={() => {
+                handleStatusChange("data_entry_in_progress");
+              }}
+              size="md"
+            >
+              {t("election_report.resume_data_entry")}
             </Button>
           </Alert>
-        )}
+        )
+      )}
 
       <main>
         <ElectionStatus

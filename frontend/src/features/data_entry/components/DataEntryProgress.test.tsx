@@ -76,8 +76,8 @@ describe("Test DataEntryProgress", () => {
     const formState = getDefaultFormState();
 
     formState.furthest = "political_group_votes_2";
-    formState.sections.voters_votes_counts.acceptErrorsAndWarnings = false;
-    formState.sections.differences_counts.acceptErrorsAndWarnings = true;
+    formState.sections.voters_votes_counts!.acceptErrorsAndWarnings = false;
+    formState.sections.differences_counts!.acceptErrorsAndWarnings = true;
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
@@ -131,8 +131,8 @@ describe("Test DataEntryProgress", () => {
 
     formState.furthest = "political_group_votes_2";
 
-    formState.sections.voters_votes_counts.errors = new ValidationResultSet([validationResultMockData.F201]);
-    formState.sections.voters_votes_counts.warnings = new ValidationResultSet([validationResultMockData.W201]);
+    formState.sections.voters_votes_counts!.errors = new ValidationResultSet([validationResultMockData.F201]);
+    formState.sections.voters_votes_counts!.warnings = new ValidationResultSet([validationResultMockData.W201]);
 
     overrideServerClaimDataEntryResponse({
       formState: formState,

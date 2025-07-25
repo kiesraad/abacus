@@ -110,7 +110,7 @@ export function getInitialFormState(dataEntryStructure: DataEntryStructure): For
 
   return {
     furthest: INITIAL_FORM_SECTION_ID,
-    sections: sections as Record<FormSectionId, FormSection>,
+    sections: sections,
   };
 }
 

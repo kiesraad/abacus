@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { render, screen } from "@/testing/test-utils";
 import { PollingStationResults } from "@/types/generated/openapi";
-import { DataEntrySection, FormSectionId, PollingStationResultsPath } from "@/types/types";
+import { DataEntrySection } from "@/types/types";
 import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
@@ -60,23 +60,23 @@ describe("ResolveDifferencesTables", () => {
     // Helper function to create a checkbox section for testing
     const createCheckboxesSection = (): DataEntrySection => {
       return {
-        id: "test" as FormSectionId,
+        id: "test",
         title: "test",
         short_title: "test",
         subsections: [
           {
             type: "checkboxes",
             short_title: "short title",
-            error_path: "test" as PollingStationResultsPath,
+            error_path: "test",
             error_message: "recounted.error",
             options: [
               {
-                path: "test.yes" as PollingStationResultsPath,
+                path: "test.yes",
                 label: "yes",
                 short_label: "yes",
               },
               {
-                path: "test.no" as PollingStationResultsPath,
+                path: "test.no",
                 label: "no",
                 short_label: "no",
               },

@@ -56,19 +56,19 @@ describe("formSectionComplete", () => {
 describe("resetFormSectionState", () => {
   test("should reset form section state", () => {
     const formState = getDefaultDataEntryState().formState;
-    formState.sections.voters_votes_counts.errors = new ValidationResultSet([validationResultMockData.W201]);
+    formState.sections.voters_votes_counts!.errors = new ValidationResultSet([validationResultMockData.W201]);
 
     resetFormSectionState(formState);
 
-    expect(formState.sections.voters_votes_counts.errors.size()).toBe(0);
+    expect(formState.sections.voters_votes_counts!.errors.size()).toBe(0);
   });
 });
 
 describe("getNextSectionID", () => {
   test("should get next section ID", () => {
     const formState = getDefaultDataEntryState().formState;
-    formState.sections.voters_votes_counts.isSaved = true;
-    formState.sections.voters_votes_counts.isSubmitted = true;
+    formState.sections.voters_votes_counts!.isSaved = true;
+    formState.sections.voters_votes_counts!.isSubmitted = true;
 
     const nextSection = getNextSectionID(formState, "voters_votes_counts");
 
@@ -144,12 +144,12 @@ describe("addValidationResultToFormState", () => {
     const defaultState = getDefaultDataEntryState();
     const formState = defaultState.formState;
     const dataEntryStructure = defaultState.dataEntryStructure;
-    formState.sections.differences_counts.isSaved = true;
+    formState.sections.differences_counts!.isSaved = true;
     const validationResults: ValidationResult[] = [validationResultMockData.F303];
 
     addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
-    expect(formState.sections.differences_counts.errors.size()).toBe(1);
+    expect(formState.sections.differences_counts!.errors.size()).toBe(1);
   });
 
   test("addValidationResultToFormState adds result to multiple sections", () => {
@@ -157,14 +157,14 @@ describe("addValidationResultToFormState", () => {
     const formState = defaultState.formState;
     const dataEntryStructure = defaultState.dataEntryStructure;
 
-    formState.sections.voters_votes_counts.isSaved = true;
+    formState.sections.voters_votes_counts!.isSaved = true;
     if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
 
     const validationResults: ValidationResult[] = [validationResultMockData.F204];
 
     addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
-    expect(formState.sections.voters_votes_counts.errors.size()).toBe(1);
+    expect(formState.sections.voters_votes_counts!.errors.size()).toBe(1);
     const pg1 = formState.sections.political_group_votes_1;
     expect(pg1?.errors.size()).toBe(1);
   });
@@ -173,11 +173,11 @@ describe("addValidationResultToFormState", () => {
     const defaultState = getDefaultDataEntryState();
     const formState = defaultState.formState;
     const dataEntryStructure = defaultState.dataEntryStructure;
-    formState.sections.differences_counts.isSaved = false;
+    formState.sections.differences_counts!.isSaved = false;
     const validationResults: ValidationResult[] = [validationResultMockData.F303];
 
     addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
-    expect(formState.sections.differences_counts.errors.size()).toBe(0);
+    expect(formState.sections.differences_counts!.errors.size()).toBe(0);
   });
 });

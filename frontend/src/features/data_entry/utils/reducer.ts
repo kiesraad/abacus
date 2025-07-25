@@ -77,7 +77,12 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         ...state,
         cache: action.cache,
       };
-    case "UPDATE_FORM_SECTION":
+    case "UPDATE_FORM_SECTION": {
+      const existingSection = state.formState.sections[action.sectionId];
+      if (!existingSection) {
+        throw new Error(`Section ${action.sectionId} not found in form state`);
+      }
+
       return {
         ...state,
         formState: {
@@ -85,12 +90,13 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           sections: {
             ...state.formState.sections,
             [action.sectionId]: {
-              ...state.formState.sections[action.sectionId],
+              ...existingSection,
               ...action.partialFormSection,
             },
           },
         },
       };
+    }
     case "FORM_SAVE_FAILED":
       return {
         ...state,

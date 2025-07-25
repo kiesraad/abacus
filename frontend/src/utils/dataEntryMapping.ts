@@ -5,20 +5,14 @@ import { deformatNumber, formatNumber } from "@/utils/format";
 type PathSegment = string | number;
 type PathValue = boolean | number | string | undefined;
 
-export function mapSectionValues(
-  current: PollingStationResults,
-  formValues: SectionValues,
-  section: DataEntrySection,
-): PollingStationResults {
-  const mappedValues: PollingStationResults = structuredClone(current);
+export function mapSectionValues<T>(current: T, formValues: SectionValues, section: DataEntrySection): T {
+  const mappedValues: T = structuredClone(current);
 
-  const fieldInfoMap = new Map<string, "string" | "boolean" | "formattedNumber">();
+  const fieldInfoMap = new Map<string, "boolean" | "formattedNumber">();
   for (const subsection of section.subsections) {
     switch (subsection.type) {
       case "radio": {
-        if (subsection.valueType) {
-          fieldInfoMap.set(subsection.path, subsection.valueType);
-        }
+        fieldInfoMap.set(subsection.path, "boolean");
         break;
       }
       case "inputGrid": {
@@ -44,7 +38,7 @@ export function mapSectionValues(
   return mappedValues;
 }
 
-export function mapResultsToSectionValues(section: DataEntrySection, results: PollingStationResults): SectionValues {
+export function mapResultsToSectionValues(section: DataEntrySection, results: unknown): SectionValues {
   const formValues: SectionValues = {};
 
   for (const subsection of section.subsections) {
@@ -80,15 +74,15 @@ export function getStringValueAtPath(results: PollingStationResults, path: strin
 }
 
 function setValueAtPath(
-  obj: PollingStationResults,
+  obj: unknown,
   path: string,
   value: string,
-  valueType: "string" | "boolean" | "formattedNumber" | undefined,
+  valueType: "boolean" | "formattedNumber" | undefined,
 ): void {
   const segments = parsePathSegments(path);
   const processedValue = processValue(value, valueType);
 
-  let current: unknown = obj;
+  let current = obj;
 
   for (let i = 0; i < segments.length - 1; i++) {
     const segment = segments[i];
@@ -117,7 +111,7 @@ function setValueAtPath(
   }
 }
 
-function getValueAtPath(obj: PollingStationResults, path: string): PathValue {
+function getValueAtPath(obj: unknown, path: string): PathValue {
   const segments = parsePathSegments(path);
 
   const result = segments.reduce<unknown>((current, segment) => {
@@ -135,7 +129,7 @@ function getValueAtPath(obj: PollingStationResults, path: string): PathValue {
 
 function processValue(
   value: string,
-  valueType: "string" | "boolean" | "formattedNumber" | undefined,
+  valueType: "boolean" | "formattedNumber" | undefined,
 ): boolean | number | string | undefined {
   if (valueType === "boolean") {
     if (value === "") {

@@ -1,6 +1,20 @@
+use async_zip::{Compression, ZipEntryBuilder, error::ZipError, tokio::write::ZipFileWriter};
+use axum::{
+    body::{Body, Bytes},
+    response::{IntoResponse, Response},
+};
 use axum_extra::response::Attachment;
-use std::io::Write;
-use zip::{result::ZipError, write::SimpleFileOptions};
+use std::{
+    io::Result as IoResult,
+    pin::Pin,
+    task::{Context, Poll},
+};
+use tokio::{
+    io::AsyncWrite,
+    sync::mpsc::{self, Sender},
+};
+use tokio_stream::wrappers::ReceiverStream;
+use tracing::info;
 
 use crate::APIError;
 
@@ -8,43 +22,104 @@ pub fn slugify_filename(filename: &str) -> String {
     filename.replace(" ", "_").replace("/", "-")
 }
 
-pub fn default_zip_options() -> SimpleFileOptions {
-    SimpleFileOptions::default()
-        .compression_method(zip::CompressionMethod::DEFLATE)
-        // zip file format does not support dates beyond 2107 or inserted leap (i.e. 61st) second
-        .last_modified_time(
-            chrono::Local::now()
-                .naive_local()
-                .try_into()
-                .expect("Timestamp should be inside zip timestamp range"),
-        )
-        .unix_permissions(0o644)
+pub type FileEntry = Option<(String, Vec<u8>)>;
+
+/// A writer that sends data through a channel
+#[derive(Clone)]
+struct ChannelWriter {
+    sender: mpsc::Sender<Result<Bytes, std::io::Error>>,
 }
 
-pub fn zip_to_attachment(data: Vec<u8>, file_name: &str) -> Attachment<Vec<u8>> {
-    Attachment::new(data)
-        .filename(file_name)
-        .content_type("application/zip")
+impl ChannelWriter {
+    pub fn new() -> (Self, mpsc::Receiver<Result<Bytes, std::io::Error>>) {
+        let (sender, receiver) = mpsc::channel(64);
+        (Self { sender }, receiver)
+    }
 }
 
-/// Creates a zip archive containing the provided files.
-/// Returns an `Attachment` with the zip data.
-/// Returns an `APIError` if the zip creation fails.
-pub fn create_zip(
-    file_name: &str,
-    files: Vec<(String, Vec<u8>)>,
-) -> Result<Attachment<Vec<u8>>, APIError> {
-    let mut data = vec![];
-    let mut cursor = std::io::Cursor::new(&mut data);
-    let mut zip = zip::ZipWriter::new(&mut cursor);
-    let options = default_zip_options();
-
-    for (name, content) in files.into_iter() {
-        zip.start_file(slugify_filename(&name), options)?;
-        zip.write_all(&content).map_err(ZipError::Io)?;
+impl AsyncWrite for ChannelWriter {
+    fn poll_write(
+        self: Pin<&mut Self>,
+        _cx: &mut Context<'_>,
+        buf: &[u8],
+    ) -> Poll<std::io::Result<usize>> {
+        // Synchronously try to send the buffer
+        let bytes = Bytes::copy_from_slice(buf);
+        match self.get_mut().sender.try_send(Ok(bytes)) {
+            Ok(_) => Poll::Ready(Ok(buf.len())),
+            Err(mpsc::error::TrySendError::Full(_)) => {
+                // Channel is full, so tell the runtime to poll again later.
+                Poll::Pending
+            }
+            Err(_) => Poll::Ready(Err(std::io::Error::new(
+                std::io::ErrorKind::BrokenPipe,
+                "channel closed",
+            ))),
+        }
     }
 
-    zip.finish()?;
+    fn poll_flush(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<IoResult<()>> {
+        Poll::Ready(Ok(()))
+    }
 
-    Ok(zip_to_attachment(data, file_name))
+    fn poll_shutdown(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<IoResult<()>> {
+        Poll::Ready(Ok(()))
+    }
+}
+
+/// A stream that reads files from a channel and writes them to a ZIP file as a streamed HTTP response
+pub struct ZipStream {
+    file_name: String,
+    sender: Sender<FileEntry>,
+    output: mpsc::Receiver<Result<Bytes, std::io::Error>>,
+}
+
+impl ZipStream {
+    pub async fn new(file_name: &str) -> Self {
+        let (write_stream, output) = ChannelWriter::new();
+        let (sender, mut receiver) = mpsc::channel::<FileEntry>(64);
+
+        tokio::spawn(async move {
+            let mut writer = ZipFileWriter::with_tokio(write_stream);
+
+            while let Some(Some((name, data))) = receiver.recv().await {
+                info!("Adding file to zip: {}", name);
+
+                let builder =
+                    ZipEntryBuilder::new(slugify_filename(&name).into(), Compression::Deflate);
+                writer.write_entry_whole(builder, &data).await?;
+            }
+
+            writer.close().await?;
+
+            Ok::<(), ZipError>(())
+        });
+
+        Self {
+            sender,
+            output,
+            file_name: slugify_filename(file_name),
+        }
+    }
+
+    pub fn sender(&self) -> Sender<FileEntry> {
+        self.sender.clone()
+    }
+
+    pub async fn add_file(&self, name: String, data: Vec<u8>) -> Result<(), APIError> {
+        self.sender
+            .send(Some((name, data)))
+            .await
+            .map_err(|_| APIError::ZipError("Failed to send file data".into()))
+    }
+}
+
+impl IntoResponse for ZipStream {
+    fn into_response(self) -> Response<Body> {
+        let stream = ReceiverStream::new(self.output);
+        Attachment::new(Body::from_stream(stream))
+            .filename(self.file_name)
+            .content_type("application/zip")
+            .into_response()
+    }
 }

@@ -1,5 +1,7 @@
-use axum::extract::{Path, State};
-use axum_extra::response::Attachment;
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+};
 use chrono::Datelike;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -9,11 +11,11 @@ use crate::{
     election::repository::Elections,
     error::ErrorReference,
     pdf_gen::{
-        generate_pdfs_zip,
+        generate_pdfs,
         models::{ModelNa31_2Bijlage1Input, PdfModel},
     },
     polling_station::repository::PollingStations,
-    zip::zip_to_attachment,
+    zip::ZipStream,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -45,7 +47,7 @@ async fn election_download_na_31_2_bijlage1(
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     Path(id): Path<u32>,
-) -> Result<Attachment<Vec<u8>>, APIError> {
+) -> Result<impl IntoResponse, APIError> {
     let election = elections_repo.get(id).await?;
     let polling_stations = polling_stations_repo.list(election.id).await?;
     let zip_filename = format!(
@@ -82,7 +84,9 @@ async fn election_download_na_31_2_bijlage1(
         })
         .collect::<Vec<_>>();
 
-    let content = generate_pdfs_zip(models).await?;
+    let zip_stream = ZipStream::new(&zip_filename).await;
 
-    Ok(zip_to_attachment(content, &zip_filename))
+    generate_pdfs(models, zip_stream.sender()).await;
+
+    Ok(zip_stream)
 }

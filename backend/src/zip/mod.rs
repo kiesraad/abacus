@@ -1,22 +1,14 @@
+use crate::{APIError, zip::write_stream::WriteStream};
 use async_zip::{Compression, ZipEntryBuilder, error::ZipError, tokio::write::ZipFileWriter};
 use axum::{
-    body::{Body, Bytes},
+    body::Body,
     response::{IntoResponse, Response},
 };
 use axum_extra::response::Attachment;
-use std::{
-    io::Result as IoResult,
-    pin::Pin,
-    task::{Context, Poll},
-};
-use tokio::{
-    io::AsyncWrite,
-    sync::mpsc::{self, Sender},
-};
-use tokio_stream::wrappers::ReceiverStream;
+use tokio::sync::mpsc::{self, Sender};
 use tracing::info;
 
-use crate::APIError;
+mod write_stream;
 
 pub fn slugify_filename(filename: &str) -> String {
     filename.replace(" ", "_").replace("/", "-")
@@ -24,63 +16,26 @@ pub fn slugify_filename(filename: &str) -> String {
 
 pub type FileEntry = Option<(String, Vec<u8>)>;
 
-/// A writer that sends data through a channel
-#[derive(Clone)]
-struct ChannelWriter {
-    sender: mpsc::Sender<Result<Bytes, std::io::Error>>,
-}
-
-impl ChannelWriter {
-    pub fn new() -> (Self, mpsc::Receiver<Result<Bytes, std::io::Error>>) {
-        let (sender, receiver) = mpsc::channel(64);
-        (Self { sender }, receiver)
-    }
-}
-
-impl AsyncWrite for ChannelWriter {
-    fn poll_write(
-        self: Pin<&mut Self>,
-        _cx: &mut Context<'_>,
-        buf: &[u8],
-    ) -> Poll<std::io::Result<usize>> {
-        // Synchronously try to send the buffer
-        let bytes = Bytes::copy_from_slice(buf);
-        match self.get_mut().sender.try_send(Ok(bytes)) {
-            Ok(_) => Poll::Ready(Ok(buf.len())),
-            Err(mpsc::error::TrySendError::Full(_)) => {
-                // Channel is full, so tell the runtime to poll again later.
-                Poll::Pending
-            }
-            Err(_) => Poll::Ready(Err(std::io::Error::new(
-                std::io::ErrorKind::BrokenPipe,
-                "channel closed",
-            ))),
-        }
-    }
-
-    fn poll_flush(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<IoResult<()>> {
-        Poll::Ready(Ok(()))
-    }
-
-    fn poll_shutdown(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<IoResult<()>> {
-        Poll::Ready(Ok(()))
-    }
-}
-
 /// A stream that reads files from a channel and writes them to a ZIP file as a streamed HTTP response
 pub struct ZipStream {
     file_name: String,
     sender: Sender<FileEntry>,
-    output: mpsc::Receiver<Result<Bytes, std::io::Error>>,
+    write_stream: WriteStream,
 }
 
 impl ZipStream {
     pub async fn new(file_name: &str) -> Self {
-        let (write_stream, output) = ChannelWriter::new();
+        // Create the buffer that will pass the resulting zip as a response stream
+        let write_stream = write_stream::WriteStream::new();
+        let input_write_stream = write_stream.clone();
+        let stream_closer = write_stream.clone();
+
+        // Create a channel to send file entries to the ZIP writer
+        // A None entry will signal the the last file was sent
         let (sender, mut receiver) = mpsc::channel::<FileEntry>(64);
 
         tokio::spawn(async move {
-            let mut writer = ZipFileWriter::with_tokio(write_stream);
+            let mut writer = ZipFileWriter::with_tokio(input_write_stream);
 
             while let Some(Some((name, data))) = receiver.recv().await {
                 info!("Adding file to zip: {}", name);
@@ -90,16 +45,27 @@ impl ZipStream {
                 writer.write_entry_whole(builder, &data).await?;
             }
 
+            // Write the ZIP central directory
             writer.close().await?;
+
+            // Signal that the stream is finished, this will finish the HTTP response
+            stream_closer.finish();
 
             Ok::<(), ZipError>(())
         });
 
         Self {
             sender,
-            output,
+            write_stream,
             file_name: slugify_filename(file_name),
         }
+    }
+
+    pub async fn finish(&self) -> Result<(), APIError> {
+        self.sender
+            .send(None)
+            .await
+            .map_err(|_| APIError::ZipError("Failed to send finish signal".into()))
     }
 
     pub fn sender(&self) -> Sender<FileEntry> {
@@ -116,8 +82,7 @@ impl ZipStream {
 
 impl IntoResponse for ZipStream {
     fn into_response(self) -> Response<Body> {
-        let stream = ReceiverStream::new(self.output);
-        Attachment::new(Body::from_stream(stream))
+        Attachment::new(Body::from_stream(self.write_stream))
             .filename(self.file_name)
             .content_type("application/zip")
             .into_response()

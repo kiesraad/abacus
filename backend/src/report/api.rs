@@ -1,7 +1,9 @@
-use axum::extract::{Path, State};
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+};
 use axum_extra::response::Attachment;
 use utoipa_axum::{router::OpenApiRouter, routes};
-use zip::result::ZipError;
 
 use crate::{
     APIError, AppState, ErrorResponse,
@@ -16,14 +18,8 @@ use crate::{
     },
     polling_station::{repository::PollingStations, structs::PollingStation},
     summary::ElectionSummary,
-    zip::{ZipResponse, slugify_filename},
+    zip::{ZipStream, slugify_filename},
 };
-
-impl From<ZipError> for APIError {
-    fn from(err: ZipError) -> Self {
-        APIError::ZipError(err)
-    }
-}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -108,14 +104,17 @@ impl ResultsInput {
     }
 
     fn into_pdf_model(self, xml_hash: impl Into<String>) -> PdfModel {
-        PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
-            committee_session: self.committee_session,
-            polling_stations: self.polling_stations,
-            summary: self.summary,
-            election: self.election,
-            hash: xml_hash.into(),
-            creation_date_time: self.creation_date_time.format("%d-%m-%Y %H:%M").to_string(),
-        }))
+        PdfModel::ModelNa31_2(
+            self.pdf_filename(),
+            Box::new(ModelNa31_2Input {
+                committee_session: self.committee_session,
+                polling_stations: self.polling_stations,
+                summary: self.summary,
+                election: self.election,
+                hash: xml_hash.into(),
+                creation_date_time: self.creation_date_time.format("%d-%m-%Y %H:%M").to_string(),
+            }),
+        )
     }
 }
 
@@ -148,7 +147,7 @@ async fn election_download_zip_results(
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
-) -> Result<Attachment<Vec<u8>>, APIError> {
+) -> Result<impl IntoResponse, APIError> {
     let input = ResultsInput::new(
         id,
         committee_sessions_repo,
@@ -166,12 +165,16 @@ async fn election_download_zip_results(
     let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model).await?;
 
-    let zip = ZipResponse::with_name(&zip_filename);
+    let zip_stream = ZipStream::new(&zip_filename).await;
 
-    zip.create_zip(vec![
-        (pdf_filename, content.buffer),
-        (xml_filename, xml_string.into_bytes()),
-    ])
+    zip_stream
+        .add_file(pdf_filename.clone(), content.buffer)
+        .await?;
+    zip_stream
+        .add_file(xml_filename.clone(), xml_string.into_bytes())
+        .await?;
+
+    Ok(zip_stream)
 }
 
 /// Download a generated PDF with election results

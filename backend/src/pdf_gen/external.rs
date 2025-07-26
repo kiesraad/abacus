@@ -1,22 +1,48 @@
-use std::path::PathBuf;
-
 use rand::{Rng, distr::Alphanumeric};
+use std::{path::PathBuf, time::Instant};
+use tokio::{sync::mpsc::Sender, task::JoinHandle};
+use tracing::info;
 
 use super::{PdfGenResult, models::PdfModel};
-use crate::APIError;
+use crate::{APIError, zip::FileEntry};
 
+/// Generates a PDF using an external typst binary.
+/// Uses environment variables `ABACUS_TYPST_BIN` (`typst` by default)
+/// and `ABACUS_TEMPLATES_DIR` (`./templates` by default) to
 pub async fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
     Ok(generate_pdf_internal(model).await?)
 }
 
-pub async fn generate_pdfs(models: Vec<PdfModel>) -> Result<Vec<PdfGenResult>, APIError> {
-    let mut results = Vec::new();
+/// Create a PDF file for each model in the provided vector and send them through the provided channel.
+pub async fn generate_pdfs(
+    models: Vec<PdfModel>,
+    sender: Sender<FileEntry>,
+) -> JoinHandle<Result<(), PdfGenError>> {
+    tokio::spawn(async move {
+        for model in models.into_iter() {
+            let file_name = model.get_filename();
+            let start = Instant::now();
+            let content = generate_pdf_internal(model).await?;
+            info!(
+                "Generated PDF {file_name} in {} ms",
+                start.elapsed().as_millis()
+            );
 
-    for model in models {
-        results.push(generate_pdf_internal(model).await?);
-    }
+            sender
+                .send(Some((file_name, content.buffer)))
+                .await
+                .map_err(|_| PdfGenError::ChannelClosed)?;
+        }
 
-    Ok(results)
+        sender
+            .send(None)
+            .await
+            .map_err(|_| PdfGenError::ChannelClosed)?;
+
+        info!("All PDFs generated and sent to the channel");
+
+        Ok::<(), PdfGenError>(())
+    })
 }
 
 /// Uses environment variables `ABACUS_TYPST_BIN` (`typst` by default) and `ABACUS_TEMPLATES_DIR` (`./templates` by
@@ -107,6 +133,7 @@ pub enum PdfGenError {
     Io(std::io::Error),
     Join(tokio::task::JoinError),
     Json(serde_json::Error),
+    ChannelClosed,
 }
 
 impl From<std::io::Error> for PdfGenError {

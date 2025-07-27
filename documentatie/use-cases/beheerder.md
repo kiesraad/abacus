@@ -41,7 +41,7 @@ __Hoofdscenario:__
 __Uitbreidingen:__  
 1a. De beheerder bereidt één of meerdere reserve-servers voor:
 
-4a. De installatie van de applicatie geeft een foutmelding:
+4a. De applicatie geeft een foutmelding tijdens het starten:
 
 ## De beheerder zet de verkiezingen in de applicatie (zee)
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
+import { AnyApiError, isSuccess } from "@/api/ApiResult.ts";
 import { useApiClient } from "@/api/useApiClient";
 import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
@@ -30,6 +31,11 @@ export function ElectionStatusPage() {
   const { statuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
   const [showPauseModal, setShowPauseModal] = useState(false);
+  const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
+
+  if (changeStatusError) {
+    throw changeStatusError;
+  }
 
   // re-fetch election when component mounts
   useEffect(() => {
@@ -53,9 +59,16 @@ export function ElectionStatusPage() {
   function handleStatusChange(status: CommitteeSessionStatus) {
     const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: status };
-    void client.putRequest(url, body).then(async () => {
-      await refetch();
-    });
+    void client
+      .putRequest(url, body)
+      .then(async (result) => {
+        if (isSuccess(result)) {
+          await refetch();
+        } else {
+          throw result;
+        }
+      })
+      .catch(setChangeStatusError);
   }
 
   function getLink() {

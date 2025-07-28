@@ -379,6 +379,7 @@ export interface CommitteeSession {
 export interface CommitteeSessionCreateRequest {
   election_id: number;
   number: number;
+  number_of_voters: number;
 }
 
 export interface CommitteeSessionDetails {
@@ -561,6 +562,7 @@ export type ElectionCategory = "Municipal";
 export interface ElectionDefinitionValidateResponse {
   election: NewElection;
   hash: RedactedEmlHash;
+  number_of_voters: number;
   polling_stations?: PollingStationRequest[];
 }
 

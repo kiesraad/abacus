@@ -149,6 +149,7 @@ pub async fn election_create(
         .create(CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
+            number_of_voters: 0,
         })
         .await?;
     audit_service
@@ -185,6 +186,7 @@ pub struct ElectionDefinitionValidateResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     polling_stations: Option<Vec<PollingStationRequest>>,
+    number_of_voters: u32,
 }
 
 /// Uploads election definition, validates it and returns the associated election data and
@@ -228,9 +230,10 @@ pub async fn election_import_validate(
 
     // parse and validate polling stations, and update number of voters
     let polling_stations;
+    let mut number_of_voters = 0;
     if let Some(data) = edu.polling_station_data {
         polling_stations = Some(EML110::from_str(&data)?.get_polling_stations()?);
-        election = EML110::from_str(&data)?.update_number_of_voters(election)?;
+        number_of_voters = EML110::from_str(&data)?.get_number_of_voters()?;
     } else {
         polling_stations = None;
     }
@@ -239,6 +242,7 @@ pub async fn election_import_validate(
         hash,
         election,
         polling_stations,
+        number_of_voters,
     }))
 }
 
@@ -286,10 +290,9 @@ pub async fn election_import(
 
     // Process polling stations
     let mut polling_places = None;
+    let mut number_of_voters = 0;
     if let Some(polling_station_data) = edu.polling_station_data {
-        new_election =
-            EML110::from_str(&polling_station_data)?.update_number_of_voters(new_election)?;
-
+        number_of_voters = EML110::from_str(&polling_station_data)?.get_number_of_voters()?;
         polling_places = Some(EML110::from_str(&polling_station_data)?.get_polling_stations()?);
     }
 
@@ -311,6 +314,7 @@ pub async fn election_import(
         .create(CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
+            number_of_voters,
         })
         .await?;
     audit_service

@@ -4,7 +4,7 @@
   "abort": {
     "action": "Afbreken",
     "description": "<p>De verkiezing wordt pas opgeslagen als je alle stappen doorlopen hebt. Weet je zeker dat je het aanmaken van de verkiezing wilt afbreken?</p>",
-    "discard_input": "Ja, verwijder verkiezing",
+    "discard_input": "Verkiezing niet opslaan",
     "keep_input": "Annuleren",
     "title": "Niet opgeslagen wijzigingen"
   },

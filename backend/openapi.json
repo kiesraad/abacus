@@ -3764,7 +3764,8 @@
         "description": "Committee session create request",
         "required": [
           "number",
-          "election_id"
+          "election_id",
+          "number_of_voters"
         ],
         "properties": {
           "election_id": {
@@ -3773,6 +3774,11 @@
             "minimum": 0
           },
           "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -4287,7 +4293,8 @@
         "type": "object",
         "required": [
           "hash",
-          "election"
+          "election",
+          "number_of_voters"
         ],
         "properties": {
           "election": {
@@ -4295,6 +4302,11 @@
           },
           "hash": {
             "$ref": "#/components/schemas/RedactedEmlHash"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           },
           "polling_stations": {
             "type": "array",

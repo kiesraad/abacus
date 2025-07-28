@@ -90,6 +90,7 @@ function electionValidateResponse(
     },
     election,
     polling_stations,
+    number_of_voters: 0,
   };
 }
 
@@ -518,7 +519,7 @@ describe("Election create pages", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
     // Delete button should move away from the import page
-    const deleteButton = screen.getByText("Ja, verwijder verkiezing");
+    const deleteButton = screen.getByText("Verkiezing niet opslaan");
     expect(deleteButton).toBeVisible();
     await user.click(deleteButton);
     expect(screen.queryAllByText("Controleer kandidatenlijst").length).toBe(0);

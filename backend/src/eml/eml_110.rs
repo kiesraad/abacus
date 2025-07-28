@@ -214,25 +214,25 @@ impl EML110 {
     }
 
     ///
-    /// Update number of voters in NewElection from 110b
+    /// Get number of voters from 110b
     ///
-    pub fn update_number_of_voters(
-        &self,
-        mut election: crate::election::NewElection,
-    ) -> std::result::Result<crate::election::NewElection, EMLImportError> {
+    pub fn get_number_of_voters(&self) -> std::result::Result<u32, EMLImportError> {
         // we need to be importing from a 110b file
         if self.base.id != "110b" {
             return Err(EMLImportError::Needs110b);
         }
 
-        // Fill in number of voters
+        // Get number of voters
+        let number_of_voters: u32;
         if let Some(voters) = &self.contest().max_votes {
-            election.number_of_voters = voters
+            number_of_voters = voters
                 .parse()
                 .or(Err(EMLImportError::InvalidNumberOfVoters))?;
+        } else {
+            return Err(EMLImportError::InvalidNumberOfVoters);
         }
 
-        Ok(election)
+        Ok(number_of_voters)
     }
 
     pub fn definition_from_abacus_election(
@@ -840,26 +840,17 @@ mod tests {
 
     #[test]
     fn test_valid_number_of_voters() {
-        let election_data = include_str!("./tests/eml110a_test.eml.xml");
-        let election_doc = EML110::from_str(election_data).unwrap();
-        let election = election_doc.as_abacus_election().unwrap();
-        assert!(matches!(election.number_of_voters, 0));
-
         let data = include_str!("./tests/eml110b_test.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.update_number_of_voters(election).unwrap();
-        assert!(matches!(res.number_of_voters, 612694));
+        let number_of_voters = doc.get_number_of_voters().unwrap();
+        assert!(matches!(number_of_voters, 612694));
     }
 
     #[test]
     fn test_invalid_number_of_voters() {
-        let election_data = include_str!("./tests/eml110a_test.eml.xml");
-        let election_doc = EML110::from_str(election_data).unwrap();
-        let election = election_doc.as_abacus_election().unwrap();
-
         let data = include_str!("./tests/eml110b_invalid_number_of_voters.eml.xml");
         let doc = EML110::from_str(data).unwrap();
-        let res = doc.update_number_of_voters(election).unwrap_err();
+        let res = doc.get_number_of_voters().unwrap_err();
         assert!(matches!(res, EMLImportError::InvalidNumberOfVoters));
     }
 }

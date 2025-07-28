@@ -3,6 +3,7 @@ use axum::{
     extract::{Path, State},
 };
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -18,7 +19,6 @@ use crate::{
         repository::{PollingStationDataEntries, PollingStationResultsEntries},
         status::DataEntryStatusName,
     },
-    election::repository::Elections,
     polling_station::repository::PollingStations,
     summary::ElectionSummary,
 };
@@ -59,14 +59,14 @@ pub struct ElectionApportionmentResponse {
 )]
 async fn election_apportionment(
     _user: Coordinator,
-    State(elections_repo): State<Elections>,
+    State(pool): State<SqlitePool>,
     State(data_entry_repo): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     audit_service: AuditService,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionApportionmentResponse>, APIError> {
-    let election = elections_repo.get(id).await?;
+    let election = crate::election::repository::get(&pool, id).await?;
     let statuses = data_entry_repo.statuses(id).await?;
     if !statuses.is_empty()
         && statuses

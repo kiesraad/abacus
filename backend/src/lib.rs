@@ -11,7 +11,7 @@ use axum::{
 };
 use hyper::http::{HeaderName, HeaderValue, header};
 use sqlx::{
-    SqlitePool,
+    Acquire, Executor, Sqlite, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
 };
 use tokio::{net::TcpListener, signal};
@@ -49,6 +49,12 @@ pub use error::{APIError, ErrorResponse};
 
 /// Maximum size of the request body in megabytes.
 pub const MAX_BODY_SIZE_MB: usize = 12;
+
+pub trait DbConnLike<'a>: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite> {}
+impl<'a, T> DbConnLike<'a> for T where
+    T: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite>
+{
+}
 
 #[derive(FromRef, Clone)]
 pub struct AppState {

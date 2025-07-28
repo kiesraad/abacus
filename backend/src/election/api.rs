@@ -5,12 +5,12 @@ use axum::{
 };
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
     NewElection,
-    repository::Elections,
     structs::{Election, ElectionWithPoliticalGroups},
 };
 use crate::{
@@ -70,9 +70,9 @@ pub struct ElectionDetailsResponse {
 pub async fn election_list(
     _user: User,
     State(committee_sessions_repo): State<CommitteeSessions>,
-    State(elections_repo): State<Elections>,
+    State(pool): State<SqlitePool>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
-    let elections = elections_repo.list().await?;
+    let elections = crate::election::repository::list(&pool).await?;
     let committee_sessions = committee_sessions_repo
         .get_committee_session_for_each_election()
         .await?;
@@ -100,11 +100,11 @@ pub async fn election_list(
 pub async fn election_details(
     _user: User,
     State(committee_sessions_repo): State<CommitteeSessions>,
-    State(elections_repo): State<Elections>,
+    State(pool): State<SqlitePool>,
     State(polling_stations): State<PollingStations>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
-    let election = elections_repo.get(id).await?;
+    let election = crate::election::repository::get(&pool, id).await?;
     let polling_stations = polling_stations.list(id).await?;
     let committee_session = committee_sessions_repo
         .get_election_committee_session(id)
@@ -132,12 +132,12 @@ pub async fn election_details(
 #[cfg(feature = "dev-database")]
 pub async fn election_create(
     _user: Admin,
-    State(elections_repo): State<Elections>,
+    State(pool): State<SqlitePool>,
     State(committee_sessions_repo): State<CommitteeSessions>,
     audit_service: AuditService,
     Json(new_election): Json<NewElection>,
 ) -> Result<(StatusCode, ElectionWithPoliticalGroups), APIError> {
-    let election = elections_repo.create(new_election).await?;
+    let election = crate::election::repository::create(&pool, new_election).await?;
     audit_service
         .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
         .await?;
@@ -243,7 +243,7 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
 )]
 pub async fn election_import(
     _user: Admin,
-    State(elections_repo): State<Elections>,
+    State(pool): State<SqlitePool>,
     State(committee_sessions_repo): State<CommitteeSessions>,
     audit_service: AuditService,
     Json(edu): Json<ElectionAndCandidatesDefinitionImportRequest>,
@@ -258,7 +258,7 @@ pub async fn election_import(
     let mut new_election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
     new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
 
-    let election = elections_repo.create(new_election).await?;
+    let election = crate::election::repository::create(&pool, new_election).await?;
     audit_service
         .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
         .await?;

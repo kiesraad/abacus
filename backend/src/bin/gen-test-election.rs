@@ -18,7 +18,7 @@ use abacus::{
     },
     election::{
         CandidateGender, ElectionCategory, ElectionWithPoliticalGroups, NewElection,
-        PoliticalGroup, VoteCountingMethod, repository::Elections,
+        PoliticalGroup, VoteCountingMethod,
     },
     eml::{EML110, EML230, EMLDocument},
     pdf_gen::models::{ModelNa31_2Input, PdfModel},
@@ -146,8 +146,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut rng = rand::rng();
 
     // generate and store the election
-    let election = Elections::new(pool.clone())
-        .create(generate_election(&mut rng, &args))
+    let election = abacus::election::repository::create(&pool, generate_election(&mut rng, &args))
         .await
         .expect("Failed to create election");
 

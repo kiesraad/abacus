@@ -19,7 +19,6 @@ use crate::{
         repository::CommitteeSessions,
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
-    election::repository::Elections,
 };
 
 pub mod repository;
@@ -63,11 +62,11 @@ impl IntoResponse for PollingStationListResponse {
 async fn polling_station_list(
     _user: User,
     State(polling_stations): State<PollingStations>,
-    State(elections): State<Elections>,
+    State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
 ) -> Result<PollingStationListResponse, APIError> {
     // Check if the election exists, will respond with NOT_FOUND otherwise
-    elections.get(election_id).await?;
+    crate::election::repository::get(&pool, election_id).await?;
 
     Ok(PollingStationListResponse {
         polling_stations: polling_stations.list(election_id).await?,
@@ -99,11 +98,10 @@ async fn polling_station_create(
     new_polling_station: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     let polling_stations_repo = PollingStations::new(pool.clone());
-    let elections_repo = Elections::new(pool.clone());
     let committee_sessions_repo = CommitteeSessions::new(pool.clone());
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    elections_repo.get(election_id).await?;
+    crate::election::repository::get(&pool, election_id).await?;
     let committee_session = committee_sessions_repo
         .get_election_committee_session(election_id)
         .await?;
@@ -228,11 +226,10 @@ async fn polling_station_delete(
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<StatusCode, APIError> {
     let polling_stations_repo = PollingStations::new(pool.clone());
-    let elections_repo = Elections::new(pool.clone());
     let committee_sessions_repo = CommitteeSessions::new(pool.clone());
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    elections_repo.get(election_id).await?;
+    crate::election::repository::get(&pool, election_id).await?;
     let committee_session = committee_sessions_repo
         .get_election_committee_session(election_id)
         .await?;

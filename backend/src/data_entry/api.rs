@@ -26,7 +26,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
     committee_session::{CommitteeSession, repository::CommitteeSessions},
-    election::{ElectionWithPoliticalGroups, repository::Elections},
+    election::ElectionWithPoliticalGroups,
     error::{ErrorReference, ErrorResponse},
     polling_station::{PollingStation, repository::PollingStations},
 };
@@ -88,8 +88,7 @@ async fn get_polling_station_election_and_committee_session_id(
 > {
     let polling_stations = PollingStations::new(pool.clone());
     let polling_station = polling_stations.get(polling_station_id).await?;
-    let elections = Elections::new(pool.clone());
-    let election = elections.get(polling_station.election_id).await?;
+    let election = crate::election::repository::get(&pool, polling_station.election_id).await?;
     let committee_sessions = CommitteeSessions::new(pool.clone());
     let committee_session = committee_sessions
         .get_election_committee_session(election.id)

@@ -44,7 +44,7 @@ impl CommitteeSessions {
         query_as!(
             CommitteeSession,
             r#"
-            SELECT 
+            SELECT
               id as "id: u32",
               number as "number: u32",
               election_id as "election_id: u32",
@@ -70,7 +70,7 @@ impl CommitteeSessions {
         query_as!(
             CommitteeSession,
             r#"
-            SELECT 
+            SELECT
               id as "id: u32",
               number as "number: u32",
               election_id as "election_id: u32",
@@ -81,7 +81,7 @@ impl CommitteeSessions {
               number_of_voters as "number_of_voters: u32"
             FROM committee_sessions
             WHERE election_id = ?
-            ORDER BY number DESC 
+            ORDER BY number DESC
             LIMIT 1
             "#,
             election_id

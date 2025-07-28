@@ -636,14 +636,14 @@ async fn export_election(
     if export_results_json {
         let election_summary = ElectionSummary::from_results(election, &results)
             .expect("Failed to create election summary");
-        let input = PdfModel::ModelNa31_2(ModelNa31_2Input {
+        let input = PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
             committee_session: committee_session.clone(),
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
             summary: election_summary,
             election: election.clone(),
             hash: "0000".to_string(),
             creation_date_time: chrono::Utc::now().format("%d-%m-%Y %H:%M").to_string(),
-        });
+        }));
         let input_json = input.get_input().expect("Failed to get model input");
         let results_filename = export_dir.join(format!(
             "input_{}_{}.json",

@@ -19,6 +19,7 @@ async fn test_airgap_detection(pool: SqlitePool) {
             (Method::POST, &item.post),
             (Method::PUT, &item.put),
             (Method::PATCH, &item.patch),
+            (Method::DELETE, &item.delete),
         ];
 
         // loop through all the operations for each path

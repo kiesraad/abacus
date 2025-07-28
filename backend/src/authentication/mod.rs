@@ -49,7 +49,7 @@ mod tests {
     use crate::{
         AppState, ErrorResponse,
         airgap::AirgapDetection,
-        audit_log::{AuditEvent, AuditLog, LogFilter, UserLoginFailedDetails},
+        audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
         authentication::{
             api::{AccountUpdateRequest, Credentials, UserListResponse},
             middleware::extend_session,
@@ -137,8 +137,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_login_error(pool: SqlitePool) {
-        let audit_log = AuditLog::new(pool.clone());
-        let app = create_app(pool);
+        let app = create_app(pool.clone());
 
         let response = app
             .oneshot(
@@ -161,13 +160,15 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 
-        let events = audit_log
-            .list(&LogFilter {
+        let events = crate::audit_log::list(
+            &pool,
+            &LogFilter {
                 limit: 10,
                 ..Default::default()
-            })
-            .await
-            .unwrap();
+            },
+        )
+        .await
+        .unwrap();
 
         assert_eq!(events.len(), 1);
         assert_eq!(

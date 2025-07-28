@@ -119,7 +119,7 @@ mod test {
 
     use super::{extend_session, inject_user};
     use crate::{
-        audit_log::{AuditLog, AuditService},
+        audit_log::AuditService,
         authentication::{Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, Sessions, User, Users},
     };
 
@@ -184,7 +184,7 @@ mod test {
         let user = User::test_user(Role::Administrator, 1);
 
         let audit_service = AuditService::new(
-            AuditLog::new(pool.clone()),
+            pool.clone(),
             Some(user.clone()),
             Some(Ipv4Addr::new(203, 0, 113, 0).into()),
         );

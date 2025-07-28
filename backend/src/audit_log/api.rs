@@ -1,10 +1,11 @@
 use axum::{Json, extract::State};
 use axum_extra::extract::Query;
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{AuditLog, AuditLogEvent, LogFilter};
+use super::{AuditLogEvent, LogFilter};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::{AdminOrCoordinator, Role},
@@ -73,12 +74,14 @@ pub struct LogFilterQuery {
 async fn audit_log_list(
     _user: AdminOrCoordinator,
     Query(filter_query): Query<LogFilterQuery>,
-    State(audit_log): State<AuditLog>,
+    State(pool): State<SqlitePool>,
 ) -> Result<Json<AuditLogListResponse>, APIError> {
     let filter = LogFilter::from_query(&filter_query);
-    let events = audit_log.list(&filter).await?;
 
-    let count = audit_log.count(&filter).await?;
+    let mut conn = pool.acquire().await?;
+    let events = crate::audit_log::list(&mut *conn, &filter).await?;
+    let count = crate::audit_log::count(&mut *conn, &filter).await?;
+
     let pages = if count > 0 && filter.limit > 0 {
         count.div_ceil(filter.limit)
     } else {
@@ -114,9 +117,9 @@ pub struct AuditLogUser {
 )]
 async fn audit_log_list_users(
     _user: AdminOrCoordinator,
-    State(audit_log): State<AuditLog>,
+    State(pool): State<SqlitePool>,
 ) -> Result<Json<Vec<AuditLogUser>>, APIError> {
-    let users = audit_log.list_users().await?;
+    let users = crate::audit_log::list_users(&pool).await?;
 
     Ok(Json(users))
 }
@@ -142,19 +145,14 @@ mod tests {
         AppState,
         airgap::AirgapDetection,
         audit_log::{
-            AuditEvent, AuditLog, AuditLogListResponse, AuditLogUser, AuditService,
-            UserLoggedInDetails,
+            AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
             api::{audit_log_list, audit_log_list_users},
         },
         authentication::{Sessions, User, Users, inject_user},
     };
 
     fn new_test_audit_service(pool: SqlitePool, user: Option<User>) -> AuditService {
-        AuditService::new(
-            AuditLog::new(pool.clone()),
-            user,
-            Some(Ipv4Addr::new(203, 0, 113, 0).into()),
-        )
+        AuditService::new(pool, user, Some(Ipv4Addr::new(203, 0, 113, 0).into()))
     }
 
     async fn create_log_entries(pool: SqlitePool) {

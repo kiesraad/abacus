@@ -23,6 +23,7 @@
     "AirgapViolation": "Abacus is niet beschikbaar omdat de applicatie verbonden is met het internet. Abacus is alleen bedoeld voor offline gebruik.",
     "AllListsExhausted": "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
     "ApportionmentNotAvailableUntilDataEntryFinalised": "De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd",
+    "CommitteeSessionPaused": "De coördinator heeft het invoeren van stemmen  gepauzeerd. Je kan niet meer verder. [Je laatste wijzigingen worden niet opgeslagen]",
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
     "DataEntryAlreadyClaimed": "Een andere invoerder is bezig met dit stembureau",
     "DataEntryAlreadyFinalised": "De invoer voor dit stembureau is al gedaan",
@@ -30,6 +31,7 @@
     "EntryNotFound": "Niet gevonden",
     "EntryNotUnique": "Deze invoer bestaat al",
     "EmlImportError": "Het EML bestand is niet geldig",
+    "Forbidden": "Je hebt niet de juiste rechten om deze actie uit te voeren",
     "InternalServerError": "Er is een interne fout opgetreden",
     "InvalidData": "De invoer is niet geldig",
     "InvalidJson": "De JSON is niet geldig",
@@ -47,10 +49,10 @@
     "PollingStationRepeated": "Het stembureau is al ingevoerd",
     "PollingStationValidationErrors": "Er zijn fouten opgetreden bij het valideren van het stembureau",
     "RequestPayloadTooLarge": "Het bestand is groter dan toegestaan",
-    "Forbidden": "Je hebt niet de juiste rechten om deze actie uit te voeren",
     "Unauthorized": "Je bent niet ingelogd of je sessie is verlopen",
     "UserNotFound": "De gebruiker is niet gevonden",
     "UsernameNotUnique": "De gebruikersnaam is al in gebruik",
+    "WrongCommitteeSessionStatus": "Deze actie is nu niet beschikbaar",
     "ZeroVotesCast": "Er zijn geen stemmen op kandidaten uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad."
   }
 }

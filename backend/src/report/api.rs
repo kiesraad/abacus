@@ -6,7 +6,10 @@ use zip::result::ZipError;
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::Coordinator,
-    committee_session::{CommitteeSession, repository::CommitteeSessions},
+    committee_session::{
+        CommitteeSession, CommitteeSessionError, repository::CommitteeSessions,
+        status::CommitteeSessionStatus,
+    },
     data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
     election::{ElectionWithPoliticalGroups, repository::Elections},
     eml::{EML510, EMLDocument, EmlHash, axum::Eml},
@@ -135,6 +138,7 @@ impl ResultsInput {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -147,10 +151,19 @@ async fn election_download_zip_results(
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await?;
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::WrongCommitteeSessionStatus,
+        ));
+    }
+
     let input = ResultsInput::new(
-        id,
+        election_id,
         committee_sessions_repo,
         elections_repo,
         polling_stations_repo,
@@ -190,6 +203,7 @@ async fn election_download_zip_results(
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -202,10 +216,19 @@ async fn election_download_pdf_results(
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await?;
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::WrongCommitteeSessionStatus,
+        ));
+    }
+
     let input = ResultsInput::new(
-        id,
+        election_id,
         committee_sessions_repo,
         elections_repo,
         polling_stations_repo,
@@ -236,6 +259,7 @@ async fn election_download_pdf_results(
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -248,10 +272,19 @@ async fn election_download_xml_results(
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<u32>,
 ) -> Result<Eml<EML510>, APIError> {
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await?;
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::WrongCommitteeSessionStatus,
+        ));
+    }
+
     let input = ResultsInput::new(
-        id,
+        election_id,
         committee_sessions_repo,
         elections_repo,
         polling_stations_repo,

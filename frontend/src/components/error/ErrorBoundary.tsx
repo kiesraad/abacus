@@ -30,6 +30,14 @@ export function ErrorBoundary() {
     return <FatalErrorPage title="error.forbidden" reference={error.reference} code={error.code} />;
   }
 
+  if (error instanceof FatalApiError && error.reference === "WrongCommitteeSessionStatus") {
+    return <FatalErrorPage title="error.forbidden" reference={error.reference} code={error.code} />;
+  }
+
+  if (error instanceof FatalApiError && error.reference === "CommitteeSessionPaused") {
+    return <FatalErrorPage title="error.forbidden" reference={error.reference} code={error.code} />;
+  }
+
   if (error instanceof ApiError || error instanceof FatalApiError) {
     return <FatalErrorPage message={error.message} reference={error.reference} code={error.code} />;
   }

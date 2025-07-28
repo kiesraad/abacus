@@ -12,24 +12,25 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-    repository::CommitteeSessions,
-    status::{CommitteeSessionTransitionError, change_committee_session_status},
+    repository::CommitteeSessions, status::change_committee_session_status,
 };
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{AdminOrCoordinator, Coordinator},
     election::repository::Elections,
-    error::ErrorReference,
 };
 
-impl From<CommitteeSessionTransitionError> for APIError {
-    fn from(err: CommitteeSessionTransitionError) -> Self {
-        match err {
-            CommitteeSessionTransitionError::Invalid => {
-                APIError::Conflict(err.to_string(), ErrorReference::InvalidStateTransition)
-            }
-        }
+#[derive(Debug, PartialEq, Eq)]
+pub enum CommitteeSessionError {
+    CommitteeSessionPaused,
+    InvalidStatusTransition,
+    WrongCommitteeSessionStatus,
+}
+
+impl From<CommitteeSessionError> for APIError {
+    fn from(err: CommitteeSessionError) -> Self {
+        APIError::CommitteeSession(err)
     }
 }
 

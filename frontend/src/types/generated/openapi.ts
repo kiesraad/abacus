@@ -666,6 +666,7 @@ export type ErrorReference =
   | "AirgapViolation"
   | "AllListsExhausted"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
+  | "CommitteeSessionPaused"
   | "DatabaseError"
   | "DataEntryAlreadyClaimed"
   | "DataEntryAlreadyFinalised"
@@ -694,6 +695,7 @@ export type ErrorReference =
   | "Unauthorized"
   | "UsernameNotUnique"
   | "UserNotFound"
+  | "WrongCommitteeSessionStatus"
   | "ZeroVotesCast";
 
 /**

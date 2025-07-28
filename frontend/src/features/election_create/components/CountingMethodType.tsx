@@ -42,10 +42,13 @@ export function CountingMethodType() {
             id="cso"
             label={t("election.voting_method_type.cso")}
             checked={true}
-            onChange={() => {/*
+            onChange={() => {
+              /*
               We need this to suppress an error because we explicitly set the `checked` property.
               We'll actually implement this handler once we support DSO
-            */}}>
+            */
+            }}
+          >
             {t("election.voting_method_type.cso_description")}
           </ChoiceList.Radio>
           <ChoiceList.Radio

@@ -14,10 +14,7 @@ use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{AdminOrCoordinator, User},
-    committee_session::{
-        repository::CommitteeSessions,
-        status::{CommitteeSessionStatus, change_committee_session_status},
-    },
+    committee_session::status::{CommitteeSessionStatus, change_committee_session_status},
 };
 
 pub mod repository;
@@ -95,13 +92,11 @@ async fn polling_station_create(
     audit_service: AuditService,
     new_polling_station: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
-    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
-
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&pool, election_id).await?;
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await?;
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
+            .await?;
 
     let polling_station =
         crate::polling_station::repository::create(&pool, election_id, new_polling_station).await?;
@@ -228,13 +223,11 @@ async fn polling_station_delete(
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<StatusCode, APIError> {
-    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
-
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&pool, election_id).await?;
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await?;
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
+            .await?;
 
     let polling_station = crate::polling_station::repository::get_for_election(
         &pool,

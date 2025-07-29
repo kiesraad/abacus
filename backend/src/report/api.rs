@@ -7,7 +7,7 @@ use zip::result::ZipError;
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::Coordinator,
-    committee_session::{CommitteeSession, repository::CommitteeSessions},
+    committee_session::CommitteeSession,
     data_entry::PollingStationResults,
     election::ElectionWithPoliticalGroups,
     eml::{EML510, EMLDocument, EmlHash, axum::Eml},
@@ -43,14 +43,13 @@ struct ResultsInput {
 }
 
 impl ResultsInput {
-    async fn new(
-        election_id: u32,
-        committee_sessions_repo: CommitteeSessions,
-        pool: SqlitePool,
-    ) -> Result<ResultsInput, APIError> {
+    async fn new(election_id: u32, pool: SqlitePool) -> Result<ResultsInput, APIError> {
         let election = crate::election::repository::get(&pool, election_id).await?;
-        let committee_session = committee_sessions_repo
-            .get_election_committee_session(election_id)
+        let committee_session =
+            crate::committee_session::repository::get_election_committee_session(
+                &pool,
+                election_id,
+            )
             .await?;
         let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
         let results =
@@ -142,11 +141,10 @@ impl ResultsInput {
 )]
 async fn election_download_zip_results(
     _user: Coordinator,
-    State(committee_sessions_repo): State<CommitteeSessions>,
     State(pool): State<SqlitePool>,
     Path(id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
-    let input = ResultsInput::new(id, committee_sessions_repo, pool).await?;
+    let input = ResultsInput::new(id, pool).await?;
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
@@ -188,11 +186,10 @@ async fn election_download_zip_results(
 )]
 async fn election_download_pdf_results(
     _user: Coordinator,
-    State(committee_sessions_repo): State<CommitteeSessions>,
     State(pool): State<SqlitePool>,
     Path(id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
-    let input = ResultsInput::new(id, committee_sessions_repo, pool).await?;
+    let input = ResultsInput::new(id, pool).await?;
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
@@ -225,11 +222,10 @@ async fn election_download_pdf_results(
 )]
 async fn election_download_xml_results(
     _user: Coordinator,
-    State(committee_sessions_repo): State<CommitteeSessions>,
     State(pool): State<SqlitePool>,
     Path(id): Path<u32>,
 ) -> Result<Eml<EML510>, APIError> {
-    let input = ResultsInput::new(id, committee_sessions_repo, pool).await?;
+    let input = ResultsInput::new(id, pool).await?;
     let xml = input.as_xml();
     Ok(Eml(xml))
 }

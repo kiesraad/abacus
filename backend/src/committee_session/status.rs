@@ -7,7 +7,6 @@ use utoipa::ToSchema;
 use crate::{
     APIError, DbConnLike,
     audit_log::{AuditEvent, AuditService},
-    committee_session::repository::CommitteeSessions,
 };
 
 /// Committee session status
@@ -53,8 +52,8 @@ pub async fn change_committee_session_status(
     pool: SqlitePool,
     audit_service: AuditService,
 ) -> Result<(), APIError> {
-    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
-    let committee_session = committee_sessions_repo.get(committee_session_id).await?;
+    let committee_session =
+        crate::committee_session::repository::get(&pool, committee_session_id).await?;
     let new_status = match status {
         CommitteeSessionStatus::Created => committee_session.status.prepare_data_entry()?,
         CommitteeSessionStatus::DataEntryNotStarted => {
@@ -72,9 +71,12 @@ pub async fn change_committee_session_status(
         }
     };
 
-    let committee_session = committee_sessions_repo
-        .change_status(committee_session_id, new_status)
-        .await?;
+    let committee_session = crate::committee_session::repository::change_status(
+        &pool,
+        committee_session_id,
+        new_status,
+    )
+    .await?;
 
     audit_service
         .log(

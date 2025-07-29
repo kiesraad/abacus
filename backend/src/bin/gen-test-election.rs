@@ -6,9 +6,7 @@ use std::{
 };
 
 use abacus::{
-    committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
-    },
+    committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
     create_sqlite_pool,
     data_entry::{
         CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
@@ -149,19 +147,23 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .expect("Failed to create election");
 
     // generate the committee session for the election
-    let cs_repo = CommitteeSessions::new(pool.clone());
-    let committee_session = cs_repo
-        .create(CommitteeSessionCreateRequest {
+    let committee_session = abacus::committee_session::repository::create(
+        &pool,
+        CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
-        })
-        .await
-        .expect("Failed to create committee session");
+        },
+    )
+    .await
+    .expect("Failed to create committee session");
 
-    cs_repo
-        .change_number_of_voters(committee_session.id, rng.random_range(args.voters.clone()))
-        .await
-        .expect("Failed to update number of voters of committee session");
+    abacus::committee_session::repository::change_number_of_voters(
+        &pool,
+        committee_session.id,
+        rng.random_range(args.voters.clone()),
+    )
+    .await
+    .expect("Failed to update number of voters of committee session");
 
     // generate the polling stations for the election
     let polling_stations =

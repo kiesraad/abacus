@@ -240,12 +240,14 @@ pub mod tests {
         pool: SqlitePool,
         number: u32,
         election_id: u32,
+        number_of_voters: u32,
     ) -> CommitteeSession {
         crate::committee_session::repository::create(
             &pool,
             CommitteeSessionCreateRequest {
                 number,
                 election_id,
+                number_of_voters,
             },
         )
         .await

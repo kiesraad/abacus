@@ -1,8 +1,10 @@
-use axum::extract::{Path, State};
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+};
 use axum_extra::response::Attachment;
 use sqlx::SqlitePool;
 use utoipa_axum::{router::OpenApiRouter, routes};
-use zip::result::ZipError;
 
 use crate::{
     APIError, AppState, ErrorResponse,
@@ -13,18 +15,12 @@ use crate::{
     eml::{EML510, EMLDocument, EmlHash, axum::Eml},
     pdf_gen::{
         generate_pdf,
-        models::{ModelNa31_2Input, PdfModel},
+        models::{ModelNa31_2Input, PdfFileModel, ToPdfFileModel},
     },
     polling_station::structs::PollingStation,
     summary::ElectionSummary,
-    zip::{ZipResponse, slugify_filename},
+    zip::{ZipStream, slugify_filename},
 };
-
-impl From<ZipError> for APIError {
-    fn from(err: ZipError) -> Self {
-        APIError::ZipError(err)
-    }
-}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -105,15 +101,17 @@ impl ResultsInput {
         ))
     }
 
-    fn into_pdf_model(self, xml_hash: impl Into<String>) -> PdfModel {
-        PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
+    fn into_pdf_file_model(self, xml_hash: impl Into<String>) -> PdfFileModel {
+        let file_name = self.pdf_filename();
+        ModelNa31_2Input {
             committee_session: self.committee_session,
             polling_stations: self.polling_stations,
             summary: self.summary,
             election: self.election,
             hash: xml_hash.into(),
             creation_date_time: self.creation_date_time.format("%d-%m-%Y %H:%M").to_string(),
-        }))
+        }
+        .to_pdf_file_model(file_name)
     }
 }
 
@@ -143,7 +141,7 @@ async fn election_download_zip_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     Path(id): Path<u32>,
-) -> Result<Attachment<Vec<u8>>, APIError> {
+) -> Result<impl IntoResponse, APIError> {
     let input = ResultsInput::new(id, pool).await?;
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
@@ -151,15 +149,21 @@ async fn election_download_zip_results(
     let xml_filename = input.xml_filename();
     let zip_filename = input.zip_name();
 
-    let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
+    let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model).await?;
 
-    let zip = ZipResponse::with_name(&zip_filename);
+    let zip_stream = ZipStream::new(&zip_filename).await;
 
-    zip.create_zip(vec![
-        (pdf_filename, content.buffer),
-        (xml_filename, xml_string.into_bytes()),
-    ])
+    zip_stream
+        .add_file(pdf_filename.clone(), content.buffer)
+        .await?;
+    zip_stream
+        .add_file(xml_filename.clone(), xml_string.into_bytes())
+        .await?;
+
+    zip_stream.finish().await?;
+
+    Ok(zip_stream)
 }
 
 /// Download a generated PDF with election results
@@ -193,7 +197,7 @@ async fn election_download_pdf_results(
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
-    let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
+    let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model).await?;
 
     Ok(Attachment::new(content.buffer)

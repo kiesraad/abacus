@@ -55,7 +55,7 @@ const pollingStationResults = {
     {
       number: 1,
       total: 0,
-      candidate_votes: [{ number: 1, votes: 0 }],
+      candidate_votes: Array.from({ length: 29 }, (_, i) => ({ number: i, votes: 0 })),
     },
     {
       number: 2,
@@ -65,7 +65,7 @@ const pollingStationResults = {
   ],
 };
 
-describe("Test DataEntryProgress", () => {
+describe("DataEntryProgress", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler);
     vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });
@@ -76,8 +76,8 @@ describe("Test DataEntryProgress", () => {
     const formState = getDefaultFormState();
 
     formState.furthest = "political_group_votes_2";
-    formState.sections.voters_votes_counts.acceptErrorsAndWarnings = false;
-    formState.sections.differences_counts.acceptErrorsAndWarnings = true;
+    formState.sections.voters_votes_counts!.acceptErrorsAndWarnings = false;
+    formState.sections.differences_counts!.acceptErrorsAndWarnings = true;
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
@@ -131,8 +131,8 @@ describe("Test DataEntryProgress", () => {
 
     formState.furthest = "political_group_votes_2";
 
-    formState.sections.voters_votes_counts.errors = new ValidationResultSet([validationResultMockData.F201]);
-    formState.sections.voters_votes_counts.warnings = new ValidationResultSet([validationResultMockData.W201]);
+    formState.sections.voters_votes_counts!.errors = new ValidationResultSet([validationResultMockData.F201]);
+    formState.sections.voters_votes_counts!.warnings = new ValidationResultSet([validationResultMockData.W201]);
 
     overrideServerClaimDataEntryResponse({
       formState: formState,

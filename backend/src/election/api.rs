@@ -22,6 +22,8 @@ use crate::{
     polling_station::PollingStation,
 };
 
+use crate::polling_station::PollingStationRequest;
+
 pub fn router() -> OpenApiRouter<AppState> {
     let router = OpenApiRouter::default()
         .routes(routes!(election_import_validate))
@@ -141,6 +143,7 @@ pub async fn election_create(
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
+            number_of_voters: 0,
         },
     )
     .await?;
@@ -165,12 +168,20 @@ pub struct ElectionAndCandidateDefinitionValidateRequest {
     #[schema(value_type = Option<Vec<String>>, nullable = false)]
     candidate_hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
     candidate_data: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = Option<String>, nullable = false)]
+    polling_station_data: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct ElectionDefinitionValidateResponse {
     hash: RedactedEmlHash,
     election: NewElection,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    polling_stations: Option<Vec<PollingStationRequest>>,
+    number_of_voters: u32,
 }
 
 /// Uploads election definition, validates it and returns the associated election data and
@@ -212,7 +223,22 @@ pub async fn election_import_validate(
         election = EML230::from_str(&data)?.add_candidate_lists(election)?;
     }
 
-    Ok(Json(ElectionDefinitionValidateResponse { hash, election }))
+    // parse and validate polling stations, and update number of voters
+    let polling_stations;
+    let mut number_of_voters = 0;
+    if let Some(data) = edu.polling_station_data {
+        polling_stations = Some(EML110::from_str(&data)?.get_polling_stations()?);
+        number_of_voters = EML110::from_str(&data)?.get_number_of_voters()?;
+    } else {
+        polling_stations = None;
+    }
+
+    Ok(Json(ElectionDefinitionValidateResponse {
+        hash,
+        election,
+        polling_stations,
+        number_of_voters,
+    }))
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -221,6 +247,9 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     election_data: String,
     candidate_hash: [String; crate::eml::hash::CHUNK_COUNT],
     candidate_data: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = Option<String>, nullable = false)]
+    polling_station_data: Option<String>,
 }
 
 /// Uploads election definition, validates it, saves it to the database, and returns the created election
@@ -252,10 +281,24 @@ pub async fn election_import(
     let mut new_election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
     new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
 
+    // Process polling stations
+    let mut polling_places = None;
+    let mut number_of_voters = 0;
+    if let Some(polling_station_data) = edu.polling_station_data {
+        number_of_voters = EML110::from_str(&polling_station_data)?.get_number_of_voters()?;
+        polling_places = Some(EML110::from_str(&polling_station_data)?.get_polling_stations()?);
+    }
+
+    // Create new election
     let election = crate::election::repository::create(&pool, new_election).await?;
     audit_service
         .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
         .await?;
+
+    // Create polling stations
+    if let Some(places) = polling_places {
+        crate::polling_station::repository::create_many(&pool, election.id, places).await?;
+    }
 
     // Create first committee session for the election
     let committee_session = crate::committee_session::repository::create(
@@ -263,6 +306,7 @@ pub async fn election_import(
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
+            number_of_voters,
         },
     )
     .await?;

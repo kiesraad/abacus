@@ -14,6 +14,7 @@ use crate::pdf_gen::PdfGenError;
 use super::super::models::PdfModel;
 
 /// Contains the context for rendering PDFs.
+#[derive(Clone)]
 pub struct PdfWorld {
     sources: Vec<Source>,
     library: LazyHash<Library>,

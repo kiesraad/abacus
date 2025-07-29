@@ -120,7 +120,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 #pagebreak(weak: true)
 
-== Uitgebranchte stemmen <cast_votes>
+== Uitgebrachte stemmen <cast_votes>
 
 #if input.election.political_groups.len() > 0 [
   #sum(

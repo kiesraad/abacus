@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="110b" SchemaVersion="5">
+  <TransactionId>1</TransactionId>
+  <ManagingAuthority>
+    <AuthorityIdentifier Id="0363">Amsterdam</AuthorityIdentifier>
+    <AuthorityAddress/>
+  </ManagingAuthority>
+  <kr:CreationDateTime>2024-05-27T17:05:57</kr:CreationDateTime>
+  <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+  <ElectionEvent>
+    <EventIdentifier/>
+    <Election>
+      <ElectionIdentifier Id="EP2024">
+        <ElectionName>Europees Parlement 2024</ElectionName>
+        <ElectionCategory>EP</ElectionCategory>
+        <kr:ElectionSubcategory>EP</kr:ElectionSubcategory>
+        <kr:ElectionDate>2024-06-06</kr:ElectionDate>
+      </ElectionIdentifier>
+      <Contest>
+        <ContestIdentifier Id="geen"/>
+        <ReportingUnit>
+          <ReportingUnitIdentifier Id="0363">Amsterdam</ReportingUnitIdentifier>
+        </ReportingUnit>
+        <VotingMethod />
+        <MaxVotes>612694</MaxVotes>
+      </Contest>
+    </Election>
+  </ElectionEvent>
+</EML>

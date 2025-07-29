@@ -6,7 +6,9 @@ use std::{
 };
 
 use abacus::{
-    committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
+    },
     create_sqlite_pool,
     data_entry::{
         CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
@@ -18,7 +20,7 @@ use abacus::{
         PoliticalGroup, VoteCountingMethod,
     },
     eml::{EML110, EML230, EMLDocument},
-    pdf_gen::models::{ModelNa31_2Input, PdfModel},
+    pdf_gen::models::{ModelNa31_2Input, ToPdfFileModel},
     polling_station::{PollingStation, PollingStationRequest, PollingStationType},
     summary::ElectionSummary,
 };
@@ -147,15 +149,26 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .expect("Failed to create election");
 
     // generate the committee session for the election
-    let committee_session = abacus::committee_session::repository::create(
+    let mut committee_session = abacus::committee_session::repository::create(
         &pool,
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
+            number_of_voters: 0,
         },
     )
     .await
     .expect("Failed to create committee session");
+
+    if args.with_data_entry {
+        committee_session = abacus::committee_session::repository::change_status(
+            &pool,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+        )
+        .await
+        .expect("Failed to update committee session status");
+    }
 
     abacus::committee_session::repository::change_number_of_voters(
         &pool,
@@ -636,19 +649,20 @@ async fn export_election(
     if export_results_json {
         let election_summary = ElectionSummary::from_results(election, &results)
             .expect("Failed to create election summary");
-        let input = PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
+        let input = ModelNa31_2Input {
             committee_session: committee_session.clone(),
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
             summary: election_summary,
             election: election.clone(),
             hash: "0000".to_string(),
             creation_date_time: chrono::Utc::now().format("%d-%m-%Y %H:%M").to_string(),
-        }));
-        let input_json = input.get_input().expect("Failed to get model input");
+        }
+        .to_pdf_file_model("file.pdf".to_string());
+        let input_json = input.model.get_input().expect("Failed to get model input");
         let results_filename = export_dir.join(format!(
             "input_{}_{}.json",
             election.election_id,
-            input.as_filename()
+            input.model.as_model_name()
         ));
         info!(
             "Writing results JSON file for input to PDF model to {:?}",

@@ -1,11 +1,11 @@
 use sqlx::{Error, query_as};
 
-use crate::DbConnLike;
-
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
     status::CommitteeSessionStatus,
 };
+
+use crate::DbConnLike;
 
 pub async fn get(
     conn: impl DbConnLike<'_>,
@@ -149,7 +149,7 @@ pub async fn create(
         committee_session.election_id,
         "",
         "",
-        ""
+        committee_session.number_of_voters,
     )
     .fetch_one(conn)
     .await

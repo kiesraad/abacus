@@ -3,8 +3,8 @@ import { useNavigate } from "react-router";
 
 import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
+import { NumberOfVotersForm } from "@/components/election/NumberOfVotersForm";
 import { Footer } from "@/components/footer/Footer";
-import { NumberOfVotersForm } from "@/features/election_management/components/NumberOfVotersForm";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {

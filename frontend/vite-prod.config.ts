@@ -9,6 +9,7 @@ import pkgjson from "./package.json";
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
   const mswEnabled = process.env.API_MODE === "mock";
+  const includeStorybookLink = process.env.INCLUDE_STORYBOOK_LINK === "true";
   let gitDetails = {
     __GIT_DIRTY__: undefined as string | undefined,
     __GIT_BRANCH__: undefined as string | undefined,
@@ -54,6 +55,7 @@ export default defineConfig(({ command }) => {
     define: {
       __API_MSW__: JSON.stringify(mswEnabled),
       __APP_VERSION__: JSON.stringify(pkgjson.version),
+      __INCLUDE_STORYBOOK_LINK__: JSON.stringify(includeStorybookLink),
       ...gitDetails,
     },
     optimizeDeps: { exclude: ["msw"] },

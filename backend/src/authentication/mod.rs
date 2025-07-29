@@ -38,7 +38,10 @@ mod tests {
         middleware,
     };
     use http_body_util::BodyExt;
-    use hyper::{Method, header::CONTENT_TYPE, header::USER_AGENT};
+    use hyper::{
+        Method,
+        header::{CONTENT_TYPE, USER_AGENT},
+    };
     use sqlx::SqlitePool;
     use test_log::test;
     use tower::ServiceExt;

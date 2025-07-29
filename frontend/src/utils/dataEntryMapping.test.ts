@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { PollingStationResults } from "@/types/generated/openapi";
-import { DataEntrySection, FormSectionId, PollingStationResultsPath } from "@/types/types";
+import { DataEntrySection } from "@/types/types";
 
 import { mapResultsToSectionValues, mapSectionValues } from "./dataEntryMapping";
 import { differencesSection, votersAndVotesSection } from "./dataEntryStructure";
@@ -35,23 +35,23 @@ const createBasePollingStationResults = (): PollingStationResults => ({
 const createCheckboxesSection = (): DataEntrySection => {
   // Use TypeScript `as` for testing
   return {
-    id: "test" as FormSectionId,
+    id: "test",
     title: "test",
     short_title: "test",
     subsections: [
       {
         type: "checkboxes",
         short_title: "test",
-        error_path: "test" as PollingStationResultsPath,
+        error_path: "test",
         error_message: "error",
         options: [
           {
-            path: "test.yes" as PollingStationResultsPath,
+            path: "test.yes",
             label: "yes",
             short_label: "yes",
           },
           {
-            path: "test.no" as PollingStationResultsPath,
+            path: "test.no",
             label: "no",
             short_label: "no",
           },
@@ -63,9 +63,8 @@ const createCheckboxesSection = (): DataEntrySection => {
 
 // Helper function to create a radio section for testing
 const createRadioSection = (): DataEntrySection => {
-  // Use TypeScript `as` for testing
   return {
-    id: "test" as FormSectionId,
+    id: "test",
     title: "test",
     short_title: "test",
     subsections: [
@@ -73,8 +72,7 @@ const createRadioSection = (): DataEntrySection => {
         type: "radio",
         short_title: "test",
         error: "error",
-        path: "test" as PollingStationResultsPath,
-        valueType: "boolean",
+        path: "test",
         options: [
           {
             value: "true",
@@ -99,20 +97,22 @@ describe("mapSectionValues", () => {
     { input: "", expected: undefined, description: "empty" },
   ])("should handle radio $description", ({ input, expected }) => {
     const radioSection = createRadioSection();
-    const current = createBasePollingStationResults();
+    const current = { test: null };
     const formValues = { test: input };
 
     const result = mapSectionValues(current, formValues, radioSection);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    expect((result as any).test).toBe(expected);
+    expect(result.test).toBe(expected);
   });
 
   test("should use section info to distinguish radio vs inputGrid fields", () => {
-    const current = createBasePollingStationResults();
+    const current = {
+      test: null,
+      test2: null,
+    };
     const formValues = {
       test: "true", // Radio field - should become boolean
-      "voters_counts.poll_card_count": "456", // InputGrid field - should be deformatted to number
+      test2: "456", // InputGrid field - should be deformatted to number
     };
 
     const testSection: DataEntrySection = {
@@ -124,16 +124,15 @@ describe("mapSectionValues", () => {
         {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
-          rows: [{ code: "A", path: "voters_counts.poll_card_count", title: "Test Title" }],
+          rows: [{ code: "A", path: "test2", title: "Test Title" }],
         },
       ],
     };
 
     const result = mapSectionValues(current, formValues, testSection);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    expect((result as any).test).toBe(true); // Radio test field becomes boolean
-    expect(result.voters_counts.poll_card_count).toBe(456); // InputGrid field gets deformatted to number
+    expect(result.test).toBe(true); // Radio test field becomes boolean
+    expect(result.test2).toBe(456); // InputGrid field gets deformatted to number
   });
 
   test("should handle numbers correctly when section info is provided", () => {
@@ -491,18 +490,14 @@ describe("mapSectionValues", () => {
   });
 
   test("should handle checkboxes subsection", () => {
-    const current = createBasePollingStationResults();
+    const current = { test: { yes: null, no: null } };
     const formValues = {
       "test.yes": "true",
       "test.no": "false",
     };
 
-    // use `any` because real PollingStationResults doesn't have recounted.yes/recounted.no
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: any = mapSectionValues(current, formValues, createCheckboxesSection());
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const result = mapSectionValues(current, formValues, createCheckboxesSection());
     expect(result.test.yes).toBe(true);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     expect(result.test.no).toBe(false);
   });
 });
@@ -513,20 +508,17 @@ describe("mapResultsToSectionValues", () => {
     { input: false, expected: "false", description: "false" },
     { input: undefined, expected: "", description: "undefined" },
   ])("should handle radio as $description", ({ input, expected }) => {
-    const results = createBasePollingStationResults();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (results as any).test = input;
+    const results = { test: input };
 
     const testSectionWithRadio: DataEntrySection = {
-      id: "test_section" as FormSectionId,
+      id: "test_section",
       title: "Test Section",
       short_title: "Test",
       subsections: [
         {
           type: "radio",
           short_title: "test",
-          path: "test" as PollingStationResultsPath,
-          valueType: "boolean",
+          path: "test",
           error: "error",
           options: [],
         },
@@ -740,13 +732,15 @@ describe("mapResultsToSectionValues", () => {
   });
 
   test("should handle mixed subsections components", () => {
-    const results = createBasePollingStationResults();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (results as any).test = true;
-    results.voters_counts.poll_card_count = 100;
+    const results = {
+      test: true,
+      voters_counts: {
+        poll_card_count: 100,
+      },
+    };
 
     const mixedSection: DataEntrySection = {
-      id: "test" as FormSectionId,
+      id: "test",
       title: "test",
       short_title: "test",
       subsections: [
@@ -769,28 +763,23 @@ describe("mapResultsToSectionValues", () => {
   });
 
   test("should extract checkboxes boolean values to string form", () => {
-    const results = createBasePollingStationResults();
     const checkboxesSection = createCheckboxesSection();
-
     // Test with both true values
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (results as any).test = { yes: true, no: true };
+    const results = { test: { yes: true, no: true } };
 
     let formValues = mapResultsToSectionValues(checkboxesSection, results);
     expect(formValues["test.yes"]).toBe("true");
     expect(formValues["test.no"]).toBe("true");
 
     // Test with both false values
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (results as any).test = { yes: false, no: false };
+    results.test = { yes: false, no: false };
 
     formValues = mapResultsToSectionValues(checkboxesSection, results);
     expect(formValues["test.yes"]).toBe("false");
     expect(formValues["test.no"]).toBe("false");
 
     // Test with mixed values
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (results as any).test = { yes: true, no: false };
+    results.test = { yes: true, no: false };
 
     formValues = mapResultsToSectionValues(checkboxesSection, results);
     expect(formValues["test.yes"]).toBe("true");

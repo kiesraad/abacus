@@ -37,7 +37,7 @@ pub fn generate_pdfs(
             );
 
             if let Err(e) = sender.send(Some((file_name, content.buffer))).await {
-                error!("Failed to send PDF: {e:?}");
+                error!("Failed to send PDF: {e} - the client might have closed the connection");
 
                 return Err(PdfGenError::ChannelClosed);
             }

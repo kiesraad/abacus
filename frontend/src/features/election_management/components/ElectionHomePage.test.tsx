@@ -1,35 +1,66 @@
-import { http, HttpResponse } from "msw";
-import { beforeEach, describe, expect, test } from "vitest";
+import { RouterProvider } from "react-router";
 
+import { render as rtlRender } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
+import { ApiProvider } from "@/api/ApiProvider.tsx";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary.tsx";
+import { electionManagementRoutes } from "@/features/election_management/routes.tsx";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { getCommitteeSessionListMockData } from "@/testing/api-mocks/CommitteeSessionMockData.ts";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionCommitteeSessionListRequestHandler,
   ElectionRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { getRouter, Router } from "@/testing/router.tsx";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, within } from "@/testing/test-utils";
+import { expectConflictErrorPage, screen, setupTestRouter, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { ElectionDetailsResponse } from "@/types/generated/openapi";
+import { CommitteeSessionListResponse, ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
 
-import { ElectionHomePage } from "./ElectionHomePage";
-
-const renderPage = async () => {
-  render(
-    <TestUserProvider userRole="coordinator">
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <ElectionHomePage />
-        </ElectionStatusProvider>
-      </ElectionProvider>
-    </TestUserProvider>,
+const Providers = ({
+  children,
+  router = getRouter(children),
+  fetchInitialUser = false,
+}: {
+  children?: React.ReactNode;
+  router?: Router;
+  fetchInitialUser?: boolean;
+}) => {
+  return (
+    <ApiProvider fetchInitialUser={fetchInitialUser}>
+      <TestUserProvider userRole="coordinator">
+        <ElectionProvider electionId={1}>
+          <ElectionStatusProvider electionId={1}>
+            <RouterProvider router={router} />
+          </ElectionStatusProvider>
+        </ElectionProvider>
+      </TestUserProvider>
+      ,
+    </ApiProvider>
   );
-  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
-  expect(
-    await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau 0035 Heemdamseburg" }),
-  ).toBeVisible();
 };
+
+function renderWithRouter() {
+  const router = setupTestRouter([
+    {
+      path: "/",
+      Component: null,
+      children: [
+        {
+          path: "elections/:electionId",
+          children: electionManagementRoutes,
+        },
+      ],
+    },
+  ]);
+  rtlRender(<Providers router={router} />);
+  return router;
+}
 
 describe("ElectionHomePage", () => {
   beforeEach(() => {
@@ -42,7 +73,13 @@ describe("ElectionHomePage", () => {
       statuses: [],
     });
 
-    await renderPage();
+    const router = renderWithRouter();
+    await router.navigate("/elections/1");
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau 0035 Heemdamseburg" }),
+    ).toBeVisible();
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
@@ -65,6 +102,69 @@ describe("ElectionHomePage", () => {
     ]);
   });
 
+  test("Shows error page when start election call returns an error", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
+    const router = setupTestRouter([
+      {
+        Component: null,
+        errorElement: <ErrorBoundary />,
+        children: [
+          {
+            path: "elections/:electionId",
+            children: electionManagementRoutes,
+          },
+        ],
+      },
+    ]);
+    const user = userEvent.setup();
+    const electionData = getElectionMockData({}, { status: "data_entry_not_started" });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+    const committeeSessionsData = getCommitteeSessionListMockData({ status: "data_entry_not_started" });
+    server.use(
+      http.get("/api/elections/1/committee_sessions", () =>
+        HttpResponse.json(committeeSessionsData satisfies CommitteeSessionListResponse, { status: 200 }),
+      ),
+    );
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [],
+    });
+    overrideOnce("put", "/api/committee_sessions/2/status", 409, {
+      error: "Wrong committee session status",
+      fatal: true,
+      reference: "WrongCommitteeSessionStatus",
+    } satisfies ErrorResponse);
+
+    await router.navigate("/elections/1");
+
+    rtlRender(<Providers router={router} />);
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau 0035 Heemdamseburg" }),
+    ).toBeVisible();
+
+    const committee_session_cards = await screen.findByTestId("committee-session-cards");
+    expect(committee_session_cards).toBeVisible();
+    expect(within(committee_session_cards).getByText("Tweede zitting")).toBeVisible();
+    expect(within(committee_session_cards).getByText("— Klaar voor steminvoer")).toBeInTheDocument();
+    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
+    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeInTheDocument();
+
+    const startButton = screen.getByRole("button", { name: "Start steminvoer" });
+    expect(startButton).toBeVisible();
+
+    await user.click(startButton);
+
+    await expectConflictErrorPage();
+  });
+
   test("Shows alert when there are no polling stations", async () => {
     const electionData = getElectionMockData();
     electionData.polling_stations = [];
@@ -77,7 +177,13 @@ describe("ElectionHomePage", () => {
       statuses: [],
     });
 
-    await renderPage();
+    const router = renderWithRouter();
+    await router.navigate("/elections/1");
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau 0035 Heemdamseburg" }),
+    ).toBeVisible();
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText("Geen stembureaus")).toBeVisible();

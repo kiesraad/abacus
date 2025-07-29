@@ -12,7 +12,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use tracing::error;
 use utoipa::ToSchema;
-use zip::result::ZipError;
 
 use crate::{
     MAX_BODY_SIZE_MB, apportionment::ApportionmentError,
@@ -97,7 +96,7 @@ pub enum APIError {
     StdError(Box<dyn Error>),
     XmlDeError(DeError),
     XmlError(SeError),
-    ZipError(ZipError),
+    ZipError(String),
 }
 
 impl IntoResponse for APIError {

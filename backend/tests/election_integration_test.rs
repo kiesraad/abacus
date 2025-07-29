@@ -7,6 +7,7 @@ use abacus::{
     committee_session::status::CommitteeSessionStatus,
     election::{ElectionDetailsResponse, ElectionListResponse},
 };
+use async_zip::base::read::mem::ZipFileReader;
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
@@ -338,20 +339,21 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     );
 
     let bytes = response.bytes().await.unwrap();
-    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
-    {
-        let xml_file = archive
-            .by_name("Telling_GR2024_Heemdamseburg.eml.xml")
-            .unwrap();
-        assert!(xml_file.size() > 0);
-    }
+    let archive = ZipFileReader::new(bytes.to_vec()).await.unwrap();
 
-    {
-        let pdf_file = archive
-            .by_name("Model_Na31-2_GR2024_Heemdamseburg.pdf")
-            .unwrap();
-        assert!(pdf_file.size() > 0);
-    }
+    let reader = archive.reader_with_entry(1).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Telling_GR2024_Heemdamseburg.eml.xml"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+
+    let reader = archive.reader_with_entry(0).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_Na31-2_GR2024_Heemdamseburg.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -399,24 +401,21 @@ async fn test_election_na_31_2_bijlage1_download(pool: SqlitePool) {
     );
 
     let bytes = response.bytes().await.unwrap();
+    assert!(bytes.len() > 1024);
 
-    // write to disk and print filename
-    std::fs::write("test_na_31_2_bijlage1.zip", &bytes).unwrap();
-    println!("Wrote test_na_31_2_bijlage1.zip");
+    let archive = ZipFileReader::new(bytes.to_vec()).await.unwrap();
 
-    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
+    let reader = archive.reader_with_entry(0).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_Na31-2_GR2024_Stembureau_33_Bijlage_1.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
 
-    {
-        let pdf_file = archive
-            .by_name("Model_Na31-2_GR2024_Stembureau_33_Bijlage_1.pdf")
-            .unwrap();
-        assert!(pdf_file.size() > 0);
-    }
-
-    {
-        let pdf_file = archive
-            .by_name("Model_Na31-2_GR2024_Stembureau_34_Bijlage_1.pdf")
-            .unwrap();
-        assert!(pdf_file.size() > 0);
-    }
+    let reader = archive.reader_with_entry(1).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_Na31-2_GR2024_Stembureau_34_Bijlage_1.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
 }

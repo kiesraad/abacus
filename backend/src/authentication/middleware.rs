@@ -6,12 +6,10 @@ use axum::{
 use axum_extra::extract::CookieJar;
 use chrono::Utc;
 use hyper::header::SET_COOKIE;
+use sqlx::SqlitePool;
 use tracing::{debug, error, info};
 
-use super::{
-    SESSION_MIN_LIFE_TIME, Users,
-    session::{Session, Sessions},
-};
+use super::{SESSION_MIN_LIFE_TIME, session::Session};
 use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{SESSION_COOKIE_NAME, User, set_default_cookie_properties},
@@ -19,8 +17,7 @@ use crate::{
 
 /// Inject user and session
 pub async fn inject_user<B>(
-    State(users): State<Users>,
-    State(sessions): State<Sessions>,
+    State(pool): State<SqlitePool>,
     jar: CookieJar,
     mut request: Request<B>,
 ) -> Request<B> {
@@ -29,7 +26,7 @@ pub async fn inject_user<B>(
     };
 
     // fetch the session from the database
-    let Ok(Some(session)) = sessions.get_by_key(session_cookie.value()).await else {
+    let Ok(Some(session)) = super::session::get_by_key(&pool, session_cookie.value()).await else {
         return request;
     };
 
@@ -40,11 +37,11 @@ pub async fn inject_user<B>(
     extensions.insert(session);
 
     // fetch the user from the database
-    let Ok(Some(user)) = users.get_by_id(session_id).await else {
+    let Ok(Some(user)) = super::user::get_by_id(&pool, session_id).await else {
         return request;
     };
 
-    if let Err(e) = user.update_last_activity_at(&users).await {
+    if let Err(e) = user.update_last_activity_at(&pool).await {
         error!("Error updating last activity at: {e:?}")
     }
 
@@ -55,7 +52,7 @@ pub async fn inject_user<B>(
 
 /// Middleware to extend the session lifetime
 pub async fn extend_session(
-    State(sessions): State<Sessions>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     session: Option<Session>,
     user: Option<User>,
@@ -71,7 +68,7 @@ pub async fn extend_session(
 
     // extend lifetime of session and set new cookie if the session is still valid and will soon expire
     if (expires - now) < SESSION_MIN_LIFE_TIME && expires > now {
-        if let Ok(session) = sessions.extend_session(&session).await {
+        if let Ok(session) = super::session::extend_session(&pool, &session).await {
             let _ = audit_service
                 .with_user(user.clone())
                 .log(&AuditEvent::UserSessionExtended, None)
@@ -119,19 +116,16 @@ mod test {
 
     use super::{extend_session, inject_user};
     use crate::{
-        audit_log::{AuditLog, AuditService},
-        authentication::{Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, Sessions, User, Users},
+        audit_log::AuditService,
+        authentication::{Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User},
     };
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_inject_user(pool: SqlitePool) {
-        let sessions = Sessions::new(pool.clone());
-        let users = Users::new(pool.clone());
         let jar = CookieJar::new();
 
         let request = inject_user(
-            State(users.clone()),
-            State(sessions.clone()),
+            State(pool.clone()),
             jar.clone(),
             Request::new(Body::empty()),
         )
@@ -143,15 +137,16 @@ mod test {
         );
 
         let user = User::test_user(Role::Administrator, 1);
-        let session = sessions.create(user.id(), SESSION_LIFE_TIME).await.unwrap();
+        let session = crate::authentication::session::create(&pool, user.id(), SESSION_LIFE_TIME)
+            .await
+            .unwrap();
 
         let mut jar = CookieJar::new();
         let cookie = session.get_cookie();
         jar = jar.add(cookie);
 
         let request = inject_user(
-            State(users.clone()),
-            State(sessions.clone()),
+            State(pool.clone()),
             jar.clone(),
             Request::new(Body::empty()),
         )
@@ -162,15 +157,11 @@ mod test {
             "inject_user should inject a user if there is a session cookie"
         );
 
-        users.delete(user.id()).await.unwrap();
+        crate::authentication::user::delete(&pool, user.id())
+            .await
+            .unwrap();
 
-        let request = inject_user(
-            State(users.clone()),
-            State(sessions.clone()),
-            jar,
-            Request::new(Body::empty()),
-        )
-        .await;
+        let request = inject_user(State(pool.clone()), jar, Request::new(Body::empty())).await;
 
         assert!(
             request.extensions().get::<User>().is_none(),
@@ -180,17 +171,16 @@ mod test {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_extend_session(pool: SqlitePool) {
-        let sessions = Sessions::new(pool.clone());
         let user = User::test_user(Role::Administrator, 1);
 
         let audit_service = AuditService::new(
-            AuditLog::new(pool.clone()),
+            pool.clone(),
             Some(user.clone()),
             Some(Ipv4Addr::new(203, 0, 113, 0).into()),
         );
 
         let updated_response = extend_session(
-            State(sessions.clone()),
+            State(pool.clone()),
             audit_service.clone(),
             None,
             None,
@@ -207,10 +197,12 @@ mod test {
         );
 
         let life_time = SESSION_MIN_LIFE_TIME + TimeDelta::seconds(30); // min life time + 30 seconds
-        let session = sessions.create(user.id(), life_time).await.unwrap();
+        let session = crate::authentication::session::create(&pool, user.id(), life_time)
+            .await
+            .unwrap();
 
         let updated_response = extend_session(
-            State(sessions.clone()),
+            State(pool.clone()),
             audit_service.clone(),
             Some(session.clone()),
             Some(user.clone()),
@@ -232,10 +224,12 @@ mod test {
         );
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
-        let session = sessions.create(user.id(), life_time).await.unwrap();
+        let session = crate::authentication::session::create(&pool, user.id(), life_time)
+            .await
+            .unwrap();
 
         let updated_response = extend_session(
-            State(sessions.clone()),
+            State(pool.clone()),
             audit_service.clone(),
             Some(session.clone()),
             Some(user),
@@ -246,7 +240,10 @@ mod test {
         let cookie = updated_response.headers().get(SET_COOKIE).unwrap();
         let cookie = Cookie::from_str(cookie.to_str().unwrap()).unwrap();
 
-        let new_session = sessions.get_by_key(cookie.value()).await.unwrap().unwrap();
+        let new_session = crate::authentication::session::get_by_key(&pool, cookie.value())
+            .await
+            .unwrap()
+            .unwrap();
 
         assert_eq!(
             updated_response

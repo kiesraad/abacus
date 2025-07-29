@@ -1,19 +1,20 @@
-use axum::extract::{Path, State};
-use axum_extra::response::Attachment;
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+};
 use chrono::Datelike;
+use sqlx::SqlitePool;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::AdminOrCoordinator,
-    election::repository::Elections,
     error::ErrorReference,
     pdf_gen::{
         generate_pdfs,
-        models::{ModelNa31_2Bijlage1Input, PdfModel},
+        models::{ModelNa31_2Bijlage1Input, ToPdfFileModel},
     },
-    polling_station::repository::PollingStations,
-    zip::ZipResponse,
+    zip::ZipStream,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -42,18 +43,17 @@ pub fn router() -> OpenApiRouter<AppState> {
 )]
 async fn election_download_na_31_2_bijlage1(
     _user: AdminOrCoordinator,
-    State(elections_repo): State<Elections>,
-    State(polling_stations_repo): State<PollingStations>,
+    State(pool): State<SqlitePool>,
     Path(id): Path<u32>,
-) -> Result<Attachment<Vec<u8>>, APIError> {
-    let election = elections_repo.get(id).await?;
-    let polling_stations = polling_stations_repo.list(election.id).await?;
-    let response = ZipResponse::with_name(&format!(
+) -> Result<impl IntoResponse, APIError> {
+    let election = crate::election::repository::get(&pool, id).await?;
+    let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
+    let zip_filename = format!(
         "{}{}_{}_na_31_2_bijlage1.zip",
         election.category.to_eml_code(),
         election.election_date.year(),
         election.location
-    ));
+    );
 
     if polling_stations.is_empty() {
         return Err(APIError::NotFound(
@@ -65,29 +65,24 @@ async fn election_download_na_31_2_bijlage1(
     let models = polling_stations
         .iter()
         .map(|ps| {
-            PdfModel::ModelNa21_2Bijlage1(Box::new(ModelNa31_2Bijlage1Input {
-                election: election.clone(),
-                polling_station: ps.clone(),
-            }))
-        })
-        .collect::<Vec<_>>();
-
-    let content = generate_pdfs(models).await?;
-
-    let files = content
-        .into_iter()
-        .zip(polling_stations.iter())
-        .map(|(pdf, polling_station)| {
             let name = format!(
                 "Model_Na31-2_{}{}_Stembureau_{}_Bijlage_1.pdf",
                 election.category.to_eml_code(),
                 election.election_date.year(),
-                polling_station.number
+                ps.number
             );
 
-            (name, pdf.buffer)
+            ModelNa31_2Bijlage1Input {
+                election: election.clone(),
+                polling_station: ps.clone(),
+            }
+            .to_pdf_file_model(name)
         })
         .collect::<Vec<_>>();
 
-    response.create_zip(files)
+    let zip_stream = ZipStream::new(&zip_filename).await;
+
+    generate_pdfs(models, zip_stream.sender());
+
+    Ok(zip_stream)
 }

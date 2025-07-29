@@ -12,13 +12,12 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-    repository::CommitteeSessions, status::change_committee_session_status,
+    status::change_committee_session_status,
 };
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{AdminOrCoordinator, Coordinator},
-    election::repository::Elections,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -72,13 +71,15 @@ impl IntoResponse for CommitteeSessionListResponse {
 )]
 pub async fn election_committee_session_list(
     _user: AdminOrCoordinator,
-    State(committee_sessions_repo): State<CommitteeSessions>,
-    State(elections_repo): State<Elections>,
+    State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
 ) -> Result<Json<CommitteeSessionListResponse>, APIError> {
-    elections_repo.get(election_id).await?;
-    let committee_sessions = committee_sessions_repo
-        .get_election_committee_session_list(election_id)
+    crate::election::repository::get(&pool, election_id).await?;
+    let committee_sessions =
+        crate::committee_session::repository::get_election_committee_session_list(
+            &pool,
+            election_id,
+        )
         .await?;
     Ok(Json(CommitteeSessionListResponse { committee_sessions }))
 }
@@ -98,13 +99,12 @@ pub async fn election_committee_session_list(
 )]
 pub async fn committee_session_create(
     _user: Coordinator,
-    State(committee_sessions_repo): State<CommitteeSessions>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(committee_session_request): Json<CommitteeSessionCreateRequest>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
-    let committee_session = committee_sessions_repo
-        .create(committee_session_request)
-        .await?;
+    let committee_session =
+        crate::committee_session::repository::create(&pool, committee_session_request).await?;
 
     audit_service
         .log(
@@ -134,14 +134,17 @@ pub async fn committee_session_create(
 )]
 pub async fn committee_session_update(
     _user: Coordinator,
-    State(committee_sessions_repo): State<CommitteeSessions>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(committee_session_id): Path<u32>,
     Json(committee_session_request): Json<CommitteeSessionUpdateRequest>,
 ) -> Result<StatusCode, APIError> {
-    let committee_session = committee_sessions_repo
-        .update(committee_session_id, committee_session_request)
-        .await?;
+    let committee_session = crate::committee_session::repository::update(
+        &pool,
+        committee_session_id,
+        committee_session_request,
+    )
+    .await?;
 
     audit_service
         .log(
@@ -171,17 +174,17 @@ pub async fn committee_session_update(
 )]
 pub async fn committee_session_number_of_voters_change(
     _user: Coordinator,
-    State(committee_sessions_repo): State<CommitteeSessions>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(committee_session_id): Path<u32>,
     Json(committee_session_request): Json<CommitteeSessionNumberOfVotersChangeRequest>,
 ) -> Result<StatusCode, APIError> {
-    let committee_session = committee_sessions_repo
-        .change_number_of_voters(
-            committee_session_id,
-            committee_session_request.number_of_voters,
-        )
-        .await?;
+    let committee_session = crate::committee_session::repository::change_number_of_voters(
+        &pool,
+        committee_session_id,
+        committee_session_request.number_of_voters,
+    )
+    .await?;
 
     audit_service
         .log(
@@ -231,8 +234,7 @@ pub async fn committee_session_status_change(
 #[cfg(test)]
 pub mod tests {
     use crate::committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
-        status::CommitteeSessionStatus,
+        CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
     };
     use sqlx::SqlitePool;
 
@@ -240,14 +242,18 @@ pub mod tests {
         pool: SqlitePool,
         number: u32,
         election_id: u32,
+        number_of_voters: u32,
     ) -> CommitteeSession {
-        CommitteeSessions::new(pool.clone())
-            .create(CommitteeSessionCreateRequest {
+        crate::committee_session::repository::create(
+            &pool,
+            CommitteeSessionCreateRequest {
                 number,
                 election_id,
-            })
-            .await
-            .unwrap()
+                number_of_voters,
+            },
+        )
+        .await
+        .unwrap()
     }
 
     pub async fn change_status_committee_session(
@@ -255,8 +261,7 @@ pub mod tests {
         committee_session_id: u32,
         status: CommitteeSessionStatus,
     ) -> CommitteeSession {
-        CommitteeSessions::new(pool.clone())
-            .change_status(committee_session_id, status)
+        crate::committee_session::repository::change_status(&pool, committee_session_id, status)
             .await
             .unwrap()
     }

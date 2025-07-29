@@ -12,7 +12,7 @@ import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 
-import { downloadFrom } from "../utils/download";
+import { directDownload } from "../utils/download";
 import { CommitteeSessionCards } from "./CommitteeSessionCards";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
@@ -31,10 +31,6 @@ export function ElectionHomePage() {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
   }, [refetch]);
-
-  const downloadNa31_2Bijlage1 = () => {
-    void downloadFrom(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
-  };
 
   if (isTypist) {
     return <Navigate to="data-entry" />;
@@ -90,7 +86,11 @@ export function ElectionHomePage() {
                 <Table.HeaderCell scope="col">{t("election_management.model_purpose")}</Table.HeaderCell>
               </Table.Header>
               <Table.Body>
-                <Table.ClickRow onClick={downloadNa31_2Bijlage1}>
+                <Table.ClickRow
+                  onClick={() => {
+                    directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
+                  }}
+                >
                   <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
                   <Table.Cell>{t("election_management.na_31_2_bijlage_1")}</Table.Cell>
                 </Table.ClickRow>

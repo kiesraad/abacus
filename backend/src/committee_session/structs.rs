@@ -48,6 +48,7 @@ impl IntoResponse for CommitteeSession {
 pub struct CommitteeSessionCreateRequest {
     pub number: u32,
     pub election_id: u32,
+    pub number_of_voters: u32,
 }
 
 /// Committee session update request

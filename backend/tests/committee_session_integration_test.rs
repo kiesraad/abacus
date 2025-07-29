@@ -62,6 +62,7 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
         .json(&CommitteeSessionCreateRequest {
             number: 2,
             election_id: 2,
+            number_of_voters: 0,
         })
         .send()
         .await

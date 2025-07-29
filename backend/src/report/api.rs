@@ -1,32 +1,26 @@
-use axum::extract::{Path, State};
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+};
 use axum_extra::response::Attachment;
+use sqlx::SqlitePool;
 use utoipa_axum::{router::OpenApiRouter, routes};
-use zip::result::ZipError;
 
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::Coordinator,
-    committee_session::{
-        CommitteeSession, CommitteeSessionError, repository::CommitteeSessions,
-        status::CommitteeSessionStatus,
-    },
-    data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
-    election::{ElectionWithPoliticalGroups, repository::Elections},
+    committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
+    data_entry::PollingStationResults,
+    election::ElectionWithPoliticalGroups,
     eml::{EML510, EMLDocument, EmlHash, axum::Eml},
     pdf_gen::{
         generate_pdf,
-        models::{ModelNa31_2Input, PdfModel},
+        models::{ModelNa31_2Input, PdfFileModel, ToPdfFileModel},
     },
-    polling_station::{repository::PollingStations, structs::PollingStation},
+    polling_station::structs::PollingStation,
     summary::ElectionSummary,
-    zip::{ZipResponse, slugify_filename},
+    zip::{ZipStream, slugify_filename},
 };
-
-impl From<ZipError> for APIError {
-    fn from(err: ZipError) -> Self {
-        APIError::ZipError(err)
-    }
-}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -45,21 +39,18 @@ struct ResultsInput {
 }
 
 impl ResultsInput {
-    async fn new(
-        election_id: u32,
-        committee_sessions_repo: CommitteeSessions,
-        elections_repo: Elections,
-        polling_stations_repo: PollingStations,
-        polling_station_results_entries_repo: PollingStationResultsEntries,
-    ) -> Result<ResultsInput, APIError> {
-        let election = elections_repo.get(election_id).await?;
-        let committee_session = committee_sessions_repo
-            .get_election_committee_session(election_id)
+    async fn new(election_id: u32, pool: SqlitePool) -> Result<ResultsInput, APIError> {
+        let election = crate::election::repository::get(&pool, election_id).await?;
+        let committee_session =
+            crate::committee_session::repository::get_election_committee_session(
+                &pool,
+                election_id,
+            )
             .await?;
-        let polling_stations = polling_stations_repo.list(election.id).await?;
-        let results = polling_station_results_entries_repo
-            .list_with_polling_stations(polling_stations_repo, election.id)
-            .await?;
+        let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
+        let results =
+            crate::data_entry::repository::list_entries_with_polling_stations(&pool, election.id)
+                .await?;
 
         Ok(ResultsInput {
             committee_session,
@@ -110,15 +101,17 @@ impl ResultsInput {
         ))
     }
 
-    fn into_pdf_model(self, xml_hash: impl Into<String>) -> PdfModel {
-        PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
+    fn into_pdf_file_model(self, xml_hash: impl Into<String>) -> PdfFileModel {
+        let file_name = self.pdf_filename();
+        ModelNa31_2Input {
             committee_session: self.committee_session,
             polling_stations: self.polling_stations,
             summary: self.summary,
             election: self.election,
             hash: xml_hash.into(),
             creation_date_time: self.creation_date_time.format("%d-%m-%Y %H:%M").to_string(),
-        }))
+        }
+        .to_pdf_file_model(file_name)
     }
 }
 
@@ -147,44 +140,40 @@ impl ResultsInput {
 )]
 async fn election_download_zip_results(
     _user: Coordinator,
-    State(committee_sessions_repo): State<CommitteeSessions>,
-    State(elections_repo): State<Elections>,
-    State(polling_stations_repo): State<PollingStations>,
-    State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
+    State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
-) -> Result<Attachment<Vec<u8>>, APIError> {
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await?;
+) -> Result<impl IntoResponse, APIError> {
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
+            .await?;
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::WrongCommitteeSessionStatus,
         ));
     }
 
-    let input = ResultsInput::new(
-        election_id,
-        committee_sessions_repo,
-        elections_repo,
-        polling_stations_repo,
-        polling_station_results_entries_repo,
-    )
-    .await?;
+    let input = ResultsInput::new(election_id, pool).await?;
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
     let xml_filename = input.xml_filename();
     let zip_filename = input.zip_name();
 
-    let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
+    let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model).await?;
 
-    let zip = ZipResponse::with_name(&zip_filename);
+    let zip_stream = ZipStream::new(&zip_filename).await;
 
-    zip.create_zip(vec![
-        (pdf_filename, content.buffer),
-        (xml_filename, xml_string.into_bytes()),
-    ])
+    zip_stream
+        .add_file(pdf_filename.clone(), content.buffer)
+        .await?;
+    zip_stream
+        .add_file(xml_filename.clone(), xml_string.into_bytes())
+        .await?;
+
+    zip_stream.finish().await?;
+
+    Ok(zip_stream)
 }
 
 /// Download a generated PDF with election results
@@ -212,33 +201,23 @@ async fn election_download_zip_results(
 )]
 async fn election_download_pdf_results(
     _user: Coordinator,
-    State(committee_sessions_repo): State<CommitteeSessions>,
-    State(elections_repo): State<Elections>,
-    State(polling_stations_repo): State<PollingStations>,
-    State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
+    State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await?;
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
+            .await?;
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::WrongCommitteeSessionStatus,
         ));
     }
 
-    let input = ResultsInput::new(
-        election_id,
-        committee_sessions_repo,
-        elections_repo,
-        polling_stations_repo,
-        polling_station_results_entries_repo,
-    )
-    .await?;
+    let input = ResultsInput::new(election_id, pool).await?;
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
-    let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
+    let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model).await?;
 
     Ok(Attachment::new(content.buffer)
@@ -268,29 +247,19 @@ async fn election_download_pdf_results(
 )]
 async fn election_download_xml_results(
     _user: Coordinator,
-    State(committee_sessions_repo): State<CommitteeSessions>,
-    State(elections_repo): State<Elections>,
-    State(polling_stations_repo): State<PollingStations>,
-    State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
+    State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
 ) -> Result<Eml<EML510>, APIError> {
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(election_id)
-        .await?;
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
+            .await?;
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::WrongCommitteeSessionStatus,
         ));
     }
 
-    let input = ResultsInput::new(
-        election_id,
-        committee_sessions_repo,
-        elections_repo,
-        polling_stations_repo,
-        polling_station_results_entries_repo,
-    )
-    .await?;
+    let input = ResultsInput::new(election_id, pool).await?;
     let xml = input.as_xml();
     Ok(Eml(xml))
 }

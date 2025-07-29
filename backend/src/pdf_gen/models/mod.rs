@@ -4,6 +4,21 @@ use std::{error::Error, path::PathBuf};
 
 pub use model_na_31_2::*;
 
+pub trait ToPdfFileModel {
+    fn to_pdf_file_model(self, file_name: String) -> PdfFileModel;
+}
+
+pub struct PdfFileModel {
+    pub file_name: String,
+    pub model: PdfModel,
+}
+
+impl PdfFileModel {
+    pub fn new(file_name: String, model: PdfModel) -> Self {
+        Self { file_name, model }
+    }
+}
+
 /// Defines the available models and what their input parameters are.
 pub enum PdfModel {
     ModelNa31_2(Box<ModelNa31_2Input>),
@@ -11,8 +26,8 @@ pub enum PdfModel {
 }
 
 impl PdfModel {
-    /// Get the filename for the input and template
-    pub fn as_filename(&self) -> &'static str {
+    /// Get the name for the input and template
+    pub fn as_model_name(&self) -> &'static str {
         match self {
             Self::ModelNa31_2(_) => "model-na-31-2",
             Self::ModelNa21_2Bijlage1(_) => "model-na-31-2-bijlage1",
@@ -21,7 +36,7 @@ impl PdfModel {
 
     /// Get the path for the template of this model
     pub fn as_template_path(&self) -> PathBuf {
-        let mut pb: PathBuf = [self.as_filename()].iter().collect();
+        let mut pb: PathBuf = [self.as_model_name()].iter().collect();
         pb.set_extension("typ");
 
         pb
@@ -29,7 +44,7 @@ impl PdfModel {
 
     /// Get the path for the input of this model
     pub fn as_input_path(&self) -> PathBuf {
-        let mut pb: PathBuf = ["inputs", self.as_filename()].iter().collect();
+        let mut pb: PathBuf = ["inputs", self.as_model_name()].iter().collect();
         pb.set_extension("json");
 
         pb

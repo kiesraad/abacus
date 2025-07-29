@@ -7,6 +7,7 @@ name = "abacus"
 version = "0.1.0"
 dependencies = [
  "argon2",
+ "async_zip",
  "axum",
  "axum-extra",
  "chrono",
@@ -26,6 +27,7 @@ dependencies = [
  "strum 0.27.2",
  "test-log",
  "tokio",
+ "tokio-stream",
  "tower",
  "tower-http",
  "tracing",
@@ -35,7 +37,6 @@ dependencies = [
  "utoipa",
  "utoipa-axum",
  "utoipa-swagger-ui",
- "zip 4.3.0",
 ]
 
 [[package]]
@@ -191,6 +192,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
 
 [[package]]
+name = "async-compression"
+version = "0.4.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ddb939d66e4ae03cee6091612804ba446b12878410cfa17f785f4dd67d4014e8"
+dependencies = [
+ "flate2",
+ "futures-core",
+ "futures-io",
+ "memchr",
+ "pin-project-lite",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -199,6 +213,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "async_zip"
+version = "0.0.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "00b9f7252833d5ed4b00aa9604b563529dd5e11de9c23615de2dcdf91eb87b52"
+dependencies = [
+ "async-compression",
+ "chrono",
+ "crc32fast",
+ "futures-lite",
+ "pin-project",
+ "thiserror 1.0.69",
+ "tokio",
+ "tokio-util",
 ]
 
 [[package]]
@@ -982,6 +1012,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd2e7510819d6fbf51a5545c8f922716ecfb14df168a3242f7d33e0239efe6a1"
 
 [[package]]
+name = "fastrand"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
+
+[[package]]
 name = "fdeflate"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1105,6 +1141,19 @@ name = "futures-io"
 version = "0.3.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e5c1b78ca4aae1ac06c48a526a655760685149f0d465d21f37abfe57ce075c6"
+
+[[package]]
+name = "futures-lite"
+version = "2.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f5edaec856126859abb19ed65f39e90fea3a9574b9707f13539acf4abf7eb532"
+dependencies = [
+ "fastrand",
+ "futures-core",
+ "futures-io",
+ "parking",
+ "pin-project-lite",
+]
 
 [[package]]
 name = "futures-sink"
@@ -2282,6 +2331,26 @@ name = "pico-args"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5be167a7af36ee22fe3115051bc51f6e6c7054c9348e28deb4f49bd6f705a315"
+
+[[package]]
+name = "pin-project"
+version = "1.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "677f1add503faace112b9f1373e43e9e054bfdd22ff1a63c1bc485eaec6a6a8a"
+dependencies = [
+ "pin-project-internal",
+]
+
+[[package]]
+name = "pin-project-internal"
+version = "1.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e918e4ff8c4549eb882f14b3a4bc8c8bc93de829416eacf579f1207a8fbf861"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "pin-project-lite"
@@ -3620,6 +3689,7 @@ checksum = "66a539a9ad6d5d281510d5bd368c973d636c02dbf8a67300bfb6b950696ad7df"
 dependencies = [
  "bytes",
  "futures-core",
+ "futures-io",
  "futures-sink",
  "pin-project-lite",
  "tokio",
@@ -4297,7 +4367,7 @@ dependencies = [
  "serde_json",
  "url",
  "utoipa",
- "zip 3.0.0",
+ "zip",
 ]
 
 [[package]]
@@ -4974,21 +5044,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "12598812502ed0105f607f941c386f43d441e00148fce9dec3ca5ffb0bde9308"
 dependencies = [
  "arbitrary",
- "crc32fast",
- "flate2",
- "indexmap",
- "memchr",
- "zopfli",
-]
-
-[[package]]
-name = "zip"
-version = "4.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9aed4ac33e8eb078c89e6cbb1d5c4c7703ec6d299fc3e7c3695af8f8b423468b"
-dependencies = [
- "arbitrary",
- "chrono",
  "crc32fast",
  "flate2",
  "indexmap",

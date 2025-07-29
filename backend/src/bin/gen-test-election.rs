@@ -13,7 +13,6 @@ use abacus::{
     data_entry::{
         CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
         VotersCounts, VotesCounts,
-        repository::{PollingStationDataEntries, PollingStationResultsEntries},
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
     election::{
@@ -31,6 +30,7 @@ use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use clap::Parser;
 use rand::{Rng, seq::IndexedRandom};
 
+use sqlx::SqlitePool;
 #[cfg(feature = "dev-database")]
 use tracing::info;
 use tracing::level_filters::LevelFilter;
@@ -176,13 +176,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     );
 
     let data_entry_completed = if args.with_data_entry {
-        let data_entries_repo = PollingStationDataEntries::new(pool.clone());
         let (_, second_entries) = generate_data_entry(
             &committee_session,
             &election,
             &polling_stations,
             &mut rng,
-            data_entries_repo,
+            pool.clone(),
             &args,
         )
         .await;
@@ -193,11 +192,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(export_dir) = args.export_definition {
         let results = if data_entry_completed {
-            let results_repo = PollingStationResultsEntries::new(pool.clone());
-            results_repo
-                .list_with_polling_stations(ps_repo, election.id)
-                .await
-                .expect("Could not load results")
+            abacus::data_entry::repository::list_entries_with_polling_stations(
+                &pool,
+                ps_repo,
+                election.id,
+            )
+            .await
+            .expect("Could not load results")
         } else {
             vec![]
         };
@@ -362,7 +363,7 @@ async fn generate_data_entry(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     rng: &mut impl rand::Rng,
-    data_entries_repo: PollingStationDataEntries,
+    pool: SqlitePool,
     args: &Args,
 ) -> (usize, usize) {
     info!("Generating data entries for election");
@@ -410,10 +411,15 @@ async fn generate_data_entry(
                     finished_at: ts,
                 });
 
-                data_entries_repo
-                    .make_definitive(ps.id, committee_session.id, &state, &results)
-                    .await
-                    .expect("Could not create definitive data entry");
+                abacus::data_entry::repository::make_definitive(
+                    &pool,
+                    ps.id,
+                    committee_session.id,
+                    &state,
+                    &results,
+                )
+                .await
+                .expect("Could not create definitive data entry");
                 generated_second_entries += 1;
             } else {
                 // generate only a first data entry
@@ -422,8 +428,7 @@ async fn generate_data_entry(
                     finalised_first_entry: results.clone(),
                     first_entry_finished_at: ts,
                 });
-                data_entries_repo
-                    .upsert(ps.id, committee_session.id, &state)
+                abacus::data_entry::repository::upsert(&pool, ps.id, committee_session.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;

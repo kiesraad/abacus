@@ -1,7 +1,9 @@
-use axum::extract::{Path, State};
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+};
 use axum_extra::response::Attachment;
 use utoipa_axum::{router::OpenApiRouter, routes};
-use zip::{result::ZipError, write::SimpleFileOptions};
 
 use crate::{
     APIError, AppState, ErrorResponse,
@@ -12,17 +14,12 @@ use crate::{
     eml::{EML510, EMLDocument, EmlHash, axum::Eml},
     pdf_gen::{
         generate_pdf,
-        models::{ModelNa31_2Input, PdfModel},
+        models::{ModelNa31_2Input, PdfFileModel, ToPdfFileModel},
     },
     polling_station::{repository::PollingStations, structs::PollingStation},
     summary::ElectionSummary,
+    zip::{ZipStream, slugify_filename},
 };
-
-impl From<ZipError> for APIError {
-    fn from(err: ZipError) -> Self {
-        APIError::ZipError(err)
-    }
-}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -78,43 +75,45 @@ impl ResultsInput {
 
     fn xml_filename(&self) -> String {
         use chrono::Datelike;
-        format!(
+        slugify_filename(&format!(
             "Telling_{}{}_{}.eml.xml",
             self.election.category.to_eml_code(),
             self.election.election_date.year(),
-            self.election.location.replace(" ", "_"),
-        )
+            self.election.location
+        ))
     }
 
     fn pdf_filename(&self) -> String {
         use chrono::Datelike;
-        format!(
+        slugify_filename(&format!(
             "Model_Na31-2_{}{}_{}.pdf",
             self.election.category.to_eml_code(),
             self.election.election_date.year(),
-            self.election.location.replace(" ", "_"),
-        )
+            self.election.location
+        ))
     }
 
-    fn zip_filename(&self) -> String {
+    fn zip_name(&self) -> String {
         use chrono::Datelike;
-        format!(
+        slugify_filename(&format!(
             "election_result_{}{}_{}.zip",
             self.election.category.to_eml_code(),
             self.election.election_date.year(),
-            self.election.location.replace(" ", "_"),
-        )
+            self.election.location
+        ))
     }
 
-    fn into_pdf_model(self, xml_hash: impl Into<String>) -> PdfModel {
-        PdfModel::ModelNa31_2(ModelNa31_2Input {
+    fn into_pdf_file_model(self, xml_hash: impl Into<String>) -> PdfFileModel {
+        let file_name = self.pdf_filename();
+        ModelNa31_2Input {
             committee_session: self.committee_session,
             polling_stations: self.polling_stations,
             summary: self.summary,
             election: self.election,
             hash: xml_hash.into(),
             creation_date_time: self.creation_date_time.format("%d-%m-%Y %H:%M").to_string(),
-        })
+        }
+        .to_pdf_file_model(file_name)
     }
 }
 
@@ -147,9 +146,7 @@ async fn election_download_zip_results(
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
-) -> Result<Attachment<Vec<u8>>, APIError> {
-    use std::io::Write;
-
+) -> Result<impl IntoResponse, APIError> {
     let input = ResultsInput::new(
         id,
         committee_sessions_repo,
@@ -162,32 +159,23 @@ async fn election_download_zip_results(
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
     let xml_filename = input.xml_filename();
-    let zip_filename = input.zip_filename();
-    let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
+    let zip_filename = input.zip_name();
+
+    let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model).await?;
 
-    let mut buf = vec![];
-    let mut cursor = std::io::Cursor::new(&mut buf);
-    let mut zip = zip::ZipWriter::new(&mut cursor);
-    let options = SimpleFileOptions::default()
-        .compression_method(zip::CompressionMethod::DEFLATE)
-        // zip file format does not support dates beyond 2107 or inserted leap (i.e. 61st) second
-        .last_modified_time(
-            chrono::Local::now()
-                .naive_local()
-                .try_into()
-                .expect("Timestamp should be inside zip timestamp range"),
-        )
-        .unix_permissions(0o644);
-    zip.start_file(xml_filename, options)?;
-    zip.write_all(xml_string.as_bytes()).map_err(ZipError::Io)?;
-    zip.start_file(pdf_filename, options)?;
-    zip.write_all(&content.buffer).map_err(ZipError::Io)?;
-    zip.finish()?;
+    let zip_stream = ZipStream::new(&zip_filename).await;
 
-    Ok(Attachment::new(buf)
-        .filename(zip_filename)
-        .content_type("application/zip"))
+    zip_stream
+        .add_file(pdf_filename.clone(), content.buffer)
+        .await?;
+    zip_stream
+        .add_file(xml_filename.clone(), xml_string.into_bytes())
+        .await?;
+
+    zip_stream.finish().await?;
+
+    Ok(zip_stream)
 }
 
 /// Download a generated PDF with election results
@@ -231,7 +219,7 @@ async fn election_download_pdf_results(
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
-    let model = input.into_pdf_model(EmlHash::from(xml_string.as_bytes()));
+    let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model).await?;
 
     Ok(Attachment::new(content.buffer)

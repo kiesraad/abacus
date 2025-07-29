@@ -5,12 +5,14 @@ import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
+import { Table } from "@/components/ui/Table/Table";
 import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 
+import { directDownload } from "../utils/download";
 import { CommitteeSessionCards } from "./CommitteeSessionCards";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
@@ -66,14 +68,34 @@ export function ElectionHomePage() {
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>
           <div className="mb-xl">
-            <div>
-              <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.about_this_election")}</h3>
-              <ElectionInformationTable
-                election={election}
-                numberOfPollingStations={pollingStations.length}
-                numberOfVoters={committeeSession.number_of_voters}
-              />
-            </div>
+            <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.about_this_election")}</h3>
+            <ElectionInformationTable
+              election={election}
+              numberOfPollingStations={pollingStations.length}
+              numberOfVoters={committeeSession.number_of_voters}
+            />
+          </div>
+          <div className="mb-xl">
+            <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.empty_models")}</h3>
+            <section className="md">
+              <p>{t("election_management.empty_models_description")}</p>
+            </section>
+            <Table className={cn(cls.electionInformationTable)}>
+              <Table.Header>
+                <Table.HeaderCell scope="col">{t("election_management.model_name")}</Table.HeaderCell>
+                <Table.HeaderCell scope="col">{t("election_management.model_purpose")}</Table.HeaderCell>
+              </Table.Header>
+              <Table.Body>
+                <Table.ClickRow
+                  onClick={() => {
+                    directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
+                  }}
+                >
+                  <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
+                  <Table.Cell>{t("election_management.na_31_2_bijlage_1")}</Table.Cell>
+                </Table.ClickRow>
+              </Table.Body>
+            </Table>
           </div>
         </article>
       </main>

@@ -3,13 +3,10 @@ use axum::{
     http::request::Parts,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::Type;
+use sqlx::{SqlitePool, Type};
 use utoipa::ToSchema;
 
-use super::{
-    error::AuthenticationError,
-    user::{User, Users},
-};
+use super::{error::AuthenticationError, user::User};
 use crate::APIError;
 
 #[derive(
@@ -97,7 +94,7 @@ impl TryFrom<User> for AdminOrCoordinator {
 
 impl<S> FromRequestParts<S> for Admin
 where
-    Users: FromRef<S>,
+    SqlitePool: FromRef<S>,
     S: Send + Sync,
 {
     type Rejection = APIError;
@@ -111,7 +108,7 @@ where
 
 impl<S> FromRequestParts<S> for Coordinator
 where
-    Users: FromRef<S>,
+    SqlitePool: FromRef<S>,
     S: Send + Sync,
 {
     type Rejection = APIError;
@@ -125,7 +122,7 @@ where
 
 impl<S> FromRequestParts<S> for Typist
 where
-    Users: FromRef<S>,
+    SqlitePool: FromRef<S>,
     S: Send + Sync,
 {
     type Rejection = APIError;
@@ -139,7 +136,7 @@ where
 
 impl<S> FromRequestParts<S> for AdminOrCoordinator
 where
-    Users: FromRef<S>,
+    SqlitePool: FromRef<S>,
     S: Send + Sync,
 {
     type Rejection = APIError;

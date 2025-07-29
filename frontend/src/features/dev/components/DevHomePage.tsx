@@ -97,6 +97,27 @@ function DevLinks() {
   return (
     <>
       <p>Dit is een ontwikkelversie van Abacus. Kies hieronder welk deel van de applicatie je wilt gebruiken.</p>
+      <strong>{t("general")}</strong>
+      <ul>
+        <li>
+          <Link to={`/account`}>{t("account.account")}</Link>
+          <ul>
+            <li>
+              <Link to={`/account/login`}>{t("account.login")}</Link>
+            </li>
+            <li>
+              <Link to={`/account/setup`}>{t("account.account_setup")}</Link>
+            </li>
+          </ul>
+        </li>
+        {__INCLUDE_STORYBOOK_LINK__ && (
+          <li>
+            <a href="/storybook" target="_blank" rel="noopener noreferrer">
+              Storybook
+            </a>
+          </li>
+        )}
+      </ul>
       <strong>Inloggen als</strong>
       <ul>
         <li>
@@ -171,20 +192,6 @@ function DevLinks() {
             </Link>
           </li>
         )}
-      </ul>
-      <strong>{t("general")}</strong>
-      <ul>
-        <li>
-          <Link to={`/account`}>{t("account.account")}</Link>
-          <ul>
-            <li>
-              <Link to={`/account/login`}>{t("account.login")}</Link>
-            </li>
-            <li>
-              <Link to={`/account/setup`}>{t("account.account_setup")}</Link>
-            </li>
-          </ul>
-        </li>
       </ul>
       {(__API_MSW__ || isAdministrator || isCoordinator) && (
         <ElectionListProvider>

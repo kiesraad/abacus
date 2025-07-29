@@ -7,7 +7,7 @@ use std::{
 use tokio::sync::watch::{self, Sender};
 use tracing::{error, info, trace, warn};
 
-use crate::audit_log::{AuditEvent, AuditLog};
+use crate::audit_log::AuditEvent;
 
 #[derive(Debug, Clone)]
 pub enum AirGapStatusChange {
@@ -68,8 +68,6 @@ impl AirgapDetection {
             last_check: Arc::new(RwLock::new(None)),
         };
 
-        let audit_log = AuditLog(pool);
-
         tokio::task::spawn(async move {
             loop {
                 match rx.changed().await {
@@ -83,7 +81,9 @@ impl AirgapDetection {
                             }
                         };
 
-                        if let Err(e) = audit_log.create(&event, None, None, None).await {
+                        if let Err(e) =
+                            crate::audit_log::create(&pool, &event, None, None, None).await
+                        {
                             error!("Failed to log air gap status change: {e:#?}");
                         }
                     }
@@ -286,14 +286,12 @@ mod tests {
 
     #[test(sqlx::test)]
     async fn test_log_status_changes_to_audit_log(pool: SqlitePool) {
-        let audit_log = AuditLog(pool.clone());
-
-        AirgapDetection::start(pool).await;
+        AirgapDetection::start(pool.clone()).await;
 
         let mut events = Vec::new();
 
         for _ in 0..20 {
-            events = audit_log.list_all().await.unwrap();
+            events = crate::audit_log::list_all(&pool).await.unwrap();
 
             if events.len() == 1 {
                 break;

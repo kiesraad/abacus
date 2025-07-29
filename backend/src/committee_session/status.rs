@@ -5,10 +5,8 @@ use strum::VariantNames;
 use utoipa::ToSchema;
 
 use crate::{
-    APIError,
+    APIError, DbConnLike,
     audit_log::{AuditEvent, AuditService},
-    committee_session::repository::CommitteeSessions,
-    polling_station::repository::PollingStations,
 };
 
 /// Committee session status
@@ -54,15 +52,14 @@ pub async fn change_committee_session_status(
     pool: SqlitePool,
     audit_service: AuditService,
 ) -> Result<(), APIError> {
-    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
-    let polling_stations_repo = PollingStations::new(pool.clone());
-    let committee_session = committee_sessions_repo.get(committee_session_id).await?;
+    let committee_session =
+        crate::committee_session::repository::get(&pool, committee_session_id).await?;
     let new_status = match status {
         CommitteeSessionStatus::Created => committee_session.status.prepare_data_entry()?,
         CommitteeSessionStatus::DataEntryNotStarted => {
             committee_session
                 .status
-                .ready_for_data_entry(committee_session.election_id, polling_stations_repo)
+                .ready_for_data_entry(committee_session.election_id, &pool)
                 .await?
         }
         CommitteeSessionStatus::DataEntryInProgress => {
@@ -74,9 +71,12 @@ pub async fn change_committee_session_status(
         }
     };
 
-    let committee_session = committee_sessions_repo
-        .change_status(committee_session_id, new_status)
-        .await?;
+    let committee_session = crate::committee_session::repository::change_status(
+        &pool,
+        committee_session_id,
+        new_status,
+    )
+    .await?;
 
     audit_service
         .log(
@@ -104,11 +104,12 @@ impl CommitteeSessionStatus {
     pub async fn ready_for_data_entry(
         self,
         election_id: u32,
-        polling_stations_repo: PollingStations,
+        conn: impl DbConnLike<'_>,
     ) -> Result<Self, CommitteeSessionTransitionError> {
         match self {
             CommitteeSessionStatus::Created => {
-                let polling_stations = polling_stations_repo.list(election_id).await?;
+                let polling_stations =
+                    crate::polling_station::repository::list(conn, election_id).await?;
                 if polling_stations.is_empty() {
                     Err(CommitteeSessionTransitionError::Invalid)
                 } else {
@@ -248,10 +249,9 @@ mod tests {
     async fn committee_session_status_created_to_data_entry_not_started_no_polling_stations(
         pool: SqlitePool,
     ) {
-        let polling_stations_repo = PollingStations::new(pool.clone());
         assert_eq!(
             CommitteeSessionStatus::Created
-                .ready_for_data_entry(6, polling_stations_repo)
+                .ready_for_data_entry(6, &pool)
                 .await,
             Err(CommitteeSessionTransitionError::Invalid)
         );
@@ -262,10 +262,9 @@ mod tests {
     async fn committee_session_status_created_to_data_entry_not_started_with_polling_stations(
         pool: SqlitePool,
     ) {
-        let polling_stations_repo = PollingStations::new(pool.clone());
         assert_eq!(
             CommitteeSessionStatus::Created
-                .ready_for_data_entry(2, polling_stations_repo)
+                .ready_for_data_entry(2, &pool)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryNotStarted)
         );
@@ -276,10 +275,9 @@ mod tests {
     async fn committee_session_status_data_entry_not_started_to_data_entry_not_started(
         pool: SqlitePool,
     ) {
-        let polling_stations_repo = PollingStations::new(pool.clone());
         assert_eq!(
             CommitteeSessionStatus::DataEntryNotStarted
-                .ready_for_data_entry(2, polling_stations_repo)
+                .ready_for_data_entry(2, &pool)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryNotStarted)
         );
@@ -290,10 +288,9 @@ mod tests {
     async fn committee_session_status_data_entry_in_progress_to_data_entry_not_started(
         pool: SqlitePool,
     ) {
-        let polling_stations_repo = PollingStations::new(pool.clone());
         assert_eq!(
             CommitteeSessionStatus::DataEntryInProgress
-                .ready_for_data_entry(2, polling_stations_repo)
+                .ready_for_data_entry(2, &pool)
                 .await,
             Err(CommitteeSessionTransitionError::Invalid)
         );
@@ -304,10 +301,9 @@ mod tests {
     async fn committee_session_status_data_entry_paused_to_data_entry_not_started(
         pool: SqlitePool,
     ) {
-        let polling_stations_repo = PollingStations::new(pool.clone());
         assert_eq!(
             CommitteeSessionStatus::DataEntryPaused
-                .ready_for_data_entry(2, polling_stations_repo)
+                .ready_for_data_entry(2, &pool)
                 .await,
             Err(CommitteeSessionTransitionError::Invalid)
         );
@@ -318,10 +314,9 @@ mod tests {
     async fn committee_session_status_data_entry_finished_to_data_entry_not_started(
         pool: SqlitePool,
     ) {
-        let polling_stations_repo = PollingStations::new(pool.clone());
         assert_eq!(
             CommitteeSessionStatus::DataEntryFinished
-                .ready_for_data_entry(2, polling_stations_repo)
+                .ready_for_data_entry(2, &pool)
                 .await,
             Err(CommitteeSessionTransitionError::Invalid)
         );

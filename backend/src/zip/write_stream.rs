@@ -66,6 +66,13 @@ impl AsyncWrite for WriteStream {
             )));
         };
 
+        if state.closed {
+            return Poll::Ready(Err(std::io::Error::new(
+                std::io::ErrorKind::BrokenPipe,
+                "WriteStream is closed",
+            )));
+        }
+
         state.buffer.push_back(Bytes::copy_from_slice(buf));
         if let Some(waker) = state.waker.take() {
             waker.wake();
@@ -103,6 +110,22 @@ impl Stream for WriteStream {
         } else {
             state.waker = Some(cx.waker().clone());
             Poll::Pending
+        }
+    }
+}
+
+impl Drop for WriteStream {
+    fn drop(&mut self) {
+        let Ok(mut state) = self.state.lock() else {
+            error!("Failed to lock WriteStream state on drop");
+            return;
+        };
+
+        if !state.closed {
+            state.closed = true;
+            if let Some(waker) = state.waker.take() {
+                waker.wake();
+            }
         }
     }
 }

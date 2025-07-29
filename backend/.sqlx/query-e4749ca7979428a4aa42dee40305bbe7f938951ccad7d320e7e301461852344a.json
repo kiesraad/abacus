@@ -1,0 +1,68 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            id AS \"id: u32\",\n            election_id AS \"election_id: u32\",\n            name,\n            number,\n            number_of_voters,\n            polling_station_type AS \"polling_station_type: _\",\n            address,\n            postal_code,\n            locality\n        FROM polling_stations\n        WHERE election_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "election_id: u32",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "number",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "number_of_voters",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "polling_station_type: _",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "address",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "postal_code",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "locality",
+        "ordinal": 8,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "e4749ca7979428a4aa42dee40305bbe7f938951ccad7d320e7e301461852344a"
+}

@@ -86,7 +86,7 @@ describe("DataEntryNavigation", () => {
             sections: {
               ...getDefaultDataEntryState().formState.sections,
               voters_votes_counts: {
-                ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+                ...getDefaultDataEntryState().formState.sections.voters_votes_counts!,
                 hasChanges: true,
               },
             },
@@ -150,7 +150,7 @@ describe("DataEntryNavigation", () => {
           sections: {
             ...getDefaultDataEntryState().formState.sections,
             voters_votes_counts: {
-              ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+              ...getDefaultDataEntryState().formState.sections.voters_votes_counts!,
               hasChanges: true,
             },
           },
@@ -325,7 +325,7 @@ describe("DataEntryNavigation", () => {
           sections: {
             ...getDefaultDataEntryState().formState.sections,
             voters_votes_counts: {
-              ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+              ...getDefaultDataEntryState().formState.sections.voters_votes_counts!,
               hasChanges: true,
             },
           },
@@ -367,7 +367,7 @@ describe("DataEntryNavigation", () => {
           sections: {
             ...getDefaultDataEntryState().formState.sections,
             voters_votes_counts: {
-              ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+              ...getDefaultDataEntryState().formState.sections.voters_votes_counts!,
               hasChanges: true,
             },
           },
@@ -405,7 +405,7 @@ describe("DataEntryNavigation", () => {
           sections: {
             ...getDefaultDataEntryState().formState.sections,
             voters_votes_counts: {
-              ...getDefaultDataEntryState().formState.sections.voters_votes_counts,
+              ...getDefaultDataEntryState().formState.sections.voters_votes_counts!,
               hasChanges: true,
             },
           },

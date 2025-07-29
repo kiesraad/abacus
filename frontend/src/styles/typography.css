@@ -82,7 +82,8 @@ p.form-paragraph {
 section.md {
   margin-bottom: 2rem;
 
-  p {
+  p,
+  form {
     max-width: 38rem;
   }
 }

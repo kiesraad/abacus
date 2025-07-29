@@ -27,6 +27,7 @@ export function CheckAndSave() {
       election_hash: state.electionDefinitionHash,
       candidate_data: state.candidateDefinitionData,
       candidate_hash: state.candidateDefinitionHash,
+      polling_station_data: state.pollingStationDefinitionData,
     });
 
     if (isSuccess(response)) {
@@ -55,6 +56,12 @@ export function CheckAndSave() {
           <strong>{t("area_designation")}:</strong> {state.election.location}
         </li>
       </ul>
+
+      {state.pollingStations && (
+        <ul>
+          <li>{t("election.polling_stations.added", { num: state.pollingStations.length })}</li>
+        </ul>
+      )}
       <div className="mt-xl">
         <Button onClick={() => void handleSubmit()}>{t("save")}</Button>
       </div>

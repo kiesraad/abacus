@@ -80,7 +80,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           ref={ref}
         />
         {formattedOverlay && (
-          <div className="formatted-overlay font-number">
+          <div className="formatted-overlay font-number" aria-hidden>
             <span id={`${id}-formatted-overlay`} data-testid={`${id}-formatted-overlay`}>
               {formattedOverlay}
             </span>

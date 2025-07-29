@@ -1,90 +1,132 @@
-mod world;
-
-use std::time::Instant;
-
-use tracing::{debug, info, warn};
-use typst::{diag::SourceDiagnostic, ecow::EcoVec};
+use std::{fmt::Debug, time::Instant};
+use tokio::{sync::mpsc::Sender, task::JoinHandle};
+use tracing::{debug, error, info, warn};
+use typst::{comemo, diag::SourceDiagnostic, ecow::EcoVec};
 use typst_pdf::{PdfOptions, PdfStandard, PdfStandards};
 
 use super::{PdfGenResult, models::PdfModel};
-use crate::APIError;
+use crate::{APIError, pdf_gen::models::PdfFileModel, zip::FileEntry};
 
-pub async fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
+mod world;
+
+/// Generates a PDF using the embedded typst library.
+pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, APIError> {
     Ok(tokio::task::spawn_blocking(move || {
-        let results = generate_pdfs_internal(vec![model])?;
+        let result = compile_pdf(&mut world::PdfWorld::new(), file_model.model);
 
-        Ok::<PdfGenResult, PdfGenError>(
-            results
-                .into_iter()
-                .next()
-                .expect("Expected at least one result"),
-        )
+        // Evict the cache to free up memory + speed up next compile
+        comemo::evict(0);
+
+        result
     })
     .await
     .map_err(PdfGenError::from)??)
 }
 
-pub async fn generate_pdfs(models: Vec<PdfModel>) -> Result<Vec<PdfGenResult>, APIError> {
-    Ok(
-        tokio::task::spawn_blocking(move || generate_pdfs_internal(models))
-            .await
-            .map_err(PdfGenError::from)??,
-    )
+/// Generates a ZIP file containing the PDFs for the provided models.
+/// Uses the embedded typst library to generate the PDFs.
+pub fn generate_pdfs(
+    models: Vec<PdfFileModel>,
+    sender: Sender<FileEntry>,
+) -> JoinHandle<Result<(), PdfGenError>> {
+    tokio::task::spawn_blocking(move || {
+        if let Err(e) = generate_pdfs_inner(models, sender) {
+            error!("Error generating PDF: {e:?}");
+
+            return Err(e);
+        }
+
+        Ok(())
+    })
 }
 
-fn generate_pdfs_internal(models: Vec<PdfModel>) -> Result<Vec<PdfGenResult>, PdfGenError> {
-    let start = Instant::now();
+pub fn generate_pdfs_inner(
+    models: Vec<PdfFileModel>,
+    sender: Sender<FileEntry>,
+) -> Result<(), PdfGenError> {
     let mut world = world::PdfWorld::new();
 
-    let pdf_standards =
-        PdfStandards::new(&[PdfStandard::A_2b]).expect("PDF standards should be valid");
+    for file_model in models.into_iter() {
+        let file_name = file_model.file_name;
+        let result = compile_pdf(&mut world, file_model.model);
 
-    let pdf_options = PdfOptions {
-        standards: pdf_standards,
-        ..Default::default()
-    };
+        // Evict the cache to free up memory + speed up next compile
+        comemo::evict(0);
 
-    let mut results = Vec::new();
+        let content = result?;
 
-    for model in models {
-        world.set_input_model(model)?;
-
-        let compile_start = Instant::now();
-        let result = typst::compile(&world);
-        let document = result.output.map_err(PdfGenError::from_typst)?;
-        info!("Compile took {} ms", compile_start.elapsed().as_millis());
-
-        info!("{} warnings", result.warnings.len());
-        result.warnings.iter().for_each(|warning| {
-            warn!("Warning: {:?}", warning);
-        });
-
-        debug!("Generating PDF...");
-        let pdf_gen_start = Instant::now();
-        let buffer = typst_pdf::pdf(&document, &pdf_options).map_err(PdfGenError::from_typst)?;
-        debug!(
-            "PDF generation took {} ms",
-            pdf_gen_start.elapsed().as_millis()
-        );
-
-        results.push(PdfGenResult { buffer });
+        sender
+            .blocking_send(Some((file_name, content.buffer)))
+            .map_err(|_| PdfGenError::ChannelClosed)?;
     }
 
-    info!("Finished in {} ms", start.elapsed().as_millis());
-    Ok(results)
+    sender
+        .blocking_send(None)
+        .map_err(|_| PdfGenError::ChannelClosed)?;
+
+    Ok(())
+}
+
+fn get_pdf_options() -> PdfOptions<'static> {
+    PdfOptions {
+        standards: PdfStandards::new(&[PdfStandard::A_2b]).expect("PDF standards should be valid"),
+        ..Default::default()
+    }
+}
+
+fn compile_pdf(world: &mut world::PdfWorld, model: PdfModel) -> Result<PdfGenResult, PdfGenError> {
+    world.set_input_model(model)?;
+
+    let compile_start = Instant::now();
+    let result = typst::compile(world);
+    let document = result.output.map_err(PdfGenError::from_typst)?;
+    info!(
+        "Compile took {} ms, {} warnings",
+        compile_start.elapsed().as_millis(),
+        result.warnings.len()
+    );
+
+    result.warnings.iter().for_each(|warning| {
+        warn!("Warning: {:?}", warning);
+    });
+
+    let pdf_gen_start = Instant::now();
+    let buffer = typst_pdf::pdf(&document, &get_pdf_options()).map_err(PdfGenError::from_typst)?;
+    debug!(
+        "PDF generation took {} ms",
+        pdf_gen_start.elapsed().as_millis()
+    );
+
+    Ok(PdfGenResult { buffer })
 }
 
 #[derive(Debug)]
 pub enum PdfGenError {
-    Typst(Vec<SourceDiagnostic>),
+    Typst(String),
     Join(tokio::task::JoinError),
     Json(serde_json::Error),
     TemplateNotFound(String),
+    ChannelClosed,
 }
 
 impl PdfGenError {
     fn from_typst(typst_errors: EcoVec<SourceDiagnostic>) -> PdfGenError {
-        PdfGenError::Typst(typst_errors.to_vec())
+        PdfGenError::Typst(
+            typst_errors
+                .into_iter()
+                .map(|e| {
+                    format!(
+                        "Typst error in {:?}: {}",
+                        e.span
+                            .id()
+                            .map(|id| id.vpath().as_rootless_path().display().to_string())
+                            .unwrap_or_default(),
+                        e.message
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join("\n"),
+        )
     }
 }
 

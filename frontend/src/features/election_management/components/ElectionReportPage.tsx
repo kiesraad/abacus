@@ -14,7 +14,7 @@ import {
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatFullDateWithoutTimezone } from "@/utils/format";
 
-import { downloadFrom } from "../utils/download";
+import { directDownload } from "../utils/download";
 import cls from "./ElectionManagement.module.css";
 
 export function ElectionReportPage() {
@@ -23,11 +23,11 @@ export function ElectionReportPage() {
   const navigate = useNavigate();
 
   function downloadPdfResults() {
-    void downloadFrom(`/api/elections/${election.id}/download_pdf_results`);
+    directDownload(`/api/elections/${election.id}/download_pdf_results`);
   }
 
   function downloadZipResults() {
-    void downloadFrom(`/api/elections/${election.id}/download_zip_results`);
+    directDownload(`/api/elections/${election.id}/download_zip_results`);
   }
 
   function handleResume() {

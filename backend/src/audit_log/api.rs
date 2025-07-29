@@ -148,7 +148,7 @@ mod tests {
             AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
             api::{audit_log_list, audit_log_list_users},
         },
-        authentication::{Sessions, User, Users, inject_user},
+        authentication::{User, Users, inject_user},
     };
 
     fn new_test_audit_service(pool: SqlitePool, user: Option<User>) -> AuditService {
@@ -178,8 +178,7 @@ mod tests {
             airgap_detection: AirgapDetection::nop(),
         };
 
-        let session = Sessions::new(pool.clone())
-            .create(1, TimeDelta::seconds(60 * 30))
+        let session = crate::authentication::session::create(&pool, 1, TimeDelta::seconds(60 * 30))
             .await
             .unwrap();
 
@@ -240,8 +239,7 @@ mod tests {
             airgap_detection: AirgapDetection::nop(),
         };
 
-        let session = Sessions::new(pool.clone())
-            .create(1, TimeDelta::seconds(60 * 30))
+        let session = crate::authentication::session::create(&pool, 1, TimeDelta::seconds(60 * 30))
             .await
             .unwrap();
 

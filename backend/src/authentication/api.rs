@@ -6,7 +6,7 @@ use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
 use cookie::{Cookie, SameSite};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
-use sqlx::Error;
+use sqlx::{Error, SqlitePool};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -14,7 +14,6 @@ use super::{
     Admin, AdminOrCoordinator, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
     error::AuthenticationError,
     role::Role,
-    session::Sessions,
     user::{User, Users},
 };
 use crate::{
@@ -108,7 +107,7 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
 async fn login(
     user_agent: Option<TypedHeader<UserAgent>>,
     State(users): State<Users>,
-    State(sessions): State<Sessions>,
+    State(pool): State<SqlitePool>,
     jar: CookieJar,
     audit_service: AuditService,
     Json(credentials): Json<Credentials>,
@@ -136,10 +135,10 @@ async fn login(
     }?;
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
-    sessions.delete_expired_sessions().await?;
+    super::session::delete_expired_sessions(&pool).await?;
 
     // Create a new session and cookie
-    let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
+    let session = super::session::create(&pool, user.id(), SESSION_LIFE_TIME).await?;
 
     // Log the login event
     audit_service
@@ -147,7 +146,7 @@ async fn login(
         .log(
             &AuditEvent::UserLoggedIn(UserLoggedInDetails {
                 user_agent,
-                logged_in_users_count: sessions.count().await?,
+                logged_in_users_count: super::session::count(&pool).await?,
             }),
             None,
         )
@@ -242,7 +241,7 @@ async fn account_update(
     ),
 )]
 async fn logout(
-    State(sessions): State<Sessions>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     jar: CookieJar,
 ) -> Result<impl IntoResponse, APIError> {
@@ -261,7 +260,11 @@ async fn logout(
     let session_key = cookie.value();
 
     // Log audit event when a valid session exists
-    if let Some(session) = sessions.get_by_key(session_key).await.ok().flatten() {
+    if let Some(session) = super::session::get_by_key(&pool, session_key)
+        .await
+        .ok()
+        .flatten()
+    {
         // Log the logout event
         audit_service
             .log(
@@ -274,7 +277,7 @@ async fn logout(
     }
 
     // Remove session from the database
-    sessions.delete(session_key).await?;
+    super::session::delete(&pool, session_key).await?;
 
     // Set cookie parameters, these are not present in the request, and have to match in order to clear the cookie
     set_default_cookie_properties(&mut cookie);
@@ -408,7 +411,7 @@ async fn user_get(
 pub async fn user_update(
     _admin: Admin,
     State(users_repo): State<Users>,
-    State(session_repo): State<Sessions>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<u32>,
     Json(update_user_req): Json<UpdateUserRequest>,
@@ -422,7 +425,7 @@ pub async fn user_update(
             .set_temporary_password(user_id, &temp_password)
             .await?;
 
-        session_repo.delete_user_session(user_id).await?;
+        super::session::delete_user_session(&pool, user_id).await?;
     };
 
     let user = users_repo

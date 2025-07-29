@@ -4,15 +4,13 @@ pub use role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
 pub use user::{User, Users};
 
 pub use self::api::*;
-#[cfg(test)]
-pub use self::session::Sessions;
 
 pub mod api;
 pub mod error;
 mod middleware;
 mod password;
 mod role;
-mod session;
+pub mod session;
 mod user;
 mod util;
 
@@ -54,7 +52,6 @@ mod tests {
             api::{AccountUpdateRequest, Credentials, UserListResponse},
             middleware::extend_session,
             role::Role,
-            session::Sessions,
             *,
         },
         error::ErrorReference,
@@ -400,8 +397,9 @@ mod tests {
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list(pool: SqlitePool) {
         let app = create_app(pool.clone());
-        let sessions = Sessions::new(pool);
-        let session = sessions.create(1, SESSION_LIFE_TIME).await.unwrap();
+        let session = super::session::create(&pool, 1, SESSION_LIFE_TIME)
+            .await
+            .unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
         let response = app
@@ -428,8 +426,9 @@ mod tests {
         let app = create_app(pool.clone());
 
         // with a normal long-valid session the user should not get a new cookie
-        let sessions = Sessions::new(pool);
-        let session = sessions.create(1, SESSION_LIFE_TIME).await.unwrap();
+        let session = super::session::create(&pool, 1, SESSION_LIFE_TIME)
+            .await
+            .unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
 
@@ -450,8 +449,9 @@ mod tests {
         assert_eq!(response.headers().get("set-cookie"), None);
 
         // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
-        let session: session::Session =
-            sessions.create(1, SESSION_MIN_LIFE_TIME / 2).await.unwrap();
+        let session: session::Session = super::session::create(&pool, 1, SESSION_MIN_LIFE_TIME / 2)
+            .await
+            .unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
 
@@ -547,9 +547,10 @@ mod tests {
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_forbidden_on_wrong_user_role(pool: SqlitePool) {
         let app = create_app(pool.clone());
-        let sessions = Sessions::new(pool);
         // user id 5 is a typist
-        let session = sessions.create(5, SESSION_LIFE_TIME).await.unwrap();
+        let session = super::session::create(&pool, 5, SESSION_LIFE_TIME)
+            .await
+            .unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
         let response = app

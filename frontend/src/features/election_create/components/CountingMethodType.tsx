@@ -30,7 +30,7 @@ export function CountingMethodType() {
       <h2>
         {t("election.voting_method_type.title")} {state.election.location}
       </h2>
-      <p className="mt-xl mb-xl">
+      <p className="mt-lg mb-xl">
         {t("election.voting_method_type.description", {
           election: state.election.name,
           location: state.election.location,

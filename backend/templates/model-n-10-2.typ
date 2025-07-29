@@ -32,13 +32,15 @@
 
 #location_name #sym.arrow.r Stembureau #input.polling_station.number
 
-#input.polling_station.locality #TODO[tijdstip aanvang zitting] \
-#TODO[tijd:van - tot] #input.polling_station.name \
-#input.polling_station.address \
-#input.polling_station.postal_code #input.polling_station.locality
-
+#v(0.5em)
 
 #input.election.location #format_date(input.election.election_date)
+
+#v(0.5em)
+
+#input.polling_station.name \
+#input.polling_station.address \
+#input.polling_station.postal_code #input.polling_station.locality
 
 // *Op deze locatie waren meerdere stembureaus>*
 

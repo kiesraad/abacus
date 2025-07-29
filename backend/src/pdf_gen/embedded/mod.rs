@@ -31,7 +31,11 @@ pub fn generate_pdfs(
 ) -> JoinHandle<Result<(), PdfGenError>> {
     tokio::task::spawn_blocking(move || {
         if let Err(e) = generate_pdfs_inner(models, sender) {
-            error!("Error generating PDF: {e:?}");
+            if matches!(e, PdfGenError::ChannelClosed) {
+                error!("Failed to send PDF: {e:?} - the client might have closed the connection");
+            } else {
+                error!("Error generating PDFs: {e:?}");
+            }
 
             return Err(e);
         }

@@ -1,7 +1,9 @@
+mod model_n_10_2;
 mod model_na_31_2;
 
 use std::{error::Error, path::PathBuf};
 
+pub use model_n_10_2::*;
 pub use model_na_31_2::*;
 
 pub trait ToPdfFileModel {
@@ -23,6 +25,7 @@ impl PdfFileModel {
 pub enum PdfModel {
     ModelNa31_2(Box<ModelNa31_2Input>),
     ModelNa21_2Bijlage1(Box<ModelNa31_2Bijlage1Input>),
+    ModelN10_2(Box<ModelN10_2Input>),
 }
 
 impl PdfModel {
@@ -31,6 +34,7 @@ impl PdfModel {
         match self {
             Self::ModelNa31_2(_) => "model-na-31-2",
             Self::ModelNa21_2Bijlage1(_) => "model-na-31-2-bijlage1",
+            Self::ModelN10_2(_) => "model-n-10-2",
         }
     }
 
@@ -55,6 +59,7 @@ impl PdfModel {
         let data = match self {
             Self::ModelNa31_2(input) => serde_json::to_string(input),
             Self::ModelNa21_2Bijlage1(input) => serde_json::to_string(input),
+            Self::ModelN10_2(input) => serde_json::to_string(input),
         }?;
 
         Ok(data)
@@ -66,6 +71,7 @@ impl PdfModel {
         match name {
             "model-na-31-2" => Ok(Self::ModelNa31_2(serde_json::from_str(input)?)),
             "model-na-31-2-bijlage1" => Ok(Self::ModelNa21_2Bijlage1(serde_json::from_str(input)?)),
+            "model-n-10-2" => Ok(Self::ModelN10_2(serde_json::from_str(input)?)),
             _ => Err(Error::new(ErrorKind::InvalidInput, "Unknown model").into()),
         }
     }

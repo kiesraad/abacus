@@ -94,6 +94,14 @@ export function ElectionHomePage() {
                   <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
                   <Table.Cell>{t("election_management.na_31_2_bijlage_1")}</Table.Cell>
                 </Table.ClickRow>
+                <Table.ClickRow
+                  onClick={() => {
+                    directDownload(`/api/elections/${election.id}/download_n_10_2`);
+                  }}
+                >
+                  <Table.Cell>N 10-2</Table.Cell>
+                  <Table.Cell>{t("election_management.n_10_2")}</Table.Cell>
+                </Table.ClickRow>
               </Table.Body>
             </Table>
           </div>

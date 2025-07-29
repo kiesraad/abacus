@@ -1,0 +1,9 @@
+.container {
+  width: 37.5rem;
+  margin-bottom: 2rem;
+
+  legend {
+    font-size: var(--font-size-md);
+    color: var(--gray-900);
+  }
+}

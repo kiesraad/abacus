@@ -14,6 +14,7 @@ type Props = {
   error: string;
   disabled: boolean;
   maxLength: number;
+  numberInput: boolean;
 };
 
 export const WideInputField: StoryObj = {
@@ -190,7 +191,7 @@ export const TextAreaInputField: StoryObj = {
 };
 
 export const CustomizableInputField: StoryObj<Props> = {
-  render: ({ label, subtext, hint, value, type, fieldSize, fieldWidth, error, disabled, maxLength }) => {
+  render: ({ label, subtext, hint, value, type, fieldSize, fieldWidth, error, disabled, maxLength, numberInput }) => {
     return (
       <InputField
         name="input-field"
@@ -204,6 +205,7 @@ export const CustomizableInputField: StoryObj<Props> = {
         error={error}
         disabled={disabled}
         maxLength={maxLength}
+        numberInput={numberInput}
       />
     );
   },
@@ -220,6 +222,7 @@ export default {
     fieldSize: "large",
     fieldWidth: "wide",
     disabled: false,
+    numberInput: false,
   },
   argTypes: {
     type: {
@@ -235,6 +238,13 @@ export default {
       control: { type: "radio" },
     },
     disabled: {
+      options: [true, false],
+      control: { type: "radio" },
+    },
+    maxLength: {
+      type: "number",
+    },
+    numberInput: {
       options: [true, false],
       control: { type: "radio" },
     },

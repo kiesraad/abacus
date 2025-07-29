@@ -9,7 +9,7 @@ use hyper::header::SET_COOKIE;
 use sqlx::SqlitePool;
 use tracing::{debug, error, info};
 
-use super::{SESSION_MIN_LIFE_TIME, Users, session::Session};
+use super::{SESSION_MIN_LIFE_TIME, session::Session};
 use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{SESSION_COOKIE_NAME, User, set_default_cookie_properties},
@@ -17,7 +17,6 @@ use crate::{
 
 /// Inject user and session
 pub async fn inject_user<B>(
-    State(users): State<Users>,
     State(pool): State<SqlitePool>,
     jar: CookieJar,
     mut request: Request<B>,
@@ -38,11 +37,11 @@ pub async fn inject_user<B>(
     extensions.insert(session);
 
     // fetch the user from the database
-    let Ok(Some(user)) = users.get_by_id(session_id).await else {
+    let Ok(Some(user)) = super::user::get_by_id(&pool, session_id).await else {
         return request;
     };
 
-    if let Err(e) = user.update_last_activity_at(&users).await {
+    if let Err(e) = user.update_last_activity_at(&pool).await {
         error!("Error updating last activity at: {e:?}")
     }
 
@@ -118,16 +117,14 @@ mod test {
     use super::{extend_session, inject_user};
     use crate::{
         audit_log::AuditService,
-        authentication::{Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User, Users},
+        authentication::{Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User},
     };
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_inject_user(pool: SqlitePool) {
-        let users = Users::new(pool.clone());
         let jar = CookieJar::new();
 
         let request = inject_user(
-            State(users.clone()),
             State(pool.clone()),
             jar.clone(),
             Request::new(Body::empty()),
@@ -149,7 +146,6 @@ mod test {
         jar = jar.add(cookie);
 
         let request = inject_user(
-            State(users.clone()),
             State(pool.clone()),
             jar.clone(),
             Request::new(Body::empty()),
@@ -161,15 +157,11 @@ mod test {
             "inject_user should inject a user if there is a session cookie"
         );
 
-        users.delete(user.id()).await.unwrap();
+        crate::authentication::user::delete(&pool, user.id())
+            .await
+            .unwrap();
 
-        let request = inject_user(
-            State(users.clone()),
-            State(pool.clone()),
-            jar,
-            Request::new(Body::empty()),
-        )
-        .await;
+        let request = inject_user(State(pool.clone()), jar, Request::new(Body::empty())).await;
 
         assert!(
             request.extensions().get::<User>().is_none(),

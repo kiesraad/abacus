@@ -12,9 +12,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
     Admin, AdminOrCoordinator, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
-    error::AuthenticationError,
-    role::Role,
-    user::{User, Users},
+    error::AuthenticationError, role::Role, user::User,
 };
 use crate::{
     APIError, AppState, ErrorResponse,
@@ -106,7 +104,6 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
 )]
 async fn login(
     user_agent: Option<TypedHeader<UserAgent>>,
-    State(users): State<Users>,
     State(pool): State<SqlitePool>,
     jar: CookieJar,
     audit_service: AuditService,
@@ -117,7 +114,7 @@ async fn login(
 
     // Check the username + password combination, do not leak information about usernames etc.
     // Log when the attempt fails
-    let user = match users.authenticate(&username, &password).await {
+    let user = match super::user::authenticate(&pool, &username, &password).await {
         Ok(u) => Ok(u),
         Err(AuthenticationError::UserNotFound) | Err(AuthenticationError::InvalidPassword) => {
             audit_service
@@ -197,7 +194,7 @@ async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
 )]
 async fn account_update(
     user: User,
-    State(users): State<Users>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(account): Json<AccountUpdateRequest>,
 ) -> Result<impl IntoResponse, APIError> {
@@ -206,16 +203,14 @@ async fn account_update(
     }
 
     // Update the password
-    users
-        .update_password(user.id(), &account.username, &account.password)
-        .await?;
+    super::user::update_password(&pool, user.id(), &account.username, &account.password).await?;
 
     // Update the fullname
     if let Some(fullname) = account.fullname {
-        users.update_fullname(user.id(), &fullname).await?;
+        super::user::update_fullname(&pool, user.id(), &fullname).await?;
     }
 
-    let Some(updated_user) = users.get_by_username(user.username()).await? else {
+    let Some(updated_user) = super::user::get_by_username(&pool, user.username()).await? else {
         return Err(AuthenticationError::UserNotFound.into());
     };
 
@@ -308,10 +303,10 @@ pub struct UserListResponse {
 )]
 async fn user_list(
     _user: AdminOrCoordinator,
-    State(users_repo): State<Users>,
+    State(pool): State<SqlitePool>,
 ) -> Result<Json<UserListResponse>, APIError> {
     Ok(Json(UserListResponse {
-        users: users_repo.list().await?,
+        users: super::user::list(&pool).await?,
     }))
 }
 
@@ -351,18 +346,18 @@ pub struct UpdateUserRequest {
 )]
 pub async fn user_create(
     _admin: Admin,
-    State(users_repo): State<Users>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(create_user_req): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
-    let user = users_repo
-        .create(
-            &create_user_req.username,
-            create_user_req.fullname.as_deref(),
-            &create_user_req.temp_password,
-            create_user_req.role,
-        )
-        .await?;
+    let user = super::user::create(
+        &pool,
+        &create_user_req.username,
+        create_user_req.fullname.as_deref(),
+        &create_user_req.temp_password,
+        create_user_req.role,
+    )
+    .await?;
 
     audit_service
         .log(&AuditEvent::UserCreated(user.clone().into()), None)
@@ -388,10 +383,10 @@ pub async fn user_create(
 )]
 async fn user_get(
     _user: Admin,
-    State(users_repo): State<Users>,
+    State(pool): State<SqlitePool>,
     Path(user_id): Path<u32>,
 ) -> Result<Json<User>, APIError> {
-    let user = users_repo.get_by_id(user_id).await?;
+    let user = super::user::get_by_id(&pool, user_id).await?;
     Ok(Json(user.ok_or(Error::RowNotFound)?))
 }
 
@@ -410,26 +405,22 @@ async fn user_get(
 )]
 pub async fn user_update(
     _admin: Admin,
-    State(users_repo): State<Users>,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<u32>,
     Json(update_user_req): Json<UpdateUserRequest>,
 ) -> Result<Json<User>, APIError> {
     if let Some(fullname) = update_user_req.fullname {
-        users_repo.update_fullname(user_id, &fullname).await?
+        super::user::update_fullname(&pool, user_id, &fullname).await?
     };
 
     if let Some(temp_password) = update_user_req.temp_password {
-        users_repo
-            .set_temporary_password(user_id, &temp_password)
-            .await?;
+        super::user::set_temporary_password(&pool, user_id, &temp_password).await?;
 
         super::session::delete_user_session(&pool, user_id).await?;
     };
 
-    let user = users_repo
-        .get_by_id(user_id)
+    let user = super::user::get_by_id(&pool, user_id)
         .await?
         .ok_or(Error::RowNotFound)?;
 
@@ -454,18 +445,18 @@ pub async fn user_update(
 )]
 async fn user_delete(
     _user: Admin,
-    State(users_repo): State<Users>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<u32>,
 ) -> Result<StatusCode, APIError> {
-    let Some(user) = users_repo.get_by_id(user_id).await? else {
+    let Some(user) = super::user::get_by_id(&pool, user_id).await? else {
         return Err(APIError::NotFound(
             format!("User with id {user_id} not found"),
             ErrorReference::EntryNotFound,
         ));
     };
 
-    let deleted = users_repo.delete(user_id).await?;
+    let deleted = super::user::delete(&pool, user_id).await?;
 
     if deleted {
         audit_service

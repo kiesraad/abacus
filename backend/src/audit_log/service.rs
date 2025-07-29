@@ -7,10 +7,7 @@ use axum::{
 use sqlx::SqlitePool;
 
 use super::AuditEvent;
-use crate::{
-    APIError,
-    authentication::{User, Users},
-};
+use crate::{APIError, authentication::User};
 
 #[derive(Clone)]
 pub struct AuditService {
@@ -22,7 +19,6 @@ pub struct AuditService {
 impl<S> FromRequestParts<S> for AuditService
 where
     SqlitePool: FromRef<S>,
-    Users: FromRef<S>,
     S: Send + Sync,
 {
     type Rejection = APIError;
@@ -77,8 +73,7 @@ mod test {
         let service = AuditService {
             pool: pool.clone(),
             ip: Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))),
-            user: Users::new(pool.clone())
-                .get_by_username("admin1")
+            user: crate::authentication::user::get_by_username(&pool, "admin1")
                 .await
                 .unwrap(),
         };

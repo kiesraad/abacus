@@ -148,7 +148,7 @@ mod tests {
             AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
             api::{audit_log_list, audit_log_list_users},
         },
-        authentication::{User, Users, inject_user},
+        authentication::{User, inject_user},
     };
 
     fn new_test_audit_service(pool: SqlitePool, user: Option<User>) -> AuditService {
@@ -156,8 +156,7 @@ mod tests {
     }
 
     async fn create_log_entries(pool: SqlitePool) {
-        let user = Users::new(pool.clone())
-            .get_by_username("admin1")
+        let user = crate::authentication::user::get_by_username(&pool, "admin1")
             .await
             .unwrap()
             .unwrap();

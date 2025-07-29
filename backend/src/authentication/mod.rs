@@ -1,7 +1,7 @@
 use chrono::TimeDelta;
 pub use middleware::*;
 pub use role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
-pub use user::{User, Users};
+pub use user::User;
 
 pub use self::api::*;
 
@@ -11,7 +11,7 @@ mod middleware;
 mod password;
 mod role;
 pub mod session;
-mod user;
+pub mod user;
 mod util;
 
 /// Session lifetime, for both cookie and database

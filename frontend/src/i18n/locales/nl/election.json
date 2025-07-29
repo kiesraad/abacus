@@ -78,6 +78,10 @@
     "dso_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
     "dso_not_supported": "Niet ondersteund in deze versie van Abacus"
   },
+  "number_of_voters": {
+    "title": "Hoeveel kiesgerechtigden telt de gemeente?",
+    "description": "Voer het aantal kiesgerechtigden in zoals door de gemeenteraad vastgesteld voor de gemeenteraadsverkiezing 2026 in de gemeente {location}"
+  },
   "invalid_polling_station_definition": {
     "title": "Ongeldig stembureaubestand",
     "description": "Het bestand <file>filename</file> bevat geen geldige lijst met stembureaus. Kies een ander bestand.",

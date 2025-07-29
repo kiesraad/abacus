@@ -5,7 +5,7 @@ use super::{PollingStationDataEntry, PollingStationResults, status::DataEntrySta
 use crate::{
     DbConnLike,
     data_entry::{ElectionStatusResponseEntry, PollingStationResultsEntry},
-    polling_station::{PollingStation, repository::PollingStations},
+    polling_station::PollingStation,
 };
 
 /// Get the full polling station data entry row for a given polling station
@@ -208,13 +208,13 @@ pub async fn list_entries(
 /// Get a list of polling stations with their results for an election
 pub async fn list_entries_with_polling_stations(
     conn: impl DbConnLike<'_>,
-    polling_stations_repo: PollingStations,
     election_id: u32,
 ) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
     let mut conn = conn.acquire().await?;
     // first get the list of results and polling stations related to an election
     let list = list_entries(&mut *conn, election_id).await?;
-    let polling_stations = polling_stations_repo.list(election_id).await?;
+    let polling_stations =
+        crate::polling_station::repository::list(&mut *conn, election_id).await?;
 
     // find the corresponding polling station for each entry, or fail if any polling station could not be found
     list.into_iter()

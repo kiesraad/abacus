@@ -16,7 +16,6 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     data_entry::status::DataEntryStatusName,
-    polling_station::repository::PollingStations,
     summary::ElectionSummary,
 };
 
@@ -57,7 +56,6 @@ pub struct ElectionApportionmentResponse {
 async fn election_apportionment(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
-    State(polling_stations_repo): State<PollingStations>,
     audit_service: AuditService,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionApportionmentResponse>, APIError> {
@@ -68,12 +66,9 @@ async fn election_apportionment(
             .iter()
             .all(|s| s.status == DataEntryStatusName::Definitive)
     {
-        let results = crate::data_entry::repository::list_entries_with_polling_stations(
-            &pool,
-            polling_stations_repo,
-            election.id,
-        )
-        .await?;
+        let results =
+            crate::data_entry::repository::list_entries_with_polling_stations(&pool, election.id)
+                .await?;
         let election_summary = ElectionSummary::from_results(&election, &results)?;
         let seat_assignment = seat_assignment(election.number_of_seats, &election_summary)?;
         let candidate_nomination = candidate_nomination(

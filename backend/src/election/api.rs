@@ -21,7 +21,7 @@ use crate::{
         CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    polling_station::{PollingStation, repository::PollingStations},
+    polling_station::PollingStation,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -101,11 +101,10 @@ pub async fn election_details(
     _user: User,
     State(committee_sessions_repo): State<CommitteeSessions>,
     State(pool): State<SqlitePool>,
-    State(polling_stations): State<PollingStations>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = crate::election::repository::get(&pool, id).await?;
-    let polling_stations = polling_stations.list(id).await?;
+    let polling_stations = crate::polling_station::repository::list(&pool, id).await?;
     let committee_session = committee_sessions_repo
         .get_election_committee_session(id)
         .await?;

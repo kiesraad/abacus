@@ -21,9 +21,7 @@ use abacus::{
     },
     eml::{EML110, EML230, EMLDocument},
     pdf_gen::models::{ModelNa31_2Input, PdfModel},
-    polling_station::{
-        PollingStation, PollingStationRequest, PollingStationType, repository::PollingStations,
-    },
+    polling_station::{PollingStation, PollingStationRequest, PollingStationType},
     summary::ElectionSummary,
 };
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
@@ -166,9 +164,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .expect("Failed to update number of voters of committee session");
 
     // generate the polling stations for the election
-    let ps_repo = PollingStations::new(pool.clone());
     let polling_stations =
-        generate_polling_stations(&mut rng, &committee_session, &election, &ps_repo, &args).await;
+        generate_polling_stations(&mut rng, &committee_session, &election, pool.clone(), &args)
+            .await;
 
     info!(
         "Election generated with election id: {}, election name: '{}'",
@@ -192,13 +190,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(export_dir) = args.export_definition {
         let results = if data_entry_completed {
-            abacus::data_entry::repository::list_entries_with_polling_stations(
-                &pool,
-                ps_repo,
-                election.id,
-            )
-            .await
-            .expect("Could not load results")
+            abacus::data_entry::repository::list_entries_with_polling_stations(&pool, election.id)
+                .await
+                .expect("Could not load results")
         } else {
             vec![]
         };
@@ -313,7 +307,7 @@ async fn generate_polling_stations(
     rng: &mut impl rand::Rng,
     committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
-    ps_repo: &PollingStations,
+    pool: SqlitePool,
     args: &Args,
 ) -> Vec<PollingStation> {
     let number_of_ps = rng.random_range(args.polling_stations.clone());
@@ -336,21 +330,21 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let ps = ps_repo
-            .create(
-                election.id,
-                PollingStationRequest {
-                    name: abacus::test_data_gen::polling_station_name(rng),
-                    number: i64::from(i),
-                    number_of_voters: Some(ps_num_voters.into()),
-                    polling_station_type: Some(PollingStationType::FixedLocation),
-                    address: abacus::test_data_gen::address(rng),
-                    postal_code: abacus::test_data_gen::postal_code(rng),
-                    locality: abacus::test_data_gen::locality(rng).to_owned(),
-                },
-            )
-            .await
-            .expect("Failed to create polling station");
+        let ps = abacus::polling_station::repository::create(
+            &pool,
+            election.id,
+            PollingStationRequest {
+                name: abacus::test_data_gen::polling_station_name(rng),
+                number: i64::from(i),
+                number_of_voters: Some(ps_num_voters.into()),
+                polling_station_type: Some(PollingStationType::FixedLocation),
+                address: abacus::test_data_gen::address(rng),
+                postal_code: abacus::test_data_gen::postal_code(rng),
+                locality: abacus::test_data_gen::locality(rng).to_owned(),
+            },
+        )
+        .await
+        .expect("Failed to create polling station");
         polling_stations.push(ps);
     }
 

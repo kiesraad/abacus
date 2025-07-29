@@ -12,7 +12,6 @@ use crate::{
         generate_pdfs,
         models::{ModelNa31_2Bijlage1Input, PdfModel},
     },
-    polling_station::repository::PollingStations,
     zip::ZipResponse,
 };
 
@@ -43,11 +42,10 @@ pub fn router() -> OpenApiRouter<AppState> {
 async fn election_download_na_31_2_bijlage1(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
-    State(polling_stations_repo): State<PollingStations>,
     Path(id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
     let election = crate::election::repository::get(&pool, id).await?;
-    let polling_stations = polling_stations_repo.list(election.id).await?;
+    let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
     let response = ZipResponse::with_name(&format!(
         "{}{}_{}_na_31_2_bijlage1.zip",
         election.category.to_eml_code(),

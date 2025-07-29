@@ -27,7 +27,7 @@ use crate::{
     committee_session::{CommitteeSession, repository::CommitteeSessions},
     election::ElectionWithPoliticalGroups,
     error::{ErrorReference, ErrorResponse},
-    polling_station::{PollingStation, repository::PollingStations},
+    polling_station::PollingStation,
 };
 
 impl From<DataError> for APIError {
@@ -85,8 +85,8 @@ async fn get_polling_station_election_and_committee_session_id(
     ),
     Error,
 > {
-    let polling_stations = PollingStations::new(pool.clone());
-    let polling_station = polling_stations.get(polling_station_id).await?;
+    let polling_station =
+        crate::polling_station::repository::get(&pool, polling_station_id).await?;
     let election = crate::election::repository::get(&pool, polling_station.election_id).await?;
     let committee_sessions = CommitteeSessions::new(pool.clone());
     let committee_session = committee_sessions

@@ -15,7 +15,7 @@ use crate::{
         generate_pdf,
         models::{ModelNa31_2Input, PdfModel},
     },
-    polling_station::{repository::PollingStations, structs::PollingStation},
+    polling_station::structs::PollingStation,
     summary::ElectionSummary,
     zip::{ZipResponse, slugify_filename},
 };
@@ -47,19 +47,15 @@ impl ResultsInput {
         election_id: u32,
         committee_sessions_repo: CommitteeSessions,
         pool: SqlitePool,
-        polling_stations_repo: PollingStations,
     ) -> Result<ResultsInput, APIError> {
         let election = crate::election::repository::get(&pool, election_id).await?;
         let committee_session = committee_sessions_repo
             .get_election_committee_session(election_id)
             .await?;
-        let polling_stations = polling_stations_repo.list(election.id).await?;
-        let results = crate::data_entry::repository::list_entries_with_polling_stations(
-            &pool,
-            polling_stations_repo,
-            election.id,
-        )
-        .await?;
+        let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
+        let results =
+            crate::data_entry::repository::list_entries_with_polling_stations(&pool, election.id)
+                .await?;
 
         Ok(ResultsInput {
             committee_session,
@@ -148,10 +144,9 @@ async fn election_download_zip_results(
     _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
     State(pool): State<SqlitePool>,
-    State(polling_stations_repo): State<PollingStations>,
     Path(id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
-    let input = ResultsInput::new(id, committee_sessions_repo, pool, polling_stations_repo).await?;
+    let input = ResultsInput::new(id, committee_sessions_repo, pool).await?;
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
@@ -195,10 +190,9 @@ async fn election_download_pdf_results(
     _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
     State(pool): State<SqlitePool>,
-    State(polling_stations_repo): State<PollingStations>,
     Path(id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
-    let input = ResultsInput::new(id, committee_sessions_repo, pool, polling_stations_repo).await?;
+    let input = ResultsInput::new(id, committee_sessions_repo, pool).await?;
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
@@ -233,10 +227,9 @@ async fn election_download_xml_results(
     _user: Coordinator,
     State(committee_sessions_repo): State<CommitteeSessions>,
     State(pool): State<SqlitePool>,
-    State(polling_stations_repo): State<PollingStations>,
     Path(id): Path<u32>,
 ) -> Result<Eml<EML510>, APIError> {
-    let input = ResultsInput::new(id, committee_sessions_repo, pool, polling_stations_repo).await?;
+    let input = ResultsInput::new(id, committee_sessions_repo, pool).await?;
     let xml = input.as_xml();
     Ok(Eml(xml))
 }

@@ -9,7 +9,6 @@ use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use self::repository::PollingStations;
 pub use self::structs::*;
 use crate::{
     APIError, AppState, ErrorResponse,
@@ -61,7 +60,6 @@ impl IntoResponse for PollingStationListResponse {
 )]
 async fn polling_station_list(
     _user: User,
-    State(polling_stations): State<PollingStations>,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
 ) -> Result<PollingStationListResponse, APIError> {
@@ -69,7 +67,7 @@ async fn polling_station_list(
     crate::election::repository::get(&pool, election_id).await?;
 
     Ok(PollingStationListResponse {
-        polling_stations: polling_stations.list(election_id).await?,
+        polling_stations: crate::polling_station::repository::list(&pool, election_id).await?,
     })
 }
 
@@ -97,7 +95,6 @@ async fn polling_station_create(
     audit_service: AuditService,
     new_polling_station: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
-    let polling_stations_repo = PollingStations::new(pool.clone());
     let committee_sessions_repo = CommitteeSessions::new(pool.clone());
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
@@ -106,9 +103,8 @@ async fn polling_station_create(
         .get_election_committee_session(election_id)
         .await?;
 
-    let polling_station = polling_stations_repo
-        .create(election_id, new_polling_station)
-        .await?;
+    let polling_station =
+        crate::polling_station::repository::create(&pool, election_id, new_polling_station).await?;
 
     audit_service
         .log(
@@ -155,14 +151,17 @@ async fn polling_station_create(
 )]
 async fn polling_station_get(
     _user: User,
-    State(polling_stations): State<PollingStations>,
+    State(pool): State<SqlitePool>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     Ok((
         StatusCode::OK,
-        polling_stations
-            .get_for_election(election_id, polling_station_id)
-            .await?,
+        crate::polling_station::repository::get_for_election(
+            &pool,
+            election_id,
+            polling_station_id,
+        )
+        .await?,
     ))
 }
 
@@ -185,14 +184,18 @@ async fn polling_station_get(
 )]
 async fn polling_station_update(
     _user: AdminOrCoordinator,
-    State(polling_stations): State<PollingStations>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
     polling_station_update: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
-    let polling_station = polling_stations
-        .update(election_id, polling_station_id, polling_station_update)
-        .await?;
+    let polling_station = crate::polling_station::repository::update(
+        &pool,
+        election_id,
+        polling_station_id,
+        polling_station_update,
+    )
+    .await?;
 
     audit_service
         .log(
@@ -225,7 +228,6 @@ async fn polling_station_delete(
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<StatusCode, APIError> {
-    let polling_stations_repo = PollingStations::new(pool.clone());
     let committee_sessions_repo = CommitteeSessions::new(pool.clone());
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
@@ -234,13 +236,14 @@ async fn polling_station_delete(
         .get_election_committee_session(election_id)
         .await?;
 
-    let polling_station = polling_stations_repo
-        .get_for_election(election_id, polling_station_id)
-        .await?;
+    let polling_station = crate::polling_station::repository::get_for_election(
+        &pool,
+        election_id,
+        polling_station_id,
+    )
+    .await?;
 
-    polling_stations_repo
-        .delete(election_id, polling_station_id)
-        .await?;
+    crate::polling_station::repository::delete(&pool, election_id, polling_station_id).await?;
 
     audit_service
         .log(
@@ -249,7 +252,10 @@ async fn polling_station_delete(
         )
         .await?;
 
-    if polling_stations_repo.list(election_id).await?.is_empty() {
+    if crate::polling_station::repository::list(&pool, election_id)
+        .await?
+        .is_empty()
+    {
         change_committee_session_status(
             committee_session.id,
             CommitteeSessionStatus::Created,

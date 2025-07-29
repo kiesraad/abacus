@@ -43,12 +43,14 @@ pub fn router() -> OpenApiRouter<AppState> {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct Credentials {
     pub username: String,
     pub password: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct LoginResponse {
     pub user_id: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -158,6 +160,7 @@ async fn login(
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct AccountUpdateRequest {
     pub username: String,
     pub password: String,
@@ -286,6 +289,7 @@ async fn logout(
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct UserListResponse {
     pub users: Vec<User>,
 }
@@ -311,6 +315,7 @@ async fn user_list(
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct CreateUserRequest {
     pub username: String,
     #[serde(skip_serializing_if = "Option::is_none")]

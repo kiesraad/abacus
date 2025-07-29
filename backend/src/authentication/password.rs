@@ -45,6 +45,7 @@ impl<'pw> ValidatedPassword<'pw> {
 /// Note that this newtype doesn't give any guarantees, as it is easily constructible
 /// because of the From<String> impl.
 #[derive(Deserialize, Default, PartialEq, Eq, Clone, Debug, Hash, Type)]
+#[serde(deny_unknown_fields)]
 #[sqlx(transparent)]
 pub(super) struct HashedPassword(String);
 

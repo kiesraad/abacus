@@ -11,6 +11,7 @@ use crate::audit_log::ElectionDetails;
 
 /// Election without political groups
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
+#[serde(deny_unknown_fields)]
 pub struct Election {
     pub id: u32,
     pub name: String,
@@ -28,6 +29,7 @@ pub struct Election {
 
 /// Election with political groups
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
+#[serde(deny_unknown_fields)]
 pub struct ElectionWithPoliticalGroups {
     pub id: u32,
     pub name: String,
@@ -93,6 +95,7 @@ impl IntoResponse for ElectionWithPoliticalGroups {
 
 /// Election request
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct NewElection {
     pub name: String,
     pub counting_method: VoteCountingMethod,
@@ -140,6 +143,7 @@ pub type PGNumber = u32;
 
 /// Political group with its candidates
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
 pub struct PoliticalGroup {
     #[schema(value_type = u32)]
     pub number: PGNumber,
@@ -151,6 +155,7 @@ pub type CandidateNumber = u32;
 
 /// Candidate
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
 pub struct Candidate {
     #[schema(value_type = u32)]
     pub number: CandidateNumber,

@@ -9,6 +9,7 @@ use crate::{
 };
 
 #[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ModelNa31_2Input {
     pub committee_session: CommitteeSession,
     pub election: ElectionWithPoliticalGroups,

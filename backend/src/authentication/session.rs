@@ -16,6 +16,7 @@ use crate::{APIError, DbConnLike};
 
 /// A session object, corresponds to a row in the sessions table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
+#[serde(deny_unknown_fields)]
 pub struct Session {
     session_key: String,
     user_id: u32,

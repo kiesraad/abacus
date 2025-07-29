@@ -15,6 +15,7 @@ use crate::{
 };
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct ValidationResults {
     pub errors: Vec<ValidationResult>,
     pub warnings: Vec<ValidationResult>,
@@ -36,6 +37,7 @@ impl ValidationResults {
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct ValidationResult {
     pub fields: Vec<String>,
     pub code: ValidationResultCode,

@@ -170,6 +170,7 @@ impl PartialEq for DisplayFraction {
 
 /// Fraction with the integer part split out for display purposes
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 #[schema(as = Fraction)]
 pub struct DisplayFraction {
     integer: u64,

@@ -12,6 +12,7 @@ use crate::{data_entry::PoliticalGroupVotes, election::PGNumber, summary::Electi
 /// and each of the changes and intermediate standings. The final standing contains the
 /// number of seats per political group that was assigned after all seats were assigned.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct SeatAssignmentResult {
     pub seats: u32,
     pub full_seats: u32,
@@ -23,6 +24,7 @@ pub struct SeatAssignmentResult {
 
 /// Contains information about the final assignment of seats for a specific political group.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct PoliticalGroupSeatAssignment {
     /// Political group number for which this assignment applies
     #[schema(value_type = u32)]
@@ -58,6 +60,7 @@ impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
 /// Contains the standing for a specific political group. This is all the information
 /// that is needed to compute the apportionment for that specific political group.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct PoliticalGroupStanding {
     /// Political group number for which this standing applies
     #[schema(value_type = u32)]
@@ -124,6 +127,7 @@ impl PoliticalGroupStanding {
 /// Records the change for a specific seat, and how the standing is once
 /// that seat was assigned or removed
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct SeatChangeStep {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -240,6 +244,7 @@ impl SeatChange {
 
 /// Contains the details for an assigned seat, assigned through the highest average method.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct HighestAverageAssignedSeat {
     /// The political group that was selected for this seat has this political group number
     #[schema(value_type = u32)]
@@ -259,6 +264,7 @@ pub struct HighestAverageAssignedSeat {
 
 /// Contains the details for an assigned seat, assigned through the largest remainder method.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct LargestRemainderAssignedSeat {
     /// The political group that was selected for this seat has this political group number
     #[schema(value_type = u32)]
@@ -275,6 +281,7 @@ pub struct LargestRemainderAssignedSeat {
 
 /// Contains information about the enactment of article P 9 of the Kieswet.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct AbsoluteMajorityReassignedSeat {
     /// Political group number which the residual seat is retracted from
     #[schema(value_type = u32)]
@@ -286,6 +293,7 @@ pub struct AbsoluteMajorityReassignedSeat {
 
 /// Contains information about the enactment of article P 10 of the Kieswet.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct ListExhaustionRemovedSeat {
     /// Political group number which the seat is retracted from
     #[schema(value_type = u32)]

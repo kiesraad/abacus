@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            UPDATE polling_stations\n            SET\n              name = ?,\n              number = ?,\n              number_of_voters = ?,\n              polling_station_type = ?,\n              address = ?,\n              postal_code = ?,\n              locality = ?\n            WHERE\n              id = ? AND election_id = ?\n            RETURNING\n                id AS \"id: u32\",\n                election_id AS \"election_id: u32\",\n                name,\n                number,\n                number_of_voters,\n                polling_station_type AS \"polling_station_type: _\",\n                address,\n                postal_code,\n                locality\n            ",
+  "query": "\n        SELECT\n            id AS \"id: u32\",\n            election_id AS \"election_id: u32\",\n            name,\n            number,\n            number_of_voters,\n            polling_station_type AS \"polling_station_type: _\",\n            address,\n            postal_code,\n            locality\n        FROM polling_stations\n        WHERE id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -50,7 +50,7 @@
       }
     ],
     "parameters": {
-      "Right": 9
+      "Right": 1
     },
     "nullable": [
       false,
@@ -64,5 +64,5 @@
       false
     ]
   },
-  "hash": "f36930d314a9119e399eb5242e5850d41902b9a5e63371a92a809e15d0ee35a1"
+  "hash": "390433deee2b35f433e8e0e565e8111b75993e735a6ac8348987198d86de8fbc"
 }

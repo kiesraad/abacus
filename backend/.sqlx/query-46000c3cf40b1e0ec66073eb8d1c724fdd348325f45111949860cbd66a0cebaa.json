@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT \n              id as \"id: u32\",\n              number as \"number: u32\",\n              election_id as \"election_id: u32\",\n              status as \"status: _\",\n              location,\n              start_date,\n              start_time,\n              number_of_voters as \"number_of_voters: u32\"\n            FROM committee_sessions\n            WHERE election_id = ?\n            ORDER BY number DESC\n            ",
+  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date,\n            start_time,\n            number_of_voters as \"number_of_voters: u32\"\n        FROM committee_sessions\n        WHERE id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -58,5 +58,5 @@
       false
     ]
   },
-  "hash": "0412e0b31c0b31e1c059fdb2c8182cb5f30c9d1f7e5eb058ab1958b3764cd778"
+  "hash": "46000c3cf40b1e0ec66073eb8d1c724fdd348325f45111949860cbd66a0cebaa"
 }

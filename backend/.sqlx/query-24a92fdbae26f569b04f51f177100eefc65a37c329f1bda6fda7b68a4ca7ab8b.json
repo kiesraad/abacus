@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n                audit_log.id as \"id: u32\",\n                time as \"time: _\",\n                json(event) as \"event!: Json<AuditEvent>\",\n                event_level as \"event_level: _\",\n                message,\n                workstation as \"workstation: _\",\n                ip as \"ip: String\",\n                user_id as \"user_id: u32\",\n                username,\n                user_fullname,\n                user_role as \"user_role: Role\"\n            FROM audit_log\n            ORDER BY time DESC\n            ",
+  "query": "SELECT\n            audit_log.id as \"id: u32\",\n            time as \"time: _\",\n            json(event) as \"event!: Json<AuditEvent>\",\n            event_level as \"event_level: _\",\n            message,\n            workstation as \"workstation: _\",\n            ip as \"ip: String\",\n            user_id as \"user_id: u32\",\n            username,\n            user_fullname,\n            user_role as \"user_role: Role\"\n        FROM audit_log\n        ORDER BY time DESC\n        ",
   "describe": {
     "columns": [
       {
@@ -76,5 +76,5 @@
       true
     ]
   },
-  "hash": "371b371ba611c9368b918759a778c5d5e2508f138ba6bc601b7ff7cbe992f5a7"
+  "hash": "24a92fdbae26f569b04f51f177100eefc65a37c329f1bda6fda7b68a4ca7ab8b"
 }

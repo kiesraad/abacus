@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n                user_id as \"id!: u32\",\n                user_fullname as \"fullname!: String\",\n                username as \"username!: String\",\n                user_role as \"role!: Role\"\n            FROM audit_log\n            WHERE user_id IS NOT NULL\n            AND user_fullname IS NOT NULL\n            AND username IS NOT NULL\n            AND user_role IS NOT NULL\n            GROUP BY user_id\n            ORDER BY username",
+  "query": "SELECT\n            user_id as \"id!: u32\",\n            user_fullname as \"fullname!: String\",\n            username as \"username!: String\",\n            user_role as \"role!: Role\"\n        FROM audit_log\n        WHERE user_id IS NOT NULL\n        AND user_fullname IS NOT NULL\n        AND username IS NOT NULL\n        AND user_role IS NOT NULL\n        GROUP BY user_id\n        ORDER BY username",
   "describe": {
     "columns": [
       {
@@ -34,5 +34,5 @@
       true
     ]
   },
-  "hash": "b09ead88547ecb9c2df5e5d3095d7260cd93ae87968cf7cb2fea9b6ec8abe7c6"
+  "hash": "b2d0fbad00bb621543e0dc6655b5ea73ec2d2a80764092f4a94b71d732827bb4"
 }

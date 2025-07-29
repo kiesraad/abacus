@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                id AS \"id: u32\",\n                election_id AS \"election_id: u32\",\n                name,\n                number,\n                number_of_voters,\n                polling_station_type AS \"polling_station_type: _\",\n                address,\n                postal_code,\n                locality\n            FROM polling_stations\n            WHERE id = $1\n            ",
+  "query": "\n        SELECT\n            id AS \"id: u32\",\n            election_id AS \"election_id: u32\",\n            name,\n            number,\n            number_of_voters,\n            polling_station_type AS \"polling_station_type: _\",\n            address,\n            postal_code,\n            locality\n        FROM polling_stations\n        WHERE election_id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -64,5 +64,5 @@
       false
     ]
   },
-  "hash": "cf060f738cc1d6dc55e6d98b83b40bde76604394f0d60adb4bb5f392dd88e1a6"
+  "hash": "e4749ca7979428a4aa42dee40305bbe7f938951ccad7d320e7e301461852344a"
 }

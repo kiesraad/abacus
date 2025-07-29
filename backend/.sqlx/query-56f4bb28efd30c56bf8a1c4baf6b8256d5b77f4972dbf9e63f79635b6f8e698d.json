@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                session_key,\n                user_id as \"user_id: u32\",\n                expires_at as \"expires_at: _\",\n                created_at as \"created_at: _\"\n            FROM sessions\n            WHERE session_key = ?\n            AND expires_at > ?\n            ",
+  "query": "INSERT INTO sessions (session_key, user_id, expires_at, created_at)\n        VALUES (?, ?, ?, ?)\n        RETURNING\n            session_key,\n            user_id as \"user_id: u32\",\n            expires_at as \"expires_at: _\",\n            created_at as \"created_at: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -25,7 +25,7 @@
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 4
     },
     "nullable": [
       false,
@@ -34,5 +34,5 @@
       false
     ]
   },
-  "hash": "1019d87a89eb4087ab3d931e41d633572bde7edacf9f5fa19c064f92d723d801"
+  "hash": "56f4bb28efd30c56bf8a1c4baf6b8256d5b77f4972dbf9e63f79635b6f8e698d"
 }

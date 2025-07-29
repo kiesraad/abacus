@@ -163,7 +163,7 @@ pub async fn create(
     let workstation: Option<u32> = None;
     let event_name = event.to_string();
     let event_level = event.level();
-    let event = sqlx::types::Json(event);
+    let event = Json(event);
     let user_id = user.map(|u| u.id());
     let username = user.map(|u| u.username().to_string());
     let fullname = user.map(|u| u.fullname().unwrap_or_default().to_string());

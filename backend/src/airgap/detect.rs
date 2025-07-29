@@ -4,7 +4,7 @@ use std::{
     sync::{Arc, RwLock, atomic::AtomicBool},
     time::{Duration, Instant},
 };
-use tokio::sync::mpsc::{self, Sender};
+use tokio::sync::watch::{self, Sender};
 use tracing::{error, info, trace, warn};
 
 use crate::audit_log::{AuditEvent, AuditLog};
@@ -59,7 +59,7 @@ impl AirgapDetection {
     /// Starts the airgap detection in a background task.
     /// It will periodically check for airgap violations by attempting to connect to a known server.
     pub async fn start(pool: SqlitePool) -> AirgapDetection {
-        let (tx, mut rx) = mpsc::channel::<AirGapStatusChange>(1);
+        let (tx, mut rx) = watch::channel(AirGapStatusChange::AirGapViolationResolved);
 
         let airgap_detection = AirgapDetection {
             enabled: true,
@@ -72,18 +72,24 @@ impl AirgapDetection {
 
         tokio::task::spawn(async move {
             loop {
-                if let Some(status) = rx.recv().await {
-                    let event = match status {
-                        AirGapStatusChange::AirGapViolationDetected => {
-                            AuditEvent::AirGapViolationDetected
-                        }
-                        AirGapStatusChange::AirGapViolationResolved => {
-                            AuditEvent::AirGapViolationResolved
-                        }
-                    };
+                match rx.changed().await {
+                    Ok(_) => {
+                        let event = match *rx.borrow() {
+                            AirGapStatusChange::AirGapViolationDetected => {
+                                AuditEvent::AirGapViolationDetected
+                            }
+                            AirGapStatusChange::AirGapViolationResolved => {
+                                AuditEvent::AirGapViolationResolved
+                            }
+                        };
 
-                    if let Err(e) = audit_log.create(&event, None, None, None).await {
-                        error!("Failed to log air gap status change: {e:#?}");
+                        if let Err(e) = audit_log.create(&event, None, None, None).await {
+                            error!("Failed to log air gap status change: {e:#?}");
+                        }
+                    }
+                    Err(e) => {
+                        error!("Failed to receive air gap status change: {e:#?}");
+                        break;
                     }
                 }
             }
@@ -112,7 +118,7 @@ impl AirgapDetection {
                 AirGapStatusChange::AirGapViolationResolved
             };
 
-            if let Err(e) = sender.blocking_send(status) {
+            if let Err(e) = sender.send(status) {
                 error!("Failed to send airgap status update: {e}");
             }
         }

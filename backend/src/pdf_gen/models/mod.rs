@@ -6,7 +6,8 @@ pub use model_na_31_2::*;
 
 /// Defines the available models and what their input parameters are.
 pub enum PdfModel {
-    ModelNa31_2(ModelNa31_2Input),
+    ModelNa31_2(Box<ModelNa31_2Input>),
+    ModelNa21_2Bijlage1(Box<ModelNa31_2Bijlage1Input>),
 }
 
 impl PdfModel {
@@ -14,6 +15,7 @@ impl PdfModel {
     pub fn as_filename(&self) -> &'static str {
         match self {
             Self::ModelNa31_2(_) => "model-na-31-2",
+            Self::ModelNa21_2Bijlage1(_) => "model-na-31-2-bijlage1",
         }
     }
 
@@ -37,6 +39,7 @@ impl PdfModel {
     pub fn get_input(&self) -> serde_json::Result<String> {
         let data = match self {
             Self::ModelNa31_2(input) => serde_json::to_string(input),
+            Self::ModelNa21_2Bijlage1(input) => serde_json::to_string(input),
         }?;
 
         Ok(data)
@@ -47,6 +50,7 @@ impl PdfModel {
 
         match name {
             "model-na-31-2" => Ok(Self::ModelNa31_2(serde_json::from_str(input)?)),
+            "model-na-31-2-bijlage1" => Ok(Self::ModelNa21_2Bijlage1(serde_json::from_str(input)?)),
             _ => Err(Error::new(ErrorKind::InvalidInput, "Unknown model").into()),
         }
     }

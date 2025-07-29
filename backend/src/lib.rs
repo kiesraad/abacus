@@ -50,10 +50,20 @@ pub use error::{APIError, ErrorResponse};
 /// Maximum size of the request body in megabytes.
 pub const MAX_BODY_SIZE_MB: usize = 12;
 
-pub trait DbConnLike<'a>: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite> {}
-impl<'a, T> DbConnLike<'a> for T where
-    T: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite>
+pub trait DbConnLike<'a>: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite> {
+    fn begin_immediate(
+        self,
+    ) -> impl Future<Output = Result<sqlx::Transaction<'a, Sqlite>, sqlx::Error>>;
+}
+
+impl<'a, T> DbConnLike<'a> for T
+where
+    T: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite>,
+    <T as Acquire<'a>>::Connection: Into<sqlx::pool::MaybePoolConnection<'a, Sqlite>>,
 {
+    async fn begin_immediate(self) -> Result<sqlx::Transaction<'a, Sqlite>, sqlx::Error> {
+        sqlx::Transaction::begin(self.acquire().await?, Some("BEGIN IMMEDIATE".into())).await
+    }
 }
 
 #[derive(FromRef, Clone)]

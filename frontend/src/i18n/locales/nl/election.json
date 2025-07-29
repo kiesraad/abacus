@@ -68,6 +68,15 @@
     "description": "Het bestand <file>filename</file> bevat geen geldige kandidatenlijst. Kies een bestand met een geldige definitie.",
     "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte."
   },
+  "voting_method_type": {
+    "title": "Type stemopneming in",
+    "description": "Hoe worden stemmen voor de {election} in de gemeente {location} geteld? Het type stemopneming wordt bepaald door het college van burgemeester en wethouders (B&W) van de gemeente.",
+    "cso": "Centrale stemopneming (CSO)",
+    "cso_description": "Op de verkiezingsdag wordt het aantal stemmen per lijst geteld. De stemmen op kandidaten worden door het gemeentelijke stembureau geteld.",
+    "dso": "Decentrale stemopneming (DSO)",
+    "dso_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
+    "dso_not_supported": "Niet ondersteund in deze versie van Abacus"
+  },
   "invalid_polling_station_definition": {
     "title": "Ongeldig stembureaubestand",
     "description": "Het bestand <file>filename</file> bevat geen geldige lijst met stembureaus. Kies een ander bestand.",

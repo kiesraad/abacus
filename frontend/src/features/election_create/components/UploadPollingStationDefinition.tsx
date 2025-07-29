@@ -33,7 +33,7 @@ export function UploadPollingStationDefinition() {
   }
 
   async function skip() {
-    await navigate("/elections/create/check-and-save");
+    await navigate("/elections/create/counting-method-type");
   }
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -83,7 +83,7 @@ export function UploadPollingStationDefinition() {
 
   if (state.pollingStations && state.pollingStationDefinitionFileName && state.pollingStationDefinitionData) {
     async function next() {
-      await navigate("/elections/create/check-and-save");
+      await navigate("/elections/create/counting-method-type");
     }
 
     function showAll() {

@@ -646,7 +646,7 @@ describe("Election create pages", () => {
       await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
     ).toBeVisible();
     await user.click(screen.getByText("Stap overslaan en stembureaus later toevoegen"));
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" })).toBeVisible();
   });
 
   test("Shows overview when uploading valid polling station file", async () => {
@@ -688,6 +688,8 @@ describe("Election create pages", () => {
 
     // click next
     await user.click(screen.getByText("Volgende"));
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" })).toBeVisible();
+
+    // Expect to see the next page
+    expect(await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" })).toBeVisible();
   });
 });

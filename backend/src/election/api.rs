@@ -5,23 +5,21 @@ use axum::{
 };
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
     NewElection,
-    repository::Elections,
     structs::{Election, ElectionWithPoliticalGroups},
 };
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{Admin, User},
-    committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
-    },
+    committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    polling_station::{PollingStation, repository::PollingStations},
+    polling_station::PollingStation,
 };
 
 use crate::polling_station::PollingStationRequest;
@@ -71,13 +69,12 @@ pub struct ElectionDetailsResponse {
 )]
 pub async fn election_list(
     _user: User,
-    State(committee_sessions_repo): State<CommitteeSessions>,
-    State(elections_repo): State<Elections>,
+    State(pool): State<SqlitePool>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
-    let elections = elections_repo.list().await?;
-    let committee_sessions = committee_sessions_repo
-        .get_committee_session_for_each_election()
-        .await?;
+    let elections = crate::election::repository::list(&pool).await?;
+    let committee_sessions =
+        crate::committee_session::repository::get_committee_session_for_each_election(&pool)
+            .await?;
     Ok(Json(ElectionListResponse {
         committee_sessions,
         elections,
@@ -101,16 +98,13 @@ pub async fn election_list(
 )]
 pub async fn election_details(
     _user: User,
-    State(committee_sessions_repo): State<CommitteeSessions>,
-    State(elections_repo): State<Elections>,
-    State(polling_stations): State<PollingStations>,
+    State(pool): State<SqlitePool>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
-    let election = elections_repo.get(id).await?;
-    let polling_stations = polling_stations.list(id).await?;
-    let committee_session = committee_sessions_repo
-        .get_election_committee_session(id)
-        .await?;
+    let election = crate::election::repository::get(&pool, id).await?;
+    let polling_stations = crate::polling_station::repository::list(&pool, id).await?;
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, id).await?;
     Ok(Json(ElectionDetailsResponse {
         committee_session,
         election,
@@ -134,24 +128,25 @@ pub async fn election_details(
 #[cfg(feature = "dev-database")]
 pub async fn election_create(
     _user: Admin,
-    State(elections_repo): State<Elections>,
-    State(committee_sessions_repo): State<CommitteeSessions>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(new_election): Json<NewElection>,
 ) -> Result<(StatusCode, ElectionWithPoliticalGroups), APIError> {
-    let election = elections_repo.create(new_election).await?;
+    let election = crate::election::repository::create(&pool, new_election).await?;
     audit_service
         .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
         .await?;
 
     // Create first committee session for the election
-    let committee_session = committee_sessions_repo
-        .create(CommitteeSessionCreateRequest {
+    let committee_session = crate::committee_session::repository::create(
+        &pool,
+        CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
             number_of_voters: 0,
-        })
-        .await?;
+        },
+    )
+    .await?;
     audit_service
         .log(
             &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
@@ -272,9 +267,7 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
 )]
 pub async fn election_import(
     _user: Admin,
-    State(elections_repo): State<Elections>,
-    State(polling_stations_repo): State<PollingStations>,
-    State(committee_sessions_repo): State<CommitteeSessions>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(edu): Json<ElectionAndCandidatesDefinitionImportRequest>,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
@@ -297,26 +290,26 @@ pub async fn election_import(
     }
 
     // Create new election
-    let election = elections_repo.create(new_election).await?;
+    let election = crate::election::repository::create(&pool, new_election).await?;
     audit_service
         .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
         .await?;
 
     // Create polling stations
     if let Some(places) = polling_places {
-        polling_stations_repo
-            .create_many(election.id, places)
-            .await?;
+        crate::polling_station::repository::create_many(&pool, election.id, places).await?;
     }
 
     // Create first committee session for the election
-    let committee_session = committee_sessions_repo
-        .create(CommitteeSessionCreateRequest {
+    let committee_session = crate::committee_session::repository::create(
+        &pool,
+        CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
             number_of_voters,
-        })
-        .await?;
+        },
+    )
+    .await?;
     audit_service
         .log(
             &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),

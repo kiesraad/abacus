@@ -4,30 +4,27 @@ use axum::{
     extract::{ConnectInfo, FromRef, FromRequestParts},
     http::request::Parts,
 };
+use sqlx::SqlitePool;
 
-use super::{AuditEvent, AuditLog};
-use crate::{
-    APIError,
-    authentication::{User, Users},
-};
+use super::AuditEvent;
+use crate::{APIError, authentication::User};
 
 #[derive(Clone)]
 pub struct AuditService {
-    log: AuditLog,
+    pool: SqlitePool,
     user: Option<User>,
     ip: Option<IpAddr>,
 }
 
 impl<S> FromRequestParts<S> for AuditService
 where
-    AuditLog: FromRef<S>,
-    Users: FromRef<S>,
+    SqlitePool: FromRef<S>,
     S: Send + Sync,
 {
     type Rejection = APIError;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, APIError> {
-        let log = AuditLog::from_ref(state);
+        let pool = SqlitePool::from_ref(state);
 
         let user: Option<User> = User::from_request_parts(parts, state).await.ok();
         let ip = ConnectInfo::<SocketAddr>::from_request_parts(parts, state)
@@ -35,14 +32,14 @@ where
             .ok()
             .map(|a| a.ip());
 
-        Ok(Self { log, ip, user })
+        Ok(Self { pool, ip, user })
     }
 }
 
 impl AuditService {
     #[cfg(test)]
-    pub fn new(log: AuditLog, user: Option<User>, ip: Option<IpAddr>) -> Self {
-        Self { log, user, ip }
+    pub fn new(pool: SqlitePool, user: Option<User>, ip: Option<IpAddr>) -> Self {
+        Self { pool, user, ip }
     }
 
     pub fn with_user(mut self, user: User) -> Self {
@@ -56,9 +53,7 @@ impl AuditService {
     }
 
     pub async fn log(&self, event: &AuditEvent, message: Option<String>) -> Result<(), APIError> {
-        self.log
-            .create(event, self.user.as_ref(), message, self.ip)
-            .await
+        crate::audit_log::create(&self.pool, event, self.user.as_ref(), message, self.ip).await
     }
 }
 
@@ -76,9 +71,11 @@ mod test {
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_log_event(pool: SqlitePool) {
         let service = AuditService {
-            log: AuditLog::new(pool.clone()),
+            pool: pool.clone(),
             ip: Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))),
-            user: Users::new(pool).get_by_username("admin1").await.unwrap(),
+            user: crate::authentication::user::get_by_username(&pool, "admin1")
+                .await
+                .unwrap(),
         };
 
         let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
@@ -89,7 +86,7 @@ mod test {
         service.log(&audit_event, message).await.unwrap();
 
         // Verify the event was logged by checking the audit log
-        let logged_events = service.log.list_all().await.unwrap();
+        let logged_events = crate::audit_log::list_all(&pool).await.unwrap();
         let event = logged_events.first().unwrap();
 
         assert_eq!(

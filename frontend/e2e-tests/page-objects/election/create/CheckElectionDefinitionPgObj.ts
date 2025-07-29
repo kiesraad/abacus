@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page } from "@playwright/test";
+import { BasePgObj } from "e2e-tests/page-objects/BasePgObj";
 
-export class CheckElectionDefinitionPgObj {
+export class CheckElectionDefinitionPgObj extends BasePgObj {
   readonly header: Locator;
   readonly hashInput1: Locator;
   readonly hashInput2: Locator;
@@ -8,6 +9,7 @@ export class CheckElectionDefinitionPgObj {
   readonly error: Locator;
 
   constructor(protected readonly page: Page) {
+    super(page);
     this.header = page.getByRole("heading", { level: 2, name: "Controleer verkiezingsdefinitie" });
     this.hashInput1 = page.getByLabel("Controle deel 1");
     this.hashInput2 = page.getByLabel("Controle deel 2");

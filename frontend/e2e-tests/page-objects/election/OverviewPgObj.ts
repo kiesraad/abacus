@@ -1,9 +1,8 @@
 import { type Locator, type Page } from "@playwright/test";
 
-import { NavBar } from "../NavBarPgObj";
+import { BasePgObj } from "../BasePgObj";
 
-export class OverviewPgObj {
-  readonly navBar: NavBar;
+export class OverviewPgObj extends BasePgObj {
   readonly main: Locator;
   readonly header: Locator;
   readonly alert: Locator;
@@ -12,7 +11,7 @@ export class OverviewPgObj {
   readonly electionsCreatedState: Locator;
 
   constructor(protected readonly page: Page) {
-    this.navBar = new NavBar(page);
+    super(page);
     this.main = page.getByRole("main");
     this.header = page.getByRole("heading", { name: "Beheer verkiezingen" });
     this.alert = page.getByRole("heading", { name: "Je account is ingesteld" });

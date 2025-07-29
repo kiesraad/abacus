@@ -1,11 +1,10 @@
 import { type Locator, type Page } from "@playwright/test";
 
-import { NavBar } from "../NavBarPgObj";
+import { BasePgObj } from "../BasePgObj";
 import { ProgressList } from "./ProgressListPgObj";
 import { UnsavedChangesModal } from "./UnsavedChangesModalPgObj";
 
-export class DataEntryBasePage {
-  readonly navBar: NavBar;
+export class DataEntryBasePage extends BasePgObj {
   readonly unsavedChangesModal: UnsavedChangesModal;
   readonly progressList: ProgressList;
 
@@ -16,7 +15,7 @@ export class DataEntryBasePage {
   readonly feedbackHeader: Locator;
 
   constructor(protected readonly page: Page) {
-    this.navBar = new NavBar(page);
+    super(page);
     this.unsavedChangesModal = new UnsavedChangesModal(page);
     this.progressList = new ProgressList(page);
 

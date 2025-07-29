@@ -16,8 +16,8 @@ test.describe("authentication", () => {
 
     await page.waitForURL("/elections");
 
-    await expect(loginPage.navbar.username).toHaveText("Sanne Molenaar");
-    await expect(loginPage.navbar.role).toHaveText("(Beheerder)");
+    await expect(loginPage.navBar.username).toHaveText("Sanne Molenaar");
+    await expect(loginPage.navBar.role).toHaveText("(Beheerder)");
   });
 
   test("login unhappy path", async ({ page }) => {

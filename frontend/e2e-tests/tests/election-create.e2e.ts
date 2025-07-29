@@ -10,7 +10,6 @@ import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/cr
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadDefinitionPgObj";
 import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
-import { NavBar } from "e2e-tests/page-objects/NavBarPgObj";
 
 import { test } from "../fixtures";
 import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
@@ -121,8 +120,7 @@ test.describe("Election creation", () => {
     await expect(checkDefinitionPage.header).toBeVisible();
 
     // Menu button back to election overview
-    const navBarPage = new NavBar(page);
-    await navBarPage.electionOverviewButton.click();
+    await overviewPage.navBar.electionOverviewButton.click();
 
     // Abort modal should have stopped navigation
     const abortModal = new AbortModalPgObj(page);
@@ -146,8 +144,7 @@ test.describe("Election creation", () => {
     await expect(checkDefinitionPage.header).toBeVisible();
 
     // Menu button back to election overview
-    const navBarPage = new NavBar(page);
-    await navBarPage.electionOverviewButton.click();
+    await checkDefinitionPage.navBar.electionOverviewButton.click();
 
     // Abort modal should have stopped navigation
     const abortModal = new AbortModalPgObj(page);
@@ -171,8 +168,7 @@ test.describe("Election creation", () => {
     await expect(checkDefinitionPage.header).toBeVisible();
 
     // Menu button back to election overview
-    const navBarPage = new NavBar(page);
-    await navBarPage.electionOverviewButton.click();
+    await checkDefinitionPage.navBar.electionOverviewButton.click();
 
     // Abort modal should have stopped navigation
     const abortModal = new AbortModalPgObj(page);
@@ -197,8 +193,7 @@ test.describe("Election creation", () => {
     await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
 
     // Menu button back to election overview
-    const navBarPage = new NavBar(page);
-    await navBarPage.electionOverviewButton.click();
+    await uploadCandidateDefinitionPage.navBar.electionOverviewButton.click();
 
     // Abort modal should have stopped navigation
     const AbortModal = new AbortModalPgObj(page);

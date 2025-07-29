@@ -44,7 +44,9 @@ pub fn generate_pdfs(
         }
 
         if let Err(e) = sender.send(None).await {
-            error!("Failed to send finish signal: {e:?}");
+            error!(
+                "Failed to send finish signal: {e} - the client might have closed the connection"
+            );
 
             return Err(PdfGenError::ChannelClosed);
         }

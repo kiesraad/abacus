@@ -11,10 +11,11 @@ interface NumberOfVotersFormProps {
   defaultValue?: number;
   instructions: string;
   hint: string | undefined;
+  button: string;
   onSubmit: (numberOfVoters: number) => void;
 }
 
-export function NumberOfVotersForm({ defaultValue, instructions, hint, onSubmit }: NumberOfVotersFormProps) {
+export function NumberOfVotersForm({ defaultValue, instructions, hint, button, onSubmit }: NumberOfVotersFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -42,7 +43,7 @@ export function NumberOfVotersForm({ defaultValue, instructions, hint, onSubmit 
 
             <FormLayout.Controls>
               <Button size="lg" type="submit">
-                {t("save")}
+                {button}
               </Button>
             </FormLayout.Controls>
           </FormLayout.Section>

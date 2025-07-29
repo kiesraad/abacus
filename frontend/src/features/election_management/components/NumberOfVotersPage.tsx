@@ -55,6 +55,7 @@ export function NumberOfVotersPage() {
             defaultValue={committeeSession.number_of_voters}
             instructions={instructions}
             hint={t("election_management.enter_a_number")}
+            button={t("save")}
             onSubmit={handleSubmit}
           />
         </article>

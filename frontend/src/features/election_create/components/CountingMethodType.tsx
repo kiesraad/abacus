@@ -22,7 +22,7 @@ export function CountingMethodType() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await navigate("/elections/create/check-and-save");
+    await navigate("/elections/create/number-of-voters");
   }
 
   return (

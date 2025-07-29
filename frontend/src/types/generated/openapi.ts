@@ -379,6 +379,7 @@ export interface CommitteeSession {
 export interface CommitteeSessionCreateRequest {
   election_id: number;
   number: number;
+  number_of_voters: number;
 }
 
 export interface CommitteeSessionDetails {
@@ -533,6 +534,7 @@ export interface ElectionAndCandidateDefinitionValidateRequest {
   candidate_hash?: string[];
   election_data: string;
   election_hash?: string[];
+  polling_station_data?: string;
 }
 
 export interface ElectionAndCandidatesDefinitionImportRequest {
@@ -540,6 +542,7 @@ export interface ElectionAndCandidatesDefinitionImportRequest {
   candidate_hash: string[];
   election_data: string;
   election_hash: string[];
+  polling_station_data?: string;
 }
 
 /**
@@ -559,6 +562,8 @@ export type ElectionCategory = "Municipal";
 export interface ElectionDefinitionValidateResponse {
   election: NewElection;
   hash: RedactedEmlHash;
+  number_of_voters: number;
+  polling_stations?: PollingStationRequest[];
 }
 
 export interface ElectionDetails {

@@ -939,7 +939,7 @@ pub mod tests {
 
         // Create a new committee session and set status to DataEntryInProgress
         let committee_session: CommitteeSession =
-            create_committee_session(pool.clone(), 2, 2).await;
+            create_committee_session(pool.clone(), 2, 2, 2).await;
         change_status_committee_session(
             pool.clone(),
             committee_session.id,

@@ -14,6 +14,8 @@ use super::{
     },
 };
 
+use crate::polling_station::PollingStationRequest;
+
 /// Election definition (110a and 110b)
 ///
 /// Use the `EMLDocument` methods to serialize to or deserialize from XML.
@@ -53,6 +55,10 @@ impl EML110 {
 
     fn election_domain(&self) -> Option<&ElectionDomain> {
         self.election_identifier().election_domain.as_ref()
+    }
+
+    fn contest(&self) -> &Contest {
+        &self.election().contest
     }
 
     pub fn as_abacus_election(&self) -> Result<crate::election::NewElection, EMLImportError> {
@@ -180,6 +186,55 @@ impl EML110 {
         Ok(election)
     }
 
+    ///
+    /// Extract polling places from a 110b
+    ///
+    pub fn get_polling_stations(
+        &self,
+    ) -> std::result::Result<Vec<PollingStationRequest>, EMLImportError> {
+        // we need to be importing from a 110b file
+        if self.base.id != "110b" {
+            return Err(EMLImportError::Needs110b);
+        }
+
+        // make sure there are polling places
+        if self.contest().polling_places.is_empty() {
+            return Err(EMLImportError::MissingPollingStations);
+        }
+
+        // extract polling places
+        let polling_places = self
+            .contest()
+            .polling_places
+            .iter()
+            .map(|place| place.try_into())
+            .collect::<Result<Vec<PollingStationRequest>, EMLImportError>>()?;
+
+        Ok(polling_places)
+    }
+
+    ///
+    /// Get number of voters from 110b
+    ///
+    pub fn get_number_of_voters(&self) -> std::result::Result<u32, EMLImportError> {
+        // we need to be importing from a 110b file
+        if self.base.id != "110b" {
+            return Err(EMLImportError::Needs110b);
+        }
+
+        // Get number of voters
+        let number_of_voters: u32;
+        if let Some(voters) = &self.contest().max_votes {
+            number_of_voters = voters
+                .parse()
+                .or(Err(EMLImportError::InvalidNumberOfVoters))?;
+        } else {
+            return Err(EMLImportError::InvalidNumberOfVoters);
+        }
+
+        Ok(number_of_voters)
+    }
+
     pub fn definition_from_abacus_election(
         election: &crate::election::ElectionWithPoliticalGroups,
         transaction_id: &str,
@@ -204,7 +259,7 @@ impl EML110 {
                     contest: Contest {
                         contest_identifier: Some(ContestIdentifier::geen()),
                         voting_method: VotingMethod::SinglePreferenceVote,
-                        max_votes: Some("".to_string()),
+                        max_votes: None,
                         polling_places: vec![],
                     },
                     number_of_seats: Some(election.number_of_seats),
@@ -396,6 +451,36 @@ pub struct PollingStation {
     token: String,
     #[serde(rename = "@Id")]
     id: String,
+}
+
+impl TryInto<PollingStationRequest> for &PollingPlace {
+    type Error = EMLImportError;
+
+    fn try_into(self) -> Result<PollingStationRequest, Self::Error> {
+        Ok(PollingStationRequest {
+            name: self
+                .physical_location
+                .address
+                .locality
+                .locality_name
+                .name
+                .clone(),
+            number: self
+                .physical_location
+                .polling_station
+                .id
+                .parse()
+                .or(Err(EMLImportError::InvalidPollingStation))?,
+            number_of_voters: None,
+            polling_station_type: None,
+            address: "".to_string(),
+            postal_code: match self.physical_location.address.locality.postal_code.clone() {
+                Some(code) => code.postal_code_number,
+                None => "".to_string(),
+            },
+            locality: "".to_string(),
+        })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -727,5 +812,45 @@ mod tests {
         let doc = EML110::from_str(data).unwrap();
         let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::InvalidVotingMethod));
+    }
+
+    #[test]
+    fn test_wrong_polling_station_file() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.get_polling_stations().unwrap_err();
+        assert!(matches!(res, EMLImportError::Needs110b));
+    }
+
+    #[test]
+    fn test_valid_polling_station_file() {
+        let data = include_str!("./tests/eml110b_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.get_polling_stations().unwrap();
+        assert!(!res.is_empty());
+    }
+
+    #[test]
+    fn test_empty_polling_station_file() {
+        let data = include_str!("./tests/eml110b_empty_polling_station.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.get_polling_stations().unwrap_err();
+        assert!(matches!(res, EMLImportError::MissingPollingStations));
+    }
+
+    #[test]
+    fn test_valid_number_of_voters() {
+        let data = include_str!("./tests/eml110b_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let number_of_voters = doc.get_number_of_voters().unwrap();
+        assert!(matches!(number_of_voters, 612694));
+    }
+
+    #[test]
+    fn test_invalid_number_of_voters() {
+        let data = include_str!("./tests/eml110b_invalid_number_of_voters.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let res = doc.get_number_of_voters().unwrap_err();
+        assert!(matches!(res, EMLImportError::InvalidNumberOfVoters));
     }
 }

@@ -158,6 +158,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .create(CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
+            number_of_voters: 0,
         })
         .await
         .expect("Failed to create committee session");

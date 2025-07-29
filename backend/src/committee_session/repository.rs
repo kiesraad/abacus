@@ -154,7 +154,7 @@ impl CommitteeSessions {
             committee_session.election_id,
             "",
             "",
-            ""
+            committee_session.number_of_voters,
         )
         .fetch_one(&self.0)
         .await

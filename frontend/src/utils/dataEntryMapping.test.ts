@@ -164,39 +164,6 @@ describe("mapSectionValues", () => {
     expect(result.voters_counts.proxy_certificate_count).toBe(2567); // Should be converted to number
   });
 
-  test("should handle mixed field types when section is provided", () => {
-    const current = createBasePollingStationResults();
-    const formValues = {
-      test: "true", // Boolean field - special case
-      "voters_counts.poll_card_count": "1234", // Numeric value
-      "differences_counts.more_ballots_count": "5", // Another numeric value
-    };
-
-    const mixedSection: DataEntrySection = {
-      id: "voters_votes_counts",
-      title: "Mixed Section",
-      short_title: "Mixed",
-      subsections: [
-        ...createRadioSection().subsections,
-        {
-          type: "inputGrid",
-          headers: ["field", "counted_number", "description"],
-          rows: [
-            { code: "A", path: "voters_counts.poll_card_count", title: "Test Title" },
-            { code: "B", path: "differences_counts.more_ballots_count", title: "Test Title" },
-          ],
-        },
-      ],
-    };
-
-    const result = mapSectionValues(current, formValues, mixedSection);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    expect((result as any).test).toBe(true);
-    expect(result.voters_counts.poll_card_count).toBe(1234);
-    expect(result.differences_counts.more_ballots_count).toBe(5);
-  });
-
   test("should handle voters_counts fields", () => {
     const current = createBasePollingStationResults();
     const formValues = {

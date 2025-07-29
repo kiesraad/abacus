@@ -3,6 +3,7 @@ import { RouteObject } from "react-router";
 import { NotAvailableInMock } from "@/components/error/NotAvailableInMock";
 import { t } from "@/i18n/translate";
 
+import { CommitteeSessionDetailsPage } from "./components/CommitteeSessionDetailsPage";
 import { ElectionHomePage } from "./components/ElectionHomePage";
 import { ElectionReportPage } from "./components/ElectionReportPage";
 import { FinishDataEntryPage } from "./components/FinishDataEntryPage";
@@ -10,6 +11,7 @@ import { NumberOfVotersPage } from "./components/NumberOfVotersPage";
 
 export const electionManagementRoutes: RouteObject[] = [
   { index: true, Component: ElectionHomePage },
+  { path: "details", Component: CommitteeSessionDetailsPage },
   { path: "number-of-voters", Component: NumberOfVotersPage },
   {
     path: "report",

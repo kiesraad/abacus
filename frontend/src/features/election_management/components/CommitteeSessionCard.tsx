@@ -144,10 +144,13 @@ export function CommitteeSessionCard({
       }
       break;
   }
-  // TODO: Add in issue #1750 with link
-  // if (isCoordinator) {
-  //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" });
-  // }
+  if (isCoordinator && currentSession) {
+    buttonLinks.push({
+      id: committeeSession.id,
+      label: t("election_management.committee_session_details"),
+      to: "details",
+    });
+  }
 
   return (
     <Card icon={icon} label={label} status={status} date={date} button={button} {...props}>

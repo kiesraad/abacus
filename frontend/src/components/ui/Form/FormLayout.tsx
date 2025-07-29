@@ -23,7 +23,7 @@ export function FormLayout({ children, disabled, width }: FormLayoutProps) {
 function FormSection({ children, title }: { children: React.ReactNode; title?: string }) {
   return (
     <section className={cls.formSection}>
-      {title && <h2>{title}</h2>}
+      {title && <h2 className="formSectionTitle">{title}</h2>}
       {children}
     </section>
   );

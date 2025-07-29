@@ -10,7 +10,7 @@ interface Element {
   children: AST;
 }
 
-export const DEFAULT_ALLOWED_TAGS = ["ul", "li", "p", "strong", "code", "h2", "h3", "h4"];
+export const DEFAULT_ALLOWED_TAGS = ["ul", "li", "p", "strong", "i", "code", "h2", "h3", "h4"];
 
 // parse the input string into an AST
 export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {

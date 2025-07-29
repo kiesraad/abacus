@@ -1,47 +1,42 @@
 #import "common/style.typ": conf, document_numbering
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-31-2.json")
+#let input = json("inputs/model-n-10-2.json")
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"
 ) { municipal } else { public_body }
 
-#let polling_station_number = 404
-#let polling_station_name = "Stembureau De Regenboog"
-#let is_mobile = false
+#let is_mobile = input.polling_station.polling_station_type == "Mobile"
 
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 #let location = is_municipality[gemeente][openbaar lichaam]
 
-#show: doc => conf(doc, header: [Stembureau #polling_station_number], footer: [Proces-verbaal van een stembureau \
+#show: doc => conf(doc, header: [Stembureau #input.polling_station.number], footer: [Proces-verbaal van een stembureau \
   Model N 10-2 centrale stemopneming])
 
 #set heading(numbering: none)
 
 #title_page(
-  [#input.election.location Stembureau #polling_station_number #polling_station_name],
+  [#input.election.location Stembureau #input.polling_station.number #input.polling_station.name],
   "",
   [#input.election.name #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst \
     Model N 10-2
-  ],
+  ]
 )
 
 == Details van het #if is_mobile { "mobiel stembureau" } else { "stembureau" }
 
-#TODO
+#location_name #sym.arrow.r Stembureau #input.polling_station.number
 
-Kieskring \<nummer> #sym.arrow.r #location_name #sym.arrow.r Stembureau #polling_station_number
+#input.polling_station.locality #TODO[tijdstip aanvang zitting] \
+#TODO[tijd:van - tot] #input.polling_station.name \
+#input.polling_station.address \
+#input.polling_station.postal_code #input.polling_station.locality
 
-#TODO
-
-\<Plaats> \<tijdstip aanvang zitting> \
-\<tijd:van> - \<tot> \<naam stembureau> \
-\<Adresregel 1> \
-\<Adresregel 2>  \
 
 #input.election.location #format_date(input.election.election_date)
 

@@ -9,6 +9,7 @@ pub enum AuthenticationError {
     NoSessionCookie,
     Database(sqlx::Error),
     HashPassword(password_hash::Error),
+    Forbidden,
     Unauthorized,
     Unauthenticated,
     PasswordRejection,

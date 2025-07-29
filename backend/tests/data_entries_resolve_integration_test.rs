@@ -2,7 +2,7 @@
 
 use std::net::SocketAddr;
 
-use abacus::data_entry::DataEntry;
+use abacus::{committee_session::status::CommitteeSessionStatus, data_entry::DataEntry};
 use axum::http::HeaderValue;
 use reqwest::{Client, Response, StatusCode};
 use sqlx::SqlitePool;
@@ -98,15 +98,16 @@ async fn resolve_differences(
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
-    let addr = utils::serve_api(pool).await;
+    let addr = utils::serve_api(pool.clone()).await;
 
-    let typist = shared::typist_login(&addr).await;
-    let res = shared::complete_data_entry(&addr, &typist, 1, 1, data_entry_with_error()).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    let res =
+        shared::complete_data_entry(&addr, &typist_cookie, 1, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
 
-    let coordinator = shared::coordinator_login(&addr).await;
-    let res = get_resolve_errors(&addr, &coordinator, 1).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let res = get_resolve_errors(&addr, &coordinator_cookie, 1).await;
     assert_eq!(res.status(), StatusCode::OK);
     let result: serde_json::Value = res.json().await.unwrap();
 
@@ -130,6 +131,17 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
         result["validation_results"]["warnings"],
         serde_json::json!([])
     );
+
+    shared::change_status_committee_session(
+        &addr,
+        &coordinator_cookie,
+        2,
+        CommitteeSessionStatus::DataEntryPaused,
+    )
+    .await;
+
+    let res = get_resolve_errors(&addr, &coordinator_cookie, 1).await;
+    assert_eq!(res.status(), StatusCode::OK);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -165,15 +177,25 @@ async fn test_polling_station_data_entry_resolve_errors_discard(pool: SqlitePool
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool) {
-    let addr = utils::serve_api(pool).await;
+    let addr = utils::serve_api(pool.clone()).await;
 
-    let typist = shared::typist_login(&addr).await;
-    let res = shared::complete_data_entry(&addr, &typist, 1, 1, data_entry_with_error()).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    let res =
+        shared::complete_data_entry(&addr, &typist_cookie, 1, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
 
-    let coordinator = shared::coordinator_login(&addr).await;
-    let res = resolve_errors(&addr, &coordinator, 1, "resume_first_entry").await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+
+    shared::change_status_committee_session(
+        &addr,
+        &coordinator_cookie,
+        2,
+        CommitteeSessionStatus::DataEntryPaused,
+    )
+    .await;
+
+    let res = resolve_errors(&addr, &coordinator_cookie, 1, "resume_first_entry").await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
     assert_eq!(body["status"], "first_entry_in_progress");
@@ -207,19 +229,19 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: Sqlit
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
-    let addr = utils::serve_api(pool).await;
+    let addr = utils::serve_api(pool.clone()).await;
     let (first_entry, second_entry) = different_data_entries();
 
-    let typist = shared::typist_login(&addr).await;
-    shared::complete_data_entry(&addr, &typist, 1, 1, first_entry).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    shared::complete_data_entry(&addr, &typist_cookie, 1, 1, first_entry).await;
 
-    let typist2 = shared::typist2_login(&addr).await;
-    let res = shared::complete_data_entry(&addr, &typist2, 1, 2, second_entry).await;
+    let typist2_cookie = shared::typist2_login(&addr).await;
+    let res = shared::complete_data_entry(&addr, &typist2_cookie, 1, 2, second_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "entries_different");
 
-    let coordinator = shared::coordinator_login(&addr).await;
-    let res = get_resolve_differences(&addr, &coordinator, 1).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let res = get_resolve_differences(&addr, &coordinator_cookie, 1).await;
     assert_eq!(res.status(), StatusCode::OK);
     let result: serde_json::Value = res.json().await.unwrap();
 
@@ -229,6 +251,17 @@ async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
         result["first_entry"]["voters_counts"]["poll_card_count"],
         result["second_entry"]["voters_counts"]["poll_card_count"]
     );
+
+    shared::change_status_committee_session(
+        &addr,
+        &coordinator_cookie,
+        2,
+        CommitteeSessionStatus::DataEntryPaused,
+    )
+    .await;
+
+    let res = get_resolve_differences(&addr, &coordinator_cookie, 1).await;
+    assert_eq!(res.status(), StatusCode::OK);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

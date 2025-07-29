@@ -5,6 +5,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -14,6 +15,10 @@ use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{AdminOrCoordinator, User},
+    committee_session::{
+        repository::CommitteeSessions,
+        status::{CommitteeSessionStatus, change_committee_session_status},
+    },
     election::repository::Elections,
 };
 
@@ -77,6 +82,7 @@ async fn polling_station_list(
     responses(
         (status = 201, description = "Polling station created successfully", body = PollingStation),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Election not found", body = ErrorResponse),
         (status = 409, description = "Polling station already exists", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -87,16 +93,22 @@ async fn polling_station_list(
 )]
 async fn polling_station_create(
     _user: AdminOrCoordinator,
-    State(polling_stations): State<PollingStations>,
-    State(elections): State<Elections>,
+    State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
     audit_service: AuditService,
     new_polling_station: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
-    // Check if the election exists, will respond with NOT_FOUND otherwise
-    elections.get(election_id).await?;
+    let polling_stations_repo = PollingStations::new(pool.clone());
+    let elections_repo = Elections::new(pool.clone());
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
 
-    let polling_station = polling_stations
+    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
+    elections_repo.get(election_id).await?;
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await?;
+
+    let polling_station = polling_stations_repo
         .create(election_id, new_polling_station)
         .await?;
 
@@ -106,6 +118,24 @@ async fn polling_station_create(
             None,
         )
         .await?;
+
+    if committee_session.status == CommitteeSessionStatus::Created {
+        change_committee_session_status(
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryNotStarted,
+            pool.clone(),
+            audit_service,
+        )
+        .await?;
+    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        change_committee_session_status(
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+            pool.clone(),
+            audit_service,
+        )
+        .await?;
+    };
 
     Ok((StatusCode::CREATED, polling_station))
 }
@@ -146,6 +176,7 @@ async fn polling_station_get(
     responses(
         (status = 200, description = "Polling station updated successfully", body = PollingStation),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -181,6 +212,7 @@ async fn polling_station_update(
     responses(
         (status = 200, description = "Polling station deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -191,30 +223,46 @@ async fn polling_station_update(
 )]
 async fn polling_station_delete(
     _user: AdminOrCoordinator,
-    State(polling_stations): State<PollingStations>,
+    State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<StatusCode, APIError> {
-    let polling_station = polling_stations
+    let polling_stations_repo = PollingStations::new(pool.clone());
+    let elections_repo = Elections::new(pool.clone());
+    let committee_sessions_repo = CommitteeSessions::new(pool.clone());
+
+    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
+    elections_repo.get(election_id).await?;
+    let committee_session = committee_sessions_repo
+        .get_election_committee_session(election_id)
+        .await?;
+
+    let polling_station = polling_stations_repo
         .get_for_election(election_id, polling_station_id)
         .await?;
 
-    let deleted = polling_stations
+    polling_stations_repo
         .delete(election_id, polling_station_id)
         .await?;
 
-    if deleted {
-        audit_service
-            .log(
-                &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
-                None,
-            )
-            .await?;
+    audit_service
+        .log(
+            &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
+            None,
+        )
+        .await?;
 
-        Ok(StatusCode::OK)
-    } else {
-        Ok(StatusCode::NOT_FOUND)
+    if polling_stations_repo.list(election_id).await?.is_empty() {
+        change_committee_session_status(
+            committee_session.id,
+            CommitteeSessionStatus::Created,
+            pool.clone(),
+            audit_service,
+        )
+        .await?;
     }
+
+    Ok(StatusCode::OK)
 }
 
 #[cfg(test)]

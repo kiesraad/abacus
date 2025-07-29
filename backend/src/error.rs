@@ -12,7 +12,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use tracing::error;
 use utoipa::ToSchema;
-use zip::result::ZipError;
 
 use crate::{
     MAX_BODY_SIZE_MB, apportionment::ApportionmentError,
@@ -33,6 +32,7 @@ pub enum ErrorReference {
     EmlImportError,
     EntryNotFound,
     EntryNotUnique,
+    Forbidden,
     InternalServerError,
     InvalidData,
     InvalidHash,
@@ -93,7 +93,7 @@ pub enum APIError {
     StdError(Box<dyn Error>),
     XmlDeError(DeError),
     XmlError(SeError),
-    ZipError(ZipError),
+    ZipError(String),
 }
 
 impl IntoResponse for APIError {
@@ -259,6 +259,10 @@ impl IntoResponse for APIError {
                     AuthenticationError::Unauthorized | AuthenticationError::Unauthenticated => (
                         StatusCode::UNAUTHORIZED,
                         to_error("Unauthorized", ErrorReference::Unauthorized, false),
+                    ),
+                    AuthenticationError::Forbidden => (
+                        StatusCode::FORBIDDEN,
+                        to_error("Forbidden", ErrorReference::Forbidden, true),
                     ),
                     AuthenticationError::PasswordRejection => (
                         StatusCode::BAD_REQUEST,

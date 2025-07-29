@@ -38,14 +38,18 @@ mod tests {
         middleware,
     };
     use http_body_util::BodyExt;
-    use hyper::{Method, header::CONTENT_TYPE};
+    use hyper::{
+        Method,
+        header::{CONTENT_TYPE, USER_AGENT},
+    };
     use sqlx::SqlitePool;
     use test_log::test;
     use tower::ServiceExt;
 
     use crate::{
-        AppState,
+        AppState, ErrorResponse,
         airgap::AirgapDetection,
+        audit_log::{AuditEvent, AuditLog, LogFilter, UserLoginFailedDetails},
         authentication::{
             api::{AccountUpdateRequest, Credentials, UserListResponse},
             middleware::extend_session,
@@ -53,6 +57,7 @@ mod tests {
             session::Sessions,
             *,
         },
+        error::ErrorReference,
     };
 
     fn create_app(pool: SqlitePool) -> Router {
@@ -132,6 +137,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_login_error(pool: SqlitePool) {
+        let audit_log = AuditLog::new(pool.clone());
         let app = create_app(pool);
 
         let response = app
@@ -140,6 +146,7 @@ mod tests {
                     .method(Method::POST)
                     .uri("/api/user/login")
                     .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, "Servo/1.0")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
                             username: "admin".to_string(),
@@ -153,6 +160,23 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+        let events = audit_log
+            .list(&LogFilter {
+                limit: 10,
+                ..Default::default()
+            })
+            .await
+            .unwrap();
+
+        assert_eq!(events.len(), 1);
+        assert_eq!(
+            events[0].event(),
+            &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
+                username: "admin".to_string(),
+                user_agent: "Servo/1.0".to_string(),
+            })
+        );
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -517,5 +541,32 @@ mod tests {
         assert_eq!(result.username(), "admin1");
         assert_eq!(result.fullname().unwrap(), "Test Full Name".to_string());
         assert_eq!(result.role(), Role::Administrator);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_forbidden_on_wrong_user_role(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+        let sessions = Sessions::new(pool);
+        // user id 5 is a typist
+        let session = sessions.create(5, SESSION_LIFE_TIME).await.unwrap();
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/user")
+                    .header("cookie", &cookie.encoded().to_string())
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::Forbidden);
     }
 }

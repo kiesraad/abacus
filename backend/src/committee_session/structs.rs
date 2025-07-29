@@ -4,9 +4,9 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
-use strum::VariantNames;
 use utoipa::ToSchema;
 
+use super::status::CommitteeSessionStatus;
 use crate::audit_log::CommitteeSessionDetails;
 
 /// Committee session
@@ -19,6 +19,7 @@ pub struct CommitteeSession {
     pub start_date: String,
     pub start_time: String,
     pub status: CommitteeSessionStatus,
+    pub number_of_voters: u32,
 }
 
 impl From<CommitteeSession> for CommitteeSessionDetails {
@@ -31,6 +32,7 @@ impl From<CommitteeSession> for CommitteeSessionDetails {
             session_start_date: value.start_date,
             session_start_time: value.start_time,
             session_status: value.status.to_string(),
+            session_number_of_voters: value.number_of_voters,
         }
     }
 }
@@ -46,6 +48,7 @@ impl IntoResponse for CommitteeSession {
 pub struct CommitteeSessionCreateRequest {
     pub number: u32,
     pub election_id: u32,
+    pub number_of_voters: u32,
 }
 
 /// Committee session update request
@@ -56,28 +59,14 @@ pub struct CommitteeSessionUpdateRequest {
     pub start_time: String,
 }
 
-/// Committee session status
-#[derive(
-    Serialize,
-    Deserialize,
-    VariantNames,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    Hash,
-    ToSchema,
-    Type,
-    strum::Display,
-)]
-#[serde(rename_all = "snake_case")]
-#[strum(serialize_all = "snake_case")]
-#[sqlx(rename_all = "snake_case")]
-pub enum CommitteeSessionStatus {
-    Created,
-    DataEntryNotStarted,
-    DataEntryInProgress,
-    DataEntryPaused,
-    DataEntryFinished,
+/// Committee session number of voters change request
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+pub struct CommitteeSessionNumberOfVotersChangeRequest {
+    pub number_of_voters: u32,
+}
+
+/// Committee session status change request
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+pub struct CommitteeSessionStatusChangeRequest {
+    pub status: CommitteeSessionStatus,
 }

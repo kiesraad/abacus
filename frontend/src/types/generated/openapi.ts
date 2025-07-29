@@ -14,6 +14,20 @@ export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
 export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
 
+// /api/committee_sessions/{committee_session_id}/status
+export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${number}/status`;
+export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
+
+// /api/committee_sessions/{committee_session_id}/voters
+export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${number}/voters`;
+export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSessionNumberOfVotersChangeRequest;
+
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
@@ -48,6 +62,12 @@ export interface ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
+
+// /api/elections/{election_id}/download_na_31_2_bijlage1
+export interface ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH = `/api/elections/${number}/download_na_31_2_bijlage1`;
 
 // /api/elections/{election_id}/download_pdf_results
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
@@ -232,6 +252,7 @@ export interface AccountUpdateRequest {
 
 export type AuditEvent =
   | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
+  | (UserLoginFailedDetails & { eventType: "UserLoginFailed" })
   | (UserLoggedOutDetails & { eventType: "UserLoggedOut" })
   | (UserDetails & { eventType: "UserAccountUpdated" })
   | { eventType: "UserSessionExtended" }
@@ -346,6 +367,7 @@ export interface CommitteeSession {
   id: number;
   location: string;
   number: number;
+  number_of_voters: number;
   start_date: string;
   start_time: string;
   status: CommitteeSessionStatus;
@@ -357,6 +379,7 @@ export interface CommitteeSession {
 export interface CommitteeSessionCreateRequest {
   election_id: number;
   number: number;
+  number_of_voters: number;
 }
 
 export interface CommitteeSessionDetails {
@@ -364,6 +387,7 @@ export interface CommitteeSessionDetails {
   sessionId: number;
   sessionLocation: string;
   sessionNumber: number;
+  sessionNumberOfVoters: number;
   sessionStartDate: string;
   sessionStartTime: string;
   sessionStatus: string;
@@ -377,6 +401,13 @@ export interface CommitteeSessionListResponse {
 }
 
 /**
+ * Committee session number of voters change request
+ */
+export interface CommitteeSessionNumberOfVotersChangeRequest {
+  number_of_voters: number;
+}
+
+/**
  * Committee session status
  */
 export type CommitteeSessionStatus =
@@ -385,6 +416,13 @@ export type CommitteeSessionStatus =
   | "data_entry_in_progress"
   | "data_entry_paused"
   | "data_entry_finished";
+
+/**
+ * Committee session status change request
+ */
+export interface CommitteeSessionStatusChangeRequest {
+  status: CommitteeSessionStatus;
+}
 
 /**
  * Committee session update request
@@ -489,7 +527,6 @@ export interface Election {
   name: string;
   nomination_date: string;
   number_of_seats: number;
-  number_of_voters: number;
 }
 
 export interface ElectionAndCandidateDefinitionValidateRequest {
@@ -497,6 +534,7 @@ export interface ElectionAndCandidateDefinitionValidateRequest {
   candidate_hash?: string[];
   election_data: string;
   election_hash?: string[];
+  polling_station_data?: string;
 }
 
 export interface ElectionAndCandidatesDefinitionImportRequest {
@@ -504,6 +542,7 @@ export interface ElectionAndCandidatesDefinitionImportRequest {
   candidate_hash: string[];
   election_data: string;
   election_hash: string[];
+  polling_station_data?: string;
 }
 
 /**
@@ -523,6 +562,8 @@ export type ElectionCategory = "Municipal";
 export interface ElectionDefinitionValidateResponse {
   election: NewElection;
   hash: RedactedEmlHash;
+  number_of_voters: number;
+  polling_stations?: PollingStationRequest[];
 }
 
 export interface ElectionDetails {
@@ -536,7 +577,6 @@ export interface ElectionDetails {
   electionName: string;
   electionNominationDate: string;
   electionNumberOfSeats: number;
-  electionNumberOfVoters: number;
 }
 
 /**
@@ -615,7 +655,6 @@ export interface ElectionWithPoliticalGroups {
   name: string;
   nomination_date: string;
   number_of_seats: number;
-  number_of_voters: number;
   political_groups: PoliticalGroup[];
 }
 
@@ -639,6 +678,7 @@ export type ErrorReference =
   | "EmlImportError"
   | "EntryNotFound"
   | "EntryNotUnique"
+  | "Forbidden"
   | "InternalServerError"
   | "InvalidData"
   | "InvalidHash"
@@ -740,7 +780,6 @@ export interface NewElection {
   name: string;
   nomination_date: string;
   number_of_seats: number;
-  number_of_voters: number;
   political_groups: PoliticalGroup[];
 }
 
@@ -1013,6 +1052,11 @@ export interface UserLoggedOutDetails {
   sessionDuration: number;
 }
 
+export interface UserLoginFailedDetails {
+  userAgent: string;
+  username: string;
+}
+
 export interface ValidationResult {
   code: ValidationResultCode;
   fields: string[];
@@ -1034,8 +1078,6 @@ export type ValidationResultCode =
   | "W202"
   | "W203"
   | "W205"
-  | "W206"
-  | "W208"
   | "W301"
   | "W302";
 

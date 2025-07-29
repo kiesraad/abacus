@@ -9,6 +9,7 @@ import cls from "./ElectionManagement.module.css";
 interface ElectionInformationTableProps {
   election: ElectionWithPoliticalGroups;
   numberOfPollingStations: number;
+  numberOfVoters: number;
 }
 
 function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
@@ -22,7 +23,11 @@ function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
   return label;
 }
 
-export function ElectionInformationTable({ election, numberOfPollingStations }: ElectionInformationTableProps) {
+export function ElectionInformationTable({
+  election,
+  numberOfPollingStations,
+  numberOfVoters,
+}: ElectionInformationTableProps) {
   return (
     <Table id="election-information-table" className={cn(cls.table, cls.electionInformationTable)}>
       <Table.Body>
@@ -49,23 +54,24 @@ export function ElectionInformationTable({ election, numberOfPollingStations }: 
           </Table.HeaderCell>
           <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
-        <Table.Row>
+        <Table.LinkRow to={"number-of-voters"}>
           <Table.HeaderCell scope="row" className="normal">
             {t("number_of_voters")}
           </Table.HeaderCell>
-          <Table.Cell>
-            {election.number_of_voters
-              ? formatNumber(election.number_of_voters)
-              : t("election_management.still_to_input")}
+          <Table.Cell className="underlined">
+            {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input")}
           </Table.Cell>
-        </Table.Row>
+        </Table.LinkRow>
         <Table.Row increasedPadding>
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.to_do_data_entry_for")}
           </Table.HeaderCell>
-          <Table.Cell></Table.Cell>
+          <Table.Cell>
+            {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+            {t("GSB")}
+          </Table.Cell>
         </Table.Row>
-        <Table.LinkRow key={election.id} to={`polling-stations`}>
+        <Table.LinkRow key={election.id} to="polling-stations">
           <Table.HeaderCell scope="row" className="normal">
             {t("polling_station.title.plural")}
           </Table.HeaderCell>

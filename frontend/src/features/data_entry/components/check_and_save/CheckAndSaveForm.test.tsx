@@ -160,7 +160,7 @@ describe("Test CheckAndSaveForm", () => {
 
   test("Data entry shows finalise button with accepted warnings", async () => {
     const formState = customFormState();
-    formState.sections.voters_votes_counts.acceptErrorsAndWarnings = true;
+    formState.sections.voters_votes_counts!.acceptErrorsAndWarnings = true;
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
@@ -180,7 +180,7 @@ describe("Test CheckAndSaveForm", () => {
       sections: {
         ...defaultState.sections,
         voters_votes_counts: {
-          ...defaultState.sections.voters_votes_counts,
+          ...defaultState.sections.voters_votes_counts!,
           errors: new ValidationResultSet([validationResultMockData.F201]),
           warnings: new ValidationResultSet([validationResultMockData.W203]),
           acceptErrorsAndWarnings: true,
@@ -213,7 +213,7 @@ describe("Test CheckAndSaveForm", () => {
       sections: {
         ...defaultState.sections,
         voters_votes_counts: {
-          ...defaultState.sections.voters_votes_counts,
+          ...defaultState.sections.voters_votes_counts!,
           errors: new ValidationResultSet([validationResultMockData.F201]),
           warnings: new ValidationResultSet([validationResultMockData.W203]),
           acceptErrorsAndWarnings: true,
@@ -284,7 +284,7 @@ describe("Test CheckAndSaveForm summary", () => {
 
   test("Accepted with warnings", async () => {
     const formState = customFormState();
-    formState.sections.differences_counts.acceptErrorsAndWarnings = true;
+    formState.sections.differences_counts!.acceptErrorsAndWarnings = true;
     overrideServerClaimDataEntryResponse({
       formState: formState,
       pollingStationResults: getInitialValues(),

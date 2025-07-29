@@ -7,9 +7,9 @@ mod embedded;
 mod external;
 
 #[cfg(feature = "embed-typst")]
-pub use embedded::{PdfGenError, generate_pdf};
+pub use embedded::{PdfGenError, generate_pdf, generate_pdfs};
 #[cfg(not(feature = "embed-typst"))]
-pub use external::{PdfGenError, generate_pdf};
+pub use external::{PdfGenError, generate_pdf, generate_pdfs};
 
 pub struct PdfGenResult {
     pub buffer: Vec<u8>,
@@ -22,11 +22,12 @@ pub(crate) mod tests {
 
     use super::*;
     use crate::{
+        committee_session::tests::committee_session_fixture,
         election::{
             ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
             tests::election_fixture,
         },
-        pdf_gen::models::PdfModel,
+        pdf_gen::models::ToPdfFileModel,
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
     };
@@ -59,7 +60,8 @@ pub(crate) mod tests {
 
     #[tokio::test]
     async fn it_generates_a_pdf() {
-        let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
+        let content = generate_pdf(ModelNa31_2Input {
+            committee_session: committee_session_fixture(1),
             election: ElectionWithPoliticalGroups {
                 id: 1,
                 name: "Municipal Election".to_string(),
@@ -67,7 +69,6 @@ pub(crate) mod tests {
                 election_id: "MunicipalElection_2025".to_string(),
                 location: "Heemdamseburg".to_string(),
                 domain_id: "0000".to_string(),
-                number_of_voters: 100,
                 category: ElectionCategory::Municipal,
                 number_of_seats: 29,
                 election_date: Utc::now().date_naive(),
@@ -79,7 +80,7 @@ pub(crate) mod tests {
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),
-        }))
+        }.to_pdf_file_model("file.pdf".into()))
         .await
         .unwrap();
 
@@ -89,14 +90,15 @@ pub(crate) mod tests {
     #[tokio::test]
     async fn it_generates_a_pdf_with_polling_stations() {
         let election = election_fixture(&[2, 3]);
-        let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
+        let content = generate_pdf(ModelNa31_2Input {
+            committee_session: committee_session_fixture(election.id),
             polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
             election,
             summary: ElectionSummary::zero(),
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),
-        }))
+        }.to_pdf_file_model("file.pdf".into()))
         .await
         .unwrap();
 

@@ -36,6 +36,8 @@ jobs:
         run: npm ci
       - name: Build with MSW
         run: npm run build:msw
+        env:
+          INCLUDE_STORYBOOK_LINK: true
       - name: Build Storybook
         run: npm run build:storybook
       - name: Deploy

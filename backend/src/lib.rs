@@ -10,7 +10,10 @@ use axum::{
     serve::ListenerExt,
 };
 use hyper::http::{HeaderName, HeaderValue, header};
-use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
+use sqlx::{
+    SqlitePool,
+    sqlite::{SqliteConnectOptions, SqliteJournalMode},
+};
 use tokio::{net::TcpListener, signal};
 use tower_http::{
     set_header::SetResponseHeaderLayer,
@@ -28,6 +31,7 @@ pub mod audit_log;
 pub mod authentication;
 pub mod committee_session;
 pub mod data_entry;
+pub mod document;
 pub mod election;
 pub mod eml;
 mod error;
@@ -39,6 +43,7 @@ pub mod report;
 pub mod summary;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
+pub mod zip;
 
 pub use error::{APIError, ErrorResponse};
 
@@ -64,6 +69,7 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
         .merge(election::router())
         .merge(polling_station::router())
         .merge(report::router())
+        .merge(document::router())
 }
 
 /// Axum router for the application
@@ -260,7 +266,9 @@ pub async fn create_sqlite_pool(
     #[cfg(feature = "dev-database")] seed_data: bool,
 ) -> Result<SqlitePool, Box<dyn Error>> {
     let db = format!("sqlite://{database}");
-    let opts = SqliteConnectOptions::from_str(&db)?.create_if_missing(true);
+    let opts = SqliteConnectOptions::from_str(&db)?
+        .create_if_missing(true)
+        .journal_mode(SqliteJournalMode::Wal);
 
     #[cfg(feature = "dev-database")]
     if reset_database {

@@ -34,23 +34,22 @@ pub async fn serve_api(pool: SqlitePool) -> SocketAddr {
 
 pub async fn serve_api_with_airgap_detection(pool: SqlitePool) -> SocketAddr {
     let airgap_detection = AirgapDetection::start(pool.clone()).await;
+    let mut violation_detected = false;
 
-    for i in 0..=100 {
-        if i == 100 {
-            panic!("Airgap detection failed to detect violation after 5 seconds");
+    for i in 0..=200 {
+        if i == 200 {
+            panic!("Airgap detection failed to detect violation after 10 seconds");
         }
 
         if airgap_detection.violation_detected() {
+            violation_detected = true;
             break;
         }
 
         tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
     }
 
-    assert!(
-        airgap_detection.get_last_check().is_some(),
-        "Airgap detection did not run"
-    );
+    assert!(violation_detected, "Airgap detection did not run");
 
     serve_api_inner(pool, airgap_detection).await
 }

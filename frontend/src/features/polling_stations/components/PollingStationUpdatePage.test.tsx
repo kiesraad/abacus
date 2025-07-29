@@ -82,11 +82,11 @@ describe("PollingStationUpdatePage", () => {
         </ElectionProvider>,
       );
 
-      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
+      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen?" });
       await user.click(deleteButton);
 
       const modal = await screen.findByTestId("modal-dialog");
-      expect(modal).toHaveTextContent("Stembureau verwijderen");
+      expect(modal).toHaveTextContent("Stembureau verwijderen?");
 
       const deletePollingStation = spyOnHandler(PollingStationDeleteHandler);
 
@@ -115,11 +115,11 @@ describe("PollingStationUpdatePage", () => {
         </ElectionProvider>,
       );
 
-      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
+      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen?" });
       await user.click(deleteButton);
 
       const modal = await screen.findByTestId("modal-dialog");
-      expect(modal).toHaveTextContent("Stembureau verwijderen");
+      expect(modal).toHaveTextContent("Stembureau verwijderen?");
 
       const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
       await user.click(confirmButton);

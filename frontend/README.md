@@ -31,7 +31,7 @@ npm run dev
 This runs the client with a (client-side) mock API:
 
 ```sh
-npm run dev:mock
+npm run dev:msw
 ```
 
 ### Linting

@@ -76,7 +76,7 @@ export function AuthorizationDialog() {
         <nav>
           <Button
             variant="primary"
-            size="lg"
+            size="xl"
             onClick={() => {
               void extendSession();
               setHideDialog(true);

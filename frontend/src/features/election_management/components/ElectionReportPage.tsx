@@ -1,65 +1,41 @@
+import { useNavigate } from "react-router";
+
+import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
-import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
+import {
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
+} from "@/types/generated/openapi";
+import { committeeSessionLabel } from "@/utils/committeeSession";
+import { formatFullDateWithoutTimezone } from "@/utils/format";
 
+import { directDownload } from "../utils/download";
 import cls from "./ElectionManagement.module.css";
 
-// Prompt the user to 'download' (i.e. save) a file
-function offerDownload(blob: Blob, filename: string) {
-  const file = new File([blob], filename);
-  const fileUrl = window.URL.createObjectURL(file);
-  const anchorElement = document.createElement("a");
-
-  anchorElement.href = fileUrl;
-  anchorElement.download = filename;
-  anchorElement.hidden = true;
-
-  document.body.appendChild(anchorElement);
-
-  anchorElement.click();
-  anchorElement.remove();
-
-  setTimeout(() => {
-    window.URL.revokeObjectURL(fileUrl);
-  }, 30000);
-}
-
-// Download a file from a URL and offer a download prompt to the user with the result
-async function downloadFrom(url: string) {
-  let filename: string;
-
-  try {
-    const res = await fetch(url);
-    if (res.status !== 200) {
-      const message = `Download failed: status code ${res.status}`;
-      throw new Error(message);
-    }
-    filename = res.headers.get("Content-Disposition")?.split('filename="')[1]?.slice(0, -1) ?? "document";
-    offerDownload(await res.blob(), filename);
-  } catch (e) {
-    console.error(e);
-  }
-}
-
 export function ElectionReportPage() {
-  const { election } = useElection();
-  const { statuses } = useElectionStatus();
-
-  // Safeguard so users cannot circumvent the check via the browser's address bar
-  if (statuses.some((s) => s.status !== "definitive")) {
-    throw new Error("Election not ready for finalisation");
-  }
+  const { committeeSession, election } = useElection();
+  const client = useApiClient();
+  const navigate = useNavigate();
 
   function downloadPdfResults() {
-    void downloadFrom(`/api/elections/${election.id}/download_pdf_results`);
+    directDownload(`/api/elections/${election.id}/download_pdf_results`);
   }
 
   function downloadZipResults() {
-    void downloadFrom(`/api/elections/${election.id}/download_zip_results`);
+    directDownload(`/api/elections/${election.id}/download_zip_results`);
+  }
+
+  function handleResume() {
+    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
+    void client.putRequest(url, body).then(() => {
+      void navigate("../../status");
+    });
   }
 
   return (
@@ -67,21 +43,37 @@ export function ElectionReportPage() {
       <PageTitle title={`${t("election.title.finish_data_entry")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("election_report.finish_data_entry_current_session")}</h1>
+          <h1>{committeeSessionLabel(committeeSession.number)}</h1>
         </section>
       </header>
       <main>
         <article>
-          <h2 className="form_title">{t("election_report.finish_data_entry_phase")}</h2>
+          <h2 className="form_title">
+            {t("election_report.counting_results")} {committeeSessionLabel(committeeSession.number).toLowerCase()}{" "}
+            {t("municipality").toLowerCase()} {election.location}
+          </h2>
           <div className={cls.reportInfoSection}>
-            {t("election_report.about_to_stop_data_entry")}
-            {tx("election_report.data_entry_finish_steps_explanation")}
-            {t("election_report.for_recount_new_session_needed")}
+            {t("election_report.committee_session_started", {
+              date: committeeSession.start_date
+                ? formatFullDateWithoutTimezone(new Date(committeeSession.start_date))
+                : "",
+              time: committeeSession.start_time,
+            })}
+            .<br />
+            {t("election_report.there_was_counting_method", { method: t(election.counting_method).toLowerCase() })}.
           </div>
-          <FormLayout.Controls>
+          <div className={cls.reportInfoSection}>
             <Button onClick={downloadZipResults}>{t("election_report.download_zip")}</Button>
+            <br />
+            <br />
             <Button variant="secondary" onClick={downloadPdfResults}>
               {t("election_report.download_report")}
+            </Button>
+          </div>
+          <FormLayout.Controls>
+            <Button.Link to="../..">{t("election_report.back_to_overview")}</Button.Link>
+            <Button variant="secondary" onClick={handleResume}>
+              {t("election_report.resume_data_entry")}
             </Button>
           </FormLayout.Controls>
         </article>

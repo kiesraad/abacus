@@ -146,29 +146,29 @@
   --border-color-default: var(--bg-gray-darkest);
   --border-color-focus: var(--interactive-default);
 
-  --color-error: #e35f77;
-  --color-error-darker: #d03651;
-  --color-error-darkest: #b02d45;
-  --color-error-bg: #fbe9ed;
-  --color-error-hover: #f6cad2;
+  --color-error: var(--red-500);
+  --color-error-darker: var(--red-600);
+  --color-error-darkest: var(--red-700);
+  --color-error-bg: var(--red-100);
+  --color-error-hover: var(--red-200);
 
   --color-warning: var(--orange-500);
-  --color-warning-darker: #d4690b;
-  --color-warning-bg: #fef4d7;
-  --color-warning-hover: #fedf89;
+  --color-warning-darker: var(--orange-600);
+  --color-warning-bg: var(--orange-100);
+  --color-warning-hover: var(--orange-200);
 
-  --color-notify: #366fca;
-  --color-notify-bg: #e7eef9;
-  --color-notify-hover: #c5d6f1;
+  --color-notify: var(--blue-600);
+  --color-notify-bg: var(--blue-100);
+  --color-notify-hover: var(--blue-200);
 
-  --color-success: #248052;
-  --color-success-bg: #e7f3ee;
-  --color-success-hover: #b8ddca;
+  --color-success: var(--green-600);
+  --color-success-bg: var(--green-100);
+  --color-success-hover: var(--green-200);
 
   --color-help-text: var(--gray-600);
   --color-hover: var(--gray-200);
 
-  --bg-gray: #f9fafb;
+  --bg-gray: var(--gray-50);
   --bg-gray-darker: var(--gray-100);
   --bg-gray-darkest: var(--gray-300);
   --bg-highlight: #eff4ff;
@@ -215,10 +215,10 @@
   --badge-definitive: var(--base-white);
   --badge-definitive-bg: var(--base-dark-blue);
 
-  --progress-bar-default: #366fca;
+  --progress-bar-default: var(--blue-600);
   --progress-bar-errors-and-warnings: var(--color-error-darker);
   --progress-bar-unfinished: var(--color-warning);
-  --progress-bar-in-progress: #efc943;
+  --progress-bar-in-progress: var(--yellow-300);
   --progress-bar-first-entry-finished: #66c61c;
   --progress-bar-definitive: var(--color-success);
   --progress-bar-not-started: var(--gray-200);

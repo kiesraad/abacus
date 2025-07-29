@@ -161,7 +161,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
       {tx("data_entry.abort.description")}
       <nav>
         <Button
-          size="lg"
+          size="xl"
           onClick={() => {
             void onAbortModalSave();
           }}
@@ -171,7 +171,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
           {t("data_entry.abort.save_input")}
         </Button>
         <Button
-          size="lg"
+          size="xl"
           variant="secondary"
           onClick={() => {
             void onAbortModalDelete();

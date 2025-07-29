@@ -19,7 +19,10 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse,
-    audit_log::{AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails},
+    audit_log::{
+        AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
+        UserLoginFailedDetails,
+    },
     error::ErrorReference,
 };
 
@@ -98,6 +101,7 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     responses(
         (status = 200, description = "The logged in user id and user name", body = LoginResponse),
         (status = 401, description = "Invalid credentials", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -110,20 +114,29 @@ async fn login(
     Json(credentials): Json<Credentials>,
 ) -> Result<impl IntoResponse, APIError> {
     let Credentials { username, password } = credentials;
+    let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
 
     // Check the username + password combination, do not leak information about usernames etc.
-    let user = users
-        .authenticate(&username, &password)
-        .await
-        .map_err(|e| match e {
-            AuthenticationError::UserNotFound => AuthenticationError::InvalidUsernameOrPassword,
-            AuthenticationError::InvalidPassword => AuthenticationError::InvalidUsernameOrPassword,
-            e => e,
-        })?;
+    // Log when the attempt fails
+    let user = match users.authenticate(&username, &password).await {
+        Ok(u) => Ok(u),
+        Err(AuthenticationError::UserNotFound) | Err(AuthenticationError::InvalidPassword) => {
+            audit_service
+                .log(
+                    &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
+                        username,
+                        user_agent: user_agent.clone(),
+                    }),
+                    None,
+                )
+                .await?;
+            Err(AuthenticationError::InvalidUsernameOrPassword)
+        }
+        e => e,
+    }?;
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
     sessions.delete_expired_sessions().await?;
-    let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
 
     // Create a new session and cookie
     let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
@@ -286,6 +299,7 @@ pub struct UserListResponse {
     responses(
         (status = 200, description = "User list", body = UserListResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -327,6 +341,7 @@ pub struct UpdateUserRequest {
     responses(
         (status = 201, description = "User created", body = User),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -360,6 +375,7 @@ pub async fn user_create(
     responses(
         (status = 200, description = "User found", body = User),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -384,6 +400,7 @@ async fn user_get(
     responses(
         (status = 200, description = "User updated", body = User),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -427,6 +444,7 @@ pub async fn user_update(
     responses(
         (status = 200, description = "User deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -467,7 +485,7 @@ mod tests {
 
     use crate::authentication::{SECURE_COOKIES, api::set_default_cookie_properties};
 
-    #[test(sqlx::test)]
+    #[test(tokio::test)]
     async fn test_set_default_cookie_properties() {
         let mut cookie = Cookie::new("test-cookie", "");
 

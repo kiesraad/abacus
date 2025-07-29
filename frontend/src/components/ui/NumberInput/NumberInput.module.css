@@ -5,7 +5,12 @@
   :global(.formatted-overlay) {
     position: absolute;
     background: white;
+
+    /* Mouse clicks should go through the overlay, to the actual input */
     pointer-events: none;
+
+    /* When selecting and copying the whole page, prevent copying the overlay value as well */
+    user-select: none;
 
     /* Same as input border */
     inset: 2px;

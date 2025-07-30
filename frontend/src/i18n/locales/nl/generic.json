@@ -47,6 +47,7 @@
   "municipality": "Gemeente",
   "name": "Naam",
   "next": "Volgende",
+  "no": "Nee",
   "no_file_chosen": "Geen bestand gekozen",
   "not_yet_finished": "nog niet afgerond",
   "number": "Nummer",
@@ -80,6 +81,7 @@
   "user": "Gebruiker",
   "version": "Versie",
   "vote_count": "Aantal stemmen",
+  "yes": "Ja",
   "yesterday": "gisteren",
   "you_are_here": "je bent hier"
 }

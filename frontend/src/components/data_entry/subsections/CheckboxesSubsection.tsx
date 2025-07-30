@@ -19,7 +19,7 @@ export function CheckboxesSubsectionComponent({
   readOnly = false,
 }: CheckboxesSubsectionProps) {
   return (
-    <div className={`radio-form ${cls.container}`}>
+    <fieldset className={`radio-form ${cls.container}`}>
       {subsection.title && <legend>{subsection.title}</legend>}
       <ChoiceList>
         {errorsAndWarnings?.get(`data.${subsection.error_path}`) && (
@@ -42,6 +42,6 @@ export function CheckboxesSubsectionComponent({
           />
         ))}
       </ChoiceList>
-    </div>
+    </fieldset>
   );
 }

@@ -3,6 +3,7 @@ import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/Candidates
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
@@ -25,12 +26,31 @@ export async function selectPollingStationForDataEntry(page: Page, pollingStatio
   await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
   await dataEntryHomePage.clickStart();
 
+  const extraInvestigationPage = new ExtraInvestigationPage(page);
+  await expect(extraInvestigationPage.fieldset).toBeVisible();
+  await extraInvestigationPage.inputExtraInvestigation({
+    extra_investigation_other_reason: {
+      yes: false,
+      no: true,
+    },
+    ballots_recounted_extra_investigation: {
+      yes: false,
+      no: true,
+    },
+  });
+  await extraInvestigationPage.clickNext();
+
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();
   return votersAndVotesPage;
 }
 
 export async function fillDataEntryPages(page: Page, results: PollingStationResults) {
+  const extraInvestigationPage = new ExtraInvestigationPage(page);
+  await expect(extraInvestigationPage.fieldset).toBeVisible();
+  await extraInvestigationPage.inputExtraInvestigation(results.extra_investigation);
+  await extraInvestigationPage.clickNext();
+
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();
   await votersAndVotesPage.fillInPageAndClickNext(results.voters_counts, results.votes_counts);

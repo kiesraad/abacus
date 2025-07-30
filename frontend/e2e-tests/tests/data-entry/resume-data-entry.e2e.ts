@@ -5,6 +5,7 @@ import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/Candidates
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 
 import { PollingStation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
@@ -19,6 +20,20 @@ test.use({
 test.describe("resume data entry flow", () => {
   const fillFirstTwoPagesAndAbort = async (page: Page, pollingStation: PollingStation) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+
+    const extraInvestigationPage = new ExtraInvestigationPage(page);
+    await expect(extraInvestigationPage.fieldset).toBeVisible();
+    await extraInvestigationPage.inputExtraInvestigation({
+      extra_investigation_other_reason: {
+        yes: false,
+        no: true,
+      },
+      ballots_recounted_extra_investigation: {
+        yes: false,
+        no: true,
+      },
+    });
+    await extraInvestigationPage.clickNext();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -45,8 +60,8 @@ test.describe("resume data entry flow", () => {
 
   test("Closing abort modal with X only closes the modal", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
-    const votersAndVotesPage = new VotersAndVotesPage(page);
-    await votersAndVotesPage.abortInput.click();
+    const extraInvestigationPage = new ExtraInvestigationPage(page);
+    await extraInvestigationPage.abortInput.click();
 
     const abortInputModal = new AbortInputModal(page);
     await expect(abortInputModal.heading).toBeVisible();
@@ -61,7 +76,7 @@ test.describe("resume data entry flow", () => {
     await expect(abortInputModal.heading).toBeHidden();
     expect(requestMade).toBe(false);
 
-    await expect(votersAndVotesPage.fieldset).toBeVisible();
+    await expect(extraInvestigationPage.fieldset).toBeVisible();
   });
 
   test.describe("resume after saving", () => {
@@ -121,6 +136,20 @@ test.describe("resume data entry flow", () => {
     test("save input from voters and votes page with error", async ({ page, request, pollingStation }) => {
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await expect(extraInvestigationPage.fieldset).toBeVisible();
+      await extraInvestigationPage.inputExtraInvestigation({
+        extra_investigation_other_reason: {
+          yes: false,
+          no: true,
+        },
+        ballots_recounted_extra_investigation: {
+          yes: false,
+          no: true,
+        },
+      });
+      await extraInvestigationPage.clickNext();
+
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       await votersAndVotesPage.proxyCertificateCount.fill("1000");
@@ -146,6 +175,16 @@ test.describe("resume data entry flow", () => {
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
           ...emptyDataEntryResponse.data,
+          extra_investigation: {
+            extra_investigation_other_reason: {
+              yes: false,
+              no: true,
+            },
+            ballots_recounted_extra_investigation: {
+              yes: false,
+              no: true,
+            },
+          },
           voters_counts: {
             poll_card_count: 0,
             proxy_certificate_count: 1000,
@@ -178,6 +217,20 @@ test.describe("resume data entry flow", () => {
 
     test("save input from voters and votes page with warning", async ({ page, request, pollingStation }) => {
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await expect(extraInvestigationPage.fieldset).toBeVisible();
+      await extraInvestigationPage.inputExtraInvestigation({
+        extra_investigation_other_reason: {
+          yes: false,
+          no: true,
+        },
+        ballots_recounted_extra_investigation: {
+          yes: false,
+          no: true,
+        },
+      });
+      await extraInvestigationPage.clickNext();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -213,6 +266,16 @@ test.describe("resume data entry flow", () => {
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
           ...emptyDataEntryResponse.data,
+          extra_investigation: {
+            extra_investigation_other_reason: {
+              yes: false,
+              no: true,
+            },
+            ballots_recounted_extra_investigation: {
+              yes: false,
+              no: true,
+            },
+          },
           voters_counts: {
             poll_card_count: 100,
             proxy_certificate_count: 0,
@@ -248,6 +311,20 @@ test.describe("resume data entry flow", () => {
     test("resuming with unsubmitted input (cached data) shows that data", async ({ page, pollingStation }) => {
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await expect(extraInvestigationPage.fieldset).toBeVisible();
+      await extraInvestigationPage.inputExtraInvestigation({
+        extra_investigation_other_reason: {
+          yes: false,
+          no: true,
+        },
+        ballots_recounted_extra_investigation: {
+          yes: false,
+          no: true,
+        },
+      });
+      await extraInvestigationPage.clickNext();
+
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       const voters: VotersCounts = {
@@ -272,6 +349,20 @@ test.describe("resume data entry flow", () => {
 
     test("save unsubmitted input when changing voters data works", async ({ page, pollingStation }) => {
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await expect(extraInvestigationPage.fieldset).toBeVisible();
+      await extraInvestigationPage.inputExtraInvestigation({
+        extra_investigation_other_reason: {
+          yes: false,
+          no: true,
+        },
+        ballots_recounted_extra_investigation: {
+          yes: false,
+          no: true,
+        },
+      });
+      await extraInvestigationPage.clickNext();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -298,6 +389,20 @@ test.describe("resume data entry flow", () => {
       const { page } = typistOne;
 
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await expect(extraInvestigationPage.fieldset).toBeVisible();
+      await extraInvestigationPage.inputExtraInvestigation({
+        extra_investigation_other_reason: {
+          yes: false,
+          no: true,
+        },
+        ballots_recounted_extra_investigation: {
+          yes: false,
+          no: true,
+        },
+      });
+      await extraInvestigationPage.clickNext();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       const voters: VotersCounts = {
@@ -358,6 +463,15 @@ test.describe("resume data entry flow", () => {
 
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
+      // extra investigation section should be empty
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await expect(extraInvestigationPage.fieldset).toBeVisible();
+      await expect(extraInvestigationPage.extraInvestigationOtherReasonYes).not.toBeChecked();
+      await expect(extraInvestigationPage.extraInvestigationOtherReasonNo).not.toBeChecked();
+      await expect(extraInvestigationPage.ballotsRecountedYes).not.toBeChecked();
+      await expect(extraInvestigationPage.ballotsRecountedNo).not.toBeChecked();
+      await extraInvestigationPage.clickNext();
+
       // voters and votes page should have empty fields
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.pollCardCount).toBeEmpty();
@@ -368,6 +482,20 @@ test.describe("resume data entry flow", () => {
       const { page, request } = typistOne;
 
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await expect(extraInvestigationPage.fieldset).toBeVisible();
+      await extraInvestigationPage.inputExtraInvestigation({
+        extra_investigation_other_reason: {
+          yes: false,
+          no: true,
+        },
+        ballots_recounted_extra_investigation: {
+          yes: false,
+          no: true,
+        },
+      });
+      await extraInvestigationPage.clickNext();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -394,6 +522,20 @@ test.describe("resume data entry flow", () => {
       const { page, request } = typistOne;
 
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await expect(extraInvestigationPage.fieldset).toBeVisible();
+      await extraInvestigationPage.inputExtraInvestigation({
+        extra_investigation_other_reason: {
+          yes: false,
+          no: true,
+        },
+        ballots_recounted_extra_investigation: {
+          yes: false,
+          no: true,
+        },
+      });
+      await extraInvestigationPage.clickNext();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -432,6 +574,20 @@ test.describe("resume data entry flow", () => {
       const { page, request } = typistOne;
 
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await expect(extraInvestigationPage.fieldset).toBeVisible();
+      await extraInvestigationPage.inputExtraInvestigation({
+        extra_investigation_other_reason: {
+          yes: false,
+          no: true,
+        },
+        ballots_recounted_extra_investigation: {
+          yes: false,
+          no: true,
+        },
+      });
+      await extraInvestigationPage.clickNext();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       const voters: VotersCounts = {

@@ -17,6 +17,16 @@ const createBasePollingStationResults = (): PollingStationResults => ({
     other_explanation_count: 0,
     no_explanation_count: 0,
   },
+  extra_investigation: {
+    extra_investigation_other_reason: {
+      yes: false,
+      no: false,
+    },
+    ballots_recounted_extra_investigation: {
+      yes: false,
+      no: false,
+    },
+  },
   political_group_votes: [],
   voters_counts: {
     poll_card_count: 0,

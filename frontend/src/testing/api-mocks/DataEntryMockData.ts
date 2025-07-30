@@ -37,6 +37,16 @@ export const emptyData: PollingStationResults = {
     other_explanation_count: 0,
     no_explanation_count: 0,
   },
+  extra_investigation: {
+    extra_investigation_other_reason: {
+      yes: false,
+      no: false,
+    },
+    ballots_recounted_extra_investigation: {
+      yes: false,
+      no: false,
+    },
+  },
   political_group_votes: electionMockData.political_groups.map((group) => ({
     number: group.number,
     total: 0,
@@ -80,6 +90,16 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       too_many_ballots_handed_out_count: 0,
       other_explanation_count: 0,
       no_explanation_count: 0,
+    },
+    extra_investigation: {
+      extra_investigation_other_reason: {
+        yes: false,
+        no: false,
+      },
+      ballots_recounted_extra_investigation: {
+        yes: false,
+        no: false,
+      },
     },
     political_group_votes: [
       {
@@ -126,6 +146,16 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       too_many_ballots_handed_out_count: 0,
       other_explanation_count: 0,
       no_explanation_count: 0,
+    },
+    extra_investigation: {
+      extra_investigation_other_reason: {
+        yes: false,
+        no: false,
+      },
+      ballots_recounted_extra_investigation: {
+        yes: false,
+        no: false,
+      },
     },
     political_group_votes: [
       {

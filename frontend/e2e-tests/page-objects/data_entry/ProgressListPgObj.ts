@@ -2,6 +2,8 @@ import { type Locator, type Page } from "@playwright/test";
 
 export class ProgressList {
   readonly navElement: Locator;
+  readonly extraInvestigation: Locator;
+  readonly extraInvestigationIcon: Locator;
   readonly votersAndVotes: Locator;
   readonly votersAndVotesIcon: Locator;
   readonly differences: Locator;
@@ -12,6 +14,8 @@ export class ProgressList {
   constructor(protected readonly page: Page) {
     this.navElement = page.getByRole("navigation");
 
+    this.extraInvestigation = this.navElement.getByRole("listitem").filter({ hasText: "Extra onderzoek" });
+    this.extraInvestigationIcon = this.extraInvestigation.getByRole("img");
     this.votersAndVotes = this.navElement.getByRole("listitem").filter({ hasText: "Aantal kiezers en stemmen" });
     this.votersAndVotesIcon = this.votersAndVotes.getByRole("img");
     this.differences = this.navElement.getByRole("listitem").filter({ hasText: "Verschillen" });

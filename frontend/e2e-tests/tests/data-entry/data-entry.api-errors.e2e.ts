@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
+import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 
@@ -97,6 +98,20 @@ test.describe("data entry - api error responses", () => {
   test("4xx non-fatal response results in error shown", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
+    const extraInvestigationPage = new ExtraInvestigationPage(page);
+    await expect(extraInvestigationPage.fieldset).toBeVisible();
+    await extraInvestigationPage.inputExtraInvestigation({
+      extra_investigation_other_reason: {
+        yes: false,
+        no: true,
+      },
+      ballots_recounted_extra_investigation: {
+        yes: false,
+        no: true,
+      },
+    });
+    await extraInvestigationPage.clickNext();
+
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     const voters: VotersCounts = {
@@ -137,6 +152,20 @@ test.describe("data entry - api error responses", () => {
 
   test("5xx fatal response results in error shown", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+
+    const extraInvestigationPage = new ExtraInvestigationPage(page);
+    await expect(extraInvestigationPage.fieldset).toBeVisible();
+    await extraInvestigationPage.inputExtraInvestigation({
+      extra_investigation_other_reason: {
+        yes: false,
+        no: true,
+      },
+      ballots_recounted_extra_investigation: {
+        yes: false,
+        no: true,
+      },
+    });
+    await extraInvestigationPage.clickNext();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();

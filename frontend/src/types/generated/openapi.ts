@@ -711,6 +711,18 @@ export interface ErrorResponse {
 }
 
 /**
+ * Extra investigation, part of the polling station results ("B1-1 Extra onderzoek")
+ */
+export interface ExtraInvestigation {
+  /** Whether ballots were (partially) recounted following the extra investigation
+("Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?") */
+  ballots_recounted_extra_investigation: YesNo;
+  /** Whether extra investigation was done for another reason than an unexplained difference
+("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?") */
+  extra_investigation_other_reason: YesNo;
+}
+
+/**
  * Fraction with the integer part split out for display purposes
  */
 export interface Fraction {
@@ -917,6 +929,8 @@ export interface PollingStationRequest {
 export interface PollingStationResults {
   /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
   differences_counts: DifferencesCounts;
+  /** Extra investigation ("B1-1 Extra onderzoek") */
+  extra_investigation: ExtraInvestigation;
   /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
   political_group_votes: PoliticalGroupVotes[];
   /** Voters counts ("1. Aantal toegelaten kiezers") */
@@ -1113,4 +1127,12 @@ export interface VotesCounts {
   /** Number of valid votes on candidates
 ("Aantal stembiljetten met een geldige stem op een kandidaat") */
   votes_candidates_count: number;
+}
+
+/**
+ * Yes/No response structure for boolean questions with separate yes and no fields.
+ */
+export interface YesNo {
+  no: boolean;
+  yes: boolean;
 }

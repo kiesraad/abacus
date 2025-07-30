@@ -11,6 +11,7 @@ import election_management from "./election_management.json";
 import election_report from "./election_report.json";
 import election_status from "./election_status.json";
 import error from "./error.json";
+import extra_investigation from "./extra_investigation.json";
 import feedback from "./feedback.json";
 import form_errors from "./form_errors.json";
 import generic from "./generic.json";
@@ -38,6 +39,7 @@ const nl = {
   differences_counts,
   election,
   election_management,
+  extra_investigation,
   election_report,
   election_status,
   error,

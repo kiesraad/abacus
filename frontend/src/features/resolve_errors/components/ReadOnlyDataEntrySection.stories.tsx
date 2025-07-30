@@ -29,6 +29,16 @@ const pollingStationResults: PollingStationResults = {
     other_explanation_count: 0,
     no_explanation_count: 1,
   },
+  extra_investigation: {
+    extra_investigation_other_reason: {
+      yes: false,
+      no: false,
+    },
+    ballots_recounted_extra_investigation: {
+      yes: false,
+      no: false,
+    },
+  },
   political_group_votes: [
     {
       number: 1,

@@ -33,6 +33,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
     let data_entry = DataEntry {
         progress: 100,
         data: PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 1203,
                 proxy_certificate_count: 2,
@@ -90,6 +91,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     let data_entry = DataEntry {
         progress: 100,
         data: PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 1203,
                 proxy_certificate_count: 2,
@@ -168,6 +170,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
     let data_entry = DataEntry {
         progress: 100,
         data: PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 102,
                 proxy_certificate_count: 2,

@@ -64,15 +64,21 @@ function Body({ children, className }: { children: React.ReactNode; className?: 
 }
 
 function Row({
+  id,
   children,
   increasedPadding,
   className,
 }: {
+  id?: string;
   children: React.ReactNode;
   increasedPadding?: boolean;
   className?: string;
 }) {
-  return <tr className={cn(increasedPadding && cls.increasedPadding, className)}>{children}</tr>;
+  return (
+    <tr id={id} className={cn(increasedPadding && cls.increasedPadding, className)}>
+      {children}
+    </tr>
+  );
 }
 
 function ClickRow({
@@ -91,7 +97,17 @@ function ClickRow({
   );
 }
 
-function LinkRow({ children, to, className }: { children: React.ReactNode; to: To; className?: string }) {
+function LinkRow({
+  id,
+  children,
+  to,
+  className,
+}: {
+  id?: string;
+  children: React.ReactNode;
+  to: To;
+  className?: string;
+}) {
   const navigate = useNavigate();
 
   function handleClick() {
@@ -99,7 +115,7 @@ function LinkRow({ children, to, className }: { children: React.ReactNode; to: T
   }
 
   return (
-    <tr className={cn(cls.rowLink, className)} onClick={handleClick}>
+    <tr id={id} className={cn(cls.rowLink, className)} onClick={handleClick}>
       {children}
     </tr>
   );

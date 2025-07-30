@@ -42,6 +42,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 
 /// Committee session list response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct CommitteeSessionListResponse {
     pub committee_sessions: Vec<CommitteeSession>,
 }

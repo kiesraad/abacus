@@ -8,31 +8,27 @@ use super::AuditEventLevel;
 use crate::{ErrorResponse, error::ErrorReference};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "camelCase")]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct UserLoggedInDetails {
     pub user_agent: String,
     pub logged_in_users_count: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "camelCase")]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct UserLoginFailedDetails {
     pub username: String,
     pub user_agent: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "camelCase")]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct UserLoggedOutDetails {
     pub session_duration: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "camelCase")]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct UserDetails {
     pub user_id: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,8 +39,7 @@ pub struct UserDetails {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "camelCase")]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct ElectionDetails {
     pub election_id: u32,
     pub election_name: String,
@@ -61,8 +56,7 @@ pub struct ElectionDetails {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "camelCase")]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct CommitteeSessionDetails {
     pub session_id: u32,
     pub session_number: u32,
@@ -75,8 +69,7 @@ pub struct CommitteeSessionDetails {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "camelCase")]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct PollingStationDetails {
     pub polling_station_id: u32,
     pub polling_station_election_id: u32,
@@ -92,8 +85,7 @@ pub struct PollingStationDetails {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "camelCase")]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct DataEntryDetails {
     pub polling_station_id: u32,
     pub data_entry_status: String,

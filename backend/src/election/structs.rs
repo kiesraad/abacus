@@ -178,6 +178,7 @@ pub struct Candidate {
 
 /// Candidate gender
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
 pub enum CandidateGender {
     Male,
     Female,

@@ -13,7 +13,11 @@ use utoipa::{
 use crate::data_entry::Count;
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
-#[serde(into = "DisplayFraction", from = "DisplayFraction")]
+#[serde(
+    deny_unknown_fields,
+    into = "DisplayFraction",
+    from = "DisplayFraction"
+)]
 // type invariant: denominator has to be nonzero
 pub struct Fraction {
     numerator: u64,

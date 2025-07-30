@@ -3572,7 +3572,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "AuditLogUser": {
         "type": "object",
@@ -3597,7 +3598,8 @@
           "username": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "Candidate": {
         "type": "object",
@@ -3855,7 +3857,8 @@
               "$ref": "#/components/schemas/CommitteeSession"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CommitteeSessionNumberOfVotersChangeRequest": {
         "type": "object",

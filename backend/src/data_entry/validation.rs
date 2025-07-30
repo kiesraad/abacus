@@ -44,6 +44,7 @@ pub struct ValidationResult {
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(deny_unknown_fields)]
 pub enum ValidationResultCode {
     F201,
     F202,

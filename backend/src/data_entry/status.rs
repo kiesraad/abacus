@@ -36,7 +36,7 @@ impl From<ValidationResults> for DataEntryTransitionError {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
-#[serde(tag = "status", content = "state")]
+#[serde(deny_unknown_fields, tag = "status", content = "state")]
 pub enum DataEntryStatus {
     FirstEntryNotStarted, // First entry has not started yet
     FirstEntryInProgress(FirstEntryInProgress),
@@ -48,7 +48,7 @@ pub enum DataEntryStatus {
 }
 
 #[derive(Debug, Serialize, Deserialize, strum::Display, Clone, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "snake_case")]
+#[serde(deny_unknown_fields, rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum DataEntryStatusName {
     FirstEntryNotStarted,
@@ -76,8 +76,7 @@ pub struct FirstEntryInProgress {
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, Clone, Type, Eq, PartialEq)]
-#[serde(transparent)]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, transparent)]
 pub struct ClientState(pub Option<serde_json::Value>);
 
 impl ClientState {

@@ -97,8 +97,7 @@ async fn get_polling_station_election_and_committee_session_id(
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
-#[serde(rename_all = "snake_case")]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ResolveDifferencesAction {
     KeepFirstEntry,
     KeepSecondEntry,

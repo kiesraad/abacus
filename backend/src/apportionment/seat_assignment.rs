@@ -138,7 +138,7 @@ pub struct SeatChangeStep {
 
 /// Records the political group and specific change for a specific residual seat
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
-#[serde(tag = "changed_by")]
+#[serde(deny_unknown_fields, tag = "changed_by")]
 pub enum SeatChange {
     HighestAverageAssignment(HighestAverageAssignedSeat),
     UniqueHighestAverageAssignment(HighestAverageAssignedSeat),

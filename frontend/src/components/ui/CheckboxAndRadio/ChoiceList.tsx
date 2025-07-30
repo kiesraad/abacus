@@ -1,7 +1,5 @@
 import { ReactNode, RefObject } from "react";
 
-import { cn } from "@/utils/classnames";
-
 import { Checkbox, CheckboxAndRadioProps, Radio } from "./CheckboxAndRadio";
 import cls from "./CheckboxAndRadio.module.css";
 
@@ -10,7 +8,7 @@ export interface ChoiceListProps {
 }
 
 export function ChoiceList({ children }: ChoiceListProps) {
-  return <fieldset className={cn(cls.choiceList)}>{children}</fieldset>;
+  return <fieldset className="choiceList">{children}</fieldset>;
 }
 
 interface ChoiceListOptionProps extends CheckboxAndRadioProps {

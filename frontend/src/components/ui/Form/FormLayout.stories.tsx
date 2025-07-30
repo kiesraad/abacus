@@ -15,7 +15,7 @@ export const DefaultFormLayout: StoryFn = () => (
         </p>
         <FormLayout.Row>
           <InputField name="inp1" label="Input 1" fieldWidth="narrow" />
-          <InputField name="inp2" label="Input 2" fieldWidth="narrow" />
+          <InputField name="inp2" label="Input 2" />
         </FormLayout.Row>
       </FormLayout.Section>
 

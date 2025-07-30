@@ -98,6 +98,19 @@ export interface POLLING_STATION_CREATE_REQUEST_PARAMS {
 export type POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
 export type POLLING_STATION_CREATE_REQUEST_BODY = PollingStationRequest;
 
+// /api/elections/{election_id}/polling_stations/import
+export interface POLLING_STATION_IMPORT_REQUEST_PARAMS {
+  election_id: number;
+}
+export type POLLING_STATION_IMPORT_REQUEST_PATH = `/api/elections/${number}/polling_stations/import`;
+export type POLLING_STATION_IMPORT_REQUEST_BODY = PollingStationsRequest;
+
+// /api/elections/{election_id}/polling_stations/validate-import
+export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PARAMS = Record<string, never>;
+export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH =
+  `/api/elections/{election_id}/polling_stations/validate-import`;
+export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_BODY = PollingStationFileRequest;
+
 // /api/elections/{election_id}/polling_stations/{polling_station_id}
 export interface POLLING_STATION_GET_REQUEST_PARAMS {
   election_id: number;
@@ -885,6 +898,10 @@ export interface PollingStationDetails {
   pollingStationType?: string;
 }
 
+export interface PollingStationFileRequest {
+  data: string;
+}
+
 /**
  * Polling station list response
  */
@@ -903,6 +920,10 @@ export interface PollingStationRequest {
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
+}
+
+export interface PollingStationRequestListResponse {
+  polling_stations: PollingStationRequest[];
 }
 
 /**
@@ -929,6 +950,10 @@ export interface PollingStationResults {
  * Type of Polling station
  */
 export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
+
+export interface PollingStationsRequest {
+  polling_stations: PollingStationRequest[];
+}
 
 export interface PreferenceThreshold {
   /** Preference threshold as a number of votes */

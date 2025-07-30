@@ -12,7 +12,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use tracing::error;
 use utoipa::ToSchema;
-use zip::result::ZipError;
 
 use crate::{
     MAX_BODY_SIZE_MB, apportionment::ApportionmentError,
@@ -33,6 +32,7 @@ pub enum ErrorReference {
     EmlImportError,
     EntryNotFound,
     EntryNotUnique,
+    Forbidden,
     InternalServerError,
     InvalidData,
     InvalidHash,
@@ -93,7 +93,7 @@ pub enum APIError {
     StdError(Box<dyn Error>),
     XmlDeError(DeError),
     XmlError(SeError),
-    ZipError(ZipError),
+    ZipError(String),
 }
 
 impl IntoResponse for APIError {
@@ -260,6 +260,10 @@ impl IntoResponse for APIError {
                         StatusCode::UNAUTHORIZED,
                         to_error("Unauthorized", ErrorReference::Unauthorized, false),
                     ),
+                    AuthenticationError::Forbidden => (
+                        StatusCode::FORBIDDEN,
+                        to_error("Forbidden", ErrorReference::Forbidden, true),
+                    ),
                     AuthenticationError::PasswordRejection => (
                         StatusCode::BAD_REQUEST,
                         to_error("Invalid password", ErrorReference::PasswordRejection, false),
@@ -393,15 +397,6 @@ impl From<InvalidHeaderValue> for APIError {
 impl From<Box<dyn Error>> for APIError {
     fn from(err: Box<dyn Error>) -> Self {
         APIError::StdError(err)
-    }
-}
-
-#[derive(Debug, Serialize)]
-pub struct JsonResponse<T>(T);
-
-impl<T: Serialize> IntoResponse for JsonResponse<T> {
-    fn into_response(self) -> Response {
-        Json(self).into_response()
     }
 }
 

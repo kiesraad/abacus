@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   ElectionListRequestHandler,
@@ -24,8 +25,9 @@ vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => navigate,
   useParams: () => ({ pollingStationId: "5" }),
-  useLocation: () => ({ pathname: "/" }),
 }));
+
+vi.mock("@/hooks/messages/useMessages");
 
 const renderPage = async () => {
   render(
@@ -43,7 +45,10 @@ const renderPage = async () => {
 };
 
 describe("ResolveErrorsPage", () => {
+  const pushMessage = vi.fn();
+
   beforeEach(() => {
+    vi.mocked(useMessages).mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
@@ -57,14 +62,26 @@ describe("ResolveErrorsPage", () => {
   test("should render the page", async () => {
     await renderPage();
 
-    // TODO: Issue #1512 Add checks for rendering errors and warnings
+    expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
+
+    const voters_votes_counts = screen.queryByRole("region", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
+    expect(voters_votes_counts).toBeInTheDocument();
+
+    const differences_counts = screen.queryByRole("region", {
+      name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+    });
+    expect(differences_counts).toBeInTheDocument();
+
+    const political_group_votes_1 = screen.queryByRole("region", { name: "Lijst 1 - Vurige Vleugels Partij" });
+    expect(political_group_votes_1).not.toBeInTheDocument();
+
+    const political_group_votes_2 = screen.queryByRole("region", { name: "Lijst 2 - Wijzen van Water en Wind" });
+    expect(political_group_votes_2).not.toBeInTheDocument();
 
     expect(
       await screen.findByRole("heading", { level: 3, name: "Wat wil je doen met de invoer in Abacus?" }),
     ).toBeVisible();
-    expect(
-      await screen.findByLabelText(/Invoer bewaren en correcties laten invoeren door Sanne Molenaar/),
-    ).toBeVisible();
+    expect(await screen.findByLabelText(/Invoer bewaren en correcties laten invoeren door Gebruiker01/)).toBeVisible();
     expect(await screen.findByLabelText(/Stembureau opnieuw laten invoeren/)).toBeVisible();
   });
 
@@ -82,7 +99,12 @@ describe("ResolveErrorsPage", () => {
     await user.click(submit);
 
     expect(resolve).toHaveBeenCalledWith("resume_first_entry");
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-resumed-5");
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Stembureau 37 teruggegeven aan Gebruiker01",
+      text: "De invoerder kan verder met invoeren",
+    });
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
   test("should refresh election status and navigate to election status page after submit", async () => {
@@ -96,6 +118,11 @@ describe("ResolveErrorsPage", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status#data-entry-discarded-5");
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Invoer stembureau 37 verwijderd",
+      text: "Het stembureau kan opnieuw ingevoerd worden",
+    });
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 });

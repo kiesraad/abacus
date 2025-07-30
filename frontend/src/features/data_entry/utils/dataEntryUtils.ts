@@ -1,18 +1,10 @@
 import { PollingStationResults, ValidationResult, ValidationResults } from "@/types/generated/openapi";
 import { DataEntryStructure, FormSectionId } from "@/types/types";
+import { extractFieldInfoFromSection, getValueAtPath } from "@/utils/dataEntryMapping";
 import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
 
 import { ClientState, FormSection, FormState } from "../types/types";
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
-
-export function objectHasOnlyEmptyValues(obj: Record<string, "" | number>): boolean {
-  for (const key in obj) {
-    if (obj[key] !== "" && obj[key] !== 0) {
-      return false;
-    }
-  }
-  return true;
-}
 
 export function formSectionComplete(section: FormSection): boolean {
   return (
@@ -49,28 +41,36 @@ export function getNextSectionID(formState: FormState, currentSectionId: FormSec
   return null;
 }
 
-export function isFormSectionEmpty(section: FormSection, values: PollingStationResults): boolean {
-  if (section.id.startsWith("political_group_votes_")) {
-    const index = parseInt(section.id.replace("political_group_votes_", "")) - 1;
-    const g = values.political_group_votes[index];
-    if (g) {
-      if (g.total !== 0) return false;
-      for (let i = 0, n = g.candidate_votes.length; i < n; i++) {
-        if (g.candidate_votes[i]?.votes !== 0) return false;
-      }
+export function isFormSectionEmpty(
+  dataEntryStructure: DataEntryStructure,
+  section: FormSection,
+  values: PollingStationResults,
+): boolean {
+  const dataEntrySection = dataEntryStructure.find((s) => s.id === section.id);
+  if (!dataEntrySection) {
+    // If section not found in structure, consider it empty
+    return true;
+  }
+
+  const fieldInfoMap = extractFieldInfoFromSection(dataEntrySection);
+  for (const [path, fieldType] of fieldInfoMap) {
+    const value = getValueAtPath(values, path);
+
+    switch (fieldType) {
+      case "boolean":
+        if (value === true) {
+          return false;
+        }
+        break;
+      case "formattedNumber":
+        if (value !== 0 && value !== undefined) {
+          return false;
+        }
+        break;
     }
   }
 
-  switch (section.id) {
-    case "voters_votes_counts":
-      return (
-        objectHasOnlyEmptyValues({ ...values.votes_counts }) && objectHasOnlyEmptyValues({ ...values.voters_counts })
-      );
-    case "differences_counts":
-      return objectHasOnlyEmptyValues({ ...values.differences_counts });
-    default:
-      return true;
-  }
+  return true;
 }
 
 export type DataEntryFormSectionStatus = "empty" | "unaccepted-warnings" | "accepted-warnings" | "errors";
@@ -110,7 +110,7 @@ export function getInitialFormState(dataEntryStructure: DataEntryStructure): For
 
   return {
     furthest: INITIAL_FORM_SECTION_ID,
-    sections: sections as Record<FormSectionId, FormSection>,
+    sections: sections,
   };
 }
 

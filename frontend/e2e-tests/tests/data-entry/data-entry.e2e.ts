@@ -296,8 +296,8 @@ test.describe("full data entry flow", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
-      blank_votes_count: 0,
+      votes_candidates_count: 50,
+      blank_votes_count: 50,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
     };
@@ -306,7 +306,14 @@ test.describe("full data entry flow", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText(
-      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      [
+        "Controleer aantal blanco stemmen",
+        "W.201",
+        "Het aantal blanco stemmen is erg hoog.",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join(""),
     );
 
     // accept the warning
@@ -322,7 +329,7 @@ test.describe("full data entry flow", () => {
 
     const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
-    await candidatesListPage_1.fillCandidatesAndTotal([99, 1], 100);
+    await candidatesListPage_1.fillCandidatesAndTotal([49, 1], 50);
     await candidatesListPage_1.next.click();
 
     const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
@@ -450,7 +457,9 @@ test.describe("second data entry", () => {
     await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
     await dataEntryHomePage.clickStart();
 
-    await expect(page).toHaveURL(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2`);
+    await expect(page).toHaveURL(
+      `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/voters_votes_counts`,
+    );
 
     await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
 
@@ -548,7 +557,9 @@ test.describe("second data entry", () => {
     await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
     await dataEntryHomePage.clickStart();
 
-    await expect(typistPage).toHaveURL(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2`);
+    await expect(typistPage).toHaveURL(
+      `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/voters_votes_counts`,
+    );
 
     // fill form with data that is different from first data entry
     const votersAndVotesPage = new VotersAndVotesPage(typistPage);
@@ -706,9 +717,9 @@ test.describe("errors and warnings", () => {
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
-      poll_card_count: 100,
+      poll_card_count: 90,
       proxy_certificate_count: 0,
-      total_admitted_voters_count: 100,
+      total_admitted_voters_count: 90,
     };
     const votes = {
       votes_candidates_count: 100,
@@ -721,7 +732,14 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText(
-      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      [
+        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
+        "W.203",
+        "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join(""),
     );
     await expect(votersAndVotesPage.error).toBeHidden();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
@@ -756,9 +774,9 @@ test.describe("errors and warnings", () => {
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
-      poll_card_count: 100,
+      poll_card_count: 90,
       proxy_certificate_count: 0,
-      total_admitted_voters_count: 100,
+      total_admitted_voters_count: 90,
     };
     const votes = {
       votes_candidates_count: 100,
@@ -771,7 +789,14 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText(
-      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      [
+        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
+        "W.203",
+        "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join(""),
     );
 
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
@@ -782,7 +807,14 @@ test.describe("errors and warnings", () => {
     await votersAndVotesPage.proxyCertificateCount.press("Tab");
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.warning).toContainText(
-      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      [
+        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
+        "W.203",
+        "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join(""),
     );
 
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
@@ -914,8 +946,8 @@ test.describe("navigation", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 100,
-        blank_votes_count: 0,
+        votes_candidates_count: 90,
+        blank_votes_count: 10,
         invalid_votes_count: 0,
         total_votes_cast_count: 100,
       };
@@ -944,7 +976,7 @@ test.describe("navigation", () => {
       await expect(candidatesListPage_1.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
       await expect(candidatesListPage_1.progressList.differencesIcon).toHaveAccessibleName("leeg");
 
-      await candidatesListPage_1.fillCandidatesAndTotal([1, 1], 100);
+      await candidatesListPage_1.fillCandidatesAndTotal([1, 1], 90);
       await candidatesListPage_1.next.click();
       await expect(candidatesListPage_1.error).toBeVisible();
       await candidatesListPage_1.progressList.differences.click();
@@ -955,7 +987,7 @@ test.describe("navigation", () => {
       await expect(differencesPage.progressList.listIcon(1)).toHaveAccessibleName("bevat een fout");
 
       await differencesPage.progressList.list(1).click();
-      await candidatesListPage_1.fillCandidatesAndTotal([50, 50], 100);
+      await candidatesListPage_1.fillCandidatesAndTotal([50, 40], 90);
       await candidatesListPage_1.next.click();
 
       const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");

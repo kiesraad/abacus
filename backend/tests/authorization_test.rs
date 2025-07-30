@@ -29,6 +29,7 @@ async fn test_route_authorization(pool: SqlitePool) {
             (Method::POST, &item.post),
             (Method::PUT, &item.put),
             (Method::PATCH, &item.patch),
+            (Method::DELETE, &item.delete),
         ];
 
         // loop through all the operations for each path

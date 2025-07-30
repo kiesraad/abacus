@@ -1,7 +1,6 @@
 #import "common/style.typ": conf, document_numbering
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
-#set text(lang: "nl")
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"
@@ -11,10 +10,9 @@
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 
-
 #show: doc => conf(doc, header: location_name, footer: [
   #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
-  #input.hash
+  #add-dashes(input.hash)
 ])
 
 #set heading(numbering: none)
@@ -22,7 +20,7 @@
 #title_page(
   is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
-  [#input.election.name #format_date(input.election.election_date)],
+  [Gemeenteraad - #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst en kandidaat \
     Model Na 31-2
@@ -31,7 +29,7 @@
 
 == Details van het #location_type
 
-#sym.arrow.r #location_name
+#location_name
 
 #input.election.location #format_date(input.election.election_date)
 
@@ -48,12 +46,12 @@ Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een v
 == Inhoudsopgave
 
 - Deel 1 - *Verslag van de zitting* (het verloop van het tellen en optellen)
-- Deel 2 - *Telresultaten* van de/het hele gemeente/openbaar lichaam
+- Deel 2 - *Telresultaten* van #is_municipality[de hele gemeente][het hele openbaar lichaam]
 - Deel 3 - *Ondertekening* door de leden van het #location_type
 
 \
 
-- Bijlage 1: Telresultaten van alle stembureaus in de/het gemeente/openbaar lichaam
+- Bijlage 1: Telresultaten van alle stembureaus in #is_municipality[de gemeente][het openbaar lichaam]
 - Bijlage 2: Overzicht van alle bezwaren die op de stembureaus zijn gemaakt
 
 #pagebreak(weak: true)
@@ -105,9 +103,9 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
             #polling_station.postal_code #polling_station.locality
           ]
         ],
-        align(center, checkbox(large: false)[]),
-        align(center, checkbox(large: false)[]),
-        align(center, checkbox(large: false)[]),
+        align(center, checkbox(checked: false)[]),
+        align(center, checkbox(checked: false)[]),
+        align(center, checkbox(checked: false)[]),
       )
     })
     .flatten(),
@@ -137,7 +135,7 @@ Bijvoorbeeld over het ongeldig verklaren van een stembiljet. Schrijf geen namen 
   rows: 10,
 )
 
-=== Andere *bijzonderheden* die mogelijk invloed hebben op het telproces of de resultaten van het gemeentelijk stembureau/stembureau voor het openbaar lichaam.
+=== Andere *bijzonderheden* die mogelijk invloed hebben op het telproces of de resultaten van het #location_type.
 
 Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georganiseerd en een stembiljet in de verkeerde stembus zat.
 
@@ -154,7 +152,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Aantal kiesgerechtigden
 
-#letterbox("Z", value: input.election.number_of_voters)[Kiesgerechtigden]
+#letterbox("Z", value: input.committee_session.number_of_voters)[Kiesgerechtigden]
 
 == Toegelaten kiezers
 
@@ -227,11 +225,11 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Verschillen tussen aantal kiezers en uitgebrachte stemmen
 
-=== Is bij alle afzonderlijke stembureaus in #this_location het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
+=== Is bij *alle afzonderlijke stembureaus* in #this_location het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
 
-#checkbox[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>)*]
+#checkbox(checked: false)[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>)*]
 
-#checkbox[Nee, er zijn stembureaus met een verschil]
+#checkbox(checked: false)[Nee, er zijn stembureaus met een verschil]
 
 === Voor de stembureaus met de nummers #input.summary.differences_counts.more_ballots_count.polling_stations.map(str).join(", ") zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
@@ -253,9 +251,9 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 === Kruis aan wat van toepassing is:
 
-#checkbox[Er zijn geen verschillen geconstateerd.]
+#checkbox(checked: false)[Er zijn geen verschillen geconstateerd.]
 
-#checkbox[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
+#checkbox(checked: false)[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
 
 #empty_lines(5)
 
@@ -270,9 +268,8 @@ Voer de controle uit volgens de stappen in het controleprotocol.
     continue
   }
 
-  title[Lijst #political_group.number #election_political_group.name]
-
   votes_table(
+    title: [#political_group.number #election_political_group.name],
     headers: ("Kandidaat", "", "Stemmen"),
     total: political_group.total,
     values: political_group.candidate_votes.map(candidate => (
@@ -281,7 +278,7 @@ Voer de controle uit volgens de stappen in het controleprotocol.
       votes: candidate.votes,
     )),
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
-    column_total: (c, v) => [Subtotaal kolom #c: #fmt-number(v, zero: 0)],
+    column_total: (c, v) => [Subtotaal kolom #c: #h(0.5em) #fmt-number(v, zero: "0")],
     sum_total: columns => [Totaal lijst (kolom #columns)],
   )
 }
@@ -309,14 +306,10 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === #is_municipality[Twee][Vier] eden van het #location_type
 
-#for i in range(0, is_municipality(2, 4)) {
-  textbox[Naam:][Handtekening:]
-}
+#stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
 === Extra ondertekening: (niet verplicht)
 
-#for i in range(0, 5) {
-  textbox[Naam:][Handtekening:]
-}
+#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))

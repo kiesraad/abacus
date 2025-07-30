@@ -42,8 +42,6 @@ __Uitbreidingen:__
 &emsp; 7a1. Het GSB stelt het bezwaar vast.  
 &emsp; 7a2. Het GSB gaat over tot hertelling.
 
-### Open punten
-- We willen zoveel mogelijk van het PV in de applicatie invoeren. Dus idealiter worden alleen de handtekeningen van de GSB-leden met pen gezet. Dat is niet wat er op dit moment in de use cases staat.
 
 ## De coördinator GSB bereidt de documenten voor de zitting voor (zee)
 

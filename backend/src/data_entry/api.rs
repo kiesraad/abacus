@@ -14,7 +14,6 @@ use super::{
     DataEntryStatusResponse, DataError, PollingStationDataEntry, PollingStationResults,
     ValidationResults,
     entry_number::EntryNumber,
-    repository::PollingStationDataEntries,
     status::{
         ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
         DataEntryTransitionError, EntriesDifferent, FirstEntryHasErrors,
@@ -25,10 +24,10 @@ use crate::{
     APIError, AppState,
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
-    committee_session::{CommitteeSession, repository::CommitteeSessions},
-    election::{ElectionWithPoliticalGroups, repository::Elections},
+    committee_session::CommitteeSession,
+    election::ElectionWithPoliticalGroups,
     error::{ErrorReference, ErrorResponse},
-    polling_station::{PollingStation, repository::PollingStations},
+    polling_station::PollingStation,
 };
 
 impl From<DataError> for APIError {
@@ -86,14 +85,12 @@ async fn get_polling_station_election_and_committee_session_id(
     ),
     Error,
 > {
-    let polling_stations = PollingStations::new(pool.clone());
-    let polling_station = polling_stations.get(polling_station_id).await?;
-    let elections = Elections::new(pool.clone());
-    let election = elections.get(polling_station.election_id).await?;
-    let committee_sessions = CommitteeSessions::new(pool.clone());
-    let committee_session = committee_sessions
-        .get_election_committee_session(election.id)
-        .await?;
+    let polling_station =
+        crate::polling_station::repository::get(&pool, polling_station_id).await?;
+    let election = crate::election::repository::get(&pool, polling_station.election_id).await?;
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election.id)
+            .await?;
     Ok((polling_station, election, committee_session))
 }
 
@@ -129,6 +126,7 @@ impl ResolveDifferencesAction {
     responses(
         (status = 200, description = "Data entry claimed successfully", body = ClaimDataEntryResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -146,12 +144,12 @@ async fn polling_station_data_entry_claim(
     let (polling_station, election, committee_session) =
         get_polling_station_election_and_committee_session_id(polling_station_id, pool.clone())
             .await?;
-    let polling_station_data_entries = PollingStationDataEntries::new(pool.clone());
-    let state = polling_station_data_entries
-        .get_or_default(polling_station_id, committee_session.id)
-        .await?;
-
-    // TODO: Check if committee session has status DataEntryInProgress
+    let state = crate::data_entry::repository::get_or_default(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+    )
+    .await?;
 
     let new_data_entry = CurrentDataEntry {
         progress: None,
@@ -180,13 +178,17 @@ async fn polling_station_data_entry_claim(
     let validation_results = validate_data_entry_status(&new_state, &polling_station, &election)?;
 
     // Save the new data entry state
-    polling_station_data_entries
-        .upsert(polling_station_id, committee_session.id, &new_state)
-        .await?;
+    crate::data_entry::repository::upsert(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+        &new_state,
+    )
+    .await?;
 
-    let data_entry = polling_station_data_entries
-        .get_row(polling_station_id, committee_session.id)
-        .await?;
+    let data_entry =
+        crate::data_entry::repository::get_row(&pool, polling_station_id, committee_session.id)
+            .await?;
 
     audit_service
         .log(&AuditEvent::DataEntryClaimed(data_entry.into()), None)
@@ -234,6 +236,7 @@ impl IntoResponse for SaveDataEntryResponse {
     responses(
         (status = 200, description = "Data entry saved successfully", body = SaveDataEntryResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -254,10 +257,12 @@ async fn polling_station_data_entry_save(
     let (polling_station, election, committee_session) =
         get_polling_station_election_and_committee_session_id(polling_station_id, pool.clone())
             .await?;
-    let polling_station_data_entries = PollingStationDataEntries::new(pool.clone());
-    let state = polling_station_data_entries
-        .get_or_default(polling_station_id, committee_session.id)
-        .await?;
+    let state = crate::data_entry::repository::get_or_default(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+    )
+    .await?;
 
     let current_data_entry = CurrentDataEntry {
         progress: Some(data_entry_request.progress),
@@ -276,13 +281,17 @@ async fn polling_station_data_entry_save(
     let validation_results = validate_data_entry_status(&new_state, &polling_station, &election)?;
 
     // Save the new data entry state
-    polling_station_data_entries
-        .upsert(polling_station_id, committee_session.id, &new_state)
-        .await?;
+    crate::data_entry::repository::upsert(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+        &new_state,
+    )
+    .await?;
 
-    let data_entry = polling_station_data_entries
-        .get_row(polling_station_id, committee_session.id)
-        .await?;
+    let data_entry =
+        crate::data_entry::repository::get_row(&pool, polling_station_id, committee_session.id)
+            .await?;
 
     audit_service
         .log(&AuditEvent::DataEntrySaved(data_entry.into()), None)
@@ -298,6 +307,7 @@ async fn polling_station_data_entry_save(
     responses(
         (status = 204, description = "Data entry deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -317,21 +327,28 @@ async fn polling_station_data_entry_delete(
     let (_, _, committee_session) =
         get_polling_station_election_and_committee_session_id(polling_station_id, pool.clone())
             .await?;
-    let polling_station_data_entries = PollingStationDataEntries::new(pool.clone());
-    let state = polling_station_data_entries
-        .get_or_default(polling_station_id, committee_session.id)
-        .await?;
+    let state = crate::data_entry::repository::get_or_default(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+    )
+    .await?;
+
     let new_state = match entry_number {
         EntryNumber::FirstEntry => state.delete_first_entry(user_id)?,
         EntryNumber::SecondEntry => state.delete_second_entry(user_id)?,
     };
-    polling_station_data_entries
-        .upsert(polling_station_id, committee_session.id, &new_state)
-        .await?;
+    crate::data_entry::repository::upsert(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+        &new_state,
+    )
+    .await?;
 
-    let data_entry = polling_station_data_entries
-        .get_row(polling_station_id, committee_session.id)
-        .await?;
+    let data_entry =
+        crate::data_entry::repository::get_row(&pool, polling_station_id, committee_session.id)
+            .await?;
 
     audit_service
         .log(&AuditEvent::DataEntryDeleted(data_entry.into()), None)
@@ -347,6 +364,7 @@ async fn polling_station_data_entry_delete(
     responses(
         (status = 200, description = "Data entry finalised successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -367,17 +385,23 @@ async fn polling_station_data_entry_finalise(
     let (polling_station, election, committee_session) =
         get_polling_station_election_and_committee_session_id(polling_station_id, pool.clone())
             .await?;
-    let polling_station_data_entries = PollingStationDataEntries::new(pool.clone());
-    let state = polling_station_data_entries
-        .get_or_default(polling_station_id, committee_session.id)
-        .await?;
+    let state = crate::data_entry::repository::get_or_default(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+    )
+    .await?;
 
     match entry_number {
         EntryNumber::FirstEntry => {
             let new_state = state.finalise_first_entry(&polling_station, &election, user_id)?;
-            polling_station_data_entries
-                .upsert(polling_station_id, committee_session.id, &new_state)
-                .await?;
+            crate::data_entry::repository::upsert(
+                &pool,
+                polling_station_id,
+                committee_session.id,
+                &new_state,
+            )
+            .await?;
         }
         EntryNumber::SecondEntry => {
             let (new_state, data) =
@@ -386,30 +410,34 @@ async fn polling_station_data_entry_finalise(
             match (&new_state, data) {
                 (DataEntryStatus::Definitive(_), Some(data)) => {
                     // Save the data to the database
-                    polling_station_data_entries
-                        .make_definitive(
-                            polling_station_id,
-                            committee_session.id,
-                            &new_state,
-                            &data,
-                        )
-                        .await?;
+                    crate::data_entry::repository::make_definitive(
+                        &pool,
+                        polling_station_id,
+                        committee_session.id,
+                        &new_state,
+                        &data,
+                    )
+                    .await?;
                 }
                 (DataEntryStatus::Definitive(_), None) => {
                     unreachable!("Data entry is in definitive state but no data is present");
                 }
                 (new_state, _) => {
-                    polling_station_data_entries
-                        .upsert(polling_station_id, committee_session.id, new_state)
-                        .await?;
+                    crate::data_entry::repository::upsert(
+                        &pool,
+                        polling_station_id,
+                        committee_session.id,
+                        new_state,
+                    )
+                    .await?;
                 }
             }
         }
     }
 
-    let data_entry = polling_station_data_entries
-        .get_row(polling_station_id, committee_session.id)
-        .await?;
+    let data_entry =
+        crate::data_entry::repository::get_row(&pool, polling_station_id, committee_session.id)
+            .await?;
 
     audit_service
         .log(
@@ -458,6 +486,7 @@ pub struct DataEntryGetErrorsResponse {
     responses(
         (status = 200, description = "Data entry with errors and warnings to be resolved", body = DataEntryGetErrorsResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with accepted errors found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -473,18 +502,17 @@ async fn polling_station_data_entry_get_errors(
     let (polling_station, election, committee_session) =
         get_polling_station_election_and_committee_session_id(polling_station_id, pool.clone())
             .await?;
-    let polling_station_data_entries = PollingStationDataEntries::new(pool.clone());
-    let status = polling_station_data_entries
-        .get(polling_station_id, committee_session.id)
-        .await?;
-    match status.clone() {
+    let state =
+        crate::data_entry::repository::get(&pool, polling_station_id, committee_session.id).await?;
+
+    match state.clone() {
         DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
             first_entry_user_id,
             finalised_first_entry,
             first_entry_finished_at,
         }) => {
             let validation_results =
-                validate_data_entry_status(&status, &polling_station, &election)?;
+                validate_data_entry_status(&state, &polling_station, &election)?;
 
             Ok(Json(DataEntryGetErrorsResponse {
                 first_entry_user_id,
@@ -508,6 +536,7 @@ async fn polling_station_data_entry_get_errors(
     responses(
         (status = 200, description = "Errors resolved successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -527,19 +556,25 @@ async fn polling_station_data_entry_resolve_errors(
     let (_, _, committee_session) =
         get_polling_station_election_and_committee_session_id(polling_station_id, pool.clone())
             .await?;
-    let polling_station_data_entries = PollingStationDataEntries::new(pool.clone());
-    let state = polling_station_data_entries
-        .get_or_default(polling_station_id, committee_session.id)
-        .await?;
+    let state = crate::data_entry::repository::get_or_default(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+    )
+    .await?;
 
     let new_state = match action {
         ResolveErrorsAction::DiscardFirstEntry => state.discard_first_entry()?,
         ResolveErrorsAction::ResumeFirstEntry => state.resume_first_entry()?,
     };
 
-    let data_entry = polling_station_data_entries
-        .upsert(polling_station_id, committee_session.id, &new_state)
-        .await?;
+    let data_entry = crate::data_entry::repository::upsert(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+        &new_state,
+    )
+    .await?;
 
     audit_service
         .log(&action.audit_event(data_entry.clone()), None)
@@ -563,6 +598,7 @@ pub struct DataEntryGetDifferencesResponse {
     responses(
         (status = 200, description = "Data entry differences to be resolved", body = DataEntryGetDifferencesResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with differences found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -578,10 +614,9 @@ async fn polling_station_data_entry_get_differences(
     let (_, _, committee_session) =
         get_polling_station_election_and_committee_session_id(polling_station_id, pool.clone())
             .await?;
-    let polling_station_data_entries = PollingStationDataEntries::new(pool.clone());
-    let state = polling_station_data_entries
-        .get(polling_station_id, committee_session.id)
-        .await?;
+    let state =
+        crate::data_entry::repository::get(&pool, polling_station_id, committee_session.id).await?;
+
     match state {
         DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry_user_id,
@@ -610,6 +645,7 @@ async fn polling_station_data_entry_get_differences(
     responses(
         (status = 200, description = "Differences resolved successfully", body = DataEntryStatusResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -629,10 +665,12 @@ async fn polling_station_data_entry_resolve_differences(
     let (polling_station, election, committee_session) =
         get_polling_station_election_and_committee_session_id(polling_station_id, pool.clone())
             .await?;
-    let polling_station_data_entries = PollingStationDataEntries::new(pool.clone());
-    let state = polling_station_data_entries
-        .get_or_default(polling_station_id, committee_session.id)
-        .await?;
+    let state = crate::data_entry::repository::get_or_default(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+    )
+    .await?;
 
     let new_state = match action {
         ResolveDifferencesAction::KeepFirstEntry => state.keep_first_entry()?,
@@ -642,9 +680,13 @@ async fn polling_station_data_entry_resolve_differences(
         ResolveDifferencesAction::DiscardBothEntries => state.delete_entries()?,
     };
 
-    let data_entry = polling_station_data_entries
-        .upsert(polling_station_id, committee_session.id, &new_state)
-        .await?;
+    let data_entry = crate::data_entry::repository::upsert(
+        &pool,
+        polling_station_id,
+        committee_session.id,
+        &new_state,
+    )
+    .await?;
 
     audit_service
         .log(&action.audit_event(data_entry.clone()), None)
@@ -704,27 +746,28 @@ pub struct ElectionStatusResponseEntry {
 )]
 async fn election_status(
     _user: User,
-    State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
-    let statuses = polling_station_data_entries.statuses(election_id).await?;
+    let statuses = crate::data_entry::repository::statuses(&pool, election_id).await?;
     Ok(Json(ElectionStatusResponse { statuses }))
 }
 
 #[cfg(test)]
 pub mod tests {
+    use super::*;
+    use crate::{
+        authentication::Role,
+        committee_session::{
+            status::CommitteeSessionStatus,
+            tests::{change_status_committee_session, create_committee_session},
+        },
+        data_entry::{DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts},
+    };
     use axum::http::StatusCode;
     use http_body_util::BodyExt;
     use sqlx::{SqlitePool, query, query_as};
     use test_log::test;
-
-    use super::*;
-    use crate::{
-        audit_log::AuditLog,
-        authentication::Role,
-        committee_session::tests::create_committee_session,
-        data_entry::{DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts},
-    };
 
     pub fn example_data_entry() -> DataEntry {
         DataEntry {
@@ -756,8 +799,7 @@ pub mod tests {
         polling_station_id: u32,
         committee_session_id: u32,
     ) -> DataEntryStatus {
-        PollingStationDataEntries::new(pool.clone())
-            .get(polling_station_id, committee_session_id)
+        crate::data_entry::repository::get(&pool, polling_station_id, committee_session_id)
             .await
             .unwrap()
     }
@@ -775,7 +817,7 @@ pub mod tests {
             Typist(user.clone()),
             State(pool.clone()),
             Path((polling_station_id, entry_number)),
-            AuditService::new(AuditLog(pool.clone()), Some(user), None),
+            AuditService::new(pool.clone(), Some(user), None),
         )
         .await
         .into_response()
@@ -795,7 +837,7 @@ pub mod tests {
             Typist(user.clone()),
             State(pool.clone()),
             Path((polling_station_id, entry_number)),
-            AuditService::new(AuditLog(pool.clone()), Some(user), None),
+            AuditService::new(pool.clone(), Some(user), None),
             request_body.clone(),
         )
         .await
@@ -815,7 +857,7 @@ pub mod tests {
             Typist(user.clone()),
             State(pool.clone()),
             Path((polling_station_id, entry_number)),
-            AuditService::new(AuditLog(pool.clone()), Some(user), None),
+            AuditService::new(pool.clone(), Some(user), None),
         )
         .await
         .into_response()
@@ -834,7 +876,7 @@ pub mod tests {
             Typist(user.clone()),
             State(pool.clone()),
             Path((polling_station_id, entry_number)),
-            AuditService::new(AuditLog(pool.clone()), Some(user), None),
+            AuditService::new(pool.clone(), Some(user), None),
         )
         .await
         .into_response()
@@ -850,7 +892,7 @@ pub mod tests {
             Coordinator(user.clone()),
             State(pool.clone()),
             Path(polling_station_id),
-            AuditService::new(AuditLog(pool.clone()), Some(user), None),
+            AuditService::new(pool.clone(), Some(user), None),
             action,
         )
         .await
@@ -893,8 +935,7 @@ pub mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_create_data_entry(pool: SqlitePool) {
-        let mut request_body = example_data_entry();
-        request_body.data.voters_counts.poll_card_count = 100; // incorrect value
+        let request_body = example_data_entry();
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -917,9 +958,6 @@ pub mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_create_data_entry_uniqueness(pool: SqlitePool) {
-        let mut request_body = example_data_entry();
-        request_body.data.voters_counts.poll_card_count = 100; // incorrect value
-
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
@@ -930,9 +968,15 @@ pub mod tests {
             .unwrap();
         assert_eq!(row_count.count, 1);
 
-        // Create a new committee session
+        // Create a new committee session and set status to DataEntryInProgress
         let committee_session: CommitteeSession =
-            create_committee_session(pool.clone(), 2, 2).await;
+            create_committee_session(pool.clone(), 2, 2, 2).await;
+        change_status_committee_session(
+            pool.clone(),
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+        )
+        .await;
 
         // Claim the same polling station again
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
@@ -962,43 +1006,6 @@ pub mod tests {
         .expect("No data found");
         assert_eq!(data[0].committee_session_id, 2);
         assert_eq!(data[1].committee_session_id, committee_session.id);
-    }
-
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_first_entry_finalise_with_errors(pool: SqlitePool) {
-        let mut request_body = example_data_entry();
-        request_body.data.voters_counts.poll_card_count = 100; // incorrect value
-
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-        let response = save(
-            pool.clone(),
-            request_body.clone(),
-            1,
-            EntryNumber::FirstEntry,
-        )
-        .await;
-        assert_eq!(response.status(), StatusCode::OK);
-
-        // Check that finalise with errors results in FirstEntryHasErrors
-        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let DataEntryStatusResponse { status } = serde_json::from_slice(&body).unwrap();
-
-        assert_eq!(status, DataEntryStatusName::FirstEntryHasErrors);
-
-        // Check that it has been logged in the audit log
-        let audit_log_row =
-            query!(r#"SELECT event_name, json(event) as "event: serde_json::Value" FROM audit_log ORDER BY id DESC LIMIT 1"#)
-                .fetch_one(&pool)
-                .await
-                .expect("should have audit log row");
-        assert_eq!(audit_log_row.event_name, "DataEntryFinalised");
-
-        let event: serde_json::Value = serde_json::to_value(&audit_log_row.event).unwrap();
-        assert_eq!(event["dataEntryStatus"], "first_entry_has_errors");
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1056,6 +1063,43 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_first_entry_finalise_with_errors(pool: SqlitePool) {
+        let mut request_body = example_data_entry();
+        request_body.data.voters_counts.poll_card_count = 100; // incorrect value
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Check that finalise with errors results in FirstEntryHasErrors
+        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let DataEntryStatusResponse { status } = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(status, DataEntryStatusName::FirstEntryHasErrors);
+
+        // Check that it has been logged in the audit log
+        let audit_log_row =
+          query!(r#"SELECT event_name, json(event) as "event: serde_json::Value" FROM audit_log ORDER BY id DESC LIMIT 1"#)
+            .fetch_one(&pool)
+            .await
+            .expect("should have audit log row");
+        assert_eq!(audit_log_row.event_name, "DataEntryFinalised");
+
+        let event: serde_json::Value = serde_json::to_value(&audit_log_row.event).unwrap();
+        assert_eq!(event["dataEntryStatus"], "first_entry_has_errors");
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1218,7 +1262,7 @@ pub mod tests {
             Typist(User::test_user(Role::Typist, 1)),
             State(pool.clone()),
             Path((1, EntryNumber::FirstEntry)),
-            AuditService::new(AuditLog(pool.clone()), Some(user), None),
+            AuditService::new(pool.clone(), Some(user), None),
         )
         .await
         .into_response();
@@ -1261,7 +1305,9 @@ pub mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_differences_keep_first(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
-        resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepFirstEntry).await;
+        let response =
+            resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepFirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
 
         let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)
@@ -1281,7 +1327,13 @@ pub mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_differences_keep_second(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
-        resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepSecondEntry).await;
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
+            .await;
+
+        let response =
+            resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepSecondEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
 
         let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)
@@ -1301,12 +1353,13 @@ pub mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_differences_discard_both(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
-        resolve_differences(
+        let response = resolve_differences(
             pool.clone(),
             1,
             ResolveDifferencesAction::DiscardBothEntries,
         )
         .await;
+        assert_eq!(response.status(), StatusCode::OK);
 
         let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
             .fetch_one(&pool)

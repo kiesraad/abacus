@@ -143,6 +143,9 @@ label.button {
   }
 
   &.lg {
+  }
+
+  &.xl {
     min-width: 13rem;
   }
 }

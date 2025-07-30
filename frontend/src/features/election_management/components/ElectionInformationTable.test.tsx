@@ -15,7 +15,6 @@ describe("ElectionInformationTable", () => {
           election_id: "Heemdamseburg_2024",
           location: "Heemdamseburg",
           domain_id: "0035",
-          number_of_voters: 0,
           category: "Municipal",
           number_of_seats: 29,
           election_date: "2024-11-30",
@@ -38,6 +37,7 @@ describe("ElectionInformationTable", () => {
           ],
         }}
         numberOfPollingStations={1}
+        numberOfVoters={0}
       />,
     );
 
@@ -48,7 +48,7 @@ describe("ElectionInformationTable", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
       ["Aantal kiesgerechtigden", "Nog invullen"],
-      ["Invoer doen voor", ""],
+      ["Invoer doen voor", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);

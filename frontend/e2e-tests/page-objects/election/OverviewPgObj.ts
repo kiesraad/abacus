@@ -18,6 +18,6 @@ export class OverviewPgObj {
     this.alert = page.getByRole("heading", { name: "Je account is ingesteld" });
     this.create = page.getByRole("link", { name: "Verkiezing toevoegen" });
     this.elections = page.getByTestId("overview").locator("tbody").getByRole("row");
-    this.electionsCreatedState = this.elections.filter({ hasText: "Voorbereiden" });
+    this.electionsCreatedState = this.elections.filter({ hasText: "Zitting voorbereiden" });
   }
 }

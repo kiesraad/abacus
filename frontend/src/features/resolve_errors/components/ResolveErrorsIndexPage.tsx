@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Loader } from "@/components/ui/Loader/Loader";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t, tx } from "@/i18n/translate";
@@ -14,23 +15,33 @@ import cls from "./ResolveErrors.module.css";
 import { ResolveErrorsOverview } from "./ResolveErrorsOverview";
 
 export function ResolveErrorsIndexPage() {
+  const { pushMessage } = useMessages();
   const navigate = useNavigate();
   const pollingStationId = useNumericParam("pollingStationId");
   const { pollingStation, election, loading, dataEntry, action, setAction, onSubmit, validationError } =
     usePollingStationDataEntryErrors(pollingStationId);
 
   const afterSave = (action: ResolveErrorsAction) => {
-    let url = `/elections/${election.id}/status`;
     switch (action) {
       case "resume_first_entry":
-        url += `#data-entry-resumed-${pollingStation.id}`;
+        pushMessage({
+          title: t("election_status.success.data_entry_resumed", {
+            nr: pollingStation.number,
+            typist: getName(dataEntry?.first_entry_user_id),
+          }),
+          text: t("election_status.success.typist_can_continue_data_entry"),
+        });
         break;
       case "discard_first_entry":
-        url += `#data-entry-discarded-${pollingStation.id}`;
+        pushMessage({
+          title: t("election_status.success.data_entry_discarded", { nr: pollingStation.number }),
+          text: t("election_status.success.polling_station_can_be_filled_again"),
+        });
         break;
     }
-    void navigate(url);
+    void navigate(`/elections/${election.id}/status`);
   };
+
   const { getName } = useUsers();
 
   if (loading || dataEntry === null) {

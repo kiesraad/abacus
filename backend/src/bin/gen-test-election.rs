@@ -7,30 +7,28 @@ use std::{
 
 use abacus::{
     committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, repository::CommitteeSessions,
+        CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
     },
     create_sqlite_pool,
     data_entry::{
         CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
         VotersCounts, VotesCounts,
-        repository::{PollingStationDataEntries, PollingStationResultsEntries},
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
     election::{
         CandidateGender, ElectionCategory, ElectionWithPoliticalGroups, NewElection,
-        PoliticalGroup, VoteCountingMethod, repository::Elections,
+        PoliticalGroup, VoteCountingMethod,
     },
     eml::{EML110, EML230, EMLDocument},
-    pdf_gen::models::{ModelNa31_2Input, PdfModel},
-    polling_station::{
-        PollingStation, PollingStationRequest, PollingStationType, repository::PollingStations,
-    },
+    pdf_gen::models::{ModelNa31_2Input, ToPdfFileModel},
+    polling_station::{PollingStation, PollingStationRequest, PollingStationType},
     summary::ElectionSummary,
 };
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use clap::Parser;
-use rand::seq::IndexedRandom;
+use rand::{Rng, seq::IndexedRandom};
 
+use sqlx::SqlitePool;
 #[cfg(feature = "dev-database")]
 use tracing::info;
 use tracing::level_filters::LevelFilter;
@@ -146,24 +144,44 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut rng = rand::rng();
 
     // generate and store the election
-    let election = Elections::new(pool.clone())
-        .create(generate_election(&mut rng, &args))
+    let election = abacus::election::repository::create(&pool, generate_election(&mut rng, &args))
         .await
         .expect("Failed to create election");
 
     // generate the committee session for the election
-    let cs_repo = CommitteeSessions::new(pool.clone());
-    let committee_session = cs_repo
-        .create(CommitteeSessionCreateRequest {
+    let mut committee_session = abacus::committee_session::repository::create(
+        &pool,
+        CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
-        })
+            number_of_voters: 0,
+        },
+    )
+    .await
+    .expect("Failed to create committee session");
+
+    if args.with_data_entry {
+        committee_session = abacus::committee_session::repository::change_status(
+            &pool,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+        )
         .await
-        .expect("Failed to create committee session");
+        .expect("Failed to update committee session status");
+    }
+
+    abacus::committee_session::repository::change_number_of_voters(
+        &pool,
+        committee_session.id,
+        rng.random_range(args.voters.clone()),
+    )
+    .await
+    .expect("Failed to update number of voters of committee session");
 
     // generate the polling stations for the election
-    let ps_repo = PollingStations::new(pool.clone());
-    let polling_stations = generate_polling_stations(&mut rng, &election, &ps_repo, &args).await;
+    let polling_stations =
+        generate_polling_stations(&mut rng, &committee_session, &election, pool.clone(), &args)
+            .await;
 
     info!(
         "Election generated with election id: {}, election name: '{}'",
@@ -171,13 +189,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     );
 
     let data_entry_completed = if args.with_data_entry {
-        let data_entries_repo = PollingStationDataEntries::new(pool.clone());
         let (_, second_entries) = generate_data_entry(
             &committee_session,
             &election,
             &polling_stations,
             &mut rng,
-            data_entries_repo,
+            pool.clone(),
             &args,
         )
         .await;
@@ -188,9 +205,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(export_dir) = args.export_definition {
         let results = if data_entry_completed {
-            let results_repo = PollingStationResultsEntries::new(pool.clone());
-            results_repo
-                .list_with_polling_stations(ps_repo, election.id)
+            abacus::data_entry::repository::list_entries_with_polling_stations(&pool, election.id)
                 .await
                 .expect("Could not load results")
         } else {
@@ -200,6 +215,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         // Export the election definition, candidate list and polling stations to a directory
         export_election(
             &export_dir,
+            &committee_session,
             &election,
             &polling_stations,
             data_entry_completed,
@@ -221,9 +237,6 @@ fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
     for i in 1..num_political_groups {
         political_groups.push(generate_political_party(rng, i, args));
     }
-
-    // generate the number of voters from the voters range
-    let number_of_voters = rng.random_range(args.voters.clone());
 
     // generate a nomination date, and an election date not too long afterward
     let nomination_date = abacus::test_data_gen::date_between(
@@ -252,7 +265,6 @@ fn generate_election(rng: &mut impl rand::Rng, args: &Args) -> NewElection {
         domain_id: abacus::test_data_gen::domain_id(rng),
         election_id,
         location: locality,
-        number_of_voters,
         category: ElectionCategory::Municipal,
         number_of_seats: rng.random_range(args.seats.clone()),
         election_date,
@@ -308,15 +320,16 @@ fn generate_political_party(
 /// Generate the polling stations for the given election using the limits from args
 async fn generate_polling_stations(
     rng: &mut impl rand::Rng,
+    committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
-    ps_repo: &PollingStations,
+    pool: SqlitePool,
     args: &Args,
 ) -> Vec<PollingStation> {
     let number_of_ps = rng.random_range(args.polling_stations.clone());
     info!("Generating {number_of_ps} polling stations for election");
 
     let mut polling_stations = vec![];
-    let mut remaining_voters = election.number_of_voters;
+    let mut remaining_voters = committee_session.number_of_voters;
     for i in 1..=number_of_ps {
         // compute a some somewhat distributed number of voters for each polling station
         let remaining_ps = number_of_ps - i + 1;
@@ -332,21 +345,21 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let ps = ps_repo
-            .create(
-                election.id,
-                PollingStationRequest {
-                    name: abacus::test_data_gen::polling_station_name(rng),
-                    number: i64::from(i),
-                    number_of_voters: Some(ps_num_voters.into()),
-                    polling_station_type: Some(PollingStationType::FixedLocation),
-                    address: abacus::test_data_gen::address(rng),
-                    postal_code: abacus::test_data_gen::postal_code(rng),
-                    locality: abacus::test_data_gen::locality(rng).to_owned(),
-                },
-            )
-            .await
-            .expect("Failed to create polling station");
+        let ps = abacus::polling_station::repository::create(
+            &pool,
+            election.id,
+            PollingStationRequest {
+                name: abacus::test_data_gen::polling_station_name(rng),
+                number: i64::from(i),
+                number_of_voters: Some(ps_num_voters.into()),
+                polling_station_type: Some(PollingStationType::FixedLocation),
+                address: abacus::test_data_gen::address(rng),
+                postal_code: abacus::test_data_gen::postal_code(rng),
+                locality: abacus::test_data_gen::locality(rng).to_owned(),
+            },
+        )
+        .await
+        .expect("Failed to create polling station");
         polling_stations.push(ps);
     }
 
@@ -359,7 +372,7 @@ async fn generate_data_entry(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     rng: &mut impl rand::Rng,
-    data_entries_repo: PollingStationDataEntries,
+    pool: SqlitePool,
     args: &Args,
 ) -> (usize, usize) {
     info!("Generating data entries for election");
@@ -381,7 +394,7 @@ async fn generate_data_entry(
 
             // extract number of voters from polling station, or generate some approx default
             let voters_available = ps.number_of_voters.unwrap_or_else(|| {
-                election.number_of_voters as i64 / polling_stations.len() as i64
+                committee_session.number_of_voters as i64 / polling_stations.len() as i64
             });
 
             // number of voters that actually came and voted
@@ -407,10 +420,15 @@ async fn generate_data_entry(
                     finished_at: ts,
                 });
 
-                data_entries_repo
-                    .make_definitive(ps.id, committee_session.id, &state, &results)
-                    .await
-                    .expect("Could not create definitive data entry");
+                abacus::data_entry::repository::make_definitive(
+                    &pool,
+                    ps.id,
+                    committee_session.id,
+                    &state,
+                    &results,
+                )
+                .await
+                .expect("Could not create definitive data entry");
                 generated_second_entries += 1;
             } else {
                 // generate only a first data entry
@@ -419,8 +437,7 @@ async fn generate_data_entry(
                     finalised_first_entry: results.clone(),
                     first_entry_finished_at: ts,
                 });
-                data_entries_repo
-                    .upsert(ps.id, committee_session.id, &state)
+                abacus::data_entry::repository::upsert(&pool, ps.id, committee_session.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;
@@ -566,6 +583,7 @@ fn distribute_power_law(
 /// Export an election (in EML) to the specified directory
 async fn export_election(
     export_dir: &Path,
+    committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     export_results_json: bool,
@@ -585,8 +603,12 @@ async fn export_election(
 
     info!("Converting election to EML definitions");
     let definition_eml = EML110::definition_from_abacus_election(election, transaction_id);
-    let polling_stations_eml =
-        EML110::polling_stations_from_election(election, polling_stations, transaction_id);
+    let polling_stations_eml = EML110::polling_stations_from_election(
+        committee_session,
+        election,
+        polling_stations,
+        transaction_id,
+    );
     let candidates_eml = EML230::candidates_from_abacus_election(election, transaction_id);
 
     info!("Converting EML definitions to XML strings");
@@ -627,18 +649,20 @@ async fn export_election(
     if export_results_json {
         let election_summary = ElectionSummary::from_results(election, &results)
             .expect("Failed to create election summary");
-        let input = PdfModel::ModelNa31_2(ModelNa31_2Input {
+        let input = ModelNa31_2Input {
+            committee_session: committee_session.clone(),
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
             summary: election_summary,
             election: election.clone(),
             hash: "0000".to_string(),
             creation_date_time: chrono::Utc::now().format("%d-%m-%Y %H:%M").to_string(),
-        });
-        let input_json = input.get_input().expect("Failed to get model input");
+        }
+        .to_pdf_file_model("file.pdf".to_string());
+        let input_json = input.model.get_input().expect("Failed to get model input");
         let results_filename = export_dir.join(format!(
             "input_{}_{}.json",
             election.election_id,
-            input.as_filename()
+            input.model.as_model_name()
         ));
         info!(
             "Writing results JSON file for input to PDF model to {:?}",

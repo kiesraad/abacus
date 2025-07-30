@@ -18,7 +18,6 @@ pub struct Election {
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
-    pub number_of_voters: u32,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
     #[schema(value_type = String, format = "date")]
@@ -36,7 +35,6 @@ pub struct ElectionWithPoliticalGroups {
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
-    pub number_of_voters: u32,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
     #[schema(value_type = String, format = "date")]
@@ -56,7 +54,6 @@ impl From<Election> for ElectionDetails {
             election_election_id: value.election_id,
             election_location: value.location,
             election_domain_id: value.domain_id,
-            election_number_of_voters: value.number_of_voters,
             election_category: value.category.to_string(),
             election_number_of_seats: value.number_of_seats,
             election_election_date: value.election_date,
@@ -74,7 +71,6 @@ impl From<ElectionWithPoliticalGroups> for ElectionDetails {
             election_election_id: value.election_id,
             election_location: value.location,
             election_domain_id: value.domain_id,
-            election_number_of_voters: value.number_of_voters,
             election_category: value.category.to_string(),
             election_number_of_seats: value.number_of_seats,
             election_election_date: value.election_date,
@@ -103,7 +99,6 @@ pub struct NewElection {
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
-    pub number_of_voters: u32,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
     #[schema(value_type = String, format = "date")]
@@ -226,7 +221,6 @@ pub(crate) mod tests {
             election_id: "Test_2023".to_string(),
             location: "Test".to_string(),
             domain_id: "0000".to_string(),
-            number_of_voters: 100,
             category: ElectionCategory::Municipal,
             number_of_seats,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),

@@ -61,7 +61,7 @@ export function AbortModal() {
       {tx("election.abort.description")}
       <nav>
         <Button
-          size="lg"
+          size="xl"
           variant="primary-destructive"
           onClick={() => {
             onAbortModalDelete();
@@ -71,13 +71,14 @@ export function AbortModal() {
           {t("election.abort.discard_input")}
         </Button>
         <Button
+          size="lg"
           variant="secondary"
           onClick={() => {
             onAbortModalCancel();
           }}
           type="button"
         >
-          {t("election.abort.save_input")}
+          {t("election.abort.keep_input")}
         </Button>
       </nav>
     </Modal>

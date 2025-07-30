@@ -22,7 +22,7 @@ describe("Format util", () => {
     ["12345", "12.345"],
     ["123456", "123.456"],
     ["1000000", "1.000.000"],
-  ])("Number validate, format and deformat string %s as %s", (input: string, expected: string) => {
+  ])("Number validate, format and deformat string %j as %j", (input: string, expected: string) => {
     expect(validateNumberString(input)).toBe(true);
     expect(formatNumber(input)).toBe(expected);
     expect(deformatNumber(expected)).toBe(parseInt(input, 10));
@@ -38,7 +38,12 @@ describe("Format util", () => {
     ["12345", "12.345"],
     ["123456", "123.456"],
     ["1000000", "1.000.000"],
-  ])("Number format string %s as %s", (input: string, expected: string) => {
+    [0, ""],
+    [10, "10"],
+    [10_000, "10.000"],
+    [null, ""],
+    [undefined, ""],
+  ])("Number format %j as %j", (input: string | number | null | undefined, expected: string) => {
     expect(formatNumber(input)).toBe(expected);
   });
 
@@ -54,7 +59,7 @@ describe("Format util", () => {
     ["1000000", 1_000_000],
     ["1.000.000", 1_000_000],
     ["x", NaN],
-  ])("Deformat number %s as %s", (input: string, expected: number) => {
+  ])("Deformat number %j as %j", (input: string, expected: number) => {
     expect(deformatNumber(input)).toBe(expected);
   });
 

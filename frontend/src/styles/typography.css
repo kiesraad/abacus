@@ -62,7 +62,7 @@ h6 {
 
 p {
   margin-top: 0;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-md);
   margin-bottom: 0.8rem;
   line-height: 1.75rem;
   color: var(--text-color-body);

@@ -58,6 +58,7 @@
     word-break: break-word;
 
     p {
+      font-size: var(--font-size-lg);
       line-height: 1.5rem;
       margin: 0;
     }

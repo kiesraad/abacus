@@ -60,6 +60,10 @@
           font-style: normal;
         }
 
+        :global(.formatted-overlay) {
+          color: var(--gray-600);
+        }
+
         &.readOnly span {
           display: block;
           height: 4.5rem;

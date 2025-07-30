@@ -23,11 +23,10 @@
   --font-text: "DMSans";
   --font-number: "GeistMono", monospace, monospace;
 
-  --font-size-body: 1.125rem;
-  /* TODO: pick a better font size scale */
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
 
   /* SPACING */
   --space-md: 1rem;

@@ -14,7 +14,7 @@
 }
 
 .error h3 {
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-lg);
   color: var(--gray-600);
   font-weight: bold;
 }

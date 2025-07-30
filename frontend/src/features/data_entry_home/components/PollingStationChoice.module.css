@@ -6,7 +6,7 @@
 
 .input {
   text-align: right;
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-lg);
   font-style: normal;
 }
 
@@ -26,7 +26,7 @@
   background-color: var(--bg-gray-darker);
   height: 4.5rem;
   align-content: center;
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-lg);
   display: inline-flex;
   gap: 0.5rem;
   align-items: center;

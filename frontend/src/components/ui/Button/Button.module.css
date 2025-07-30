@@ -9,7 +9,7 @@ label.button {
   background: var(--button-color-primary);
   text-decoration: none;
 
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-lg);
   font-weight: 500;
 
   /* Shadow/xs */

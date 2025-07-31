@@ -21,7 +21,7 @@ export const Form: Story = {
   },
   play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByText(args.instructions)).toBeInTheDocument();
-    await expect(canvas.getByLabelText("Aantal kiesgerechtigden")).toHaveValue("2.000");
+    await expect(canvas.getByRole("textbox", { name: "Aantal kiesgerechtigden" })).toHaveValue("2000");
     await expect(canvas.getByText(args.hint!)).toBeInTheDocument();
 
     const button = canvas.getByRole("button");

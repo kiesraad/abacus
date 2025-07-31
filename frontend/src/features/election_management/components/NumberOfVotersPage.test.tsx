@@ -35,8 +35,8 @@ describe("NumberOfVotersPage", () => {
     const changeVoters = spyOnHandler(ElectionCommitteeSessionChangeNumberOfVotersHandler);
     const user = userEvent.setup();
 
-    const input = screen.getByLabelText("Aantal kiesgerechtigden");
-    expect(input).toHaveValue("2.000");
+    const input = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" });
+    expect(input).toHaveValue("2000");
     await user.click(screen.getByRole("button", { name: "Opslaan" }));
 
     expect(changeVoters).toHaveBeenCalledExactlyOnceWith({ number_of_voters: 2000 });

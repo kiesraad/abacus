@@ -21,6 +21,7 @@ use crate::{
 
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, Clone, Copy, ToSchema, PartialEq, Eq, Debug)]
+#[serde(deny_unknown_fields)]
 pub enum ErrorReference {
     AirgapViolation,
     AllListsExhausted,
@@ -60,6 +61,7 @@ pub enum ErrorReference {
 
 /// Response structure for errors
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ErrorResponse {
     pub error: String,
     pub fatal: bool,

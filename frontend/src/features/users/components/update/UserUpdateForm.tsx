@@ -79,7 +79,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
       )}
 
       <Form onSubmit={handleSubmit}>
-        <FormLayout width="medium" disabled={saving}>
+        <FormLayout disabled={saving}>
           <FormLayout.Section title={t("users.details_title")}>
             <InputField
               id="username"
@@ -111,7 +111,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
               />
             ) : (
               <FormLayout.Field label={t("account.password")}>
-                {t("users.change_password_hint")}
+                <p>{t("users.change_password_hint")}</p>
 
                 <Button
                   type="button"

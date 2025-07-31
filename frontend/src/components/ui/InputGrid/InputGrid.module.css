@@ -42,19 +42,28 @@
         border-right: 1px solid var(--bg-gray-darkest);
         padding: 0;
         input {
-          text-align: right;
           width: 100%;
           height: 4.5rem;
           border: 2px solid transparent;
-          padding: 1rem 1.5rem;
-          font-size: var(--font-size-body);
-          font-style: normal;
           &:focus,
           &:focus-visible {
             outline: none;
             border-color: var(--border-color-focus);
           }
         }
+
+        input,
+        :global(.formatted-overlay) {
+          text-align: right;
+          padding: 1rem 1.5rem;
+          font-size: var(--font-size-body);
+          font-style: normal;
+        }
+
+        :global(.formatted-overlay) {
+          color: var(--gray-600);
+        }
+
         &.readOnly span {
           display: block;
           height: 4.5rem;

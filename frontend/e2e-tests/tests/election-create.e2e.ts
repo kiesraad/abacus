@@ -16,6 +16,8 @@ import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/elec
 import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
 import { NavBar } from "e2e-tests/page-objects/NavBarPgObj";
 
+import { Election } from "@/types/generated/openapi";
+
 import { test } from "../fixtures";
 import { eml110a, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
 
@@ -27,8 +29,6 @@ test.describe("Election creation", () => {
   test("it uploads an election file, candidate list and polling stations", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
-    const initialElectionCount = await overviewPage.elections.count();
-    const initialCreatedStateCount = await overviewPage.electionsCreatedState.count();
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -48,20 +48,24 @@ test.describe("Election creation", () => {
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
-    await checkAndSavePage.save.click();
 
+    const responsePromise = page.waitForResponse(`/api/elections/import`);
+    await checkAndSavePage.save.click();
     await expect(overviewPage.header).toBeVisible();
-    // Check if the amount of elections by this title is greater than before the import
-    expect(await overviewPage.elections.count()).toBeGreaterThan(initialElectionCount);
-    // Check if the amount of "Voorbereiden" states is greater than before the import
-    expect(await overviewPage.electionsCreatedState.count()).toBeGreaterThan(initialCreatedStateCount);
+
+    const response = await responsePromise;
+    expect(response.status()).toBe(201);
+    const election = (await response.json()) as Election;
+
+    const electionRow = overviewPage.findElectionRowById(election.id);
+    await expect(electionRow).toBeVisible();
+    await expect(electionRow).toContainText("Gemeenteraad Amsterdam 2022");
+    await expect(electionRow).toContainText("Zitting voorbereiden");
   });
 
   test("it uploads an election file, candidate list but skips polling stations", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new OverviewPgObj(page);
-    const initialElectionCount = await overviewPage.elections.count();
-    const initialCreatedStateCount = await overviewPage.electionsCreatedState.count();
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -83,13 +87,19 @@ test.describe("Election creation", () => {
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
-    await checkAndSavePage.save.click();
 
+    const responsePromise = page.waitForResponse(`/api/elections/import`);
+    await checkAndSavePage.save.click();
     await expect(overviewPage.header).toBeVisible();
-    // Check if the amount of elections by this title is greater than before the import
-    expect(await overviewPage.elections.count()).toBeGreaterThan(initialElectionCount);
-    // Check if the amount of "Voorbereiden" states is greater than before the import
-    expect(await overviewPage.electionsCreatedState.count()).toBeGreaterThan(initialCreatedStateCount);
+
+    const response = await responsePromise;
+    expect(response.status()).toBe(201);
+    const election = (await response.json()) as Election;
+
+    const electionRow = overviewPage.findElectionRowById(election.id);
+    await expect(electionRow).toBeVisible();
+    await expect(electionRow).toContainText("Gemeenteraad Amsterdam 2022");
+    await expect(electionRow).toContainText("Zitting voorbereiden");
   });
 
   test("it fails on incorrect hash", async ({ page }) => {

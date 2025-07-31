@@ -42,7 +42,7 @@ export function UserCreateTypePage() {
       </header>
       <main>
         <Form onSubmit={handleSubmit}>
-          <FormLayout width="medium">
+          <FormLayout>
             <FormLayout.Section>
               <ChoiceList>
                 <ChoiceList.Title>{t("users.type_title")}</ChoiceList.Title>
@@ -62,7 +62,9 @@ export function UserCreateTypePage() {
                 />
               </ChoiceList>
             </FormLayout.Section>
-            <FormLayout.Section>{t("users.type_hint")}</FormLayout.Section>
+            <FormLayout.Section>
+              <p>{t("users.type_hint")}</p>
+            </FormLayout.Section>
           </FormLayout>
           <FormLayout.Controls>
             <Button size="xl" type="submit">

@@ -31,6 +31,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 
 /// Polling station list response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct PollingStationListResponse {
     pub polling_stations: Vec<PollingStation>,
 }

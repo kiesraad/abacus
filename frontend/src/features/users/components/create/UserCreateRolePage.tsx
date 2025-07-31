@@ -47,7 +47,7 @@ export function UserCreateRolePage() {
       </header>
       <main>
         <Form onSubmit={handleSubmit}>
-          <FormLayout width="medium">
+          <FormLayout>
             <FormLayout.Section>
               <ChoiceList>
                 <ChoiceList.Title>{t("users.role_title")}</ChoiceList.Title>
@@ -81,7 +81,9 @@ export function UserCreateRolePage() {
                 </ChoiceList.Radio>
               </ChoiceList>
             </FormLayout.Section>
-            <FormLayout.Section>{t("users.role_hint")}</FormLayout.Section>
+            <FormLayout.Section>
+              <p>{t("users.role_hint")}</p>
+            </FormLayout.Section>
           </FormLayout>
           <FormLayout.Controls>
             <Button size="xl" type="submit">

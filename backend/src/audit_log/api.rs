@@ -18,7 +18,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
-#[serde(rename_all = "camelCase")]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct AuditLogListResponse {
     pub events: Vec<AuditLogEvent>,
     pub page: u32,
@@ -37,7 +37,7 @@ fn default_per_page() -> u32 {
 }
 
 #[derive(Debug, Deserialize, ToSchema, IntoParams)]
-#[serde(rename_all = "camelCase")]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct LogFilterQuery {
     /// Page number, default 1
     #[serde(default = "default_page")]
@@ -97,6 +97,7 @@ async fn audit_log_list(
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct AuditLogUser {
     pub id: u32,
     pub username: String,

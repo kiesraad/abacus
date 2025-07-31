@@ -2,7 +2,7 @@
 
 use crate::{shared::create_result, utils::serve_api};
 #[cfg(feature = "dev-database")]
-use abacus::election::Election;
+use abacus::election::ElectionWithPoliticalGroups;
 use abacus::{
     committee_session::status::CommitteeSessionStatus,
     election::{ElectionDetailsResponse, ElectionListResponse},
@@ -89,7 +89,6 @@ async fn test_election_create_works(pool: SqlitePool) {
             "number_of_seats": 29,
             "election_date": "2026-01-01",
             "nomination_date": "2026-01-01",
-            "status": "DataEntryInProgress",
             "political_groups": [
           {
             "number": 1,
@@ -121,7 +120,7 @@ async fn test_election_create_works(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::CREATED);
-    let body: Election = response.json().await.unwrap();
+    let body: ElectionWithPoliticalGroups = response.json().await.unwrap();
     assert_eq!(body.name, "Test Election");
 }
 

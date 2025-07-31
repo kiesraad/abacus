@@ -37,26 +37,25 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 #### CSO | F.102: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
 
 > Invoerder: **Controleer je antwoorden** (F.101)
-> Coördinator: **Er mag maar 1 antwoord per vraag worden gegeven.** (F.102)
+> Coördinator: **Er mag maar één antwoord per vraag worden gegeven.** (F.102)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-#### CSO | F.111: 'Verschillen met telresultaten van het stembureau': beide vragen verplicht
+#### CSO | F.111: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
 
 > Invoerder: **Controleer je antwoorden** (F.101)
 > Coördinator: **Bij beide vragen moet een antwoord gegeven worden.** (F.102)
-
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### CSO | F.112: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
 
 > Invoerder: **Controleer je antwoorden** (F.101)  
-> Coördinator: **Er mag maar 1 antwoord per vraag worden gegeven.** (F.102)
+> Coördinator: **Er mag maar één antwoord per vraag worden gegeven.** (F.102)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-#### DSO | F.151: Over het proces-verbaal: Vragen bij 'Over het proces verbaal' moeten beantwoord worden
+#### DSO | F.151: Over het proces-verbaal: Niet alle vragen bij 'Over het proces verbaal' zijn beantwoord
 
 > Invoerder: **Controleer je antwoorden** (F.151)  
 > Beantwoord de vragen over het papieren proces-verbaal. Overleg met de coördinator als je twijfelt.
@@ -64,7 +63,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > Coördinator: **Er is niet correct aangegeven welke documenten zijn ingevoerd** (F.151)
 > Bekijk welke documenten aanwezig zijn, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden. 
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 #### DSO | F.152: Over het proces-verbaal: Ongeldige combinatie van antwoorden: `wel corrigendum, geen inlegvel`
@@ -75,7 +74,7 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 > Coördinator: **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)
 > Zorg dat een correct ingevuld inlegvel wordt toegevoegd, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 #### DSO | F.153: 'Controles en correcties': vragen moeten beantwoord worden (geen vinkjes bij de eerste twee vragen)

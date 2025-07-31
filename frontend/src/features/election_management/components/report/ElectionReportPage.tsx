@@ -12,10 +12,10 @@ import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-import { formatFullDateWithoutTimezone } from "@/utils/format";
+import { formatFullDateWithoutTimezone } from "@/utils/dateTime";
 
-import { directDownload } from "../utils/download";
-import cls from "./ElectionManagement.module.css";
+import { directDownload } from "../../utils/download";
+import cls from "../ElectionManagement.module.css";
 
 export function ElectionReportPage() {
   const { committeeSession, election } = useElection();

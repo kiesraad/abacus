@@ -14,7 +14,7 @@ import {
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-import { formatFullDateWithoutTimezone } from "@/utils/format";
+import { formatFullDateWithoutTimezone } from "@/utils/dateTime";
 
 import cls from "./CommitteeSessionCard.module.css";
 

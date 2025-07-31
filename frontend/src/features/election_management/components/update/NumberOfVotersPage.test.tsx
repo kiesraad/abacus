@@ -1,14 +1,14 @@
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { NumberOfVotersPage } from "@/features/election_management/components/NumberOfVotersPage";
-import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionProvider } from "../../../../hooks/election/ElectionProvider";
 import {
   ElectionCommitteeSessionChangeNumberOfVotersHandler,
   ElectionRequestHandler,
-} from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
-import { render, screen, spyOnHandler } from "@/testing/test-utils";
+} from "../../../../testing/api-mocks/RequestHandlers";
+import { server } from "../../../../testing/server";
+import { render, screen, spyOnHandler } from "../../../../testing/test-utils";
+import { NumberOfVotersPage } from "./NumberOfVotersPage";
 
 const navigate = vi.fn();
 

@@ -3,11 +3,11 @@ import { RouteObject } from "react-router";
 import { NotAvailableInMock } from "@/components/error/NotAvailableInMock";
 import { t } from "@/i18n/translate";
 
-import { CommitteeSessionDetailsPage } from "./components/CommitteeSessionDetailsPage";
 import { ElectionHomePage } from "./components/ElectionHomePage";
-import { ElectionReportPage } from "./components/ElectionReportPage";
-import { FinishDataEntryPage } from "./components/FinishDataEntryPage";
-import { NumberOfVotersPage } from "./components/NumberOfVotersPage";
+import { ElectionReportPage } from "./components/report/ElectionReportPage";
+import { FinishDataEntryPage } from "./components/report/FinishDataEntryPage";
+import { CommitteeSessionDetailsPage } from "./components/update/CommitteeSessionDetailsPage";
+import { NumberOfVotersPage } from "./components/update/NumberOfVotersPage";
 
 export const electionManagementRoutes: RouteObject[] = [
   { index: true, Component: ElectionHomePage },

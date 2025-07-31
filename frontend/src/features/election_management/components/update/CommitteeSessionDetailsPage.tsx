@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
@@ -11,20 +10,32 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
-import {
-  COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
-  COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
-} from "@/types/generated/openapi";
+import { COMMITTEE_SESSION_UPDATE_REQUEST_PATH, CommitteeSessionUpdateRequest } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
+import { convertNLDateToISODate, isValidNLDate, isValidTime } from "@/utils/dateTime";
 
-import cls from "./ElectionManagement.module.css";
+import cls from "../ElectionManagement.module.css";
+
+type ValidationErrors = {
+  location?: string;
+  start_date?: string;
+  start_time?: string;
+};
 
 export function CommitteeSessionDetailsPage() {
   const client = useApiClient();
   const navigate = useNavigate();
   const { committeeSession } = useElection();
   const [submitError, setSubmitError] = useState<AnyApiError | null>(null);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
   const sessionLabel = committeeSessionLabel(committeeSession.number, true).toLowerCase();
+  const defaultDate = committeeSession.start_date
+    ? new Date(committeeSession.start_date).toLocaleDateString(t("date_locale"), {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+    : "";
 
   if (submitError) {
     throw submitError;
@@ -33,22 +44,24 @@ export function CommitteeSessionDetailsPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-
-    // Convert date from dd-mm-yyyy to yyyy-mm-dd
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const dateParts = /(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[12])-(20\d{2})/.exec(formData.get("startDate") as string);
-    const dateString = `${dateParts?.[3]}-${dateParts?.[2]}-${dateParts?.[1]}`;
-
-    const path: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}`;
-    const body: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
+    const details: CommitteeSessionUpdateRequest = {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       location: (formData.get("location") as string).trim(),
-      start_date: dateString,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      start_time: (formData.get("startTime") as string).trim(),
+      start_date: (formData.get("start_date") as string).trim(),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      start_time: (formData.get("start_time") as string).trim(),
     };
+
+    if (!validate(details)) {
+      return;
+    }
+
+    details.start_date = convertNLDateToISODate(details.start_date);
+
+    const path: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}`;
     client
-      .putRequest(path, body)
+      .putRequest(path, details)
       .then((result) => {
         if (isSuccess(result)) {
           void navigate("..");
@@ -57,6 +70,30 @@ export function CommitteeSessionDetailsPage() {
         }
       })
       .catch(setSubmitError);
+  }
+
+  function validate(detailsUpdate: CommitteeSessionUpdateRequest) {
+    const errors: ValidationErrors = {};
+
+    if (detailsUpdate.location.length === 0) {
+      errors.location = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
+    }
+
+    if (detailsUpdate.start_date.length === 0) {
+      errors.start_date = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
+    } else if (!isValidNLDate(detailsUpdate.start_date)) {
+      errors.start_date = t("election_management.date_error");
+    }
+
+    if (detailsUpdate.start_time.length === 0) {
+      errors.start_time = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
+    } else if (!isValidTime(detailsUpdate.start_time)) {
+      errors.start_time = t("election_management.time_error");
+    }
+
+    const isValid = Object.keys(errors).length === 0;
+    setValidationErrors(isValid ? null : errors);
+    return isValid;
   }
 
   return (
@@ -74,61 +111,37 @@ export function CommitteeSessionDetailsPage() {
         <article>
           <Form className={cls.detailsForm} onSubmit={handleSubmit}>
             <FormLayout>
-              <h2>{t("election_management.where_is_the_committee_session")}</h2>
+              <h2>{t("election_management.where_is_the_committee_session", { sessionLabel: sessionLabel })}</h2>
               <InputField
                 id="location"
                 name="location"
                 label={t("election_management.session_location")}
                 hint={tx("election_management.add_the_location")}
                 fieldWidth="wide"
+                error={validationErrors?.location}
                 defaultValue={committeeSession.location || ""}
-                required
               />
               <h2>{t("election_management.when_is_the_committee_session", { sessionLabel: sessionLabel })}</h2>
               <FormLayout.Row>
                 <InputField
-                  id="startDate"
-                  name="startDate"
+                  id="start_date"
+                  name="start_date"
                   label={t("election_management.date")}
                   hint={t("election_management.date_hint")}
                   fieldWidth="average"
-                  defaultValue={
-                    committeeSession.start_date
-                      ? new Date(committeeSession.start_date).toLocaleDateString(t("date_locale"), {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                        })
-                      : ""
-                  }
+                  error={validationErrors?.start_date}
+                  defaultValue={defaultDate}
                   placeholder="dd-mm-jjjj"
-                  pattern="(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[12])-(20\d{2})"
-                  onInvalid={(e) => {
-                    e.currentTarget.setCustomValidity(t("election_management.date_error"));
-                  }}
-                  onInput={(e) => {
-                    e.currentTarget.setCustomValidity("");
-                    return !e.currentTarget.validity.valid && e.currentTarget.setCustomValidity(" ");
-                  }}
-                  required
                 />
                 <InputField
-                  id="startTime"
-                  name="startTime"
+                  id="start_time"
+                  name="start_time"
                   label={t("election_management.time")}
                   hint={t("election_management.time_hint")}
                   fieldWidth="narrowish"
+                  error={validationErrors?.start_time}
                   defaultValue={committeeSession.start_time || ""}
                   placeholder="uu:mm"
-                  pattern="([01][0-9]|2[0-3]):([0-5][0-9])"
-                  onInvalid={(e) => {
-                    e.currentTarget.setCustomValidity(t("election_management.time_error"));
-                  }}
-                  onInput={(e) => {
-                    e.currentTarget.setCustomValidity("");
-                    return !e.currentTarget.validity.valid && e.currentTarget.setCustomValidity(" ");
-                  }}
-                  required
                 />
               </FormLayout.Row>
               <FormLayout.Controls>

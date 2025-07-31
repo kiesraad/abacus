@@ -1,17 +1,16 @@
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { ElectionProvider } from "../../../../hooks/election/ElectionProvider";
+import { ElectionStatusProvider } from "../../../../hooks/election/ElectionStatusProvider";
+import { getElectionMockData } from "../../../../testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-} from "@/testing/api-mocks/RequestHandlers";
-import { overrideOnce, server } from "@/testing/server";
-import { renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
-
+} from "../../../../testing/api-mocks/RequestHandlers";
+import { overrideOnce, server } from "../../../../testing/server";
+import { renderReturningRouter, screen, spyOnHandler } from "../../../../testing/test-utils";
 import { FinishDataEntryPage } from "./FinishDataEntryPage";
 
 const navigate = vi.fn();

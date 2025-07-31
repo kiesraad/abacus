@@ -9,7 +9,7 @@ export function committeeSessionLabel(sessionNumber: number, addArticle = false)
     sessionString === "4" ||
     sessionString === "5"
   ) {
-    return `${addArticle ? `${t("the")} ` : ""}${t(`committee_session_status.number.${sessionString}`)} ${t(`committee_session_status.session`).toLowerCase()}`;
+    return `${addArticle ? `${t("committee_session_status.the")} ` : ""}${t(`committee_session_status.number.${sessionString}`)} ${t(`committee_session_status.session`).toLowerCase()}`;
   } else {
     return `${t("committee_session_status.session")} ${sessionString}`;
   }

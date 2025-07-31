@@ -122,9 +122,9 @@ describe("FinishDataEntryPage", () => {
       ),
     );
     overrideOnce("put", "/api/committee_sessions/1/status", 409, {
-      error: "Wrong committee session status",
+      error: "Invalid committee session status",
       fatal: true,
-      reference: "WrongCommitteeSessionStatus",
+      reference: "InvalidCommitteeSessionStatus",
     } satisfies ErrorResponse);
 
     await router.navigate("/elections/1/report");

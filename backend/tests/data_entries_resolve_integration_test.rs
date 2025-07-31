@@ -145,7 +145,7 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_errors_wrong_committee_session_state(pool: SqlitePool) {
+async fn test_polling_station_data_entry_errors_invalid_committee_session_state(pool: SqlitePool) {
     let addr = utils::serve_api(pool.clone()).await;
     let typist_cookie = shared::typist_login(&addr).await;
     let res =
@@ -236,7 +236,7 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_state(pool: Sqlite
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_resolve_errors_wrong_committee_session_state(
+async fn test_polling_station_data_entry_resolve_errors_invalid_committee_session_state(
     pool: SqlitePool,
 ) {
     let addr = utils::serve_api(pool.clone()).await;
@@ -312,7 +312,7 @@ async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_differences_wrong_committee_session_state(
+async fn test_polling_station_data_entry_differences_invalid_committee_session_state(
     pool: SqlitePool,
 ) {
     let addr = utils::serve_api(pool.clone()).await;

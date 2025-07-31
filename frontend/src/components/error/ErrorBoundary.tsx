@@ -38,7 +38,7 @@ export function ErrorBoundary() {
     );
   }
 
-  if (error instanceof FatalApiError && error.reference === "WrongCommitteeSessionStatus") {
+  if (error instanceof FatalApiError && error.reference === "InvalidCommitteeSessionStatus") {
     return (
       <FatalErrorPage
         title="error.not_possible"

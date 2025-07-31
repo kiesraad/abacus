@@ -1018,7 +1018,7 @@ pub mod tests {
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(
             result.reference,
-            ErrorReference::WrongCommitteeSessionStatus
+            ErrorReference::InvalidCommitteeSessionStatus
         );
 
         // Check that no row was created
@@ -1111,7 +1111,7 @@ pub mod tests {
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(
             result.reference,
-            ErrorReference::WrongCommitteeSessionStatus
+            ErrorReference::InvalidCommitteeSessionStatus
         );
 
         // Check that the row was not updated
@@ -1287,7 +1287,7 @@ pub mod tests {
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(
             result.reference,
-            ErrorReference::WrongCommitteeSessionStatus
+            ErrorReference::InvalidCommitteeSessionStatus
         );
     }
 
@@ -1543,7 +1543,7 @@ pub mod tests {
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(
             result.reference,
-            ErrorReference::WrongCommitteeSessionStatus
+            ErrorReference::InvalidCommitteeSessionStatus
         );
 
         // Check if entry is still in FirstEntryInProgress state
@@ -1688,7 +1688,7 @@ pub mod tests {
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(
             result.reference,
-            ErrorReference::WrongCommitteeSessionStatus
+            ErrorReference::InvalidCommitteeSessionStatus
         );
 
         let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")

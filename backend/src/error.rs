@@ -36,6 +36,7 @@ pub enum ErrorReference {
     EntryNotUnique,
     Forbidden,
     InternalServerError,
+    InvalidCommitteeSessionStatus,
     InvalidData,
     InvalidHash,
     InvalidJson,
@@ -55,7 +56,6 @@ pub enum ErrorReference {
     Unauthorized,
     UsernameNotUnique,
     UserNotFound,
-    WrongCommitteeSessionStatus,
     ZeroVotesCast,
 }
 
@@ -365,8 +365,8 @@ impl IntoResponse for APIError {
                     CommitteeSessionError::InvalidCommitteeSessionStatus => (
                         StatusCode::CONFLICT,
                         to_error(
-                            "Wrong committee session status",
-                            ErrorReference::WrongCommitteeSessionStatus,
+                            "Invalid committee session status",
+                            ErrorReference::InvalidCommitteeSessionStatus,
                             true,
                         ),
                     ),

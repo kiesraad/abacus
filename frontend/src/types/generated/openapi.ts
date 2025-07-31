@@ -681,6 +681,7 @@ export type ErrorReference =
   | "EntryNotUnique"
   | "Forbidden"
   | "InternalServerError"
+  | "InvalidCommitteeSessionStatus"
   | "InvalidData"
   | "InvalidHash"
   | "InvalidJson"
@@ -700,7 +701,6 @@ export type ErrorReference =
   | "Unauthorized"
   | "UsernameNotUnique"
   | "UserNotFound"
-  | "WrongCommitteeSessionStatus"
   | "ZeroVotesCast";
 
 /**

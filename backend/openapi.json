@@ -4692,6 +4692,7 @@
           "EntryNotUnique",
           "Forbidden",
           "InternalServerError",
+          "InvalidCommitteeSessionStatus",
           "InvalidData",
           "InvalidHash",
           "InvalidJson",
@@ -4711,7 +4712,6 @@
           "Unauthorized",
           "UsernameNotUnique",
           "UserNotFound",
-          "WrongCommitteeSessionStatus",
           "ZeroVotesCast"
         ]
       },

@@ -22,7 +22,7 @@ export function RadioSubsectionComponent({
   readOnly = false,
 }: RadioSubsectionProps) {
   return (
-    <fieldset className={`radio-form ${cls.container}`}>
+    <fieldset className={cls.container}>
       {subsection.title && <legend>{subsection.title}</legend>}
       <ChoiceList>
         {defaultProps.errorsAndWarnings?.get(`data.${subsection.path}`) && (

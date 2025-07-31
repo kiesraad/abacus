@@ -14,7 +14,8 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
-import { screen, setupTestRouter } from "@/testing/test-utils";
+import { expectForbiddenErrorPage, screen, setupTestRouter } from "@/testing/test-utils";
+import { ErrorResponse } from "@/types/generated/openapi";
 
 import { electionStatusRoutes } from "../routes";
 
@@ -45,9 +46,6 @@ async function renderPage() {
   await router.navigate("/elections/1/status");
   rtlRender(<Providers router={router} />);
 
-  // Wait for the page to be loaded
-  expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
-
   return router;
 }
 
@@ -64,6 +62,9 @@ describe("ElectionStatusPage", () => {
   test("Finish input not visible when data entry is in progress", async () => {
     await renderPage();
 
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+
     // Test that the data entry finished message doesn't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
@@ -79,6 +80,9 @@ describe("ElectionStatusPage", () => {
     });
 
     await renderPage();
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
     const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
@@ -100,7 +104,26 @@ describe("ElectionStatusPage", () => {
 
     await renderPage();
 
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
+  });
+
+  test("Shows error page when election status call returns an error", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
+    overrideOnce("get", "/api/elections/1/status", 403, {
+      error: "Forbidden",
+      fatal: true,
+      reference: "Forbidden",
+    } satisfies ErrorResponse);
+
+    await renderPage();
+
+    await expectForbiddenErrorPage();
   });
 });

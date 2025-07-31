@@ -11,6 +11,7 @@ use crate::audit_log::CommitteeSessionDetails;
 
 /// Committee session
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
 pub struct CommitteeSession {
     pub id: u32,
     pub number: u32,
@@ -45,6 +46,7 @@ impl IntoResponse for CommitteeSession {
 
 /// Committee session create request
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
 pub struct CommitteeSessionCreateRequest {
     pub number: u32,
     pub election_id: u32,
@@ -53,6 +55,7 @@ pub struct CommitteeSessionCreateRequest {
 
 /// Committee session update request
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
 pub struct CommitteeSessionUpdateRequest {
     pub location: String,
     pub start_date: String,
@@ -61,12 +64,14 @@ pub struct CommitteeSessionUpdateRequest {
 
 /// Committee session number of voters change request
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
 pub struct CommitteeSessionNumberOfVotersChangeRequest {
     pub number_of_voters: u32,
 }
 
 /// Committee session status change request
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
 pub struct CommitteeSessionStatusChangeRequest {
     pub status: CommitteeSessionStatus,
 }

@@ -2895,7 +2895,8 @@
             "description": "Political group number which the residual seat is retracted from",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "AccountUpdateRequest": {
         "type": "object",
@@ -2913,7 +2914,8 @@
           "username": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "AuditEvent": {
         "oneOf": [
@@ -3537,7 +3539,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "AuditLogListResponse": {
         "type": "object",
@@ -3569,7 +3572,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "AuditLogUser": {
         "type": "object",
@@ -3594,7 +3598,8 @@
           "username": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "Candidate": {
         "type": "object",
@@ -3632,7 +3637,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CandidateGender": {
         "type": "string",
@@ -3670,7 +3676,8 @@
             "$ref": "#/components/schemas/PreferenceThreshold",
             "description": "Preference threshold percentage and number of votes"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CandidateVotes": {
         "type": "object",
@@ -3689,7 +3696,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ClaimDataEntryResponse": {
         "type": "object",
@@ -3709,7 +3717,8 @@
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CommitteeSession": {
         "type": "object",
@@ -3757,7 +3766,8 @@
           "status": {
             "$ref": "#/components/schemas/CommitteeSessionStatus"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CommitteeSessionCreateRequest": {
         "type": "object",
@@ -3783,7 +3793,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CommitteeSessionDetails": {
         "type": "object",
@@ -3830,7 +3841,8 @@
           "sessionStatus": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CommitteeSessionListResponse": {
         "type": "object",
@@ -3845,7 +3857,8 @@
               "$ref": "#/components/schemas/CommitteeSession"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CommitteeSessionNumberOfVotersChangeRequest": {
         "type": "object",
@@ -3859,7 +3872,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CommitteeSessionStatus": {
         "type": "string",
@@ -3882,7 +3896,8 @@
           "status": {
             "$ref": "#/components/schemas/CommitteeSessionStatus"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CommitteeSessionUpdateRequest": {
         "type": "object",
@@ -3902,7 +3917,8 @@
           "start_time": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "CreateUserRequest": {
         "type": "object",
@@ -3924,7 +3940,8 @@
           "username": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "Credentials": {
         "type": "object",
@@ -3939,7 +3956,8 @@
           "username": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "DataEntry": {
         "type": "object",
@@ -3965,7 +3983,8 @@
             "maximum": 100,
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "DataEntryDetails": {
         "type": "object",
@@ -4010,7 +4029,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "DataEntryGetDifferencesResponse": {
         "type": "object",
@@ -4037,7 +4057,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "DataEntryGetErrorsResponse": {
         "type": "object",
@@ -4062,7 +4083,8 @@
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "DataEntryStatusName": {
         "type": "string",
@@ -4085,7 +4107,8 @@
           "status": {
             "$ref": "#/components/schemas/DataEntryStatusName"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "DifferencesCounts": {
         "type": "object",
@@ -4142,7 +4165,8 @@
             "description": "Number of unreturned ballots (\"Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?\")",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "Election": {
         "type": "object",
@@ -4196,7 +4220,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionAndCandidateDefinitionValidateRequest": {
         "type": "object",
@@ -4228,7 +4253,8 @@
           "polling_station_data": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionAndCandidatesDefinitionImportRequest": {
         "type": "object",
@@ -4260,7 +4286,8 @@
           "polling_station_data": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionApportionmentResponse": {
         "type": "object",
@@ -4280,7 +4307,8 @@
           "seat_assignment": {
             "$ref": "#/components/schemas/SeatAssignmentResult"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionCategory": {
         "type": "string",
@@ -4314,7 +4342,8 @@
               "$ref": "#/components/schemas/PollingStationRequest"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionDetails": {
         "type": "object",
@@ -4367,7 +4396,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionDetailsResponse": {
         "type": "object",
@@ -4390,7 +4420,8 @@
               "$ref": "#/components/schemas/PollingStation"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionListResponse": {
         "type": "object",
@@ -4412,7 +4443,8 @@
               "$ref": "#/components/schemas/Election"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionStatusResponse": {
         "type": "object",
@@ -4427,7 +4459,8 @@
               "$ref": "#/components/schemas/ElectionStatusResponseEntry"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionStatusResponseEntry": {
         "type": "object",
@@ -4475,7 +4508,8 @@
             "$ref": "#/components/schemas/DataEntryStatusName",
             "description": "Data entry status"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionSummary": {
         "type": "object",
@@ -4506,7 +4540,8 @@
             "$ref": "#/components/schemas/VotesCounts",
             "description": "The total number of votes"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ElectionWithPoliticalGroups": {
         "type": "object",
@@ -4567,7 +4602,8 @@
               "$ref": "#/components/schemas/PoliticalGroup"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ErrorDetails": {
         "type": "object",
@@ -4586,7 +4622,8 @@
           "reference": {
             "$ref": "#/components/schemas/ErrorReference"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ErrorReference": {
         "type": "string",
@@ -4644,7 +4681,8 @@
           "reference": {
             "$ref": "#/components/schemas/ErrorReference"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ExtraInvestigation": {
         "type": "object",
@@ -4689,7 +4727,8 @@
             "format": "int64",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "HighestAverageAssignedSeat": {
         "type": "object",
@@ -4739,7 +4778,8 @@
             "$ref": "#/components/schemas/Fraction",
             "description": "This is the votes per seat achieved by the selected political group"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "LargestRemainderAssignedSeat": {
         "type": "object",
@@ -4779,7 +4819,8 @@
             "description": "The political group that was selected for this seat has this political group number",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ListExhaustionRemovedSeat": {
         "type": "object",
@@ -4799,7 +4840,8 @@
             "description": "Political group number which the seat is retracted from",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "LoginResponse": {
         "type": "object",
@@ -4827,7 +4869,8 @@
           "username": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "NewElection": {
         "type": "object",
@@ -4882,7 +4925,8 @@
               "$ref": "#/components/schemas/PoliticalGroup"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PoliticalGroup": {
         "type": "object",
@@ -4907,7 +4951,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PoliticalGroupCandidateNomination": {
         "type": "object",
@@ -4958,7 +5003,8 @@
             },
             "description": "The updated ranking of the whole candidate list, can be empty"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PoliticalGroupSeatAssignment": {
         "type": "object",
@@ -5011,7 +5057,8 @@
             "description": "The number of votes cast for this group",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PoliticalGroupStanding": {
         "type": "object",
@@ -5062,7 +5109,8 @@
             "description": "The number of votes cast for this group",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PoliticalGroupVotes": {
         "type": "object",
@@ -5088,7 +5136,8 @@
             "format": "int32",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PollingStation": {
         "type": "object",
@@ -5136,7 +5185,8 @@
           "postal_code": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PollingStationDetails": {
         "type": "object",
@@ -5186,7 +5236,8 @@
           "pollingStationType": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PollingStationListResponse": {
         "type": "object",
@@ -5201,7 +5252,8 @@
               "$ref": "#/components/schemas/PollingStation"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PollingStationRequest": {
         "type": "object",
@@ -5237,7 +5289,8 @@
           "postal_code": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PollingStationResults": {
         "type": "object",
@@ -5273,7 +5326,8 @@
             "$ref": "#/components/schemas/VotesCounts",
             "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PollingStationType": {
         "type": "string",
@@ -5301,7 +5355,8 @@
             "description": "Preference threshold as a percentage (0 to 100)",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "RedactedEmlHash": {
         "type": "object",
@@ -5360,7 +5415,8 @@
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "SeatAssignmentResult": {
         "type": "object",
@@ -5404,7 +5460,8 @@
               "$ref": "#/components/schemas/SeatChangeStep"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "SeatChange": {
         "oneOf": [
@@ -5538,7 +5595,8 @@
               "$ref": "#/components/schemas/PoliticalGroupStanding"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "SumCount": {
         "type": "object",
@@ -5560,7 +5618,8 @@
               "format": "int64"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "SummaryDifferencesCounts": {
         "type": "object",
@@ -5596,7 +5655,8 @@
           "unreturned_ballots_count": {
             "$ref": "#/components/schemas/SumCount"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "UpdateUserRequest": {
         "type": "object",
@@ -5668,7 +5728,8 @@
           "username": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "UserListResponse": {
         "type": "object",
@@ -5682,7 +5743,8 @@
               "$ref": "#/components/schemas/User"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "UserLoggedInDetails": {
         "type": "object",
@@ -5699,7 +5761,8 @@
           "userAgent": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "UserLoggedOutDetails": {
         "type": "object",
@@ -5712,7 +5775,8 @@
             "format": "int64",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "UserLoginFailedDetails": {
         "type": "object",
@@ -5727,7 +5791,8 @@
           "username": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ValidationResult": {
         "type": "object",
@@ -5745,7 +5810,8 @@
               "type": "string"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ValidationResultCode": {
         "type": "string",
@@ -5788,7 +5854,8 @@
               "$ref": "#/components/schemas/ValidationResult"
             }
           }
-        }
+        },
+        "additionalProperties": false
       },
       "VoteCountingMethod": {
         "type": "string",
@@ -5824,7 +5891,8 @@
             "description": "Total number of admitted voters (\"Totaal aantal toegelaten kiezers\")",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "VotesCounts": {
         "type": "object",
@@ -5860,7 +5928,8 @@
             "description": "Number of valid votes on candidates\n(\"Aantal stembiljetten met een geldige stem op een kandidaat\")",
             "minimum": 0
           }
-        }
+        },
+        "additionalProperties": false
       },
       "YesNo": {
         "type": "object",

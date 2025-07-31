@@ -19,7 +19,7 @@ use abacus::{
     data_entry::{
         DataEntry, PollingStationResults, VotersCounts, VotesCounts, status::ClientState,
     },
-    election::Election,
+    election::ElectionWithPoliticalGroups,
 };
 
 pub mod shared;
@@ -259,7 +259,7 @@ async fn test_election_apportionment_error_apportionment_not_available_no_pollin
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::CREATED);
-    let election: Election = response.json().await.unwrap();
+    let election: ElectionWithPoliticalGroups = response.json().await.unwrap();
 
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let url = format!(

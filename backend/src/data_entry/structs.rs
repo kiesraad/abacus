@@ -14,6 +14,7 @@ use crate::{
 };
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]
+#[serde(deny_unknown_fields)]
 pub struct PollingStationDataEntry {
     pub polling_station_id: u32,
     pub committee_session_id: u32,
@@ -54,6 +55,7 @@ pub struct PollingStationResultsEntry {
 /// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
 /// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
 pub struct PollingStationResults {
     /// Extra investigation ("B1-1 Extra onderzoek")
     pub extra_investigation: ExtraInvestigation,
@@ -95,6 +97,7 @@ pub type Count = u32;
 
 /// Voters counts, part of the polling station results.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
 pub struct VotersCounts {
     /// Number of valid poll cards ("Aantal geldige stempassen")
     #[schema(value_type = u32)]
@@ -117,6 +120,7 @@ impl AddAssign<&VotersCounts> for VotersCounts {
 
 /// Votes counts, part of the polling station results.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
 pub struct VotesCounts {
     /// Number of valid votes on candidates
     /// ("Aantal stembiljetten met een geldige stem op een kandidaat")
@@ -144,6 +148,7 @@ impl AddAssign<&VotesCounts> for VotesCounts {
 
 /// Differences counts, part of the polling station results.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
 pub struct DifferencesCounts {
     /// Number of more counted ballots ("Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?")
     #[schema(value_type = u32)]
@@ -203,6 +208,7 @@ pub struct ExtraInvestigation {
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
 pub struct PoliticalGroupVotes {
     #[schema(value_type = u32)]
     pub number: PGNumber,
@@ -264,6 +270,7 @@ impl PoliticalGroupVotes {
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
 pub struct CandidateVotes {
     #[schema(value_type = u32)]
     pub number: CandidateNumber,
@@ -320,6 +327,7 @@ mod tests {
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct DataEntryStatusResponse {
     pub status: DataEntryStatusName,
 }

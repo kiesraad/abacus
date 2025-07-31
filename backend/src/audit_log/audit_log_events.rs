@@ -27,7 +27,7 @@ pub enum AuditEventLevel {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(transparent)]
+#[serde(deny_unknown_fields, transparent)]
 pub struct Ip(Option<IpAddr>);
 
 impl From<Option<String>> for Ip {
@@ -37,7 +37,7 @@ impl From<Option<String>> for Ip {
 }
 
 #[derive(Serialize, Deserialize, Debug, FromRow, ToSchema)]
-#[serde(rename_all = "camelCase")]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct AuditLogEvent {
     id: u32,
     #[schema(value_type = String)]

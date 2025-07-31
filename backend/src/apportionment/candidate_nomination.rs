@@ -12,6 +12,7 @@ use crate::{
 /// Contains information about the chosen candidates and the candidate list ranking
 /// for a specific political group.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct PoliticalGroupCandidateNomination {
     /// Political group number for which this nomination applies
     #[schema(value_type = u32)]
@@ -29,6 +30,7 @@ pub struct PoliticalGroupCandidateNomination {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct PreferenceThreshold {
     /// Preference threshold as a percentage (0 to 100)
     pub percentage: u64,
@@ -42,6 +44,7 @@ pub struct PreferenceThreshold {
 /// It also contains the preferential nomination of candidates, the remaining
 /// nomination of candidates and the final ranking of candidates for each political group.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct CandidateNominationResult {
     /// Preference threshold percentage and number of votes
     pub preference_threshold: PreferenceThreshold,

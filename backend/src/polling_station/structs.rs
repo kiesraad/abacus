@@ -11,6 +11,7 @@ use crate::{APIError, audit_log::PollingStationDetails};
 
 /// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct PollingStation {
     pub id: u32,
     pub election_id: u32,
@@ -52,6 +53,7 @@ impl From<PollingStation> for PollingStationDetails {
 /// Polling station of a certain [crate::election::Election]
 #[derive(Clone, Serialize, Deserialize, ToSchema, Debug, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
+#[serde(deny_unknown_fields)]
 pub struct PollingStationRequest {
     pub name: String,
     pub number: i64,

@@ -12,7 +12,7 @@ const checkboxesSubsection: CheckboxesSubsection = {
   title: "This is the title above the checkboxes",
   short_title: "voters_votes_counts.short_title",
   error_path: "voters_counts.poll_card_count",
-  error_message: "form_errors.FORM_VALIDATION_RESULT_REQUIRED",
+  error_message: "This is an error message",
   options: [
     {
       path: "voters_counts.poll_card_count",

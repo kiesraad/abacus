@@ -71,31 +71,55 @@ export function doesValidationResultApplyToSection(
 
     // Check exact matches in the section
     for (const subsection of section.subsections) {
-      if (subsection.type === "radio" && subsection.path === normalizedFieldName) {
-        return true;
-      }
-
-      if (subsection.type === "inputGrid") {
-        for (const row of subsection.rows) {
-          if (row.path === normalizedFieldName) {
+      switch (subsection.type) {
+        case "radio":
+          if (subsection.path === normalizedFieldName) {
             return true;
           }
-        }
+          break;
+
+        case "inputGrid":
+          for (const row of subsection.rows) {
+            if (row.path === normalizedFieldName) {
+              return true;
+            }
+          }
+          break;
+
+        case "checkboxes":
+          for (const option of subsection.options) {
+            if (option.path === normalizedFieldName) {
+              return true;
+            }
+          }
+          break;
       }
     }
 
     // Check parent object paths
     for (const subsection of section.subsections) {
-      if (subsection.type === "radio" && subsection.path.startsWith(normalizedFieldName + ".")) {
-        return true;
-      }
-
-      if (subsection.type === "inputGrid") {
-        for (const row of subsection.rows) {
-          if (row.path.startsWith(normalizedFieldName + ".") || row.path.startsWith(normalizedFieldName + "[")) {
+      switch (subsection.type) {
+        case "radio":
+          if (subsection.path.startsWith(normalizedFieldName + ".")) {
             return true;
           }
-        }
+          break;
+
+        case "inputGrid":
+          for (const row of subsection.rows) {
+            if (row.path.startsWith(normalizedFieldName + ".") || row.path.startsWith(normalizedFieldName + "[")) {
+              return true;
+            }
+          }
+          break;
+
+        case "checkboxes":
+          for (const option of subsection.options) {
+            if (option.path.startsWith(normalizedFieldName + ".")) {
+              return true;
+            }
+          }
+          break;
       }
     }
 

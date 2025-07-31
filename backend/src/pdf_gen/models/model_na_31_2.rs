@@ -26,6 +26,7 @@ impl ToPdfFileModel for ModelNa31_2Input {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ModelNa31_2Bijlage1Input {
     pub election: ElectionWithPoliticalGroups,
     pub polling_station: PollingStation,

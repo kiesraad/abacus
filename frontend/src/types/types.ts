@@ -12,7 +12,6 @@ export interface HeadingSubsection {
 export interface MessageSubsection {
   type: "message";
   message: string;
-  className?: string;
 }
 
 export interface RadioSubsectionOption {

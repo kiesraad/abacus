@@ -7,5 +7,5 @@ export interface MessageSubsectionProps {
 }
 
 export function MessageSubsectionComponent({ subsection }: MessageSubsectionProps) {
-  return <p className={[subsection.className, cls.message].join(" ")}>{subsection.message}</p>;
+  return <p className={cls.message}>{subsection.message}</p>;
 }

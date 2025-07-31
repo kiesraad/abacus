@@ -73,7 +73,7 @@ export function CommitteeSessionDetailsPage() {
       <main>
         <article>
           <Form className={cls.detailsForm} onSubmit={handleSubmit}>
-            <FormLayout width="medium">
+            <FormLayout>
               <h2>{t("election_management.where_is_the_committee_session")}</h2>
               <InputField
                 id="location"
@@ -81,7 +81,7 @@ export function CommitteeSessionDetailsPage() {
                 label={t("election_management.session_location")}
                 hint={tx("election_management.add_the_location")}
                 fieldWidth="wide"
-                defaultValue={committeeSession.location}
+                defaultValue={committeeSession.location || ""}
                 required
               />
               <h2>{t("election_management.when_is_the_committee_session", { sessionLabel: sessionLabel })}</h2>
@@ -92,15 +92,19 @@ export function CommitteeSessionDetailsPage() {
                   label={t("election_management.date")}
                   hint={t("election_management.date_hint")}
                   fieldWidth="average"
-                  defaultValue={new Date(committeeSession.start_date).toLocaleDateString(t("date_locale"), {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  })}
+                  defaultValue={
+                    committeeSession.start_date
+                      ? new Date(committeeSession.start_date).toLocaleDateString(t("date_locale"), {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        })
+                      : ""
+                  }
                   placeholder="dd-mm-jjjj"
                   pattern="(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[12])-(20\d{2})"
                   onInvalid={(e) => {
-                    e.currentTarget.setCustomValidity("Vul de datum in met het format: dd-mm-jjjj");
+                    e.currentTarget.setCustomValidity(t("election_management.date_error"));
                   }}
                   onInput={(e) => {
                     e.currentTarget.setCustomValidity("");
@@ -114,11 +118,11 @@ export function CommitteeSessionDetailsPage() {
                   label={t("election_management.time")}
                   hint={t("election_management.time_hint")}
                   fieldWidth="narrowish"
-                  defaultValue={committeeSession.start_time}
+                  defaultValue={committeeSession.start_time || ""}
                   placeholder="uu:mm"
                   pattern="([01][0-9]|2[0-3]):([0-5][0-9])"
                   onInvalid={(e) => {
-                    e.currentTarget.setCustomValidity("Vul de tijd in met het format: uu:mm");
+                    e.currentTarget.setCustomValidity(t("election_management.time_error"));
                   }}
                   onInput={(e) => {
                     e.currentTarget.setCustomValidity("");

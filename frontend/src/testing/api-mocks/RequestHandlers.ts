@@ -16,6 +16,9 @@ import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
+  COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
+  COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS,
+  COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   CommitteeSessionListResponse,
   DataEntryGetDifferencesResponse,
   DataEntryGetErrorsResponse,
@@ -160,12 +163,19 @@ export const CommitteeSessionStatusChangeRequestHandler = http.put<
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH
 >("/api/committee_sessions/1/status", () => HttpResponse.json(null, { status: 200 }));
 
-export const ElectionCommitteeSessionChangeNumberOfVotersHandler = http.put<
+export const CommitteeSessionChangeNumberOfVotersHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
   null,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH
 >("/api/committee_sessions/1/voters", () => new HttpResponse(null, { status: 200 }));
+
+export const CommitteeSessionUpdateHandler = http.put<
+  ParamsToString<COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS>,
+  COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
+  null,
+  COMMITTEE_SESSION_UPDATE_REQUEST_PATH
+>("/api/committee_sessions/1", () => new HttpResponse(null, { status: 200 }));
 
 // get election list handler
 export const ElectionListRequestHandler = http.get<

@@ -1,13 +1,14 @@
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionProvider } from "../../../../hooks/election/ElectionProvider";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import {
-  ElectionCommitteeSessionChangeNumberOfVotersHandler,
+  CommitteeSessionChangeNumberOfVotersHandler,
   ElectionRequestHandler,
-} from "../../../../testing/api-mocks/RequestHandlers";
-import { server } from "../../../../testing/server";
-import { render, screen, spyOnHandler } from "../../../../testing/test-utils";
+} from "@/testing/api-mocks/RequestHandlers";
+import { server } from "@/testing/server";
+import { render, screen, spyOnHandler } from "@/testing/test-utils";
+
 import { NumberOfVotersPage } from "./NumberOfVotersPage";
 
 const navigate = vi.fn();
@@ -28,11 +29,12 @@ async function renderPage() {
 
 describe("NumberOfVotersPage", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, ElectionCommitteeSessionChangeNumberOfVotersHandler);
+    server.use(ElectionRequestHandler, CommitteeSessionChangeNumberOfVotersHandler);
   });
+
   test("save and navigate on submit", async () => {
     await renderPage();
-    const changeVoters = spyOnHandler(ElectionCommitteeSessionChangeNumberOfVotersHandler);
+    const changeVoters = spyOnHandler(CommitteeSessionChangeNumberOfVotersHandler);
     const user = userEvent.setup();
 
     const input = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" });

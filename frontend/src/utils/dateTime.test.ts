@@ -2,7 +2,15 @@ import { describe, expect, test } from "vitest";
 
 import { t } from "@/i18n/translate";
 
-import { formatDateTime, formatDateTimeFull, formatFullDateWithoutTimezone, formatTimeToGo } from "./dateTime";
+import {
+  convertNLDateToISODate,
+  formatDateTime,
+  formatDateTimeFull,
+  formatFullDateWithoutTimezone,
+  formatTimeToGo,
+  isValidNLDate,
+  isValidTime,
+} from "./dateTime";
 
 describe("DateTime util", () => {
   const today = new Date();
@@ -59,5 +67,34 @@ describe("DateTime util", () => {
     [1337 * 60 + 42, "1337 minuten en 42 seconden"],
   ])("Time to go %s formatted as %s", (input: number, expected: string) => {
     expect(formatTimeToGo(input)).toBe(expected);
+  });
+
+  test.each([
+    ["31-12-2025", true],
+    ["12-31-2025", false],
+    ["2025-12-31", false],
+    ["31 januari 2025", false],
+    ["", false],
+  ])("NL date %s is valid %s", (input: string, expected: boolean) => {
+    expect(isValidNLDate(input)).toEqual(expected);
+  });
+
+  test.each([
+    ["09:15", true],
+    ["9:15", false],
+    ["9 uur", false],
+    ["", false],
+  ])("Time %s is valid %s", (input: string, expected: boolean) => {
+    expect(isValidTime(input)).toEqual(expected);
+  });
+
+  test("convert date should work for valid NL date format", () => {
+    expect(convertNLDateToISODate("31-12-2025")).toEqual("2025-12-31");
+  });
+
+  test("convert date should throw error for invalid NL date format", () => {
+    expect(() => {
+      convertNLDateToISODate("2025-12-31");
+    }).toThrowError("Error: 2025-12-31 has an invalid date format, should be: dd-mm-yyyy");
   });
 });

@@ -4217,14 +4217,7 @@
             }
           },
           "counting_method": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/VoteCountingMethod"
-              }
-            ]
+            "$ref": "#/components/schemas/VoteCountingMethod"
           },
           "election_data": {
             "type": "string"
@@ -4254,9 +4247,7 @@
           "election_hash",
           "election_data",
           "candidate_hash",
-          "candidate_data",
-          "counting_method",
-          "number_of_voters"
+          "candidate_data"
         ],
         "properties": {
           "candidate_data": {
@@ -4281,7 +4272,10 @@
             }
           },
           "number_of_voters": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "format": "int32",
             "minimum": 0
           },

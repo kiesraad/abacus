@@ -18,6 +18,7 @@ const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
 
 /// User object, corresponds to a row in the users table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow, ToSchema)]
+// can't set `deny_unknown_fields` because this would break tests where `needs_password_change` is returned from API
 pub struct User {
     id: u32,
     username: String,

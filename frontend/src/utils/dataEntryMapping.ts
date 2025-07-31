@@ -1,6 +1,6 @@
 import { PollingStationResults } from "@/types/generated/openapi";
 import { DataEntrySection, SectionValues } from "@/types/types";
-import { deformatNumber, formatNumber } from "@/utils/format";
+import { parseIntUserInput } from "@/utils/strings";
 
 type PathSegment = string | number;
 type PathValue = boolean | number | string | undefined;
@@ -10,8 +10,8 @@ type PathValue = boolean | number | string | undefined;
  * @param section The data entry section to extract field information from
  * @returns Map where key is the field path and value is the field type
  */
-export function extractFieldInfoFromSection(section: DataEntrySection): Map<string, "boolean" | "formattedNumber"> {
-  const fieldInfoMap = new Map<string, "boolean" | "formattedNumber">();
+export function extractFieldInfoFromSection(section: DataEntrySection): Map<string, "boolean" | "number"> {
+  const fieldInfoMap = new Map<string, "boolean" | "number">();
 
   for (const subsection of section.subsections) {
     switch (subsection.type) {
@@ -20,7 +20,7 @@ export function extractFieldInfoFromSection(section: DataEntrySection): Map<stri
         break;
       case "inputGrid":
         for (const row of subsection.rows) {
-          fieldInfoMap.set(row.path, "formattedNumber");
+          fieldInfoMap.set(row.path, "number");
         }
         break;
       case "checkboxes":
@@ -64,12 +64,7 @@ export function getStringValueAtPath(results: PollingStationResults, path: strin
   return valueToString(value);
 }
 
-function setValueAtPath(
-  obj: unknown,
-  path: string,
-  value: string,
-  valueType: "boolean" | "formattedNumber" | undefined,
-): void {
+function setValueAtPath(obj: unknown, path: string, value: string, valueType: "boolean" | "number" | undefined): void {
   const segments = parsePathSegments(path);
   const processedValue = processValue(value, valueType);
 
@@ -120,7 +115,7 @@ export function getValueAtPath(obj: unknown, path: string): PathValue {
 
 function processValue(
   value: string,
-  valueType: "boolean" | "formattedNumber" | undefined,
+  valueType: "boolean" | "number" | undefined,
 ): boolean | number | string | undefined {
   if (valueType === "boolean") {
     if (value === "") {
@@ -129,24 +124,18 @@ function processValue(
     return value === "true";
   }
 
-  if (valueType === "formattedNumber") {
-    return deformatNumber(value);
+  if (valueType === "number") {
+    return parseIntUserInput(value) ?? 0;
   }
 
   return value;
 }
 
 function valueToString(value: PathValue): string {
-  if (value === undefined) {
+  if (value === undefined || value === 0) {
     return "";
   }
-  if (typeof value === "boolean") {
-    return value.toString();
-  }
-  if (typeof value === "string") {
-    return value;
-  }
-  return formatNumber(value);
+  return String(value);
 }
 
 function parsePathSegments(path: string): PathSegment[] {

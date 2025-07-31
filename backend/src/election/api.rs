@@ -42,6 +42,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 /// Also includes a list of the current committee session for each election.
 /// Does not include the candidate list (political groups) to keep the response size small.
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ElectionListResponse {
     pub committee_sessions: Vec<CommitteeSession>,
     pub elections: Vec<Election>,
@@ -50,6 +51,7 @@ pub struct ElectionListResponse {
 /// Election details response, including the election's candidate list (political groups),
 /// its polling stations and the current committee session
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ElectionDetailsResponse {
     pub committee_session: CommitteeSession,
     pub election: ElectionWithPoliticalGroups,
@@ -158,6 +160,7 @@ pub async fn election_create(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct ElectionAndCandidateDefinitionValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<Vec<String>>, nullable = false)]
@@ -175,6 +178,7 @@ pub struct ElectionAndCandidateDefinitionValidateRequest {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct ElectionDefinitionValidateResponse {
     hash: RedactedEmlHash,
     election: NewElection,
@@ -242,6 +246,7 @@ pub async fn election_import_validate(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct ElectionAndCandidatesDefinitionImportRequest {
     election_hash: [String; crate::eml::hash::CHUNK_COUNT],
     election_data: String,

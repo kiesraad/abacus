@@ -58,13 +58,13 @@ export function OverviewPage() {
     }
     if (electionLink) {
       return (
-        <Table.LinkRow key={election.id} to={electionLink}>
+        <Table.LinkRow id={`election-row-${election.id}`} key={election.id} to={electionLink}>
           <ElectionRowContent />
         </Table.LinkRow>
       );
     } else {
       return (
-        <Table.Row>
+        <Table.Row id={`election-row-${election.id}`}>
           <ElectionRowContent />
         </Table.Row>
       );

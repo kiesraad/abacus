@@ -105,7 +105,7 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
       )}
 
       <Form onSubmit={handleSubmit}>
-        <FormLayout width="medium" disabled={saving}>
+        <FormLayout disabled={saving}>
           <FormLayout.Section title={t("users.details_title")}>
             <InputField
               id="username"

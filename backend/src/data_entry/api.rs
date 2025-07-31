@@ -54,6 +54,7 @@ impl From<DataEntryTransitionError> for APIError {
 
 /// Response structure for getting data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ClaimDataEntryResponse {
     pub data: PollingStationResults,
     #[schema(value_type = Object)]
@@ -96,7 +97,7 @@ async fn get_polling_station_election_and_committee_session_id(
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
-#[serde(rename_all = "snake_case")]
+#[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ResolveDifferencesAction {
     KeepFirstEntry,
     KeepSecondEntry,
@@ -205,6 +206,7 @@ async fn polling_station_data_entry_claim(
 /// Request structure for saving data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
+#[serde(deny_unknown_fields)]
 pub struct DataEntry {
     /// Data entry progress between 0 and 100
     #[schema(maximum = 100)]
@@ -218,6 +220,7 @@ pub struct DataEntry {
 
 /// Response structure for saving data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct SaveDataEntryResponse {
     pub validation_results: ValidationResults,
 }
@@ -451,7 +454,7 @@ async fn polling_station_data_entry_finalise(
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
-#[serde(rename_all = "snake_case")]
+#[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ResolveErrorsAction {
     DiscardFirstEntry,
     ResumeFirstEntry,
@@ -471,6 +474,7 @@ impl ResolveErrorsAction {
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct DataEntryGetErrorsResponse {
     pub first_entry_user_id: u32,
     pub finalised_first_entry: PollingStationResults,
@@ -584,6 +588,7 @@ async fn polling_station_data_entry_resolve_errors(
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct DataEntryGetDifferencesResponse {
     pub first_entry_user_id: u32,
     pub first_entry: PollingStationResults,
@@ -697,12 +702,14 @@ async fn polling_station_data_entry_resolve_differences(
 
 /// Election polling stations data entry statuses response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ElectionStatusResponse {
     pub statuses: Vec<ElectionStatusResponseEntry>,
 }
 
 /// Election polling stations data entry statuses response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ElectionStatusResponseEntry {
     /// Polling station id
     pub polling_station_id: u32,

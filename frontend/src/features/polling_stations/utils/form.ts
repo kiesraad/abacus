@@ -1,4 +1,3 @@
-import { deformatNumber } from "@/utils/format";
 import { parseIntUserInput } from "@/utils/strings";
 
 export type ValidationError =
@@ -31,7 +30,6 @@ export type FormFieldStringUndefined = FormFieldBase & {
 
 export type FormFieldNumber = FormFieldBase & {
   type: "number";
-  isFormatted?: boolean;
   min?: number;
   max?: number;
 };
@@ -74,9 +72,8 @@ export function processForm<RequestObject>(
           value = undefined;
           break;
         }
-        const parsedValue = field.isFormatted ? deformatNumber(value) : parseIntUserInput(value);
-        //parseInt is used in deformatNumber, the result is a number or NaN.
-        if (parsedValue === undefined || Number.isNaN(parsedValue)) {
+        const parsedValue = parseIntUserInput(value);
+        if (parsedValue === undefined) {
           validationResult[fieldName] = "FORM_VALIDATION_RESULT_INVALID_NUMBER";
           continue;
         } else {

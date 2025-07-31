@@ -48,7 +48,7 @@ test.describe("full data entry flow", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.pollCardCount).toBeFocused();
@@ -145,7 +145,7 @@ test.describe("full data entry flow", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -205,7 +205,7 @@ test.describe("full data entry flow", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -282,7 +282,7 @@ test.describe("full data entry flow", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -357,7 +357,7 @@ test.describe("full data entry flow", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -457,7 +457,7 @@ test.describe("full data entry flow", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
@@ -595,7 +595,7 @@ test.describe("second data entry", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     // fill form with data that is different from first data entry
     const votersAndVotesPage = new VotersAndVotesPage(typistPage);
@@ -674,7 +674,7 @@ test.describe("second data entry", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     // fill form with data that is different from first data entry
     const votersAndVotesPage = new VotersAndVotesPage(typistPage);
@@ -744,7 +744,7 @@ test.describe("errors and warnings", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     // fill form with data that results in an error
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -802,7 +802,7 @@ test.describe("errors and warnings", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
@@ -872,7 +872,7 @@ test.describe("errors and warnings", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -944,7 +944,7 @@ test.describe("errors and warnings", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -1011,7 +1011,7 @@ test.describe("errors and warnings", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     // fill form with data that results in an error
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -1059,7 +1059,7 @@ test.describe("navigation", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -1112,7 +1112,7 @@ test.describe("navigation", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -1169,7 +1169,7 @@ test.describe("navigation", () => {
         },
       });
       await expect(extraInvestigationPage.progressList.extraInvestigationIcon).toHaveAccessibleName("je bent hier");
-      await extraInvestigationPage.clickNext();
+      await extraInvestigationPage.next.click();
       await expect(extraInvestigationPage.progressList.extraInvestigationIcon).toHaveAccessibleName("opgeslagen");
 
       const votersAndVotesPage = new VotersAndVotesPage(page);

@@ -79,8 +79,4 @@ export class ExtraInvestigationPage extends DataEntryBasePage {
       },
     };
   }
-
-  async clickNext() {
-    await this.next.click();
-  }
 }

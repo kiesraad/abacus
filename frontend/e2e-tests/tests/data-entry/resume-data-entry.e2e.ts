@@ -33,7 +33,7 @@ test.describe("resume data entry flow", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -148,7 +148,7 @@ test.describe("resume data entry flow", () => {
           no: true,
         },
       });
-      await extraInvestigationPage.clickNext();
+      await extraInvestigationPage.next.click();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -230,7 +230,7 @@ test.describe("resume data entry flow", () => {
           no: true,
         },
       });
-      await extraInvestigationPage.clickNext();
+      await extraInvestigationPage.next.click();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -323,7 +323,7 @@ test.describe("resume data entry flow", () => {
           no: true,
         },
       });
-      await extraInvestigationPage.clickNext();
+      await extraInvestigationPage.next.click();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -362,7 +362,7 @@ test.describe("resume data entry flow", () => {
           no: true,
         },
       });
-      await extraInvestigationPage.clickNext();
+      await extraInvestigationPage.next.click();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -402,7 +402,7 @@ test.describe("resume data entry flow", () => {
           no: true,
         },
       });
-      await extraInvestigationPage.clickNext();
+      await extraInvestigationPage.next.click();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       const voters: VotersCounts = {
@@ -470,7 +470,7 @@ test.describe("resume data entry flow", () => {
       await expect(extraInvestigationPage.extraInvestigationOtherReasonNo).not.toBeChecked();
       await expect(extraInvestigationPage.ballotsRecountedYes).not.toBeChecked();
       await expect(extraInvestigationPage.ballotsRecountedNo).not.toBeChecked();
-      await extraInvestigationPage.clickNext();
+      await extraInvestigationPage.next.click();
 
       // voters and votes page should have empty fields
       const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -495,7 +495,7 @@ test.describe("resume data entry flow", () => {
           no: true,
         },
       });
-      await extraInvestigationPage.clickNext();
+      await extraInvestigationPage.next.click();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -535,7 +535,7 @@ test.describe("resume data entry flow", () => {
           no: true,
         },
       });
-      await extraInvestigationPage.clickNext();
+      await extraInvestigationPage.next.click();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -587,7 +587,7 @@ test.describe("resume data entry flow", () => {
           no: true,
         },
       });
-      await extraInvestigationPage.clickNext();
+      await extraInvestigationPage.next.click();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       const voters: VotersCounts = {

@@ -38,7 +38,7 @@ export async function selectPollingStationForDataEntry(page: Page, pollingStatio
       no: true,
     },
   });
-  await extraInvestigationPage.clickNext();
+  await extraInvestigationPage.next.click();
 
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -49,7 +49,7 @@ export async function fillDataEntryPages(page: Page, results: PollingStationResu
   const extraInvestigationPage = new ExtraInvestigationPage(page);
   await expect(extraInvestigationPage.fieldset).toBeVisible();
   await extraInvestigationPage.inputExtraInvestigation(results.extra_investigation);
-  await extraInvestigationPage.clickNext();
+  await extraInvestigationPage.next.click();
 
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();

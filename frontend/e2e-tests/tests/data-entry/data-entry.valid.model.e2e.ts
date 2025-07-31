@@ -245,7 +245,7 @@ test.describe("Data entry model test - valid data", () => {
             });
           },
           SUBMIT: async () => {
-            await extraInvestigationPage.clickNext();
+            await extraInvestigationPage.next.click();
           },
         };
 

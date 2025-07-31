@@ -250,7 +250,7 @@ test.describe("Data entry model test - warnings", () => {
             await extraInvestigationPage.inputExtraInvestigation(extraInvestigation);
           },
           SUBMIT: async () => {
-            await extraInvestigationPage.clickNext();
+            await extraInvestigationPage.next.click();
           },
         };
 

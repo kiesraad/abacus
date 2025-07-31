@@ -110,7 +110,7 @@ test.describe("data entry - api error responses", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -165,7 +165,7 @@ test.describe("data entry - api error responses", () => {
         no: true,
       },
     });
-    await extraInvestigationPage.clickNext();
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();

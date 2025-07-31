@@ -4,8 +4,8 @@ use std::{
     sync::{Arc, RwLock, atomic::AtomicBool},
     time::{Duration, Instant},
 };
-use tokio::time::timeout;
-use tracing::{error, info, trace, warn};
+use tokio::{task::JoinSet, time::timeout};
+use tracing::{debug, error, info, trace, warn};
 
 use crate::audit_log::AuditEvent;
 
@@ -19,7 +19,7 @@ pub struct AirgapDetection {
 
 const SECURE_PORT: u16 = 443; // Default secure port for HTTPS
 
-const CONNECT_TIMEOUT: Duration = Duration::from_secs(5); // Timeout for TCP connections
+const CONNECT_TIMEOUT: Duration = Duration::from_secs(10); // Timeout for TCP connections
 
 const IPV4: [Ipv4Addr; 2] = [
     Ipv4Addr::new(104, 26, 1, 225), // Cloudflare (informatiebeveiligingsdienst.nl)
@@ -63,7 +63,9 @@ impl AirgapDetection {
         let inner_airgap_detection = airgap_detection.clone();
         tokio::task::spawn(async move {
             loop {
+                let start = Instant::now();
                 inner_airgap_detection.perform_detection().await;
+                debug!("Airgap detection took {} ms", start.elapsed().as_millis());
                 tokio::time::sleep(Duration::from_secs(AIRGAP_DETECTION_INTERVAL)).await;
             }
         });
@@ -111,6 +113,8 @@ impl AirgapDetection {
 
     /// Detects if the system is in an airgap by attempting to connect to IPv4, IPv6 addresses and performing DNS lookups
     async fn is_connected(&self) -> bool {
+        let mut set = JoinSet::new();
+
         let all_ip_adresses = IPV4
             .iter()
             .map(|ip| IpAddr::V4(*ip))
@@ -118,25 +122,43 @@ impl AirgapDetection {
 
         // attempt to connect to known IP addresses over TCP
         for ip in all_ip_adresses {
-            if timeout(
-                CONNECT_TIMEOUT,
-                tokio::net::TcpStream::connect((ip, SECURE_PORT)),
-            )
-            .await
-            .is_ok()
-            {
-                warn!("TCP connection to IP address {ip} successful");
-                return true;
-            }
+            set.spawn(async move {
+                match timeout(
+                    CONNECT_TIMEOUT,
+                    tokio::net::TcpStream::connect((ip, SECURE_PORT)),
+                )
+                .await
+                {
+                    Ok(Ok(_)) => {
+                        warn!("TCP connection to IP address {ip} successful");
+                        true
+                    }
+                    _ => false,
+                }
+            });
         }
 
         // attempt to resolve known domains
         for domain in DOMAINS {
-            if timeout(CONNECT_TIMEOUT, tokio::net::lookup_host(domain))
+            set.spawn(async move {
+                match timeout(
+                    CONNECT_TIMEOUT,
+                    tokio::net::lookup_host((domain, SECURE_PORT)),
+                )
                 .await
-                .is_ok()
-            {
-                warn!("DNS lookup of domain {domain} successful");
+                {
+                    Ok(Ok(_)) => {
+                        warn!("DNS lookup of domain {domain} successful");
+                        true
+                    }
+                    _ => false,
+                }
+            });
+        }
+
+        // if one of the connection attempts or lookups succeeded, return the result
+        while let Some(res) = set.join_next().await {
+            if matches!(res, Ok(true)) {
                 return true;
             }
         }

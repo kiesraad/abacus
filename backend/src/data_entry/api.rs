@@ -454,8 +454,7 @@ async fn polling_station_data_entry_finalise(
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
-#[serde(rename_all = "snake_case")]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ResolveErrorsAction {
     DiscardFirstEntry,
     ResumeFirstEntry,

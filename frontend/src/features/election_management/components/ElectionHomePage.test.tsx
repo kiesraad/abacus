@@ -18,49 +18,27 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router.tsx";
 import { overrideOnce, server } from "@/testing/server";
-import { expectConflictErrorPage, screen, setupTestRouter, within } from "@/testing/test-utils";
+import { expectConflictErrorPage, render, screen, setupTestRouter, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { CommitteeSessionListResponse, ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
 
-const Providers = ({
-  children,
-  router = getRouter(children),
-  fetchInitialUser = false,
-}: {
-  children?: React.ReactNode;
-  router?: Router;
-  fetchInitialUser?: boolean;
-}) => {
-  return (
-    <ApiProvider fetchInitialUser={fetchInitialUser}>
-      <TestUserProvider userRole="coordinator">
-        <ElectionProvider electionId={1}>
-          <ElectionStatusProvider electionId={1}>
-            <RouterProvider router={router} />
-          </ElectionStatusProvider>
-        </ElectionProvider>
-      </TestUserProvider>
-      ,
-    </ApiProvider>
-  );
-};
+import { ElectionHomePage } from "./ElectionHomePage";
 
-function renderWithRouter() {
-  const router = setupTestRouter([
-    {
-      path: "/",
-      Component: null,
-      children: [
-        {
-          path: "elections/:electionId",
-          children: electionManagementRoutes,
-        },
-      ],
-    },
-  ]);
-  rtlRender(<Providers router={router} />);
-  return router;
-}
+const renderPage = async () => {
+  render(
+    <TestUserProvider userRole="coordinator">
+      <ElectionProvider electionId={1}>
+        <ElectionStatusProvider electionId={1}>
+          <ElectionHomePage />
+        </ElectionStatusProvider>
+      </ElectionProvider>
+    </TestUserProvider>,
+  );
+  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+  expect(
+    await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau 0035 Heemdamseburg" }),
+  ).toBeVisible();
+};
 
 describe("ElectionHomePage", () => {
   beforeEach(() => {
@@ -73,13 +51,7 @@ describe("ElectionHomePage", () => {
       statuses: [],
     });
 
-    const router = renderWithRouter();
-    await router.navigate("/elections/1");
-
-    expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
-    expect(
-      await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau 0035 Heemdamseburg" }),
-    ).toBeVisible();
+    await renderPage();
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
@@ -102,11 +74,33 @@ describe("ElectionHomePage", () => {
     ]);
   });
 
-  test("Shows error page when start election call returns an error", async () => {
+  test("Shows error page when start data entry call returns an error", async () => {
     // Since we test what happens after an error, we want vitest to ignore them
     vi.spyOn(console, "error").mockImplementation(() => {
       /* do nothing */
     });
+    const Providers = ({
+      children,
+      router = getRouter(children),
+      fetchInitialUser = false,
+    }: {
+      children?: React.ReactNode;
+      router?: Router;
+      fetchInitialUser?: boolean;
+    }) => {
+      return (
+        <ApiProvider fetchInitialUser={fetchInitialUser}>
+          <TestUserProvider userRole="coordinator">
+            <ElectionProvider electionId={1}>
+              <ElectionStatusProvider electionId={1}>
+                <RouterProvider router={router} />
+              </ElectionStatusProvider>
+            </ElectionProvider>
+          </TestUserProvider>
+          ,
+        </ApiProvider>
+      );
+    };
     const router = setupTestRouter([
       {
         Component: null,
@@ -177,13 +171,7 @@ describe("ElectionHomePage", () => {
       statuses: [],
     });
 
-    const router = renderWithRouter();
-    await router.navigate("/elections/1");
-
-    expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
-    expect(
-      await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau 0035 Heemdamseburg" }),
-    ).toBeVisible();
+    await renderPage();
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText("Geen stembureaus")).toBeVisible();

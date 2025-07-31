@@ -118,81 +118,85 @@ function DevLinks() {
           </li>
         )}
       </ul>
-      <strong>Inloggen als</strong>
-      <ul>
-        <li>
-          <Link
-            to="/dev"
-            onClick={() => {
-              void login("admin1", "Admin1Password01").then(setResponse);
-            }}
-          >
-            {t("administrator")} 1
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/dev"
-            onClick={() => {
-              void login("admin2", "Admin2Password01").then(setResponse);
-            }}
-          >
-            {t("administrator")} 2
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/dev"
-            onClick={() => {
-              void login("coordinator1", "Coordinator1Password01").then(setResponse);
-            }}
-          >
-            {t("coordinator")} 1
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/dev"
-            onClick={() => {
-              void login("coordinator2", "Coordinator2Password01").then(setResponse);
-            }}
-          >
-            {t("coordinator")} 2
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/dev"
-            onClick={() => {
-              void login("typist1", "Typist1Password01").then(setResponse);
-            }}
-          >
-            {t("typist")} 1
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/dev"
-            onClick={() => {
-              void login("typist2", "Typist2Password01").then(setResponse);
-            }}
-          >
-            {t("typist")} 2
-          </Link>
-        </li>
-        {user && (
-          <li>
-            <Link
-              to="/dev"
-              onClick={() => {
-                void logout();
-              }}
-            >
-              {t("account.logout")}: {user.fullname || user.username} ({user.role})
-            </Link>
-          </li>
-        )}
-      </ul>
+      {!__API_MSW__ && (
+        <>
+          <strong>Inloggen als</strong>
+          <ul>
+            <li>
+              <Link
+                to="/dev"
+                onClick={() => {
+                  void login("admin1", "Admin1Password01").then(setResponse);
+                }}
+              >
+                {t("administrator")} 1
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dev"
+                onClick={() => {
+                  void login("admin2", "Admin2Password01").then(setResponse);
+                }}
+              >
+                {t("administrator")} 2
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dev"
+                onClick={() => {
+                  void login("coordinator1", "Coordinator1Password01").then(setResponse);
+                }}
+              >
+                {t("coordinator")} 1
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dev"
+                onClick={() => {
+                  void login("coordinator2", "Coordinator2Password01").then(setResponse);
+                }}
+              >
+                {t("coordinator")} 2
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dev"
+                onClick={() => {
+                  void login("typist1", "Typist1Password01").then(setResponse);
+                }}
+              >
+                {t("typist")} 1
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dev"
+                onClick={() => {
+                  void login("typist2", "Typist2Password01").then(setResponse);
+                }}
+              >
+                {t("typist")} 2
+              </Link>
+            </li>
+            {user && (
+              <li>
+                <Link
+                  to="/dev"
+                  onClick={() => {
+                    void logout();
+                  }}
+                >
+                  {t("account.logout")}: {user.fullname || user.username} ({user.role})
+                </Link>
+              </li>
+            )}
+          </ul>
+        </>
+      )}
       {(__API_MSW__ || isAdministrator || isCoordinator) && (
         <ElectionListProvider>
           <AdministratorCoordinatorLinks />

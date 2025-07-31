@@ -1,13 +1,13 @@
 import { ReactNode } from "react";
 import { useNavigate } from "react-router";
 
+import errorImage from "@/assets/images/error.webp";
 import { IconArrowLeft } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
 import { t } from "@/i18n/translate";
 import { isDevelopment } from "@/utils/env";
 
 import cls from "./Error.module.css";
-import errorImage from "./error.png";
 
 interface ErrorProps {
   title: string;

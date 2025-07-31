@@ -24,7 +24,7 @@ use crate::{
 pub enum CommitteeSessionError {
     CommitteeSessionPaused,
     InvalidStatusTransition,
-    WrongCommitteeSessionStatus,
+    InvalidCommitteeSessionStatus,
 }
 
 impl From<CommitteeSessionError> for APIError {

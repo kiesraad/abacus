@@ -148,7 +148,7 @@ async fn election_download_zip_results(
             .await?;
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
         return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
         ));
     }
 
@@ -209,7 +209,7 @@ async fn election_download_pdf_results(
             .await?;
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
         return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
         ));
     }
 
@@ -255,7 +255,7 @@ async fn election_download_xml_results(
             .await?;
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
         return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
         ));
     }
 

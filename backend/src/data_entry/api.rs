@@ -95,6 +95,34 @@ async fn get_polling_station_election_and_committee_session_id(
     Ok((polling_station, election, committee_session))
 }
 
+fn validate_committee_session_for_typist(
+    committee_session: &CommitteeSession,
+) -> Result<(), APIError> {
+    if committee_session.status == CommitteeSessionStatus::DataEntryPaused {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::CommitteeSessionPaused,
+        ));
+    } else if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ));
+    }
+    Ok(())
+}
+
+fn validate_committee_session_for_coordinator(
+    committee_session: &CommitteeSession,
+) -> Result<(), APIError> {
+    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
+        && committee_session.status != CommitteeSessionStatus::DataEntryPaused
+    {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ));
+    }
+    Ok(())
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -152,15 +180,7 @@ async fn polling_station_data_entry_claim(
     )
     .await?;
 
-    if committee_session.status == CommitteeSessionStatus::DataEntryPaused {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::CommitteeSessionPaused,
-        ));
-    } else if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
-        ));
-    }
+    validate_committee_session_for_typist(&committee_session)?;
 
     let new_data_entry = CurrentDataEntry {
         progress: None,
@@ -277,15 +297,7 @@ async fn polling_station_data_entry_save(
     )
     .await?;
 
-    if committee_session.status == CommitteeSessionStatus::DataEntryPaused {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::CommitteeSessionPaused,
-        ));
-    } else if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
-        ));
-    }
+    validate_committee_session_for_typist(&committee_session)?;
 
     let current_data_entry = CurrentDataEntry {
         progress: Some(data_entry_request.progress),
@@ -357,15 +369,7 @@ async fn polling_station_data_entry_delete(
     )
     .await?;
 
-    if committee_session.status == CommitteeSessionStatus::DataEntryPaused {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::CommitteeSessionPaused,
-        ));
-    } else if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
-        ));
-    }
+    validate_committee_session_for_typist(&committee_session)?;
 
     let new_state = match entry_number {
         EntryNumber::FirstEntry => state.delete_first_entry(user_id)?,
@@ -425,15 +429,7 @@ async fn polling_station_data_entry_finalise(
     )
     .await?;
 
-    if committee_session.status == CommitteeSessionStatus::DataEntryPaused {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::CommitteeSessionPaused,
-        ));
-    } else if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
-        ));
-    }
+    validate_committee_session_for_typist(&committee_session)?;
 
     match entry_number {
         EntryNumber::FirstEntry => {
@@ -550,13 +546,7 @@ async fn polling_station_data_entry_get_errors(
     let state =
         crate::data_entry::repository::get(&pool, polling_station_id, committee_session.id).await?;
 
-    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
-        && committee_session.status != CommitteeSessionStatus::DataEntryPaused
-    {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
-        ));
-    }
+    validate_committee_session_for_coordinator(&committee_session)?;
 
     match state.clone() {
         DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
@@ -616,13 +606,7 @@ async fn polling_station_data_entry_resolve_errors(
     )
     .await?;
 
-    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
-        && committee_session.status != CommitteeSessionStatus::DataEntryPaused
-    {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
-        ));
-    }
+    validate_committee_session_for_coordinator(&committee_session)?;
 
     let new_state = match action {
         ResolveErrorsAction::DiscardFirstEntry => state.discard_first_entry()?,
@@ -680,13 +664,7 @@ async fn polling_station_data_entry_get_differences(
     let state =
         crate::data_entry::repository::get(&pool, polling_station_id, committee_session.id).await?;
 
-    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
-        && committee_session.status != CommitteeSessionStatus::DataEntryPaused
-    {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
-        ));
-    }
+    validate_committee_session_for_coordinator(&committee_session)?;
 
     match state {
         DataEntryStatus::EntriesDifferent(EntriesDifferent {
@@ -743,13 +721,7 @@ async fn polling_station_data_entry_resolve_differences(
     )
     .await?;
 
-    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
-        && committee_session.status != CommitteeSessionStatus::DataEntryPaused
-    {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::WrongCommitteeSessionStatus,
-        ));
-    }
+    validate_committee_session_for_coordinator(&committee_session)?;
 
     let new_state = match action {
         ResolveDifferencesAction::KeepFirstEntry => state.keep_first_entry()?,

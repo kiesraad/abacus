@@ -362,7 +362,7 @@ impl IntoResponse for APIError {
                             true,
                         ),
                     ),
-                    CommitteeSessionError::WrongCommitteeSessionStatus => (
+                    CommitteeSessionError::InvalidCommitteeSessionStatus => (
                         StatusCode::CONFLICT,
                         to_error(
                             "Wrong committee session status",

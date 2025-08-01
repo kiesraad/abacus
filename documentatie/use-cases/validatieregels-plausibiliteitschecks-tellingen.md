@@ -77,14 +77,15 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
-#### DSO | F.153: 'Controles en correcties': vragen moeten beantwoord worden (geen vinkjes bij de eerste twee vragen)
+#### DSO | F.153: 'Controles en correcties': geen vinkjes bij de eerste twee vragen
 
 > Invoerder: **Controleer je antwoorden** (F.153)
 
 > Coördinator: **De vragen op het inlegvel zijn niet volledig beantwoord** (F.153)
 > Zorg dat het inlegvel volledig is ingevuld, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### DSO, eerste zitting | F.154: Controles en correcties: Ongeldige set documenten (vraag 'gecorrigeerde telresultaten' = 'nee')
 
@@ -97,7 +98,8 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > Als er geen gecorrigeerde telresultaten zijn, dan hoort er ook geen corrigendum te zijn. Verwijder het corrigendum, of geef op het inlegvel aan dat
 > er wel gecorrigeerde telresultaten zijn. Geef daarna de invoer terug aan de invoerder.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
+Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 #### DSO, eerste zitting | F.155: Controles en correcties: Ongeldig antwoord in eerste zitting (vraag 'op verzoek van het CSB' = 'ja')
 
@@ -106,15 +108,18 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > Coördinator: **Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn.** (F.154)
 > Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### DSO | F.156: Controles en correcties: meer dan 1 antwoord op vraag 'zijn er gecorrigeerde telresultaten'
 
 > Invoerder: **Controleer je antwoorden** (F.156)
+
 > Coördinator: **Er mag maar 1 antwoord per vraag worden gegeven** (F.156)
 > Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 ### Regels voor totalen (reeks F.2xx)
 
@@ -128,17 +133,20 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > Zo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.
 > Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: A, B en D
+Velden markeren: A, B en D  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### F.202: `E.1 t/m E.n tellen niet op naar E`
 
 > Invoerder **Controleer de stemmen op lijsten en totaal stemmen op kandidaten** (F.202)
+
 > Coördinator: **De stemmen op lijsten tellen niet op tot E** (F.202)
 > Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en H worden ingevuld.
 > Zo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.
 > Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: E.1 t/m E.n en E
+Velden markeren: E.1 t/m E.n en E  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal uitgebrachte stemmen`
 
@@ -150,7 +158,8 @@ Velden markeren: E.1 t/m E.n en E
 > Zo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.
 > Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: E, F, G en H
+Velden markeren: E, F, G en H  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 
 ### Regels voor verschillen (reeks F.3xx)
@@ -164,31 +173,34 @@ Velden markeren: E, F, G en H
 > Controleer ook of er een onverklaard verschil ontstaat.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### CSO | F.302 "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
+
 > Invoerder: **Controleer je antwoorden** (F.302)
 
 > Coördinator: **Het getal dat is ingevuld bij H is niet groter dan D** (F.302)
-> Herstel de fout door op papier de juiste optie te selecteren.
 
-Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H  
 
 #### DSO | F.352 "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
+
 > Invoerder: **Controleer je antwoorden** (F.352)
 
 > Coördinator: **Het getal dat is ingevuld bij H is niet groter dan D** (F.352)
 > Maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
-Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### CSO | F.303 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
+
 > Invoerder: **Controleer je antwoorden** (F.303)
 
 > Coördinator: **Het getal dat is ingevuld bij H is niet kleiner dan D** (F.303)
-> Herstel de fout door op papier de juiste optie te selecteren.
 
-Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H  
 
 #### DSO | F.353 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
 > Invoerder: **Controleer je antwoorden** (F.353)
@@ -196,24 +208,27 @@ Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 > Coördinator: **Het getal dat is ingevuld bij H is niet kleiner dan D** (F.353)
 > Maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
-Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H    
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### CSO | F.304 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+
 > Invoerder: **Controleer je antwoorden** (F.304)
 
 > Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.304)
-> Herstel de fout door op papier de juiste optie te selecteren.
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
 #### DSO | F.354 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+
 > Invoerder: **Controleer je antwoorden** (F.354)
 
 > Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.354)
 > Is op het proces-verbaal duidelijk aangegeven welk van de opties bedoeld is?
 > Laat dat dan overnemen in Abacus. Zo niet, maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
-Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
+Veld markeren: foutmelding op checkboxgroup Vergelijk D en H  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### CSO | F.305 (Als D < H) `I <> H - D`
 // TODO DSO
@@ -224,7 +239,8 @@ Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Veld markeren: I
+Veld markeren: I  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### CSO | F.306 (Als D < H en J is ingevuld) `I <> H - D`
 // TODO DSO
@@ -235,7 +251,9 @@ Veld markeren: I
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan. 
 
-Veld markeren: I, J
+Veld markeren: I, J  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
+
 
 #### CSO | F.307 (Als D > H) `J <> D - H`
 // TODO DSO
@@ -246,7 +264,8 @@ Veld markeren: I, J
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Veld markeren: J
+Veld markeren: J  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### CSO | F.308 (Als D > H en I is ingevuld) `J <> D - H`
 // TODO DSO
@@ -257,14 +276,14 @@ Veld markeren: J
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Veld markeren: I, J
+Veld markeren: I, J  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### CSO | F.309 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
 // TODO DSO
 > Invoerder: **Controleer je antwoorden** (F.309)  
 
 > Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.309)
-> Herstel de fout door op papier de juiste optie te selecteren.
 
 Veld markeren: 3.3.2
 
@@ -274,7 +293,8 @@ Veld markeren: 3.3.2
  
 > Coördinator: **Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen** (F.310)
 
-Veld markeren: 2.3.2
+Veld markeren: 2.3.2  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 
 

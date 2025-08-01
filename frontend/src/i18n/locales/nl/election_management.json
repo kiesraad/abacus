@@ -36,6 +36,7 @@
   "time_hint": "uu:mm, bijvoorbeeld 21:34",
   "time_error": "Vul de tijd in als: uu:mm",
   "to_do_data_entry_for": "Invoer doen voor",
+  "to_report": "Naar proces-verbaal",
   "view_data_entry": "Steminvoer bekijken",
   "view_progress": "Bekijk voortgang",
   "when_is_the_committee_session": "Wanneer {verb} {sessionLabel} van het gemeentelijk stembureau?",

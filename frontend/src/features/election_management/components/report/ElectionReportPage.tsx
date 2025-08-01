@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 import { AnyApiError, ApiResponseStatus, FatalApiError, isSuccess } from "@/api/ApiResult.ts";
 import { useApiClient } from "@/api/useApiClient";
@@ -24,6 +24,11 @@ export function ElectionReportPage() {
   const client = useApiClient();
   const navigate = useNavigate();
   const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
+
+  // Redirect to update details page if committee session details have not been filled in
+  if (committeeSession.location === "" || committeeSession.start_date === "" || committeeSession.start_time === "") {
+    return <Navigate to={`/elections/${election.id}/details#redirect-to-report`} />;
+  }
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
   if (committeeSession.status !== "data_entry_finished") {
@@ -78,9 +83,7 @@ export function ElectionReportPage() {
           </h2>
           <div className={cls.reportInfoSection}>
             {t("election_report.committee_session_started", {
-              date: committeeSession.start_date
-                ? formatFullDateWithoutTimezone(new Date(committeeSession.start_date))
-                : "",
+              date: formatFullDateWithoutTimezone(new Date(committeeSession.start_date)),
               time: committeeSession.start_time,
             })}
             .<br />

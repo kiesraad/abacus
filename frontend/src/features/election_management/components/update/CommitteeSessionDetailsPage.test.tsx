@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 
 import { render as rtlRender } from "@testing-library/react";
@@ -25,6 +26,41 @@ vi.mock(import("react-router"), async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => navigate,
 }));
+
+const Providers = ({
+  children,
+  router = getRouter(children),
+  fetchInitialUser = false,
+}: {
+  children?: ReactNode;
+  router?: Router;
+  fetchInitialUser?: boolean;
+}) => {
+  return (
+    <ApiProvider fetchInitialUser={fetchInitialUser}>
+      <TestUserProvider userRole="coordinator">
+        <ElectionProvider electionId={1}>
+          <RouterProvider router={router} />
+        </ElectionProvider>
+      </TestUserProvider>
+    </ApiProvider>
+  );
+};
+
+function testRouter() {
+  return setupTestRouter([
+    {
+      Component: null,
+      errorElement: <ErrorBoundary />,
+      children: [
+        {
+          path: "elections/:electionId",
+          children: electionManagementRoutes,
+        },
+      ],
+    },
+  ]);
+}
 
 function renderPage() {
   return renderReturningRouter(
@@ -164,6 +200,64 @@ describe("CommitteeSessionDetailsPage", () => {
     expect(navigate).toHaveBeenCalledExactlyOnceWith("..");
   });
 
+  test("Shows form with pre-filled data, save and navigate to report on submit", async () => {
+    const user = userEvent.setup();
+    const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
+    overrideOnce(
+      "get",
+      "/api/elections/1",
+      200,
+      getElectionMockData(
+        {},
+        {
+          number: 2,
+          status: "data_entry_not_started",
+          location: "Den Haag",
+          start_date: "2026-03-18",
+          start_time: "21:36",
+        },
+      ),
+    );
+
+    const router = testRouter();
+    await router.navigate("/elections/1/details#redirect-to-report");
+    rtlRender(<Providers router={router} />);
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Details van de tweede zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Waar vindt de tweede zitting plaats?" }),
+    ).toBeInTheDocument();
+    const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
+    expect(location).toHaveValue("Den Haag");
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Wanneer begint de tweede zitting van het gemeentelijk stembureau?",
+      }),
+    ).toBeInTheDocument();
+    const date = screen.getByRole("textbox", { name: "Datum" });
+    expect(date).toHaveValue("18-03-2026");
+    const time = screen.getByRole("textbox", { name: "Tijd" });
+    expect(time).toHaveValue("21:36");
+
+    await user.clear(time);
+    await user.type(time, "22:36");
+
+    await user.click(screen.getByRole("button", { name: "Naar proces-verbaal" }));
+
+    expect(location).toBeValid();
+    expect(date).toBeValid();
+    expect(time).toBeValid();
+
+    expect(updateDetails).toHaveBeenCalledExactlyOnceWith({
+      location: "Den Haag",
+      start_date: "2026-03-18",
+      start_time: "22:36",
+    });
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/report/download");
+  });
+
   test("Shows form with pre-filled data, cancel and navigate", async () => {
     const user = userEvent.setup();
     const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
@@ -214,37 +308,6 @@ describe("CommitteeSessionDetailsPage", () => {
     vi.spyOn(console, "error").mockImplementation(() => {
       /* do nothing */
     });
-    const Providers = ({
-      children,
-      router = getRouter(children),
-      fetchInitialUser = false,
-    }: {
-      children?: React.ReactNode;
-      router?: Router;
-      fetchInitialUser?: boolean;
-    }) => {
-      return (
-        <ApiProvider fetchInitialUser={fetchInitialUser}>
-          <TestUserProvider userRole="coordinator">
-            <ElectionProvider electionId={1}>
-              <RouterProvider router={router} />
-            </ElectionProvider>
-          </TestUserProvider>
-        </ApiProvider>
-      );
-    };
-    const router = setupTestRouter([
-      {
-        Component: null,
-        errorElement: <ErrorBoundary />,
-        children: [
-          {
-            path: "elections/:electionId",
-            children: electionManagementRoutes,
-          },
-        ],
-      },
-    ]);
     const user = userEvent.setup();
     const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
     overrideOnce("put", "/api/committee_sessions/1", 400, {
@@ -253,6 +316,7 @@ describe("CommitteeSessionDetailsPage", () => {
       reference: "InvalidData",
     } satisfies ErrorResponse);
 
+    const router = testRouter();
     await router.navigate("/elections/1/details");
 
     rtlRender(<Providers router={router} />);
@@ -299,37 +363,6 @@ describe("CommitteeSessionDetailsPage", () => {
     vi.spyOn(console, "error").mockImplementation(() => {
       /* do nothing */
     });
-    const Providers = ({
-      children,
-      router = getRouter(children),
-      fetchInitialUser = false,
-    }: {
-      children?: React.ReactNode;
-      router?: Router;
-      fetchInitialUser?: boolean;
-    }) => {
-      return (
-        <ApiProvider fetchInitialUser={fetchInitialUser}>
-          <TestUserProvider userRole="coordinator">
-            <ElectionProvider electionId={1}>
-              <RouterProvider router={router} />
-            </ElectionProvider>
-          </TestUserProvider>
-        </ApiProvider>
-      );
-    };
-    const router = setupTestRouter([
-      {
-        Component: null,
-        errorElement: <ErrorBoundary />,
-        children: [
-          {
-            path: "elections/:electionId",
-            children: electionManagementRoutes,
-          },
-        ],
-      },
-    ]);
     const user = userEvent.setup();
     const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
     overrideOnce("put", "/api/committee_sessions/1", 404, {
@@ -338,8 +371,8 @@ describe("CommitteeSessionDetailsPage", () => {
       reference: "EntryNotFound",
     } satisfies ErrorResponse);
 
+    const router = testRouter();
     await router.navigate("/elections/1/details");
-
     rtlRender(<Providers router={router} />);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Details van de eerste zitting" })).toBeInTheDocument();

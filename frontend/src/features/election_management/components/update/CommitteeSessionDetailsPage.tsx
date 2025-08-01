@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -25,11 +25,13 @@ type ValidationErrors = {
 
 export function CommitteeSessionDetailsPage() {
   const client = useApiClient();
+  const location = useLocation();
   const navigate = useNavigate();
-  const { committeeSession } = useElection();
+  const { committeeSession, election, refetch } = useElection();
   const [submitError, setSubmitError] = useState<AnyApiError | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
   const [errorAlert, setErrorAlert] = useState<string | null>(null);
+  const redirectToReportPage = location.hash === "#redirect-to-report";
   const sessionLabel = committeeSessionLabel(committeeSession.number, true).toLowerCase();
   const defaultDate = committeeSession.start_date
     ? new Date(committeeSession.start_date).toLocaleDateString(t("date_locale"), {
@@ -64,9 +66,14 @@ export function CommitteeSessionDetailsPage() {
     const path: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}`;
     client
       .putRequest(path, details)
-      .then((result) => {
+      .then(async (result) => {
         if (isSuccess(result)) {
-          void navigate("..");
+          if (redirectToReportPage) {
+            await refetch();
+            void navigate(`/elections/${election.id}/report/download`);
+          } else {
+            void navigate("..");
+          }
         } else if (result instanceof ApiError && result.reference === "InvalidData") {
           setErrorAlert(t(`error.api_error.${result.reference}`));
         } else {
@@ -114,7 +121,7 @@ export function CommitteeSessionDetailsPage() {
       <main>
         <article>
           <Form className={cls.detailsForm} onSubmit={handleSubmit}>
-            {errorAlert !== null && (
+            {errorAlert && (
               <FormLayout.Alert>
                 <Alert type="error">{errorAlert}</Alert>
               </FormLayout.Alert>
@@ -163,7 +170,7 @@ export function CommitteeSessionDetailsPage() {
               </FormLayout.Row>
               <FormLayout.Controls>
                 <Button size="lg" type="submit">
-                  {t("save_changes")}
+                  {redirectToReportPage ? t("election_management.to_report") : t("save_changes")}
                 </Button>
                 <Button.Link variant="secondary" size="lg" to="..">
                   {t("cancel")}

@@ -297,12 +297,11 @@ Veld markeren: 2.3.2
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 
-
 ### Regels voor kandidaten en lijsttotalen (reeks F.4xx)
 
 #### CSO F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
 // TODO DSO
-> Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg?  Dan kan je verdergaan.** (F.401)
+> Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.** (F.401)
 
 > Coördinator: **Het totaal van de lijst is niet ingevuld.** (F.401)
 > Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.{x} in rubriek 3.2)
@@ -311,8 +310,8 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > - Zo nee: Onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: totaal van de lijst 
-N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding onderaan de pagina, onder het totaal-veld.
-[Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11)
+N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding _bij invoerders_ onderaan de pagina, onder het totaal-veld ([Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11))  
+Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 #### CSO | F.402 `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
 // TODO DSO
@@ -327,38 +326,43 @@ N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding onderaan de p
 > - Zo ja: corrigeer de optelfout op het papieren proces-verbaal.
 > - Zo nee: Onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)
-
-[Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=1635-58277&t=zTY4ajWtsFkiTOYP-4)
-
+Velden markeren: geen (laat alleen foutmelding zien op de pagina) [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=1635-58277&t=zTY4ajWtsFkiTOYP-4)  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### CSO | F.403 `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
 // TODO DSO
 > Invoerder: **Controleer het totaal van de lijst** (F.403)
-> Als die overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij [Aantal kiezers en stemmen]()
+> Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij [Aantal kiezers en stemmen]()
 
 > Coördinator: **Controleer het totaal van de lijst en E.{x} in rubriek 3.2** (F.403)
 > Controleer wat er fout is gegaan in rubriek 3.2 en herstel de fout.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen
-
+Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen  
+Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 ## Plausibiliteitschecks geven waarschuwingen
 
-Plausibiliteitschecks vragen de gebruiker de invoer extra te controleren. Ze resulteren in een niet-blokkerende waarschuwing. De waarschuwing wordt getoond als de check evalueert naar `FALSE`.
+Plausibiliteitschecks vragen de gebruiker de invoer extra te controleren. Ze resulteren in een niet-blokkerende waarschuwing. De waarschuwing wordt getoond als de check evalueert naar `TRUE`.
 
 De foutmelding die wordt getoond bestaat uit dezelfde onderdelen als bij de validatieregels. Het handelingsperspectief voor alle plausibiliteitschecks is als volgt:
 
+> Invoerder:
 > - Heb je iets niet goed overgenomen? Herstel de fout en ga verder.
 > - Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.
+
+> Coördinator:
+> Er is geen standaard handelingspersepctief voor de coördinator.
 
 ### Checks voor alle velden (reeks W.0xx)
 
 #### W.001 (Bij tweede invoer) Niet alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
 
-> **Verschil met eerste invoer. Extra controle nodig** (W.001)  
+> Invoerder: **Verschil met eerste invoer. Extra controle nodig** (W.001)  
 > Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.
+
+> Coördinator:
+> W.001 is er alleen voor invoerders. Voor de coördinator hebben we het scherm 'verschillen oplossen'.
 
 Velden markeren: alle velden met een verschil
 
@@ -371,6 +375,7 @@ Geen checks.
 ### Checks voor totalen (reeks W.2xx)
 
 #### CSO en DSO | W.201 aantal blanco stemmen is groter of gelijk aan 3% van het totaal uitgebrachte stemmen
+
 > Invoerder: **Controleer aantal blanco stemmen** (W.201)  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
@@ -383,7 +388,8 @@ Veld markeren: F
 
 #### CSO en DSO | W.202: Aantal ongeldige stemmen is groter of gelijk aan 3% van het totaal uitgebrachte stemmen
 
-> Invoerder: **Controleer aantal ongeldige stemmen** (W.202)  
+> Invoerder: **Controleer aantal ongeldige stemmen** (W.202)
+> Check of je het papieren proces-verbaal goed hebt overgenomen.
 
 > Coördinator: **Het aantal ongeldige stemmen is erg hoog** (W.202)
 > Hertel de ongeldige stemmen of geef een verklaring voor het hoge aantal. Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).
@@ -395,8 +401,9 @@ Veld markeren: G
 - 2% of meer: abs(toegelaten kiezers - getelde stembiljetten) / getelde stembiljetten \>= 0.02
 - 15 of meer: abs(toegelaten kiezers - getelde stembiljetten) \>= 15
 
-> Invoerder: **Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
-
+> Invoerder: **Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)
+> Check of je het papieren proces-verbaal goed hebt overgenomen.
+ 
 > Coördinator: **Groot verschil tussen aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
 > Er is een groot verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).  
 > Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitslag per lijst.
@@ -407,7 +414,8 @@ Velden markeren: D en H
 
 #### W.205 Totaal aantal uitgebrachte stemmen leeg of 0
 
-> Invoerder: **Controleer aantal uitgebrachte stemmen** (W.205)  
+> Invoerder: **Controleer aantal uitgebrachte stemmen** (W.205)
+> Check of je het papieren proces-verbaal goed hebt overgenomen.
 
 > Coördinator: **Het totaal aantal uitgebrachte stemmen (H) is nul** (W.205)
 > Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.
@@ -415,7 +423,6 @@ Velden markeren: D en H
 > Zo ja: Verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht.
 
 Veld markeren: H
-
 
 ### Checks voor kandidaten en lijsttotalen (reeks W.4xx)
 
@@ -429,7 +436,7 @@ In de user interface behandelen we die als volgt:
 
 - Voor de stappen **vóór** de hoogste stap waar de gebruiker invoer voor heeft gedaan: als er fouten zijn dan tonen we bij die stap in de navigatiebalk een fout-icoon, als er alleen waarschuwingen zijn dan tonen we bij die stap in de navigatiebalk een waarschuwings-icoon ([voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=137-4359&t=6BRGJQMHbKwihTCh-4)).
 - Fouten of waarschuwingen **voorbij** de hoogste stap waar de gebruiker invoer voor heeft gedaan, tonen we niet.
-- Zijn er fouten of waarschuwingen in de huidige stap, dan tonen we alle waarschuwingen of fouten ([voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=2871-9169&t=FtsIfhKtOeDxlo9v-4)).
+- Zijn er fouten of waarschuwingen in de huidige stap, dan tonen we alle fouten en waarschuwingen ([voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=2871-9169&t=FtsIfhKtOeDxlo9v-4)).
   - We tonen van elke melding de titel, het nummer en de toelichting.
   - Omdat het handelingsperspectief voor alle meldingen hetzelfde is, tonen we deze maar één keer.
   - We markeren alle invoervelden waar een foutmelding of waarschuwing op is. Gaat melding 1 over veld A, B en C, en melding 2 over veld C en D, dan markeren we dus A, B, C en D. Mocht er voor een invoerveld zowel een foutmelding als een waarschuwing zijn, dan wordt alleen de foutmelding markering getoond. 

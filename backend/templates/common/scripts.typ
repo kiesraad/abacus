@@ -449,6 +449,6 @@
 }
 
 /// Display a TODO label
-#let TODO = {
-  box(fill: red, stroke: black, inset: 2pt)[#text(fill: white, size: 6pt)[*TODO*]]
+#let TODO(content)= {
+  box(fill: red, inset: 2pt, text(fill: white, if content != none { [TODO: #content] } else { "TODO" }))
 }

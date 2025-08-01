@@ -6,7 +6,7 @@
 }
 
 .error h1 {
-  font-size: var(--font-size-xl);
+  font-size: 3rem;
   font-family: var(--font-text);
   font-weight: bold;
   line-height: 1.25;
@@ -14,7 +14,7 @@
 }
 
 .error h3 {
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-lg);
   color: var(--gray-600);
   font-weight: bold;
 }
@@ -50,7 +50,7 @@
 }
 
 .stack h2 {
-  font-size: var(--font-size-lg);
+  font-size: 1.875rem;
   font-family: var(--font-text);
   font-weight: bold;
 }

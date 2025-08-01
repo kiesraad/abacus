@@ -2,7 +2,7 @@
 
 use crate::{shared::create_result, utils::serve_api};
 #[cfg(feature = "dev-database")]
-use abacus::election::Election;
+use abacus::election::ElectionWithPoliticalGroups;
 use abacus::{
     committee_session::status::CommitteeSessionStatus,
     election::{ElectionDetailsResponse, ElectionListResponse},
@@ -89,7 +89,6 @@ async fn test_election_create_works(pool: SqlitePool) {
             "number_of_seats": 29,
             "election_date": "2026-01-01",
             "nomination_date": "2026-01-01",
-            "status": "DataEntryInProgress",
             "political_groups": [
           {
             "number": 1,
@@ -121,7 +120,7 @@ async fn test_election_create_works(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::CREATED);
-    let body: Election = response.json().await.unwrap();
+    let body: ElectionWithPoliticalGroups = response.json().await.unwrap();
     assert_eq!(body.name, "Test Election");
 }
 
@@ -234,6 +233,25 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_pdf_download_invalid_committee_session_state(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_pdf_results");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::CONFLICT);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_xml_download_works(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
@@ -263,6 +281,25 @@ async fn test_election_xml_download_works(pool: SqlitePool) {
     let body = response.text().await.unwrap();
     assert!(body.contains("<Election>"));
     assert!(body.contains("<TotalCounted>204</TotalCounted>"));
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_xml_download_invalid_committee_session_state(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_xml_results");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -316,6 +353,25 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
         "Model_Na31-2_GR2024_Heemdamseburg.pdf"
     );
     assert!(reader.entry().uncompressed_size() > 1024);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_zip_download_invalid_committee_session_state(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_zip_results");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

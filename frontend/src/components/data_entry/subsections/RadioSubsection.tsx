@@ -1,6 +1,8 @@
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { RadioSubsection, SectionValues } from "@/types/types";
 
+import cls from "./CheckboxesRadioSubsection.module.css";
+
 export interface RadioSubsectionProps {
   subsection: RadioSubsection;
   currentValues: SectionValues;
@@ -20,7 +22,8 @@ export function RadioSubsectionComponent({
   readOnly = false,
 }: RadioSubsectionProps) {
   return (
-    <div className="radio-form">
+    <fieldset className={cls.container}>
+      {subsection.title && <legend>{subsection.title}</legend>}
       <ChoiceList>
         {defaultProps.errorsAndWarnings?.get(`data.${subsection.path}`) && (
           <ChoiceList.Error id={`${subsection.path}-error`}>{subsection.error}</ChoiceList.Error>
@@ -41,6 +44,6 @@ export function RadioSubsectionComponent({
           />
         ))}
       </ChoiceList>
-    </div>
+    </fieldset>
   );
 }

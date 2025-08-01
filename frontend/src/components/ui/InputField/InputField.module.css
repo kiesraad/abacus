@@ -83,6 +83,15 @@
     }
   }
 
+  :global(.formatted-overlay) {
+    padding: 1rem 1.5rem 1rem 1rem;
+
+    :global(.small) & {
+      /* Inset should correspond to input border */
+      inset: 1px;
+    }
+  }
+
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
     -webkit-appearance: none;

@@ -19,7 +19,7 @@ use abacus::{
     data_entry::{
         DataEntry, PollingStationResults, VotersCounts, VotesCounts, status::ClientState,
     },
-    election::Election,
+    election::ElectionWithPoliticalGroups,
 };
 
 pub mod shared;
@@ -33,6 +33,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
     let data_entry = DataEntry {
         progress: 100,
         data: PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 1203,
                 proxy_certificate_count: 2,
@@ -90,6 +91,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     let data_entry = DataEntry {
         progress: 100,
         data: PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 1203,
                 proxy_certificate_count: 2,
@@ -168,6 +170,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
     let data_entry = DataEntry {
         progress: 100,
         data: PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 102,
                 proxy_certificate_count: 2,
@@ -256,7 +259,7 @@ async fn test_election_apportionment_error_apportionment_not_available_no_pollin
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::CREATED);
-    let election: Election = response.json().await.unwrap();
+    let election: ElectionWithPoliticalGroups = response.json().await.unwrap();
 
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let url = format!(

@@ -54,6 +54,7 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     DataEntry {
         progress: 60,
         data: PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 102,
                 proxy_certificate_count: 2,

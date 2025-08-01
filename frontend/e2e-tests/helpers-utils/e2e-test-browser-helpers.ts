@@ -3,6 +3,7 @@ import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/Candidates
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
@@ -12,25 +13,16 @@ import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
 
-import { PollingStation, PollingStationResults } from "@/types/generated/openapi";
+import { PollingStationResults } from "@/types/generated/openapi";
 
 import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
 
-export async function selectPollingStationForDataEntry(page: Page, pollingStation: PollingStation) {
-  await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
-
-  const dataEntryHomePage = new DataEntryHomePage(page);
-  await expect(dataEntryHomePage.fieldset).toBeVisible();
-  await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
-  await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
-  await dataEntryHomePage.clickStart();
-
-  const votersAndVotesPage = new VotersAndVotesPage(page);
-  await expect(votersAndVotesPage.fieldset).toBeVisible();
-  return votersAndVotesPage;
-}
-
 export async function fillDataEntryPages(page: Page, results: PollingStationResults) {
+  const extraInvestigationPage = new ExtraInvestigationPage(page);
+  await expect(extraInvestigationPage.fieldset).toBeVisible();
+  await extraInvestigationPage.inputExtraInvestigation(results.extra_investigation);
+  await extraInvestigationPage.next.click();
+
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();
   await votersAndVotesPage.fillInPageAndClickNext(results.voters_counts, results.votes_counts);

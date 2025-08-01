@@ -30,6 +30,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 
 /// Election apportionment response, including the seat assignment, candidate nomination and election summary
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ElectionApportionmentResponse {
     pub seat_assignment: SeatAssignmentResult,
     pub candidate_nomination: CandidateNominationResult,

@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
+import { AnyApiError, isSuccess } from "@/api/ApiResult.ts";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -20,6 +21,11 @@ export function FinishDataEntryPage() {
   const { committeeSession, election, refetch } = useElection();
   const client = useApiClient();
   const navigate = useNavigate();
+  const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
+
+  if (changeStatusError) {
+    throw changeStatusError;
+  }
 
   useEffect(() => {
     // Redirect to report download if committee session data entry phase is already finished
@@ -31,9 +37,16 @@ export function FinishDataEntryPage() {
   function handleFinish() {
     const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
-    void client.putRequest(url, body).then(async () => {
-      await refetch();
-    });
+    void client
+      .putRequest(url, body)
+      .then(async (result) => {
+        if (isSuccess(result)) {
+          await refetch();
+        } else {
+          throw result;
+        }
+      })
+      .catch(setChangeStatusError);
   }
 
   return (

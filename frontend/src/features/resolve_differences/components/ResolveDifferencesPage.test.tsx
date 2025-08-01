@@ -77,6 +77,7 @@ describe("ResolveDifferencesPage", () => {
       .queryAllByRole("listitem")
       .map((item) => item.textContent);
     expect(overviewContent).toEqual([
+      "Extra onderzoek",
       "Aantal kiezers en stemmen",
       "Verschillen",
       "Lijst 1 - Vurige Vleugels Partij",

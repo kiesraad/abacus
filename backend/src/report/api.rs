@@ -9,7 +9,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::Coordinator,
-    committee_session::CommitteeSession,
+    committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
     data_entry::PollingStationResults,
     election::ElectionWithPoliticalGroups,
     eml::{EML510, EMLDocument, EmlHash, axum::Eml},
@@ -131,6 +131,7 @@ impl ResultsInput {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -140,9 +141,18 @@ impl ResultsInput {
 async fn election_download_zip_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<u32>,
 ) -> Result<impl IntoResponse, APIError> {
-    let input = ResultsInput::new(id, pool).await?;
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
+            .await?;
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ));
+    }
+
+    let input = ResultsInput::new(election_id, pool).await?;
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
@@ -182,6 +192,7 @@ async fn election_download_zip_results(
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -191,9 +202,18 @@ async fn election_download_zip_results(
 async fn election_download_pdf_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
-    let input = ResultsInput::new(id, pool).await?;
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
+            .await?;
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ));
+    }
+
+    let input = ResultsInput::new(election_id, pool).await?;
     let xml = input.as_xml();
     let xml_string = xml.to_xml_string()?;
     let pdf_filename = input.pdf_filename();
@@ -218,6 +238,7 @@ async fn election_download_pdf_results(
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -227,9 +248,18 @@ async fn election_download_pdf_results(
 async fn election_download_xml_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<u32>,
 ) -> Result<Eml<EML510>, APIError> {
-    let input = ResultsInput::new(id, pool).await?;
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
+            .await?;
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ));
+    }
+
+    let input = ResultsInput::new(election_id, pool).await?;
     let xml = input.as_xml();
     Ok(Eml(xml))
 }

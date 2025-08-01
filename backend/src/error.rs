@@ -15,16 +15,18 @@ use utoipa::ToSchema;
 
 use crate::{
     MAX_BODY_SIZE_MB, apportionment::ApportionmentError,
-    authentication::error::AuthenticationError, data_entry::DataError, eml::EMLImportError,
-    pdf_gen::PdfGenError,
+    authentication::error::AuthenticationError, committee_session::CommitteeSessionError,
+    data_entry::DataError, eml::EMLImportError, pdf_gen::PdfGenError,
 };
 
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, Clone, Copy, ToSchema, PartialEq, Eq, Debug)]
+#[serde(deny_unknown_fields)]
 pub enum ErrorReference {
     AirgapViolation,
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
+    CommitteeSessionPaused,
     DatabaseError,
     DataEntryAlreadyClaimed,
     DataEntryAlreadyFinalised,
@@ -34,6 +36,7 @@ pub enum ErrorReference {
     EntryNotUnique,
     Forbidden,
     InternalServerError,
+    InvalidCommitteeSessionStatus,
     InvalidData,
     InvalidHash,
     InvalidJson,
@@ -58,6 +61,7 @@ pub enum ErrorReference {
 
 /// Response structure for errors
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ErrorResponse {
     pub error: String,
     pub fatal: bool,
@@ -79,6 +83,7 @@ pub enum APIError {
     Apportionment(ApportionmentError),
     Authentication(AuthenticationError),
     BadRequest(String, ErrorReference),
+    CommitteeSession(CommitteeSessionError),
     Conflict(String, ErrorReference),
     ContentTooLarge(String, ErrorReference),
     EmlImportError(EMLImportError),
@@ -333,6 +338,36 @@ impl IntoResponse for APIError {
                             "No votes on candidates cast",
                             ErrorReference::ZeroVotesCast,
                             false,
+                        ),
+                    ),
+                }
+            }
+            APIError::CommitteeSession(err) => {
+                error!("Committee session status error: {:?}", err);
+
+                match err {
+                    CommitteeSessionError::CommitteeSessionPaused => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Committee session data entry is paused",
+                            ErrorReference::CommitteeSessionPaused,
+                            true,
+                        ),
+                    ),
+                    CommitteeSessionError::InvalidStatusTransition => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Invalid committee session state transition",
+                            ErrorReference::InvalidStateTransition,
+                            true,
+                        ),
+                    ),
+                    CommitteeSessionError::InvalidCommitteeSessionStatus => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Invalid committee session status",
+                            ErrorReference::InvalidCommitteeSessionStatus,
+                            true,
                         ),
                     ),
                 }

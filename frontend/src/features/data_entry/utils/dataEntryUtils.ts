@@ -62,7 +62,7 @@ export function isFormSectionEmpty(
           return false;
         }
         break;
-      case "formattedNumber":
+      case "number":
         if (value !== 0 && value !== undefined) {
           return false;
         }

@@ -1,31 +1,25 @@
 use sqlx::SqlitePool;
 use std::{
-    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, TcpStream, ToSocketAddrs},
+    net::{IpAddr, Ipv4Addr, Ipv6Addr},
     sync::{Arc, RwLock, atomic::AtomicBool},
     time::{Duration, Instant},
 };
-use tokio::sync::watch::{self, Sender};
-use tracing::{error, info, trace, warn};
+use tokio::{task::JoinSet, time::timeout};
+use tracing::{debug, error, info, trace, warn};
 
 use crate::audit_log::AuditEvent;
-
-#[derive(Debug, Clone)]
-pub enum AirGapStatusChange {
-    AirGapViolationDetected,
-    AirGapViolationResolved,
-}
 
 #[derive(Clone)]
 pub struct AirgapDetection {
     enabled: bool,
-    updates: Option<Sender<AirGapStatusChange>>,
+    pool: Option<SqlitePool>,
     airgap_violation_detected: Arc<AtomicBool>,
     last_check: Arc<RwLock<Option<Instant>>>,
 }
 
 const SECURE_PORT: u16 = 443; // Default secure port for HTTPS
 
-const TCP_CONNECT_TIMEOUT: Duration = Duration::from_secs(5); // Timeout for TCP connections
+const CONNECT_TIMEOUT: Duration = Duration::from_secs(10); // Timeout for TCP connections
 
 const IPV4: [Ipv4Addr; 2] = [
     Ipv4Addr::new(104, 26, 1, 225), // Cloudflare (informatiebeveiligingsdienst.nl)
@@ -50,7 +44,7 @@ impl AirgapDetection {
     pub fn nop() -> Self {
         Self {
             enabled: false,
-            updates: None,
+            pool: None,
             airgap_violation_detected: Arc::new(AtomicBool::new(false)),
             last_check: Arc::new(RwLock::new(None)),
         }
@@ -59,138 +53,114 @@ impl AirgapDetection {
     /// Starts the airgap detection in a background task.
     /// It will periodically check for airgap violations by attempting to connect to a known server.
     pub async fn start(pool: SqlitePool) -> AirgapDetection {
-        let (tx, mut rx) = watch::channel(AirGapStatusChange::AirGapViolationResolved);
-
         let airgap_detection = AirgapDetection {
             enabled: true,
-            updates: Some(tx),
+            pool: Some(pool),
             airgap_violation_detected: Arc::new(AtomicBool::new(false)),
             last_check: Arc::new(RwLock::new(None)),
         };
 
+        let inner_airgap_detection = airgap_detection.clone();
         tokio::task::spawn(async move {
             loop {
-                match rx.changed().await {
-                    Ok(_) => {
-                        let event = match *rx.borrow() {
-                            AirGapStatusChange::AirGapViolationDetected => {
-                                AuditEvent::AirGapViolationDetected
-                            }
-                            AirGapStatusChange::AirGapViolationResolved => {
-                                AuditEvent::AirGapViolationResolved
-                            }
-                        };
-
-                        if let Err(e) =
-                            crate::audit_log::create(&pool, &event, None, None, None).await
-                        {
-                            error!("Failed to log air gap status change: {e:#?}");
-                        }
-                    }
-                    Err(e) => {
-                        error!("Failed to receive air gap status change: {e:#?}");
-                        break;
-                    }
-                }
-            }
-        });
-
-        std::thread::spawn({
-            let airgap_detection = airgap_detection.clone();
-
-            move || {
-                loop {
-                    airgap_detection.perform_detection();
-
-                    std::thread::sleep(Duration::from_secs(AIRGAP_DETECTION_INTERVAL));
-                }
+                let start = Instant::now();
+                inner_airgap_detection.perform_detection().await;
+                debug!("Airgap detection took {} ms", start.elapsed().as_millis());
+                tokio::time::sleep(Duration::from_secs(AIRGAP_DETECTION_INTERVAL)).await;
             }
         });
 
         airgap_detection
     }
 
-    fn send_update(&self) {
-        if let Some(sender) = self.updates.as_ref() {
-            let status = if self.violation_detected() {
-                AirGapStatusChange::AirGapViolationDetected
-            } else {
-                AirGapStatusChange::AirGapViolationResolved
-            };
+    async fn log_status_change(&self) {
+        let event = if self.violation_detected() {
+            AuditEvent::AirGapViolationDetected
+        } else {
+            AuditEvent::AirGapViolationResolved
+        };
 
-            if let Err(e) = sender.send(status) {
-                error!("Failed to send airgap status update: {e}");
+        if let Some(pool) = &self.pool {
+            if let Err(e) = crate::audit_log::create(pool, &event, None, None, None).await {
+                error!("Failed to log air gap status change: {e:#?}");
             }
         }
     }
 
-    fn perform_detection(&self) {
+    async fn perform_detection(&self) {
         let was_connected = self.violation_detected();
 
-        if self.is_connected() {
+        if self.is_connected().await {
             self.set_airgap_violation_detected(true);
 
             if was_connected {
                 warn!("Airgap violation detected, abacus is still connected to the internet.");
             } else {
                 error!("Airgap violation detected, abacus is connected to the internet!");
-                self.send_update();
+                self.log_status_change().await;
             }
         } else {
             self.set_airgap_violation_detected(false);
 
             if was_connected {
                 info!("Airgap violation resolved, abacus is no longer connected to the internet.");
-                self.send_update();
+                self.log_status_change().await;
             } else {
                 trace!("No airgap violation detected.");
             }
         }
-
-        self.set_last_check();
     }
 
     /// Detects if the system is in an airgap by attempting to connect to IPv4, IPv6 addresses and performing DNS lookups
-    fn is_connected(&self) -> bool {
-        // attempt to connect to known IPv4 addresses over TCP
-        let tcp_ipv4_connection_success = IPV4
+    async fn is_connected(&self) -> bool {
+        let mut set = JoinSet::new();
+
+        let all_ip_adresses = IPV4
             .iter()
-            .map(|ip| SocketAddr::new(IpAddr::V4(*ip), SECURE_PORT))
-            .map(|addr| TcpStream::connect_timeout(&addr, TCP_CONNECT_TIMEOUT))
-            .filter_map(Result::ok)
-            .count();
+            .map(|ip| IpAddr::V4(*ip))
+            .chain(IPV6.iter().map(|ip| IpAddr::V6(*ip)));
 
-        if tcp_ipv4_connection_success > 0 {
-            trace!("TCP IPv4 connections: {tcp_ipv4_connection_success}");
-
-            return true;
+        // attempt to connect to known IP addresses over TCP
+        for ip in all_ip_adresses {
+            set.spawn(async move {
+                match timeout(
+                    CONNECT_TIMEOUT,
+                    tokio::net::TcpStream::connect((ip, SECURE_PORT)),
+                )
+                .await
+                {
+                    Ok(Ok(_)) => {
+                        warn!("TCP connection to IP address {ip} successful");
+                        true
+                    }
+                    _ => false,
+                }
+            });
         }
 
-        // attempt to connect to known IPv6 addresses over TCP
-        let tcp_ipv6_connection_success = IPV6
-            .iter()
-            .map(|ip| SocketAddr::new(IpAddr::V6(*ip), SECURE_PORT))
-            .map(|addr| TcpStream::connect_timeout(&addr, TCP_CONNECT_TIMEOUT))
-            .filter_map(Result::ok)
-            .count();
-
-        if tcp_ipv6_connection_success > 0 {
-            trace!("TCP IPv6 connections: {tcp_ipv6_connection_success}");
-
-            return true;
+        // attempt to resolve known domains
+        for domain in DOMAINS {
+            set.spawn(async move {
+                match timeout(
+                    CONNECT_TIMEOUT,
+                    tokio::net::lookup_host((domain, SECURE_PORT)),
+                )
+                .await
+                {
+                    Ok(Ok(_)) => {
+                        warn!("DNS lookup of domain {domain} successful");
+                        true
+                    }
+                    _ => false,
+                }
+            });
         }
 
-        // perform a DNS lookup using the default resolver
-        let dns_lookup_success = DOMAINS
-            .iter()
-            .map(|d| format!("{d}:{SECURE_PORT}").to_socket_addrs())
-            .filter_map(Result::ok)
-            .count();
-
-        if dns_lookup_success > 0 {
-            trace!("DNS lookup success: {dns_lookup_success}");
-
-            return true;
+        // if one of the connection attempts or lookups succeeded, return the result
+        while let Some(res) = set.join_next().await {
+            if matches!(res, Ok(true)) {
+                return true;
+            }
         }
 
         false
@@ -199,9 +169,7 @@ impl AirgapDetection {
     fn set_airgap_violation_detected(&self, status: bool) {
         self.airgap_violation_detected
             .store(status, std::sync::atomic::Ordering::Relaxed);
-    }
 
-    fn set_last_check(&self) {
         if let Ok(mut last_check) = self.last_check.write() {
             *last_check = Some(Instant::now());
         }
@@ -238,7 +206,7 @@ mod tests {
     async fn test_block_request_on_airgap_violation() {
         let airgap_detection = AirgapDetection {
             enabled: true,
-            updates: None,
+            pool: None,
             airgap_violation_detected: Arc::new(AtomicBool::new(false)),
             last_check: Arc::new(RwLock::new(None)),
         };
@@ -269,7 +237,6 @@ mod tests {
         assert_eq!(res.status(), StatusCode::OK);
 
         airgap_detection.set_airgap_violation_detected(true);
-        airgap_detection.set_last_check();
 
         let res = app
             .oneshot(
@@ -308,7 +275,7 @@ mod tests {
     async fn test_block_request_on_airgap_detection_outdated() {
         let airgap_detection = AirgapDetection {
             enabled: true,
-            updates: None,
+            pool: None,
             airgap_violation_detected: Arc::new(AtomicBool::new(false)),
             last_check: Arc::new(RwLock::new(Some(Instant::now()))),
         };

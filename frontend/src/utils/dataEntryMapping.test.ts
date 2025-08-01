@@ -17,6 +17,16 @@ const createBasePollingStationResults = (): PollingStationResults => ({
     other_explanation_count: 0,
     no_explanation_count: 0,
   },
+  extra_investigation: {
+    extra_investigation_other_reason: {
+      yes: false,
+      no: false,
+    },
+    ballots_recounted_extra_investigation: {
+      yes: false,
+      no: false,
+    },
+  },
   political_group_votes: [],
   voters_counts: {
     poll_card_count: 0,
@@ -135,11 +145,11 @@ describe("mapSectionValues", () => {
     expect(result.test2).toBe(456); // InputGrid field gets deformatted to number
   });
 
-  test("should handle formatted numbers correctly when section info is provided", () => {
+  test("should handle numbers correctly when section info is provided", () => {
     const current = createBasePollingStationResults();
     const formValues = {
-      "voters_counts.poll_card_count": "1.234", // Formatted number for inputGrid
-      "voters_counts.proxy_certificate_count": "2.567", // Another formatted number for inputGrid
+      "voters_counts.poll_card_count": "1234", // Number for inputGrid
+      "voters_counts.proxy_certificate_count": "2567", // Another number for inputGrid
     };
 
     const testSection: DataEntrySection = {
@@ -160,8 +170,8 @@ describe("mapSectionValues", () => {
 
     const result = mapSectionValues(current, formValues, testSection);
 
-    expect(result.voters_counts.poll_card_count).toBe(1234); // Should be deformatted to number
-    expect(result.voters_counts.proxy_certificate_count).toBe(2567); // Should be deformatted to number
+    expect(result.voters_counts.poll_card_count).toBe(1234); // Should be converted to number
+    expect(result.voters_counts.proxy_certificate_count).toBe(2567); // Should be converted to number
   });
 
   test("should handle voters_counts fields", () => {
@@ -350,18 +360,18 @@ describe("mapSectionValues", () => {
     expect(result.political_group_votes[2]?.total).toBe(12);
   });
 
-  test("should handle formatted numbers by deformatting them", () => {
+  test("should handle numbers", () => {
     const current = createBasePollingStationResults();
     const formValues = {
-      "voters_counts.poll_card_count": "1.234",
-      "votes_counts.votes_candidates_count": "2.567",
+      "voters_counts.poll_card_count": "1234",
+      "votes_counts.votes_candidates_count": "2567",
       "political_group_votes[0].candidate_votes[0].votes": "89",
     };
 
-    const formattedNumbersSection: DataEntrySection = {
+    const numbersSection: DataEntrySection = {
       id: "voters_votes_counts",
-      title: "Formatted Numbers Section",
-      short_title: "Formatted Numbers",
+      title: "Numbers Section",
+      short_title: "Numbers",
       subsections: [
         {
           type: "inputGrid",
@@ -375,7 +385,7 @@ describe("mapSectionValues", () => {
       ],
     };
 
-    const result = mapSectionValues(current, formValues, formattedNumbersSection);
+    const result = mapSectionValues(current, formValues, numbersSection);
 
     expect(result.voters_counts.poll_card_count).toBe(1234);
     expect(result.votes_counts.votes_candidates_count).toBe(2567);
@@ -495,40 +505,6 @@ describe("mapResultsToSectionValues", () => {
     const formValues = mapResultsToSectionValues(testSectionWithRadio, results);
 
     expect(formValues["test"]).toBe(expected);
-  });
-
-  test("should format only inputGrid values, not radio values", () => {
-    const results = {
-      test: true,
-      voters_counts: {
-        poll_card_count: 1234,
-      },
-    };
-
-    const testSection: DataEntrySection = {
-      id: "voters_votes_counts",
-      title: "Test Section",
-      short_title: "Test",
-      subsections: [
-        {
-          type: "radio",
-          short_title: "test.short_title",
-          path: "test",
-          error: "test.error",
-          options: [],
-        },
-        {
-          type: "inputGrid",
-          headers: ["field", "counted_number", "description"],
-          rows: [{ code: "A", path: "voters_counts.poll_card_count", title: "Test Title" }],
-        },
-      ],
-    };
-
-    const formValues = mapResultsToSectionValues(testSection, results);
-
-    expect(formValues["test"]).toBe("true"); // Radio value stays as string
-    expect(formValues["voters_counts.poll_card_count"]).toBe("1.234"); // InputGrid value gets formatted
   });
 
   test("should extract voters_votes_counts section fields", () => {
@@ -684,17 +660,6 @@ describe("mapResultsToSectionValues", () => {
 
     expect(formValues["political_group_votes[2].candidate_votes[5].votes"]).toBe("12");
     expect(formValues["political_group_votes[2].total"]).toBe("12");
-  });
-
-  test("should format large numbers correctly", () => {
-    const results = createBasePollingStationResults();
-    results.voters_counts.poll_card_count = 1234;
-    results.votes_counts.votes_candidates_count = 5678;
-
-    const formValues = mapResultsToSectionValues(votersAndVotesSection, results);
-
-    expect(formValues["voters_counts.poll_card_count"]).toBe("1.234");
-    expect(formValues["votes_counts.votes_candidates_count"]).toBe("5.678");
   });
 
   test("should handle zero values", () => {

@@ -32,7 +32,7 @@ export function OverviewPage() {
     function ElectionRowContent() {
       return (
         <>
-          <Table.Cell className="fs-body">{election.name}</Table.Cell>
+          <Table.Cell className="fs-lg">{election.name}</Table.Cell>
           <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
           <Table.Cell>{committeeSessionStatus}</Table.Cell>
         </>
@@ -58,13 +58,13 @@ export function OverviewPage() {
     }
     if (electionLink) {
       return (
-        <Table.LinkRow key={election.id} to={electionLink}>
+        <Table.LinkRow id={`election-row-${election.id}`} key={election.id} to={electionLink}>
           <ElectionRowContent />
         </Table.LinkRow>
       );
     } else {
       return (
-        <Table.Row>
+        <Table.Row id={`election-row-${election.id}`}>
           <ElectionRowContent />
         </Table.Row>
       );

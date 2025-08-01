@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
+import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 
@@ -97,21 +98,8 @@ test.describe("data entry - api error responses", () => {
   test("4xx non-fatal response results in error shown", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
-    const votersAndVotesPage = new VotersAndVotesPage(page);
-    await expect(votersAndVotesPage.fieldset).toBeVisible();
-    const voters: VotersCounts = {
-      poll_card_count: 99,
-      proxy_certificate_count: 1,
-      total_admitted_voters_count: 100,
-    };
-    const votes: VotesCounts = {
-      votes_candidates_count: 100,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 100,
-    };
-    await votersAndVotesPage.inputVotersCounts(voters);
-    await votersAndVotesPage.inputVotesCounts(votes);
+    const extraInvestigationPage = new ExtraInvestigationPage(page);
+    await expect(extraInvestigationPage.fieldset).toBeVisible();
 
     await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1`, async (route) => {
       await route.fulfill({
@@ -123,7 +111,7 @@ test.describe("data entry - api error responses", () => {
         },
       });
     });
-    await votersAndVotesPage.next.click();
+    await extraInvestigationPage.next.click();
 
     const errorModal = new ErrorModalPgObj(page);
     await expect(errorModal.dialog).toBeVisible();
@@ -132,11 +120,25 @@ test.describe("data entry - api error responses", () => {
 
     await errorModal.close.click();
     await expect(errorModal.dialog).toBeHidden();
-    await expect(votersAndVotesPage.fieldset).toBeVisible();
+    await expect(extraInvestigationPage.fieldset).toBeVisible();
   });
 
   test("5xx fatal response results in error shown", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+
+    const extraInvestigationPage = new ExtraInvestigationPage(page);
+    await expect(extraInvestigationPage.fieldset).toBeVisible();
+    await extraInvestigationPage.inputExtraInvestigation({
+      extra_investigation_other_reason: {
+        yes: false,
+        no: true,
+      },
+      ballots_recounted_extra_investigation: {
+        yes: false,
+        no: true,
+      },
+    });
+    await extraInvestigationPage.next.click();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();

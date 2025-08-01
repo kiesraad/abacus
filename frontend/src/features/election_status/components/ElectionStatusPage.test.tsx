@@ -17,9 +17,9 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
-import { screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
+import { expectForbiddenErrorPage, screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser } from "@/testing/user-mock-data";
-import { ElectionDetailsResponse } from "@/types/generated/openapi";
+import { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { electionStatusRoutes } from "../routes";
 
@@ -50,9 +50,6 @@ async function renderPage() {
 
   await router.navigate("/elections/1/status");
   rtlRender(<Providers router={router} />);
-
-  // Wait for the page to be loaded
-  expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
 
   return router;
 }
@@ -388,5 +385,21 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
 
     expect(await screen.findByText("Steminvoer afgerond")).toBeVisible();
+  });
+
+  test("Shows error page when election status call returns an error", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
+    overrideOnce("get", "/api/elections/1/status", 403, {
+      error: "Forbidden",
+      fatal: true,
+      reference: "Forbidden",
+    } satisfies ErrorResponse);
+
+    await renderPage();
+
+    await expectForbiddenErrorPage();
   });
 });

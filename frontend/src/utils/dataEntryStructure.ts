@@ -111,6 +111,58 @@ export const differencesSection: DataEntrySection = {
   ],
 };
 
+export const extraInvestigationSection: DataEntrySection = {
+  id: "extra_investigation",
+  title: t("extra_investigation.form_title"),
+  short_title: t("extra_investigation.short_title"),
+  sectionNumber: "B1-1",
+  subsections: [
+    {
+      type: "message",
+      message: t("extra_investigation.form_description"),
+    },
+    {
+      type: "checkboxes",
+      title: t("extra_investigation.extra_investigation_other_reason.title"),
+      short_title: t("extra_investigation.extra_investigation_other_reason.short_title"),
+      error_path: "extra_investigation.extra_investigation_other_reason",
+      error_message: t("extra_investigation.validation_error"),
+      options: [
+        {
+          path: "extra_investigation.extra_investigation_other_reason.yes",
+          label: t("yes"),
+          short_label: t("yes"),
+          autoFocusInput: true,
+        },
+        {
+          path: "extra_investigation.extra_investigation_other_reason.no",
+          label: t("no"),
+          short_label: t("no"),
+        },
+      ],
+    },
+    {
+      type: "checkboxes",
+      title: t("extra_investigation.ballots_recounted_extra_investigation.title"),
+      short_title: t("extra_investigation.ballots_recounted_extra_investigation.short_title"),
+      error_path: "extra_investigation.ballots_recounted_extra_investigation",
+      error_message: t("extra_investigation.validation_error"),
+      options: [
+        {
+          path: "extra_investigation.ballots_recounted_extra_investigation.yes",
+          label: t("yes"),
+          short_label: t("yes"),
+        },
+        {
+          path: "extra_investigation.ballots_recounted_extra_investigation.no",
+          label: t("no"),
+          short_label: t("no"),
+        },
+      ],
+    },
+  ],
+};
+
 /**
  * Creates political group sections based on election data
  * @param election ElectionWithPoliticalGroups object
@@ -155,7 +207,12 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
 }
 
 function buildDataEntryStructure(election: ElectionWithPoliticalGroups): DataEntryStructure {
-  return [votersAndVotesSection, differencesSection, ...createPoliticalGroupSections(election)];
+  return [
+    extraInvestigationSection,
+    votersAndVotesSection,
+    differencesSection,
+    ...createPoliticalGroupSections(election),
+  ];
 }
 
 /**

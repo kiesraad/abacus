@@ -36,7 +36,7 @@ impl From<ValidationResults> for DataEntryTransitionError {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
-#[serde(tag = "status", content = "state")]
+#[serde(deny_unknown_fields, tag = "status", content = "state")]
 pub enum DataEntryStatus {
     FirstEntryNotStarted, // First entry has not started yet
     FirstEntryInProgress(FirstEntryInProgress),
@@ -48,7 +48,7 @@ pub enum DataEntryStatus {
 }
 
 #[derive(Debug, Serialize, Deserialize, strum::Display, Clone, PartialEq, Eq, ToSchema)]
-#[serde(rename_all = "snake_case")]
+#[serde(deny_unknown_fields, rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum DataEntryStatusName {
     FirstEntryNotStarted,
@@ -61,6 +61,7 @@ pub enum DataEntryStatusName {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
 pub struct FirstEntryInProgress {
     /// Data entry progress between 0 and 100
     #[schema(maximum = 100)]
@@ -75,7 +76,7 @@ pub struct FirstEntryInProgress {
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, Clone, Type, Eq, PartialEq)]
-#[serde(transparent)]
+#[serde(deny_unknown_fields, transparent)]
 pub struct ClientState(pub Option<serde_json::Value>);
 
 impl ClientState {
@@ -90,6 +91,7 @@ impl ClientState {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
 pub struct FirstEntryHasErrors {
     /// User who did the first data entry
     pub first_entry_user_id: u32,
@@ -101,6 +103,7 @@ pub struct FirstEntryHasErrors {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
 pub struct SecondEntryNotStarted {
     /// User who did the first data entry
     pub first_entry_user_id: u32,
@@ -112,6 +115,7 @@ pub struct SecondEntryNotStarted {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
 pub struct SecondEntryInProgress {
     /// User who did the first data entry
     pub first_entry_user_id: u32,
@@ -133,6 +137,7 @@ pub struct SecondEntryInProgress {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
 pub struct EntriesDifferent {
     /// User who did the first data entry
     pub first_entry_user_id: u32,
@@ -151,6 +156,7 @@ pub struct EntriesDifferent {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
 pub struct Definitive {
     /// User who did the first data entry
     pub first_entry_user_id: u32,
@@ -687,6 +693,7 @@ mod tests {
 
     fn polling_station_result() -> PollingStationResults {
         PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: Default::default(),
             votes_counts: Default::default(),
             differences_counts: Default::default(),
@@ -919,6 +926,7 @@ mod tests {
     fn finalise_first_entry_validation_error() {
         // Create data with validation errors that will trigger FirstEntryHasErrors
         let invalid_entry = PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 10,
                 proxy_certificate_count: 5,
@@ -1319,6 +1327,7 @@ mod tests {
         // Create valid data without errors, so we transition to SecondEntryNotStarted
         let first_entry = polling_station_result();
         let second_entry = PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 1,
                 proxy_certificate_count: 0,
@@ -1359,6 +1368,7 @@ mod tests {
         let first_entry = polling_station_result();
         // Create second entry with validation errors that will trigger FirstEntryHasErrors
         let second_entry = PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 5,
                 proxy_certificate_count: 3,

@@ -106,7 +106,17 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
               }
             ]
           }
-        ]
+        ],
+        "extra_investigation": {
+          "extra_investigation_other_reason": {
+            "yes": false,
+            "no": false
+          },
+          "ballots_recounted_extra_investigation": {
+            "yes": false,
+            "no": false
+          }
+        }
       },
       "progress": 60,
       "client_state": {"foo": "bar"}

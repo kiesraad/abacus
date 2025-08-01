@@ -12,7 +12,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Form: Story = {
   args: {
-    defaultValue: 2000,
+    defaultValue: 0,
     instructions:
       "Voer het aantal kiesgerechtigden in zoals door de gemeenteraad vastgesteld voor de gemeenteraad 2026 in de gemeente Juinen.",
     hint: "Voer een getal in",
@@ -21,12 +21,18 @@ export const Form: Story = {
   },
   play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByText(args.instructions)).toBeInTheDocument();
-    await expect(canvas.getByLabelText("Aantal kiesgerechtigden")).toHaveValue("2.000");
     await expect(canvas.getByText(args.hint!)).toBeInTheDocument();
+
+    const inputField = canvas.getByRole("textbox", { name: "Aantal kiesgerechtigden" });
+    await expect(inputField).toHaveValue("");
 
     const button = canvas.getByRole("button");
     await expect(button).toHaveAccessibleName("Opslaan");
 
+    await userEvent.click(button);
+    await expect(args.onSubmit).toHaveBeenCalledWith(0);
+
+    await userEvent.type(inputField, "2000");
     await userEvent.click(button);
     await expect(args.onSubmit).toHaveBeenCalledWith(2000);
   },

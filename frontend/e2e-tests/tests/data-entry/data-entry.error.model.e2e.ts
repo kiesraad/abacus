@@ -3,10 +3,11 @@ import { createTestModel } from "@xstate/graph";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { createMachine } from "xstate";
 
-import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
+import { ExtraInvestigation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
 import {
@@ -25,7 +26,7 @@ to the polling stations page.
 */
 
 const dataEntryMachineDefinition = {
-  initial: "voterVotesPageEmpty",
+  initial: "extraInvestigationPageEmpty",
   states: {
     pollingStationsPageErrorSaved: {
       on: {
@@ -38,6 +39,16 @@ const dataEntryMachineDefinition = {
       },
     },
     pollingStationsPageDiscarded: {},
+    extraInvestigationPageEmpty: {
+      on: {
+        FILL_EXTRA_INVESTIGATION: "extraInvestigationPageFilledValid",
+      },
+    },
+    extraInvestigationPageFilledValid: {
+      on: {
+        SUBMIT: "voterVotesPageEmpty",
+      },
+    },
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilledValid",
@@ -121,6 +132,28 @@ const dataEntryMachineDefinition = {
 const machine = createMachine(dataEntryMachineDefinition);
 const { machineStates, machineEvents } = getStatesAndEventsFromMachineDefinition(dataEntryMachineDefinition);
 
+const extraInvestigation: ExtraInvestigation = {
+  extra_investigation_other_reason: {
+    yes: false,
+    no: true,
+  },
+  ballots_recounted_extra_investigation: {
+    yes: false,
+    no: true,
+  },
+};
+
+const extraInvestigationEmpty: ExtraInvestigation = {
+  extra_investigation_other_reason: {
+    yes: false,
+    no: false,
+  },
+  ballots_recounted_extra_investigation: {
+    yes: false,
+    no: false,
+  },
+};
+
 const voters: VotersCounts = {
   poll_card_count: 90,
   proxy_certificate_count: 10,
@@ -177,6 +210,7 @@ test.describe("Data entry model test - errors", () => {
       // eslint-disable-next-line playwright/valid-title
       test(path.description, async ({ page, pollingStation, election }) => {
         const dataEntryHomePage = new DataEntryHomePage(page);
+        const extraInvestigationPage = new ExtraInvestigationPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
         const abortModal = new AbortInputModal(page);
@@ -204,6 +238,28 @@ test.describe("Data entry model test - errors", () => {
             await dataEntryHomePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
           },
         };
+
+        const extraInvestigationPageStates = {
+          extraInvestigationPageEmpty: async () => {
+            await expect(extraInvestigationPage.fieldset).toBeVisible();
+            const extraInvestigationFields = await extraInvestigationPage.getExtraInvestigation();
+            expect(extraInvestigationFields).toStrictEqual(extraInvestigationEmpty);
+          },
+          extraInvestigationPageFilledValid: async () => {
+            await expect(extraInvestigationPage.fieldset).toBeVisible();
+            const extraInvestigationFields = await extraInvestigationPage.getExtraInvestigation();
+            expect(extraInvestigationFields).toStrictEqual(extraInvestigation);
+          },
+        };
+        const extraInvestigationPageEvents = {
+          FILL_EXTRA_INVESTIGATION: async () => {
+            await extraInvestigationPage.inputExtraInvestigation(extraInvestigation);
+          },
+          SUBMIT: async () => {
+            await extraInvestigationPage.next.click();
+          },
+        };
+
         const votersVotesPageStates = {
           voterVotesPageEmpty: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -353,8 +409,20 @@ test.describe("Data entry model test - errors", () => {
         // check that events and states used by the machine are equal to
         // the events and states specified in the test
         const { states, events } = getStatesAndEventsFromTest(
-          [pollingStationsPageStates, votersVotesPageStates, differencesPageStates, abortInputModalStates],
-          [PollingStationsPageEvents, votersAndVotesPageEvents, differencesPageEvents, abortInputModalEvents],
+          [
+            pollingStationsPageStates,
+            extraInvestigationPageStates,
+            votersVotesPageStates,
+            differencesPageStates,
+            abortInputModalStates,
+          ],
+          [
+            PollingStationsPageEvents,
+            extraInvestigationPageEvents,
+            votersAndVotesPageEvents,
+            differencesPageEvents,
+            abortInputModalEvents,
+          ],
         );
         expect(new Set(states)).toEqual(new Set(machineStates));
         expect(new Set(events)).toEqual(new Set(machineEvents));
@@ -373,11 +441,13 @@ test.describe("Data entry model test - errors", () => {
         await path.test({
           states: {
             ...pollingStationsPageStates,
+            ...extraInvestigationPageStates,
             ...votersVotesPageStates,
             ...differencesPageStates,
             ...abortInputModalStates,
           } satisfies Record<MachineStateKey, () => void>,
           events: {
+            ...extraInvestigationPageEvents,
             ...votersAndVotesPageEvents,
             ...differencesPageEvents,
             ...abortInputModalEvents,

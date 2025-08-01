@@ -200,15 +200,16 @@ describe("getDataEntryStructure", () => {
   test("should return all sections in correct order", () => {
     const structure = getDataEntryStructure(electionMockData);
 
-    const expectedLength = 2 + electionMockData.political_groups.length; // voters_votes + differences + political groups
+    const expectedLength = 3 + electionMockData.political_groups.length; // extra_investigation + voters_votes + differences + political groups
     expect(structure).toHaveLength(expectedLength);
 
-    expect(structure[0]?.id).toBe("voters_votes_counts");
-    expect(structure[1]?.id).toBe("differences_counts");
+    expect(structure[0]?.id).toBe("extra_investigation");
+    expect(structure[1]?.id).toBe("voters_votes_counts");
+    expect(structure[2]?.id).toBe("differences_counts");
 
     // Check political group sections
     for (let i = 0; i < electionMockData.political_groups.length; i++) {
-      expect(structure[2 + i]?.id).toBe(`political_group_votes_${electionMockData.political_groups[i]?.number}`);
+      expect(structure[3 + i]?.id).toBe(`political_group_votes_${electionMockData.political_groups[i]?.number}`);
     }
   });
 });

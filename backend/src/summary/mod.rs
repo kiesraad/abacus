@@ -14,6 +14,7 @@ use crate::{
 
 /// Contains a summary of the election results, added up from the votes of all polling stations.
 #[derive(Serialize, Deserialize, Debug, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct ElectionSummary {
     /// The total number of voters
     pub voters_counts: VotersCounts,
@@ -132,6 +133,7 @@ impl ElectionSummary {
 
 /// Contains a summary of the differences, containing which polling stations had differences.
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct SummaryDifferencesCounts {
     pub more_ballots_count: SumCount,
     pub fewer_ballots_count: SumCount,
@@ -186,6 +188,7 @@ impl SummaryDifferencesCounts {
 /// Contains a summary count, containing both the count and a list of polling
 /// stations that contributed to it.
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct SumCount {
     #[schema(value_type = u32)]
     pub count: Count,
@@ -219,6 +222,7 @@ mod tests {
 
     fn polling_station_results_fixture_a() -> PollingStationResults {
         PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 30,
                 proxy_certificate_count: 5,
@@ -244,6 +248,7 @@ mod tests {
 
     fn polling_station_results_fixture_b() -> PollingStationResults {
         PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 49,
                 proxy_certificate_count: 1,

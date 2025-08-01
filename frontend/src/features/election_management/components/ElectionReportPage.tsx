@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useNavigate } from "react-router";
 
+import { AnyApiError, ApiResponseStatus, FatalApiError, isSuccess } from "@/api/ApiResult.ts";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -21,6 +23,21 @@ export function ElectionReportPage() {
   const { committeeSession, election } = useElection();
   const client = useApiClient();
   const navigate = useNavigate();
+  const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
+
+  // Safeguard so users cannot circumvent the check via the browser's address bar
+  if (committeeSession.status !== "data_entry_finished") {
+    throw new FatalApiError(
+      ApiResponseStatus.ClientError,
+      409,
+      "Invalid committee session status",
+      "InvalidCommitteeSessionStatus",
+    );
+  }
+
+  if (changeStatusError) {
+    throw changeStatusError;
+  }
 
   function downloadPdfResults() {
     directDownload(`/api/elections/${election.id}/download_pdf_results`);
@@ -33,9 +50,16 @@ export function ElectionReportPage() {
   function handleResume() {
     const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
-    void client.putRequest(url, body).then(() => {
-      void navigate("../../status");
-    });
+    void client
+      .putRequest(url, body)
+      .then((result) => {
+        if (isSuccess(result)) {
+          void navigate("../../status");
+        } else {
+          throw result;
+        }
+      })
+      .catch(setChangeStatusError);
   }
 
   return (

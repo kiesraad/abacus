@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     election::{PoliticalGroup, VoteCountingMethod},
     eml::common::{AuthorityAddress, AuthorityIdentifier},
+    polling_station::PollingStationRequest,
 };
 
 use super::{
@@ -13,8 +14,6 @@ use super::{
         ElectionSubcategory, ManagingAuthority,
     },
 };
-
-use crate::polling_station::PollingStationRequest;
 
 /// Election definition (110a and 110b)
 ///

@@ -3,7 +3,7 @@
   line-height: 1.5rem;
   border-spacing: unset;
   color: var(--color-help-text);
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-lg);
 
   thead {
     font-size: var(--font-size-xs);
@@ -103,7 +103,7 @@
 
 :where(.numberCell) {
   font-weight: bold;
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-lg);
   /* Enable 'Tabular Figures' font feature for fixed-width numbers */
   font-feature-settings: "tnum" on;
 }

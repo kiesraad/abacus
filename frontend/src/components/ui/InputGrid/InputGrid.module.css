@@ -56,7 +56,7 @@
         :global(.formatted-overlay) {
           text-align: right;
           padding: 1rem 1.5rem;
-          font-size: var(--font-size-body);
+          font-size: var(--font-size-lg);
           font-style: normal;
         }
 
@@ -69,7 +69,7 @@
           height: 4.5rem;
           padding: 1rem 1.6rem;
           text-align: right;
-          font-size: var(--font-size-body);
+          font-size: var(--font-size-lg);
           font-style: normal;
           font-weight: bold;
           line-height: 2.5rem;

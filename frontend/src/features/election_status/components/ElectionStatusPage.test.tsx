@@ -17,8 +17,14 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
-import { expectForbiddenErrorPage, screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
-import { getAdminUser, getCoordinatorUser } from "@/testing/user-mock-data";
+import {
+  expectConflictErrorPage,
+  expectForbiddenErrorPage,
+  screen,
+  setupTestRouter,
+  spyOnHandler,
+} from "@/testing/test-utils";
+import { getAdminUser, getCoordinatorUser, getTypistUser } from "@/testing/user-mock-data";
 import { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { electionStatusRoutes } from "../routes";
@@ -387,12 +393,41 @@ describe("ElectionStatusPage", () => {
     expect(await screen.findByText("Steminvoer afgerond")).toBeVisible();
   });
 
-  test("Shows error page when election status call returns an error", async () => {
+  test("Page render when committee session status is data_entry_finished", async () => {
+    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(
+          getElectionMockData({}, { status: "data_entry_finished" }) satisfies ElectionDetailsResponse,
+          { status: 200 },
+        ),
+      ),
+    );
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [
+        { id: 1, status: "definitive" },
+        { id: 2, status: "definitive" },
+      ],
+    });
+
+    await renderPage();
+
+    // Test that the data entry finished and data entry paused alerts don't exist
+    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+
+    expect(await screen.findByText("Steminvoer afgerond")).toBeVisible();
+  });
+
+  test("Shows error page when user is not allowed to view the page", async () => {
+    vi.mocked(useUser).mockReturnValue(getTypistUser());
     // Since we test what happens after an error, we want vitest to ignore them
     vi.spyOn(console, "error").mockImplementation(() => {
       /* do nothing */
     });
-    overrideOnce("get", "/api/elections/1/status", 403, {
+    overrideOnce("get", "/api/user", 403, {
       error: "Forbidden",
       fatal: true,
       reference: "Forbidden",
@@ -401,5 +436,43 @@ describe("ElectionStatusPage", () => {
     await renderPage();
 
     await expectForbiddenErrorPage();
+  });
+
+  test("Shows error page when election status change call returns an error", async () => {
+    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(getElectionMockData({}, { status: "data_entry_paused" }) satisfies ElectionDetailsResponse, {
+          status: 200,
+        }),
+      ),
+    );
+    overrideOnce("put", "/api/committee_sessions/1/status", 409, {
+      error: "Invalid committee session status",
+      fatal: true,
+      reference: "InvalidCommitteeSessionStatus",
+    } satisfies ErrorResponse);
+
+    await renderPage();
+
+    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
+    expect(await screen.findByText("Het invoeren van stemmen is gepauzeerd")).toBeVisible();
+    const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });
+    expect(resumeButton).toBeVisible();
+
+    await user.click(resumeButton);
+
+    expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_in_progress" });
+    expect(navigate).not.toHaveBeenCalled();
+
+    await expectConflictErrorPage();
+    expect(console.error).toHaveBeenCalled();
   });
 });

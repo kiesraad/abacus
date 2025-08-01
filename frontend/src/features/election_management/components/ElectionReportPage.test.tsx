@@ -37,6 +37,29 @@ vi.mock("react-router", async (importOriginal) => ({
   useNavigate: () => navigate,
 }));
 
+const Providers = ({
+  children,
+  router = getRouter(children),
+  fetchInitialUser = false,
+}: {
+  children?: React.ReactNode;
+  router?: Router;
+  fetchInitialUser?: boolean;
+}) => {
+  return (
+    <ApiProvider fetchInitialUser={fetchInitialUser}>
+      <TestUserProvider userRole="coordinator">
+        <ElectionProvider electionId={1}>
+          <ElectionStatusProvider electionId={1}>
+            <RouterProvider router={router} />
+          </ElectionStatusProvider>
+        </ElectionProvider>
+      </TestUserProvider>
+      ,
+    </ApiProvider>
+  );
+};
+
 const renderPage = async () => {
   const router = renderReturningRouter(
     <ElectionProvider electionId={1}>
@@ -101,28 +124,6 @@ describe("ElectionReportPage", () => {
     vi.spyOn(console, "error").mockImplementation(() => {
       /* do nothing */
     });
-    const Providers = ({
-      children,
-      router = getRouter(children),
-      fetchInitialUser = false,
-    }: {
-      children?: React.ReactNode;
-      router?: Router;
-      fetchInitialUser?: boolean;
-    }) => {
-      return (
-        <ApiProvider fetchInitialUser={fetchInitialUser}>
-          <TestUserProvider userRole="coordinator">
-            <ElectionProvider electionId={1}>
-              <ElectionStatusProvider electionId={1}>
-                <RouterProvider router={router} />
-              </ElectionStatusProvider>
-            </ElectionProvider>
-          </TestUserProvider>
-          ,
-        </ApiProvider>
-      );
-    };
     const router = setupTestRouter([
       {
         Component: null,
@@ -164,6 +165,33 @@ describe("ElectionReportPage", () => {
     const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });
     expect(resumeButton).toBeVisible();
     await user.click(resumeButton);
+
+    await expectConflictErrorPage();
+  });
+
+  test("Error when committee session status is not DataEntryFinished", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
+    const router = setupTestRouter([
+      {
+        Component: null,
+        errorElement: <ErrorBoundary />,
+        children: [
+          {
+            path: "elections/:electionId",
+            children: electionManagementRoutes,
+          },
+        ],
+      },
+    ]);
+
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
+
+    await router.navigate("/elections/1/report/download");
+
+    rtlRender(<Providers router={router} />);
 
     await expectConflictErrorPage();
   });

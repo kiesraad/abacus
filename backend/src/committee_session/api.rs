@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use utoipa::ToSchema;
@@ -23,8 +24,9 @@ use crate::{
 #[derive(Debug, PartialEq, Eq)]
 pub enum CommitteeSessionError {
     CommitteeSessionPaused,
-    InvalidStatusTransition,
     InvalidCommitteeSessionStatus,
+    InvalidDetails,
+    InvalidStatusTransition,
 }
 
 impl From<CommitteeSessionError> for APIError {
@@ -124,6 +126,7 @@ pub async fn committee_session_create(
     request_body = CommitteeSessionUpdateRequest,
     responses(
         (status = 200, description = "Committee session updated successfully"),
+        (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Committee session not found", body = ErrorResponse),
@@ -138,14 +141,19 @@ pub async fn committee_session_update(
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(committee_session_id): Path<u32>,
-    Json(committee_session_request): Json<CommitteeSessionUpdateRequest>,
+    Json(request): Json<CommitteeSessionUpdateRequest>,
 ) -> Result<StatusCode, APIError> {
-    let committee_session = crate::committee_session::repository::update(
-        &pool,
-        committee_session_id,
-        committee_session_request,
-    )
-    .await?;
+    let date_time = format!("{0} {1}", &request.start_date, &request.start_time);
+    if request.location.is_empty()
+        || NaiveDateTime::parse_from_str(&date_time, "%Y-%m-%d %H:%M").is_err()
+    {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidDetails,
+        ));
+    };
+
+    let committee_session =
+        crate::committee_session::repository::update(&pool, committee_session_id, request).await?;
 
     audit_service
         .log(

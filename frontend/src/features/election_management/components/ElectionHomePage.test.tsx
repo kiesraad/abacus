@@ -97,7 +97,6 @@ describe("ElectionHomePage", () => {
               </ElectionStatusProvider>
             </ElectionProvider>
           </TestUserProvider>
-          ,
         </ApiProvider>
       );
     };

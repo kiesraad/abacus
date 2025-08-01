@@ -55,7 +55,6 @@ const Providers = ({
           </ElectionStatusProvider>
         </ElectionProvider>
       </TestUserProvider>
-      ,
     </ApiProvider>
   );
 };

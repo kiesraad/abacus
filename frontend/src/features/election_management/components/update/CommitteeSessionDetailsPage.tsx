@@ -1,9 +1,10 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, isSuccess } from "@/api/ApiResult";
+import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
@@ -28,6 +29,7 @@ export function CommitteeSessionDetailsPage() {
   const { committeeSession } = useElection();
   const [submitError, setSubmitError] = useState<AnyApiError | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
+  const [errorAlert, setErrorAlert] = useState<string | null>(null);
   const sessionLabel = committeeSessionLabel(committeeSession.number, true).toLowerCase();
   const defaultDate = committeeSession.start_date
     ? new Date(committeeSession.start_date).toLocaleDateString(t("date_locale"), {
@@ -65,6 +67,8 @@ export function CommitteeSessionDetailsPage() {
       .then((result) => {
         if (isSuccess(result)) {
           void navigate("..");
+        } else if (result instanceof ApiError && result.reference === "InvalidData") {
+          setErrorAlert(t(`error.api_error.${result.reference}`));
         } else {
           throw result;
         }
@@ -110,6 +114,11 @@ export function CommitteeSessionDetailsPage() {
       <main>
         <article>
           <Form className={cls.detailsForm} onSubmit={handleSubmit}>
+            {errorAlert !== null && (
+              <FormLayout.Alert>
+                <Alert type="error">{errorAlert}</Alert>
+              </FormLayout.Alert>
+            )}
             <FormLayout>
               <h2>{t("election_management.where_is_the_committee_session", { sessionLabel: sessionLabel })}</h2>
               <InputField

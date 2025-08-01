@@ -1,12 +1,22 @@
+import { RouterProvider } from "react-router";
+
+import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { ApiProvider } from "@/api/ApiProvider";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { CommitteeSessionUpdateHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
-import { renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
+import { expectNotFound, renderReturningRouter, screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
+import { TestUserProvider } from "@/testing/TestUserProvider";
+import { ErrorResponse } from "@/types/generated/openapi";
 
+import { electionManagementRoutes } from "../../routes";
 import { CommitteeSessionDetailsPage } from "./CommitteeSessionDetailsPage";
 
 const navigate = vi.fn();
@@ -197,5 +207,174 @@ describe("CommitteeSessionDetailsPage", () => {
 
     expect(updateDetails).not.toHaveBeenCalled();
     expect(router.state.location.pathname).toEqual("/");
+  });
+
+  test("Shows error page when change details call returns an error", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
+    const Providers = ({
+      children,
+      router = getRouter(children),
+      fetchInitialUser = false,
+    }: {
+      children?: React.ReactNode;
+      router?: Router;
+      fetchInitialUser?: boolean;
+    }) => {
+      return (
+        <ApiProvider fetchInitialUser={fetchInitialUser}>
+          <TestUserProvider userRole="coordinator">
+            <ElectionProvider electionId={1}>
+              <RouterProvider router={router} />
+            </ElectionProvider>
+          </TestUserProvider>
+        </ApiProvider>
+      );
+    };
+    const router = setupTestRouter([
+      {
+        Component: null,
+        errorElement: <ErrorBoundary />,
+        children: [
+          {
+            path: "elections/:electionId",
+            children: electionManagementRoutes,
+          },
+        ],
+      },
+    ]);
+    const user = userEvent.setup();
+    const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
+    overrideOnce("put", "/api/committee_sessions/1", 400, {
+      error: "Invalid details",
+      fatal: false,
+      reference: "InvalidData",
+    } satisfies ErrorResponse);
+
+    await router.navigate("/elections/1/details");
+
+    rtlRender(<Providers router={router} />);
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Details van de eerste zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Waar vindt de eerste zitting plaats?" }),
+    ).toBeInTheDocument();
+    const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
+    expect(location).toHaveValue("");
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Wanneer begon de eerste zitting van het gemeentelijk stembureau?",
+      }),
+    ).toBeInTheDocument();
+    const date = screen.getByRole("textbox", { name: "Datum" });
+    expect(date).toHaveValue("");
+    const time = screen.getByRole("textbox", { name: "Tijd" });
+    expect(time).toHaveValue("");
+
+    await user.type(location, "Amsterdam");
+    await user.type(date, "13-12-2025");
+    await user.type(time, "09:15");
+
+    const saveButton = screen.getByRole("button", { name: "Wijzigingen opslaan" });
+
+    await user.click(saveButton);
+
+    expect(updateDetails).toHaveBeenCalledExactlyOnceWith({
+      location: "Amsterdam",
+      start_date: "2025-12-13",
+      start_time: "09:15",
+    });
+    expect(navigate).not.toHaveBeenCalled();
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText("De invoer is niet geldig")).toBeVisible();
+  });
+
+  test("Shows error page when change details call returns an error", async () => {
+    // Since we test what happens after an error, we want vitest to ignore them
+    vi.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
+    const Providers = ({
+      children,
+      router = getRouter(children),
+      fetchInitialUser = false,
+    }: {
+      children?: React.ReactNode;
+      router?: Router;
+      fetchInitialUser?: boolean;
+    }) => {
+      return (
+        <ApiProvider fetchInitialUser={fetchInitialUser}>
+          <TestUserProvider userRole="coordinator">
+            <ElectionProvider electionId={1}>
+              <RouterProvider router={router} />
+            </ElectionProvider>
+          </TestUserProvider>
+        </ApiProvider>
+      );
+    };
+    const router = setupTestRouter([
+      {
+        Component: null,
+        errorElement: <ErrorBoundary />,
+        children: [
+          {
+            path: "elections/:electionId",
+            children: electionManagementRoutes,
+          },
+        ],
+      },
+    ]);
+    const user = userEvent.setup();
+    const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
+    overrideOnce("put", "/api/committee_sessions/1", 404, {
+      error: "Resource not found",
+      fatal: true,
+      reference: "EntryNotFound",
+    } satisfies ErrorResponse);
+
+    await router.navigate("/elections/1/details");
+
+    rtlRender(<Providers router={router} />);
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Details van de eerste zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Waar vindt de eerste zitting plaats?" }),
+    ).toBeInTheDocument();
+    const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
+    expect(location).toHaveValue("");
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Wanneer begon de eerste zitting van het gemeentelijk stembureau?",
+      }),
+    ).toBeInTheDocument();
+    const date = screen.getByRole("textbox", { name: "Datum" });
+    expect(date).toHaveValue("");
+    const time = screen.getByRole("textbox", { name: "Tijd" });
+    expect(time).toHaveValue("");
+
+    await user.type(location, "Amsterdam");
+    await user.type(date, "13-12-2025");
+    await user.type(time, "09:15");
+
+    const saveButton = screen.getByRole("button", { name: "Wijzigingen opslaan" });
+
+    await user.click(saveButton);
+
+    expect(updateDetails).toHaveBeenCalledExactlyOnceWith({
+      location: "Amsterdam",
+      start_date: "2025-12-13",
+      start_time: "09:15",
+    });
+    expect(navigate).not.toHaveBeenCalled();
+
+    await expectNotFound("Niet gevonden");
   });
 });

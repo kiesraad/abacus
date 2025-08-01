@@ -98,7 +98,6 @@ describe("FinishDataEntryPage", () => {
               </ElectionStatusProvider>
             </ElectionProvider>
           </TestUserProvider>
-          ,
         </ApiProvider>
       );
     };

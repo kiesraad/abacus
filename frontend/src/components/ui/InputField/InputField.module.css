@@ -19,7 +19,17 @@
     &:global(.narrow),
     &:global(.narrow) ~ span,
     &:global(.full-field-with-narrow-input) input {
-      width: 10rem;
+      width: 10.75rem;
+    }
+
+    &:global(.narrowish),
+    &:global(.narrowish) ~ span {
+      width: 12.25rem;
+    }
+
+    &:global(.average),
+    &:global(.average) ~ span {
+      width: 18.25rem;
     }
 
     &:global(.wide),

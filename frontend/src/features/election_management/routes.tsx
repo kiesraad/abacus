@@ -4,12 +4,14 @@ import { NotAvailableInMock } from "@/components/error/NotAvailableInMock";
 import { t } from "@/i18n/translate";
 
 import { ElectionHomePage } from "./components/ElectionHomePage";
-import { ElectionReportPage } from "./components/ElectionReportPage";
-import { FinishDataEntryPage } from "./components/FinishDataEntryPage";
-import { NumberOfVotersPage } from "./components/NumberOfVotersPage";
+import { ElectionReportPage } from "./components/report/ElectionReportPage";
+import { FinishDataEntryPage } from "./components/report/FinishDataEntryPage";
+import { CommitteeSessionDetailsPage } from "./components/update/CommitteeSessionDetailsPage";
+import { NumberOfVotersPage } from "./components/update/NumberOfVotersPage";
 
 export const electionManagementRoutes: RouteObject[] = [
   { index: true, Component: ElectionHomePage },
+  { path: "details", Component: CommitteeSessionDetailsPage },
   { path: "number-of-voters", Component: NumberOfVotersPage },
   {
     path: "report",

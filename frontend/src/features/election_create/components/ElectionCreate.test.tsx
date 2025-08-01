@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 
 import { render as rtlRender } from "@testing-library/react";
@@ -22,7 +23,7 @@ const Providers = ({
   router = getRouter(children),
   fetchInitialUser = false,
 }: {
-  children?: React.ReactNode;
+  children?: ReactNode;
   router?: Router;
   fetchInitialUser?: boolean;
 }) => {

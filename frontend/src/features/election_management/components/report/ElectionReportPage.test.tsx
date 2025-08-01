@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 
 import { render as rtlRender } from "@testing-library/react";
@@ -24,6 +25,7 @@ import {
   screen,
   setupTestRouter,
   spyOnHandler,
+  waitFor,
 } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider.tsx";
 import { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi.ts";
@@ -32,8 +34,12 @@ import { ElectionReportPage } from "./ElectionReportPage";
 
 const navigate = vi.fn();
 
-vi.mock("react-router", async (importOriginal) => ({
+vi.mock(import("react-router"), async (importOriginal) => ({
   ...(await importOriginal()),
+  Navigate: ({ to }) => {
+    navigate(to);
+    return null;
+  },
   useNavigate: () => navigate,
 }));
 
@@ -42,7 +48,7 @@ const Providers = ({
   router = getRouter(children),
   fetchInitialUser = false,
 }: {
-  children?: React.ReactNode;
+  children?: ReactNode;
   router?: Router;
   fetchInitialUser?: boolean;
 }) => {
@@ -55,24 +61,18 @@ const Providers = ({
           </ElectionStatusProvider>
         </ElectionProvider>
       </TestUserProvider>
-      ,
     </ApiProvider>
   );
 };
 
-const renderPage = async () => {
-  const router = renderReturningRouter(
+const renderPage = () => {
+  return renderReturningRouter(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
         <ElectionReportPage />
       </ElectionStatusProvider>
     </ElectionProvider>,
   );
-  expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
-  expect(
-    await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
-  ).toBeVisible();
-  return router;
 };
 
 describe("ElectionReportPage", () => {
@@ -80,13 +80,35 @@ describe("ElectionReportPage", () => {
     server.use(CommitteeSessionStatusChangeRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
   });
 
+  test("Redirects to CommitteeSessionDetailsPage when details are not filled in", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/details#redirect-to-report");
+    });
+  });
+
   test("Shows page and click on back to overview", async () => {
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+    overrideOnce(
+      "get",
+      "/api/elections/1",
+      200,
+      getElectionMockData(
+        {},
+        { status: "data_entry_finished", location: "Den Haag", start_date: "2026-03-18", start_time: "21:36" },
+      ),
+    );
 
-    const router = await renderPage();
+    const router = renderPage();
 
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
+    ).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
@@ -103,10 +125,22 @@ describe("ElectionReportPage", () => {
   test("Shows page and click on resume data entry", async () => {
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+    overrideOnce(
+      "get",
+      "/api/elections/1",
+      200,
+      getElectionMockData(
+        {},
+        { status: "data_entry_finished", location: "Den Haag", start_date: "2026-03-18", start_time: "21:36" },
+      ),
+    );
 
-    await renderPage();
+    renderPage();
 
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
+    ).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
@@ -137,7 +171,10 @@ describe("ElectionReportPage", () => {
       },
     ]);
     const user = userEvent.setup();
-    const electionData = getElectionMockData({}, { status: "data_entry_finished" });
+    const electionData = getElectionMockData(
+      {},
+      { status: "data_entry_finished", location: "Den Haag", start_date: "2026-03-18", start_time: "21:36" },
+    );
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
@@ -157,7 +194,6 @@ describe("ElectionReportPage", () => {
     expect(
       await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
     ).toBeVisible();
-
     expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
     expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
@@ -188,7 +224,15 @@ describe("ElectionReportPage", () => {
       },
     ]);
 
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
+    overrideOnce(
+      "get",
+      "/api/elections/1",
+      200,
+      getElectionMockData(
+        {},
+        { status: "data_entry_in_progress", location: "Den Haag", start_date: "2026-03-18", start_time: "21:36" },
+      ),
+    );
 
     await router.navigate("/elections/1/report/download");
 

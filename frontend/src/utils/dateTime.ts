@@ -1,37 +1,7 @@
 import { t } from "@/i18n/translate";
 
-const numberFormatter = new Intl.NumberFormat("nl-NL", {
-  maximumFractionDigits: 0,
-});
-
-export function formatNumber(s: string | number | null | undefined | readonly string[]) {
-  if ((typeof s !== "string" && typeof s !== "number") || (typeof s === "number" && s === 0)) {
-    return "";
-  }
-
-  const result = `${s}`.replace(/\D/g, "");
-  if (result === "") {
-    return "";
-  } else {
-    return numberFormatter.format(Number(result));
-  }
-}
-
-export function deformatNumber(s: string) {
-  const cleaned = s.replace(/[.]/g, "");
-  if (cleaned == "") {
-    // An empty value should be parsed as 0
-    return 0;
-  } else {
-    return parseInt(cleaned);
-  }
-}
-
-export function validateNumberString(s: string | null | undefined) {
-  if (s === null || s === undefined || s === "") return false;
-  const result = s.trim();
-  return !!result.match(/^(\d*\.?)$|^(\d{1,3}(\.\d{3})+\.?)$/g);
-}
+const NL_DATE_REGEX = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[12])-(20\d{2})$/;
+const TIME_REGEX = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
 
 function isToday(date: Date): boolean {
   const today = new Date();
@@ -135,4 +105,22 @@ export function formatTimeToGo(seconds: number) {
   }
 
   return minutesFormatted;
+}
+
+export function isValidNLDate(date: string) {
+  return NL_DATE_REGEX.test(date);
+}
+
+export function isValidTime(time: string) {
+  return TIME_REGEX.test(time);
+}
+
+/** Convert date from dd-mm-yyyy to yyyy-mm-dd */
+export function convertNLDateToISODate(date: string) {
+  if (isValidNLDate(date)) {
+    const dateParts = NL_DATE_REGEX.exec(date);
+    return `${dateParts?.[3]}-${dateParts?.[2]}-${dateParts?.[1]}`;
+  } else {
+    throw new Error(`Error: ${date} has an invalid date format, should be: dd-mm-yyyy`);
+  }
 }

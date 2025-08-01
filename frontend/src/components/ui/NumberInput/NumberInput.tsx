@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { IconWarningSquare } from "@/components/generated/icons";
 import { tx } from "@/i18n/translate";
-import { formatNumber, validateNumberString } from "@/utils/format";
+import { formatNumber, validateNumberString } from "@/utils/number";
 
 import { Icon } from "../Icon/Icon";
 import { Tooltip } from "../Tooltip/Tooltip";

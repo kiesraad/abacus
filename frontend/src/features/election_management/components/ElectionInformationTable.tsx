@@ -2,7 +2,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { formatNumber } from "@/utils/format";
+import { formatNumber } from "@/utils/number";
 
 import cls from "./ElectionManagement.module.css";
 

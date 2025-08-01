@@ -5,7 +5,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
-import { deformatNumber } from "@/utils/format";
+import { deformatNumber } from "@/utils/number";
 
 interface NumberOfVotersFormProps {
   defaultValue?: number;

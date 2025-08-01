@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 
 import { render as rtlRender } from "@testing-library/react";
@@ -84,7 +85,7 @@ describe("ElectionHomePage", () => {
       router = getRouter(children),
       fetchInitialUser = false,
     }: {
-      children?: React.ReactNode;
+      children?: ReactNode;
       router?: Router;
       fetchInitialUser?: boolean;
     }) => {
@@ -97,7 +98,6 @@ describe("ElectionHomePage", () => {
               </ElectionStatusProvider>
             </ElectionProvider>
           </TestUserProvider>
-          ,
         </ApiProvider>
       );
     };

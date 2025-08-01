@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ReactElement } from "react";
 
 import { NumberInput } from "../NumberInput/NumberInput";
 import cls from "./InputField.module.css";
@@ -7,11 +8,13 @@ export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElem
   name: string;
   label: string;
   subtext?: string;
-  hint?: string;
+  hint?: string | ReactElement;
   fieldSize?: "small" | "medium" | "large" | "text-area";
   fieldWidth?:
     | "narrowest"
     | "narrow"
+    | "narrowish"
+    | "average"
     | "wide"
     | "full"
     | "full-field-with-narrowest-input"

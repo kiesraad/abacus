@@ -6,7 +6,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import { RedactedEmlHash } from "@/types/generated/openapi";
-import { formatFullDateWithoutTimezone } from "@/utils/format";
+import { formatFullDateWithoutTimezone } from "@/utils/dateTime";
 
 import { RedactedHash, Stub } from "./RedactedHash";
 

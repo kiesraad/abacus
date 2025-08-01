@@ -16,14 +16,12 @@ vi.mock(import("react-router"), async (importOriginal) => ({
   useNavigate: () => navigate,
 }));
 
-async function renderPage() {
-  const router = renderReturningRouter(
+function renderPage() {
+  return renderReturningRouter(
     <ElectionProvider electionId={1}>
       <CommitteeSessionDetailsPage />
     </ElectionProvider>,
   );
-  expect(await screen.findByRole("heading", { name: "Details van de eerste zitting" })).toBeInTheDocument();
-  return router;
 }
 
 describe("CommitteeSessionDetailsPage", () => {
@@ -34,11 +32,23 @@ describe("CommitteeSessionDetailsPage", () => {
   test("Shows empty form, save and navigate on submit", async () => {
     const user = userEvent.setup();
     const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "created" }));
 
-    await renderPage();
+    renderPage();
 
+    expect(await screen.findByRole("heading", { level: 1, name: "Details van de eerste zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Waar vindt de eerste zitting plaats?" }),
+    ).toBeInTheDocument();
     const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
     expect(location).toHaveValue("");
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Wanneer begint de eerste zitting van het gemeentelijk stembureau?",
+      }),
+    ).toBeInTheDocument();
     const date = screen.getByRole("textbox", { name: "Datum" });
     expect(date).toHaveValue("");
     const time = screen.getByRole("textbox", { name: "Tijd" });
@@ -95,13 +105,33 @@ describe("CommitteeSessionDetailsPage", () => {
       "get",
       "/api/elections/1",
       200,
-      getElectionMockData({}, { location: "Den Haag", start_date: "2026-03-18", start_time: "21:36" }),
+      getElectionMockData(
+        {},
+        {
+          number: 2,
+          status: "data_entry_not_started",
+          location: "Den Haag",
+          start_date: "2026-03-18",
+          start_time: "21:36",
+        },
+      ),
     );
 
-    await renderPage();
+    renderPage();
 
+    expect(await screen.findByRole("heading", { level: 1, name: "Details van de tweede zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Waar vindt de tweede zitting plaats?" }),
+    ).toBeInTheDocument();
     const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
     expect(location).toHaveValue("Den Haag");
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Wanneer begint de tweede zitting van het gemeentelijk stembureau?",
+      }),
+    ).toBeInTheDocument();
     const date = screen.getByRole("textbox", { name: "Datum" });
     expect(date).toHaveValue("18-03-2026");
     const time = screen.getByRole("textbox", { name: "Tijd" });
@@ -124,20 +154,38 @@ describe("CommitteeSessionDetailsPage", () => {
     expect(navigate).toHaveBeenCalledExactlyOnceWith("..");
   });
 
-  test("Shows form with pre-filled data, do not save on cancel and navigate", async () => {
+  test("Shows form with pre-filled data, cancel and navigate", async () => {
     const user = userEvent.setup();
     const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
     overrideOnce(
       "get",
       "/api/elections/1",
       200,
-      getElectionMockData({}, { location: "Den Haag", start_date: "2026-03-18", start_time: "21:36" }),
+      getElectionMockData(
+        {},
+        {
+          number: 6,
+          status: "data_entry_in_progress",
+          location: "Den Haag",
+          start_date: "2026-03-18",
+          start_time: "21:36",
+        },
+      ),
     );
 
-    const router = await renderPage();
+    const router = renderPage();
 
+    expect(await screen.findByRole("heading", { level: 1, name: "Details van zitting 6" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Waar vindt zitting 6 plaats?" })).toBeInTheDocument();
     const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
     expect(location).toHaveValue("Den Haag");
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Wanneer begon zitting 6 van het gemeentelijk stembureau?",
+      }),
+    ).toBeInTheDocument();
     const date = screen.getByRole("textbox", { name: "Datum" });
     expect(date).toHaveValue("18-03-2026");
     const time = screen.getByRole("textbox", { name: "Tijd" });

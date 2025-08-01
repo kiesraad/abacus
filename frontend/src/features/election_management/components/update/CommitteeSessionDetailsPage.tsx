@@ -121,7 +121,15 @@ export function CommitteeSessionDetailsPage() {
                 error={validationErrors?.location}
                 defaultValue={committeeSession.location || ""}
               />
-              <h2>{t("election_management.when_is_the_committee_session", { sessionLabel: sessionLabel })}</h2>
+              <h2>
+                {t("election_management.when_is_the_committee_session", {
+                  verb:
+                    committeeSession.status === "created" || committeeSession.status === "data_entry_not_started"
+                      ? t("election_management.starts")
+                      : t("election_management.started"),
+                  sessionLabel: sessionLabel,
+                })}
+              </h2>
               <FormLayout.Row>
                 <InputField
                   id="start_date"

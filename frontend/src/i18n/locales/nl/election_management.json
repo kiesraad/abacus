@@ -28,6 +28,8 @@
   "select_polling_stations": "Selecteer stembureaus",
   "session_location": "Plaats van de zitting",
   "start_data_entry": "Start steminvoer",
+  "started": "begon",
+  "starts": "begint",
   "stay_in_data_entry_phase": "In invoerfase blijven",
   "still_to_input": "Nog invullen",
   "time": "Tijd",
@@ -36,6 +38,6 @@
   "to_do_data_entry_for": "Invoer doen voor",
   "view_data_entry": "Steminvoer bekijken",
   "view_progress": "Bekijk voortgang",
-  "when_is_the_committee_session": "Wanneer begint {sessionLabel} van het gemeentelijk stembureau?",
+  "when_is_the_committee_session": "Wanneer {verb} {sessionLabel} van het gemeentelijk stembureau?",
   "where_is_the_committee_session": "Waar vindt {sessionLabel} plaats?"
 }

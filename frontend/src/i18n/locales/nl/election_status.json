@@ -1,5 +1,6 @@
 {
   "add_polling_station": "Stembureau toevoegen",
+  "data_entry_is_paused": "Het invoeren van stemmen is gepauzeerd",
   "definitive": {
     "title": "Alle stembureaus zijn twee keer ingevoerd",
     "message": "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
@@ -8,7 +9,13 @@
   "label": "Status",
   "main_title": "Statusoverzicht steminvoer",
   "no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
+  "pause": "Pauzeren",
+  "pause_are_you_sure": "Weet je zeker dat je wilt pauzeren? Invoerders kunnen niet verder werken.",
+  "pause_session": "Zitting pauzeren",
+  "paused_status_information": "Het is nu niet mogelijk om nieuwe stembureaus in te voeren. Invoerders kunnen wel inloggen. Hervat de steminvoer om weer verder te gaan.",
   "polling_stations_per_status": "Stembureaus per status",
+  "resume": "Hervatten",
+  "start": "Starten",
   "success": {
     "data_entries_discarded": "Omdat beide invoeren zijn verwijderd, moet stembureau {nr} twee keer opnieuw ingevoerd worden.",
     "data_entry_discarded": "Invoer stembureau {nr} verwijderd",

@@ -122,8 +122,10 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(router.state.location.pathname).toEqual("/status");
   });
 
-  test("The card renders with status data_entry_paused", () => {
+  test("The card renders with status data_entry_paused for coordinator", async () => {
     vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_paused",
@@ -135,6 +137,39 @@ describe("UI component: CommitteeSessionCard", () => {
 
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Steminvoer gepauzeerd")).toBeVisible();
+
+    const statusButton = screen.getByRole("button", { name: "Hervatten of voortgang bekijken" });
+    expect(statusButton).toBeVisible();
+
+    await user.click(statusButton);
+
+    expect(statusChange).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith("status");
+  });
+
+  test("The card renders with status data_entry_paused for administrator", async () => {
+    vi.mocked(useUser).mockReturnValue(getAdminUser());
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+    const committeeSession = getCommitteeSessionMockData({
+      number: 1,
+      status: "data_entry_paused",
+      start_date: "",
+      start_time: "",
+      location: "Juinen",
+    });
+    render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
+
+    expect(screen.getByText("Eerste zitting")).toBeVisible();
+    expect(screen.getByText("— Steminvoer gepauzeerd")).toBeVisible();
+
+    const statusButton = screen.getByRole("button", { name: "Bekijk voortgang" });
+    expect(statusButton).toBeVisible();
+
+    await user.click(statusButton);
+
+    expect(statusChange).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith("status");
   });
 
   test("The card renders with status data_entry_finished for coordinator", async () => {

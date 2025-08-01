@@ -233,6 +233,25 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_pdf_download_invalid_committee_session_state(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_pdf_results");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::CONFLICT);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_xml_download_works(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
@@ -262,6 +281,25 @@ async fn test_election_xml_download_works(pool: SqlitePool) {
     let body = response.text().await.unwrap();
     assert!(body.contains("<Election>"));
     assert!(body.contains("<TotalCounted>204</TotalCounted>"));
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_xml_download_invalid_committee_session_state(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_xml_results");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -315,6 +353,25 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
         "Model_Na31-2_GR2024_Heemdamseburg.pdf"
     );
     assert!(reader.entry().uncompressed_size() > 1024);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_zip_download_invalid_committee_session_state(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_zip_results");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 use sqlx::{SqlitePool, Type};
-use std::fmt::Display;
 use strum::VariantNames;
 use utoipa::ToSchema;
 
+use super::CommitteeSessionError;
 use crate::{
     APIError, DbConnLike,
     audit_log::{AuditEvent, AuditService},
@@ -35,14 +35,9 @@ pub enum CommitteeSessionStatus {
     DataEntryFinished,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub enum CommitteeSessionTransitionError {
-    Invalid,
-}
-
-impl From<sqlx::Error> for CommitteeSessionTransitionError {
+impl From<sqlx::Error> for CommitteeSessionError {
     fn from(_: sqlx::Error) -> Self {
-        CommitteeSessionTransitionError::Invalid
+        CommitteeSessionError::InvalidStatusTransition
     }
 }
 
@@ -89,14 +84,14 @@ pub async fn change_committee_session_status(
 }
 
 impl CommitteeSessionStatus {
-    pub fn prepare_data_entry(self) -> Result<Self, CommitteeSessionTransitionError> {
+    pub fn prepare_data_entry(self) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => Ok(self),
             CommitteeSessionStatus::DataEntryNotStarted => Ok(CommitteeSessionStatus::Created),
             CommitteeSessionStatus::DataEntryInProgress => Ok(CommitteeSessionStatus::Created),
             CommitteeSessionStatus::DataEntryPaused => Ok(CommitteeSessionStatus::Created),
             CommitteeSessionStatus::DataEntryFinished => {
-                Err(CommitteeSessionTransitionError::Invalid)
+                Err(CommitteeSessionError::InvalidStatusTransition)
             }
         }
     }
@@ -105,33 +100,33 @@ impl CommitteeSessionStatus {
         self,
         election_id: u32,
         conn: impl DbConnLike<'_>,
-    ) -> Result<Self, CommitteeSessionTransitionError> {
+    ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => {
                 let polling_stations =
                     crate::polling_station::repository::list(conn, election_id).await?;
                 if polling_stations.is_empty() {
-                    Err(CommitteeSessionTransitionError::Invalid)
+                    Err(CommitteeSessionError::InvalidStatusTransition)
                 } else {
                     Ok(CommitteeSessionStatus::DataEntryNotStarted)
                 }
             }
             CommitteeSessionStatus::DataEntryNotStarted => Ok(self),
             CommitteeSessionStatus::DataEntryInProgress => {
-                Err(CommitteeSessionTransitionError::Invalid)
+                Err(CommitteeSessionError::InvalidStatusTransition)
             }
             CommitteeSessionStatus::DataEntryPaused => {
-                Err(CommitteeSessionTransitionError::Invalid)
+                Err(CommitteeSessionError::InvalidStatusTransition)
             }
             CommitteeSessionStatus::DataEntryFinished => {
-                Err(CommitteeSessionTransitionError::Invalid)
+                Err(CommitteeSessionError::InvalidStatusTransition)
             }
         }
     }
 
-    pub fn start_data_entry(self) -> Result<Self, CommitteeSessionTransitionError> {
+    pub fn start_data_entry(self) -> Result<Self, CommitteeSessionError> {
         match self {
-            CommitteeSessionStatus::Created => Err(CommitteeSessionTransitionError::Invalid),
+            CommitteeSessionStatus::Created => Err(CommitteeSessionError::InvalidStatusTransition),
             CommitteeSessionStatus::DataEntryNotStarted => {
                 Ok(CommitteeSessionStatus::DataEntryInProgress)
             }
@@ -145,27 +140,27 @@ impl CommitteeSessionStatus {
         }
     }
 
-    pub fn pause_data_entry(self) -> Result<Self, CommitteeSessionTransitionError> {
+    pub fn pause_data_entry(self) -> Result<Self, CommitteeSessionError> {
         match self {
-            CommitteeSessionStatus::Created => Err(CommitteeSessionTransitionError::Invalid),
+            CommitteeSessionStatus::Created => Err(CommitteeSessionError::InvalidStatusTransition),
             CommitteeSessionStatus::DataEntryNotStarted => {
-                Err(CommitteeSessionTransitionError::Invalid)
+                Err(CommitteeSessionError::InvalidStatusTransition)
             }
             CommitteeSessionStatus::DataEntryInProgress => {
                 Ok(CommitteeSessionStatus::DataEntryPaused)
             }
             CommitteeSessionStatus::DataEntryPaused => Ok(self),
             CommitteeSessionStatus::DataEntryFinished => {
-                Err(CommitteeSessionTransitionError::Invalid)
+                Err(CommitteeSessionError::InvalidStatusTransition)
             }
         }
     }
 
-    pub fn finish_data_entry(self) -> Result<Self, CommitteeSessionTransitionError> {
+    pub fn finish_data_entry(self) -> Result<Self, CommitteeSessionError> {
         match self {
-            CommitteeSessionStatus::Created => Err(CommitteeSessionTransitionError::Invalid),
+            CommitteeSessionStatus::Created => Err(CommitteeSessionError::InvalidStatusTransition),
             CommitteeSessionStatus::DataEntryNotStarted => {
-                Err(CommitteeSessionTransitionError::Invalid)
+                Err(CommitteeSessionError::InvalidStatusTransition)
             }
             CommitteeSessionStatus::DataEntryInProgress => {
                 Ok(CommitteeSessionStatus::DataEntryFinished)
@@ -174,16 +169,6 @@ impl CommitteeSessionStatus {
                 Ok(CommitteeSessionStatus::DataEntryFinished)
             }
             CommitteeSessionStatus::DataEntryFinished => Ok(self),
-        }
-    }
-}
-
-impl Display for CommitteeSessionTransitionError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            CommitteeSessionTransitionError::Invalid => {
-                write!(f, "Invalid state transition")
-            }
         }
     }
 }
@@ -240,7 +225,7 @@ mod tests {
     fn committee_session_status_data_entry_finished_to_created() {
         assert_eq!(
             CommitteeSessionStatus::DataEntryFinished.prepare_data_entry(),
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 
@@ -253,7 +238,7 @@ mod tests {
             CommitteeSessionStatus::Created
                 .ready_for_data_entry(6, &pool)
                 .await,
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 
@@ -292,7 +277,7 @@ mod tests {
             CommitteeSessionStatus::DataEntryInProgress
                 .ready_for_data_entry(2, &pool)
                 .await,
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 
@@ -305,7 +290,7 @@ mod tests {
             CommitteeSessionStatus::DataEntryPaused
                 .ready_for_data_entry(2, &pool)
                 .await,
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 
@@ -318,7 +303,7 @@ mod tests {
             CommitteeSessionStatus::DataEntryFinished
                 .ready_for_data_entry(2, &pool)
                 .await,
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 
@@ -327,7 +312,7 @@ mod tests {
     fn committee_session_status_created_to_data_entry_in_progress() {
         assert_eq!(
             CommitteeSessionStatus::Created.start_data_entry(),
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 
@@ -372,7 +357,7 @@ mod tests {
     fn committee_session_status_created_to_data_entry_paused() {
         assert_eq!(
             CommitteeSessionStatus::Created.pause_data_entry(),
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 
@@ -381,7 +366,7 @@ mod tests {
     fn committee_session_status_data_entry_not_started_to_data_entry_paused() {
         assert_eq!(
             CommitteeSessionStatus::DataEntryNotStarted.pause_data_entry(),
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 
@@ -408,7 +393,7 @@ mod tests {
     fn committee_session_status_data_entry_finished_to_data_entry_paused() {
         assert_eq!(
             CommitteeSessionStatus::DataEntryFinished.pause_data_entry(),
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 
@@ -417,7 +402,7 @@ mod tests {
     fn committee_session_status_created_to_data_entry_finished() {
         assert_eq!(
             CommitteeSessionStatus::Created.finish_data_entry(),
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 
@@ -426,7 +411,7 @@ mod tests {
     fn committee_session_status_data_entry_not_started_to_data_entry_finished() {
         assert_eq!(
             CommitteeSessionStatus::DataEntryNotStarted.finish_data_entry(),
-            Err(CommitteeSessionTransitionError::Invalid)
+            Err(CommitteeSessionError::InvalidStatusTransition)
         );
     }
 

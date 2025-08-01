@@ -1,11 +1,11 @@
 import { ReactElement } from "react";
 
+import errorImage from "@/assets/images/airgap-error.webp";
 import { t, tx } from "@/i18n/translate";
 
 import { Footer } from "../footer/Footer";
 import navbarCls from "../navbar/NavBar.module.css";
 import { AppLayout } from "../ui/AppLayout/AppLayout";
-import errorImage from "./airgap-error.png";
 import cls from "./Error.module.css";
 
 export function AirGapViolationPage() {

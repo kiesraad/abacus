@@ -24,7 +24,7 @@ use crate::{
     APIError, AppState,
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
-    committee_session::CommitteeSession,
+    committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
     election::ElectionWithPoliticalGroups,
     error::{ErrorReference, ErrorResponse},
     polling_station::PollingStation,
@@ -95,6 +95,34 @@ async fn get_polling_station_election_and_committee_session_id(
     Ok((polling_station, election, committee_session))
 }
 
+fn validate_committee_session_for_typist(
+    committee_session: &CommitteeSession,
+) -> Result<(), APIError> {
+    if committee_session.status == CommitteeSessionStatus::DataEntryPaused {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::CommitteeSessionPaused,
+        ));
+    } else if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ));
+    }
+    Ok(())
+}
+
+fn validate_committee_session_for_coordinator(
+    committee_session: &CommitteeSession,
+) -> Result<(), APIError> {
+    if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
+        && committee_session.status != CommitteeSessionStatus::DataEntryPaused
+    {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ));
+    }
+    Ok(())
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -151,6 +179,8 @@ async fn polling_station_data_entry_claim(
         committee_session.id,
     )
     .await?;
+
+    validate_committee_session_for_typist(&committee_session)?;
 
     let new_data_entry = CurrentDataEntry {
         progress: None,
@@ -267,6 +297,8 @@ async fn polling_station_data_entry_save(
     )
     .await?;
 
+    validate_committee_session_for_typist(&committee_session)?;
+
     let current_data_entry = CurrentDataEntry {
         progress: Some(data_entry_request.progress),
         user_id: user.0.id(),
@@ -337,6 +369,8 @@ async fn polling_station_data_entry_delete(
     )
     .await?;
 
+    validate_committee_session_for_typist(&committee_session)?;
+
     let new_state = match entry_number {
         EntryNumber::FirstEntry => state.delete_first_entry(user_id)?,
         EntryNumber::SecondEntry => state.delete_second_entry(user_id)?,
@@ -394,6 +428,8 @@ async fn polling_station_data_entry_finalise(
         committee_session.id,
     )
     .await?;
+
+    validate_committee_session_for_typist(&committee_session)?;
 
     match entry_number {
         EntryNumber::FirstEntry => {
@@ -492,6 +528,7 @@ pub struct DataEntryGetErrorsResponse {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with accepted errors found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -508,6 +545,8 @@ async fn polling_station_data_entry_get_errors(
             .await?;
     let state =
         crate::data_entry::repository::get(&pool, polling_station_id, committee_session.id).await?;
+
+    validate_committee_session_for_coordinator(&committee_session)?;
 
     match state.clone() {
         DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
@@ -567,6 +606,8 @@ async fn polling_station_data_entry_resolve_errors(
     )
     .await?;
 
+    validate_committee_session_for_coordinator(&committee_session)?;
+
     let new_state = match action {
         ResolveErrorsAction::DiscardFirstEntry => state.discard_first_entry()?,
         ResolveErrorsAction::ResumeFirstEntry => state.resume_first_entry()?,
@@ -605,6 +646,7 @@ pub struct DataEntryGetDifferencesResponse {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with differences found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -621,6 +663,8 @@ async fn polling_station_data_entry_get_differences(
             .await?;
     let state =
         crate::data_entry::repository::get(&pool, polling_station_id, committee_session.id).await?;
+
+    validate_committee_session_for_coordinator(&committee_session)?;
 
     match state {
         DataEntryStatus::EntriesDifferent(EntriesDifferent {
@@ -676,6 +720,8 @@ async fn polling_station_data_entry_resolve_differences(
         committee_session.id,
     )
     .await?;
+
+    validate_committee_session_for_coordinator(&committee_session)?;
 
     let new_state = match action {
         ResolveDifferencesAction::KeepFirstEntry => state.keep_first_entry()?,
@@ -941,6 +987,49 @@ pub mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_claim_data_entry_committee_session_status_is_data_entry_paused(pool: SqlitePool) {
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
+            .await;
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::CommitteeSessionPaused);
+
+        // Check that no row was created
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 0);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_claim_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
+        pool: SqlitePool,
+    ) {
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
+            .await;
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            result.reference,
+            ErrorReference::InvalidCommitteeSessionStatus
+        );
+
+        // Check that no row was created
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 0);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_create_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
 
@@ -961,6 +1050,79 @@ pub mod tests {
             .await
             .unwrap();
         assert_eq!(row_count.count, 1);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_create_data_entry_committee_session_status_is_data_entry_paused(
+        pool: SqlitePool,
+    ) {
+        let request_body = example_data_entry();
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
+            .await;
+
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::CommitteeSessionPaused);
+
+        // Check that the row was not updated
+        let data_entry = crate::data_entry::repository::get_row(&pool, 1, 2)
+            .await
+            .unwrap();
+        let data: DataEntryStatus = data_entry.state.0;
+        let DataEntryStatus::FirstEntryInProgress(state) = data else {
+            panic!("Expected entry to be in FirstEntryInProgress state");
+        };
+        assert_ne!(state.first_entry, request_body.data);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_create_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
+        pool: SqlitePool,
+    ) {
+        let request_body = example_data_entry();
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
+            .await;
+
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            result.reference,
+            ErrorReference::InvalidCommitteeSessionStatus
+        );
+
+        // Check that the row was not updated
+        let data_entry = crate::data_entry::repository::get_row(&pool, 1, 2)
+            .await
+            .unwrap();
+        let data: DataEntryStatus = data_entry.state.0;
+        let DataEntryStatus::FirstEntryInProgress(state) = data else {
+            panic!("Expected entry to be in FirstEntryInProgress state");
+        };
+        assert_ne!(state.first_entry, request_body.data);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1070,6 +1232,63 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_finalise_data_entry_committee_session_status_is_data_entry_paused(
+        pool: SqlitePool,
+    ) {
+        let request_body = example_data_entry();
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
+            .await;
+
+        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::CommitteeSessionPaused);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_finalise_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
+        pool: SqlitePool,
+    ) {
+        let request_body = example_data_entry();
+
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
+            .await;
+
+        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            result.reference,
+            ErrorReference::InvalidCommitteeSessionStatus
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1262,6 +1481,81 @@ pub mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_polling_station_data_entry_delete_committee_session_status_is_data_entry_paused(
+        pool: SqlitePool,
+    ) {
+        // create data entry
+        let request_body = example_data_entry();
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
+            .await;
+
+        // delete data entry
+        let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::CommitteeSessionPaused);
+
+        // Check if entry is still in FirstEntryInProgress state
+        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .expect("One row should exist");
+        let status: DataEntryStatus = row.state.0;
+        assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_polling_station_data_entry_delete_committee_session_status_not_data_entry_paused_or_in_progress(
+        pool: SqlitePool,
+    ) {
+        // create data entry
+        let request_body = example_data_entry();
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
+            .await;
+
+        // delete data entry
+        let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            result.reference,
+            ErrorReference::InvalidCommitteeSessionStatus
+        );
+
+        // Check if entry is still in FirstEntryInProgress state
+        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .expect("One row should exist");
+        let status: DataEntryStatus = row.state.0;
+        assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entry_delete_nonexistent(pool: SqlitePool) {
         let user = User::test_user(Role::Typist, 1);
         // check that deleting a non-existing data entry returns 404
@@ -1374,5 +1668,34 @@ pub mod tests {
             .expect("One row should exist");
         let status: DataEntryStatus = row.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryNotStarted));
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_data_entry_resolve_differences_committee_session_status_not_ok(pool: SqlitePool) {
+        finalise_different_entries(pool.clone()).await;
+
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
+            .await;
+
+        let response = resolve_differences(
+            pool.clone(),
+            1,
+            ResolveDifferencesAction::DiscardBothEntries,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            result.reference,
+            ErrorReference::InvalidCommitteeSessionStatus
+        );
+
+        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .expect("One row should exist");
+        let status: DataEntryStatus = row.state.0;
+        assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
     }
 }

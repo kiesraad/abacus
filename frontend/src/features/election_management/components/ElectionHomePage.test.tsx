@@ -157,6 +157,7 @@ describe("ElectionHomePage", () => {
     await user.click(startButton);
 
     await expectConflictErrorPage();
+    expect(console.error).toHaveBeenCalled();
   });
 
   test("Shows alert when there are no polling stations", async () => {

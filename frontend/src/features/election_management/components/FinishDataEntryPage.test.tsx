@@ -143,6 +143,7 @@ describe("FinishDataEntryPage", () => {
     await user.click(finishButton);
 
     await expectConflictErrorPage();
+    expect(console.error).toHaveBeenCalled();
   });
 
   test("Shows page and click on stay in data entry phase", async () => {

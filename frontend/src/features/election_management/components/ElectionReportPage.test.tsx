@@ -167,6 +167,7 @@ describe("ElectionReportPage", () => {
     await user.click(resumeButton);
 
     await expectConflictErrorPage();
+    expect(console.error).toHaveBeenCalled();
   });
 
   test("Error when committee session status is not DataEntryFinished", async () => {
@@ -194,5 +195,6 @@ describe("ElectionReportPage", () => {
     rtlRender(<Providers router={router} />);
 
     await expectConflictErrorPage();
+    expect(console.error).toHaveBeenCalled();
   });
 });

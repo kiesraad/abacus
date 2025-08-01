@@ -154,7 +154,7 @@ async fn test_committee_session_status_change_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_committee_session_status_change_wrong_status(pool: SqlitePool) {
+async fn test_committee_session_status_change_invalid_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/committee_sessions/2/status");

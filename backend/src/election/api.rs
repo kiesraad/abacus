@@ -19,10 +19,8 @@ use crate::{
     authentication::{Admin, User},
     committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    polling_station::PollingStation,
+    polling_station::{PollingStation, PollingStationRequest},
 };
-
-use crate::polling_station::PollingStationRequest;
 
 pub fn router() -> OpenApiRouter<AppState> {
     let router = OpenApiRouter::default()

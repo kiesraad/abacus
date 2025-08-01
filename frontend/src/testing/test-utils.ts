@@ -34,6 +34,14 @@ export const expectErrorPage = async () => {
   expect(await screen.findByText(/Abacus is stuk/)).toBeVisible();
 };
 
+export const expectForbiddenErrorPage = async () => {
+  expect(await screen.findByText(/Geen toegang/)).toBeVisible();
+};
+
+export const expectConflictErrorPage = async () => {
+  expect(await screen.findByText(/Dit kan nu niet/)).toBeVisible();
+};
+
 export const expectNotFound = async (message?: string) => {
   expect(await screen.findByText(new RegExp(message || "Pagina niet gevonden"))).toBeVisible();
 };

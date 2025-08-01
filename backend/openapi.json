@@ -4291,6 +4291,9 @@
               "type": "string"
             }
           },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod"
+          },
           "election_data": {
             "type": "string"
           },
@@ -4299,6 +4302,14 @@
             "items": {
               "type": "string"
             }
+          },
+          "number_of_voters": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
           },
           "polling_station_data": {
             "type": "string"
@@ -4324,6 +4335,9 @@
               "type": "string"
             }
           },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod"
+          },
           "election_data": {
             "type": "string"
           },
@@ -4332,6 +4346,14 @@
             "items": {
               "type": "string"
             }
+          },
+          "number_of_voters": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
           },
           "polling_station_data": {
             "type": "string"

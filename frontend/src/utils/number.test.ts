@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { deformatNumber, formatNumber, validateNumberString } from "./number";
 
-describe("Format util", () => {
+describe("Number util", () => {
   test.each([
     ["0", "0"],
     ["000", "0"],

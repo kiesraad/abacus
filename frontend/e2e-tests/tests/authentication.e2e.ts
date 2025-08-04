@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test";
+import { NavBar } from "e2e-tests/page-objects/nav_bar/NavBarPgObj";
 
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
 import { AccountSetupPgObj } from "../page-objects/authentication/AccountSetupPgObj";
@@ -16,8 +17,9 @@ test.describe("authentication", () => {
 
     await page.waitForURL("/elections");
 
-    await expect(loginPage.navbar.username).toHaveText("Sanne Molenaar");
-    await expect(loginPage.navbar.role).toHaveText("(Beheerder)");
+    const navBar = new NavBar(page);
+    await expect(navBar.username).toHaveText("Sanne Molenaar");
+    await expect(navBar.role).toHaveText("(Beheerder)");
   });
 
   test("login unhappy path", async ({ page }) => {
@@ -48,10 +50,12 @@ test.describe("authentication", () => {
     await accountSetupPage.password.fill(password);
     await accountSetupPage.passwordRepeat.fill(password);
     await accountSetupPage.nextBtn.click();
-    await expect(accountSetupPage.navBar.username).toHaveText(newTypist.fullname!);
+
+    const navBar = new NavBar(page);
+    await expect(navBar.username).toHaveText(newTypist.fullname!);
 
     const overviewPage = new OverviewPgObj(page);
-    await expect(overviewPage.navBar.username).toHaveText(newTypist.fullname!);
+    await expect(navBar.username).toHaveText(newTypist.fullname!);
     await expect(overviewPage.alert).toBeVisible();
   });
 });

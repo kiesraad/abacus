@@ -272,6 +272,7 @@ export type AuditEvent =
   | (PollingStationDetails & { eventType: "PollingStationCreated" })
   | (PollingStationDetails & { eventType: "PollingStationUpdated" })
   | (PollingStationDetails & { eventType: "PollingStationDeleted" })
+  | (PollingStationImportDetails & { eventType: "PollingStationsImported" })
   | (DataEntryDetails & { eventType: "DataEntryClaimed" })
   | (DataEntryDetails & { eventType: "DataEntrySaved" })
   | (DataEntryDetails & { eventType: "DataEntryDeleted" })
@@ -903,6 +904,12 @@ export interface PollingStationDetails {
   pollingStationNumberOfVoters?: number | null;
   pollingStationPostalCode: string;
   pollingStationType?: string;
+}
+
+export interface PollingStationImportDetails {
+  importElectionId: number;
+  importFileName: string;
+  importNumberOfPollingStations: number;
 }
 
 /**

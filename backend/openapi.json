@@ -3384,6 +3384,27 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/PollingStationImportDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "eventType"
+                ],
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "PollingStationsImported"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/DataEntryDetails"
               },
               {
@@ -5394,6 +5415,29 @@
           }
         },
         "additionalProperties": false
+      },
+      "PollingStationImportDetails": {
+        "type": "object",
+        "required": [
+          "importElectionId",
+          "importFileName",
+          "importNumberOfPollingStations"
+        ],
+        "properties": {
+          "importElectionId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "importFileName": {
+            "type": "string"
+          },
+          "importNumberOfPollingStations": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
       },
       "PollingStationListResponse": {
         "type": "object",

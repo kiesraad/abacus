@@ -222,6 +222,7 @@ mod tests {
 
     fn polling_station_results_fixture_a() -> PollingStationResults {
         PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 30,
                 proxy_certificate_count: 5,
@@ -247,6 +248,7 @@ mod tests {
 
     fn polling_station_results_fixture_b() -> PollingStationResults {
         PollingStationResults {
+            extra_investigation: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 49,
                 proxy_certificate_count: 1,

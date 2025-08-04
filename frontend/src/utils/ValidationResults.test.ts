@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
+import { ValidationResult } from "@/types/generated/openapi";
 
 import { getDataEntryStructure } from "./dataEntryStructure";
 import {
@@ -59,8 +60,19 @@ describe("mapValidationResultSetsToFields", () => {
 });
 
 describe("doesValidationResultApplyToSection", () => {
+  const extraInvestigationW001: ValidationResult = {
+    code: "W001",
+    fields: [
+      "data.extra_investigation.extra_investigation_other_reason.yes",
+      "data.extra_investigation.ballots_recounted_extra_investigation.no",
+    ],
+  };
+
   test("should return true when validation result applies to section", () => {
     const dataEntryStructure = getDataEntryStructure(electionMockData);
+
+    const extraInvestigationSection = dataEntryStructure.find((s) => s.id === "extra_investigation")!;
+    expect(doesValidationResultApplyToSection(extraInvestigationW001, extraInvestigationSection)).toBe(true);
 
     const votersVotesSection = dataEntryStructure.find((s) => s.id === "voters_votes_counts")!;
     expect(doesValidationResultApplyToSection(validationResultMockData.F201, votersVotesSection)).toBe(true);
@@ -76,7 +88,11 @@ describe("doesValidationResultApplyToSection", () => {
   test("should return false when validation result does not apply to section", () => {
     const dataEntryStructure = getDataEntryStructure(electionMockData);
 
+    const extraInvestigationSection = dataEntryStructure.find((s) => s.id === "extra_investigation")!;
+    expect(doesValidationResultApplyToSection(validationResultMockData.F201, extraInvestigationSection)).toBe(false);
+
     const differencesSection = dataEntryStructure.find((s) => s.id === "differences_counts")!;
+    expect(doesValidationResultApplyToSection(extraInvestigationW001, differencesSection)).toBe(false);
     expect(doesValidationResultApplyToSection(validationResultMockData.F201, differencesSection)).toBe(false);
     expect(doesValidationResultApplyToSection(validationResultMockData.F202, differencesSection)).toBe(false);
 
@@ -89,7 +105,6 @@ describe("doesValidationResultApplyToSection", () => {
   });
 });
 
-// TODO: clean up these tests
 describe("getValidationResultSetForSection", () => {
   test("should return validation results for specific section", () => {
     const dataEntryStructure = getDataEntryStructure(electionMockData);

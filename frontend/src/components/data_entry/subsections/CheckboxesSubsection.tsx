@@ -1,6 +1,8 @@
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import type { CheckboxesSubsection, SectionValues } from "@/types/types";
 
+import cls from "./CheckboxesRadioSubsection.module.css";
+
 export interface CheckboxesSubsectionProps {
   subsection: CheckboxesSubsection;
   currentValues: SectionValues;
@@ -16,10 +18,15 @@ export function CheckboxesSubsectionComponent({
   errorsAndWarnings,
   readOnly = false,
 }: CheckboxesSubsectionProps) {
+  const hasErrorOrWarning =
+    errorsAndWarnings?.get(`data.${subsection.error_path}`) ||
+    subsection.options.some((option) => errorsAndWarnings?.get(`data.${option.path}`));
+
   return (
-    <div className="radio-form">
+    <fieldset className={cls.container}>
+      {subsection.title && <legend>{subsection.title}</legend>}
       <ChoiceList>
-        {errorsAndWarnings?.get(`data.${subsection.error_path}`) && (
+        {hasErrorOrWarning && (
           <ChoiceList.Error id={`${subsection.error_path}-error`}>{subsection.error_message}</ChoiceList.Error>
         )}
         {subsection.options.map((option) => (
@@ -34,11 +41,10 @@ export function CheckboxesSubsectionComponent({
             }}
             label={option.label}
             autoFocus={option.autoFocusInput}
-            hasError={errorsAndWarnings?.get(`data.${option.path}`) === "error"}
             disabled={readOnly}
           />
         ))}
       </ChoiceList>
-    </div>
+    </fieldset>
   );
 }

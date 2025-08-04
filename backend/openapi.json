@@ -783,6 +783,90 @@
         }
       }
     },
+    "/api/elections/{election_id}/download_n_10_2": {
+      "get": {
+        "operationId": "election_download_n_10_2",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ZIP",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.zip\""
+              }
+            },
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/elections/{election_id}/download_na_31_2_bijlage1": {
       "get": {
         "operationId": "election_download_na_31_2_bijlage1",
@@ -824,8 +908,28 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
             "content": {
               "application/json": {
                 "schema": {
@@ -4776,6 +4880,25 @@
         },
         "additionalProperties": false
       },
+      "ExtraInvestigation": {
+        "type": "object",
+        "description": "Extra investigation, part of the polling station results (\"B1-1 Extra onderzoek\")",
+        "required": [
+          "extra_investigation_other_reason",
+          "ballots_recounted_extra_investigation"
+        ],
+        "properties": {
+          "ballots_recounted_extra_investigation": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether ballots were (partially) recounted following the extra investigation\n(\"Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?\")"
+          },
+          "extra_investigation_other_reason": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether extra investigation was done for another reason than an unexplained difference\n(\"Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "Fraction": {
         "type": "object",
         "description": "Fraction with the integer part split out for display purposes",
@@ -5369,6 +5492,7 @@
         "type": "object",
         "description": "PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
         "required": [
+          "extra_investigation",
           "voters_counts",
           "votes_counts",
           "differences_counts",
@@ -5378,6 +5502,10 @@
           "differences_counts": {
             "$ref": "#/components/schemas/DifferencesCounts",
             "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "extra_investigation": {
+            "$ref": "#/components/schemas/ExtraInvestigation",
+            "description": "Extra investigation (\"B1-1 Extra onderzoek\")"
           },
           "political_group_votes": {
             "type": "array",
@@ -5995,6 +6123,23 @@
             "format": "int32",
             "description": "Number of valid votes on candidates\n(\"Aantal stembiljetten met een geldige stem op een kandidaat\")",
             "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "YesNo": {
+        "type": "object",
+        "description": "Yes/No response structure for boolean questions with separate yes and no fields.",
+        "required": [
+          "yes",
+          "no"
+        ],
+        "properties": {
+          "no": {
+            "type": "boolean"
+          },
+          "yes": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

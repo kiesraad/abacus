@@ -8,6 +8,7 @@ import { RadioSubsectionComponent } from "./RadioSubsection";
 
 const radioSubsection: RadioSubsection = {
   type: "radio",
+  title: "This is the title above the radio buttons",
   short_title: "radio",
   error: "error",
   path: "test.radio",

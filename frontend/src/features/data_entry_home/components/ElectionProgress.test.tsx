@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, Mock, test, vi } from "vitest";
 
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
+import { ElectionStatusResponse } from "@/types/generated/openapi.ts";
 
 import { ElectionProgress } from "./ElectionProgress";
 
@@ -16,23 +17,23 @@ describe("ElectionProgress", () => {
     (useElectionStatus as Mock).mockReturnValue({
       statuses: [
         {
-          id: 1,
+          polling_station_id: 1,
           status: "first_entry_not_started",
         },
         {
-          id: 2,
+          polling_station_id: 2,
           status: "second_entry_not_started",
         },
         {
-          id: 3,
+          polling_station_id: 3,
           status: "definitive",
         },
         {
-          id: 4,
+          polling_station_id: 4,
           status: "first_entry_in_progress",
         },
       ],
-    });
+    } satisfies ElectionStatusResponse);
 
     render(<ElectionProgress />);
 

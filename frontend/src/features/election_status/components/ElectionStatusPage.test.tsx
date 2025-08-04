@@ -25,7 +25,12 @@ import {
   spyOnHandler,
 } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser, getTypistUser } from "@/testing/user-mock-data";
-import { ElectionDetailsResponse, ErrorResponse, LoginResponse } from "@/types/generated/openapi";
+import {
+  ElectionDetailsResponse,
+  ElectionStatusResponse,
+  ErrorResponse,
+  LoginResponse,
+} from "@/types/generated/openapi";
 
 import { electionStatusRoutes } from "../routes";
 
@@ -212,12 +217,19 @@ describe("ElectionStatusPage", () => {
   test("Finish input alert visible when data entry has finished for coordinator", async () => {
     vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { id: 1, status: "definitive" },
-        { id: 2, status: "definitive" },
-      ],
-    });
+    server.use(
+      http.get("/api/elections/1/status", () =>
+        HttpResponse.json(
+          {
+            statuses: [
+              { polling_station_id: 1, status: "definitive" },
+              { polling_station_id: 2, status: "definitive" },
+            ],
+          } satisfies ElectionStatusResponse,
+          { status: 200 },
+        ),
+      ),
+    );
 
     await renderPage();
 
@@ -238,8 +250,8 @@ describe("ElectionStatusPage", () => {
     vi.mocked(useUser).mockReturnValue(getAdminUser());
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "definitive" },
-        { id: 2, status: "definitive" },
+        { polling_station_id: 1, status: "definitive" },
+        { polling_station_id: 2, status: "definitive" },
       ],
     });
 
@@ -262,12 +274,19 @@ describe("ElectionStatusPage", () => {
         }),
       ),
     );
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { id: 1, status: "definitive" },
-        { id: 2, status: "definitive" },
-      ],
-    });
+    server.use(
+      http.get("/api/elections/1/status", () =>
+        HttpResponse.json(
+          {
+            statuses: [
+              { polling_station_id: 1, status: "definitive" },
+              { polling_station_id: 2, status: "definitive" },
+            ],
+          } satisfies ElectionStatusResponse,
+          { status: 200 },
+        ),
+      ),
+    );
 
     await renderPage();
 
@@ -353,8 +372,8 @@ describe("ElectionStatusPage", () => {
       );
       overrideOnce("get", "/api/elections/1/status", 200, {
         statuses: [
-          { id: 1, status: "definitive" },
-          { id: 2, status: "definitive" },
+          { polling_station_id: 1, status: "definitive" },
+          { polling_station_id: 2, status: "definitive" },
         ],
       });
 

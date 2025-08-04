@@ -1,4 +1,16 @@
 .resolveErrors {
+  article {
+    margin-bottom: 2rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+  }
+
   p {
     max-width: 37.5rem;
     font-size: var(--font-size-md);
@@ -6,11 +18,8 @@
     line-height: 1.5rem;
   }
 
-  form {
-    margin-bottom: 2rem;
-  }
-
   .resolveForm {
+    margin-top: 3rem;
     padding: 1.5rem;
     background-color: var(--base-white);
     border-radius: 1rem;

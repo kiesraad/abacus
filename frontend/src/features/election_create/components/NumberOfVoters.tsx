@@ -9,8 +9,7 @@ export function NumberOfVoters() {
   const { state } = useElectionCreateContext();
   const navigate = useNavigate();
   // if no data was stored, navigate back to beginning
-
-  if (!state.election || !state.pollingStations) {
+  if (!state.election) {
     return <Navigate to="/elections/create" />;
   }
 
@@ -18,17 +17,18 @@ export function NumberOfVoters() {
     await navigate("/elections/create/check-and-save");
   }
 
-  let numberOfVoters = 0;
-
-  for (let ps of state.pollingStations) {
-    console.log(ps);
-    numberOfVoters += ps.number_of_voters ?? 0;
+  let numberOfVoters = undefined;
+  if (state.pollingStations) {
+    numberOfVoters = 0;
+    for (const ps of state.pollingStations) {
+      numberOfVoters += ps.number_of_voters ?? 0;
+    }
   }
-  console.log(numberOfVoters);
+
   return (
     <section className="md">
       <NumberOfVotersForm
-        defaultValue={0}
+        defaultValue={numberOfVoters}
         instructions={t("election_management.enter_number_of_voters", {
           name: state.election.name,
           location: state.election.location,

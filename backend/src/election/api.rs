@@ -178,6 +178,7 @@ pub struct ElectionAndCandidateDefinitionValidateRequest {
     #[schema(value_type = Option<VoteCountingMethod>, nullable = false)]
     counting_method: Option<VoteCountingMethod>,
 
+    #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
     number_of_voters: Option<u32>,
 }
@@ -271,6 +272,7 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     #[schema(value_type = Option<VoteCountingMethod>, nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
     counting_method: Option<VoteCountingMethod>,
+    #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
     number_of_voters: Option<u32>,
 }

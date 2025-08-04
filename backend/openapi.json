@@ -4229,10 +4229,7 @@
             }
           },
           "number_of_voters": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           },
@@ -4272,10 +4269,7 @@
             }
           },
           "number_of_voters": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           },

@@ -128,6 +128,10 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
+// /api/initialised
+export type INITIALISED_REQUEST_PARAMS = Record<string, never>;
+export type INITIALISED_REQUEST_PATH = `/api/initialised`;
+
 // /api/log
 export interface AUDIT_LOG_LIST_REQUEST_PARAMS {
   page: number;
@@ -678,8 +682,8 @@ export interface ErrorDetails {
  */
 export type ErrorReference =
   | "AirgapViolation"
+  | "NotInitialised"
   | "AllListsExhausted"
-  | "ApplicationNotInitialised"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "CommitteeSessionPaused"
   | "DatabaseError"

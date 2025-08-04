@@ -1634,6 +1634,27 @@
         }
       }
     },
+    "/api/initialised": {
+      "get": {
+        "summary": "Check whether the application is initialised (an admin user exists + has logged in at least once)",
+        "operationId": "initialised",
+        "responses": {
+          "200": {
+            "description": "The application is initialised"
+          },
+          "418": {
+            "description": "The application is not initialised",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/log": {
       "get": {
         "summary": "List audit events",
@@ -4795,8 +4816,8 @@
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
           "AirgapViolation",
+          "NotInitialised",
           "AllListsExhausted",
-          "ApplicationNotInitialised",
           "ApportionmentNotAvailableUntilDataEntryFinalised",
           "CommitteeSessionPaused",
           "DatabaseError",

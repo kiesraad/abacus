@@ -86,9 +86,9 @@ export const routes: RouteObject[] = [
       {
         Component: AdministratorLayout,
         children: [
-          { path: "dev", children: devRoutes },
           { path: "logs", children: logsRoutes },
           { path: "users", children: usersRoutes },
+          ...(showDevPage ? [{ path: "dev", children: devRoutes }] : []),
         ],
       },
     ],

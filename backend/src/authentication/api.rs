@@ -33,6 +33,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(login))
         .routes(routes!(whoami))
+        .routes(routes!(initialised))
         .routes(routes!(account_update))
         .routes(routes!(logout))
         .routes(routes!(user_list))
@@ -183,6 +184,23 @@ async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     let user = user.ok_or(AuthenticationError::UserNotFound)?;
 
     Ok(Json(LoginResponse::from(&user)))
+}
+
+/// Check whether the application is initialised (an admin user exists + has logged in at least once)
+#[utoipa::path(
+  get,
+  path = "/api/initialised",
+  responses(
+      (status = 200, description = "The application is initialised"),
+      (status = 418, description = "The application is not initialised", body = ErrorResponse),
+  ),
+)]
+async fn initialised(State(pool): State<SqlitePool>) -> Result<impl IntoResponse, APIError> {
+    if super::user::get_active_user_count(&pool).await? == 0 {
+        Err(AuthenticationError::NotInitialised.into())
+    } else {
+        Ok(StatusCode::OK)
+    }
 }
 
 /// Update the user's account with a new password and optionally new fullname
@@ -484,10 +502,18 @@ async fn user_delete(
 
 #[cfg(test)]
 mod tests {
+    use axum::{extract::State, response::IntoResponse};
     use cookie::{Cookie, SameSite};
+    use hyper::StatusCode;
+    use sqlx::SqlitePool;
     use test_log::test;
 
-    use crate::authentication::{SECURE_COOKIES, api::set_default_cookie_properties};
+    use crate::{
+        APIError,
+        authentication::{
+            Role, SECURE_COOKIES, api::set_default_cookie_properties, error::AuthenticationError,
+        },
+    };
 
     #[test(tokio::test)]
     async fn test_set_default_cookie_properties() {
@@ -499,5 +525,36 @@ mod tests {
         assert!(cookie.http_only().unwrap());
         assert_eq!(cookie.secure().unwrap(), SECURE_COOKIES);
         assert_eq!(cookie.same_site().unwrap(), SameSite::Strict);
+    }
+
+    #[test(sqlx::test)]
+    async fn test_initialised(pool: SqlitePool) {
+        let initialised = super::initialised(State(pool.clone())).await;
+
+        assert!(matches!(
+            initialised,
+            Err(APIError::Authentication(
+                AuthenticationError::NotInitialised
+            ))
+        ));
+
+        // Create an admin user to mark the application as initialised
+        let admin = crate::authentication::user::create(
+            &pool,
+            "admin",
+            Some("Admin User"),
+            "admin_password",
+            Role::Administrator,
+        )
+        .await
+        .unwrap();
+
+        admin.update_last_activity_at(&pool).await.unwrap();
+
+        let initialised = super::initialised(State(pool)).await;
+        assert!(initialised.is_ok());
+
+        let response = initialised.unwrap().into_response();
+        assert_eq!(response.status(), StatusCode::OK);
     }
 }

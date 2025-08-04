@@ -24,8 +24,8 @@ use crate::{
 #[serde(deny_unknown_fields)]
 pub enum ErrorReference {
     AirgapViolation,
+    NotInitialised,
     AllListsExhausted,
-    ApplicationNotInitialised,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     CommitteeSessionPaused,
     DatabaseError,
@@ -246,17 +246,17 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
+                    AuthenticationError::NotInitialised => (
+                        StatusCode::IM_A_TEAPOT,
+                        to_error(
+                            "Application not initialised",
+                            ErrorReference::NotInitialised,
+                            false,
+                        ),
+                    ),
                     AuthenticationError::UserNotFound => (
                         StatusCode::UNAUTHORIZED,
                         to_error("User not found", ErrorReference::UserNotFound, false),
-                    ),
-                    AuthenticationError::ApplicationNotInitialised => (
-                        StatusCode::UNAUTHORIZED,
-                        to_error(
-                            "Application not initialised",
-                            ErrorReference::ApplicationNotInitialised,
-                            true,
-                        ),
                     ),
                     AuthenticationError::InvalidPassword => (
                         StatusCode::UNAUTHORIZED,

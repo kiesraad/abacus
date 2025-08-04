@@ -30,6 +30,7 @@
     "InvalidVoteCandidate": "De kandidaat van de stem is niet geldig",
     "InvalidVoteGroup": "De politieke partij van de stem is niet geldig",
     "InvalidXml": "De XML is niet geldig",
+    "NotInitialised": "De applicatie is nog niet klaar voor gebruik.",
     "OwnAccountCannotBeDeleted": "Je kunt je eigen account niet verwijderen",
     "PasswordRejection": "Het opgegeven wachtwoord voldoet niet aan de eisen. Gebruik minimaal 13 karakters.",
     "PdfGenerationError": "Er is een fout opgetreden bij het genereren van de PDF",

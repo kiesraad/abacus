@@ -366,6 +366,21 @@ pub async fn list(conn: impl DbConnLike<'_>) -> Result<Vec<User>, Error> {
     Ok(users)
 }
 
+/// Fetch the first admin user ever created
+pub async fn get_active_user_count(conn: impl DbConnLike<'_>) -> Result<u32, AuthenticationError> {
+    let row = sqlx::query!(
+        r#"
+        SELECT COUNT(*) AS "count: u32"
+        FROM users
+        WHERE last_activity_at IS NOT NULL
+        "#,
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(row.count)
+}
+
 pub async fn username_by_id(conn: impl DbConnLike<'_>, user_id: u32) -> Result<String, Error> {
     Ok(
         sqlx::query!("SELECT username FROM users WHERE id = ?", user_id)
@@ -609,5 +624,17 @@ mod tests {
         // Should update when `last_activity_at` was 2 minutes ago
         user.last_activity_at = Some(chrono::Utc::now() - chrono::Duration::minutes(2));
         assert!(user.should_update_last_activity_at());
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_get_active_user_count(pool: SqlitePool) {
+        let count = super::get_active_user_count(&pool).await.unwrap();
+        assert_eq!(count, 0);
+
+        let user = User::test_user(Role::Administrator, 1);
+        user.update_last_activity_at(&pool).await.unwrap();
+
+        let count = super::get_active_user_count(&pool).await.unwrap();
+        assert_eq!(count, 1);
     }
 }

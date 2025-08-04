@@ -19,7 +19,7 @@
     &:global(.narrow),
     &:global(.narrow) ~ span,
     &:global(.full-field-with-narrow-input) input {
-      width: 10.75rem;
+      width: 10rem;
     }
 
     &:global(.narrowish),

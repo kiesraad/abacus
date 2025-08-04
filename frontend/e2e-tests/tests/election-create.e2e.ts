@@ -49,6 +49,7 @@ test.describe("Election creation", () => {
     // Number of voters page
     const numberOfVotersPage = new NumberOfVotersPgObj(page);
     await expect(numberOfVotersPage.header).toBeVisible();
+    await expect(numberOfVotersPage.hint).toBeVisible();
     await numberOfVotersPage.next.click();
 
     // Now we should be at the check and save page
@@ -93,6 +94,7 @@ test.describe("Election creation", () => {
     // Number of voters page
     const numberOfVotersPage = new NumberOfVotersPgObj(page);
     await expect(numberOfVotersPage.header).toBeVisible();
+    await expect(numberOfVotersPage.hint).toBeHidden();
     await numberOfVotersPage.next.click();
 
     // Now we should be at the check and save page

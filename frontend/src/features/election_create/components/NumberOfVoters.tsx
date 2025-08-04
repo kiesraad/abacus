@@ -13,7 +13,7 @@ export function NumberOfVoters() {
     return <Navigate to="/elections/create" />;
   }
 
-  async function handleSubmit(_numberOfVoters: number) {
+  async function handleSubmit(numberOfVoters: number | undefined) {
     await navigate("/elections/create/check-and-save");
   }
 
@@ -34,8 +34,8 @@ export function NumberOfVoters() {
           location: state.election.location,
         })}
         button="Volgende"
-        onSubmit={handleSubmit}
-        hint={undefined}
+        onSubmit={() => void handleSubmit(numberOfVoters)}
+        hint={numberOfVoters ? t("election.number_of_voters.hint") : undefined}
       />
     </section>
   );

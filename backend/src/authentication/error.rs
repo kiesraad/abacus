@@ -1,6 +1,7 @@
 #[derive(Debug)]
 pub enum AuthenticationError {
     UserNotFound,
+    ApplicationNotInitialised,
     InvalidUsernameOrPassword,
     InvalidPassword,
     InvalidSessionDuration,

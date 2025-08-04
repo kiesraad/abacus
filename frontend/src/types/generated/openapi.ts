@@ -679,6 +679,7 @@ export interface ErrorDetails {
 export type ErrorReference =
   | "AirgapViolation"
   | "AllListsExhausted"
+  | "ApplicationNotInitialised"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "CommitteeSessionPaused"
   | "DatabaseError"

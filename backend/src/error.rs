@@ -25,6 +25,7 @@ use crate::{
 pub enum ErrorReference {
     AirgapViolation,
     AllListsExhausted,
+    ApplicationNotInitialised,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     CommitteeSessionPaused,
     DatabaseError,
@@ -248,6 +249,14 @@ impl IntoResponse for APIError {
                     AuthenticationError::UserNotFound => (
                         StatusCode::UNAUTHORIZED,
                         to_error("User not found", ErrorReference::UserNotFound, false),
+                    ),
+                    AuthenticationError::ApplicationNotInitialised => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error(
+                            "Application not initialised",
+                            ErrorReference::ApplicationNotInitialised,
+                            true,
+                        ),
                     ),
                     AuthenticationError::InvalidPassword => (
                         StatusCode::UNAUTHORIZED,

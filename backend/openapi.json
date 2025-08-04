@@ -4796,6 +4796,7 @@
         "enum": [
           "AirgapViolation",
           "AllListsExhausted",
+          "ApplicationNotInitialised",
           "ApportionmentNotAvailableUntilDataEntryFinalised",
           "CommitteeSessionPaused",
           "DatabaseError",

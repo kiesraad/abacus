@@ -27,8 +27,8 @@ import { ElectionStatus } from "./ElectionStatus";
 export function ElectionStatusPage() {
   const client = useApiClient();
   const navigate = useNavigate();
-  const { committeeSession, election, pollingStations, refetch } = useElection();
-  const { statuses } = useElectionStatus();
+  const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
+  const { statuses, refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
   const [showPauseModal, setShowPauseModal] = useState(false);
   const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
@@ -41,12 +41,13 @@ export function ElectionStatusPage() {
   useEffect(() => {
     const abortController = new AbortController();
 
-    void refetch(abortController);
+    void refetchElection(abortController);
+    void refetchStatuses(abortController);
 
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
-  }, [refetch]);
+  }, [refetchElection, refetchStatuses]);
 
   function finishDataEntry() {
     void navigate("../report");
@@ -63,7 +64,7 @@ export function ElectionStatusPage() {
       .putRequest(url, body)
       .then(async (result) => {
         if (isSuccess(result)) {
-          await refetch();
+          await refetchElection();
         } else {
           throw result;
         }

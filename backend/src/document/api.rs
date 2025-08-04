@@ -115,12 +115,12 @@ async fn election_download_na_31_2_bijlage1(
 )]
 async fn election_download_n_10_2(
     _user: AdminOrCoordinator,
-    State(elections_repo): State<Elections>,
-    State(polling_stations_repo): State<PollingStations>,
+    State(pool): State<SqlitePool>,
     Path(id): Path<u32>,
 ) -> Result<impl IntoResponse, APIError> {
-    let election = elections_repo.get(id).await?;
-    let polling_stations = polling_stations_repo.list(election.id).await?;
+    let election = crate::election::repository::get(&pool, id).await?;
+    let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
+
     let zip_filename = format!(
         "{}{}_{}_n_10_2.zip",
         election.category.to_eml_code(),

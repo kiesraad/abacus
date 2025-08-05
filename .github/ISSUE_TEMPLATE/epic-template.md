@@ -1,12 +1,11 @@
 ---
 name: Epic
 about: Template for epics
-title: 'Epic: '
+title: 'Epic:'
 type: epic
 labels: ''
 assignees: ''
 projects: ["kiesraad/1"]
-
 ---
 
 # Context
@@ -26,9 +25,7 @@ What's the basic structure of what's going to be built?
 <!--
 While describing the scope and/or creating sub-issues, split up the epic in a way
 that allows for small PRs.
--->
 
-<!--
 To consider for the scope:
 - functionality to be implemented (include a link to the design)
 - handling multiple users interacting with the same data

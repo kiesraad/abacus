@@ -277,7 +277,7 @@ impl IntoResponse for APIError {
                     AuthenticationError::OwnAccountCannotBeDeleted => (
                         StatusCode::FORBIDDEN,
                         to_error(
-                            "Cannot delete the last admin user",
+                            "Cannot delete your own account",
                             ErrorReference::OwnAccountCannotBeDeleted,
                             false,
                         ),

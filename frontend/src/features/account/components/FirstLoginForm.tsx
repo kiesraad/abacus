@@ -52,7 +52,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
     <>
       <header>
         <section>
-          <h1>{t("initialise.create_admin_account")}</h1>
+          <h1>{t("initialise.login_to_admin_account")}</h1>
         </section>
       </header>
       <main>

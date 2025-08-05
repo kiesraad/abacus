@@ -3,6 +3,7 @@
   "installation_success": "Installatie gelukt",
   "setup_instructions": "<p>Abacus is geïnstalleerd en bijna klaar voor gebruik.</p><p>Voordat je verder gaat moet je als beheerder een account aanmaken. Als eerste beheerder kan je vervolgens:</p><ul><li>Andere gebruikers aanmaken en beheren</li><li>De verkiezing voorbereiden</li></ul>",
   "create_admin_account": "Account voor beheerder aanmaken",
+  "login_to_admin_account": "Inloggen met account van beheerder",
   "account_details": "Details van het account",
   "store_in_safe_place": "Bewaar de gegevens van het account van de beheerder op een veilige plek.",
   "admin_configured": "Account van beheerder ingesteld",
@@ -10,5 +11,7 @@
   "login_error": "De gebruikersnaam of het wachtwoord is onjuist",
   "reconfigure_admin_account": "Ben je de inloggegevens kwijt? <link>Stel het account van de beheerder opnieuw in.</link>",
   "username_login_hint": "De naam die je zojuist hebt ingesteld",
-  "password_login_hint": "Het wachtwoord dat je zojuist hebt gekozen"
+  "password_login_hint": "Het wachtwoord dat je zojuist hebt gekozen",
+  "password": "Kies een wachtwoord",
+  "password_hint": "Gebruik minimaal 13 karakters. Het wachtwoord is hoofdlettergevoelig."
 }

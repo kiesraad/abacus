@@ -1,18 +1,20 @@
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
-import { InitialisedHandler, LoginHandler } from "@/testing/api-mocks/RequestHandlers";
+import { LoginHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 
-import { LoginPage } from "./LoginPage";
+import { FirstLoginForm } from "./FirstLoginForm";
 
-describe("LoginPage", () => {
-  test("Enter form field values", async () => {
-    server.use(InitialisedHandler, LoginHandler);
+const prev = vi.fn();
+
+describe("FirstLoginForm", () => {
+  test("Create the first admin user", async () => {
+    server.use(LoginHandler);
     const login = spyOnHandler(LoginHandler);
 
-    render(<LoginPage />);
+    render(<FirstLoginForm prev={prev} />);
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText("Gebruikersnaam"), "username");

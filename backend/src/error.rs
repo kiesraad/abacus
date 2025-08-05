@@ -363,19 +363,23 @@ impl IntoResponse for APIError {
                             true,
                         ),
                     ),
-                    CommitteeSessionError::InvalidStatusTransition => (
-                        StatusCode::CONFLICT,
-                        to_error(
-                            "Invalid committee session state transition",
-                            ErrorReference::InvalidStateTransition,
-                            true,
-                        ),
-                    ),
                     CommitteeSessionError::InvalidCommitteeSessionStatus => (
                         StatusCode::CONFLICT,
                         to_error(
                             "Invalid committee session status",
                             ErrorReference::InvalidCommitteeSessionStatus,
+                            true,
+                        ),
+                    ),
+                    CommitteeSessionError::InvalidDetails => (
+                        StatusCode::BAD_REQUEST,
+                        to_error("Invalid details", ErrorReference::InvalidData, false),
+                    ),
+                    CommitteeSessionError::InvalidStatusTransition => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Invalid committee session state transition",
+                            ErrorReference::InvalidStateTransition,
                             true,
                         ),
                     ),

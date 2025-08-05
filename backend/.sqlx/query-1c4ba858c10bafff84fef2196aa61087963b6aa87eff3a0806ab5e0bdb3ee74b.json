@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        INSERT INTO committee_sessions (\n            number,\n            election_id,\n            location,\n            start_date,\n            start_time\n        ) VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date,\n            start_time,\n            number_of_voters as \"number_of_voters: u32\"\n        ",
+  "query": "\n        INSERT INTO committee_sessions (\n            number,\n            election_id,\n            location,\n            start_date,\n            start_time,\n            number_of_voters\n        ) VALUES (?, ?, ?, ?, ?, ?)\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date,\n            start_time,\n            number_of_voters as \"number_of_voters: u32\"\n        ",
   "describe": {
     "columns": [
       {
@@ -45,7 +45,7 @@
       }
     ],
     "parameters": {
-      "Right": 5
+      "Right": 6
     },
     "nullable": [
       false,
@@ -58,5 +58,5 @@
       false
     ]
   },
-  "hash": "42fb005043d163d11cb01ec93d4838f6cc96f7f0c892aeceb9a0c7fe02a48e01"
+  "hash": "1c4ba858c10bafff84fef2196aa61087963b6aa87eff3a0806ab5e0bdb3ee74b"
 }

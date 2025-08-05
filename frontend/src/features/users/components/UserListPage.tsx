@@ -7,7 +7,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/i18n/translate";
 import { Role } from "@/types/generated/openapi";
-import { formatDateTime } from "@/utils/format";
+import { formatDateTime } from "@/utils/dateTime";
 
 import { useQueryParam } from "../hooks/useQueryParam";
 import { useUserListRequest } from "../hooks/useUserListRequest";

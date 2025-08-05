@@ -4,7 +4,7 @@ import { Modal } from "@/components/ui/Modal/Modal";
 import { TranslationPath } from "@/i18n/i18n.types";
 import { hasTranslation, t } from "@/i18n/translate";
 import { AuditLogEvent } from "@/types/generated/openapi";
-import { formatDateTimeFull } from "@/utils/format";
+import { formatDateTimeFull } from "@/utils/dateTime";
 
 import cls from "./LogsHomePage.module.css";
 

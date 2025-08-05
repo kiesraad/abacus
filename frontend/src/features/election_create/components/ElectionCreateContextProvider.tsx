@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { ReactNode, useReducer } from "react";
 
 import {
   ElectionDefinitionValidateResponse,
@@ -102,7 +102,7 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
   }
 }
 
-export function ElectionCreateContextProvider({ children }: { children: React.ReactNode }) {
+export function ElectionCreateContextProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, {});
   const context: IElectionCreateContext = { state, dispatch };
   return <ElectionCreateContext.Provider value={context}>{children}</ElectionCreateContext.Provider>;

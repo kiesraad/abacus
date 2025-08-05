@@ -15,7 +15,7 @@ import {
 } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 
-import cls from "./ElectionManagement.module.css";
+import cls from "../ElectionManagement.module.css";
 
 export function FinishDataEntryPage() {
   const { committeeSession, election, refetch } = useElection();

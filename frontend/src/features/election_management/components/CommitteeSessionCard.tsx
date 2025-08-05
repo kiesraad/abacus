@@ -15,7 +15,7 @@ import {
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-import { formatFullDateWithoutTimezone } from "@/utils/format";
+import { formatFullDateWithoutTimezone } from "@/utils/dateTime";
 
 import cls from "./CommitteeSessionCard.module.css";
 
@@ -164,10 +164,13 @@ export function CommitteeSessionCard({
       }
       break;
   }
-  // TODO: Add in issue #1750 with link
-  // if (isCoordinator) {
-  //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.committee_session_details"), to: "" });
-  // }
+  if (isCoordinator && currentSession) {
+    buttonLinks.push({
+      id: committeeSession.id,
+      label: t("election_management.committee_session_details"),
+      to: "details",
+    });
+  }
 
   return (
     <Card icon={icon} label={label} status={status} date={date} button={button} {...props}>

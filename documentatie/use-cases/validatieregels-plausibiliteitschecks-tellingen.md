@@ -37,7 +37,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### CSO | F.102: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
 
-> Invoerder: **Controleer je antwoorden** (F.101)
+> Invoerder: **Controleer je antwoorden** (F.102)
 
 > Coördinator: **Er mag maar één antwoord per vraag worden gegeven.** (F.102)
 
@@ -45,17 +45,17 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### CSO | F.111: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
 
-> Invoerder: **Controleer je antwoorden** (F.101)
+> Invoerder: **Controleer je antwoorden** (F.111)
 
-> Coördinator: **Bij beide vragen moet een antwoord gegeven worden.** (F.102)
+> Coördinator: **Bij beide vragen moet een antwoord gegeven worden.** (F.111)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### CSO | F.112: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
 
-> Invoerder: **Controleer je antwoorden** (F.101)
+> Invoerder: **Controleer je antwoorden** (F.112)
 
-> Coördinator: **Er mag maar één antwoord per vraag worden gegeven.** (F.102)
+> Coördinator: **Er mag maar één antwoord per vraag worden gegeven.** (F.112)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
@@ -107,9 +107,9 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 #### DSO, eerste zitting | F.155: Controles en correcties: Ongeldig antwoord in eerste zitting (vraag 'op verzoek van het CSB' = 'ja')
 
-> Invoerder: **Controleer je antwoorden** (F.154)
+> Invoerder: **Controleer je antwoorden** (F.155)
 
-> Coördinator: **Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn.** (F.154)  
+> Coördinator: **Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn.** (F.155)  
 > Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
@@ -154,10 +154,10 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 #### F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal uitgebrachte stemmen`
 
-> Invoerder: **Controleer uitgebrachte stemmen** (F.202)  
+> Invoerder: **Controleer uitgebrachte stemmen** (F.203)  
 > De invoer bij E, F, G of H klopt niet.  
 
-> Coördinator: **E, F en G tellen niet op tot H** (F.202)  
+> Coördinator: **E, F en G tellen niet op tot H** (F.203)  
 > Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij H wordt ingevuld.
 > Zo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.
 > Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.

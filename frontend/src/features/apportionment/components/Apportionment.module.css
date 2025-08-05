@@ -45,7 +45,6 @@ td > .footnoteNumber {
   color: var(--gray-900);
   td {
     line-height: 1.5rem;
-    font-size: var(--font-size-md);
   }
   th {
     text-wrap: nowrap;

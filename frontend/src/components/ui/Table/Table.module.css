@@ -3,7 +3,6 @@
   line-height: 1.5rem;
   border-spacing: unset;
   color: var(--color-help-text);
-  font-size: var(--font-size-lg);
 
   thead {
     font-size: var(--font-size-xs);
@@ -103,6 +102,8 @@
   }
 }
 
-:where(.numberCell) {
+/* Row header and first cell in the row large font, using `:where()` to give it lowest specificity */
+:where(.table th[scope="row"]),
+:where(.table td:first-child) {
   font-size: var(--font-size-lg);
 }

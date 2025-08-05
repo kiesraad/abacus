@@ -16,6 +16,25 @@ const data: [number, string, string][] = [
 export const BasicTable: StoryFn = () => (
   <Table id="basic_table">
     <Table.Header>
+      <Table.HeaderCell className="w-14">Large font</Table.HeaderCell>
+      <Table.HeaderCell className="w-14">Fixed width</Table.HeaderCell>
+      <Table.HeaderCell>Some value</Table.HeaderCell>
+    </Table.Header>
+    <Table.Body>
+      {data.map((row) => (
+        <Table.Row key={row[0]}>
+          <Table.Cell>{`Element ${row[0]}`}</Table.Cell>
+          <Table.Cell>{row[1]}</Table.Cell>
+          <Table.Cell>{row[2]}</Table.Cell>
+        </Table.Row>
+      ))}
+    </Table.Body>
+  </Table>
+);
+
+export const NumberCellTable: StoryFn = () => (
+  <Table id="basic_table_number_cell">
+    <Table.Header>
       <Table.HeaderCell>Number</Table.HeaderCell>
       <Table.HeaderCell className="w-14">Fixed width</Table.HeaderCell>
       <Table.HeaderCell>Some value</Table.HeaderCell>

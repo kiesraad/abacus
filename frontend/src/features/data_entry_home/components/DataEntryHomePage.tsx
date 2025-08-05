@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
+import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal.tsx";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -15,7 +16,7 @@ import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { election, pollingStations } = useElection();
+  const { committeeSession, election, pollingStations } = useElection();
   const { statuses, refetch } = useElectionStatus();
 
   // re-fetch statuses when component mounts
@@ -69,6 +70,7 @@ export function DataEntryHomePage() {
           <h1>{election.name}</h1>
         </section>
       </header>
+      {committeeSession.status === "data_entry_paused" && <CommitteeSessionPausedModal />}
       {dataEntryDone && (
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
           <h2>{t("data_entry.entry_saved")}</h2>

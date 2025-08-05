@@ -53,11 +53,11 @@ export function LargestRemaindersTable({
                 {pgSeatAssignment.pg_number}
               </Table.Cell>
               <Table.Cell>{politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}</Table.Cell>
-              <Table.NumberCell className="font-number">
+              <Table.NumberCell className="bold">
                 {pgFullSeatsNotes.length > 0 && getFootnotes(pgFullSeatsNotes)} {pgSeatAssignment.full_seats}
               </Table.NumberCell>
               <Table.DisplayFractionCells>{pgSeatAssignment.remainder_votes}</Table.DisplayFractionCells>
-              <Table.NumberCell className="font-number">
+              <Table.NumberCell className="bold">
                 {getFootnotes(pgResultChanges)} {residualSeats}
               </Table.NumberCell>
             </Table.Row>

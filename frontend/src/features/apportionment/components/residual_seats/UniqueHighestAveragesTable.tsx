@@ -39,9 +39,9 @@ export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGrou
                   {pgSeatAssignment.pg_number}
                 </Table.Cell>
                 <Table.Cell>{politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}</Table.Cell>
-                <Table.NumberCell className="font-number">{pgSeatAssignment.full_seats}</Table.NumberCell>
+                <Table.NumberCell className="bold">{pgSeatAssignment.full_seats}</Table.NumberCell>
                 <Table.DisplayFractionCells>{average}</Table.DisplayFractionCells>
-                <Table.NumberCell className="font-number">{pgSeatAssignmentSteps.length}</Table.NumberCell>
+                <Table.NumberCell className="bold">{pgSeatAssignmentSteps.length}</Table.NumberCell>
               </Table.Row>
             );
           }

@@ -49,9 +49,6 @@ pub struct AuditLogEvent {
     message: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    workstation: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
     user_id: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -159,8 +156,6 @@ pub async fn create(
     message: Option<String>,
     ip: Option<IpAddr>,
 ) -> Result<(), APIError> {
-    // TODO: set workstation id
-    let workstation: Option<u32> = None;
     let event_name = event.to_string();
     let event_level = event.level();
     let event = Json(event);
@@ -171,13 +166,12 @@ pub async fn create(
     let ip = ip.map(|ip| ip.to_string());
 
     sqlx::query!(
-        "INSERT INTO audit_log (event, event_name, event_level, message, workstation, user_id, username, user_fullname, user_role, ip)
-        VALUES (jsonb(?), ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO audit_log (event, event_name, event_level, message, user_id, username, user_fullname, user_role, ip)
+        VALUES (jsonb(?), ?, ?, ?, ?, ?, ?, ?, ?)",
         event,
         event_name,
         event_level,
         message,
-        workstation,
         user_id,
         username,
         fullname,
@@ -200,7 +194,6 @@ pub async fn list_all(conn: impl DbConnLike<'_>) -> Result<Vec<AuditLogEvent>, A
             json(event) as "event!: Json<AuditEvent>",
             event_level as "event_level: _",
             message,
-            workstation as "workstation: _",
             ip as "ip: String",
             user_id as "user_id: u32",
             username,
@@ -230,7 +223,6 @@ pub async fn list(
             json(event) as "event!: Json<AuditEvent>",
             event_level as "event_level: _",
             message,
-            workstation as "workstation: _",
             ip as "ip: String",
             user_id as "user_id: u32",
             audit_log.username,

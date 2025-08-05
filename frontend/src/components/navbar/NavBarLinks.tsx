@@ -87,7 +87,6 @@ function TopLevelManagementLinks({ isAdministrator }: { isAdministrator: boolean
       {isAdministrator && (
         <>
           <NavLink to={"/users"}>{t("users.users")}</NavLink>
-          <NavLink to={"/workstations"}>{t("workstations.workstations")}</NavLink>
         </>
       )}
       <NavLink to={"/logs"}>{t("logs")}</NavLink>
@@ -102,7 +101,6 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
     (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||
     location.pathname.startsWith("/elections/create") ||
     location.pathname.startsWith("/users") ||
-    location.pathname === "/workstations" ||
     location.pathname === "/logs"
   ) {
     return <TopLevelManagementLinks isAdministrator={isAdministrator} />;

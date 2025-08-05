@@ -51,9 +51,7 @@
 
 .formAlert {
   overflow: hidden;
-  margin-top: -2.5rem;
-  margin-left: -5rem;
-  margin-right: -5rem;
+  margin: -2.5rem -5rem 2rem -5rem;
 }
 
 .formControls {

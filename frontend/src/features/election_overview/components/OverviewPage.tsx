@@ -32,7 +32,7 @@ export function OverviewPage() {
     function ElectionRowContent() {
       return (
         <>
-          <Table.Cell className="fs-lg">{election.name}</Table.Cell>
+          <Table.Cell>{election.name}</Table.Cell>
           <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
           <Table.Cell>{committeeSessionStatus}</Table.Cell>
         </>

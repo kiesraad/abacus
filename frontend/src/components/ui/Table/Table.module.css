@@ -3,7 +3,6 @@
   line-height: 1.5rem;
   border-spacing: unset;
   color: var(--color-help-text);
-  font-size: var(--font-size-lg);
 
   thead {
     font-size: var(--font-size-xs);
@@ -59,6 +58,8 @@
     text-align: right;
     width: 6.5rem;
     line-height: 1.75rem;
+    font-family: var(--font-number);
+    font-feature-settings: "ss09" on;
   }
 
   td.integerCell {
@@ -101,9 +102,8 @@
   }
 }
 
-:where(.numberCell) {
-  font-weight: bold;
+/* Row header and first cell in the row large font, using `:where()` to give it lowest specificity */
+:where(.table.defaultVariant th[scope="row"]),
+:where(.table.defaultVariant td:first-child) {
   font-size: var(--font-size-lg);
-  /* Enable 'Tabular Figures' font feature for fixed-width numbers */
-  font-feature-settings: "tnum" on;
 }

@@ -29,7 +29,7 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className={cn(cls.bt1Gray, "normal")}>
             {t("apportionment.voters")}
           </Table.HeaderCell>
-          <Table.NumberCell className={cn(cls.bt1Gray, "font-number", "normal")}>
+          <Table.NumberCell className={cls.bt1Gray}>
             {numberOfVoters ? formatNumber(numberOfVoters) : ""}
           </Table.NumberCell>
           <Table.Cell className={cn(cls.bt1Gray, "fs-sm")} />
@@ -38,9 +38,7 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("apportionment.total_votes_cast_count")}
           </Table.HeaderCell>
-          <Table.NumberCell className="font-number normal">
-            {formatNumber(votesCounts.total_votes_cast_count)}
-          </Table.NumberCell>
+          <Table.NumberCell>{formatNumber(votesCounts.total_votes_cast_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
             {numberOfVoters
               ? `${t("apportionment.turnout")}: ${Number((votesCounts.total_votes_cast_count / numberOfVoters) * 100).toFixed(2)}%`
@@ -51,9 +49,7 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.blank_votes_count")}
           </Table.HeaderCell>
-          <Table.NumberCell className="font-number normal">
-            {formatNumber(votesCounts.blank_votes_count)}
-          </Table.NumberCell>
+          <Table.NumberCell>{formatNumber(votesCounts.blank_votes_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
             {`${Number((votesCounts.blank_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
           </Table.Cell>
@@ -62,9 +58,7 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.invalid_votes_count")}
           </Table.HeaderCell>
-          <Table.NumberCell className="font-number normal">
-            {formatNumber(votesCounts.invalid_votes_count)}
-          </Table.NumberCell>
+          <Table.NumberCell>{formatNumber(votesCounts.invalid_votes_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
             {`${Number((votesCounts.invalid_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
           </Table.Cell>
@@ -73,23 +67,21 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.votes_candidates_count")}
           </Table.HeaderCell>
-          <Table.NumberCell className="font-number normal">
-            {formatNumber(votesCounts.votes_candidates_count)}
-          </Table.NumberCell>
+          <Table.NumberCell>{formatNumber(votesCounts.votes_candidates_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm" />
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("apportionment.number_of_seats")}
           </Table.HeaderCell>
-          <Table.NumberCell className="font-number normal">{seats}</Table.NumberCell>
+          <Table.NumberCell>{seats}</Table.NumberCell>
           <Table.Cell className="fs-sm" />
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("apportionment.quota")}
           </Table.HeaderCell>
-          <Table.NumberCell className="font-number normal">
+          <Table.NumberCell>
             <DisplayFraction id="quota" fraction={quota} />
           </Table.NumberCell>
           <Table.Cell className="fs-sm">{t("apportionment.quota_description")}</Table.Cell>
@@ -98,7 +90,7 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("apportionment.preference_threshold")}
           </Table.HeaderCell>
-          <Table.NumberCell className="font-number normal">
+          <Table.NumberCell>
             <DisplayFraction id="quota" fraction={preferenceThreshold.number_of_votes} />
           </Table.NumberCell>
           <Table.Cell className="fs-sm">

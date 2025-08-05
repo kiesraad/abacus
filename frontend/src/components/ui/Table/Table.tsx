@@ -7,11 +7,13 @@ import { getFractionInteger, getFractionWithoutInteger } from "@/utils/fraction"
 
 import cls from "./Table.module.css";
 
-export type TableProps = React.TableHTMLAttributes<HTMLTableElement>;
+interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
+  variant?: "default" | "information";
+}
 
-export function Table({ children, className, ...props }: TableProps) {
+export function Table({ variant = "default", children, className, ...props }: TableProps) {
   return (
-    <table className={cn(cls.table, className)} {...props}>
+    <table className={cn(cls.table, cls[`${variant}Variant`], className)} {...props}>
       {children}
     </table>
   );

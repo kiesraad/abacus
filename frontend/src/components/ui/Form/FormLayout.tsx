@@ -17,7 +17,7 @@ export function FormLayout({ children, disabled }: FormLayoutProps) {
   );
 }
 
-function FormSection({ children, title }: { children: React.ReactNode; title?: string }) {
+function FormSection({ children, title }: { children: React.ReactNode; title?: string | React.ReactElement }) {
   return (
     <section className={cls.formSection}>
       {title && <h2 className="formSectionTitle">{title}</h2>}

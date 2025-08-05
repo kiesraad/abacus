@@ -24,16 +24,11 @@ use crate::{
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
-    let router = OpenApiRouter::default()
+    OpenApiRouter::default()
         .routes(routes!(election_import_validate))
         .routes(routes!(election_import))
         .routes(routes!(election_list))
-        .routes(routes!(election_details));
-
-    #[cfg(feature = "dev-database")]
-    let router = router.routes(routes!(election_create));
-
-    router
+        .routes(routes!(election_details))
 }
 
 /// Election list response
@@ -111,51 +106,6 @@ pub async fn election_details(
         election,
         polling_stations,
     }))
-}
-
-/// Create an election. For test usage only!
-#[utoipa::path(
-    post,
-    path = "/api/elections",
-    request_body = NewElection,
-    responses(
-        (status = 201, description = "Election created", body = ElectionWithPoliticalGroups),
-        (status = 400, description = "Bad request", body = ErrorResponse),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-)]
-#[cfg(feature = "dev-database")]
-pub async fn election_create(
-    _user: Admin,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Json(new_election): Json<NewElection>,
-) -> Result<(StatusCode, ElectionWithPoliticalGroups), APIError> {
-    let election = crate::election::repository::create(&pool, new_election).await?;
-    audit_service
-        .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
-        .await?;
-
-    // Create first committee session for the election
-    let committee_session = crate::committee_session::repository::create(
-        &pool,
-        CommitteeSessionCreateRequest {
-            number: 1,
-            election_id: election.id,
-            number_of_voters: 0,
-        },
-    )
-    .await?;
-    audit_service
-        .log(
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
-            None,
-        )
-        .await?;
-
-    Ok((StatusCode::CREATED, election))
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]

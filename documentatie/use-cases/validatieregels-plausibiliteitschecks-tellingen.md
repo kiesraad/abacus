@@ -30,6 +30,7 @@ Er zijn geen regels omdat het niet mogelijk is om foute aantallen in te vullen i
 #### CSO | F.101: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
 
 > Invoerder: **Controleer je antwoorden** (F.101)
+
 > Coördinator: **Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden. Als er geen extra onderzoek is gedaan, moeten deze vragen overgeslagen worden.** (F.101)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
@@ -37,6 +38,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 #### CSO | F.102: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
 
 > Invoerder: **Controleer je antwoorden** (F.101)
+
 > Coördinator: **Er mag maar één antwoord per vraag worden gegeven.** (F.102)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
@@ -44,13 +46,15 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 #### CSO | F.111: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
 
 > Invoerder: **Controleer je antwoorden** (F.101)
+
 > Coördinator: **Bij beide vragen moet een antwoord gegeven worden.** (F.102)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### CSO | F.112: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
 
-> Invoerder: **Controleer je antwoorden** (F.101)  
+> Invoerder: **Controleer je antwoorden** (F.101)
+
 > Coördinator: **Er mag maar één antwoord per vraag worden gegeven.** (F.102)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
@@ -60,8 +64,8 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > Invoerder: **Controleer je antwoorden** (F.151)  
 > Beantwoord de vragen over het papieren proces-verbaal. Overleg met de coördinator als je twijfelt.
 
-> Coördinator: **Er is niet correct aangegeven welke documenten zijn ingevoerd** (F.151)
-> Bekijk welke documenten aanwezig zijn, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden. 
+> Coördinator: **Er is niet correct aangegeven welke documenten zijn ingevoerd** (F.151)  
+> Bekijk welke documenten aanwezig zijn, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
@@ -71,7 +75,7 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 > Invoerder: **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)  
 > Overleg met de coördinator over het ontbrekende inlegvel.
 
-> Coördinator: **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)
+> Coördinator: **Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn** (F.152)  
 > Zorg dat een correct ingevuld inlegvel wordt toegevoegd, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
@@ -81,7 +85,7 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 > Invoerder: **Controleer je antwoorden** (F.153)
 
-> Coördinator: **De vragen op het inlegvel zijn niet volledig beantwoord** (F.153)
+> Coördinator: **De vragen op het inlegvel zijn niet volledig beantwoord** (F.153)  
 > Zorg dat het inlegvel volledig is ingevuld, en geef de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
@@ -105,7 +109,7 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 > Invoerder: **Controleer je antwoorden** (F.154)
 
-> Coördinator: **Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn.** (F.154)
+> Coördinator: **Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn.** (F.154)  
 > Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
@@ -115,7 +119,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 > Invoerder: **Controleer je antwoorden** (F.156)
 
-> Coördinator: **Er mag maar 1 antwoord per vraag worden gegeven** (F.156)
+> Coördinator: **Er mag maar 1 antwoord per vraag worden gegeven** (F.156)  
 > Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
@@ -128,7 +132,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > Invoerder: **Controleer toegelaten kiezers** (F.201)  
 > De invoer bij A, B of D klopt niet.  
 
-> Coördinator: **A en B tellen niet op tot D** (F.201)
+> Coördinator: **A en B tellen niet op tot D** (F.201)  
 > Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.
 > Zo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.
 > Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
@@ -140,7 +144,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 > Invoerder **Controleer de stemmen op lijsten en totaal stemmen op kandidaten** (F.202)
 
-> Coördinator: **De stemmen op lijsten tellen niet op tot E** (F.202)
+> Coördinator: **De stemmen op lijsten tellen niet op tot E** (F.202)  
 > Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en H worden ingevuld.
 > Zo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.
 > Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
@@ -168,7 +172,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 > Invoerder: **Controleer je antwoorden** (F.301)
 
-> Coördinator: **De getallen die zijn ingevuld bij D en H zijn niet gelijk** (F.301)
+> Coördinator: **De getallen die zijn ingevuld bij D en H zijn niet gelijk** (F.301)  
 > Herstel de fout door op papier het juiste getal in te (laten) vullen.
 > Controleer ook of er een onverklaard verschil ontstaat.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
@@ -188,7 +192,7 @@ Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
 > Invoerder: **Controleer je antwoorden** (F.352)
 
-> Coördinator: **Het getal dat is ingevuld bij H is niet groter dan D** (F.352)
+> Coördinator: **Het getal dat is ingevuld bij H is niet groter dan D** (F.352)  
 > Maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H  
@@ -205,7 +209,7 @@ Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 #### DSO | F.353 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
 > Invoerder: **Controleer je antwoorden** (F.353)
 
-> Coördinator: **Het getal dat is ingevuld bij H is niet kleiner dan D** (F.353)
+> Coördinator: **Het getal dat is ingevuld bij H is niet kleiner dan D** (F.353)  
 > Maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H    
@@ -223,7 +227,7 @@ Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 
 > Invoerder: **Controleer je antwoorden** (F.354)
 
-> Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.354)
+> Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.354)  
 > Is op het proces-verbaal duidelijk aangegeven welk van de opties bedoeld is?
 > Laat dat dan overnemen in Abacus. Zo niet, maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
@@ -234,7 +238,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 // TODO DSO
 > Invoerder: **Controleer I (stembiljetten meer geteld)** (F.305)
 
-> Coördinator: **Controleer I (stembiljetten meer geteld)** (F.305)
+> Coördinator: **Controleer I (stembiljetten meer geteld)** (F.305)  
 > Herstel de fout door op papier het juiste getal in te (laten) vullen.
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
@@ -246,7 +250,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 // TODO DSO
 > Invoerder: **Controleer I en J** (F.306)
 
-> Coördinator: **Controleer of I en J verwisseld zijn** (F.306)
+> Coördinator: **Controleer of I en J verwisseld zijn** (F.306)  
 > Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan. 
@@ -259,7 +263,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 // TODO DSO
 > Invoerder: **Controleer J** (F.307)
 
-> Coördinator: **Controleer J (stembiljetten meer geteld)** (F.307)
+> Coördinator: **Controleer J (stembiljetten meer geteld)** (F.307)  
 > Herstel de fout door op papier het juiste getal in te (laten) vullen.
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
@@ -271,7 +275,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 // TODO DSO
 > Invoerder: **Controleer I en J** (F.308)  
 
-> Coördinator: **Controleer of I en J verwisseld zijn** (F.308)
+> Coördinator: **Controleer of I en J verwisseld zijn** (F.308)  
 > Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
@@ -303,7 +307,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 // TODO DSO
 > Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.** (F.401)
 
-> Coördinator: **Het totaal van de lijst is niet ingevuld.** (F.401)
+> Coördinator: **Het totaal van de lijst is niet ingevuld.** (F.401)  
 > Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.{x} in rubriek 3.2)
 > Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.
 > - Zo ja: corrigeer de optelfout op het papieren proces-verbaal.
@@ -319,7 +323,7 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 > De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
-> Coördinator: **De optelling van de stemmen op kandidaten komt niet overeen met het ingevulde lijsttotaal** (F.402)
+> Coördinator: **De optelling van de stemmen op kandidaten komt niet overeen met het ingevulde lijsttotaal** (F.402)  
 > Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld.
 > Reken de optelling in het papieren proces-verbaal na.
 > Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.
@@ -331,10 +335,10 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 #### CSO | F.403 `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
 // TODO DSO
-> Invoerder: **Controleer het totaal van de lijst** (F.403)
+> Invoerder: **Controleer het totaal van de lijst** (F.403)  
 > Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij [Aantal kiezers en stemmen]()
 
-> Coördinator: **Controleer het totaal van de lijst en E.{x} in rubriek 3.2** (F.403)
+> Coördinator: **Controleer het totaal van de lijst en E.{x} in rubriek 3.2** (F.403)  
 > Controleer wat er fout is gegaan in rubriek 3.2 en herstel de fout.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
@@ -379,7 +383,7 @@ Geen checks.
 > Invoerder: **Controleer aantal blanco stemmen** (W.201)  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
-> Coördinator: **Het aantal blanco stemmen is erg hoog** (W.201)
+> Coördinator: **Het aantal blanco stemmen is erg hoog** (W.201)  
 > Hertel de blanco stemmen of geef een verklaring voor het hoge aantal. Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).
 
 Veld markeren: F
@@ -391,7 +395,7 @@ Veld markeren: F
 > Invoerder: **Controleer aantal ongeldige stemmen** (W.202)
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
-> Coördinator: **Het aantal ongeldige stemmen is erg hoog** (W.202)
+> Coördinator: **Het aantal ongeldige stemmen is erg hoog** (W.202)  
 > Hertel de ongeldige stemmen of geef een verklaring voor het hoge aantal. Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).
 
 Veld markeren: G
@@ -401,7 +405,7 @@ Veld markeren: G
 - 2% of meer: abs(toegelaten kiezers - getelde stembiljetten) / getelde stembiljetten \>= 0.02
 - 15 of meer: abs(toegelaten kiezers - getelde stembiljetten) \>= 15
 
-> Invoerder: **Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)
+> Invoerder: **Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
  
 > Coördinator: **Groot verschil tussen aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
@@ -414,10 +418,10 @@ Velden markeren: D en H
 
 #### W.205 Totaal aantal uitgebrachte stemmen leeg of 0
 
-> Invoerder: **Controleer aantal uitgebrachte stemmen** (W.205)
+> Invoerder: **Controleer aantal uitgebrachte stemmen** (W.205)  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
-> Coördinator: **Het totaal aantal uitgebrachte stemmen (H) is nul** (W.205)
+> Coördinator: **Het totaal aantal uitgebrachte stemmen (H) is nul** (W.205)  
 > Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.
 > Zo nee: Verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.
 > Zo ja: Verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht.

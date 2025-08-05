@@ -301,7 +301,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 #### CSO F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
 // TODO DSO
-> Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.** (F.401)
+> Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.** (F.401)
 
 > Coördinator: **Het totaal van de lijst is niet ingevuld.** (F.401)
 > Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.{x} in rubriek 3.2)

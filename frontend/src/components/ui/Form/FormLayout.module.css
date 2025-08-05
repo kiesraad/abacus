@@ -18,12 +18,6 @@
 }
 
 .formSection {
-  margin-bottom: var(--space-md);
-
-  &:not(:first-child) {
-    margin-top: var(--space-xl);
-  }
-
   h2.formSectionTitle {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -53,7 +47,7 @@
   flex-direction: column;
   border: none;
   padding: 0;
-  gap: 1.5rem;
+  gap: 2.5rem;
 }
 
 .formAlert {

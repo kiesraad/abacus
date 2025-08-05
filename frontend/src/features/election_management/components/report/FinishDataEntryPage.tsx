@@ -71,7 +71,7 @@ export function FinishDataEntryPage() {
             <Button type="submit" onClick={handleFinish}>
               {t("election.title.finish_data_entry")}
             </Button>
-            <Button.Link type="button" variant="secondary" to="../status">
+            <Button.Link variant="secondary" to="../status">
               {t("election_management.stay_in_data_entry_phase")}
             </Button.Link>
           </FormLayout.Controls>

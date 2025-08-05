@@ -36,7 +36,7 @@ describe("NumberOfVotersPage", () => {
     const user = userEvent.setup();
 
     const input = screen.getByLabelText("Aantal kiesgerechtigden");
-    expect(input).toHaveValue("2.000");
+    expect(input).toHaveValue("2000");
     await user.click(screen.getByRole("button", { name: "Opslaan" }));
 
     expect(changeVoters).toHaveBeenCalledExactlyOnceWith({ number_of_voters: 2000 });

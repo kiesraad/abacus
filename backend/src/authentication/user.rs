@@ -385,6 +385,18 @@ pub async fn update_last_activity_at(conn: impl DbConnLike<'_>, user_id: u32) ->
     Ok(())
 }
 
+/// Count the number of admin users that have been active
+pub async fn count_admins(conn: impl DbConnLike<'_>) -> Result<i64, Error> {
+    let count = sqlx::query_scalar!(
+        r#"SELECT COUNT(*) FROM users WHERE role = ? AND last_activity_at IS NOT NULL"#,
+        Role::Administrator
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(count)
+}
+
 #[cfg(test)]
 mod tests {
     use sqlx::SqlitePool;

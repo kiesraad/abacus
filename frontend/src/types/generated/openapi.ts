@@ -703,6 +703,7 @@ export type ErrorReference =
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
   | "InvalidXml"
+  | "LastAdminCannotBeDeleted"
   | "PasswordRejection"
   | "PdfGenerationError"
   | "PollingStationRepeated"

@@ -48,6 +48,7 @@ pub enum ErrorReference {
     InvalidVoteCandidate,
     InvalidVoteGroup,
     InvalidXml,
+    LastAdminCannotBeDeleted,
     PasswordRejection,
     PdfGenerationError,
     PollingStationRepeated,
@@ -272,6 +273,14 @@ impl IntoResponse for APIError {
                     AuthenticationError::PasswordRejection => (
                         StatusCode::BAD_REQUEST,
                         to_error("Invalid password", ErrorReference::PasswordRejection, false),
+                    ),
+                    AuthenticationError::LastAdminCannotBeDeleted => (
+                        StatusCode::FORBIDDEN,
+                        to_error(
+                            "Cannot delete the last admin user",
+                            ErrorReference::LastAdminCannotBeDeleted,
+                            false,
+                        ),
                     ),
                     // server errors
                     AuthenticationError::Database(_)

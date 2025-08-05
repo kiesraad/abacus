@@ -61,7 +61,9 @@ export function UserUpdatePage() {
         <article>
           {error && (
             <FormLayout.Alert>
-              <Alert type="error">{t(`error.api_error.${error.reference}`)}</Alert>
+              <Alert type="error">
+                <p>{t(`error.api_error.${error.reference}`)}</p>
+              </Alert>
             </FormLayout.Alert>
           )}
 

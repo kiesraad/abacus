@@ -13,6 +13,7 @@ pub enum AuthenticationError {
     Unauthorized,
     Unauthenticated,
     PasswordRejection,
+    LastAdminCannotBeDeleted,
 }
 
 impl From<password_hash::Error> for AuthenticationError {

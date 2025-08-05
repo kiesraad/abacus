@@ -139,6 +139,9 @@ async fn login(
     // Create a new session and cookie
     let session = super::session::create(&pool, user.id(), SESSION_LIFE_TIME).await?;
 
+    // set last activity
+    super::user::update_last_activity_at(&pool, user.id()).await?;
+
     // Log the login event
     audit_service
         .with_user(user.clone())
@@ -460,6 +463,11 @@ async fn user_delete(
             ErrorReference::EntryNotFound,
         ));
     };
+
+    // prevent deleting the last admin user
+    if user.role() == Role::Administrator && super::user::count_admins(&pool).await? <= 1 {
+        return Err(AuthenticationError::LastAdminCannotBeDeleted.into());
+    }
 
     let deleted = super::user::delete(&pool, user_id).await?;
 

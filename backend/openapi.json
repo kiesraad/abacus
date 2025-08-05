@@ -4824,6 +4824,7 @@
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
           "InvalidXml",
+          "LastAdminCannotBeDeleted",
           "PasswordRejection",
           "PdfGenerationError",
           "PollingStationRepeated",

@@ -196,10 +196,10 @@ async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   ),
 )]
 async fn initialised(State(pool): State<SqlitePool>) -> Result<impl IntoResponse, APIError> {
-    if super::user::get_active_user_count(&pool).await? == 0 {
-        Err(AuthenticationError::NotInitialised.into())
-    } else {
+    if super::user::has_active_users(&pool).await? {
         Ok(StatusCode::OK)
+    } else {
+        Err(AuthenticationError::NotInitialised.into())
     }
 }
 

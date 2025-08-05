@@ -367,18 +367,14 @@ pub async fn list(conn: impl DbConnLike<'_>) -> Result<Vec<User>, Error> {
 }
 
 /// Fetch the first admin user ever created
-pub async fn get_active_user_count(conn: impl DbConnLike<'_>) -> Result<u32, AuthenticationError> {
-    let row = sqlx::query!(
-        r#"
-        SELECT COUNT(*) AS "count: u32"
-        FROM users
-        WHERE last_activity_at IS NOT NULL
-        "#,
+pub async fn has_active_users(conn: impl DbConnLike<'_>) -> Result<bool, AuthenticationError> {
+    let result = sqlx::query!(
+        r#"SELECT 1 AS 'exists' FROM users WHERE last_activity_at IS NOT NULL LIMIT 1"#,
     )
-    .fetch_one(conn)
+    .fetch_optional(conn)
     .await?;
 
-    Ok(row.count)
+    Ok(result.is_some())
 }
 
 pub async fn username_by_id(conn: impl DbConnLike<'_>, user_id: u32) -> Result<String, Error> {
@@ -627,14 +623,17 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
-    async fn test_get_active_user_count(pool: SqlitePool) {
-        let count = super::get_active_user_count(&pool).await.unwrap();
-        assert_eq!(count, 2);
+    async fn test_has_active_users(pool: SqlitePool) {
+        let result = super::has_active_users(&pool).await.unwrap();
+        assert!(result);
 
-        let user = User::test_user(Role::Typist, 5);
-        user.update_last_activity_at(&pool).await.unwrap();
+        // delete all users
+        sqlx::query!("DELETE FROM users")
+            .execute(&pool)
+            .await
+            .unwrap();
 
-        let count = super::get_active_user_count(&pool).await.unwrap();
-        assert_eq!(count, 3);
+        let result = super::has_active_users(&pool).await.unwrap();
+        assert!(!result);
     }
 }

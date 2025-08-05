@@ -26,6 +26,7 @@ export function UserDelete({ user, onDeleted, onError }: UserDeleteProps) {
     void remove().then((result) => {
       if (!isSuccess(result)) {
         onError(result);
+        setShowModal(false);
       } else {
         onDeleted();
       }

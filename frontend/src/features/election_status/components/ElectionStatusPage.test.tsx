@@ -441,4 +441,29 @@ describe("ElectionStatusPage", () => {
     await expectConflictErrorPage();
     expect(console.error).toHaveBeenCalled();
   });
+
+  test("Refetches data every 30 seconds", async () => {
+    vi.useFakeTimers();
+    await renderPage();
+
+    // Wait for the page to be loaded
+    await vi.waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+    });
+
+    const electionRequestSpy = spyOnHandler(ElectionRequestHandler);
+    const electionStatusRequestSpy = spyOnHandler(ElectionStatusRequestHandler);
+
+    // Test 3 intervals of 30 seconds each
+    for (let i = 1; i <= 3; i++) {
+      vi.advanceTimersByTime(30_000);
+
+      await vi.waitFor(() => {
+        expect(electionRequestSpy).toHaveBeenCalledTimes(i);
+        expect(electionStatusRequestSpy).toHaveBeenCalledTimes(i);
+      });
+    }
+
+    vi.useRealTimers();
+  });
 });

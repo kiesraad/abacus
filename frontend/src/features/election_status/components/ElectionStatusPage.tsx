@@ -37,15 +37,21 @@ export function ElectionStatusPage() {
     throw changeStatusError;
   }
 
-  // re-fetch election when component mounts
+  // re-fetch election and status when component mounts and every 30 seconds
   useEffect(() => {
     const abortController = new AbortController();
 
-    void refetchElection(abortController);
-    void refetchStatuses(abortController);
+    const refetch = () => {
+      void refetchElection(abortController);
+      void refetchStatuses(abortController);
+    };
+
+    refetch();
+    const refetchInterval = setInterval(refetch, 30_000);
 
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
+      clearInterval(refetchInterval);
     };
   }, [refetchElection, refetchStatuses]);
 

@@ -17,6 +17,9 @@ use crate::{
     committee_session::status::{CommitteeSessionStatus, change_committee_session_status},
 };
 
+use crate::eml::EML110;
+use crate::eml::EMLDocument;
+
 pub mod repository;
 pub mod structs;
 
@@ -27,6 +30,8 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_get))
         .routes(routes!(polling_station_update))
         .routes(routes!(polling_station_delete))
+        .routes(routes!(polling_station_validate_import))
+        .routes(routes!(polling_station_import))
 }
 
 /// Polling station list response
@@ -202,6 +207,7 @@ async fn polling_station_update(
 
     Ok((StatusCode::OK, polling_station))
 }
+
 /// Delete a [PollingStation]
 #[utoipa::path(
     delete,
@@ -260,6 +266,85 @@ async fn polling_station_delete(
     }
 
     Ok(StatusCode::OK)
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+pub struct PollingStationFileRequest {
+    data: String,
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct PollingStationRequestListResponse {
+    pub polling_stations: Vec<PollingStationRequest>,
+}
+
+/// Validate a file with Polling Stations
+#[utoipa::path(
+    post,
+    path = "/api/elections/{election_id}/polling_stations/validate-import",
+    request_body = PollingStationFileRequest,
+    responses(
+        (status = 200, description = "Polling stations validated", body = PollingStationRequestListResponse),
+        (status = 400, description = "Bad request", body = ErrorResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+async fn polling_station_validate_import(
+    _user: AdminOrCoordinator,
+    Json(polling_station_request): Json<PollingStationFileRequest>,
+) -> Result<(StatusCode, Json<PollingStationRequestListResponse>), APIError> {
+    Ok((
+        StatusCode::OK,
+        Json(PollingStationRequestListResponse {
+            polling_stations: EML110::from_str(&polling_station_request.data)?
+                .get_polling_stations()?,
+        }),
+    ))
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+pub struct PollingStationsRequest {
+    pub file_name: String,
+    pub polling_stations: Vec<PollingStationRequest>,
+}
+
+/// Import file with Polling Stations
+#[utoipa::path(
+    post,
+    path = "/api/elections/{election_id}/polling_stations/import",
+    request_body = PollingStationsRequest,
+    responses(
+        (status = 200, description = "Polling stations imported", body = PollingStationListResponse),
+        (status = 400, description = "Bad request", body = ErrorResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
+)]
+async fn polling_station_import(
+    _user: AdminOrCoordinator,
+    State(pool): State<SqlitePool>,
+    Path(election_id): Path<u32>,
+    _audit_service: AuditService,
+    Json(polling_stations_request): Json<PollingStationsRequest>,
+) -> Result<(StatusCode, PollingStationListResponse), APIError> {
+    // Create new polling stations
+    let polling_stations = crate::polling_station::repository::create_many(
+        &pool,
+        election_id,
+        polling_stations_request.polling_stations,
+    )
+    .await?;
+
+    Ok((
+        StatusCode::OK,
+        PollingStationListResponse { polling_stations },
+    ))
 }
 
 #[cfg(test)]

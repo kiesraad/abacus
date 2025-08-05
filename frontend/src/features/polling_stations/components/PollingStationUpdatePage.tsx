@@ -104,7 +104,7 @@ export function PollingStationUpdatePage() {
                 onCancel={handleCancel}
               />
 
-              <div className="mt-lg">
+              <div className="mt-md">
                 <Button
                   type="button"
                   variant="tertiary-destructive"

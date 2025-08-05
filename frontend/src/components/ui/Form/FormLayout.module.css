@@ -49,8 +49,11 @@
 }
 
 .rootFieldset {
+  display: flex;
+  flex-direction: column;
   border: none;
   padding: 0;
+  gap: 1.5rem;
 }
 
 .formAlert {

@@ -131,10 +131,11 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
               label={t("users.temporary_password")}
               hint={t("users.temporary_password_hint")}
               error={validationErrors?.temp_password}
+              margin="mb-0"
             />
           </FormLayout.Section>
           <FormLayout.Controls>
-            <Button size="xl" type="submit">
+            <Button size="lg" type="submit">
               {t("save")}
             </Button>
           </FormLayout.Controls>

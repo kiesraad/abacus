@@ -43,9 +43,10 @@ export function UserCreateTypePage() {
       <main>
         <Form onSubmit={handleSubmit}>
           <FormLayout>
-            <FormLayout.Section>
+            <FormLayout.Section title={t("users.type_title")}>
+              <p className="mb-md-lg">{t("users.type_hint")}</p>
               <ChoiceList>
-                <ChoiceList.Title>{t("users.type_title")}</ChoiceList.Title>
+                <ChoiceList.Title>{t("users.type_label")}</ChoiceList.Title>
                 <ChoiceList.Radio
                   id={"role-fullname"}
                   name={"type"}
@@ -60,15 +61,14 @@ export function UserCreateTypePage() {
                   defaultChecked={!fullnameChecked}
                   label={t("users.type_anonymous")}
                 />
-                {t("users.type_hint")}
               </ChoiceList>
             </FormLayout.Section>
+            <FormLayout.Controls>
+              <Button size="lg" type="submit">
+                {t("continue")}
+              </Button>
+            </FormLayout.Controls>
           </FormLayout>
-          <FormLayout.Controls>
-            <Button size="xl" type="submit">
-              {t("continue")}
-            </Button>
-          </FormLayout.Controls>
         </Form>
       </main>
     </>

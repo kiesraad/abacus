@@ -629,12 +629,12 @@ mod tests {
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_get_active_user_count(pool: SqlitePool) {
         let count = super::get_active_user_count(&pool).await.unwrap();
-        assert_eq!(count, 0);
+        assert_eq!(count, 2);
 
-        let user = User::test_user(Role::Administrator, 1);
+        let user = User::test_user(Role::Typist, 5);
         user.update_last_activity_at(&pool).await.unwrap();
 
         let count = super::get_active_user_count(&pool).await.unwrap();
-        assert_eq!(count, 1);
+        assert_eq!(count, 3);
     }
 }

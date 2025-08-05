@@ -9,12 +9,7 @@ import { LoginForm } from "./LoginForm";
 export function LoginPage() {
   const isInitialised = useIsInitialised();
 
-  if (isInitialised === undefined) {
-    // Still loading, return nothing
-    return null;
-  }
-
-  if (!isInitialised) {
+  if (isInitialised === false) {
     return <Navigate to="/account/initialise" replace />;
   }
 

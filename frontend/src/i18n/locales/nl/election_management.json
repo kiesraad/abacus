@@ -2,7 +2,7 @@
   "about_this_election": "Over deze verkiezing",
   "about_to_stop_data_entry": "Je staat op het punt het invoeren van stemmen te stoppen.",
   "add_polling_stations_first": "De invoerfase kan pas gestart worden als er stembureaus zijn toegevoegd.",
-  "add_the_location": "Vul de plaatsnaam in. Bijvoorbeeld <i>Amersfoort</i>",
+  "add_the_location": "Vul de plaatsnaam in. Bijvoorbeeld <em>Amersfoort</em>",
   "add_the_date_and_time": "Voer de datum en tijd in waarop de zitting van het gemeentelijke stembureau officieel is geopend.",
   "committee_session_details": "Details van de zitting",
   "custom_committee_session_details": "Details van {sessionLabel}",

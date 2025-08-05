@@ -1,6 +1,4 @@
 .formLayout {
-  margin-bottom: var(--space-md);
-
   h1,
   h2,
   h3,
@@ -43,10 +41,13 @@
 }
 
 .rootFieldset {
-  display: flex;
-  flex-direction: column;
   border: none;
   padding: 0;
+}
+
+.rootFieldset:not(.noGap) {
+  display: flex;
+  flex-direction: column;
   gap: 2.5rem;
 }
 

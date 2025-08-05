@@ -73,7 +73,7 @@ export function LoginForm() {
         void handleSubmit(e);
       }}
     >
-      <FormLayout>
+      <FormLayout noGap>
         {notification && (
           <FormLayout.Alert>
             <Alert type="notify">
@@ -89,29 +89,33 @@ export function LoginForm() {
             </Alert>
           </FormLayout.Alert>
         )}
-        <InputField
-          name="username"
-          label={t("account.username")}
-          hint={t("account.username_login_hint")}
-          readOnly={loading}
-          required={true}
-          value={username}
-          onChange={(e) => {
-            setUsername(e.target.value);
-          }}
-        />
-        <InputField
-          name="password"
-          label={t("account.password")}
-          hint={t("account.password_login_hint")}
-          type="password"
-          readOnly={loading}
-          required={true}
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-        />
+        <FormLayout.Section>
+          <InputField
+            name="username"
+            label={t("account.username")}
+            hint={t("account.username_login_hint")}
+            readOnly={loading}
+            required={true}
+            value={username}
+            onChange={(e) => {
+              setUsername(e.target.value);
+            }}
+            margin="mb-lg"
+          />
+          <InputField
+            name="password"
+            label={t("account.password")}
+            hint={t("account.password_login_hint")}
+            type="password"
+            readOnly={loading}
+            required={true}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+            margin="mb-lg"
+          />
+        </FormLayout.Section>
       </FormLayout>
       <BottomBar type="footer">
         <BottomBar.Row>

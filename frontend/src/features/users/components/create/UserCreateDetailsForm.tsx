@@ -37,9 +37,9 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
     const formData = new StringFormData(event.currentTarget);
 
     const user: CreateUserRequest = {
-      role: role,
+      role,
       username: formData.getString("username"),
-      fullname: formData.getString("fullname"),
+      fullname: formData.has("fullname") ? formData.getString("fullname") : undefined,
       temp_password: formData.getString("temp_password"),
     };
 

@@ -41,7 +41,8 @@
   "type": {
     "FixedLocation": "Vaste locatie",
     "Mobile": "Mobiel",
-    "Special": "Bijzonder (afwijkende openingstijden)",
+    "Special": "Bijzonder",
+    "SpecialExplanation": "Bijzonder (afwijkende openingstijden)",
     "Unknown": "Onbekend"
   },
   "unsaved_changes_title": "Let op: niet opgeslagen wijzigingen",

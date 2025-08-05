@@ -374,7 +374,7 @@ Geen checks.
 
 ### Checks voor totalen (reeks W.2xx)
 
-#### CSO en DSO | W.201 aantal blanco stemmen is groter of gelijk aan 3% van het totaal uitgebrachte stemmen
+#### CSO en DSO | W.201 aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal uitgebrachte stemmen
 
 > Invoerder: **Controleer aantal blanco stemmen** (W.201)  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
@@ -386,7 +386,7 @@ Veld markeren: F
 
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=137-3939&t=zTY4ajWtsFkiTOYP-4)
 
-#### CSO en DSO | W.202: Aantal ongeldige stemmen is groter of gelijk aan 3% van het totaal uitgebrachte stemmen
+#### CSO en DSO | W.202: Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal uitgebrachte stemmen
 
 > Invoerder: **Controleer aantal ongeldige stemmen** (W.202)
 > Check of je het papieren proces-verbaal goed hebt overgenomen.

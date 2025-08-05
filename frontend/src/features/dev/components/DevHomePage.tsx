@@ -72,9 +72,6 @@ function AdministratorCoordinatorLinks() {
             <li>
               <Link to={`/users`}>{t("users.management")}</Link>
             </li>
-            <li>
-              <Link to={`/workstations`}>{t("workstations.manage")}</Link>
-            </li>
           </>
         )}
         <li>

@@ -193,8 +193,6 @@
 
   --badge-polling-station: var(--base-white);
   --badge-polling-station-bg: #4a75ba;
-  --badge-workstation: var(--base-brand-blue);
-  --badge-workstation-bg: var(--bg-gray-darker);
   --badge-first-entry: #93370d;
   --badge-first-entry-bg: #fef0c7;
   --badge-second-entry: #095c37;

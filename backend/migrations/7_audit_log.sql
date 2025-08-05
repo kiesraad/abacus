@@ -6,7 +6,6 @@ CREATE TABLE audit_log
     event_name         TEXT            NOT NULL,
     event_level        TEXT            CHECK( event_level IN ('error','warning','info','success') ) NOT NULL DEFAULT 'info',
     message            TEXT            ,
-    workstation        INTEGER         ,
     ip                 TEXT            ,
     user_id            INTEGER         ,
     username           TEXT            ,

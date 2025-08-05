@@ -299,7 +299,6 @@ export interface AuditLogEvent {
   userId?: number;
   userRole?: Role;
   username?: string;
-  workstation?: number;
 }
 
 export interface AuditLogListResponse {

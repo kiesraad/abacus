@@ -12,8 +12,7 @@
     "message": "Toelichting",
     "since": "Sinds",
     "time": "Tijdstip",
-    "user": "Gebruiker: id, gebruikersnaam (rol)",
-    "workstation": "Werkplek"
+    "user": "Gebruiker: id, gebruikersnaam (rol)"
   },
   "filter": {
     "event": "Gebeurtenis",

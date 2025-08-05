@@ -15,6 +15,7 @@ import extra_investigation from "./extra_investigation.json";
 import feedback from "./feedback.json";
 import form_errors from "./form_errors.json";
 import generic from "./generic.json";
+import initialise from "./initialise.json";
 import log from "./log.json";
 import messages from "./messages.json";
 import polling_station from "./polling_station.json";
@@ -44,6 +45,7 @@ const nl = {
   error,
   feedback,
   form_errors,
+  initialise,
   log,
   messages,
   polling_station,

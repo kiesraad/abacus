@@ -7,6 +7,7 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
+import { StringFormData } from "@/utils/stringFormData";
 
 import { UserType } from "../../hooks/UserCreateContext";
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
@@ -24,9 +25,9 @@ export function UserCreateTypePage() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const formData = new StringFormData(event.currentTarget);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const type = formData.get("type") as UserType;
+    const type = formData.getString("type") as UserType;
 
     setType(type);
     void navigate("/users/create/details");

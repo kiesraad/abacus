@@ -9,16 +9,15 @@ import { AccountSetupForm } from "./AccountSetupForm";
 
 export function AccountSetupPage() {
   const navigate = useNavigate();
-
   const { user, setUser } = useApiState();
-
-  if (!user) {
-    return <Navigate to="/account/login" />;
-  }
 
   function handleSaved(user: LoginResponse) {
     setUser(user);
     void navigate("/elections#new-account");
+  }
+
+  if (!user) {
+    return <Navigate to="/account/login" />;
   }
 
   return (

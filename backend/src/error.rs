@@ -254,6 +254,14 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
+                    AuthenticationError::AlreadyInitialised => (
+                        StatusCode::FORBIDDEN,
+                        to_error(
+                            "Application already initialised",
+                            ErrorReference::Forbidden,
+                            false,
+                        ),
+                    ),
                     AuthenticationError::UserNotFound => (
                         StatusCode::UNAUTHORIZED,
                         to_error("User not found", ErrorReference::UserNotFound, false),

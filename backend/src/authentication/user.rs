@@ -377,6 +377,17 @@ pub async fn has_active_users(conn: impl DbConnLike<'_>) -> Result<bool, Authent
     Ok(result.is_some())
 }
 
+pub async fn admin_exists(conn: impl DbConnLike<'_>) -> Result<bool, AuthenticationError> {
+    let result = sqlx::query!(
+        r#"SELECT 1 AS 'exists' FROM users WHERE role = ? LIMIT 1"#,
+        Role::Administrator
+    )
+    .fetch_optional(conn)
+    .await?;
+
+    Ok(result.is_some())
+}
+
 pub async fn username_by_id(conn: impl DbConnLike<'_>, user_id: u32) -> Result<String, Error> {
     Ok(
         sqlx::query!("SELECT username FROM users WHERE id = ?", user_id)
@@ -634,6 +645,21 @@ mod tests {
             .unwrap();
 
         let result = super::has_active_users(&pool).await.unwrap();
+        assert!(!result);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_admin_exists(pool: SqlitePool) {
+        let result = super::admin_exists(&pool).await.unwrap();
+        assert!(result);
+
+        // delete all users
+        sqlx::query!("DELETE FROM users")
+            .execute(&pool)
+            .await
+            .unwrap();
+
+        let result = super::admin_exists(&pool).await.unwrap();
         assert!(!result);
     }
 }

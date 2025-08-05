@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 import { useApiState } from "@/api/useApiState";
 import { t } from "@/i18n/translate";
@@ -6,15 +6,23 @@ import { t } from "@/i18n/translate";
 import cls from "./NavBar.module.css";
 import { NavBarLinks } from "./NavBarLinks";
 
-type NavBarProps = { location: { pathname: string } };
+interface NavBarProps {
+  location?: { pathname: string };
+  empty?: boolean;
+}
 
-export function NavBar({ location }: NavBarProps) {
+export function NavBar({ location, empty }: NavBarProps) {
   const { user } = useApiState();
+  const currentLocation = useLocation();
+
+  if (empty) {
+    return <nav aria-label="primary-navigation" className={cls.navBar} />;
+  }
 
   return (
     <nav aria-label="primary-navigation" className={cls.navBar}>
       <div className={cls.links}>
-        <NavBarLinks location={location} />
+        <NavBarLinks location={location || currentLocation} />
       </div>
       <div className={cls.userInfo}>
         {user ? (

@@ -449,7 +449,7 @@ pub async fn user_update(
     ),
 )]
 async fn user_delete(
-    _user: Admin,
+    logged_in_user: Admin,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<u32>,
@@ -460,6 +460,11 @@ async fn user_delete(
             ErrorReference::EntryNotFound,
         ));
     };
+
+    // Prevent user from deleting their own account
+    if logged_in_user.0.id() == user_id {
+        return Err(AuthenticationError::OwnAccountCannotBeDeleted.into());
+    }
 
     let deleted = super::user::delete(&pool, user_id).await?;
 

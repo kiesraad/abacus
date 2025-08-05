@@ -1,4 +1,5 @@
 import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
+import fs from "fs";
 
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
@@ -6,8 +7,8 @@ import {
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
   COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   Election,
-  ELECTION_CREATE_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PATH,
+  ELECTION_IMPORT_REQUEST_PATH,
   ElectionDetailsResponse,
   POLLING_STATION_CREATE_REQUEST_PATH,
   POLLING_STATION_GET_REQUEST_PATH,
@@ -20,11 +21,11 @@ import {
 import { DataEntryApiClient } from "./helpers-utils/api-clients";
 import { completePollingStationDataEntries, loginAs } from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
+import { eml110a, eml230b } from "./test-data/eml-files";
 import {
   dataEntryRequest,
   dataEntryWithDifferencesRequest,
   dataEntryWithErrorRequest,
-  electionRequest,
   pollingStationRequests,
 } from "./test-data/request-response-templates";
 
@@ -91,10 +92,17 @@ export const test = base.extend<Fixtures>({
   },
   emptyElection: async ({ request }, use) => {
     await loginAs(request, "admin1");
-    // override the current storage state
-    // create an election with no polling stations
-    const url: ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
-    const electionResponse = await request.post(url, { data: electionRequest });
+    const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
+    const election_data = fs.readFileSync(eml110a.path, "utf8");
+    const candidate_data = fs.readFileSync(eml230b.path, "utf8");
+    const electionResponse = await request.post(url, {
+      data: {
+        election_data,
+        election_hash: eml110a.fullHash,
+        candidate_data,
+        candidate_hash: eml230b.fullHash,
+      },
+    });
     expect(electionResponse.ok()).toBeTruthy();
     const election = (await electionResponse.json()) as Election;
 

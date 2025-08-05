@@ -29,8 +29,7 @@ export function NumberOfVotersForm({ defaultValue, instructions, hint, button, o
       <Form onSubmit={handleSubmit}>
         <FormLayout>
           <FormLayout.Section title={t("election_management.how_many_voters")}>
-            <p>{instructions}</p>
-
+            <p className="mb-md-lg">{instructions}</p>
             <InputField
               id="number_of_voters"
               name="number_of_voters"
@@ -41,13 +40,12 @@ export function NumberOfVotersForm({ defaultValue, instructions, hint, button, o
               defaultValue={defaultValue || ""}
               margin="mb-0"
             />
-
-            <FormLayout.Controls>
-              <Button size="lg" type="submit">
-                {button}
-              </Button>
-            </FormLayout.Controls>
           </FormLayout.Section>
+          <FormLayout.Controls>
+            <Button size="lg" type="submit">
+              {button}
+            </Button>
+          </FormLayout.Controls>
         </FormLayout>
       </Form>
     </>

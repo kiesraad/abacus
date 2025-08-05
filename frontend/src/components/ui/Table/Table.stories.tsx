@@ -51,6 +51,35 @@ export const NumberCellTable: StoryFn = () => (
   </Table>
 );
 
+export const InformationTable: StoryFn = () => (
+  <div className="w-39">
+    <Table variant="information">
+      <Table.Body>
+        <Table.Row>
+          <Table.Cell>Verkiezing</Table.Cell>
+          <Table.Cell>Gemeenteraadsverkiezing 2026</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>Kiesgebied</Table.Cell>
+          <Table.Cell>045 – Gemeente Juinen</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>Lijsten en kandidaten</Table.Cell>
+          <Table.Cell>18 lijsten met 764 kandidaten</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>Aantal kiesgerechtigden</Table.Cell>
+          <Table.Cell>24.000</Table.Cell>
+        </Table.Row>
+      </Table.Body>
+    </Table>
+
+    <p className="mt-xl">
+      NB: Table variant <i>information</i> does not have a first column with a larger font size.
+    </p>
+  </div>
+);
+
 export const StyledTable: StoryFn = () => (
   <Table id="styled_table">
     <Table.Header className="bg-gray">

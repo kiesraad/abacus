@@ -21,10 +21,6 @@
 
 .electionInformationTable {
   width: 58.5rem;
-
-  th[scope="row"] {
-    font-size: var(--font-size-md);
-  }
 }
 
 .reportInfoSection {

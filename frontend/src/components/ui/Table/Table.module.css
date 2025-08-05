@@ -103,7 +103,7 @@
 }
 
 /* Row header and first cell in the row large font, using `:where()` to give it lowest specificity */
-:where(.table th[scope="row"]),
-:where(.table td:first-child) {
+:where(.table.defaultVariant th[scope="row"]),
+:where(.table.defaultVariant td:first-child) {
   font-size: var(--font-size-lg);
 }

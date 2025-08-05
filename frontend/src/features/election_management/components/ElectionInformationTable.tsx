@@ -29,7 +29,11 @@ export function ElectionInformationTable({
   numberOfVoters,
 }: ElectionInformationTableProps) {
   return (
-    <Table id="election-information-table" className={cn(cls.table, cls.electionInformationTable)}>
+    <Table
+      id="election-information-table"
+      variant="information"
+      className={cn(cls.table, cls.electionInformationTable)}
+    >
       <Table.Body>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">

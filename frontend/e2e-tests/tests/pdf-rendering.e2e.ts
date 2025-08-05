@@ -37,7 +37,7 @@ test.describe("report pdf rendering", () => {
   });
 });
 
-test.describe("template pdf rendering", () => {
+test.describe("template pdf rendering Na 31-2", () => {
   test("it downloads a zip with pdf templates", async ({ page, completedElection }) => {
     await page.goto(`/elections/${completedElection.id}`);
 
@@ -47,6 +47,20 @@ test.describe("template pdf rendering", () => {
     const download = await downloadPromise;
 
     expect(download.suggestedFilename()).toBe("GR2026_Test_Location_na_31_2_bijlage1.zip");
+    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+  });
+});
+
+test.describe("template pdf rendering N 10-2", () => {
+  test("it downloads a zip with pdf templates", async ({ page, completedElection }) => {
+    await page.goto(`/elections/${completedElection.id}`);
+
+    const ElectionHomePage = new ElectionHome(page);
+    const downloadPromise = page.waitForEvent("download");
+    await ElectionHomePage.downloadN10_2.click();
+    const download = await downloadPromise;
+
+    expect(download.suggestedFilename()).toBe("GR2026_Test_Location_n_10_2.zip");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 });

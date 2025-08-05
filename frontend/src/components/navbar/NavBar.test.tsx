@@ -81,7 +81,6 @@ describe("NavBar", () => {
     { pathname: "/users" },
     { pathname: "/users/create" },
     { pathname: "/users/create/details" },
-    { pathname: "/workstations" },
     { pathname: "/logs" },
     { pathname: "/elections/1" },
     { pathname: "/elections/create" },
@@ -90,7 +89,6 @@ describe("NavBar", () => {
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Werkplekken" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
   });
 
@@ -165,7 +163,6 @@ describe("NavBar", () => {
     await user.click(menuButton);
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Werkplekken" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
 
     // menu should hide after clicking outside it

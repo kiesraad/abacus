@@ -3,7 +3,7 @@ import { Fragment, ReactElement, useId } from "react";
 import { Table } from "@/components/ui/Table/Table";
 import { ResolveDifferencesAction } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { formatNumber, validateNumberString } from "@/utils/format";
+import { formatNumber, validateNumberString } from "@/utils/number";
 
 import cls from "./ResolveDifferences.module.css";
 

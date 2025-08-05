@@ -63,6 +63,12 @@ export interface ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS {
 }
 export type ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
 
+// /api/elections/{election_id}/download_n_10_2
+export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_DOWNLOAD_N_10_2_REQUEST_PATH = `/api/elections/${number}/download_n_10_2`;
+
 // /api/elections/{election_id}/download_na_31_2_bijlage1
 export interface ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PARAMS {
   election_id: number;
@@ -293,7 +299,6 @@ export interface AuditLogEvent {
   userId?: number;
   userRole?: Role;
   username?: string;
-  workstation?: number;
 }
 
 export interface AuditLogListResponse {
@@ -532,16 +537,20 @@ export interface Election {
 export interface ElectionAndCandidateDefinitionValidateRequest {
   candidate_data?: string | null;
   candidate_hash?: string[];
+  counting_method?: VoteCountingMethod;
   election_data: string;
   election_hash?: string[];
+  number_of_voters?: number;
   polling_station_data?: string;
 }
 
 export interface ElectionAndCandidatesDefinitionImportRequest {
   candidate_data: string;
   candidate_hash: string[];
+  counting_method?: VoteCountingMethod;
   election_data: string;
   election_hash: string[];
+  number_of_voters?: number;
   polling_station_data?: string;
 }
 
@@ -693,6 +702,7 @@ export type ErrorReference =
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
   | "InvalidXml"
+  | "OwnAccountCannotBeDeleted"
   | "PasswordRejection"
   | "PdfGenerationError"
   | "PollingStationRepeated"

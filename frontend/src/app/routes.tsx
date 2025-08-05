@@ -20,7 +20,6 @@ import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
 import { resolveErrorsRoutes } from "@/features/resolve_errors/routes";
 import { usersRoutes } from "@/features/users/routes";
-import { workstationsRoutes } from "@/features/workstations/routes";
 
 import { RootLayout } from "./RootLayout";
 
@@ -84,7 +83,6 @@ export const routes: RouteObject[] = [
           { path: "dev", children: devRoutes },
           { path: "logs", children: logsRoutes },
           { path: "users", children: usersRoutes },
-          { path: "workstations", children: workstationsRoutes },
         ],
       },
     ],

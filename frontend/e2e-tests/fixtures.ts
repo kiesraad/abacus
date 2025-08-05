@@ -3,6 +3,8 @@ import { APIRequestContext, test as base, expect, Page } from "@playwright/test"
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
+  COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
+  COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   Election,
   ELECTION_CREATE_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PATH,
@@ -116,9 +118,19 @@ export const test = base.extend<Fixtures>({
     // Set committee session status to DataEntryInProgress
     await loginAs(request, "coordinator1");
     const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${response.committee_session.id}/status`;
-    const data: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
-    const statusChangeResponse = await request.put(statusChangeUrl, { data: data });
+    const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
+    const statusChangeResponse = await request.put(statusChangeUrl, { data: statusChangeData });
     expect(statusChangeResponse.ok()).toBeTruthy();
+
+    // Fill in committee session details
+    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${response.committee_session.id}`;
+    const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
+      location: "Den Haag",
+      start_date: "2026-03-18",
+      start_time: "21:45",
+    };
+    const detailsUpdateResponse = await request.put(detailsUpdateUrl, { data: detailsUpdateData });
+    expect(detailsUpdateResponse.ok()).toBeTruthy();
 
     await use(response);
   },

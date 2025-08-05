@@ -192,6 +192,7 @@ async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   request_body = AccountUpdateRequest,
   responses(
       (status = 200, description = "The logged in user", body = LoginResponse),
+      (status = 400, description = "Bad request", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
@@ -343,6 +344,7 @@ pub struct UpdateUserRequest {
     request_body = CreateUserRequest,
     responses(
         (status = 201, description = "User created", body = User),
+        (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
@@ -402,6 +404,7 @@ async fn user_get(
     request_body = UpdateUserRequest,
     responses(
         (status = 200, description = "User updated", body = User),
+        (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
@@ -449,7 +452,7 @@ pub async fn user_update(
     ),
 )]
 async fn user_delete(
-    _user: Admin,
+    logged_in_user: Admin,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<u32>,
@@ -460,6 +463,11 @@ async fn user_delete(
             ErrorReference::EntryNotFound,
         ));
     };
+
+    // Prevent user from deleting their own account
+    if logged_in_user.0.id() == user_id {
+        return Err(AuthenticationError::OwnAccountCannotBeDeleted.into());
+    }
 
     let deleted = super::user::delete(&pool, user_id).await?;
 

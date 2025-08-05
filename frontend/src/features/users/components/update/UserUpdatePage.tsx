@@ -8,6 +8,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
+import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import { User, USER_GET_REQUEST_PATH } from "@/types/generated/openapi";
 
@@ -16,6 +17,7 @@ import { UserUpdateForm } from "./UserUpdateForm";
 
 export function UserUpdatePage() {
   const navigate = useNavigate();
+  const loggedInUser = useUser();
   const userId = useNumericParam("userId");
   const { requestState: getUser } = useInitialApiGet<User>(`/api/user/${userId}` satisfies USER_GET_REQUEST_PATH);
   const [error, setError] = useState<AnyApiError>();
@@ -33,6 +35,7 @@ export function UserUpdatePage() {
   }
 
   const user = getUser.data;
+  const itsMe = loggedInUser?.user_id === userId;
 
   function handleSaved({ fullname, username }: User) {
     const updatedMessage = t("users.user_updated_details", { fullname: fullname || username });
@@ -61,12 +64,14 @@ export function UserUpdatePage() {
         <article>
           {error && (
             <FormLayout.Alert>
-              <Alert type="error">{t(`error.api_error.${error.reference}`)}</Alert>
+              <Alert type="error">
+                <p>{t(`error.api_error.${error.reference}`)}</p>
+              </Alert>
             </FormLayout.Alert>
           )}
 
           <UserUpdateForm user={user} onSaved={handleSaved} onAbort={handleAbort} />
-          <UserDelete user={user} onDeleted={handleDeleted} onError={setError} />
+          {!itsMe && <UserDelete user={user} onDeleted={handleDeleted} onError={setError} />}
         </article>
       </main>
     </>

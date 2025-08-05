@@ -48,6 +48,7 @@ pub enum ErrorReference {
     InvalidVoteCandidate,
     InvalidVoteGroup,
     InvalidXml,
+    OwnAccountCannotBeDeleted,
     PasswordRejection,
     PdfGenerationError,
     PollingStationRepeated,
@@ -273,6 +274,14 @@ impl IntoResponse for APIError {
                         StatusCode::BAD_REQUEST,
                         to_error("Invalid password", ErrorReference::PasswordRejection, false),
                     ),
+                    AuthenticationError::OwnAccountCannotBeDeleted => (
+                        StatusCode::FORBIDDEN,
+                        to_error(
+                            "Cannot delete your own account",
+                            ErrorReference::OwnAccountCannotBeDeleted,
+                            false,
+                        ),
+                    ),
                     // server errors
                     AuthenticationError::Database(_)
                     | AuthenticationError::HashPassword(_)
@@ -354,19 +363,23 @@ impl IntoResponse for APIError {
                             true,
                         ),
                     ),
-                    CommitteeSessionError::InvalidStatusTransition => (
-                        StatusCode::CONFLICT,
-                        to_error(
-                            "Invalid committee session state transition",
-                            ErrorReference::InvalidStateTransition,
-                            true,
-                        ),
-                    ),
                     CommitteeSessionError::InvalidCommitteeSessionStatus => (
                         StatusCode::CONFLICT,
                         to_error(
                             "Invalid committee session status",
                             ErrorReference::InvalidCommitteeSessionStatus,
+                            true,
+                        ),
+                    ),
+                    CommitteeSessionError::InvalidDetails => (
+                        StatusCode::BAD_REQUEST,
+                        to_error("Invalid details", ErrorReference::InvalidData, false),
+                    ),
+                    CommitteeSessionError::InvalidStatusTransition => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Invalid committee session state transition",
+                            ErrorReference::InvalidStateTransition,
                             true,
                         ),
                     ),

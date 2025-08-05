@@ -3,66 +3,16 @@ import { describe, expect, test } from "vitest";
 import { t } from "@/i18n/translate";
 
 import {
-  deformatNumber,
+  convertNLDateToISODate,
   formatDateTime,
   formatDateTimeFull,
   formatFullDateWithoutTimezone,
-  formatNumber,
   formatTimeToGo,
-  validateNumberString,
-} from "./format";
+  isValidNLDate,
+  isValidTime,
+} from "./dateTime";
 
-describe("Format util", () => {
-  test.each([
-    ["0", "0"],
-    ["000", "0"],
-    ["8", "8"],
-    ["10", "10"],
-    ["1000", "1.000"],
-    ["12345", "12.345"],
-    ["123456", "123.456"],
-    ["1000000", "1.000.000"],
-  ])("Number validate, format and deformat string %j as %j", (input: string, expected: string) => {
-    expect(validateNumberString(input)).toBe(true);
-    expect(formatNumber(input)).toBe(expected);
-    expect(deformatNumber(expected)).toBe(parseInt(input, 10));
-  });
-
-  test.each([
-    ["", ""],
-    ["0", "0"],
-    ["000", "0"],
-    ["8", "8"],
-    ["10", "10"],
-    ["1000", "1.000"],
-    ["12345", "12.345"],
-    ["123456", "123.456"],
-    ["1000000", "1.000.000"],
-    [0, ""],
-    [10, "10"],
-    [10_000, "10.000"],
-    [null, ""],
-    [undefined, ""],
-  ])("Number format %j as %j", (input: string | number | null | undefined, expected: string) => {
-    expect(formatNumber(input)).toBe(expected);
-  });
-
-  test.each([
-    ["", 0],
-    ["0", 0],
-    ["000", 0],
-    ["8", 8],
-    ["10", 10],
-    ["1.000", 1_000],
-    ["12.345", 12_345],
-    ["123.456", 123_456],
-    ["1000000", 1_000_000],
-    ["1.000.000", 1_000_000],
-    ["x", NaN],
-  ])("Deformat number %j as %j", (input: string, expected: number) => {
-    expect(deformatNumber(input)).toBe(expected);
-  });
-
+describe("DateTime util", () => {
   const today = new Date();
   today.setHours(10, 20);
   const yesterday = new Date(today);
@@ -117,5 +67,34 @@ describe("Format util", () => {
     [1337 * 60 + 42, "1337 minuten en 42 seconden"],
   ])("Time to go %s formatted as %s", (input: number, expected: string) => {
     expect(formatTimeToGo(input)).toBe(expected);
+  });
+
+  test.each([
+    ["31-12-2025", true],
+    ["12-31-2025", false],
+    ["2025-12-31", false],
+    ["31 januari 2025", false],
+    ["", false],
+  ])("NL date %s is valid %s", (input: string, expected: boolean) => {
+    expect(isValidNLDate(input)).toEqual(expected);
+  });
+
+  test.each([
+    ["09:15", true],
+    ["9:15", false],
+    ["9 uur", false],
+    ["", false],
+  ])("Time %s is valid %s", (input: string, expected: boolean) => {
+    expect(isValidTime(input)).toEqual(expected);
+  });
+
+  test("convert date should work for valid NL date format", () => {
+    expect(convertNLDateToISODate("31-12-2025")).toEqual("2025-12-31");
+  });
+
+  test("convert date should throw error for invalid NL date format", () => {
+    expect(() => {
+      convertNLDateToISODate("2025-12-31");
+    }).toThrowError("Error: 2025-12-31 has an invalid date format, should be: dd-mm-yyyy");
   });
 });

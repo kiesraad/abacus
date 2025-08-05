@@ -76,7 +76,7 @@ export function LoginForm() {
       <FormLayout>
         {notification && (
           <FormLayout.Alert>
-            <Alert type="notify" margin="mb-lg">
+            <Alert type="notify">
               <h2>{t(`${notification}_title`)}</h2>
               <p>{tx(notification)}</p>
             </Alert>
@@ -84,7 +84,7 @@ export function LoginForm() {
         )}
         {error && (
           <FormLayout.Alert>
-            <Alert type="error" margin="mb-lg">
+            <Alert type="error">
               <h2>{t(`error.api_error.${error.reference}`)}</h2>
             </Alert>
           </FormLayout.Alert>

@@ -92,7 +92,7 @@ async fn test_committee_session_update_works(pool: SqlitePool) {
         .header("cookie", coordinator_cookie)
         .json(&CommitteeSessionUpdateRequest {
             location: "Juinen".to_string(),
-            start_date: "25-10-2025".to_string(),
+            start_date: "2026-03-18".to_string(),
             start_time: "10:45".to_string(),
         })
         .send()
@@ -107,6 +107,43 @@ async fn test_committee_session_update_works(pool: SqlitePool) {
     );
 }
 
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_committee_session_update_bad_request(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/committee_sessions/2");
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", &coordinator_cookie)
+        .json(&CommitteeSessionUpdateRequest {
+            location: "".to_string(),
+            start_date: "".to_string(),
+            start_time: "".to_string(),
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", &coordinator_cookie)
+        .json(&CommitteeSessionUpdateRequest {
+            location: "Juinen".to_string(),
+            start_date: "25-10-2025".to_string(),
+            start_time: "10:45".to_string(),
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_committee_session_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -118,7 +155,7 @@ async fn test_committee_session_update_not_found(pool: SqlitePool) {
         .header("cookie", coordinator_cookie)
         .json(&CommitteeSessionUpdateRequest {
             location: "Juinen".to_string(),
-            start_date: "25-10-2025".to_string(),
+            start_date: "2025-10-25".to_string(),
             start_time: "10:45".to_string(),
         })
         .send()

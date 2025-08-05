@@ -1,6 +1,6 @@
 import { t } from "@/i18n/translate";
 
-export function committeeSessionLabel(sessionNumber: number): string {
+export function committeeSessionLabel(sessionNumber: number, addArticle = false): string {
   const sessionString = sessionNumber.toString();
   if (
     sessionString === "1" ||
@@ -9,7 +9,7 @@ export function committeeSessionLabel(sessionNumber: number): string {
     sessionString === "4" ||
     sessionString === "5"
   ) {
-    return `${t(`committee_session_status.number.${sessionString}`)} ${t(`committee_session_status.session`).toLowerCase()}`;
+    return `${addArticle ? `${t("committee_session_status.the")} ` : ""}${t(`committee_session_status.number.${sessionString}`)} ${t(`committee_session_status.session`).toLowerCase()}`;
   } else {
     return `${t("committee_session_status.session")} ${sessionString}`;
   }

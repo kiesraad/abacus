@@ -117,9 +117,6 @@ components:
   - name: "(Frontend) Modules/users"
     include:
       - ".*/frontend/src/features/users/.*"
-  - name: "(Frontend) Modules/workstations"
-    include:
-      - ".*/frontend/src/features/workstations/.*"
 
   - name: "(Frontend) Lib/API"
     include:

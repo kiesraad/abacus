@@ -1,4 +1,3 @@
-import { IconPlus } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
 import { Circle } from "@/components/ui/Icon/Circle";
 import { Progress } from "@/components/ui/ProgressBar/Progress";
@@ -40,12 +39,11 @@ export function ElectionStatus({ statuses, election, pollingStations, addLinks, 
             <Button
               size="md"
               variant="secondary"
-              leftIcon={<IconPlus />}
               onClick={() => {
                 navigate(`/elections/${election.id}/polling-stations`);
               }}
             >
-              {t("election_status.add_polling_station")}
+              {t("polling_station.title.plural")}
             </Button>
           </div>
         </div>

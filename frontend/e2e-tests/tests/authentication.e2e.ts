@@ -1,10 +1,11 @@
 import { expect } from "@playwright/test";
-import { NavBar } from "e2e-tests/page-objects/nav_bar/NavBarPgObj";
 
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
 import { AccountSetupPgObj } from "../page-objects/authentication/AccountSetupPgObj";
 import { LoginPgObj } from "../page-objects/authentication/LoginPgObj";
 import { OverviewPgObj } from "../page-objects/election/OverviewPgObj";
+import { AdminNavBar } from "../page-objects/nav_bar/AdminNavBarPgObj";
+import { TypistNavBar } from "../page-objects/nav_bar/TypistNavBarPgObj";
 
 test.describe("authentication", () => {
   test("login happy path", async ({ page }) => {
@@ -17,7 +18,7 @@ test.describe("authentication", () => {
 
     await page.waitForURL("/elections");
 
-    const navBar = new NavBar(page);
+    const navBar = new AdminNavBar(page);
     await expect(navBar.username).toHaveText("Sanne Molenaar");
     await expect(navBar.role).toHaveText("(Beheerder)");
   });
@@ -51,7 +52,7 @@ test.describe("authentication", () => {
     await accountSetupPage.passwordRepeat.fill(password);
     await accountSetupPage.nextBtn.click();
 
-    const navBar = new NavBar(page);
+    const navBar = new TypistNavBar(page);
     await expect(navBar.username).toHaveText(newTypist.fullname!);
 
     const overviewPage = new OverviewPgObj(page);

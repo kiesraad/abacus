@@ -1,12 +1,17 @@
 import { type Locator, type Page } from "@playwright/test";
 
-import { NavBar } from "./NavBarPgObj";
-
-export class AdminNavBar extends NavBar {
+export class AdminNavBar {
+  readonly logout: Locator;
+  readonly navigation: Locator;
+  readonly username: Locator;
+  readonly role: Locator;
   readonly electionOverviewButton: Locator;
 
   constructor(protected readonly page: Page) {
-    super(page);
+    this.navigation = page.getByRole("navigation", { name: "primary-navigation" });
+    this.logout = this.navigation.getByRole("link", { name: "Afmelden" });
+    this.username = this.navigation.getByTestId("navbar-username");
+    this.role = this.navigation.getByTestId("navbar-role");
     this.electionOverviewButton = page.getByRole("link", { name: "Verkiezingen" });
   }
 }

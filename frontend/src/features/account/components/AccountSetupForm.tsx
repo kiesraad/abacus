@@ -44,11 +44,13 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
 
     const passwordRepeat = formData.getString("password_repeat");
     const errors = validateUpdateUser(account, passwordRepeat);
-    setValidationErrors(errors);
 
     if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
       return;
     }
+
+    setValidationErrors(null);
 
     void update(account).then((result) => {
       if (isSuccess(result)) {

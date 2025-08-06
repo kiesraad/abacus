@@ -38,11 +38,13 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
 
     const passwordRepeat = formData.getString("password_repeat");
     const errors = validateCreateUser(account, passwordRepeat);
-    setValidationErrors(errors);
 
     if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
       return;
     }
+
+    setValidationErrors(null);
 
     void create(account).then((result) => {
       if (isSuccess(result)) {

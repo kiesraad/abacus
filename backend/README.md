@@ -51,7 +51,7 @@ Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the proje
 
 ### Testing
 
-Use `cargo test` to run the tests. The tests are also run in a GitHub Actions workflow.
+Use `cargo test --features embed-typst` to run the tests. The tests are also run in a GitHub Actions workflow.
 
 ### Air gap detection
 

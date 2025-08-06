@@ -244,9 +244,9 @@ Veld markeren: I en/of J (als gevuld)
 
 #### CSO | F.306 (Als D < H) `I <> H - D`
 // TODO DSO
-> Invoerder: **Controleer I (stembiljetten meer geteld)** (F.305)
+> Invoerder: **Controleer I (stembiljetten meer geteld)** (F.306)
 
-> Coördinator: **Controleer I (stembiljetten meer geteld)** (F.305)  
+> Coördinator: **Controleer I (stembiljetten meer geteld)** (F.306)  
 > Herstel de fout door op papier het juiste getal in te (laten) vullen.
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
@@ -256,9 +256,9 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 #### CSO | F.307 (Als D < H) J is ingevuld
 // TODO DSO
-> Invoerder: **Controleer I en J** (F.306)
+> Invoerder: **Controleer I en J** (F.307)
 
-> Coördinator: **Controleer of I en J verwisseld zijn** (F.306)  
+> Coördinator: **Controleer of I en J verwisseld zijn** (F.307)  
 > Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan. 
@@ -268,9 +268,9 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 #### CSO | F.308 (Als D > H) `J <> D - H`
 // TODO DSO
-> Invoerder: **Controleer J** (F.307)
+> Invoerder: **Controleer J** (F.308)
 
-> Coördinator: **Controleer J (stembiljetten meer geteld)** (F.307)  
+> Coördinator: **Controleer J (stembiljetten meer geteld)** (F.308)  
 > Herstel de fout door op papier het juiste getal in te (laten) vullen.
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
@@ -280,9 +280,9 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 #### CSO | F.309 (Als D > H) I is ingevuld
 // TODO DSO
-> Invoerder: **Controleer I en J** (F.308)  
+> Invoerder: **Controleer I en J** (F.309)  
 
-> Coördinator: **Controleer of I en J verwisseld zijn** (F.308)  
+> Coördinator: **Controleer of I en J verwisseld zijn** (F.309)  
 > Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.
 > Controleer ook of het verschil nog volledig verklaard is.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
@@ -292,17 +292,17 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 #### CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
 // TODO DSO
-> Invoerder: **Controleer je antwoorden** (F.309)  
+> Invoerder: **Controleer je antwoorden** (F.310)  
 
-> Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.309)
+> Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.310)
 
 Veld markeren: 3.3.2
 
 #### DSO | F.311 (2.2.3 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap 'controles en correcties' is niet aangevinkt)
 
-> Invoerder: **Controleer je antwoorden** (F.310)
+> Invoerder: **Controleer je antwoorden** (F.311)
  
-> Coördinator: **Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen** (F.310)
+> Coördinator: **Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen** (F.311)
 
 Veld markeren: 2.3.2  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).

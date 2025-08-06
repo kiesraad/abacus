@@ -234,7 +234,15 @@ Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-#### CSO | F.305 (Als D < H) `I <> H - D`
+#### CSO | F.305 (Als D = H) I en/of J zijn ingevuld
+// TODO DSO
+> Invoerder: // TODO
+
+> Coördinator: // TODO
+
+Veld markeren: I en/of J (als gevuld)
+
+#### CSO | F.306 (Als D < H) `I <> H - D`
 // TODO DSO
 > Invoerder: **Controleer I (stembiljetten meer geteld)** (F.305)
 
@@ -246,7 +254,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 Veld markeren: I  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-#### CSO | F.306 (Als D < H en J is ingevuld) `I <> H - D`
+#### CSO | F.307 (Als D < H) J is ingevuld
 // TODO DSO
 > Invoerder: **Controleer I en J** (F.306)
 
@@ -258,8 +266,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 Veld markeren: I, J  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-
-#### CSO | F.307 (Als D > H) `J <> D - H`
+#### CSO | F.308 (Als D > H) `J <> D - H`
 // TODO DSO
 > Invoerder: **Controleer J** (F.307)
 
@@ -271,7 +278,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 Veld markeren: J  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-#### CSO | F.308 (Als D > H en I is ingevuld) `J <> D - H`
+#### CSO | F.309 (Als D > H) I is ingevuld
 // TODO DSO
 > Invoerder: **Controleer I en J** (F.308)  
 
@@ -283,7 +290,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 Veld markeren: I, J  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-#### CSO | F.309 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+#### CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
 // TODO DSO
 > Invoerder: **Controleer je antwoorden** (F.309)  
 
@@ -291,7 +298,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 Veld markeren: 3.3.2
 
-#### DSO | F.310 (2.2.3 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap 'controles en correcties' is niet aangevinkt)
+#### DSO | F.311 (2.2.3 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap 'controles en correcties' is niet aangevinkt)
 
 > Invoerder: **Controleer je antwoorden** (F.310)
  

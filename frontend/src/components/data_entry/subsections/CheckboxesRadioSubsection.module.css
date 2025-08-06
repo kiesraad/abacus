@@ -2,9 +2,14 @@
   width: 37.5rem;
   margin-bottom: 2rem;
 
-  legend {
+  legend,
+  p {
     font-size: var(--font-size-md);
     color: var(--gray-900);
     margin-bottom: 1rem;
+  }
+
+  legend {
+    font-weight: 700;
   }
 }

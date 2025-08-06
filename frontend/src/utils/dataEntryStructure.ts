@@ -123,7 +123,7 @@ export const extraInvestigationSection: DataEntrySection = {
     },
     {
       type: "checkboxes",
-      title: t("extra_investigation.extra_investigation_other_reason.title"),
+      description: t("extra_investigation.extra_investigation_other_reason.description"),
       short_title: t("extra_investigation.extra_investigation_other_reason.short_title"),
       error_path: "extra_investigation.extra_investigation_other_reason",
       error_message: t("extra_investigation.validation_error"),
@@ -143,7 +143,7 @@ export const extraInvestigationSection: DataEntrySection = {
     },
     {
       type: "checkboxes",
-      title: t("extra_investigation.ballots_recounted_extra_investigation.title"),
+      description: t("extra_investigation.ballots_recounted_extra_investigation.description"),
       short_title: t("extra_investigation.ballots_recounted_extra_investigation.short_title"),
       error_path: "extra_investigation.ballots_recounted_extra_investigation",
       error_message: t("extra_investigation.validation_error"),

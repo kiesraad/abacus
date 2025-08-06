@@ -462,6 +462,19 @@ export interface CommitteeSessionUpdateRequest {
   start_time: string;
 }
 
+/**
+ * Counting Differences Polling Station,
+ * part of the polling station results ("B1-2 Verschillen met telresultaten van het stembureau")
+ */
+export interface CountingDifferencesPollingStation {
+  /** Whether there was a difference between the total votes per list as determined by the polling station and by the typist
+("Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?") */
+  difference_ballots_per_list: YesNo;
+  /** Whether there was an unexplained difference between the number of voters and votes
+("Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?") */
+  unexplained_difference_ballots_voters: YesNo;
+}
+
 export interface CreateUserRequest {
   fullname?: string;
   role: Role;
@@ -980,6 +993,8 @@ export interface PollingStationRequestListResponse {
  * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
  */
 export interface PollingStationResults {
+  /** Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau") */
+  counting_differences_polling_station: CountingDifferencesPollingStation;
   /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
   differences_counts: DifferencesCounts;
   /** Extra investigation ("B1-1 Extra onderzoek") */

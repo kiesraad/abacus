@@ -59,6 +59,8 @@ pub struct PollingStationResultsEntry {
 pub struct PollingStationResults {
     /// Extra investigation ("B1-1 Extra onderzoek")
     pub extra_investigation: ExtraInvestigation,
+    /// Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau")
+    pub counting_differences_polling_station: CountingDifferencesPollingStation,
     /// Voters counts ("1. Aantal toegelaten kiezers")
     pub voters_counts: VotersCounts,
     /// Votes counts ("2. Aantal getelde stembiljetten")
@@ -205,6 +207,19 @@ pub struct ExtraInvestigation {
     /// Whether ballots were (partially) recounted following the extra investigation
     /// ("Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?")
     pub ballots_recounted_extra_investigation: YesNo,
+}
+
+/// Counting Differences Polling Station,
+/// part of the polling station results ("B1-2 Verschillen met telresultaten van het stembureau")
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct CountingDifferencesPollingStation {
+    /// Whether there was an unexplained difference between the number of voters and votes
+    /// ("Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?")
+    pub unexplained_difference_ballots_voters: YesNo,
+    /// Whether there was a difference between the total votes per list as determined by the polling station and by the typist
+    /// ("Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?")
+    pub difference_ballots_per_list: YesNo,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]

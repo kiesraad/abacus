@@ -57,6 +57,14 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
 
     let request_body = json!({
       "data": {
+        "extra_investigation": {
+          "extra_investigation_other_reason": { "yes": false, "no": false },
+          "ballots_recounted_extra_investigation": { "yes": false, "no": false },
+        },
+        "counting_differences_polling_station": {
+          "unexplained_difference_ballots_voters": { "yes": false, "no": false },
+          "difference_ballots_per_list": { "yes": false, "no": false },
+        },
         "voters_counts": {
           "poll_card_count": 4,
           "proxy_certificate_count": 2,
@@ -106,17 +114,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
               }
             ]
           }
-        ],
-        "extra_investigation": {
-          "extra_investigation_other_reason": {
-            "yes": false,
-            "no": false
-          },
-          "ballots_recounted_extra_investigation": {
-            "yes": false,
-            "no": false
-          }
-        }
+        ]
       },
       "progress": 60,
       "client_state": {"foo": "bar"}

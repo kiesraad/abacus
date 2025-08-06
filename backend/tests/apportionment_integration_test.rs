@@ -19,7 +19,6 @@ use abacus::{
     data_entry::{
         DataEntry, PollingStationResults, VotersCounts, VotesCounts, status::ClientState,
     },
-    election::ElectionWithPoliticalGroups,
 };
 
 pub mod shared;
@@ -209,63 +208,17 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
     assert_eq!(body.error, "Drawing of lots is required");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("users", "election_6_no_polling_stations")
+)))]
 async fn test_election_apportionment_error_apportionment_not_available_no_polling_stations(
     pool: SqlitePool,
 ) {
     let addr: std::net::SocketAddr = serve_api(pool).await;
-    let cookie = shared::admin_login(&addr).await;
-
-    // Create election without polling stations
-    let response = reqwest::Client::new()
-        .post(format!("http://{addr}/api/elections"))
-        .header("cookie", cookie)
-        .json(&serde_json::json!({
-            "name": "Test Election",
-            "counting_method": "CSO",
-            "election_id": "TestElection_2026",
-            "location": "Test Location",
-            "domain_id": "0000",
-            "category": "Municipal",
-            "number_of_seats": 29,
-            "election_date": "2026-01-01",
-            "nomination_date": "2026-01-01",
-            "political_groups": [
-          {
-            "number": 1,
-            "name": "Political Group A",
-            "candidates": [
-              {
-                "number": 1,
-                "initials": "A.",
-                "first_name": "Alice",
-                "last_name": "Foo",
-                "locality": "Amsterdam",
-                "gender": "Female"
-              },
-              {
-                "number": 2,
-                "initials": "C.",
-                "first_name": "Charlie",
-                "last_name": "Doe",
-                "locality": "Rotterdam",
-                "gender": null
-              }
-            ]
-          }
-        ]
-        }))
-        .send()
-        .await
-        .unwrap();
-    assert_eq!(response.status(), StatusCode::CREATED);
-    let election: ElectionWithPoliticalGroups = response.json().await.unwrap();
 
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let url = format!(
-        "http://{}/api/elections/{}/apportionment",
-        addr, election.id
-    );
+    let url = format!("http://{addr}/api/elections/6/apportionment");
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", coordinator_cookie)

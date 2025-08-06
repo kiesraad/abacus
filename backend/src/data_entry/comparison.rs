@@ -10,6 +10,18 @@ pub trait Compare {
 
 impl Compare for PollingStationResults {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        self.extra_investigation.compare(
+            &first_entry.extra_investigation,
+            different_fields,
+            &path.field("extra_investigation"),
+        );
+
+        self.counting_differences_polling_station.compare(
+            &first_entry.counting_differences_polling_station,
+            different_fields,
+            &path.field("counting_differences_polling_station"),
+        );
+
         self.voters_counts.compare(
             &first_entry.voters_counts,
             different_fields,
@@ -32,12 +44,6 @@ impl Compare for PollingStationResults {
             &first_entry.political_group_votes,
             different_fields,
             &path.field("political_group_votes"),
-        );
-
-        self.extra_investigation.compare(
-            &first_entry.extra_investigation,
-            different_fields,
-            &path.field("extra_investigation"),
         );
     }
 }

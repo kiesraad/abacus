@@ -32,7 +32,7 @@ interface LogDetailsModalProps {
 
 export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
   const filteredDetails = Object.entries(details.event).filter(
-    ([k]) => k !== "eventType" && hasTranslation(`log.field.${k}`),
+    ([k]) => k !== "event_type" && hasTranslation(`log.field.${k}`),
   );
 
   return (

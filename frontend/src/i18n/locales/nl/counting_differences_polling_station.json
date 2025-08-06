@@ -1,0 +1,16 @@
+{
+  "form_title": "Verschillen met telresultaten van het stembureau",
+  "short_title": "Verschillen met stembureau",
+  "form_description": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+  "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+  "unexplained_difference_ballots_voters": {
+    "title": "2.1  Aantallen kiezers en stemmen",
+    "description": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?",
+    "short_title": "Verschil tussen getelde stembiljetten en toegelaten kiezers?"
+  },
+  "difference_ballots_per_list": {
+    "title": "2.3 Tellingen op lijstniveau",
+    "description": "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
+    "short_title": "Verschil tussen totalen per lijst op stembureau en gemeentelijk stembureau?"
+  }
+}

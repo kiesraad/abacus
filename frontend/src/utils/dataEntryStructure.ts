@@ -163,6 +163,60 @@ export const extraInvestigationSection: DataEntrySection = {
   ],
 };
 
+export const countingDifferencesPollingStation: DataEntrySection = {
+  id: "counting_differences_polling_station",
+  title: t("counting_differences_polling_station.form_title"),
+  short_title: t("counting_differences_polling_station.short_title"),
+  sectionNumber: "B1-2",
+  subsections: [
+    {
+      type: "message",
+      message: t("counting_differences_polling_station.form_description"),
+    },
+    {
+      type: "checkboxes",
+      title: t("counting_differences_polling_station.unexplained_difference_ballots_voters.title"),
+      description: t("counting_differences_polling_station.unexplained_difference_ballots_voters.description"),
+      short_title: t("counting_differences_polling_station.unexplained_difference_ballots_voters.short_title"),
+      error_path: "counting_differences_polling_station.unexplained_difference_ballots_voters",
+      error_message: t("counting_differences_polling_station.validation_error"),
+      options: [
+        {
+          path: "counting_differences_polling_station.unexplained_difference_ballots_voters.yes",
+          label: t("yes"),
+          short_label: t("yes"),
+          autoFocusInput: true,
+        },
+        {
+          path: "counting_differences_polling_station.unexplained_difference_ballots_voters.no",
+          label: t("no"),
+          short_label: t("no"),
+        },
+      ],
+    },
+    {
+      type: "checkboxes",
+      title: t("counting_differences_polling_station.difference_ballots_per_list.title"),
+      description: t("counting_differences_polling_station.difference_ballots_per_list.description"),
+      short_title: t("counting_differences_polling_station.difference_ballots_per_list.short_title"),
+      error_path: "counting_differences_polling_station.difference_ballots_per_list",
+      error_message: t("counting_differences_polling_station.validation_error"),
+      options: [
+        {
+          path: "counting_differences_polling_station.difference_ballots_per_list.yes",
+          label: t("yes"),
+          short_label: t("yes"),
+        },
+        {
+          path: "counting_differences_polling_station.difference_ballots_per_list.no",
+          label: t("no"),
+          short_label: t("no"),
+        },
+      ],
+    },
+  ],
+};
+
 /**
  * Creates political group sections based on election data
  * @param election ElectionWithPoliticalGroups object
@@ -209,6 +263,7 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
 function buildDataEntryStructure(election: ElectionWithPoliticalGroups): DataEntryStructure {
   return [
     extraInvestigationSection,
+    countingDifferencesPollingStation,
     votersAndVotesSection,
     differencesSection,
     ...createPoliticalGroupSections(election),
@@ -222,7 +277,7 @@ function buildDataEntryStructure(election: ElectionWithPoliticalGroups): DataEnt
  * but the number of sections and their order do not change.
  *
  * @param election ElectionWithPoliticalGroups object
- * @param pollingStationResults PollingStationResults object (optional)
+ * @param _pollingStationResults PollingStationResults object (optional)
  * @returns Complete array of all data entry sections
  */
 export function getDataEntryStructure(
@@ -237,8 +292,8 @@ export function getDataEntryStructure(
  * Returns all data entry sections for differences rendering (with two data entries).
  *
  * @param election ElectionWithPoliticalGroups object
- * @param firstEntry First data entry
- * @param secondEntry Second data entry
+ * @param _firstEntry First data entry
+ * @param _secondEntry Second data entry
  * @returns Complete array of all data entry sections
  */
 export function getDataEntryStructureForDifferences(

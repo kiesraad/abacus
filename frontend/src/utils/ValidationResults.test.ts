@@ -68,11 +68,29 @@ describe("doesValidationResultApplyToSection", () => {
     ],
   };
 
+  const countingDifferencesPollingStationW001: ValidationResult = {
+    code: "W001",
+    fields: [
+      "data.counting_differences_polling_station.unexplained_difference_ballots_voters.yes",
+      "data.counting_differences_polling_station.difference_ballots_per_list.no",
+    ],
+  };
+
   test("should return true when validation result applies to section", () => {
     const dataEntryStructure = getDataEntryStructure(electionMockData);
 
     const extraInvestigationSection = dataEntryStructure.find((s) => s.id === "extra_investigation")!;
     expect(doesValidationResultApplyToSection(extraInvestigationW001, extraInvestigationSection)).toBe(true);
+
+    const countingDifferencesPollingStationSection = dataEntryStructure.find(
+      (s) => s.id === "counting_differences_polling_station",
+    )!;
+    expect(
+      doesValidationResultApplyToSection(
+        countingDifferencesPollingStationW001,
+        countingDifferencesPollingStationSection,
+      ),
+    ).toBe(true);
 
     const votersVotesSection = dataEntryStructure.find((s) => s.id === "voters_votes_counts")!;
     expect(doesValidationResultApplyToSection(validationResultMockData.F201, votersVotesSection)).toBe(true);
@@ -91,12 +109,22 @@ describe("doesValidationResultApplyToSection", () => {
     const extraInvestigationSection = dataEntryStructure.find((s) => s.id === "extra_investigation")!;
     expect(doesValidationResultApplyToSection(validationResultMockData.F201, extraInvestigationSection)).toBe(false);
 
+    const countingDifferencesPollingStationSection = dataEntryStructure.find(
+      (s) => s.id === "counting_differences_polling_station",
+    )!;
+    expect(
+      doesValidationResultApplyToSection(validationResultMockData.F201, countingDifferencesPollingStationSection),
+    ).toBe(false);
+
     const differencesSection = dataEntryStructure.find((s) => s.id === "differences_counts")!;
     expect(doesValidationResultApplyToSection(extraInvestigationW001, differencesSection)).toBe(false);
     expect(doesValidationResultApplyToSection(validationResultMockData.F201, differencesSection)).toBe(false);
     expect(doesValidationResultApplyToSection(validationResultMockData.F202, differencesSection)).toBe(false);
 
     const politicalGroupSection1 = dataEntryStructure.find((s) => s.id === "political_group_votes_1")!;
+    expect(doesValidationResultApplyToSection(countingDifferencesPollingStationW001, politicalGroupSection1)).toBe(
+      false,
+    );
     expect(doesValidationResultApplyToSection(validationResultMockData.F301, politicalGroupSection1)).toBe(false);
 
     const politicalGroupSection2 = dataEntryStructure.find((s) => s.id === "political_group_votes_2")!;

@@ -242,7 +242,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 Veld markeren: I en/of J (als gevuld)
 
-#### CSO | F.306 (Als D < H) `I <> H - D`
+#### CSO | F.306 (Als H > D) `I <> H - D`
 // TODO DSO
 > Invoerder: **Controleer I (stembiljetten meer geteld)** (F.306)
 
@@ -254,7 +254,7 @@ Veld markeren: I en/of J (als gevuld)
 Veld markeren: I  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-#### CSO | F.307 (Als D < H) J is ingevuld
+#### CSO | F.307 (Als H > D) J is ingevuld
 // TODO DSO
 > Invoerder: **Controleer I en J** (F.307)
 
@@ -266,7 +266,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 Veld markeren: I, J  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-#### CSO | F.308 (Als D > H) `J <> D - H`
+#### CSO | F.308 (Als H < D) `J <> D - H`
 // TODO DSO
 > Invoerder: **Controleer J** (F.308)
 
@@ -278,7 +278,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 Veld markeren: J  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-#### CSO | F.309 (Als D > H) I is ingevuld
+#### CSO | F.309 (Als H < D) I is ingevuld
 // TODO DSO
 > Invoerder: **Controleer I en J** (F.309)  
 

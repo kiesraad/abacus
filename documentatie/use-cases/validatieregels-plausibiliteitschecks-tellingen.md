@@ -324,7 +324,7 @@ Velden markeren: totaal van de lijst
 N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding _bij invoerders_ onderaan de pagina, onder het totaal-veld ([Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11))  
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
-#### CSO | F.402 `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
+#### CSO | F.402 (Als totaal aantal stemmen op een lijst niet leeg of 0 is) `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
 // TODO DSO
 > Invoerder: **Controleer ingevoerde aantallen** (F.402)  
 > De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.  

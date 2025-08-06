@@ -23,12 +23,18 @@ import { usersRoutes } from "@/features/users/routes";
 
 import { RootLayout } from "./RootLayout";
 
+const showDevPage = __SHOW_DEV_PAGE__;
+
 export const routes: RouteObject[] = [
   {
     Component: RootLayout,
     errorElement: <ErrorBoundary />,
     children: [
-      { index: true, path: "/", element: <Navigate to="/dev" replace /> },
+      {
+        index: true,
+        path: "/",
+        element: showDevPage ? <Navigate to="/dev" replace /> : <Navigate to="/account/login" replace />,
+      },
       { path: "account", children: accountRoutes },
       {
         path: "elections",
@@ -80,9 +86,9 @@ export const routes: RouteObject[] = [
       {
         Component: AdministratorLayout,
         children: [
-          { path: "dev", children: devRoutes },
           { path: "logs", children: logsRoutes },
           { path: "users", children: usersRoutes },
+          ...(showDevPage ? [{ path: "dev", children: devRoutes }] : []),
         ],
       },
     ],

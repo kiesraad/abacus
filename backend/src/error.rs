@@ -24,6 +24,7 @@ use crate::{
 #[serde(deny_unknown_fields)]
 pub enum ErrorReference {
     AirgapViolation,
+    NotInitialised,
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     CommitteeSessionPaused,
@@ -242,6 +243,14 @@ impl IntoResponse for APIError {
                         to_error(
                             "Username already exists",
                             ErrorReference::UsernameNotUnique,
+                            false,
+                        ),
+                    ),
+                    AuthenticationError::NotInitialised => (
+                        StatusCode::IM_A_TEAPOT,
+                        to_error(
+                            "Application not initialised",
+                            ErrorReference::NotInitialised,
                             false,
                         ),
                     ),

@@ -35,6 +35,8 @@ import {
   ElectionListResponse,
   ElectionStatusResponse,
   ErrorResponse,
+  INITIALISED_REQUEST_PARAMS,
+  INITIALISED_REQUEST_PATH,
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PARAMS,
   LOGIN_REQUEST_PATH,
@@ -204,6 +206,11 @@ export const ElectionStatusRequestHandler = http.get<
 export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse, LOGIN_REQUEST_PATH>(
   "/api/user/login",
   () => HttpResponse.json(loginResponseMockData, { status: 200 }),
+);
+
+export const InitialisedHandler = http.get<INITIALISED_REQUEST_PARAMS, INITIALISED_REQUEST_PATH>(
+  "/api/initialised",
+  () => HttpResponse.text("", { status: 200 }),
 );
 
 export const PollingStationDataEntryGetDifferencesHandler = http.get<

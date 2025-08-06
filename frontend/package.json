@@ -10,6 +10,7 @@
     "dev": "npm run check-server && vite",
     "dev:msw": "cross-env API_MODE=mock vite",
     "build": "vite build --config vite-prod.config.ts",
+    "build:prod": "cross-env SHOW_DEV_PAGE=false vite build --config vite-prod.config.ts",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "tsc && cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettier": "prettier --ignore-unknown --write .",

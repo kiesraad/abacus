@@ -17,8 +17,7 @@ use crate::{
     committee_session::status::{CommitteeSessionStatus, change_committee_session_status},
 };
 
-use crate::eml::EML110;
-use crate::eml::EMLDocument;
+use crate::eml::{EML110, EMLDocument};
 
 pub mod repository;
 pub mod structs;

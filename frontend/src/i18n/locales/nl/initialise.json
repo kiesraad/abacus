@@ -13,5 +13,6 @@
   "username_login_hint": "De naam die je zojuist hebt ingesteld",
   "password_login_hint": "Het wachtwoord dat je zojuist hebt gekozen",
   "password": "Kies een wachtwoord",
-  "password_hint": "Gebruik minimaal 13 karakters. Het wachtwoord is hoofdlettergevoelig."
+  "password_hint": "Gebruik minimaal 13 karakters. Het wachtwoord is hoofdlettergevoelig.",
+  "password_rules": "Het wachtwoord moet minimaal 13 karakters lang zijn."
 }

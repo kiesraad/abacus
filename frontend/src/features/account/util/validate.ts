@@ -45,11 +45,11 @@ export function validateCreateUser(
   }
 
   if (accountUpdate.temp_password.length === 0) {
-    errors.password = t("account.password_rules");
+    errors.password = t("initialise.password_rules");
   }
 
   if (accountUpdate.temp_password !== passwordRepeat) {
-    errors.password = t("account.password_rules");
+    errors.password = t("initialise.password_rules");
     errors.password_repeat = t("account.password_mismatch");
   }
 

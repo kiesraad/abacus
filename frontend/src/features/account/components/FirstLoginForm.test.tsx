@@ -2,7 +2,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { LoginHandler } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
+import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 
 import { FirstLoginForm } from "./FirstLoginForm";
@@ -10,7 +10,7 @@ import { FirstLoginForm } from "./FirstLoginForm";
 const prev = vi.fn();
 
 describe("FirstLoginForm", () => {
-  test("Create the first admin user", async () => {
+  test("Login for the first time", async () => {
     server.use(LoginHandler);
     const login = spyOnHandler(LoginHandler);
 
@@ -27,5 +27,23 @@ describe("FirstLoginForm", () => {
       username: "username",
       password: "password*password",
     });
+  });
+
+  test("Login for the first time error", async () => {
+    overrideOnce("post", "/api/user/login", 400, {
+      error: "Invalid credentials",
+      fatal: false,
+    });
+
+    render(<FirstLoginForm prev={prev} />);
+
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText("Gebruikersnaam"), "username");
+    await user.type(screen.getByLabelText("Wachtwoord"), "password*password");
+
+    const submitButton = screen.getByRole("button", { name: "Inloggen" });
+    await user.click(submitButton);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("De gebruikersnaam of het wachtwoord is onjuist");
   });
 });

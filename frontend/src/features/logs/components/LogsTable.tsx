@@ -33,16 +33,16 @@ export function LogsTable({ events, setDetails }: LogsTableProps) {
           >
             <Table.Cell>{event.id}</Table.Cell>
             <Table.Cell>{formatDateTime(new Date(event.time), false)}</Table.Cell>
-            <Table.Cell>{t(`log.level.${event.eventLevel}`)}</Table.Cell>
+            <Table.Cell>{t(`log.level.${event.event_level}`)}</Table.Cell>
             <Table.Cell>
-              {t(`log.event.${event.event.eventType}`)}
-              {event.event.eventType == "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
+              {t(`log.event.${event.event.event_type}`)}
+              {event.event.event_type == "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
             </Table.Cell>
             <Table.Cell>
-              {event.userId &&
+              {event.user_id &&
                 event.username &&
-                event.userRole &&
-                `${event.userId}, ${event.username} (${t(event.userRole)})`}
+                event.user_role &&
+                `${event.user_id}, ${event.username} (${t(event.user_role)})`}
             </Table.Cell>
           </Table.ClickRow>
         ))}

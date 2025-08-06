@@ -144,7 +144,7 @@ export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 // /api/log
 export interface AUDIT_LOG_LIST_REQUEST_PARAMS {
   page: number;
-  perPage: number;
+  per_page: number;
   level: string[];
   event: string[];
   user: number[];
@@ -270,47 +270,47 @@ export interface AccountUpdateRequest {
 }
 
 export type AuditEvent =
-  | (UserLoggedInDetails & { eventType: "UserLoggedIn" })
-  | (UserLoginFailedDetails & { eventType: "UserLoginFailed" })
-  | (UserLoggedOutDetails & { eventType: "UserLoggedOut" })
-  | (UserDetails & { eventType: "UserAccountUpdated" })
-  | { eventType: "UserSessionExtended" }
-  | (UserDetails & { eventType: "UserCreated" })
-  | (UserDetails & { eventType: "UserUpdated" })
-  | (UserDetails & { eventType: "UserDeleted" })
-  | (ElectionDetails & { eventType: "ElectionCreated" })
-  | (CommitteeSessionDetails & { eventType: "CommitteeSessionCreated" })
-  | (CommitteeSessionDetails & { eventType: "CommitteeSessionUpdated" })
-  | (ElectionDetails & { eventType: "ApportionmentCreated" })
-  | (PollingStationDetails & { eventType: "PollingStationCreated" })
-  | (PollingStationDetails & { eventType: "PollingStationUpdated" })
-  | (PollingStationDetails & { eventType: "PollingStationDeleted" })
-  | (DataEntryDetails & { eventType: "DataEntryClaimed" })
-  | (DataEntryDetails & { eventType: "DataEntrySaved" })
-  | (DataEntryDetails & { eventType: "DataEntryDeleted" })
-  | (DataEntryDetails & { eventType: "DataEntryFinalised" })
-  | (DataEntryDetails & { eventType: "DataEntryDiscardedFirst" })
-  | (DataEntryDetails & { eventType: "DataEntryResumedFirst" })
-  | (DataEntryDetails & { eventType: "DataEntryKeptFirst" })
-  | (DataEntryDetails & { eventType: "DataEntryKeptSecond" })
-  | (DataEntryDetails & { eventType: "DataEntryDiscardedBoth" })
-  | { eventType: "AirGapViolationDetected" }
-  | { eventType: "AirGapViolationResolved" }
-  | (ErrorDetails & { eventType: "Error" })
-  | { eventType: "UnknownEvent" };
+  | (UserLoggedInDetails & { event_type: "UserLoggedIn" })
+  | (UserLoginFailedDetails & { event_type: "UserLoginFailed" })
+  | (UserLoggedOutDetails & { event_type: "UserLoggedOut" })
+  | (UserDetails & { event_type: "UserAccountUpdated" })
+  | { event_type: "UserSessionExtended" }
+  | (UserDetails & { event_type: "UserCreated" })
+  | (UserDetails & { event_type: "UserUpdated" })
+  | (UserDetails & { event_type: "UserDeleted" })
+  | (ElectionDetails & { event_type: "ElectionCreated" })
+  | (CommitteeSessionDetails & { event_type: "CommitteeSessionCreated" })
+  | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
+  | (ElectionDetails & { event_type: "ApportionmentCreated" })
+  | (PollingStationDetails & { event_type: "PollingStationCreated" })
+  | (PollingStationDetails & { event_type: "PollingStationUpdated" })
+  | (PollingStationDetails & { event_type: "PollingStationDeleted" })
+  | (DataEntryDetails & { event_type: "DataEntryClaimed" })
+  | (DataEntryDetails & { event_type: "DataEntrySaved" })
+  | (DataEntryDetails & { event_type: "DataEntryDeleted" })
+  | (DataEntryDetails & { event_type: "DataEntryFinalised" })
+  | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
+  | (DataEntryDetails & { event_type: "DataEntryResumedFirst" })
+  | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
+  | (DataEntryDetails & { event_type: "DataEntryKeptSecond" })
+  | (DataEntryDetails & { event_type: "DataEntryDiscardedBoth" })
+  | { event_type: "AirGapViolationDetected" }
+  | { event_type: "AirGapViolationResolved" }
+  | (ErrorDetails & { event_type: "Error" })
+  | { event_type: "UnknownEvent" };
 
 export type AuditEventLevel = "info" | "success" | "warning" | "error";
 
 export interface AuditLogEvent {
   event: AuditEvent;
-  eventLevel: AuditEventLevel;
+  event_level: AuditEventLevel;
   id: number;
   ip: string;
   message?: string;
   time: string;
-  userFullname?: string;
-  userId?: number;
-  userRole?: Role;
+  user_fullname?: string;
+  user_id?: number;
+  user_role?: Role;
   username?: string;
 }
 
@@ -318,7 +318,7 @@ export interface AuditLogListResponse {
   events: AuditLogEvent[];
   page: number;
   pages: number;
-  perPage: number;
+  per_page: number;
 }
 
 export interface AuditLogUser {
@@ -401,14 +401,14 @@ export interface CommitteeSessionCreateRequest {
 }
 
 export interface CommitteeSessionDetails {
-  sessionElectionId: number;
-  sessionId: number;
-  sessionLocation: string;
-  sessionNumber: number;
-  sessionNumberOfVoters: number;
-  sessionStartDate: string;
-  sessionStartTime: string;
-  sessionStatus: string;
+  session_election_id: number;
+  session_id: number;
+  session_location: string;
+  session_number: number;
+  session_number_of_voters: number;
+  session_start_date: string;
+  session_start_time: string;
+  session_status: string;
 }
 
 /**
@@ -476,12 +476,12 @@ export interface DataEntry {
 }
 
 export interface DataEntryDetails {
-  dataEntryProgress: number;
-  dataEntryStatus: string;
-  finishedAt?: string | null;
-  firstEntryUserId?: number | null;
-  pollingStationId: number;
-  secondEntryUserId?: number | null;
+  data_entry_progress: number;
+  data_entry_status: string;
+  finished_at?: string | null;
+  first_entry_user_id?: number | null;
+  polling_station_id: number;
+  second_entry_user_id?: number | null;
 }
 
 export interface DataEntryGetDifferencesResponse {
@@ -589,16 +589,16 @@ export interface ElectionDefinitionValidateResponse {
 }
 
 export interface ElectionDetails {
-  electionCategory: string;
-  electionCountingMethod: string;
-  electionDomainId: string;
-  electionElectionDate: string;
-  electionElectionId: string;
-  electionId: number;
-  electionLocation: string;
-  electionName: string;
-  electionNominationDate: string;
-  electionNumberOfSeats: number;
+  election_category: string;
+  election_counting_method: string;
+  election_domain_id: string;
+  election_election_date: string;
+  election_election_id: string;
+  election_id: number;
+  election_location: string;
+  election_name: string;
+  election_nomination_date: string;
+  election_number_of_seats: number;
 }
 
 /**
@@ -911,15 +911,15 @@ export interface PollingStation {
 }
 
 export interface PollingStationDetails {
-  pollingStationAddress: string;
-  pollingStationElectionId: number;
-  pollingStationId: number;
-  pollingStationLocality: string;
-  pollingStationName: string;
-  pollingStationNumber: number;
-  pollingStationNumberOfVoters?: number | null;
-  pollingStationPostalCode: string;
-  pollingStationType?: string;
+  polling_station_address: string;
+  polling_station_election_id: number;
+  polling_station_id: number;
+  polling_station_locality: string;
+  polling_station_name: string;
+  polling_station_number: number;
+  polling_station_number_of_voters?: number | null;
+  polling_station_postal_code: string;
+  polling_station_type?: string;
 }
 
 export interface PollingStationFileRequest {
@@ -1087,7 +1087,7 @@ export interface User {
 export interface UserDetails {
   fullname?: string;
   role: string;
-  userId: number;
+  user_id: number;
   username: string;
 }
 
@@ -1096,16 +1096,16 @@ export interface UserListResponse {
 }
 
 export interface UserLoggedInDetails {
-  loggedInUsersCount: number;
-  userAgent: string;
+  logged_in_users_count: number;
+  user_agent: string;
 }
 
 export interface UserLoggedOutDetails {
-  sessionDuration: number;
+  session_duration: number;
 }
 
 export interface UserLoginFailedDetails {
-  userAgent: string;
+  user_agent: string;
   username: string;
 }
 

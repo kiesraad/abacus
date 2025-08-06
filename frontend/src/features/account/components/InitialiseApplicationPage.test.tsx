@@ -6,8 +6,8 @@ import {
   CreateFirstAdminRequestHandler,
   LoginHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
-import { render, screen } from "@/testing/test-utils";
+import { overrideOnce, server } from "@/testing/server";
+import { render, screen, waitFor } from "@/testing/test-utils";
 
 import { InitialiseApplicationPage } from "./InitialiseApplicationPage";
 
@@ -42,6 +42,21 @@ describe("InitialiseApplicationPage", () => {
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Inloggen met account van beheerder");
 
+    const back = screen.getByText("Stel het account van de beheerder opnieuw in.");
+    await user.click(back);
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Account voor beheerder aanmaken");
+
+    await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
+    await user.type(screen.getByLabelText("Gebruikersnaam"), "firstlast");
+    await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
+    await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
+
+    const submitButton2 = screen.getByRole("button", { name: "Opslaan" });
+    await user.click(submitButton2);
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Inloggen met account van beheerder");
+
     await user.type(screen.getByLabelText("Gebruikersnaam"), "username");
     await user.type(screen.getByLabelText("Wachtwoord"), "password*password");
 
@@ -49,5 +64,15 @@ describe("InitialiseApplicationPage", () => {
     await user.click(loginButton);
 
     expect(navigate).toHaveBeenCalledWith("/elections");
+  });
+
+  test("Go to login if an account was already created", async () => {
+    overrideOnce("get", "/api/initialise/admin-exists", 200, "");
+
+    render(<InitialiseApplicationPage />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Inloggen met account van beheerder");
+    });
   });
 });

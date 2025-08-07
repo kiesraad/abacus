@@ -89,23 +89,26 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
 
   return (
     <div>
-      {isValid && requestState.status === "api-error" && (
-        <FormLayout.Alert>
-          {requestState.error.reference === "EntryNotUnique" ? (
-            <Alert type="error">
-              <h2>
-                {t("polling_station.form.not_unique.title", { number: formRef.current?.elements.number.value || "-1" })}
-              </h2>
-              <p>{t("polling_station.form.not_unique.description")}</p>
-            </Alert>
-          ) : (
-            <Alert type="error">
-              {requestState.error.code}: {requestState.error.message}
-            </Alert>
-          )}
-        </FormLayout.Alert>
-      )}
       <Form onSubmit={handleSubmit} id="polling-station-form" ref={formRef}>
+        {isValid && requestState.status === "api-error" && (
+          <FormLayout.Alert>
+            {requestState.error.reference === "EntryNotUnique" ? (
+              <Alert type="error">
+                <h2>
+                  {t("polling_station.form.not_unique.title", {
+                    number: formRef.current?.elements.number.value || "-1",
+                  })}
+                </h2>
+                <p>{t("polling_station.form.not_unique.description")}</p>
+              </Alert>
+            ) : (
+              <Alert type="error">
+                {requestState.error.code}: {requestState.error.message}
+              </Alert>
+            )}
+          </FormLayout.Alert>
+        )}
+        <h2>{t("polling_station.details")}</h2>
         <FormLayout disabled={requestState.status === "loading"}>
           <FormLayout.Section title={t("general_details")}>
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />
@@ -117,7 +120,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 name="number"
                 label={t("number")}
                 fieldWidth="narrowest"
-                margin="mb-md-lg"
                 defaultValue={pollingStation?.number}
                 error={numberFieldError}
                 hideErrorMessage={
@@ -128,7 +130,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 id="name"
                 name="name"
                 label={t("name")}
-                margin="mb-md-lg"
                 defaultValue={pollingStation?.name}
                 error={validationResult.name ? t(`form_errors.${validationResult.name}`) : undefined}
               />
@@ -179,7 +180,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               label={t("number_of_voters")}
               subtext={t("optional")}
               fieldWidth="full-field-with-narrowest-input"
-              margin="mb-md-lg"
               defaultValue={pollingStation?.number_of_voters}
               error={
                 validationResult.number_of_voters ? t(`form_errors.${validationResult.number_of_voters}`) : undefined
@@ -194,7 +194,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 id="address"
                 name="address"
                 fieldWidth="full"
-                margin="mb-md-lg"
                 label={t("polling_station.address")}
                 defaultValue={pollingStation?.address}
                 error={validationResult.address ? t(`form_errors.${validationResult.address}`) : undefined}
@@ -205,7 +204,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 id="postal_code"
                 name="postal_code"
                 fieldWidth="narrowest"
-                margin="mb-md-lg"
                 label={t("polling_station.postal_code")}
                 defaultValue={pollingStation?.postal_code}
                 error={validationResult.postal_code ? t(`form_errors.${validationResult.postal_code}`) : undefined}
@@ -213,7 +211,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               <InputField
                 id="locality"
                 name="locality"
-                margin="mb-md-lg"
                 label={t("polling_station.locality")}
                 defaultValue={pollingStation?.locality}
                 error={validationResult.locality ? t(`form_errors.${validationResult.locality}`) : undefined}
@@ -226,7 +223,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               {pollingStation ? t("polling_station.form.save_update") : t("polling_station.form.save_create")}
             </Button>
             {pollingStation && onCancel && (
-              <Button type="button" variant="secondary" name="cancel" onClick={onCancel}>
+              <Button variant="secondary" name="cancel" onClick={onCancel}>
                 {t("cancel")}
               </Button>
             )}

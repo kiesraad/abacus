@@ -114,7 +114,6 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
                 <p>{t("users.change_password_hint")}</p>
 
                 <Button
-                  type="button"
                   variant="secondary"
                   size="md"
                   onClick={() => {
@@ -126,16 +125,14 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
                 </Button>
               </FormLayout.Field>
             )}
-
             <FormLayout.Field label={t("role")}>{t(user.role)}</FormLayout.Field>
-
-            <FormLayout.Controls>
-              <Button type="submit">{t("save_changes")}</Button>
-              <Button type="button" variant="secondary" onClick={onAbort}>
-                {t("cancel")}
-              </Button>
-            </FormLayout.Controls>
           </FormLayout.Section>
+          <FormLayout.Controls>
+            <Button type="submit">{t("save_changes")}</Button>
+            <Button variant="secondary" onClick={onAbort}>
+              {t("cancel")}
+            </Button>
+          </FormLayout.Controls>
         </FormLayout>
       </Form>
     </>

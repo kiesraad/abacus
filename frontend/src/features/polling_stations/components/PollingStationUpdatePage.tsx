@@ -105,12 +105,7 @@ export function PollingStationUpdatePage() {
               />
 
               <div className="mt-md">
-                <Button
-                  type="button"
-                  variant="tertiary-destructive"
-                  leftIcon={<IconTrash />}
-                  onClick={toggleShowDeleteModal}
-                >
+                <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleShowDeleteModal}>
                   {t("polling_station.delete")}
                 </Button>
                 {showDeleteModal && (

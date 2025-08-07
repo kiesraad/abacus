@@ -437,7 +437,9 @@ describe("Test PollingStationChoiceForm", () => {
       await renderPollingStationChoiceForm();
 
       const alert = await screen.findByRole("alert");
-      expect(await within(alert).findByRole("heading", { name: "Je hebt nog een openstaande invoer" })).toBeVisible();
+      expect(
+        await within(alert).findByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" }),
+      ).toBeVisible();
 
       const pollingStations = await within(alert).findAllByRole("link");
       expect(pollingStations.map((ps) => ps.textContent)).toEqual(["34 - Testplek", "35 - Testschool"]);

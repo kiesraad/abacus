@@ -42,7 +42,7 @@ const typePage = {
 };
 
 const detailsPage = {
-  title: () => screen.findByRole("heading", { name: "Details van het account" }),
+  title: () => screen.findByRole("heading", { level: 2, name: "Details van het account" }),
   username: () => screen.getByLabelText("Gebruikersnaam"),
   fullname: () => screen.getByLabelText("Volledige naam"),
   fullnameQuery: () => screen.queryByLabelText("Volledige naam"),
@@ -122,7 +122,7 @@ describe("User create pages integration test", () => {
       await user.type(detailsPage.password(), "Geluksdubbeltje10");
       await user.click(detailsPage.save());
 
-      expect(await screen.findByRole("heading", { name: "Gebruikersbeheer" })).toBeInTheDocument();
+      expect(await screen.findByRole("heading", { level: 1, name: "Gebruikersbeheer" })).toBeInTheDocument();
       const alert = screen.getByRole("alert");
       expect(within(alert).getByText("GuusGeluk is toegevoegd met de rol Beheerder")).toBeInTheDocument();
     });

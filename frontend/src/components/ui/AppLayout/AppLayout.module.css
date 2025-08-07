@@ -34,13 +34,9 @@
   > main {
     flex: 1 1 auto;
     display: flex;
-    padding: 2.5rem 5rem 0 5rem;
+    padding: 2.5rem 5rem 5rem 5rem;
     gap: 2rem;
     background-color: var(--bg-gray);
-
-    &:has(+ footer) {
-      padding-bottom: 2.5rem;
-    }
 
     > nav {
       overflow: hidden;
@@ -74,6 +70,7 @@
     padding: 2rem 5rem;
     font-size: var(--font-size-sm);
     line-height: 1.25rem;
+    max-height: 5rem;
     a {
       color: var(--color-help-text);
       text-decoration: none;

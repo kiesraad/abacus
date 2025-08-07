@@ -82,16 +82,11 @@ describe("CommitteeSessionDetailsPage", () => {
     renderPage();
 
     // Check that the labels reflect the first committee session
-    expect(await screen.findByRole("heading", { level: 1, name: "Details van de eerste zitting" })).toBeInTheDocument();
     expect(
-      await screen.findByRole("heading", { level: 2, name: "Waar vindt de eerste zitting plaats?" }),
+      await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
     ).toBeInTheDocument();
-    expect(
-      await screen.findByRole("heading", {
-        level: 2,
-        name: "Wanneer begint de eerste zitting van het gemeentelijk stembureau?",
-      }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Details van de eerste zitting" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 3, name: "Start van de zitting" })).toBeInTheDocument();
 
     // Check that the fields are empty
     const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
@@ -161,14 +156,14 @@ describe("CommitteeSessionDetailsPage", () => {
     renderPage();
 
     // Check that the labels reflect the second committee session
-    expect(await screen.findByRole("heading", { level: 1, name: "Details van de tweede zitting" })).toBeInTheDocument();
     expect(
-      await screen.findByRole("heading", { level: 2, name: "Waar vindt de tweede zitting plaats?" }),
+      await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
     ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Details van de tweede zitting" })).toBeInTheDocument();
     expect(
       await screen.findByRole("heading", {
-        level: 2,
-        name: "Wanneer begint de tweede zitting van het gemeentelijk stembureau?",
+        level: 3,
+        name: "Start van de zitting",
       }),
     ).toBeInTheDocument();
 
@@ -201,7 +196,9 @@ describe("CommitteeSessionDetailsPage", () => {
 
     renderPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Details van de eerste zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
 
@@ -235,7 +232,9 @@ describe("CommitteeSessionDetailsPage", () => {
     await router.navigate("/elections/1/details#redirect-to-report");
     rtlRender(<Providers router={router} />);
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Details van de eerste zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Naar proces-verbaal" }));
 
@@ -269,14 +268,10 @@ describe("CommitteeSessionDetailsPage", () => {
     const router = renderPage();
 
     // Check that the labels reflect the sixth committee session
-    expect(await screen.findByRole("heading", { level: 1, name: "Details van zitting 6" })).toBeInTheDocument();
-    expect(await screen.findByRole("heading", { level: 2, name: "Waar vindt zitting 6 plaats?" })).toBeInTheDocument();
     expect(
-      await screen.findByRole("heading", {
-        level: 2,
-        name: "Wanneer begon zitting 6 van het gemeentelijk stembureau?",
-      }),
+      await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
     ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Details van zitting 6" })).toBeInTheDocument();
 
     await user.click(screen.getByRole("link", { name: "Annuleren" }));
 
@@ -295,7 +290,9 @@ describe("CommitteeSessionDetailsPage", () => {
 
     renderPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Details van de eerste zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
+    ).toBeInTheDocument();
 
     const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
     const date = screen.getByRole("textbox", { name: "Datum" });
@@ -338,7 +335,9 @@ describe("CommitteeSessionDetailsPage", () => {
     await router.navigate("/elections/1/details");
     rtlRender(<Providers router={router} />);
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Details van de eerste zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
+    ).toBeInTheDocument();
 
     const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
     const date = screen.getByRole("textbox", { name: "Datum" });

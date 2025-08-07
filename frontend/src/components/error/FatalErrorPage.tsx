@@ -32,7 +32,7 @@ export function FatalErrorPage({ title = "error.title", message, code, reference
         {message && <p>{message}</p>}
         {isDevelopment && (
           <>
-            <h4>{t("error.instruction.title")}</h4>
+            <h6>{t("error.instruction.title")}</h6>
             <p>
               {tx("error.instruction.content", {
                 link: (content) => (

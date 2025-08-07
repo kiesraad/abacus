@@ -88,7 +88,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form title={t("account.personalize_account")} onSubmit={handleSubmit}>
       {showLoginSuccess && (
         <FormLayout.Alert>
           <Alert type="success" onClose={hideLoginSuccess}>
@@ -111,7 +111,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
         </FormLayout.Alert>
       )}
       <FormLayout disabled={requestState.status === "loading"}>
-        <FormLayout.Section title={t("account.personalize_account")}>
+        <FormLayout.Section>
           <InputField
             name="username"
             label={t("account.username")}

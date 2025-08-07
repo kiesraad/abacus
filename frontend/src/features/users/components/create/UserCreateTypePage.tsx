@@ -41,10 +41,10 @@ export function UserCreateTypePage() {
         </section>
       </header>
       <main>
-        <Form onSubmit={handleSubmit}>
+        <Form title={t("users.type_title")} onSubmit={handleSubmit}>
           <FormLayout>
-            <FormLayout.Section title={t("users.type_title")}>
-              <p className="mb-md-lg">{t("users.type_hint")}</p>
+            <FormLayout.Section>
+              <p>{t("users.type_hint")}</p>
               <ChoiceList>
                 <ChoiceList.Title>{t("users.type_label")}</ChoiceList.Title>
                 <ChoiceList.Radio

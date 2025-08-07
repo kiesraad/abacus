@@ -31,9 +31,3 @@
     padding-left: 1.75rem;
   }
 }
-
-.detailsForm {
-  h2 {
-    margin-bottom: var(--space-lg);
-  }
-}

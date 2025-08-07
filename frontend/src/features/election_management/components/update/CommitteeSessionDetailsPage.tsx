@@ -112,24 +112,27 @@ export function CommitteeSessionDetailsPage() {
       <header>
         <section>
           <h1>
-            {t("election_management.custom_committee_session_details", {
-              sessionLabel: sessionLabel,
-            })}
+            {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+            {t("GSB")} {election.location}
           </h1>
         </section>
       </header>
       <main>
         <article>
-          <Form className={cls.detailsForm} onSubmit={handleSubmit}>
+          <Form
+            title={t("election_management.custom_committee_session_details", {
+              sessionLabel: sessionLabel,
+            })}
+            className={cls.detailsForm}
+            onSubmit={handleSubmit}
+          >
             {errorAlert && (
               <FormLayout.Alert>
                 <Alert type="error">{errorAlert}</Alert>
               </FormLayout.Alert>
             )}
             <FormLayout>
-              <FormLayout.Section
-                title={t("election_management.where_is_the_committee_session", { sessionLabel: sessionLabel })}
-              >
+              <FormLayout.Section>
                 <InputField
                   id="location"
                   name="location"
@@ -140,15 +143,7 @@ export function CommitteeSessionDetailsPage() {
                   defaultValue={committeeSession.location || ""}
                 />
               </FormLayout.Section>
-              <FormLayout.Section
-                title={t("election_management.when_is_the_committee_session", {
-                  verb:
-                    committeeSession.status === "created" || committeeSession.status === "data_entry_not_started"
-                      ? t("election_management.starts")
-                      : t("election_management.started"),
-                  sessionLabel: sessionLabel,
-                })}
-              >
+              <FormLayout.Section title={t("election_management.session_start")}>
                 <FormLayout.Row>
                   <InputField
                     id="start_date"

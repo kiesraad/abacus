@@ -89,7 +89,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
 
   return (
     <div>
-      <Form onSubmit={handleSubmit} id="polling-station-form" ref={formRef}>
+      <Form title={t("polling_station.details")} onSubmit={handleSubmit} id="polling-station-form" ref={formRef}>
         {isValid && requestState.status === "api-error" && (
           <FormLayout.Alert>
             {requestState.error.reference === "EntryNotUnique" ? (
@@ -108,7 +108,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
             )}
           </FormLayout.Alert>
         )}
-        <h2>{t("polling_station.details")}</h2>
         <FormLayout disabled={requestState.status === "loading"}>
           <FormLayout.Section title={t("general_details")}>
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />

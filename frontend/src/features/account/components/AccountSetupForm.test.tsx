@@ -19,7 +19,7 @@ async function renderForm(user: Partial<LoginResponse> = {}) {
     ></AccountSetupForm>,
   );
 
-  expect(await screen.findByRole("heading", { name: "Personaliseer je account" })).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { level: 2, name: "Personaliseer je account" })).toBeInTheDocument();
   return { onSaved };
 }
 
@@ -55,7 +55,7 @@ describe("AccountSetupForm", () => {
     await renderForm();
 
     const loginSuccess = screen.getByRole("alert");
-    expect(await within(loginSuccess).findByRole("heading", { name: "Inloggen gelukt" })).toBeVisible();
+    expect(await within(loginSuccess).findByRole("heading", { level: 2, name: "Inloggen gelukt" })).toBeVisible();
 
     const user = userEvent.setup();
     await user.click(await within(loginSuccess).findByRole("button"));
@@ -67,7 +67,7 @@ describe("AccountSetupForm", () => {
     await renderForm();
 
     const loginSuccess = screen.getByRole("alert");
-    expect(await within(loginSuccess).findByRole("heading", { name: "Inloggen gelukt" })).toBeVisible();
+    expect(await within(loginSuccess).findByRole("heading", { level: 2, name: "Inloggen gelukt" })).toBeVisible();
 
     const user = userEvent.setup();
     const submitButton = screen.getByRole("button", { name: "Opslaan" });

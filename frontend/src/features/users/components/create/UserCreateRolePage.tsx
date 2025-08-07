@@ -49,7 +49,7 @@ export function UserCreateRolePage() {
         <Form onSubmit={handleSubmit}>
           <FormLayout>
             <FormLayout.Section title={t("users.role_title")}>
-              <p className="mb-md-lg">{t("users.role_hint")}</p>
+              <p>{t("users.role_hint")}</p>
               <ChoiceList>
                 <ChoiceList.Title>{t("users.role_label")}</ChoiceList.Title>
                 {error && <ChoiceList.Error id="role-error">{error}</ChoiceList.Error>}

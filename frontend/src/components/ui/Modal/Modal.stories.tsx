@@ -16,7 +16,6 @@ export const DefaultModal: StoryObj = {
     return (
       <>
         <Button
-          size="lg"
           onClick={() => {
             setModalOpen(true);
           }}

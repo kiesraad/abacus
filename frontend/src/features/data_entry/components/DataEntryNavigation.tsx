@@ -118,8 +118,6 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
         <p>{t("polling_station.save_changes")}</p>
         <nav>
           <Button
-            size="lg"
-            type="button"
             onClick={() => {
               void onModalSave();
             }}
@@ -127,9 +125,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
             {t("save_changes")}
           </Button>
           <Button
-            size="lg"
             variant="secondary"
-            type="button"
             onClick={() => {
               onModalDoNoSave();
             }}
@@ -165,7 +161,6 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
           onClick={() => {
             void onAbortModalSave();
           }}
-          type="button"
           disabled={status === "saving"}
         >
           {t("data_entry.abort.save_input")}
@@ -176,7 +171,6 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
           onClick={() => {
             void onAbortModalDelete();
           }}
-          type="button"
           disabled={status === "deleting"}
         >
           {t("data_entry.abort.discard_input")}

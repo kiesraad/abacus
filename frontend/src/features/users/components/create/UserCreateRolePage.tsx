@@ -84,9 +84,7 @@ export function UserCreateRolePage() {
             </FormLayout.Section>
           </FormLayout>
           <FormLayout.Controls>
-            <Button size="xl" type="submit">
-              {t("continue")}
-            </Button>
+            <Button type="submit">{t("continue")}</Button>
           </FormLayout.Controls>
         </Form>
       </main>

@@ -28,11 +28,7 @@ export function AbortModal() {
     }
 
     // check if nextLocation is outside the create election flow
-    if (!isPartOfCreateElectionFlow(nextLocation.pathname)) {
-      return true;
-    }
-
-    return false;
+    return !isPartOfCreateElectionFlow(nextLocation.pathname);
   });
 
   // Do not show modal when state is not blocked
@@ -66,17 +62,15 @@ export function AbortModal() {
           onClick={() => {
             onAbortModalDelete();
           }}
-          type="button"
         >
           {t("election.abort.discard_input")}
         </Button>
         <Button
-          size="lg"
+          size="xl"
           variant="secondary"
           onClick={() => {
             onAbortModalCancel();
           }}
-          type="button"
         >
           {t("election.abort.keep_input")}
         </Button>

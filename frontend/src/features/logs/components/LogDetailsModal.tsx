@@ -32,12 +32,12 @@ interface LogDetailsModalProps {
 
 export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
   const filteredDetails = Object.entries(details.event).filter(
-    ([k]) => k !== "eventType" && hasTranslation(`log.field.${k}`),
+    ([k]) => k !== "event_type" && hasTranslation(`log.field.${k}`),
   );
 
   return (
     <Modal
-      title={t(`log.event.${details.event.eventType}`)}
+      title={t(`log.event.${details.event.event_type}`)}
       onClose={() => {
         setDetails(null);
       }}
@@ -52,22 +52,22 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
               <dd>{details.username}</dd>
             </>
           )}
-          {details.userFullname && (
+          {details.user_fullname && (
             <>
               <dt>{t("log.field.fullname")}</dt>
-              <dd>{details.userFullname || "-"}</dd>
+              <dd>{details.user_fullname || "-"}</dd>
             </>
           )}
-          {details.userRole && (
+          {details.user_role && (
             <>
               <dt>{t("log.field.role")}</dt>
-              <dd>{t(details.userRole)}</dd>
+              <dd>{t(details.user_role)}</dd>
             </>
           )}
-          {details.userId && (
+          {details.user_id && (
             <>
               <dt>{t("log.field.user_id")}</dt>
-              <dd>{details.userId}</dd>
+              <dd>{details.user_id}</dd>
             </>
           )}
           <dt>{t("log.header.message")}</dt>

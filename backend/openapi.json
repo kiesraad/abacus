@@ -1831,7 +1831,7 @@
             }
           },
           {
-            "name": "perPage",
+            "name": "per_page",
             "in": "query",
             "description": "Number of items per page",
             "required": false,
@@ -3291,10 +3291,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "UserLoggedIn"
@@ -3312,10 +3312,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "UserLoginFailed"
@@ -3333,10 +3333,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "UserLoggedOut"
@@ -3354,10 +3354,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "UserAccountUpdated"
@@ -3370,10 +3370,10 @@
           {
             "type": "object",
             "required": [
-              "eventType"
+              "event_type"
             ],
             "properties": {
-              "eventType": {
+              "event_type": {
                 "type": "string",
                 "enum": [
                   "UserSessionExtended"
@@ -3389,10 +3389,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "UserCreated"
@@ -3410,10 +3410,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "UserUpdated"
@@ -3431,10 +3431,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "UserDeleted"
@@ -3452,10 +3452,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "ElectionCreated"
@@ -3473,10 +3473,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "CommitteeSessionCreated"
@@ -3494,10 +3494,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "CommitteeSessionUpdated"
@@ -3515,10 +3515,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "ApportionmentCreated"
@@ -3536,10 +3536,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "PollingStationCreated"
@@ -3557,10 +3557,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "PollingStationUpdated"
@@ -3578,10 +3578,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "PollingStationDeleted"
@@ -3599,10 +3599,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "DataEntryClaimed"
@@ -3620,10 +3620,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "DataEntrySaved"
@@ -3641,10 +3641,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "DataEntryDeleted"
@@ -3662,10 +3662,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "DataEntryFinalised"
@@ -3683,10 +3683,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "DataEntryDiscardedFirst"
@@ -3704,10 +3704,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "DataEntryResumedFirst"
@@ -3725,10 +3725,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "DataEntryKeptFirst"
@@ -3746,10 +3746,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "DataEntryKeptSecond"
@@ -3767,10 +3767,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "DataEntryDiscardedBoth"
@@ -3783,10 +3783,10 @@
           {
             "type": "object",
             "required": [
-              "eventType"
+              "event_type"
             ],
             "properties": {
-              "eventType": {
+              "event_type": {
                 "type": "string",
                 "enum": [
                   "AirGapViolationDetected"
@@ -3797,10 +3797,10 @@
           {
             "type": "object",
             "required": [
-              "eventType"
+              "event_type"
             ],
             "properties": {
-              "eventType": {
+              "event_type": {
                 "type": "string",
                 "enum": [
                   "AirGapViolationResolved"
@@ -3816,10 +3816,10 @@
               {
                 "type": "object",
                 "required": [
-                  "eventType"
+                  "event_type"
                 ],
                 "properties": {
-                  "eventType": {
+                  "event_type": {
                     "type": "string",
                     "enum": [
                       "Error"
@@ -3832,10 +3832,10 @@
           {
             "type": "object",
             "required": [
-              "eventType"
+              "event_type"
             ],
             "properties": {
-              "eventType": {
+              "event_type": {
                 "type": "string",
                 "enum": [
                   "UnknownEvent"
@@ -3860,14 +3860,14 @@
           "id",
           "time",
           "event",
-          "eventLevel",
+          "event_level",
           "ip"
         ],
         "properties": {
           "event": {
             "$ref": "#/components/schemas/AuditEvent"
           },
-          "eventLevel": {
+          "event_level": {
             "$ref": "#/components/schemas/AuditEventLevel"
           },
           "id": {
@@ -3884,15 +3884,15 @@
           "time": {
             "type": "string"
           },
-          "userFullname": {
+          "user_fullname": {
             "type": "string"
           },
-          "userId": {
+          "user_id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "userRole": {
+          "user_role": {
             "$ref": "#/components/schemas/Role"
           },
           "username": {
@@ -3907,7 +3907,7 @@
           "events",
           "page",
           "pages",
-          "perPage"
+          "per_page"
         ],
         "properties": {
           "events": {
@@ -3926,7 +3926,7 @@
             "format": "int32",
             "minimum": 0
           },
-          "perPage": {
+          "per_page": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -4158,46 +4158,46 @@
       "CommitteeSessionDetails": {
         "type": "object",
         "required": [
-          "sessionId",
-          "sessionNumber",
-          "sessionElectionId",
-          "sessionLocation",
-          "sessionStartDate",
-          "sessionStartTime",
-          "sessionStatus",
-          "sessionNumberOfVoters"
+          "session_id",
+          "session_number",
+          "session_election_id",
+          "session_location",
+          "session_start_date",
+          "session_start_time",
+          "session_status",
+          "session_number_of_voters"
         ],
         "properties": {
-          "sessionElectionId": {
+          "session_election_id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "sessionId": {
+          "session_id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "sessionLocation": {
+          "session_location": {
             "type": "string"
           },
-          "sessionNumber": {
+          "session_number": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "sessionNumberOfVoters": {
+          "session_number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "sessionStartDate": {
+          "session_start_date": {
             "type": "string"
           },
-          "sessionStartTime": {
+          "session_start_time": {
             "type": "string"
           },
-          "sessionStatus": {
+          "session_status": {
             "type": "string"
           }
         },
@@ -4348,26 +4348,26 @@
       "DataEntryDetails": {
         "type": "object",
         "required": [
-          "pollingStationId",
-          "dataEntryStatus",
-          "dataEntryProgress"
+          "polling_station_id",
+          "data_entry_status",
+          "data_entry_progress"
         ],
         "properties": {
-          "dataEntryProgress": {
+          "data_entry_progress": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "dataEntryStatus": {
+          "data_entry_status": {
             "type": "string"
           },
-          "finishedAt": {
+          "finished_at": {
             "type": [
               "string",
               "null"
             ]
           },
-          "firstEntryUserId": {
+          "first_entry_user_id": {
             "type": [
               "integer",
               "null"
@@ -4375,12 +4375,12 @@
             "format": "int32",
             "minimum": 0
           },
-          "pollingStationId": {
+          "polling_station_id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "secondEntryUserId": {
+          "second_entry_user_id": {
             "type": [
               "integer",
               "null"
@@ -4723,50 +4723,50 @@
       "ElectionDetails": {
         "type": "object",
         "required": [
-          "electionId",
-          "electionName",
-          "electionCountingMethod",
-          "electionElectionId",
-          "electionLocation",
-          "electionDomainId",
-          "electionCategory",
-          "electionNumberOfSeats",
-          "electionElectionDate",
-          "electionNominationDate"
+          "election_id",
+          "election_name",
+          "election_counting_method",
+          "election_election_id",
+          "election_location",
+          "election_domain_id",
+          "election_category",
+          "election_number_of_seats",
+          "election_election_date",
+          "election_nomination_date"
         ],
         "properties": {
-          "electionCategory": {
+          "election_category": {
             "type": "string"
           },
-          "electionCountingMethod": {
+          "election_counting_method": {
             "type": "string"
           },
-          "electionDomainId": {
+          "election_domain_id": {
             "type": "string"
           },
-          "electionElectionDate": {
+          "election_election_date": {
             "type": "string",
             "format": "date"
           },
-          "electionElectionId": {
+          "election_election_id": {
             "type": "string"
           },
-          "electionId": {
+          "election_id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "electionLocation": {
+          "election_location": {
             "type": "string"
           },
-          "electionName": {
+          "election_name": {
             "type": "string"
           },
-          "electionNominationDate": {
+          "election_nomination_date": {
             "type": "string",
             "format": "date"
           },
-          "electionNumberOfSeats": {
+          "election_number_of_seats": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -5570,49 +5570,49 @@
       "PollingStationDetails": {
         "type": "object",
         "required": [
-          "pollingStationId",
-          "pollingStationElectionId",
-          "pollingStationName",
-          "pollingStationNumber",
-          "pollingStationAddress",
-          "pollingStationPostalCode",
-          "pollingStationLocality"
+          "polling_station_id",
+          "polling_station_election_id",
+          "polling_station_name",
+          "polling_station_number",
+          "polling_station_address",
+          "polling_station_postal_code",
+          "polling_station_locality"
         ],
         "properties": {
-          "pollingStationAddress": {
+          "polling_station_address": {
             "type": "string"
           },
-          "pollingStationElectionId": {
+          "polling_station_election_id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "pollingStationId": {
+          "polling_station_id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "pollingStationLocality": {
+          "polling_station_locality": {
             "type": "string"
           },
-          "pollingStationName": {
+          "polling_station_name": {
             "type": "string"
           },
-          "pollingStationNumber": {
+          "polling_station_number": {
             "type": "integer",
             "format": "int64"
           },
-          "pollingStationNumberOfVoters": {
+          "polling_station_number_of_voters": {
             "type": [
               "integer",
               "null"
             ],
             "format": "int64"
           },
-          "pollingStationPostalCode": {
+          "polling_station_postal_code": {
             "type": "string"
           },
-          "pollingStationType": {
+          "polling_station_type": {
             "type": "string"
           }
         },
@@ -6131,7 +6131,7 @@
       "UserDetails": {
         "type": "object",
         "required": [
-          "userId",
+          "user_id",
           "username",
           "role"
         ],
@@ -6142,7 +6142,7 @@
           "role": {
             "type": "string"
           },
-          "userId": {
+          "user_id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -6171,16 +6171,16 @@
       "UserLoggedInDetails": {
         "type": "object",
         "required": [
-          "userAgent",
-          "loggedInUsersCount"
+          "user_agent",
+          "logged_in_users_count"
         ],
         "properties": {
-          "loggedInUsersCount": {
+          "logged_in_users_count": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "userAgent": {
+          "user_agent": {
             "type": "string"
           }
         },
@@ -6189,10 +6189,10 @@
       "UserLoggedOutDetails": {
         "type": "object",
         "required": [
-          "sessionDuration"
+          "session_duration"
         ],
         "properties": {
-          "sessionDuration": {
+          "session_duration": {
             "type": "integer",
             "format": "int64",
             "minimum": 0
@@ -6204,10 +6204,10 @@
         "type": "object",
         "required": [
           "username",
-          "userAgent"
+          "user_agent"
         ],
         "properties": {
-          "userAgent": {
+          "user_agent": {
             "type": "string"
           },
           "username": {

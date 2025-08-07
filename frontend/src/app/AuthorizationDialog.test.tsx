@@ -85,7 +85,7 @@ describe("AuthorizationDialog", () => {
       events: [],
       page: 1,
       pages: 1,
-      perPage: 200,
+      per_page: 200,
     });
 
     const router = setupTestRouter(routes);

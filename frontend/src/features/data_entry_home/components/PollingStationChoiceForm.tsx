@@ -217,7 +217,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
               {t("polling_station_choice.view_list")}
             </span>
           </summary>
-          <h2 className={cls.formTitle}>{t("polling_station_choice.choose_polling_station")}</h2>
+          <h3 className="mb-lg">{t("polling_station_choice.choose_polling_station")}</h3>
           {!pollingStations.length ? (
             <Alert type="error" small>
               <p>{t("polling_station_choice.no_polling_stations_found")}</p>

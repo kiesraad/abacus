@@ -298,10 +298,10 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 Veld markeren: 3.3.2
 
-#### DSO | F.311 (2.2.3 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap 'controles en correcties' is niet aangevinkt)
+#### DSO | F.360 (2.2.3 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap 'controles en correcties' is niet aangevinkt)
 
 > Invoerder: **Controleer je antwoorden** (F.311)
- 
+
 > Coördinator: **Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen** (F.311)
 
 Veld markeren: 2.3.2  
@@ -414,7 +414,7 @@ Veld markeren: G
 
 > Invoerder: **Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
- 
+
 > Coördinator: **Groot verschil tussen aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
 > Er is een groot verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).  
 > Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitslag per lijst.

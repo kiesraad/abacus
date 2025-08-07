@@ -1,10 +1,9 @@
 import { FormEvent, useState } from "react";
-import { Location, useLocation, useNavigate } from "react-router";
+import { Form, Location, useLocation, useNavigate } from "react-router";
 
 import { AnyApiError, FatalError, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { Alert } from "@/components/ui/Alert/Alert";
-import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
@@ -67,28 +66,27 @@ export function LoginForm() {
   }
 
   return (
-    <form
-      className="no_footer"
+    <Form
       onSubmit={(e) => {
         void handleSubmit(e);
       }}
     >
-      <FormLayout noGap>
-        {notification && (
-          <FormLayout.Alert>
-            <Alert type="notify">
-              <h2>{t(`${notification}_title`)}</h2>
-              <p>{tx(notification)}</p>
-            </Alert>
-          </FormLayout.Alert>
-        )}
-        {error && (
-          <FormLayout.Alert>
-            <Alert type="error">
-              <h2>{t(`error.api_error.${error.reference}`)}</h2>
-            </Alert>
-          </FormLayout.Alert>
-        )}
+      {notification && (
+        <FormLayout.Alert>
+          <Alert type="notify">
+            <h2>{t(`${notification}_title`)}</h2>
+            <p>{tx(notification)}</p>
+          </Alert>
+        </FormLayout.Alert>
+      )}
+      {error && (
+        <FormLayout.Alert>
+          <Alert type="error">
+            <h2>{t(`error.api_error.${error.reference}`)}</h2>
+          </Alert>
+        </FormLayout.Alert>
+      )}
+      <FormLayout>
         <FormLayout.Section>
           <InputField
             name="username"
@@ -100,7 +98,6 @@ export function LoginForm() {
             onChange={(e) => {
               setUsername(e.target.value);
             }}
-            margin="mb-lg"
           />
           <InputField
             name="password"
@@ -113,17 +110,15 @@ export function LoginForm() {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
-            margin="mb-lg"
+            margin="mb-0"
           />
         </FormLayout.Section>
-      </FormLayout>
-      <BottomBar type="footer">
-        <BottomBar.Row>
+        <FormLayout.Controls>
           <Button type="submit" size="lg" disabled={loading}>
             {t("account.login")}
           </Button>
-        </BottomBar.Row>
-      </BottomBar>
-    </form>
+        </FormLayout.Controls>
+      </FormLayout>
+    </Form>
   );
 }

@@ -1,19 +1,16 @@
 import * as React from "react";
 
-import { cn } from "@/utils/classnames";
-
 import cls from "./FormLayout.module.css";
 
 export interface FormLayoutProps {
   children: React.ReactNode;
   disabled?: boolean;
-  noGap?: boolean;
 }
 
-export function FormLayout({ children, disabled, noGap }: FormLayoutProps) {
+export function FormLayout({ children, disabled }: FormLayoutProps) {
   return (
     <div className={cls.formLayout}>
-      <fieldset disabled={disabled} className={cn(noGap && cls.noGap, cls.rootFieldset)}>
+      <fieldset disabled={disabled} className={cls.rootFieldset}>
         {children}
       </fieldset>
     </div>

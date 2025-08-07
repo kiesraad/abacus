@@ -1,6 +1,7 @@
 import { Navigate, useNavigate } from "react-router";
 
 import { useApiState } from "@/api/useApiState";
+import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { t } from "@/i18n/translate";
 import { LoginResponse } from "@/types/generated/openapi";
@@ -34,6 +35,7 @@ export function AccountSetupPage() {
           <AccountSetupForm user={user} onSaved={handleSaved} />
         </article>
       </main>
+      <Footer />
     </>
   );
 }

@@ -3,8 +3,8 @@ import { FormEvent, useState } from "react";
 import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
-import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
+import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
@@ -88,29 +88,29 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
   }
 
   return (
-    <form className="no_footer" onSubmit={handleSubmit}>
-      <FormLayout noGap disabled={requestState.status === "loading"}>
-        {showLoginSuccess && (
-          <FormLayout.Alert>
-            <Alert type="success" onClose={hideLoginSuccess}>
-              <h2>{t("account.login_success")}</h2>
-              <p>{t("account.setting_up_account")}</p>
-            </Alert>
-          </FormLayout.Alert>
-        )}
-        {validationErrors && (
-          <FormLayout.Alert>
-            <Alert type="error">
-              <h2>{t("account.not_saved")}</h2>
-              <p>{t("account.check_fields")}</p>
-            </Alert>
-          </FormLayout.Alert>
-        )}
-        {apiError && (
-          <FormLayout.Alert>
-            <Alert type="error">{apiError.message}</Alert>
-          </FormLayout.Alert>
-        )}
+    <Form onSubmit={handleSubmit}>
+      {showLoginSuccess && (
+        <FormLayout.Alert>
+          <Alert type="success" onClose={hideLoginSuccess}>
+            <h2>{t("account.login_success")}</h2>
+            <p>{t("account.setting_up_account")}</p>
+          </Alert>
+        </FormLayout.Alert>
+      )}
+      {validationErrors && (
+        <FormLayout.Alert>
+          <Alert type="error">
+            <h2>{t("account.not_saved")}</h2>
+            <p>{t("account.check_fields")}</p>
+          </Alert>
+        </FormLayout.Alert>
+      )}
+      {apiError && (
+        <FormLayout.Alert>
+          <Alert type="error">{apiError.message}</Alert>
+        </FormLayout.Alert>
+      )}
+      <FormLayout disabled={requestState.status === "loading"}>
         <FormLayout.Section title={t("account.personalize_account")}>
           <InputField
             name="username"
@@ -118,7 +118,6 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
             hint={t("account.username_hint")}
             value={user.username}
             disabled
-            margin="mb-lg"
           />
           <InputField
             name="fullname"
@@ -127,7 +126,6 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
             hint={t("account.fullname_hint")}
             error={validationErrors?.fullname}
             defaultValue={user.fullname}
-            margin="mb-lg"
           />
           <InputField
             name="password"
@@ -135,24 +133,21 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
             hint={t("account.password_hint")}
             type="password"
             error={validationErrors?.password}
-            margin="mb-lg"
           />
           <InputField
             name="password_repeat"
             label={t("account.password_repeat")}
             type="password"
             error={validationErrors?.password_repeat}
-            margin="mb-lg"
+            margin="mb-0"
           />
         </FormLayout.Section>
-      </FormLayout>
-      <BottomBar type="footer">
-        <BottomBar.Row>
+        <FormLayout.Controls>
           <Button type="submit" size="lg">
-            {t("next")}
+            {t("save")}
           </Button>
-        </BottomBar.Row>
-      </BottomBar>
-    </form>
+        </FormLayout.Controls>
+      </FormLayout>
+    </Form>
   );
 }

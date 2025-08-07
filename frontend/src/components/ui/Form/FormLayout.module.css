@@ -43,9 +43,6 @@
 .rootFieldset {
   border: none;
   padding: 0;
-}
-
-.rootFieldset:not(.noGap) {
   display: flex;
   flex-direction: column;
   gap: 2.5rem;

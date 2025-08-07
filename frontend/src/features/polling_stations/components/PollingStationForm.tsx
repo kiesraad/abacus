@@ -154,7 +154,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                   name={"polling_station_type"}
                   defaultValue={"Special"}
                   defaultChecked={pollingStation?.polling_station_type === "Special"}
-                  label={t("polling_station.type.Special")}
+                  label={t("polling_station.type.SpecialExplanation")}
                 />
                 <ChoiceList.Radio
                   id={`polling_station_type-Mobile`}

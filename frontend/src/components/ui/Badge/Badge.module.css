@@ -10,20 +10,6 @@
   color: var(--badge-polling-station);
 }
 
-.workstation {
-  text-align: center;
-  font-family: var(--font-header);
-  font-size: 2.25rem;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 2.75rem;
-  letter-spacing: -0.045rem;
-  padding: 1.125rem 1.3125rem;
-  border-radius: var(--rounded-default);
-  background: var(--badge-workstation-bg);
-  color: var(--badge-workstation);
-}
-
 .badge {
   text-align: center;
   font-family: var(--font-text);

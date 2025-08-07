@@ -24,6 +24,7 @@ use crate::{
 #[serde(deny_unknown_fields)]
 pub enum ErrorReference {
     AirgapViolation,
+    NotInitialised,
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     CommitteeSessionPaused,
@@ -48,6 +49,7 @@ pub enum ErrorReference {
     InvalidVoteCandidate,
     InvalidVoteGroup,
     InvalidXml,
+    OwnAccountCannotBeDeleted,
     PasswordRejection,
     PdfGenerationError,
     PollingStationRepeated,
@@ -244,6 +246,14 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
+                    AuthenticationError::NotInitialised => (
+                        StatusCode::IM_A_TEAPOT,
+                        to_error(
+                            "Application not initialised",
+                            ErrorReference::NotInitialised,
+                            false,
+                        ),
+                    ),
                     AuthenticationError::UserNotFound => (
                         StatusCode::UNAUTHORIZED,
                         to_error("User not found", ErrorReference::UserNotFound, false),
@@ -272,6 +282,14 @@ impl IntoResponse for APIError {
                     AuthenticationError::PasswordRejection => (
                         StatusCode::BAD_REQUEST,
                         to_error("Invalid password", ErrorReference::PasswordRejection, false),
+                    ),
+                    AuthenticationError::OwnAccountCannotBeDeleted => (
+                        StatusCode::FORBIDDEN,
+                        to_error(
+                            "Cannot delete your own account",
+                            ErrorReference::OwnAccountCannotBeDeleted,
+                            false,
+                        ),
                     ),
                     // server errors
                     AuthenticationError::Database(_)
@@ -354,19 +372,23 @@ impl IntoResponse for APIError {
                             true,
                         ),
                     ),
-                    CommitteeSessionError::InvalidStatusTransition => (
-                        StatusCode::CONFLICT,
-                        to_error(
-                            "Invalid committee session state transition",
-                            ErrorReference::InvalidStateTransition,
-                            true,
-                        ),
-                    ),
                     CommitteeSessionError::InvalidCommitteeSessionStatus => (
                         StatusCode::CONFLICT,
                         to_error(
                             "Invalid committee session status",
                             ErrorReference::InvalidCommitteeSessionStatus,
+                            true,
+                        ),
+                    ),
+                    CommitteeSessionError::InvalidDetails => (
+                        StatusCode::BAD_REQUEST,
+                        to_error("Invalid details", ErrorReference::InvalidData, false),
+                    ),
+                    CommitteeSessionError::InvalidStatusTransition => (
+                        StatusCode::CONFLICT,
+                        to_error(
+                            "Invalid committee session state transition",
+                            ErrorReference::InvalidStateTransition,
                             true,
                         ),
                     ),

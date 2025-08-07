@@ -6,7 +6,7 @@ use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::utils::serve_api;
-use abacus::authentication::UserListResponse;
+use abacus::authentication::{Role, UserListResponse};
 
 pub mod shared;
 pub mod utils;
@@ -34,7 +34,11 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
     let body: UserListResponse = response.json().await.unwrap();
-    let typist_user = body.users.iter().find(|u| u.id() == 2).unwrap();
+    let typist_user = body
+        .users
+        .iter()
+        .find(|u| u.role() == Role::Typist)
+        .unwrap();
     assert!(typist_user.last_activity_at().is_none());
 
     // Log in as the typist and call whoami to trigger an update
@@ -328,6 +332,21 @@ async fn test_user_delete(pool: SqlitePool) {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_prevent_delete_own_account(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let admin_cookie = shared::admin_login(&addr).await;
+
+    let url = format!("http://{addr}/api/user/1");
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", &admin_cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

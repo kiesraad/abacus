@@ -33,6 +33,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(login))
         .routes(routes!(whoami))
+        .routes(routes!(initialised))
         .routes(routes!(account_update))
         .routes(routes!(logout))
         .routes(routes!(user_list))
@@ -185,6 +186,23 @@ async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     Ok(Json(LoginResponse::from(&user)))
 }
 
+/// Check whether the application is initialised (an admin user exists + has logged in at least once)
+#[utoipa::path(
+  get,
+  path = "/api/initialised",
+  responses(
+      (status = 200, description = "The application is initialised"),
+      (status = 418, description = "The application is not initialised", body = ErrorResponse),
+  ),
+)]
+async fn initialised(State(pool): State<SqlitePool>) -> Result<impl IntoResponse, APIError> {
+    if super::user::has_active_users(&pool).await? {
+        Ok(StatusCode::OK)
+    } else {
+        Err(AuthenticationError::NotInitialised.into())
+    }
+}
+
 /// Update the user's account with a new password and optionally new fullname
 #[utoipa::path(
   put,
@@ -192,6 +210,7 @@ async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   request_body = AccountUpdateRequest,
   responses(
       (status = 200, description = "The logged in user", body = LoginResponse),
+      (status = 400, description = "Bad request", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
@@ -343,6 +362,7 @@ pub struct UpdateUserRequest {
     request_body = CreateUserRequest,
     responses(
         (status = 201, description = "User created", body = User),
+        (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
@@ -402,6 +422,7 @@ async fn user_get(
     request_body = UpdateUserRequest,
     responses(
         (status = 200, description = "User updated", body = User),
+        (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
@@ -449,7 +470,7 @@ pub async fn user_update(
     ),
 )]
 async fn user_delete(
-    _user: Admin,
+    logged_in_user: Admin,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<u32>,
@@ -460,6 +481,11 @@ async fn user_delete(
             ErrorReference::EntryNotFound,
         ));
     };
+
+    // Prevent user from deleting their own account
+    if logged_in_user.0.id() == user_id {
+        return Err(AuthenticationError::OwnAccountCannotBeDeleted.into());
+    }
 
     let deleted = super::user::delete(&pool, user_id).await?;
 
@@ -479,10 +505,18 @@ async fn user_delete(
 
 #[cfg(test)]
 mod tests {
+    use axum::{extract::State, response::IntoResponse};
     use cookie::{Cookie, SameSite};
+    use hyper::StatusCode;
+    use sqlx::SqlitePool;
     use test_log::test;
 
-    use crate::authentication::{SECURE_COOKIES, api::set_default_cookie_properties};
+    use crate::{
+        APIError,
+        authentication::{
+            Role, SECURE_COOKIES, api::set_default_cookie_properties, error::AuthenticationError,
+        },
+    };
 
     #[test(tokio::test)]
     async fn test_set_default_cookie_properties() {
@@ -494,5 +528,36 @@ mod tests {
         assert!(cookie.http_only().unwrap());
         assert_eq!(cookie.secure().unwrap(), SECURE_COOKIES);
         assert_eq!(cookie.same_site().unwrap(), SameSite::Strict);
+    }
+
+    #[test(sqlx::test)]
+    async fn test_initialised(pool: SqlitePool) {
+        let initialised = super::initialised(State(pool.clone())).await;
+
+        assert!(matches!(
+            initialised,
+            Err(APIError::Authentication(
+                AuthenticationError::NotInitialised
+            ))
+        ));
+
+        // Create an admin user to mark the application as initialised
+        let admin = crate::authentication::user::create(
+            &pool,
+            "admin",
+            Some("Admin User"),
+            "admin_password",
+            Role::Administrator,
+        )
+        .await
+        .unwrap();
+
+        admin.update_last_activity_at(&pool).await.unwrap();
+
+        let initialised = super::initialised(State(pool)).await;
+        assert!(initialised.is_ok());
+
+        let response = initialised.unwrap().into_response();
+        assert_eq!(response.status(), StatusCode::OK);
     }
 }

@@ -31,7 +31,6 @@ const locations: { pathname: string; userRole: Role }[] = [
   { pathname: "/dev", userRole: "typist" },
   { pathname: "/elections", userRole: "coordinator" },
   { pathname: "/users", userRole: "coordinator" },
-  { pathname: "/workstations", userRole: "coordinator" },
   { pathname: "/logs", userRole: "coordinator" },
   { pathname: "/elections/1", userRole: "coordinator" },
   { pathname: "/elections/1/report", userRole: "coordinator" },

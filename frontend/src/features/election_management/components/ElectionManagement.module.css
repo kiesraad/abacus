@@ -21,7 +21,6 @@
 
 .electionInformationTable {
   width: 58.5rem;
-  font-size: var(--font-size-md);
 }
 
 .reportInfoSection {
@@ -30,5 +29,11 @@
 
   ul {
     padding-left: 1.75rem;
+  }
+}
+
+.detailsForm {
+  h2 {
+    margin-bottom: var(--space-lg);
   }
 }

@@ -24,10 +24,14 @@
   }
 
   .buttons {
-    min-width: calc(16.5rem + 2px);
     min-height: calc(3.125rem + 2px);
     display: flex;
     align-items: center;
+    gap: 1rem;
+
+    button {
+      width: fit-content;
+    }
   }
 }
 

@@ -20,7 +20,11 @@
 .formSection {
   margin-bottom: var(--space-md);
 
-  h2 {
+  &:not(:first-child) {
+    margin-top: var(--space-xl);
+  }
+
+  h2.formSectionTitle {
     font-size: 1.5rem;
     line-height: 2rem;
     margin-bottom: var(--space-md-lg);
@@ -51,12 +55,10 @@
 
 .formAlert {
   overflow: hidden;
-  margin-top: -2.5rem;
-  margin-left: -5rem;
-  margin-right: -5rem;
+  margin: -2.5rem -5rem 2rem -5rem;
 }
 
 .formControls {
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-md-lg);
 }

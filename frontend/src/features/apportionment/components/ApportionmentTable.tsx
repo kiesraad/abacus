@@ -43,21 +43,17 @@ export function ApportionmentTable({
               {standing.pg_number}
             </Table.Cell>
             <Table.Cell>{politicalGroups[standing.pg_number - 1]?.name || ""}</Table.Cell>
-            <Table.NumberCell className="font-number normal">
-              {convert_zero_to_dash(standing.full_seats)}
-            </Table.NumberCell>
-            <Table.NumberCell className="font-number normal">
-              {convert_zero_to_dash(standing.residual_seats)}
-            </Table.NumberCell>
-            <Table.NumberCell className="font-number">{convert_zero_to_dash(standing.total_seats)}</Table.NumberCell>
+            <Table.NumberCell>{convert_zero_to_dash(standing.full_seats)}</Table.NumberCell>
+            <Table.NumberCell>{convert_zero_to_dash(standing.residual_seats)}</Table.NumberCell>
+            <Table.NumberCell className="bold">{convert_zero_to_dash(standing.total_seats)}</Table.NumberCell>
           </Table.LinkRow>
         ))}
         <Table.TotalRow>
           <Table.Cell />
           <Table.Cell className="text-align-r bold">{t("apportionment.total")}</Table.Cell>
-          <Table.NumberCell className="font-number">{fullSeats}</Table.NumberCell>
-          <Table.NumberCell className="font-number">{residualSeats}</Table.NumberCell>
-          <Table.NumberCell className="font-number link-cell-padding">{seats}</Table.NumberCell>
+          <Table.NumberCell>{fullSeats}</Table.NumberCell>
+          <Table.NumberCell>{residualSeats}</Table.NumberCell>
+          <Table.NumberCell className="link-cell-padding">{seats}</Table.NumberCell>
         </Table.TotalRow>
       </Table.Body>
     </Table>

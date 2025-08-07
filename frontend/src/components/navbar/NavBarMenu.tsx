@@ -1,7 +1,7 @@
 import * as React from "react";
 import { NavLink } from "react-router";
 
-import { IconCompass, IconFile, IconHamburger, IconLaptop, IconUsers } from "@/components/generated/icons";
+import { IconCompass, IconFile, IconHamburger, IconUsers } from "@/components/generated/icons";
 import { t } from "@/i18n/translate";
 
 import cls from "./NavBar.module.css";
@@ -16,10 +16,6 @@ export function NavBarMenu() {
       <NavLink to={"/users"}>
         <IconUsers />
         {t("users.users")}
-      </NavLink>
-      <NavLink to={"/workstations"}>
-        <IconLaptop />
-        {t("workstations.workstations")}
       </NavLink>
       <NavLink to={"/logs"}>
         <IconFile />

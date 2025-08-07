@@ -104,7 +104,7 @@ export function UploadPollingStationDefinition() {
             <Table.Body>
               {state.pollingStations.map((pollingStation: PollingStationRequest) => (
                 <Table.Row key={pollingStation.number}>
-                  <Table.NumberCell className="font-number">{pollingStation.number}</Table.NumberCell>
+                  <Table.NumberCell className="bold">{pollingStation.number}</Table.NumberCell>
                   <Table.Cell>{pollingStation.name}</Table.Cell>
                 </Table.Row>
               ))}
@@ -118,7 +118,7 @@ export function UploadPollingStationDefinition() {
               <Table.Body>
                 {state.pollingStations.slice(0, 10).map((pollingStation: PollingStationRequest) => (
                   <Table.Row key={pollingStation.number}>
-                    <Table.NumberCell className="font-number">{pollingStation.number}</Table.NumberCell>
+                    <Table.NumberCell className="bold">{pollingStation.number}</Table.NumberCell>
                     <Table.Cell>{pollingStation.name}</Table.Cell>
                   </Table.Row>
                 ))}

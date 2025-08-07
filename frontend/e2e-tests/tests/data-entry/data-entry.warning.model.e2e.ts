@@ -5,6 +5,7 @@ import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHo
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
+import { TypistNavBar } from "e2e-tests/page-objects/nav_bar/TypistNavBarPgObj";
 import { createMachine } from "xstate";
 
 import { ExtraInvestigation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
@@ -208,6 +209,7 @@ test.describe("Data entry model test - warnings", () => {
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
         const abortModal = new AbortInputModal(page);
+        const navBar = new TypistNavBar(page);
 
         const pollingStationsPageStates = {
           pollingStationsPageWarningSaved: async () => {
@@ -398,7 +400,7 @@ test.describe("Data entry model test - warnings", () => {
             await abortModal.saveInput.click();
           },
           NAV_TO_POLLING_STATION_PAGE: async () => {
-            await votersAndVotesPage.navBar.clickElection(election.election.location, election.election.name);
+            await navBar.clickElection(election.election.location, election.election.name);
           },
         };
 

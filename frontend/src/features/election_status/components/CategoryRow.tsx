@@ -5,7 +5,7 @@ import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import { DataEntryStatusName } from "@/types/generated/openapi";
-import { formatDateTime } from "@/utils/format";
+import { formatDateTime } from "@/utils/dateTime";
 
 import { PollingStationWithStatusAndTypist, StatusCategory } from "../hooks/useElectionStatus";
 

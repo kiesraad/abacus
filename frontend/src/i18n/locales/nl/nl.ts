@@ -25,7 +25,6 @@ import resolve_errors from "./resolve_errors.json";
 import status from "./status.json";
 import users from "./users.json";
 import voters_votes_counts from "./voters_votes_counts.json";
-import workstations from "./workstations.json";
 
 const nl = {
   ...generic,
@@ -55,7 +54,6 @@ const nl = {
   status,
   users,
   voters_votes_counts,
-  workstations,
 };
 
 export default nl;

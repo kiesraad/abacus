@@ -64,7 +64,7 @@ export function HighestAveragesTable({
                     </Table.DisplayFractionCells>
                   );
                 })}
-                <Table.NumberCell className={cn(cls.sticky, "font-number")}>
+                <Table.NumberCell className={cn(cls.sticky, "bold")}>
                   {getFootnotes(pgResultChanges)} {residualSeats}
                 </Table.NumberCell>
               </Table.Row>

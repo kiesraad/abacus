@@ -12,7 +12,7 @@ pub mod utils;
 fn expected_response_code(path: &str) -> StatusCode {
     match path {
         "/api/user/login" => StatusCode::UNSUPPORTED_MEDIA_TYPE,
-        "/api/user/logout" => StatusCode::OK,
+        "/api/user/logout" | "/api/initialised" => StatusCode::OK,
         _ => StatusCode::UNAUTHORIZED,
     }
 }

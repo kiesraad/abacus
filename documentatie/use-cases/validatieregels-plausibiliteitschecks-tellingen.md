@@ -25,7 +25,7 @@ Coördinator
 
 Er zijn geen regels omdat het niet mogelijk is om foute aantallen in te vullen in de frontend, dus er wordt een error vanuit de backend gegeven als er toch met de aantallen geknoeid is en ze niet toegestaan zijn.
 
-### Regels voor hertelling GSB (reeks F.1xx)
+### Regels voor extra onderzoek en controles (reeks F.1xx)
 
 #### CSO | F.101: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
 
@@ -380,7 +380,7 @@ Velden markeren: alle velden met een verschil
 
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=130-10813&t=zTY4ajWtsFkiTOYP-11)
 
-### Checks voor hertelling GSB (reeks W.1xx)
+### Checks voor extra onderzoek en controles (reeks W.1xx)
 
 Geen checks.
 

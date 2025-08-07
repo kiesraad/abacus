@@ -114,6 +114,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
                 <p>{t("users.change_password_hint")}</p>
 
                 <Button
+                  type="button"
                   variant="secondary"
                   size="md"
                   onClick={() => {
@@ -129,7 +130,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
           </FormLayout.Section>
           <FormLayout.Controls>
             <Button type="submit">{t("save_changes")}</Button>
-            <Button variant="secondary" onClick={onAbort}>
+            <Button type="button" variant="secondary" onClick={onAbort}>
               {t("cancel")}
             </Button>
           </FormLayout.Controls>

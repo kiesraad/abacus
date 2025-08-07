@@ -54,9 +54,6 @@
     > article {
       flex: 1 1 auto;
       background-color: var(--bg-gray);
-      &.no_footer {
-        padding-bottom: 0;
-      }
     }
   }
 

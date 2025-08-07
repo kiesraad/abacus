@@ -31,7 +31,7 @@ export function AccountSetupPage() {
         </section>
       </header>
       <main>
-        <article className="no_footer">
+        <article>
           <AccountSetupForm user={user} onSaved={handleSaved} />
         </article>
       </main>

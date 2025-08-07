@@ -241,7 +241,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 > Coördinator: // TODO
 
-Veld markeren: I en/of J (als gevuld)
+Veld markeren: I en/of J (als ingevuld)
 
 #### CSO | F.306 (Als H > D) `I <> H - D`
 // TODO DSO

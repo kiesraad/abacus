@@ -71,6 +71,7 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
             title={t("cancel")}
             size="lg"
             variant="tertiary"
+            type="button"
           />
         )}
         <div className={cls.modalBody}>

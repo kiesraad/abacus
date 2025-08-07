@@ -152,7 +152,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 Velden markeren: E.1 t/m E.n en E  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-#### F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal uitgebrachte stemmen`
+#### F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen`
 
 > Invoerder: **Controleer uitgebrachte stemmen** (F.203)  
 > De invoer bij E, F, G of H klopt niet.  
@@ -207,6 +207,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H  
 
 #### DSO | F.353 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
+
 > Invoerder: **Controleer je antwoorden** (F.353)
 
 > Coördinator: **Het getal dat is ingevuld bij H is niet kleiner dan D** (F.353)  
@@ -300,9 +301,9 @@ Veld markeren: 3.3.2
 
 #### DSO | F.360 (2.2.3 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap 'controles en correcties' is niet aangevinkt)
 
-> Invoerder: **Controleer je antwoorden** (F.311)
+> Invoerder: **Controleer je antwoorden** (F.360)
 
-> Coördinator: **Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen** (F.311)
+> Coördinator: **Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen** (F.360)
 
 Veld markeren: 2.3.2  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
@@ -310,7 +311,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 ### Regels voor kandidaten en lijsttotalen (reeks F.4xx)
 
-#### CSO F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
+#### CSO | F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
 // TODO DSO
 > Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.** (F.401)
 
@@ -367,7 +368,7 @@ De foutmelding die wordt getoond bestaat uit dezelfde onderdelen als bij de vali
 
 ### Checks voor alle velden (reeks W.0xx)
 
-#### W.001 (Bij tweede invoer) Niet alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
+#### CSO en DSO | W.001 (Bij tweede invoer) Niet alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
 
 > Invoerder: **Verschil met eerste invoer. Extra controle nodig** (W.001)  
 > Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal.
@@ -385,7 +386,7 @@ Geen checks.
 
 ### Checks voor totalen (reeks W.2xx)
 
-#### CSO en DSO | W.201 aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal uitgebrachte stemmen
+#### CSO en DSO | W.201 aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
 
 > Invoerder: **Controleer aantal blanco stemmen** (W.201)  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
@@ -397,7 +398,7 @@ Veld markeren: F
 
 [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=137-3939&t=zTY4ajWtsFkiTOYP-4)
 
-#### CSO en DSO | W.202: Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal uitgebrachte stemmen
+#### CSO en DSO | W.202: Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
 
 > Invoerder: **Controleer aantal ongeldige stemmen** (W.202)
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
@@ -407,7 +408,7 @@ Veld markeren: F
 
 Veld markeren: G
 
-#### W.203: Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
+#### CSO en DSO | W.203: Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
 
 - 2% of meer: abs(toegelaten kiezers - uitgebrachte stemmen) / uitgebrachte stemmen \>= 0.02
 - 15 of meer: abs(toegelaten kiezers - uitgebrachte stemmen) \>= 15
@@ -423,7 +424,7 @@ Veld markeren: G
 
 Velden markeren: D en H
 
-#### W.205 Totaal aantal uitgebrachte stemmen leeg of 0
+#### CSO en DSO | W.205 Totaal aantal uitgebrachte stemmen leeg of 0
 
 > Invoerder: **Controleer aantal uitgebrachte stemmen** (W.205)  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.

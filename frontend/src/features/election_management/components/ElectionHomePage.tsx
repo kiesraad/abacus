@@ -68,7 +68,7 @@ export function ElectionHomePage() {
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>
           <div className="mb-xl">
-            <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.about_this_election")}</h3>
+            <h3 className={cls.tableTitle}>{t("election_management.about_this_election")}</h3>
             <ElectionInformationTable
               election={election}
               numberOfPollingStations={pollingStations.length}
@@ -76,7 +76,7 @@ export function ElectionHomePage() {
             />
           </div>
           <div className="mb-xl">
-            <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.empty_models")}</h3>
+            <h3 className={cls.tableTitle}>{t("election_management.empty_models")}</h3>
             <section className="md">
               <p>{t("election_management.empty_models_description")}</p>
             </section>

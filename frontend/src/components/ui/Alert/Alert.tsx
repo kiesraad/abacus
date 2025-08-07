@@ -15,7 +15,7 @@ export interface AlertProps {
   variant?: "default" | "no-icon";
   inline?: boolean;
   small?: boolean;
-  margin?: "mb-md" | "mb-md-lg" | "mb-lg";
+  margin?: "mb-0" | "mb-sm" | "mb-md" | "mb-md-lg" | "mb-lg";
   children: React.ReactNode;
   onClose?: () => void;
 }

@@ -169,8 +169,10 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         </div>
       )}
       <fieldset>
-        <legend className="heading-lg mb-lg">
-          {anotherEntry ? t("polling_station_choice.insert_another") : t("polling_station_choice.insert_title")}
+        <legend className="mb-sm">
+          <h2>
+            {anotherEntry ? t("polling_station_choice.insert_another") : t("polling_station_choice.insert_title")}
+          </h2>
         </legend>
         <PollingStationSelector
           pollingStationNumber={pollingStationNumber}

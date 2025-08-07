@@ -21,7 +21,7 @@ export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElem
     | "full-field-with-narrow-input"
     | "parent";
   error?: string;
-  margin?: "mb-0" | "mb-md" | "mb-md-lg" | "mb-lg";
+  margin?: "mb-0" | "mb-sm" | "mb-md" | "mb-md-lg" | "mb-lg";
   numberInput?: boolean;
   hideErrorMessage?: boolean;
 }

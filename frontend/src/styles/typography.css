@@ -57,6 +57,7 @@ h5 {
 h6 {
   font-weight: bold;
   font-size: 1rem;
+  margin-bottom: 0;
 }
 
 p {

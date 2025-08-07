@@ -1,10 +1,4 @@
 .electionHome {
-  h2 {
-    font-size: 1.5rem;
-    font-family: var(--font-header), sans-serif;
-    line-height: 2rem;
-  }
-
   .tableTitle {
     margin-bottom: 1rem;
   }

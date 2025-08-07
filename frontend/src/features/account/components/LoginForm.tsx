@@ -110,11 +110,10 @@ export function LoginForm() {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
-            margin="mb-0"
           />
         </FormLayout.Section>
         <FormLayout.Controls>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" disabled={loading}>
             {t("account.login")}
           </Button>
         </FormLayout.Controls>

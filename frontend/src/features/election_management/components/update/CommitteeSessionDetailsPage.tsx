@@ -138,7 +138,6 @@ export function CommitteeSessionDetailsPage() {
                   fieldWidth="wide"
                   error={validationErrors?.location}
                   defaultValue={committeeSession.location || ""}
-                  margin="mb-0"
                 />
               </FormLayout.Section>
               <FormLayout.Section
@@ -160,7 +159,6 @@ export function CommitteeSessionDetailsPage() {
                     error={validationErrors?.start_date}
                     defaultValue={defaultDate}
                     placeholder="dd-mm-jjjj"
-                    margin="mb-0"
                   />
                   <InputField
                     id="start_time"
@@ -171,7 +169,6 @@ export function CommitteeSessionDetailsPage() {
                     error={validationErrors?.start_time}
                     defaultValue={committeeSession.start_time || ""}
                     placeholder="uu:mm"
-                    margin="mb-0"
                   />
                 </FormLayout.Row>
               </FormLayout.Section>

@@ -37,7 +37,7 @@ export function InputField({
   fieldWidth = "wide",
   error = "",
   disabled = false,
-  margin = "mb-md-lg",
+  margin = "mb-0",
   autoFocus,
   numberInput,
   hideErrorMessage,

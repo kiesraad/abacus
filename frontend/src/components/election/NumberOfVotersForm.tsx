@@ -38,7 +38,6 @@ export function NumberOfVotersForm({ defaultValue, instructions, hint, button, o
               fieldWidth="full-field-with-narrow-input"
               numberInput
               defaultValue={defaultValue || ""}
-              margin="mb-0"
             />
           </FormLayout.Section>
           <FormLayout.Controls>

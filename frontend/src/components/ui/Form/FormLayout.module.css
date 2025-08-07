@@ -16,6 +16,10 @@
 }
 
 .formSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md-lg);
+
   h2.formSectionTitle {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -31,9 +35,11 @@
 .formField {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-sm);
 
-  margin-bottom: var(--space-lg);
+  > p {
+    margin-bottom: var(--space-sm);
+  }
 }
 
 .formField > label {

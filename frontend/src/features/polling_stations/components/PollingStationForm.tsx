@@ -135,44 +135,42 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               />
             </FormLayout.Row>
 
-            <FormLayout.Field>
-              <ChoiceList>
-                <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
-                {validationResult.polling_station_type && (
-                  <ChoiceList.Error id="polling-station-type-error">
-                    {t(`form_errors.${validationResult.polling_station_type}`)}
-                  </ChoiceList.Error>
-                )}
-                <ChoiceList.Radio
-                  id={`polling_station_type-FixedLocation`}
-                  name={"polling_station_type"}
-                  defaultValue={"FixedLocation"}
-                  defaultChecked={pollingStation?.polling_station_type === "FixedLocation"}
-                  label={t("polling_station.type.FixedLocation")}
-                />
-                <ChoiceList.Radio
-                  id={`polling_station_type-Special`}
-                  name={"polling_station_type"}
-                  defaultValue={"Special"}
-                  defaultChecked={pollingStation?.polling_station_type === "Special"}
-                  label={t("polling_station.type.SpecialExplanation")}
-                />
-                <ChoiceList.Radio
-                  id={`polling_station_type-Mobile`}
-                  name={"polling_station_type"}
-                  defaultValue={"Mobile"}
-                  defaultChecked={pollingStation?.polling_station_type === "Mobile"}
-                  label={t("polling_station.type.Mobile")}
-                />
-                <ChoiceList.Radio
-                  id={`polling_station_type-Undefined`}
-                  name={"polling_station_type"}
-                  defaultValue={"Undefined"}
-                  defaultChecked={pollingStation?.polling_station_type === undefined}
-                  label={t("polling_station.type.Unknown")}
-                />
-              </ChoiceList>
-            </FormLayout.Field>
+            <ChoiceList>
+              <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
+              {validationResult.polling_station_type && (
+                <ChoiceList.Error id="polling-station-type-error">
+                  {t(`form_errors.${validationResult.polling_station_type}`)}
+                </ChoiceList.Error>
+              )}
+              <ChoiceList.Radio
+                id={`polling_station_type-FixedLocation`}
+                name={"polling_station_type"}
+                defaultValue={"FixedLocation"}
+                defaultChecked={pollingStation?.polling_station_type === "FixedLocation"}
+                label={t("polling_station.type.FixedLocation")}
+              />
+              <ChoiceList.Radio
+                id={`polling_station_type-Special`}
+                name={"polling_station_type"}
+                defaultValue={"Special"}
+                defaultChecked={pollingStation?.polling_station_type === "Special"}
+                label={t("polling_station.type.SpecialExplanation")}
+              />
+              <ChoiceList.Radio
+                id={`polling_station_type-Mobile`}
+                name={"polling_station_type"}
+                defaultValue={"Mobile"}
+                defaultChecked={pollingStation?.polling_station_type === "Mobile"}
+                label={t("polling_station.type.Mobile")}
+              />
+              <ChoiceList.Radio
+                id={`polling_station_type-Undefined`}
+                name={"polling_station_type"}
+                defaultValue={"Undefined"}
+                defaultChecked={pollingStation?.polling_station_type === undefined}
+                label={t("polling_station.type.Unknown")}
+              />
+            </ChoiceList>
 
             <InputField
               id="number_of_voters"

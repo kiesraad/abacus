@@ -93,7 +93,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                   name="fullname"
                   label={t("account.fullname")}
                   subtext={t("account.fullname_subtext")}
-                  hint={t("account.fullname_hint")}
+                  hint={t("initialise.fullname_hint")}
                   error={validationErrors?.fullname}
                 />
                 <InputField

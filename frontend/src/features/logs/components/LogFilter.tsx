@@ -76,6 +76,7 @@ export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogF
               setSince(dateToTimestampString(e.target.value));
             }}
             label={t("log.filter.show_events_since")}
+            margin="mb-lg"
           />
         </div>
       </div>

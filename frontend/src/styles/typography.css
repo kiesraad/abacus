@@ -34,15 +34,16 @@ h1,
 
 h2,
 .heading-lg {
-  font-size: 1.25rem;
-  font-weight: bold;
-  line-height: 1.875rem;
-  margin-bottom: 1rem;
+  font-family: var(--font-header), sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-h3 {
-  font-size: 1.125em;
-  margin-bottom: 0.4rem;
+h3,
+.heading-md {
+  font-size: 1.25em;
   font-weight: bold;
 }
 
@@ -57,13 +58,13 @@ h5 {
 h6 {
   font-weight: bold;
   font-size: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 p {
   margin-top: 0;
   font-size: var(--font-size-md);
-  margin-bottom: 0.8rem;
+  margin-bottom: 0;
   line-height: 1.75rem;
   color: var(--text-color-body);
 }

@@ -86,7 +86,7 @@ export function OverviewPage() {
       </header>
       {isNewAccount && (
         <Alert type="success" onClose={closeNewAccountAlert}>
-          <h2>{t("account_configured")}</h2>
+          <strong className="heading-md">{t("account_configured")}</strong>
           <p>{t("election.start_when_count_list_received")}</p>
         </Alert>
       )}

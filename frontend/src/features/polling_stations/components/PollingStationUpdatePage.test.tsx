@@ -124,7 +124,11 @@ describe("PollingStationUpdatePage", () => {
       const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
       await user.click(confirmButton);
 
-      expect(await screen.findByRole("alert")).toHaveTextContent("Het stembureau kan niet meer verwijderd worden.");
+      const deleteAlert = await screen.findByRole("alert");
+      expect(within(deleteAlert).getByRole("strong")).toHaveTextContent("Stembureau kan niet verwijderd worden");
+      expect(within(deleteAlert).getByRole("paragraph")).toHaveTextContent(
+        "Het stembureau kan niet meer verwijderd worden.",
+      );
     });
   });
 });

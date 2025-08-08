@@ -21,7 +21,7 @@ async function renderForm(user: Partial<User> = {}) {
     ></UserUpdateForm>,
   );
 
-  expect(await screen.findByRole("heading", { name: "Details van het account" })).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { level: 2, name: "Details van het account" })).toBeInTheDocument();
   return { onSaved, onAbort };
 }
 

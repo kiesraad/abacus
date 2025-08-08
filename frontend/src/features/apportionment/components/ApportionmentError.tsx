@@ -12,7 +12,9 @@ export function ApportionmentError({ error }: ApportionmentErrorProps) {
   return (
     <FormLayout.Alert>
       <Alert type={isError ? "error" : "warning"}>
-        <h2>{isError ? t("apportionment.not_yet_available") : t("apportionment.not_possible")}</h2>
+        <strong className="heading-md">
+          {isError ? t("apportionment.not_yet_available") : t("apportionment.not_possible")}
+        </strong>
         <p>{t(`error.api_error.${error.reference}`)}</p>
       </Alert>
     </FormLayout.Alert>

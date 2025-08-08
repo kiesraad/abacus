@@ -25,7 +25,7 @@ export function Messages() {
 
   return messages.map((message, index) => (
     <Alert key={index} type={message.type ?? "success"} onClose={closeHandler(index)}>
-      {message.title && <h2>{message.title}</h2>}
+      {message.title && <strong className="heading-md">{message.title}</strong>}
       {message.text && <p>{message.text}</p>}
     </Alert>
   ));

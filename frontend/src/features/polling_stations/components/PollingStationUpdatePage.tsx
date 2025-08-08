@@ -86,7 +86,7 @@ export function PollingStationUpdatePage() {
 
       {error && (
         <Alert type="error" onClose={closeError}>
-          <h2>{error[0]}</h2>
+          <strong className="heading-md">{error[0]}</strong>
           <p>{error[1]}</p>
         </Alert>
       )}
@@ -104,13 +104,8 @@ export function PollingStationUpdatePage() {
                 onCancel={handleCancel}
               />
 
-              <div className="mt-lg">
-                <Button
-                  type="button"
-                  variant="tertiary-destructive"
-                  leftIcon={<IconTrash />}
-                  onClick={toggleShowDeleteModal}
-                >
+              <div className="mt-md">
+                <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleShowDeleteModal}>
                   {t("polling_station.delete")}
                 </Button>
                 {showDeleteModal && (

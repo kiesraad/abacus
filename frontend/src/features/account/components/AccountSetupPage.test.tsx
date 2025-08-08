@@ -32,7 +32,7 @@ describe("AccountSetupPage", () => {
     await user.type(screen.getByLabelText("Kies nieuw wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
     expect(navigate).toHaveBeenCalledWith("/elections#new-account");

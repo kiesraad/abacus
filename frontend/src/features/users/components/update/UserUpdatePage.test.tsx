@@ -29,7 +29,7 @@ describe("UserUpdatePage", () => {
 
   test("update user", async () => {
     render(<UserUpdatePage></UserUpdatePage>);
-    expect(await screen.findByRole("heading", { name: "Details van het account" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Details van het account" })).toBeInTheDocument();
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
@@ -40,7 +40,7 @@ describe("UserUpdatePage", () => {
 
   test("delete user", async () => {
     render(<UserUpdatePage></UserUpdatePage>);
-    expect(await screen.findByRole("heading", { name: "Details van het account" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Details van het account" })).toBeInTheDocument();
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Gebruiker verwijderen" }));

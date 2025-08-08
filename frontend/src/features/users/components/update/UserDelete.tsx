@@ -36,8 +36,8 @@ export function UserDelete({ user, onDeleted, onError }: UserDeleteProps) {
   const deleting = requestState.status === "loading";
 
   return (
-    <>
-      <Button type="button" variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleModal}>
+    <div className="mt-md">
+      <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleModal}>
         {t("users.delete")}
       </Button>
 
@@ -60,6 +60,6 @@ export function UserDelete({ user, onDeleted, onError }: UserDeleteProps) {
           </nav>
         </Modal>
       )}
-    </>
+    </div>
   );
 }

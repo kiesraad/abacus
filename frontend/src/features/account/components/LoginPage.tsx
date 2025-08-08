@@ -22,7 +22,7 @@ export function LoginPage() {
         </section>
       </header>
       <main>
-        <article className="no_footer">
+        <article>
           <LoginForm />
         </article>
       </main>

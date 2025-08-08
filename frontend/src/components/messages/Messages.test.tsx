@@ -31,7 +31,7 @@ describe("Messages component", () => {
     const aside = within(alerts[0]!).getByRole("complementary");
     expect(within(aside).getByRole("img")).toHaveAccessibleName("Let op");
 
-    expect(within(alerts[0]!).getByRole("heading")).toHaveTextContent("Main screen turn on");
+    expect(within(alerts[0]!).getByRole("strong")).toHaveTextContent("Main screen turn on");
     expect(within(alerts[0]!).getByRole("paragraph")).toHaveTextContent("Somebody set up us the bomb");
   });
 

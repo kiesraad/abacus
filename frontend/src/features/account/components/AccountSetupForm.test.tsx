@@ -19,7 +19,7 @@ async function renderForm(user: Partial<LoginResponse> = {}) {
     ></AccountSetupForm>,
   );
 
-  expect(await screen.findByRole("heading", { name: "Personaliseer je account" })).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { level: 2, name: "Personaliseer je account" })).toBeInTheDocument();
   return { onSaved };
 }
 
@@ -39,7 +39,7 @@ describe("AccountSetupForm", () => {
     await user.type(screen.getByLabelText("Kies nieuw wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
     expect(updateAccount).toHaveBeenCalledExactlyOnceWith({
@@ -54,11 +54,11 @@ describe("AccountSetupForm", () => {
   test("Login success alert", async () => {
     await renderForm();
 
-    const loginSuccess = screen.getByRole("alert");
-    expect(await within(loginSuccess).findByRole("heading", { name: "Inloggen gelukt" })).toBeVisible();
+    const loginSuccess = await screen.findByRole("alert");
+    expect(within(loginSuccess).getByRole("strong")).toHaveTextContent("Inloggen gelukt");
 
     const user = userEvent.setup();
-    await user.click(await within(loginSuccess).findByRole("button"));
+    await user.click(within(loginSuccess).getByRole("button", { name: "Melding sluiten" }));
 
     expect(loginSuccess).not.toBeInTheDocument();
   });
@@ -66,11 +66,11 @@ describe("AccountSetupForm", () => {
   test("Hide login success on submit", async () => {
     await renderForm();
 
-    const loginSuccess = screen.getByRole("alert");
-    expect(await within(loginSuccess).findByRole("heading", { name: "Inloggen gelukt" })).toBeVisible();
+    const loginSuccess = await screen.findByRole("alert");
+    expect(within(loginSuccess).getByRole("strong")).toHaveTextContent("Inloggen gelukt");
 
     const user = userEvent.setup();
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
     expect(loginSuccess).not.toBeInTheDocument();
@@ -80,7 +80,7 @@ describe("AccountSetupForm", () => {
     const { onSaved } = await renderForm();
 
     const user = userEvent.setup();
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
     const fullname = screen.getByLabelText("Jouw naam (roepnaam + achternaam)");
@@ -105,7 +105,7 @@ describe("AccountSetupForm", () => {
     const passwordRepeat = screen.getByLabelText("Herhaal wachtwoord");
     await user.type(passwordRepeat, "something_else");
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
     expect(passwordRepeat).toBeInvalid();
@@ -122,7 +122,7 @@ describe("AccountSetupForm", () => {
     expect(fullname).toHaveValue("Roep Achternaam");
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Volgende" }));
+    await user.click(screen.getByRole("button", { name: "Opslaan" }));
     expect(fullname).not.toBeInvalid();
     expect(fullname).not.toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
   });

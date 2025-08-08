@@ -91,9 +91,9 @@ describe("DataEntryHomePage", () => {
     renderDataEntryHomePage();
 
     const alert = await screen.findByRole("alert");
-    expect(within(alert).getByText("Je hebt nog een openstaande invoer")).toBeVisible();
-    expect(within(alert).getByText("Op Rolletjes")).toBeVisible();
-    expect(within(alert).queryByText("Testplek")).toBeNull();
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Je hebt nog een openstaande invoer");
+    const pollingStations = await within(alert).findAllByRole("link");
+    expect(pollingStations.map((ps) => ps.textContent)).toEqual(["33 - Op Rolletjes"]);
   });
 
   test("Resume input invisible when none are unfinished", async () => {
@@ -141,11 +141,12 @@ describe("DataEntryHomePage", () => {
 
     // Set the hash to show the alert and expect it to be visible
     await router.navigate({ hash: "data-entry-1-saved" });
-    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeading);
 
     // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
-    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
+    const alertClosed = waitForElementToBeRemoved(alert);
+    await user.click(within(alert).getByRole("button", { name: "Melding sluiten" }));
     await alertClosed;
   });
 
@@ -179,11 +180,12 @@ describe("DataEntryHomePage", () => {
 
     // Set the hash to show the alert and expect it to be visible
     await router.navigate({ hash: "data-entry-different" });
-    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeading);
 
     // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
-    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
+    const alertClosed = waitForElementToBeRemoved(alert);
+    await user.click(within(alert).getByRole("button", { name: "Melding sluiten" }));
     await alertClosed;
   });
 
@@ -217,11 +219,12 @@ describe("DataEntryHomePage", () => {
 
     // Set the hash to show the alert and expect it to be visible
     await router.navigate({ hash: "data-entry-errors" });
-    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeading);
 
     // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
-    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
+    const alertClosed = waitForElementToBeRemoved(alert);
+    await user.click(within(alert).getByRole("button", { name: "Melding sluiten" }));
     await alertClosed;
   });
 
@@ -249,15 +252,18 @@ describe("DataEntryHomePage", () => {
       }),
     ).toBeVisible();
 
+    // Expect the alert to not be visible
     const alertHeading = "Je kan stembureau 33 niet invoeren";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
+    // Set the hash to show the alert and expect it to be visible
     await router.navigate({ hash: "data-entry-claimed-1" });
-    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeading);
 
     // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
-    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
+    const alertClosed = waitForElementToBeRemoved(alert);
+    await user.click(within(alert).getByRole("button", { name: "Melding sluiten" }));
     await alertClosed;
   });
 
@@ -284,15 +290,18 @@ describe("DataEntryHomePage", () => {
       }),
     ).toBeVisible();
 
+    // Expect the alert to not be visible
     const alertHeading = "Je kan stembureau 33 niet invoeren";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
+    // Set the hash to show the alert and expect it to be visible
     await router.navigate({ hash: "data-entry-finalised-1" });
-    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeading);
 
     // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
-    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
+    const alertClosed = waitForElementToBeRemoved(alert);
+    await user.click(within(alert).getByRole("button", { name: "Melding sluiten" }));
     await alertClosed;
   });
 
@@ -319,15 +328,18 @@ describe("DataEntryHomePage", () => {
       }),
     ).toBeVisible();
 
+    // Expect the alert to not be visible
     const alertHeading = "Je kan stembureau 33 niet invoeren";
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
+    // Set the hash to show the alert and expect it to be visible
     await router.navigate({ hash: "invalid-action-1" });
-    expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeading);
 
     // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
-    await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
+    const alertClosed = waitForElementToBeRemoved(alert);
+    await user.click(within(alert).getByRole("button", { name: "Melding sluiten" }));
     await alertClosed;
   });
 });

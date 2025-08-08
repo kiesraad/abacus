@@ -46,7 +46,9 @@ export function ElectionHomePage() {
       </header>
       {pollingStations.length === 0 && (
         <Alert type="warning">
-          <h2 id="noPollingStationsWarningAlertTitle">{t("election_management.no_polling_stations")}</h2>
+          <strong className="heading-md" id="noPollingStationsWarningAlertTitle">
+            {t("election_management.no_polling_stations")}
+          </strong>
           <p id="noPollingStationsWarningAlertDescription">{t("election_management.add_polling_stations_first")}</p>
           <p>
             <Link to="polling-stations">{t("election_management.manage_polling_stations")}</Link> →
@@ -68,7 +70,7 @@ export function ElectionHomePage() {
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>
           <div className="mb-xl">
-            <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.about_this_election")}</h3>
+            <h3 className={cls.tableTitle}>{t("election_management.about_this_election")}</h3>
             <ElectionInformationTable
               election={election}
               numberOfPollingStations={pollingStations.length}
@@ -76,7 +78,7 @@ export function ElectionHomePage() {
             />
           </div>
           <div className="mb-xl">
-            <h3 className={cn(cls.tableTitle, "heading-lg")}>{t("election_management.empty_models")}</h3>
+            <h3 className={cls.tableTitle}>{t("election_management.empty_models")}</h3>
             <section className="md">
               <p>{t("election_management.empty_models_description")}</p>
             </section>

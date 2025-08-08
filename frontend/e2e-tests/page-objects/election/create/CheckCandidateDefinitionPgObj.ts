@@ -12,7 +12,7 @@ export class CheckCandidateDefinitionPgObj {
     this.hashInput1 = page.getByLabel("Controle deel 1");
     this.hashInput2 = page.getByLabel("Controle deel 2");
     this.next = page.getByRole("button", { name: "Volgende" });
-    this.error = page.getByRole("heading", { level: 3, name: "Controle digitale vingerafdruk niet gelukt" });
+    this.error = page.getByRole("strong").filter({ hasText: "Controle digitale vingerafdruk niet gelukt" });
   }
 
   async inputHash(hashInput1: string, hashInput2: string) {

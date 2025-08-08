@@ -8,7 +8,7 @@ export class UploadElectionDefinitionPgObj {
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" });
-    this.error = page.getByRole("heading", { level: 3, name: "Ongeldige verkiezingsdefinitie" });
+    this.error = page.getByRole("strong").filter({ hasText: "Ongeldige verkiezingsdefinitie" });
     this.upload = page.getByRole("button", { name: "Bestand kiezen" });
     this.main = page.getByRole("main");
   }

@@ -54,11 +54,11 @@ describe("AccountSetupForm", () => {
   test("Login success alert", async () => {
     await renderForm();
 
-    const loginSuccess = screen.getByRole("alert");
-    expect(await within(loginSuccess).findByRole("heading", { level: 2, name: "Inloggen gelukt" })).toBeVisible();
+    const loginSuccess = await screen.findByRole("alert");
+    expect(within(loginSuccess).getByRole("strong")).toHaveTextContent("Inloggen gelukt");
 
     const user = userEvent.setup();
-    await user.click(await within(loginSuccess).findByRole("button"));
+    await user.click(within(loginSuccess).getByRole("button", { name: "Melding sluiten" }));
 
     expect(loginSuccess).not.toBeInTheDocument();
   });
@@ -66,8 +66,8 @@ describe("AccountSetupForm", () => {
   test("Hide login success on submit", async () => {
     await renderForm();
 
-    const loginSuccess = screen.getByRole("alert");
-    expect(await within(loginSuccess).findByRole("heading", { level: 2, name: "Inloggen gelukt" })).toBeVisible();
+    const loginSuccess = await screen.findByRole("alert");
+    expect(within(loginSuccess).getByRole("strong")).toHaveTextContent("Inloggen gelukt");
 
     const user = userEvent.setup();
     const submitButton = screen.getByRole("button", { name: "Opslaan" });

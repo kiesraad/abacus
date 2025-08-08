@@ -315,7 +315,7 @@ describe("CommitteeSessionDetailsPage", () => {
 
     // Expect error alert to be shown after a 400 error
     const alert = await screen.findByRole("alert");
-    expect(within(alert).getByText("De invoer is niet geldig")).toBeVisible();
+    expect(within(alert).getByRole("strong")).toHaveTextContent("De invoer is niet geldig");
   });
 
   test("Shows error page when change details call returns a 404 error", async () => {

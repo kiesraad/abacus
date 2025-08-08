@@ -119,6 +119,13 @@ export function CommitteeSessionDetailsPage() {
       </header>
       <main>
         <article>
+          {errorAlert && (
+            <FormLayout.Alert>
+              <Alert type="error">
+                <strong className="heading-md">{errorAlert}</strong>
+              </Alert>
+            </FormLayout.Alert>
+          )}
           <Form
             title={t("election_management.custom_committee_session_details", {
               sessionLabel: sessionLabel,
@@ -126,11 +133,6 @@ export function CommitteeSessionDetailsPage() {
             className={cls.detailsForm}
             onSubmit={handleSubmit}
           >
-            {errorAlert && (
-              <FormLayout.Alert>
-                <Alert type="error">{errorAlert}</Alert>
-              </FormLayout.Alert>
-            )}
             <FormLayout>
               <FormLayout.Section>
                 <InputField

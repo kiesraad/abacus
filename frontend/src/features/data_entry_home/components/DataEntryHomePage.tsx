@@ -71,7 +71,7 @@ export function DataEntryHomePage() {
       </header>
       {dataEntryDone && (
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
-          <h2>{t("data_entry.entry_saved")}</h2>
+          <strong className="heading-md">{t("data_entry.entry_saved")}</strong>
           <p>
             {t("data_entry.success.return_paper")}.
             {showFirstDataEntrySavedAlert && (
@@ -86,7 +86,9 @@ export function DataEntryHomePage() {
 
       {dataEntryNotification && (
         <Alert type="notify" onClose={closeDataEntryNotifyAlert}>
-          <h2>{showDifferenceWithFirstEntryAlert ? t("data_entry.entry_different") : t("data_entry.entry_errors")}</h2>
+          <strong className="heading-md">
+            {showDifferenceWithFirstEntryAlert ? t("data_entry.entry_different") : t("data_entry.entry_errors")}
+          </strong>
           <p>
             {t("data_entry.entry_saved")}. {t("data_entry.success.return_paper")},<br />
             {showDifferenceWithFirstEntryAlert
@@ -98,11 +100,11 @@ export function DataEntryHomePage() {
 
       {dataEntryWarning && claimedPollingStationNumber !== 0 && (
         <Alert type="warning" onClose={closeDataEntryWarningAlert}>
-          <h2 id="dataEntryWarningAlertTitle">
+          <strong className="heading-md" id="dataEntryWarningAlertTitle">
             {t("data_entry.data_entry_not_possible", {
               nr: claimedPollingStationNumber,
             })}
-          </h2>
+          </strong>
           <p id="dataEntryWarningAlertDescription">
             {t(
               `error.api_error.${
@@ -119,7 +121,7 @@ export function DataEntryHomePage() {
 
       {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
-          <h2>{t("data_entry.completed.all_entries_completed")}</h2>
+          <strong className="heading-md">{t("data_entry.completed.all_entries_completed")}</strong>
           <p>{t("data_entry.completed.thank_you")}</p>
           <p>{t("data_entry.completed.info", { electionName: election.name })}</p>
           <p>{t("data_entry.completed.wait_for_instructions")}</p>

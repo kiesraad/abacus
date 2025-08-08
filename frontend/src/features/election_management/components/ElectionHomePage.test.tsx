@@ -175,11 +175,12 @@ describe("ElectionHomePage", () => {
     await renderPage();
 
     const alert = await screen.findByRole("alert");
-    expect(within(alert).getByText("Geen stembureaus")).toBeVisible();
-    expect(
-      within(alert).getByText("De invoerfase kan pas gestart worden als er stembureaus zijn toegevoegd."),
-    ).toBeVisible();
-    expect(within(alert).getByRole("link", { name: "Stembureaus beheren" })).toBeVisible();
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Geen stembureaus");
+    const alertParagraphs = within(alert).getAllByRole("paragraph");
+    expect(alertParagraphs[0]!).toHaveTextContent(
+      "De invoerfase kan pas gestart worden als er stembureaus zijn toegevoegd.",
+    );
+    expect(within(alertParagraphs[1]!).getByRole("link", { name: "Stembureaus beheren" })).toBeVisible();
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();

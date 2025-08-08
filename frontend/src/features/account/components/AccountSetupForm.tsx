@@ -88,11 +88,11 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
   }
 
   return (
-    <Form title={t("account.personalize_account")} onSubmit={handleSubmit}>
+    <>
       {showLoginSuccess && (
         <FormLayout.Alert>
           <Alert type="success" onClose={hideLoginSuccess}>
-            <h2>{t("account.login_success")}</h2>
+            <strong className="heading-md">{t("account.login_success")}</strong>
             <p>{t("account.setting_up_account")}</p>
           </Alert>
         </FormLayout.Alert>
@@ -100,54 +100,57 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
       {validationErrors && (
         <FormLayout.Alert>
           <Alert type="error">
-            <h2>{t("account.not_saved")}</h2>
+            <strong className="heading-md">{t("account.not_saved")}</strong>
             <p>{t("account.check_fields")}</p>
           </Alert>
         </FormLayout.Alert>
       )}
       {apiError && (
         <FormLayout.Alert>
-          <Alert type="error">{apiError.message}</Alert>
+          <Alert type="error">
+            <strong className="heading-md">{apiError.message}</strong>
+          </Alert>
         </FormLayout.Alert>
       )}
-      <FormLayout disabled={requestState.status === "loading"}>
-        <FormLayout.Section>
-          <InputField
-            name="username"
-            label={t("account.username")}
-            hint={t("account.username_hint")}
-            value={user.username}
-            disabled
-          />
-          <InputField
-            name="fullname"
-            label={t("account.fullname")}
-            subtext={t("account.fullname_subtext")}
-            hint={t("account.fullname_hint")}
-            error={validationErrors?.fullname}
-            defaultValue={user.fullname}
-          />
-          <InputField
-            name="password"
-            label={t("account.password_new")}
-            hint={t("account.password_hint")}
-            type="password"
-            error={validationErrors?.password}
-          />
-          <InputField
-            name="password_repeat"
-            label={t("account.password_repeat")}
-            type="password"
-            error={validationErrors?.password_repeat}
-            margin="mb-0"
-          />
-        </FormLayout.Section>
-        <FormLayout.Controls>
-          <Button type="submit" size="lg">
-            {t("save")}
-          </Button>
-        </FormLayout.Controls>
-      </FormLayout>
-    </Form>
+      <Form title={t("account.personalize_account")} onSubmit={handleSubmit}>
+        <FormLayout disabled={requestState.status === "loading"}>
+          <FormLayout.Section>
+            <InputField
+              name="username"
+              label={t("account.username")}
+              hint={t("account.username_hint")}
+              value={user.username}
+              disabled
+            />
+            <InputField
+              name="fullname"
+              label={t("account.fullname")}
+              subtext={t("account.fullname_subtext")}
+              hint={t("account.fullname_hint")}
+              error={validationErrors?.fullname}
+              defaultValue={user.fullname}
+            />
+            <InputField
+              name="password"
+              label={t("account.password_new")}
+              hint={t("account.password_hint")}
+              type="password"
+              error={validationErrors?.password}
+            />
+            <InputField
+              name="password_repeat"
+              label={t("account.password_repeat")}
+              type="password"
+              error={validationErrors?.password_repeat}
+            />
+          </FormLayout.Section>
+          <FormLayout.Controls>
+            <Button type="submit" size="lg">
+              {t("save")}
+            </Button>
+          </FormLayout.Controls>
+        </FormLayout>
+      </Form>
+    </>
   );
 }

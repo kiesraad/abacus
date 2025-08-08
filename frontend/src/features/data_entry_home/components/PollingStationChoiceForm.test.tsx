@@ -331,7 +331,9 @@ describe("Test PollingStationChoiceForm", () => {
       expect(pollingStationList).not.toBeInTheDocument();
 
       const alert = await screen.findByRole("alert");
-      expect(alert).toHaveTextContent("Er zijn voor jou geen stembureaus meer om in te voeren");
+      expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+        "Er zijn voor jou geen stembureaus meer om in te voeren",
+      );
     });
 
     test("All data entries of polling stations are finished, polling station list shows message", async () => {
@@ -437,10 +439,7 @@ describe("Test PollingStationChoiceForm", () => {
       await renderPollingStationChoiceForm();
 
       const alert = await screen.findByRole("alert");
-      expect(
-        await within(alert).findByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" }),
-      ).toBeVisible();
-
+      expect(within(alert).getByRole("strong")).toHaveTextContent("Je hebt nog een openstaande invoer");
       const pollingStations = await within(alert).findAllByRole("link");
       expect(pollingStations.map((ps) => ps.textContent)).toEqual(["34 - Testplek", "35 - Testschool"]);
     });

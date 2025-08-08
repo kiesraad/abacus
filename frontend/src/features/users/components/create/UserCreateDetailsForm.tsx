@@ -91,14 +91,16 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
     <>
       {error && (
         <FormLayout.Alert>
-          <Alert type="error">{t(`error.api_error.${error.reference}`)}</Alert>
+          <Alert type="error">
+            <strong className="heading-md">{t(`error.api_error.${error.reference}`)}</strong>
+          </Alert>
         </FormLayout.Alert>
       )}
 
       {usernameUniqueError && (
         <FormLayout.Alert>
           <Alert type="error">
-            <h2>{usernameUniqueError}</h2>
+            <strong className="heading-md">{usernameUniqueError}</strong>
             <p>{t("users.username_unique")}</p>
           </Alert>
         </FormLayout.Alert>

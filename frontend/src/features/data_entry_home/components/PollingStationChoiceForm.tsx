@@ -156,7 +156,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       {inProgressCurrentUser.length > 0 && (
         <div className="mb-lg" id="unfinished-list">
           <Alert type="notify" variant="no-icon">
-            <h2>{t("polling_station_choice.unfinished_input_title")}</h2>
+            <strong className="heading-md">{t("polling_station_choice.unfinished_input_title")}</strong>
             <p>{t("polling_station_choice.unfinished_input_content")}</p>
             {inProgressCurrentUser.map((pollingStation) => (
               <PollingStationLink

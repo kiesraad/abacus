@@ -22,17 +22,14 @@ export class ElectionStatus {
     this.definitive = page.getByRole("table", { name: "Eerste en tweede invoer klaar" });
     this.notStarted = page.getByRole("table", { name: "Werkvoorraad" });
 
-    this.differencesResolved = page.getByRole("heading", {
-      level: 2,
-      name: /Verschil opgelost voor stembureau \d+/,
+    this.differencesResolved = page.getByRole("strong").filter({
+      hasText: /Verschil opgelost voor stembureau \d+/,
     });
-    this.firstDataEntryResumed = page.getByRole("heading", {
-      level: 2,
-      name: /Stembureau \d+ teruggegeven aan \w+/,
+    this.firstDataEntryResumed = page.getByRole("strong").filter({
+      hasText: /Stembureau \d+ teruggegeven aan \w+/,
     });
-    this.firstDataEntryDiscarded = page.getByRole("heading", {
-      level: 2,
-      name: /^Invoer stembureau \d+ verwijderd$/,
+    this.firstDataEntryDiscarded = page.getByRole("strong").filter({
+      hasText: /^Invoer stembureau \d+ verwijderd$/,
     });
 
     this.alertDifferencesResolved = page.getByRole("alert").filter({ has: this.differencesResolved });

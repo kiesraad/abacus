@@ -165,7 +165,7 @@ export function ElectionStatusPage() {
       statuses.length > 0 &&
       statuses.every((s) => s.status === "definitive") ? (
         <Alert type="success">
-          <h2>{t("election_status.definitive.title")}</h2>
+          <strong className="heading-md">{t("election_status.definitive.title")}</strong>
           <p>{t("election_status.definitive.message")}</p>
           <Button onClick={finishDataEntry} size="md">
             {t("election_status.definitive.finish_button")}
@@ -175,7 +175,7 @@ export function ElectionStatusPage() {
         isCoordinator &&
         committeeSession.status === "data_entry_paused" && (
           <Alert type="warning">
-            <h2>{t("election_status.data_entry_is_paused")}</h2>
+            <strong className="heading-md">{t("election_status.data_entry_is_paused")}</strong>
             <p>{t("election_status.paused_status_information")}</p>
             <Button
               onClick={() => {

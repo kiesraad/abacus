@@ -48,7 +48,7 @@ export function Alert({
               <AlertIcon type={type} />
             </aside>
           )}
-          {title && <h3>{title}</h3>}
+          {title && <strong className="heading-md">{title}</strong>}
         </header>
       ) : (
         variant !== "no-icon" && (

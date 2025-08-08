@@ -123,8 +123,9 @@ describe("User create pages integration test", () => {
       await user.click(detailsPage.save());
 
       expect(await screen.findByRole("heading", { level: 1, name: "Gebruikersbeheer" })).toBeInTheDocument();
-      const alert = screen.getByRole("alert");
-      expect(within(alert).getByText("GuusGeluk is toegevoegd met de rol Beheerder")).toBeInTheDocument();
+      const alert = await screen.findByRole("alert");
+      expect(within(alert).getByRole("strong")).toHaveTextContent("Gebruiker toegevoegd");
+      expect(within(alert).getByRole("paragraph")).toHaveTextContent("GuusGeluk is toegevoegd met de rol Beheerder");
     });
 
     test("Showing a unique username error", async () => {
@@ -149,8 +150,10 @@ describe("User create pages integration test", () => {
       await user.type(detailsPage.password(), "Geluksdubbeltje10");
       await user.click(detailsPage.save());
 
-      const alert = screen.getByRole("alert");
-      expect(within(alert).getByText("Er bestaat al een gebruiker met gebruikersnaam GuusGeluk")).toBeInTheDocument();
+      const alert = await screen.findByRole("alert");
+      expect(within(alert).getByRole("strong")).toHaveTextContent(
+        "Er bestaat al een gebruiker met gebruikersnaam GuusGeluk",
+      );
       expect(await detailsPage.title()).toBeInTheDocument();
     });
   });

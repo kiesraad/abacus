@@ -74,7 +74,9 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
     <>
       {error && (
         <FormLayout.Alert>
-          <Alert type="error">{t(`error.api_error.${error.reference}`)}</Alert>
+          <Alert type="error">
+            <strong className="heading-md">{t(`error.api_error.${error.reference}`)}</strong>
+          </Alert>
         </FormLayout.Alert>
       )}
 

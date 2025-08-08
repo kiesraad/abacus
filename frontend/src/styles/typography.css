@@ -41,7 +41,8 @@ h2,
   margin-bottom: 1.5rem;
 }
 
-h3 {
+h3,
+.heading-md {
   font-size: 1.25em;
   font-weight: bold;
 }

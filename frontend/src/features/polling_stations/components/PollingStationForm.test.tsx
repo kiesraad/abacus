@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { PollingStationCreateHandler, PollingStationUpdateHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, waitFor } from "@/testing/test-utils";
+import { render, screen, waitFor, within } from "@/testing/test-utils";
 import { ErrorResponse, PollingStation } from "@/types/generated/openapi";
 
 import { PollingStationForm } from "./PollingStationForm";
@@ -144,11 +144,9 @@ describe("PollingStationForm", () => {
 
       await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
-      await waitFor(() => {
-        expect(screen.getByRole("alert")).toHaveTextContent(
-          ["Er bestaat al een stembureau met nummer 42.", "Het nummer van het stembureau moet uniek zijn."].join(""),
-        );
-      });
+      const alert = await screen.findByRole("alert");
+      expect(within(alert).getByRole("strong")).toHaveTextContent("Er bestaat al een stembureau met nummer 42.");
+      expect(within(alert).getByRole("paragraph")).toHaveTextContent("Het nummer van het stembureau moet uniek zijn.");
 
       expect(onSaved).not.toHaveBeenCalled();
     });
@@ -202,11 +200,9 @@ describe("PollingStationForm", () => {
 
     await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
-    await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent(
-        ["Er bestaat al een stembureau met nummer 42.", "Het nummer van het stembureau moet uniek zijn."].join(""),
-      );
-    });
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Er bestaat al een stembureau met nummer 42.");
+    expect(within(alert).getByRole("paragraph")).toHaveTextContent("Het nummer van het stembureau moet uniek zijn.");
 
     //generate client error:
     await user.type(inputs.number, "asd");

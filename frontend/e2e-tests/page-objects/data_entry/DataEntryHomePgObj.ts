@@ -36,23 +36,11 @@ export class DataEntryHomePage {
     this.pollingStationSubmitFeedback = page.getByTestId("pollingStationSubmitFeedback");
     this.start = page.getByRole("button", { name: "Beginnen" });
 
-    this.dataEntrySaved = page.getByRole("heading", {
-      level: 2,
-      name: "Je invoer is opgeslagen",
-    });
-    this.dataEntryDifferent = page.getByRole("heading", {
-      level: 2,
-      name: "Let op: verschil met eerste invoer",
-    });
-    this.dataEntryErrors = page.getByRole("heading", {
-      level: 2,
-      name: "Let op: fouten in het proces-verbaal",
-    });
-    this.dataEntryWarning = page.getByRole("heading", {
-      level: 2,
-      name: /^Je kan stembureau \d+ niet invoeren$/,
-    });
-    this.resumeDataEntry = page.getByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" });
+    this.dataEntrySaved = page.getByRole("strong").filter({ hasText: "Je invoer is opgeslagen" });
+    this.dataEntryDifferent = page.getByRole("strong").filter({ hasText: "Let op: verschil met eerste invoer" });
+    this.dataEntryErrors = page.getByRole("strong").filter({ hasText: "Let op: fouten in het proces-verbaal" });
+    this.dataEntryWarning = page.getByRole("strong").filter({ hasText: /^Je kan stembureau \d+ niet invoeren$/ });
+    this.resumeDataEntry = page.getByRole("strong").filter({ hasText: "Je hebt nog een openstaande invoer" });
 
     this.alertDataEntrySaved = page.getByRole("alert").filter({ has: this.dataEntrySaved });
 

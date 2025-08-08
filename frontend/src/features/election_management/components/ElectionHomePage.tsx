@@ -46,7 +46,9 @@ export function ElectionHomePage() {
       </header>
       {pollingStations.length === 0 && (
         <Alert type="warning">
-          <h2 id="noPollingStationsWarningAlertTitle">{t("election_management.no_polling_stations")}</h2>
+          <strong className="heading-md" id="noPollingStationsWarningAlertTitle">
+            {t("election_management.no_polling_stations")}
+          </strong>
           <p id="noPollingStationsWarningAlertDescription">{t("election_management.add_polling_stations_first")}</p>
           <p>
             <Link to="polling-stations">{t("election_management.manage_polling_stations")}</Link> →

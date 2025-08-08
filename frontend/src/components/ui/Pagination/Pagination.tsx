@@ -13,6 +13,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
   return (
     <div className={cls.pagination}>
       <Button
+        size="md"
         disabled={page === 1}
         onClick={() => {
           onPageChange(page - 1);
@@ -22,6 +23,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
       </Button>
       <span>{t("page_number", { page, totalPages })}</span>
       <Button
+        size="md"
         disabled={page === totalPages}
         onClick={() => {
           onPageChange(page + 1);

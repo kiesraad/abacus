@@ -125,9 +125,7 @@ export function ResolveDifferencesPage() {
             </ChoiceList>
             <BottomBar type="form">
               <BottomBar.Row>
-                <Button size="xl" type="submit">
-                  {t("save")}
-                </Button>
+                <Button type="submit">{t("save")}</Button>
               </BottomBar.Row>
             </BottomBar>
           </form>

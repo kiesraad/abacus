@@ -195,7 +195,6 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           <BottomBar.Row>
             <Button
               type="button"
-              size="lg"
               onClick={() => {
                 handleSubmit();
               }}

@@ -141,7 +141,7 @@ export function DataEntrySection() {
           </BottomBar.Row>
         )}
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={status === "saving"}>
+          <Button type="submit" disabled={status === "saving"}>
             {t("next")}
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

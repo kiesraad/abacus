@@ -91,9 +91,7 @@ export function ResolveErrorsIndexPage() {
             {t("resolve_errors.options.discard_first_entry_description")}
           </ChoiceList.Radio>
         </ChoiceList>
-        <Button size="xl" type="submit">
-          {t("save")}
-        </Button>
+        <Button type="submit">{t("save")}</Button>
       </form>
     </>
   );

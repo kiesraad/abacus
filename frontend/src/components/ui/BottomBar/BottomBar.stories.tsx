@@ -12,9 +12,7 @@ export const BottomBarFooter: StoryFn = () => {
   return (
     <BottomBar type="footer">
       <BottomBar.Row>
-        <Button size="lg" onClick={action("on-click")}>
-          Click me
-        </Button>
+        <Button onClick={action("on-click")}>Click me</Button>
       </BottomBar.Row>
     </BottomBar>
   );
@@ -25,9 +23,7 @@ export const BottomBarForm: StoryObj = {
     return (
       <BottomBar type="form">
         <BottomBar.Row>
-          <Button size="lg" onClick={action("on-click")}>
-            Click me
-          </Button>
+          <Button onClick={action("on-click")}>Click me</Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
@@ -50,9 +46,7 @@ export const BottomBarInputGrid: StoryFn = () => {
   return (
     <BottomBar type="inputGrid">
       <BottomBar.Row>
-        <Button size="lg" onClick={action("on-click")}>
-          Click me
-        </Button>
+        <Button onClick={action("on-click")}>Click me</Button>
         <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
       </BottomBar.Row>
     </BottomBar>

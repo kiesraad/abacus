@@ -234,7 +234,7 @@ export function CheckAndSaveForm() {
           {!hasErrors && allFeedbackAccepted && (
             <BottomBar type="form">
               <BottomBar.Row>
-                <Button type="submit" size="lg" disabled={status === "finalising"}>
+                <Button type="submit" disabled={status === "finalising"}>
                   {t("save")}
                 </Button>
                 <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
@@ -266,7 +266,7 @@ export function CheckAndSaveForm() {
           </BottomBar.Row>
 
           <BottomBar.Row>
-            <Button type="submit" size="lg" disabled={status === "finalising"}>
+            <Button type="submit" disabled={status === "finalising"}>
               {t("complete")}
             </Button>
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

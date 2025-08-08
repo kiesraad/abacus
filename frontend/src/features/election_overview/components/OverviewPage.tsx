@@ -103,11 +103,10 @@ export function OverviewPage() {
             !isAdminOrCoordinator ? (
               <>
                 <h2 className="mb-lg">{t("election.not_ready_for_use")}</h2>
-                <p className="md form-paragraph">{t("election.please_wait_for_coordinator")}</p>
+                <p className="md">{t("election.please_wait_for_coordinator")}</p>
               </>
             ) : (
               <h2>{t("election.no_elections_added")}</h2>
-              // TODO: To be expanded in issue #888
             )
           ) : (
             <Table id="overview">

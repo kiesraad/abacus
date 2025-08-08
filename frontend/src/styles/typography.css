@@ -70,14 +70,10 @@ p {
 }
 
 p.md {
+  width: 39.5rem;
   font-size: var(--font-size-md);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   line-height: 1.5rem;
-}
-
-p.form-paragraph {
-  width: 37.5rem;
-  margin-top: 1rem;
 }
 
 section.md {

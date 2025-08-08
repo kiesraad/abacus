@@ -92,13 +92,13 @@ export function OverviewPage() {
       )}
       <main>
         <article>
-          <Toolbar>
-            {isAdministrator && (
+          {isAdministrator && (
+            <Toolbar>
               <Button.Link variant="secondary" size="sm" to={"./create"}>
                 <IconPlus /> {t("election.create")}
               </Button.Link>
-            )}
-          </Toolbar>
+            </Toolbar>
+          )}
           {!electionList.length ? (
             !isAdminOrCoordinator ? (
               <>

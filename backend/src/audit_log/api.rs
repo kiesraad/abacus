@@ -18,7 +18,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct AuditLogListResponse {
     pub events: Vec<AuditLogEvent>,
     pub page: u32,
@@ -37,7 +37,7 @@ fn default_per_page() -> u32 {
 }
 
 #[derive(Debug, Deserialize, ToSchema, IntoParams)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct LogFilterQuery {
     /// Page number, default 1
     #[serde(default = "default_page")]
@@ -217,7 +217,7 @@ mod tests {
                 Request::builder()
                     .method(Method::GET)
                     .header("cookie", session.get_cookie().encoded().to_string())
-                    .uri("/api/log?perPage=2&page=2")
+                    .uri("/api/log?per_page=2&page=2")
                     .body(Body::empty())
                     .unwrap(),
             )

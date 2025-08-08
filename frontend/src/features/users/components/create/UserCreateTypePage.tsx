@@ -64,9 +64,7 @@ export function UserCreateTypePage() {
               </ChoiceList>
             </FormLayout.Section>
             <FormLayout.Controls>
-              <Button size="lg" type="submit">
-                {t("continue")}
-              </Button>
+              <Button type="submit">{t("continue")}</Button>
             </FormLayout.Controls>
           </FormLayout>
         </Form>

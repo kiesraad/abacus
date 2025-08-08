@@ -37,7 +37,7 @@ impl From<Option<String>> for Ip {
 }
 
 #[derive(Serialize, Deserialize, Debug, FromRow, ToSchema)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct AuditLogEvent {
     id: u32,
     #[schema(value_type = String)]

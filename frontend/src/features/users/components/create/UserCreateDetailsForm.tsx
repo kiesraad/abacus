@@ -137,9 +137,7 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
             />
           </FormLayout.Section>
           <FormLayout.Controls>
-            <Button size="lg" type="submit">
-              {t("save")}
-            </Button>
+            <Button type="submit">{t("save")}</Button>
           </FormLayout.Controls>
         </FormLayout>
       </Form>

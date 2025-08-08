@@ -8,27 +8,27 @@ use super::AuditEventLevel;
 use crate::{ErrorResponse, error::ErrorReference};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct UserLoggedInDetails {
     pub user_agent: String,
     pub logged_in_users_count: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct UserLoginFailedDetails {
     pub username: String,
     pub user_agent: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct UserLoggedOutDetails {
     pub session_duration: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct UserDetails {
     pub user_id: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,7 +39,7 @@ pub struct UserDetails {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct ElectionDetails {
     pub election_id: u32,
     pub election_name: String,
@@ -56,7 +56,7 @@ pub struct ElectionDetails {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct CommitteeSessionDetails {
     pub session_id: u32,
     pub session_number: u32,
@@ -69,7 +69,7 @@ pub struct CommitteeSessionDetails {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct PollingStationDetails {
     pub polling_station_id: u32,
     pub polling_station_election_id: u32,
@@ -85,7 +85,14 @@ pub struct PollingStationDetails {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct PollingStationImportDetails {
+    pub import_election_id: u32,
+    pub import_file_name: String,
+    pub import_number_of_polling_stations: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct DataEntryDetails {
     pub polling_station_id: u32,
     pub data_entry_status: String,
@@ -125,7 +132,7 @@ impl ErrorDetails {
 #[derive(
     Serialize, Deserialize, strum::Display, VariantNames, Debug, PartialEq, Eq, ToSchema, Default,
 )]
-#[serde(rename_all = "PascalCase", tag = "eventType")]
+#[serde(rename_all = "PascalCase", tag = "event_type")]
 pub enum AuditEvent {
     // authentication and account events
     UserLoggedIn(UserLoggedInDetails),
@@ -148,6 +155,7 @@ pub enum AuditEvent {
     PollingStationCreated(PollingStationDetails),
     PollingStationUpdated(PollingStationDetails),
     PollingStationDeleted(PollingStationDetails),
+    PollingStationsImported(PollingStationImportDetails),
     // data entry events
     DataEntryClaimed(DataEntryDetails),
     DataEntrySaved(DataEntryDetails),
@@ -198,6 +206,7 @@ impl AuditEvent {
             AuditEvent::PollingStationCreated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationUpdated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationDeleted(_) => AuditEventLevel::Info,
+            AuditEvent::PollingStationsImported(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryClaimed(_) => AuditEventLevel::Success,
             AuditEvent::DataEntrySaved(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,

@@ -170,7 +170,7 @@ export function CommitteeSessionDetailsPage() {
                 </FormLayout.Row>
               </FormLayout.Section>
               <FormLayout.Controls>
-                <Button size="lg" type="submit">
+                <Button type="submit">
                   {redirectToReportPage ? t("election_management.to_report") : t("save_changes")}
                 </Button>
                 <Button.Link variant="secondary" size="lg" to="..">

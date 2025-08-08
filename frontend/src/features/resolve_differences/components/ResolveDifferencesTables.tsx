@@ -33,6 +33,12 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
   let title = section.title;
   const firstValues = mapResultsToSectionValues(section, first);
   const secondValues = mapResultsToSectionValues(section, second);
+  const checkboxRows: Array<{
+    code: string;
+    first: string;
+    second: string;
+    description: string;
+  }> = [];
 
   return (
     <div>
@@ -71,13 +77,6 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
             );
           }
           case "checkboxes": {
-            const headers = [
-              t("resolve_differences.headers.field"),
-              t("resolve_differences.headers.first_entry"),
-              t("resolve_differences.headers.second_entry"),
-              t("resolve_differences.headers.description"),
-            ];
-
             const getSelectedOptions = (values: SectionValues) => {
               return subsection.options
                 .filter((option) => values[option.path] === "true")
@@ -92,15 +91,30 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
               description: subsection.short_title,
             };
 
-            return (
-              <DifferencesTable
-                key={`${section.id}-${subsectionIdx}`}
-                title={title}
-                headers={headers}
-                rows={[row]}
-                action={action}
-              />
-            );
+            checkboxRows.push(row);
+
+            if (
+              checkboxRows.length ===
+              section.subsections.filter((subsection) => subsection.type === "checkboxes").length
+            ) {
+              const headers = [
+                t("resolve_differences.headers.field"),
+                t("resolve_differences.headers.first_entry"),
+                t("resolve_differences.headers.second_entry"),
+                t("resolve_differences.headers.description"),
+              ];
+
+              return (
+                <DifferencesTable
+                  key={`${section.id}-${subsectionIdx}`}
+                  title={title}
+                  headers={headers}
+                  rows={checkboxRows}
+                  action={action}
+                />
+              );
+            }
+            break;
           }
           case "inputGrid": {
             const headers = [

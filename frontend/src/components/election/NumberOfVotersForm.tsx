@@ -41,9 +41,7 @@ export function NumberOfVotersForm({ defaultValue, instructions, hint, button, o
             />
           </FormLayout.Section>
           <FormLayout.Controls>
-            <Button size="lg" type="submit">
-              {button}
-            </Button>
+            <Button type="submit">{button}</Button>
           </FormLayout.Controls>
         </FormLayout>
       </Form>

@@ -118,7 +118,6 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
         <p>{t("polling_station.save_changes")}</p>
         <nav>
           <Button
-            size="lg"
             type="button"
             onClick={() => {
               void onModalSave();
@@ -127,7 +126,6 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
             {t("save_changes")}
           </Button>
           <Button
-            size="lg"
             variant="secondary"
             type="button"
             onClick={() => {

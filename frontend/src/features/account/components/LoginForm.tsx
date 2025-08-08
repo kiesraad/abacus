@@ -115,7 +115,7 @@ export function LoginForm() {
       </FormLayout>
       <BottomBar type="footer">
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" disabled={loading}>
             {t("account.login")}
           </Button>
         </BottomBar.Row>

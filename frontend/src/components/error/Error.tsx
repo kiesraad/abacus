@@ -27,7 +27,6 @@ export function Error({ title, error, children }: ErrorProps) {
             {children}
             <nav>
               <Button
-                size="lg"
                 variant="secondary"
                 leftIcon={<IconArrowLeft />}
                 onClick={() => {

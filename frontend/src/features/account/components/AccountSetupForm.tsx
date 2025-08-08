@@ -148,9 +148,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
           </FormLayout.Section>
           <BottomBar type="footer">
             <BottomBar.Row>
-              <Button type="submit" size="lg">
-                {t("next")}
-              </Button>
+              <Button type="submit">{t("next")}</Button>
             </BottomBar.Row>
           </BottomBar>
         </FormLayout>

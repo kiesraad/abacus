@@ -30,6 +30,7 @@
     "list_name": "{location}, kandidatenlijst {name}",
     "polling_station_title": "Controleer stembureaus"
   },
+  "configuration_not_finished": "De configuratie van Abacus is nog niet afgerond.",
   "create": "Verkiezing toevoegen",
   "import_candidates_eml": "Importeer kandidatenlijst",
   "import_election_eml": "Importeer verkiezingsdefinitie",
@@ -85,5 +86,6 @@
     "dso_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
     "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
     "title": "Type stemopneming in"
-  }
+  },
+  "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."
 }

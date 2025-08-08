@@ -45,7 +45,7 @@ function AdministratorCoordinatorLinks() {
       </strong>
       <ul>
         <li>
-          <Link to={"/elections"}>{t("election.manage")}</Link>
+          <Link to={"/elections"}>{isAdministrator ? t("election.manage") : t("election.title.plural")}</Link>
         </li>
         <ul>
           {electionList.map((election) => (

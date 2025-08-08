@@ -31,6 +31,10 @@
       padding-top: 0.5rem;
     }
 
+    &:global(.smallerMargin) {
+      margin-bottom: 0.5rem;
+    }
+
     &:global(.empty) {
       svg {
         fill: var(--menu-empty);
@@ -59,5 +63,6 @@
 
 .title {
   font-weight: bold;
+  margin-top: 1rem;
   padding-bottom: 0.5rem;
 }

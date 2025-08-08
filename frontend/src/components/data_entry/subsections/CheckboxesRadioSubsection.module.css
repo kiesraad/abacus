@@ -1,6 +1,6 @@
 .container {
   width: 37.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 
   legend {
     font-size: var(--font-size-md);

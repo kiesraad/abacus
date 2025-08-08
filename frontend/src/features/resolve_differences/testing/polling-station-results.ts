@@ -28,12 +28,12 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
     },
     extra_investigation: {
       extra_investigation_other_reason: {
-        yes: false,
-        no: false,
+        yes: !first,
+        no: first,
       },
       ballots_recounted_extra_investigation: {
         yes: false,
-        no: false,
+        no: !first,
       },
     },
     political_group_votes: [

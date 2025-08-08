@@ -307,7 +307,7 @@ Veld markeren: 3.3.2
 > Invoerder: **Controleer je antwoorden** (F.360)
 
 > Coördinator: **Hertel onverklaard verschil** (F.360)
-> Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen
+> Er is een onverklaard verschil dat herteld moet worden. Volg de instructies voor hertellingen.
 
 Veld markeren: 2.3.2  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).

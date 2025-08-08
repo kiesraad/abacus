@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactElement, ReactNode, useEffect, useRef } from "react";
 
 import { IconCross } from "@/components/generated/icons";
 import { t } from "@/i18n/translate";
@@ -7,7 +7,7 @@ import { IconButton } from "../IconButton/IconButton";
 import cls from "./Modal.module.css";
 
 export interface ModalProps {
-  title: string;
+  title: string | ReactElement;
   noFlex?: boolean;
   onClose?: () => void;
   children?: ReactNode;

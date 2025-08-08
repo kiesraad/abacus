@@ -6,6 +6,7 @@
     "save_input": "Invoer bewaren",
     "title": "Wat wil je doen met je invoer?"
   },
+  "changes_are_not_saved": "Je laatste wijzigingen worden niet opgeslagen.",
   "completed": {
     "all_entries_completed": "Alle stembureaus zijn ingevoerd",
     "info": "De resultaten van alle stembureaus kunnen nu opgeteld gaan worden om de uitslag van de {electionName} vast te stellen.",
@@ -33,5 +34,6 @@
     "return_paper": "Geef het papieren proces-verbaal terug aan de coördinator",
     "second_entry_info": "Een andere invoerder doet straks de tweede invoer."
   },
-  "title": "Invoeren"
+  "title": "Invoeren",
+  "to_overview": "Naar startscherm"
 }

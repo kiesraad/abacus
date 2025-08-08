@@ -35,7 +35,7 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
   }, [election.id, navigate, stateAndActions.error, pollingStationId]);
 
   // throw fatal errors, so the error boundary can catch them and show the full page error
-  if (stateAndActions.error instanceof FatalApiError) {
+  if (stateAndActions.error instanceof FatalApiError && stateAndActions.error.reference !== "CommitteeSessionPaused") {
     throw stateAndActions.error;
   }
 

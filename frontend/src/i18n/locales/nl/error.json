@@ -8,7 +8,7 @@
     "AirgapViolation": "Abacus is niet beschikbaar omdat de applicatie verbonden is met het internet. Abacus is alleen bedoeld voor offline gebruik.",
     "AllListsExhausted": "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
     "ApportionmentNotAvailableUntilDataEntryFinalised": "De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd",
-    "CommitteeSessionPaused": "De coördinator heeft het invoeren van stemmen gepauzeerd. Je kan niet meer verder. [Je laatste wijzigingen worden niet opgeslagen]",
+    "CommitteeSessionPaused": "De coördinator heeft het invoeren van stemmen gepauzeerd. Je kan niet meer verder.",
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
     "DataEntryAlreadyClaimed": "Een andere invoerder is bezig met dit stembureau",
     "DataEntryAlreadyFinalised": "De invoer voor dit stembureau is al gedaan",

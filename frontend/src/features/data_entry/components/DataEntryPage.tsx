@@ -1,10 +1,12 @@
 import { useParams } from "react-router";
 
-import { NotFoundError } from "@/api/ApiResult";
+import { FatalApiError, NotFoundError } from "@/api/ApiResult";
+import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal.tsx";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
+import { useDataEntryContext } from "@/features/data_entry/hooks/useDataEntryContext.ts";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
@@ -22,6 +24,8 @@ export function DataEntryPage() {
   const entryNumber = useNumericParam("entryNumber");
   const { election, pollingStation } = useElection(pollingStationId);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
+  // FIXME: Context is not available yet, so this does not work
+  const { error } = useDataEntryContext();
 
   if (!pollingStation) {
     throw new NotFoundError("error.polling_station_not_found");
@@ -47,6 +51,9 @@ export function DataEntryPage() {
           <AbortDataEntryControl />
         </section>
       </header>
+      {error instanceof FatalApiError && error.reference === "CommitteeSessionPaused" && (
+        <CommitteeSessionPausedModal showUnsavedChanges />
+      )}
       <main>
         <StickyNav>
           <DataEntryProgress />

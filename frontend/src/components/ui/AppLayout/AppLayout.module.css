@@ -18,7 +18,7 @@
 
       div:global(.election_status) {
         display: flex;
-        gap: 0.5rem;
+        gap: 1rem;
         line-height: 1.75rem;
         align-items: center;
         a:visited {

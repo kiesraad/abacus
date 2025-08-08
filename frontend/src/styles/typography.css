@@ -112,6 +112,11 @@ a {
   }
 }
 
+.underlined {
+  text-decoration: underline;
+  color: var(--link-default);
+}
+
 /* Font weight */
 .bold {
   font-weight: bold;
@@ -155,10 +160,4 @@ a {
 .font-number {
   font-family: var(--font-number);
   font-feature-settings: "ss09" on;
-}
-
-/* Link styling */
-.underlined {
-  text-decoration: underline;
-  color: var(--link-default);
 }

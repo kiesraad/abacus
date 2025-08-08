@@ -43,7 +43,10 @@ async fn test_polling_station_listing(pool: SqlitePool) {
     )
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_6", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
 async fn test_polling_station_creation_for_committee_session_with_created_status(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
@@ -498,7 +501,10 @@ async fn test_polling_station_import_validate_wrong_file(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST,);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_6", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
 async fn test_polling_station_import_missing_data(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
@@ -517,7 +523,10 @@ async fn test_polling_station_import_missing_data(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY,);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_6", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
 async fn test_polling_station_import_correct_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;

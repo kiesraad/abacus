@@ -100,7 +100,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
                   setPassword(e.target.value);
                 }}
               />
-              <Button type="submit" size="lg" disabled={loading}>
+              <Button type="submit" disabled={loading}>
                 {t("account.login")}
               </Button>
             </FormLayout>

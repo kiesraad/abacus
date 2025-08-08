@@ -8,7 +8,7 @@ export class UploadCandidateDefinitionPgObj {
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 2, name: "Importeer kandidatenlijst" });
-    this.error = page.getByRole("heading", { level: 3, name: "Ongeldige kandidatenlijst" });
+    this.error = page.getByRole("strong").filter({ hasText: "Ongeldige kandidatenlijst" });
     this.upload = page.getByRole("button", { name: "Bestand kiezen" });
     this.main = page.getByRole("main");
   }

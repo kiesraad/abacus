@@ -236,10 +236,13 @@ Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
 #### CSO | F.305 (Als D = H) I en/of J zijn ingevuld
-// TODO DSO
-> Invoerder: // TODO
+// TODO Handelingsperspectief reviewen met RKV
+> Invoerder: **Controleer je antwoorden** (F.305)
 
-> Coördinator: // TODO
+> Coördinator: **Contorleer I en J** (F.305)
+> De getallen bij D en H zijn gelijk. Er zijn geen stemmen meer of minder geteld.
+> Herstel de fout door op papier I en J leeg te (laten) maken.
+> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Veld markeren: I en/of J (als ingevuld)
 

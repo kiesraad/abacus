@@ -67,7 +67,6 @@ export function AbortModal() {
           {t("election.abort.discard_input")}
         </Button>
         <Button
-          size="xl"
           variant="secondary"
           onClick={() => {
             onAbortModalCancel();

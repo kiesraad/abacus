@@ -117,9 +117,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                 />
               </FormLayout.Section>
               <div className="mt-lg">
-                <Button type="submit" size="lg">
-                  {t("save")}
-                </Button>
+                <Button type="submit">{t("save")}</Button>
               </div>
             </FormLayout>
           </Form>

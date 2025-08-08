@@ -62,22 +62,21 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
               void handleSubmit(e);
             }}
           >
+            {error ? (
+              <FormLayout.Alert>
+                <Alert type="error">
+                  <h2>{t("initialise.login_error")}</h2>
+                </Alert>
+              </FormLayout.Alert>
+            ) : (
+              <FormLayout.Alert>
+                <Alert type="success">
+                  <h2>{t("initialise.admin_configured")}</h2>
+                </Alert>
+              </FormLayout.Alert>
+            )}
+            <section className="md">{tx("initialise.login_to_finish_setup", { link })}</section>
             <FormLayout>
-              {error ? (
-                <FormLayout.Alert>
-                  <Alert type="error">
-                    <h2>{t("initialise.login_error")}</h2>
-                    <p>{tx("initialise.reconfigure_admin_account", { link })}</p>
-                  </Alert>
-                </FormLayout.Alert>
-              ) : (
-                <FormLayout.Alert>
-                  <Alert type="notify">
-                    <h2>{t("initialise.admin_configured")}</h2>
-                    <p>{tx("initialise.login_to_finish_setup", { link })}</p>
-                  </Alert>
-                </FormLayout.Alert>
-              )}
               <InputField
                 name="username"
                 label={t("account.username")}

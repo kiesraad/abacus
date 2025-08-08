@@ -7,12 +7,13 @@
   "account_details": "Details van het account",
   "store_in_safe_place": "Bewaar de gegevens van het account van de beheerder op een veilige plek.",
   "admin_configured": "Account van beheerder ingesteld",
-  "login_to_finish_setup": "Abacus is nog niet klaar voor gebruik. Log in met het account van de beheerder om de configuratie af te ronden. Ben je de inloggegevens kwijt? <link>Stel het account van de beheerder opnieuw in.</link>",
+  "login_to_finish_setup": "<p>Abacus is nog niet klaar voor gebruik. Log in met het account van de beheerder om de configuratie af te ronden. Ben je de inloggegevens kwijt?</p><p><link>Stel het account van de beheerder opnieuw in.</link></p>",
   "login_error": "De gebruikersnaam of het wachtwoord is onjuist",
   "reconfigure_admin_account": "Ben je de inloggegevens kwijt? <link>Stel het account van de beheerder opnieuw in.</link>",
   "username_login_hint": "De naam die je zojuist hebt ingesteld",
   "password_login_hint": "Het wachtwoord dat je zojuist hebt gekozen",
   "password": "Kies een wachtwoord",
   "password_hint": "Gebruik minimaal 13 karakters. Het wachtwoord is hoofdlettergevoelig.",
-  "password_rules": "Het wachtwoord moet minimaal 13 karakters lang zijn."
+  "password_rules": "Het wachtwoord moet minimaal 13 karakters lang zijn.",
+  "fullname_hint": "Bijvoorbeeld Karel van Tellingen. Accounts in Abacus zijn persoonsgebonden. Je kan via gebruikersbeheer accounts aanmaken voor meer dan één beheerder."
 }

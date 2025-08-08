@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/Button/Button";
-import cls from "@/components/ui/Form/FormLayout.module.css";
 import { t, tx } from "@/i18n/translate";
 
 interface InitialiseWelcomeProps {
@@ -15,7 +14,7 @@ export function InitialiseWelcome({ next }: InitialiseWelcomeProps) {
         </section>
       </header>
       <main>
-        <section className={cls.formSection}>
+        <section className="md">
           <h2>{t("initialise.installation_success")}</h2>
           {tx("initialise.setup_instructions")}
           <p className="mt-xl">

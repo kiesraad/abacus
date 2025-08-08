@@ -1,20 +1,21 @@
 #[derive(Debug)]
 pub enum AuthenticationError {
-    UserNotFound,
-    NotInitialised,
-    InvalidUsernameOrPassword,
+    AlreadyInitialised,
+    Database(sqlx::Error),
+    Forbidden,
+    HashPassword(password_hash::Error),
     InvalidPassword,
     InvalidSessionDuration,
-    UsernameAlreadyExists,
-    SessionKeyNotFound,
+    InvalidUsernameOrPassword,
     NoSessionCookie,
-    Database(sqlx::Error),
-    HashPassword(password_hash::Error),
-    Forbidden,
-    Unauthorized,
-    Unauthenticated,
-    PasswordRejection,
+    NotInitialised,
     OwnAccountCannotBeDeleted,
+    PasswordRejection,
+    SessionKeyNotFound,
+    Unauthenticated,
+    Unauthorized,
+    UsernameAlreadyExists,
+    UserNotFound,
 }
 
 impl From<password_hash::Error> for AuthenticationError {

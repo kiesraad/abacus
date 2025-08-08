@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT 1 AS 'exists' FROM users WHERE role = ? LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "name": "exists",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "23e67e9efc1fde4fcf80e9ad751c141175d0b9428fe0efafdde2f07cfd9f6b65"
+}

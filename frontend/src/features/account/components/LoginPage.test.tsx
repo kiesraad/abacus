@@ -1,16 +1,29 @@
+import userEvent from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { InitialisedHandler } from "@/testing/api-mocks/RequestHandlers";
+import { InitialisedHandler, LoginHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { render } from "@/testing/test-utils";
+import { render, screen, spyOnHandler } from "@/testing/test-utils";
 
 import { LoginPage } from "./LoginPage";
 
 describe("LoginPage", () => {
-  test("Enter form field values", () => {
-    server.use(InitialisedHandler);
+  test("Enter form field values", async () => {
+    server.use(InitialisedHandler, LoginHandler);
+    const login = spyOnHandler(LoginHandler);
 
     render(<LoginPage />);
-    expect(true).toBe(true);
+
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText("Gebruikersnaam"), "username");
+    await user.type(screen.getByLabelText("Wachtwoord"), "password*password");
+
+    const submitButton = screen.getByRole("button", { name: "Inloggen" });
+    await user.click(submitButton);
+
+    expect(login).toHaveBeenCalledWith({
+      username: "username",
+      password: "password*password",
+    });
   });
 });

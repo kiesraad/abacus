@@ -1,14 +1,12 @@
-import { Outlet, useLocation } from "react-router";
+import { Outlet } from "react-router";
 
 import { NavBar } from "@/components/navbar/NavBar";
 import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
 
 export function LoginLayout() {
-  const location = useLocation();
-
   return (
     <AppLayout>
-      <NavBar location={location} />
+      <NavBar />
       <Outlet />
     </AppLayout>
   );

@@ -25,6 +25,7 @@ import {
   screen,
   setupTestRouter,
   spyOnHandler,
+  waitFor,
 } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider.tsx";
 import { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi.ts";
@@ -73,7 +74,9 @@ describe("FinishDataEntryPage", () => {
     await user.click(finishButton);
 
     expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_finished" });
-    expect(navigate).toHaveBeenCalledWith("/elections/1/report/download");
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/report/download");
+    });
   });
 
   test("Shows error page when finish data entry call returns an error", async () => {
@@ -170,6 +173,8 @@ describe("FinishDataEntryPage", () => {
 
     await renderPage();
 
-    expect(navigate).toHaveBeenCalledWith("/elections/1/report/download");
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/report/download");
+    });
   });
 });

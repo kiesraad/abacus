@@ -239,7 +239,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 // TODO Handelingsperspectief reviewen met RKV
 > Invoerder: **Controleer je antwoorden** (F.305)
 
-> Coördinator: **Contorleer I en J** (F.305)
+> Coördinator: **Controleer I en J** (F.305)
 > De getallen bij D en H zijn gelijk. Er zijn geen stemmen meer of minder geteld.
 > Herstel de fout door op papier I en J leeg te (laten) maken.
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.

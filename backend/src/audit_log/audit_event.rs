@@ -85,6 +85,13 @@ pub struct PollingStationDetails {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+pub struct PollingStationImportDetails {
+    pub import_election_id: u32,
+    pub import_file_name: String,
+    pub import_number_of_polling_stations: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct DataEntryDetails {
     pub polling_station_id: u32,
@@ -148,6 +155,7 @@ pub enum AuditEvent {
     PollingStationCreated(PollingStationDetails),
     PollingStationUpdated(PollingStationDetails),
     PollingStationDeleted(PollingStationDetails),
+    PollingStationsImported(PollingStationImportDetails),
     // data entry events
     DataEntryClaimed(DataEntryDetails),
     DataEntrySaved(DataEntryDetails),
@@ -198,6 +206,7 @@ impl AuditEvent {
             AuditEvent::PollingStationCreated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationUpdated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationDeleted(_) => AuditEventLevel::Info,
+            AuditEvent::PollingStationsImported(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryClaimed(_) => AuditEventLevel::Success,
             AuditEvent::DataEntrySaved(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,

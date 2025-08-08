@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT 1 AS 'exists' FROM users WHERE last_activity_at IS NOT NULL LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "name": "exists",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "477e079d04813ce04fd80db8c17ee7ddd8b07cd11d63bfc034d9c0e8bdd600af"
+}

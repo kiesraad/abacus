@@ -60,16 +60,12 @@ export function UserCreateTypePage() {
                   defaultChecked={!fullnameChecked}
                   label={t("users.type_anonymous")}
                 />
+                {t("users.type_hint")}
               </ChoiceList>
-            </FormLayout.Section>
-            <FormLayout.Section>
-              <p>{t("users.type_hint")}</p>
             </FormLayout.Section>
           </FormLayout>
           <FormLayout.Controls>
-            <Button size="xl" type="submit">
-              {t("continue")}
-            </Button>
+            <Button type="submit">{t("continue")}</Button>
           </FormLayout.Controls>
         </Form>
       </main>

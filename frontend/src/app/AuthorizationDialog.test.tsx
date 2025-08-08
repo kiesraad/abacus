@@ -4,7 +4,8 @@ import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { overrideOnce } from "@/testing/server";
+import { InitialisedHandler } from "@/testing/api-mocks/RequestHandlers";
+import { overrideOnce, server } from "@/testing/server";
 import { render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
@@ -62,6 +63,8 @@ describe("AuthorizationDialog", () => {
   });
 
   test("Redirect should happen after expiration", async () => {
+    server.use(InitialisedHandler);
+
     const router = setupTestRouter(routes);
     await router.navigate("/account");
 
@@ -76,11 +79,13 @@ describe("AuthorizationDialog", () => {
   });
 
   test("Redirect should happen when not authorized", async () => {
+    server.use(InitialisedHandler);
+
     overrideOnce("get", "/api/log", 200, {
       events: [],
       page: 1,
       pages: 1,
-      perPage: 200,
+      per_page: 200,
     });
 
     const router = setupTestRouter(routes);

@@ -17,7 +17,7 @@ function getInputs() {
     postalCode: screen.getByRole("textbox", { name: "Postcode" }),
     locality: screen.getByRole("textbox", { name: "Plaats" }),
     typeOptionFixedLocation: screen.getByRole("radio", { name: "Vaste locatie" }),
-    typeOptionSpecial: screen.getByRole("radio", { name: "Bijzonder" }),
+    typeOptionSpecial: screen.getByRole("radio", { name: "Bijzonder (afwijkende openingstijden)" }),
     typeOptionMobile: screen.getByRole("radio", { name: "Mobiel" }),
   };
 }

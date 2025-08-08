@@ -10,6 +10,9 @@ import pkgjson from "./package.json";
 export default defineConfig(({ command }) => {
   const mswEnabled = process.env.API_MODE === "mock";
   const includeStorybookLink = process.env.INCLUDE_STORYBOOK_LINK === "true";
+  // true by default, can be set to false
+  const showDevPage = process.env.SHOW_DEV_PAGE === undefined || process.env.SHOW_DEV_PAGE === "true";
+
   let gitDetails = {
     __GIT_DIRTY__: undefined as string | undefined,
     __GIT_BRANCH__: undefined as string | undefined,
@@ -56,6 +59,7 @@ export default defineConfig(({ command }) => {
       __API_MSW__: JSON.stringify(mswEnabled),
       __APP_VERSION__: JSON.stringify(pkgjson.version),
       __INCLUDE_STORYBOOK_LINK__: JSON.stringify(includeStorybookLink),
+      __SHOW_DEV_PAGE__: JSON.stringify(showDevPage),
       ...gitDetails,
     },
     optimizeDeps: { exclude: ["msw"] },

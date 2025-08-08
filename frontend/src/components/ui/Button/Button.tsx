@@ -20,7 +20,7 @@ export function Button({
   isDisabled,
   isLoading,
   variant = "primary",
-  size = "md",
+  size = "lg",
   leftIcon,
   rightIcon,
   children,

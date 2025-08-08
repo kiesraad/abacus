@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { LoginHandler } from "@/testing/api-mocks/RequestHandlers";
+import { InitialisedHandler, LoginHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 import { LOGIN_REQUEST_PATH, LoginResponse } from "@/types/generated/openapi";
@@ -19,7 +19,7 @@ describe("LoginForm", () => {
   const loginUrl: LOGIN_REQUEST_PATH = "/api/user/login";
 
   test("Successful login", async () => {
-    server.use(LoginHandler);
+    server.use(LoginHandler, InitialisedHandler);
     const login = spyOnHandler(LoginHandler);
 
     render(<LoginForm />);

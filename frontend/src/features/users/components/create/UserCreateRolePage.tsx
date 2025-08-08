@@ -79,16 +79,12 @@ export function UserCreateRolePage() {
                 >
                   {t("users.role_typist_hint")}
                 </ChoiceList.Radio>
+                {t("users.role_hint")}
               </ChoiceList>
-            </FormLayout.Section>
-            <FormLayout.Section>
-              <p>{t("users.role_hint")}</p>
             </FormLayout.Section>
           </FormLayout>
           <FormLayout.Controls>
-            <Button size="xl" type="submit">
-              {t("continue")}
-            </Button>
+            <Button type="submit">{t("continue")}</Button>
           </FormLayout.Controls>
         </Form>
       </main>

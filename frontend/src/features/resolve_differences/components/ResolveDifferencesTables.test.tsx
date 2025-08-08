@@ -17,6 +17,16 @@ describe("ResolveDifferencesTables", () => {
   test("renders the resolve differences tables", async () => {
     render(<ResolveDifferencesTables first={first} second={second} structure={structure} />);
 
+    const extraInvestigationTable = await screen.findByRole("table", {
+      name: "Extra onderzoek",
+    });
+    expect(extraInvestigationTable).toBeVisible();
+    expect(extraInvestigationTable).toHaveTableContent([
+      ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
+      ["", "Nee", "Ja", "Extra onderzoek vanwege andere reden dan onverklaard verschil?"],
+      ["", "-", "Nee", "Stembiljetten na onderzoek (deels) herteld?"],
+    ]);
+
     const votersVotesCountsTable = await screen.findByRole("table", {
       name: "Toegelaten kiezers en uitgebrachte stemmen",
     });

@@ -1327,7 +1327,7 @@ pub mod tests {
         assert_eq!(audit_log_row.event_name, "DataEntryFinalised");
 
         let event: serde_json::Value = serde_json::to_value(&audit_log_row.event).unwrap();
-        assert_eq!(event["dataEntryStatus"], "first_entry_has_errors");
+        assert_eq!(event["data_entry_status"], "first_entry_has_errors");
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

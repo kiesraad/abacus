@@ -9,7 +9,8 @@ use abacus::{
     ErrorResponse,
     committee_session::status::CommitteeSessionStatus,
     polling_station::{
-        PollingStation, PollingStationListResponse, PollingStationRequest, PollingStationType,
+        PollingStation, PollingStationListResponse, PollingStationRequest,
+        PollingStationRequestListResponse, PollingStationType, PollingStationsRequest,
     },
 };
 
@@ -455,4 +456,97 @@ async fn test_polling_station_list_invalid_election(pool: SqlitePool) {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_polling_station_import_validate_correct_file(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let url = format!("http://{addr}/api/elections/2/polling_stations/validate-import");
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&serde_json::json!({
+            "data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+        }))
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let body: PollingStationRequestListResponse = response.json().await.unwrap();
+    assert_eq!(body.polling_stations.len(), 420);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_polling_station_import_validate_wrong_file(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let url = format!("http://{addr}/api/elections/2/polling_stations/validate-import");
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&serde_json::json!({
+            "data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+        }))
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST,);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_6", "users"))))]
+async fn test_polling_station_import_missing_data(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let url = format!("http://{addr}/api/elections/6/polling_stations/import");
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&serde_json::json!({
+            "file_name": "eml110b_test.eml.xml",
+        }))
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY,);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_6", "users"))))]
+async fn test_polling_station_import_correct_file(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let validate_url = format!("http://{addr}/api/elections/6/polling_stations/validate-import");
+    let validate_response = reqwest::Client::new()
+        .post(&validate_url)
+        .json(&serde_json::json!({
+            "data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+        }))
+        .header("cookie", &cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(validate_response.status(), StatusCode::OK);
+    let validate_body: PollingStationRequestListResponse = validate_response.json().await.unwrap();
+    let polling_stations = validate_body.polling_stations;
+
+    let import_url = format!("http://{addr}/api/elections/6/polling_stations/import");
+    let import_response = reqwest::Client::new()
+        .post(&import_url)
+        .json(&PollingStationsRequest {
+            file_name: "eml110b_test.eml.xml".to_string(),
+            polling_stations,
+        })
+        .header("cookie", &cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(import_response.status(), StatusCode::OK);
 }

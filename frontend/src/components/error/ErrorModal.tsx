@@ -39,7 +39,9 @@ export function ErrorModal({ error }: ErrorModalProps) {
               <strong>{t(key)}</strong>
             </p>
             <nav>
-              <Button onClick={hideModal}>{t("close_message")}</Button>
+              <Button size="md" onClick={hideModal}>
+                {t("close_message")}
+              </Button>
             </nav>
           </div>
         </Modal>
@@ -59,7 +61,9 @@ export function ErrorModal({ error }: ErrorModalProps) {
         )}
         <p>{error.message}</p>
         <nav>
-          <Button onClick={hideModal}>{t("close_message")}</Button>
+          <Button size="md" onClick={hideModal}>
+            {t("close_message")}
+          </Button>
         </nav>
       </div>
     </Modal>

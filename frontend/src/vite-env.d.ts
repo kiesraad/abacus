@@ -4,3 +4,4 @@ declare const __GIT_DIRTY__: boolean | undefined;
 declare const __GIT_BRANCH__: string | undefined;
 declare const __GIT_COMMIT__: string | undefined;
 declare const __INCLUDE_STORYBOOK_LINK__: boolean;
+declare const __SHOW_DEV_PAGE__: boolean;

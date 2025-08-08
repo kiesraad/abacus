@@ -52,7 +52,7 @@ export function ElectionInformationTable({
             {election.domain_id} - {t("municipality")} {election.location}
           </Table.Cell>
         </Table.Row>
-        <Table.Row increasedPadding>
+        <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.lists_and_candidates")}
           </Table.HeaderCell>
@@ -66,7 +66,7 @@ export function ElectionInformationTable({
             {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input")}
           </Table.Cell>
         </Table.LinkRow>
-        <Table.Row increasedPadding>
+        <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.to_do_data_entry_for")}
           </Table.HeaderCell>

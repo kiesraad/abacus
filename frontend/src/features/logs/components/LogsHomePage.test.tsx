@@ -56,10 +56,12 @@ describe("LogsHomePage", () => {
 
     expect(await screen.findByRole("heading", { name: "Activiteitenlog" })).toBeVisible();
 
-    const firstRow = screen.getByRole("row", {
-      name: "24 11 mrt 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
+    await waitFor(async () => {
+      const firstRow = screen.getByRole("row", {
+        name: "24 11 mrt 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
+      });
+      await user.click(firstRow);
     });
-    await user.click(firstRow);
 
     const list = (await screen.findAllByRole("list"))[0] as HTMLDataListElement;
     expect(list).toBeVisible();
@@ -101,17 +103,19 @@ describe("LogsHomePage", () => {
 
     const formattedDate = formatDateTime(new Date("2025-03-11T09:02:36Z"));
 
-    expect(table).toHaveTableContent([
-      ["Nummer", "Tijdstip", "Type", "Gebeurtenis", "Gebruiker: id, gebruikersnaam (rol)"],
-      ["24", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
-      ["23", formattedDate, "Succes", "Gebruiker uitgelogd", "1, admin (Beheerder)"],
-      ["22", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
-      ["21", formattedDate, "Succes", "Gebruiker uitgelogd", "2, typist (Invoerder)"],
-      ["20", formattedDate, "Succes", "Gebruiker ingelogd", "2, typist (Invoerder)"],
-      ["19", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
-      ["18", formattedDate, "Succes", "Gebruiker ingelogd", "3, coordinator (Coördinator)"],
-      ["17", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
-    ]);
+    await waitFor(() => {
+      expect(table).toHaveTableContent([
+        ["Nummer", "Tijdstip", "Type", "Gebeurtenis", "Gebruiker: id, gebruikersnaam (rol)"],
+        ["24", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
+        ["23", formattedDate, "Succes", "Gebruiker uitgelogd", "1, admin (Beheerder)"],
+        ["22", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
+        ["21", formattedDate, "Succes", "Gebruiker uitgelogd", "2, typist (Invoerder)"],
+        ["20", formattedDate, "Succes", "Gebruiker ingelogd", "2, typist (Invoerder)"],
+        ["19", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
+        ["18", formattedDate, "Succes", "Gebruiker ingelogd", "3, coordinator (Coördinator)"],
+        ["17", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
+      ]);
+    });
 
     const filterButton = await screen.findByRole("button", { name: "Filteren" });
     await userEvent.click(filterButton);

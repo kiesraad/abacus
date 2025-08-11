@@ -1,9 +1,10 @@
-import { Form, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
+import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useMessages } from "@/hooks/messages/useMessages";

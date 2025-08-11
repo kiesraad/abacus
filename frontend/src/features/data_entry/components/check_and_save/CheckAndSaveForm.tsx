@@ -2,7 +2,7 @@ import * as React from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
 import { ApiError, FatalApiError } from "@/api/ApiResult";
-import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal.tsx";
+import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
 import { ErrorModal } from "@/components/error/ErrorModal";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";

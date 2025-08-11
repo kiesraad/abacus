@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { ApiError, FatalApiError } from "@/api/ApiResult";
-import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal.tsx";
+import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
 import { DataEntrySubsections } from "@/components/data_entry/DataEntrySubsections";
 import { ErrorModal } from "@/components/error/ErrorModal";
 import { Alert } from "@/components/ui/Alert/Alert";

@@ -1,6 +1,6 @@
 import { useBlocker, useParams } from "react-router";
 
-import { FatalApiError } from "@/api/ApiResult.ts";
+import { FatalApiError } from "@/api/ApiResult";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUser } from "@/hooks/user/useUser";

@@ -1,4 +1,4 @@
-import { CommitteeSessionStatusWithRightIcon } from "@/components/committee_session/CommitteeSessionStatus.tsx";
+import { CommitteeSessionStatusWithRightIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";

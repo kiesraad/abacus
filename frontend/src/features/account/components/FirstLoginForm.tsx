@@ -61,13 +61,13 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
           {error ? (
             <FormLayout.Alert>
               <Alert type="error">
-                <h2>{t("error.api_error.InvalidUsernameOrPassword")}</h2>
+                <strong className="heading-md">{t("error.api_error.InvalidUsernameOrPassword")}</strong>
               </Alert>
             </FormLayout.Alert>
           ) : (
             <FormLayout.Alert>
               <Alert type="success">
-                <h2>{t("initialise.admin_configured")}</h2>
+                <strong className="heading-md">{t("initialise.admin_configured")}</strong>
               </Alert>
             </FormLayout.Alert>
           )}

@@ -73,7 +73,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
           {validationErrors && (
             <FormLayout.Alert>
               <Alert type="error">
-                <h2>{t("account.not_saved")}</h2>
+                <strong className="heading-md">{t("account.not_saved")}</strong>
                 <p>{t("account.check_fields")}</p>
               </Alert>
             </FormLayout.Alert>
@@ -81,7 +81,9 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
 
           {apiError && (
             <FormLayout.Alert>
-              <Alert type="error">{apiError.message}</Alert>
+              <Alert type="error">
+                <p>{apiError.message}</p>
+              </Alert>
             </FormLayout.Alert>
           )}
 

@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 
 import { LoginHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, spyOnHandler } from "@/testing/test-utils";
+import { render, screen, spyOnHandler, within } from "@/testing/test-utils";
 
 import { FirstLoginForm } from "./FirstLoginForm";
 
@@ -44,6 +44,9 @@ describe("FirstLoginForm", () => {
     const submitButton = screen.getByRole("button", { name: "Inloggen" });
     await user.click(submitButton);
 
-    expect(screen.getByRole("alert")).toHaveTextContent("De gebruikersnaam of het wachtwoord is onjuist");
+    const loginSuccess = await screen.findByRole("alert");
+    expect(within(loginSuccess).getByRole("strong")).toHaveTextContent(
+      "De gebruikersnaam of het wachtwoord is onjuist",
+    );
   });
 });

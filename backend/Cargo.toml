@@ -7,7 +7,7 @@ rust-version = "1.85"
 default-run = "abacus"
 
 [features]
-default = ["openapi", "dev-database", "embed-typst"]
+default = ["openapi", "dev-database"]
 openapi = ["dep:utoipa-swagger-ui"]
 memory-serve = ["dep:memory-serve"]
 embed-typst = ["dep:typst", "dep:typst-pdf"]

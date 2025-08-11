@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, Mock, test, vi } from "vitest";
 
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { ElectionStatusResponse } from "@/types/generated/openapi.ts";
+import { ElectionStatusResponse } from "@/types/generated/openapi";
 
 import { ElectionProgress } from "./ElectionProgress";
 

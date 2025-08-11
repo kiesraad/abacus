@@ -107,7 +107,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                 <InputField
                   name="password"
                   label={t("initialise.password")}
-                  hint={t("users.temporary_password_hint")}
+                  hint={t("initialise.password_hint")}
                   type="password"
                   error={validationErrors?.password}
                 />

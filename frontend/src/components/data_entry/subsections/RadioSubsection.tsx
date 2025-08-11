@@ -30,9 +30,9 @@ export function RadioSubsectionComponent({
         )}
         {subsection.options.map((option) => (
           <ChoiceList.Radio
-            key={String(option.value)}
-            id={String(option.value)}
-            value={String(option.value)}
+            key={option.value}
+            id={option.value}
+            value={option.value}
             name={subsection.path}
             autoFocus={option.autoFocusInput}
             checked={currentValues[subsection.path] === option.value}

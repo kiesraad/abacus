@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
-import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient.ts";
+import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { CommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { IconPlus } from "@/components/generated/icons";

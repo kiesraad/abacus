@@ -1,6 +1,7 @@
 import { waitForElementToBeRemoved } from "@testing-library/dom";
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
@@ -8,7 +9,7 @@ import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { useUser } from "@/hooks/user/useUser";
-import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
+import { electionDetailsMockResponse, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -18,7 +19,7 @@ import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, setupTestRouter, within } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import { ElectionStatusResponse } from "@/types/generated/openapi";
+import { ElectionDetailsResponse, ElectionStatusResponse } from "@/types/generated/openapi";
 
 import { dataEntryHomeRoutes } from "../routes";
 import { DataEntryHomePage } from "./DataEntryHomePage";
@@ -329,5 +330,33 @@ describe("DataEntryHomePage", () => {
     const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
     await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
     await alertClosed;
+  });
+
+  test("Alert when committee session is paused is shown", async () => {
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(getElectionMockData({}, { status: "data_entry_paused" }) satisfies ElectionDetailsResponse, {
+          status: 200,
+        }),
+      ),
+    );
+
+    renderDataEntryHomePage();
+
+    // Wait for the page to be loaded
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: electionDetailsMockResponse.election.name,
+      }),
+    ).toBeVisible();
+
+    const pausedModal = await screen.findByRole("dialog");
+    expect(within(pausedModal).getByRole("heading", { level: 2, name: "Invoer gepauzeerd" })).toBeVisible();
+    expect(within(pausedModal).getByRole("paragraph")).toHaveTextContent(
+      "De coördinator heeft het invoeren van stemmen gepauzeerd. Je kan niet meer verder.",
+    );
+    expect(within(pausedModal).getByRole("link", { name: "Naar startscherm" })).toBeVisible();
+    expect(within(pausedModal).getByRole("link", { name: "Afmelden" })).toBeVisible();
   });
 });

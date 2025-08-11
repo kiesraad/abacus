@@ -120,7 +120,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps --no-shell
       - name: Download Abacus
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: abacus
           path: builds/backend
@@ -160,7 +160,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Download Abacus
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: abacus
       - name: Strip debug symbols

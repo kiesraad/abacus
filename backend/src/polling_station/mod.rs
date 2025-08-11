@@ -17,10 +17,10 @@ use crate::{
     committee_session::status::{CommitteeSessionStatus, change_committee_session_status},
 };
 
-use crate::audit_log::PollingStationImportDetails;
-use crate::eml::EML110;
-use crate::eml::EMLDocument;
-use crate::eml::EMLImportError;
+use crate::{
+    audit_log::PollingStationImportDetails,
+    eml::{EML110, EMLDocument, EMLImportError},
+};
 
 pub mod repository;
 pub mod structs;

@@ -1,100 +1,217 @@
-use crate::{APIError, zip::write_stream::WriteStream};
-use async_zip::{
-    Compression, ZipDateTime, ZipEntryBuilder, error::ZipError, tokio::write::ZipFileWriter,
-};
+use async_zip::{Compression, ZipDateTime, ZipEntryBuilder, tokio::write::ZipFileWriter};
 use axum::{
     body::Body,
     response::{IntoResponse, Response},
 };
 use axum_extra::response::Attachment;
-use tokio::sync::mpsc::{self, Sender};
-use tracing::info;
+use tokio::io::{AsyncWriteExt, DuplexStream};
+use tokio_util::io::ReaderStream;
 
-mod write_stream;
-
+/// Slugify a filename by replacing spaces with underscores and slashes with dashes.
 pub fn slugify_filename(filename: &str) -> String {
     filename.replace(" ", "_").replace("/", "-")
 }
 
-pub type FileEntry = Option<(String, Vec<u8>)>;
-
-/// A stream that reads files from a channel and writes them to a ZIP file as a streamed HTTP response
-pub struct ZipStream {
-    file_name: String,
-    sender: Sender<FileEntry>,
-    write_stream: WriteStream,
+/// A ZIP file response, that streams its contents to the client every time a file is added
+pub struct ZipResponse {
+    inner: ReaderStream<DuplexStream>,
+    filename: String,
 }
 
-impl ZipStream {
-    pub async fn new(file_name: &str) -> Self {
-        // Create the buffer that will pass the resulting zip as a response stream
-        let write_stream = write_stream::WriteStream::new();
-        let input_write_stream = write_stream.clone();
-        let stream_closer = write_stream.clone();
+impl ZipResponse {
+    /// Create a new [`ZipResponse`] with a buffer size of 16KB.
+    pub fn new(filename: &str) -> (Self, ZipResponseWriter) {
+        let (reader, writer) = tokio::io::duplex(16 * 1024);
 
-        // Create a channel to send file entries to the ZIP writer
-        // A None entry will signal the the last file was sent
-        let (sender, mut receiver) = mpsc::channel::<FileEntry>(64);
+        (
+            Self {
+                inner: ReaderStream::new(reader),
+                filename: filename.into(),
+            },
+            ZipResponseWriter::new(writer),
+        )
+    }
 
-        tokio::spawn(async move {
-            let mut writer = ZipFileWriter::with_tokio(input_write_stream);
-            let mut count = 0;
+    /// Convert this `ZipResponse` into an Axum [`Body`] stream.
+    pub fn into_body(self) -> Body {
+        Body::from_stream(self.inner)
+    }
+}
 
-            while let Some(Some((name, data))) = receiver.recv().await {
-                info!("Adding file to zip: {}", name);
+impl IntoResponse for ZipResponse {
+    fn into_response(self) -> Response<Body> {
+        let filename = self.filename.clone();
 
-                let builder =
-                    ZipEntryBuilder::new(slugify_filename(&name).into(), Compression::Deflate)
-                        .last_modification_date(ZipDateTime::from(chrono::Utc::now()));
-                writer.write_entry_whole(builder, &data).await?;
+        Attachment::new(self.into_body())
+            .filename(filename)
+            .content_type("application/zip")
+            .into_response()
+    }
+}
 
-                count += 1;
-            }
+/// Writer used to add files into a streaming ZIP archive.
+pub struct ZipResponseWriter {
+    inner: ZipFileWriter<DuplexStream>,
+}
 
-            if count == 0 {
-                info!("No files added to zip, returning error response");
-            }
-
-            // Write the ZIP central directory
-            writer.close().await?;
-
-            // Signal that the stream is finished, this will finish the HTTP response
-            stream_closer.finish();
-
-            Ok::<(), ZipError>(())
-        });
-
+impl ZipResponseWriter {
+    /// Create a new writer wrapping the provided duplex stream.
+    fn new(writer: DuplexStream) -> Self {
         Self {
-            sender,
-            write_stream,
-            file_name: slugify_filename(file_name),
+            inner: ZipFileWriter::with_tokio(writer),
         }
     }
 
-    pub async fn finish(&self) -> Result<(), APIError> {
-        self.sender
-            .send(None)
-            .await
-            .map_err(|_| APIError::ZipError("Failed to send finish signal".into()))
+    /// Add a file with the given name and contents to the archive.
+    pub async fn add_file(&mut self, name: &str, data: &[u8]) -> Result<(), ZipResponseError> {
+        let builder = ZipEntryBuilder::new(slugify_filename(name).into(), Compression::Deflate)
+            .last_modification_date(ZipDateTime::from(chrono::Utc::now()));
+
+        Ok(self.inner.write_entry_whole(builder, data).await?)
     }
 
-    pub fn sender(&self) -> Sender<FileEntry> {
-        self.sender.clone()
-    }
+    /// Finish writing the archive and flush the underlying stream.
+    pub async fn finish(self) -> Result<(), ZipResponseError> {
+        let final_writer = self.inner.close().await?;
 
-    pub async fn add_file(&self, name: String, data: Vec<u8>) -> Result<(), APIError> {
-        self.sender
-            .send(Some((name, data)))
+        final_writer
+            .into_inner()
+            .shutdown()
             .await
-            .map_err(|_| APIError::ZipError("Failed to send file data".into()))
+            .map_err(|_| ZipResponseError::ConnectionClosed)?;
+
+        Ok(())
     }
 }
 
-impl IntoResponse for ZipStream {
-    fn into_response(self) -> Response<Body> {
-        Attachment::new(Body::from_stream(self.write_stream))
-            .filename(self.file_name)
-            .content_type("application/zip")
-            .into_response()
+#[derive(Debug)]
+/// Errors that can occur while creating or streaming a ZIP response.
+pub enum ZipResponseError {
+    /// The client closed the connection before the ZIP archive was fully written.
+    ConnectionClosed,
+    /// An error bubbled up from the underlying ZIP writer.
+    ZipError(async_zip::error::ZipError),
+}
+
+impl From<async_zip::error::ZipError> for ZipResponseError {
+    fn from(err: async_zip::error::ZipError) -> Self {
+        ZipResponseError::ZipError(err)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use async_zip::{Compression, ZipEntryBuilder, tokio::write::ZipFileWriter};
+    use http_body_util::BodyExt;
+    use tokio::io::{AsyncWriteExt, BufWriter};
+
+    use super::ZipResponse;
+
+    /// Build a ZIP archive using the library itself to obtain the expected bytes.
+    async fn expected_zip_bytes(files: &[(String, Vec<u8>)]) -> Vec<u8> {
+        let mut data = Vec::new();
+        let mut buffer = BufWriter::new(&mut data);
+        let mut zip_writer = ZipFileWriter::with_tokio(&mut buffer);
+
+        for (name, data) in files {
+            let builder = ZipEntryBuilder::new(name.clone().into(), Compression::Deflate)
+                .last_modification_date(async_zip::ZipDateTime::from(chrono::Utc::now()));
+
+            zip_writer.write_entry_whole(builder, data).await.unwrap();
+        }
+
+        zip_writer.close().await.unwrap();
+        buffer.shutdown().await.unwrap();
+
+        data
+    }
+
+    /// Verifies that a response built in a single task has the correct length.
+    #[tokio::test]
+    async fn zip_response_returns_expected_length() {
+        let files = vec![("example.txt".to_string(), b"example data".to_vec())];
+        let expected_len = expected_zip_bytes(&files).await.len();
+
+        let (response, mut writer) = ZipResponse::new("test.zip");
+        for (name, data) in &files {
+            writer.add_file(name, data).await.unwrap();
+        }
+        writer.finish().await.unwrap();
+
+        let body_bytes = response.into_body().collect().await.unwrap().to_bytes();
+        assert_eq!(body_bytes.len(), expected_len);
+    }
+
+    /// Ensures that files added from another task produce a valid archive.
+    #[tokio::test]
+    async fn zip_response_streaming_task_returns_expected_length() {
+        use tokio::time::{Duration, sleep};
+
+        let files: Vec<(String, Vec<u8>)> = (0..10)
+            .map(|i| (format!("file_{i}.txt"), format!("content {i}").into_bytes()))
+            .collect();
+        let expected_len = expected_zip_bytes(&files).await.len();
+
+        let (response, mut writer) = ZipResponse::new("test.zip");
+
+        tokio::spawn(async move {
+            for (name, data) in &files {
+                writer.add_file(name, data).await.unwrap();
+                sleep(Duration::from_millis(10)).await;
+            }
+            writer.finish().await.unwrap();
+        });
+
+        let body_bytes = response.into_body().collect().await.unwrap().to_bytes();
+
+        assert_eq!(body_bytes.len(), expected_len);
+    }
+
+    /// Checks that writing stops when the receiving end is dropped.
+    #[tokio::test]
+    async fn zip_response_stops_writing_when_connection_closes() {
+        use tokio::time::{Duration, sleep};
+
+        // Prepare 10 small files to write into the archive.
+        let files: Vec<(String, Vec<u8>)> = (0..10)
+            .map(|i| (format!("file_{i}.txt"), format!("content {i}").into_bytes()))
+            .collect();
+
+        let (response, mut writer) = ZipResponse::new("test.zip");
+
+        // Spawn a task that adds files to the zip with a 10 ms delay between each
+        let handle = tokio::spawn(async move {
+            let mut written = 0;
+            let mut add_err = None;
+            for (name, data) in &files {
+                match writer.add_file(name, data).await {
+                    Ok(_) => {
+                        written += 1;
+                    }
+                    Err(e) => {
+                        add_err = Some(e);
+                        break;
+                    }
+                }
+                sleep(Duration::from_millis(10)).await;
+            }
+            (written, add_err)
+        });
+
+        // Start streaming the ZIP response and wait until 50 ms have passed
+        let body = response.into_body();
+        sleep(Duration::from_millis(50)).await;
+        drop(body);
+
+        let (written, add_err) = handle.await.unwrap();
+
+        assert!(
+            written < 10,
+            "expected not all files to be written before closure"
+        );
+        assert!(
+            add_err.is_some(),
+            "expected writing to fail once connection closed"
+        );
     }
 }

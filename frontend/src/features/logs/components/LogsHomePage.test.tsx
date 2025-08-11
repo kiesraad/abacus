@@ -56,12 +56,10 @@ describe("LogsHomePage", () => {
 
     expect(await screen.findByRole("heading", { name: "Activiteitenlog" })).toBeVisible();
 
-    await waitFor(async () => {
-      const firstRow = screen.getByRole("row", {
-        name: "24 11 mrt 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
-      });
-      await user.click(firstRow);
+    const firstRow = await screen.findByRole("row", {
+      name: "24 11 mrt 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
     });
+    await user.click(firstRow);
 
     const list = (await screen.findAllByRole("list"))[0] as HTMLDataListElement;
     expect(list).toBeVisible();
@@ -120,9 +118,7 @@ describe("LogsHomePage", () => {
     const filterButton = await screen.findByRole("button", { name: "Filteren" });
     await userEvent.click(filterButton);
 
-    await waitFor(() => {
-      expect(screen.getByTestId("event-UserLoggedIn")).toBeInTheDocument();
-    });
+    expect(await screen.findByTestId("event-UserLoggedIn")).toBeInTheDocument();
 
     const filterLog = spyOnHandler(LogRequestHandler);
 

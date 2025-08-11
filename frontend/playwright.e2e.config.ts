@@ -2,17 +2,19 @@ import { defineConfig, type PlaywrightTestConfig } from "@playwright/test";
 
 import commonConfig from "./playwright.common.config";
 
-function returnWebserverCommand(): string {
+function returnWebserverCommand(port: number, dbPath: string, loadFixtures: boolean): string {
+  const additionalArgs = loadFixtures ? "--seed-data" : "";
+
   if (process.env.CI) {
     // CI: use existing backend build, reset and seed database
     const binary = process.platform === "win32" ? "..\\builds\\backend\\abacus.exe" : "../builds/backend/abacus";
-    return `${binary} --reset-database --seed-data --port 8081`;
+    return `${binary} --database ${dbPath} --reset-database ${additionalArgs} --port ${port}`;
   } else if (process.env.LOCAL_CI) {
     // LOCAL CI: build frontend, then build and run backend with database reset and seed playwright-specific database
-    return `npm run build && cd ../backend && cargo run --features memory-serve,embed-typst -- --database target/debug/playwright.sqlite --reset-database --seed-data --port 8081`;
+    return `npm run build && cd ../backend && cargo run --features memory-serve,embed-typst -- --database target/debug/${dbPath} --reset-database ${additionalArgs} --port ${port}`;
   } else {
     // DEV: expects frontend build and playwright-specific database setup/seeding to have been done
-    return `cd ../backend && cargo run --features memory-serve,embed-typst -- --database ../backend/target/debug/playwright.sqlite --port 8081`;
+    return `cd ../backend && cargo run --features memory-serve,embed-typst -- --database ../backend/target/debug/${dbPath} --port ${port}`;
   }
 }
 
@@ -32,8 +34,13 @@ const config: PlaywrightTestConfig = defineConfig({
   },
   webServer: [
     {
-      command: returnWebserverCommand(),
+      command: returnWebserverCommand(8081, "playwright.db", true),
       url: "http://127.0.0.1:8081",
+      stdout: process.env.LOCAL_CI ? "pipe" : "ignore",
+    },
+    {
+      command: returnWebserverCommand(8082, "playwright-no-fixtures.db", false),
+      url: "http://127.0.0.1:8082",
       stdout: process.env.LOCAL_CI ? "pipe" : "ignore",
     },
   ],

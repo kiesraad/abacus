@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router";
+import { Form, useNavigate } from "react-router";
 
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
@@ -53,46 +54,51 @@ export function ResolveErrorsIndexPage() {
   return (
     <>
       <h2>{t("resolve_errors.title")}</h2>
-      <p>{t("resolve_errors.page_content")}</p>
+      <p className="md">{t("resolve_errors.page_content")}</p>
 
       <ResolveErrorsOverview structure={structure} results={dataEntry.validation_results} />
 
-      <form
+      <Form
         className={cls.resolveForm}
         onSubmit={(e) => {
           e.preventDefault();
           void onSubmit(afterSave);
         }}
       >
-        <h3 className="heading-lg mb-md">{t("resolve_errors.form_question")}</h3>
-        <p>{t("resolve_errors.form_content")}</p>
-        <ChoiceList>
-          {validationError && <ChoiceList.Error id="resolve-errors-error">{validationError}</ChoiceList.Error>}
-          <ChoiceList.Radio
-            id="keep_entry"
-            label={tx("resolve_errors.options.resume_first_entry", undefined, {
-              name: getName(dataEntry.first_entry_user_id, t("typist")),
-            })}
-            checked={action === "resume_first_entry"}
-            onChange={() => {
-              setAction("resume_first_entry");
-            }}
-          >
-            {t("resolve_errors.options.resume_first_entry_description")}
-          </ChoiceList.Radio>
-          <ChoiceList.Radio
-            id="discard_entry"
-            label={tx("resolve_errors.options.discard_first_entry")}
-            checked={action === "discard_first_entry"}
-            onChange={() => {
-              setAction("discard_first_entry");
-            }}
-          >
-            {t("resolve_errors.options.discard_first_entry_description")}
-          </ChoiceList.Radio>
-        </ChoiceList>
-        <Button type="submit">{t("save")}</Button>
-      </form>
+        <FormLayout>
+          <FormLayout.Section title={t("resolve_errors.form_question")}>
+            <p className="md">{t("resolve_errors.form_content")}</p>
+            <ChoiceList>
+              {validationError && <ChoiceList.Error id="resolve-errors-error">{validationError}</ChoiceList.Error>}
+              <ChoiceList.Radio
+                id="keep_entry"
+                label={tx("resolve_errors.options.resume_first_entry", undefined, {
+                  name: getName(dataEntry.first_entry_user_id, t("typist")),
+                })}
+                checked={action === "resume_first_entry"}
+                onChange={() => {
+                  setAction("resume_first_entry");
+                }}
+              >
+                {t("resolve_errors.options.resume_first_entry_description")}
+              </ChoiceList.Radio>
+              <ChoiceList.Radio
+                id="discard_entry"
+                label={tx("resolve_errors.options.discard_first_entry")}
+                checked={action === "discard_first_entry"}
+                onChange={() => {
+                  setAction("discard_first_entry");
+                }}
+              >
+                {t("resolve_errors.options.discard_first_entry_description")}
+              </ChoiceList.Radio>
+            </ChoiceList>
+          </FormLayout.Section>
+          <FormLayout.Controls>
+            <Button type="submit">{t("save")}</Button>
+          </FormLayout.Controls>
+        </FormLayout>
+      </Form>
     </>
   );
 }

@@ -1,67 +1,10 @@
 import {
   ClaimDataEntryResponse,
   DataEntry,
-  NewElection,
   PollingStationRequest,
   PollingStationResults,
   SaveDataEntryResponse,
 } from "@/types/generated/openapi";
-
-export const electionRequest: NewElection = {
-  name: "Test Election",
-  counting_method: "CSO",
-  election_id: "TestLocation_2026",
-  location: "Test Location",
-  domain_id: "0000",
-  category: "Municipal",
-  number_of_seats: 29,
-  election_date: "2026-01-01",
-  nomination_date: "2026-01-01",
-  political_groups: [
-    {
-      number: 1,
-      name: "Political Group A",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 2,
-      name: "",
-      candidates: [
-        {
-          number: 1,
-          initials: "E.",
-          first_name: "Edgar",
-          last_name: "Fizz",
-          locality: "Utrecht",
-          gender: "Male",
-        },
-        {
-          number: 2,
-          initials: "H.",
-          first_name: "Hilde",
-          last_name: "Smit",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-  ],
-};
 
 export const pollingStationRequests: PollingStationRequest[] = [
   {
@@ -128,10 +71,72 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
             number: 2,
             votes: 0,
           },
+          {
+            number: 3,
+            votes: 0,
+          },
+          {
+            number: 4,
+            votes: 0,
+          },
+          {
+            number: 5,
+            votes: 0,
+          },
+          {
+            number: 6,
+            votes: 0,
+          },
+          {
+            number: 7,
+            votes: 0,
+          },
+          {
+            number: 8,
+            votes: 0,
+          },
+          {
+            number: 9,
+            votes: 0,
+          },
+          {
+            number: 10,
+            votes: 0,
+          },
+          {
+            number: 11,
+            votes: 0,
+          },
+          {
+            number: 12,
+            votes: 0,
+          },
         ],
       },
       {
         number: 2,
+        total: 0,
+        candidate_votes: [
+          {
+            number: 1,
+            votes: 0,
+          },
+          {
+            number: 2,
+            votes: 0,
+          },
+          {
+            number: 3,
+            votes: 0,
+          },
+          {
+            number: 4,
+            votes: 0,
+          },
+        ],
+      },
+      {
+        number: 3,
         total: 0,
         candidate_votes: [
           {
@@ -161,15 +166,15 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
     },
   },
   voters_counts: {
-    poll_card_count: 879,
-    proxy_certificate_count: 50,
-    total_admitted_voters_count: 929,
+    poll_card_count: 3450,
+    proxy_certificate_count: 157,
+    total_admitted_voters_count: 3607,
   },
   votes_counts: {
-    votes_candidates_count: 894,
+    votes_candidates_count: 3572,
     blank_votes_count: 20,
     invalid_votes_count: 15,
-    total_votes_cast_count: 929,
+    total_votes_cast_count: 3607,
   },
   differences_counts: {
     more_ballots_count: 0,
@@ -183,29 +188,91 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
   political_group_votes: [
     {
       number: 1,
-      total: 890,
+      total: 3536,
       candidate_votes: [
         {
           number: 1,
-          votes: 737,
+          votes: 1337,
         },
         {
           number: 2,
-          votes: 153,
+          votes: 423,
+        },
+        {
+          number: 3,
+          votes: 300,
+        },
+        {
+          number: 4,
+          votes: 236,
+        },
+        {
+          number: 5,
+          votes: 533,
+        },
+        {
+          number: 6,
+          votes: 205,
+        },
+        {
+          number: 7,
+          votes: 103,
+        },
+        {
+          number: 8,
+          votes: 286,
+        },
+        {
+          number: 9,
+          votes: 0,
+        },
+        {
+          number: 10,
+          votes: 0,
+        },
+        {
+          number: 11,
+          votes: 113,
+        },
+        {
+          number: 12,
+          votes: 0,
         },
       ],
     },
     {
       number: 2,
-      total: 4,
+      total: 36,
       candidate_votes: [
         {
           number: 1,
-          votes: 3,
+          votes: 28,
         },
         {
           number: 2,
-          votes: 1,
+          votes: 4,
+        },
+        {
+          number: 3,
+          votes: 2,
+        },
+        {
+          number: 4,
+          votes: 2,
+        },
+      ],
+    },
+    {
+      number: 3,
+      total: 0,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 0,
+        },
+        {
+          number: 2,
+          votes: 0,
         },
       ],
     },
@@ -213,11 +280,11 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
 };
 
 export const dataEntryRequest: DataEntry = {
-  progress: 83,
+  progress: 86,
   data: noRecountNoDifferencesDataEntry,
   client_state: {
-    furthest: "political_group_votes_2",
-    current: "political_group_votes_2",
+    furthest: "political_group_votes_3",
+    current: "political_group_votes_3",
     acceptedErrorsAndWarnings: [],
     continue: true,
   },

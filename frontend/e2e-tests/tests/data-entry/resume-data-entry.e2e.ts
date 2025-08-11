@@ -122,7 +122,7 @@ test.describe("resume data entry flow", () => {
       await expect(differencesPage.fieldset).toBeVisible();
       await differencesPage.next.click();
 
-      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
       await expect(candidatesListPage_1.fieldset).toBeVisible();
       await candidatesListPage_1.progressList.votersAndVotes.click();
 
@@ -406,28 +406,32 @@ test.describe("resume data entry flow", () => {
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       const voters: VotersCounts = {
-        poll_card_count: 879,
-        proxy_certificate_count: 50,
-        total_admitted_voters_count: 929,
+        poll_card_count: 3450,
+        proxy_certificate_count: 157,
+        total_admitted_voters_count: 3607,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 894,
+        votes_candidates_count: 3572,
         blank_votes_count: 20,
         invalid_votes_count: 15,
-        total_votes_cast_count: 929,
+        total_votes_cast_count: 3607,
       };
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.next.click();
 
-      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
-      await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
+      await candidatesListPage_1.fillCandidatesAndTotal([1337, 423, 300, 236, 533, 205, 103, 286, 0, 0, 113, 0], 3536);
       await candidatesListPage_1.next.click();
 
-      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
-      await candidatesListPage_2.fillCandidatesAndTotal([3, 1], 4);
+      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
+      await candidatesListPage_2.fillCandidatesAndTotal([28, 4, 2, 2], 36);
       await candidatesListPage_2.next.click();
+
+      const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+      await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
+      await candidatesListPage_3.next.click();
 
       const checkAndSavePage = new CheckAndSavePage(page);
       await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -591,28 +595,32 @@ test.describe("resume data entry flow", () => {
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       const voters: VotersCounts = {
-        poll_card_count: 879,
-        proxy_certificate_count: 50,
-        total_admitted_voters_count: 929,
+        poll_card_count: 3450,
+        proxy_certificate_count: 157,
+        total_admitted_voters_count: 3607,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 894,
+        votes_candidates_count: 3572,
         blank_votes_count: 20,
         invalid_votes_count: 15,
-        total_votes_cast_count: 929,
+        total_votes_cast_count: 3607,
       };
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.next.click();
 
-      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
-      await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
+      await candidatesListPage_1.fillCandidatesAndTotal([1337, 423, 300, 236, 533, 205, 103, 286, 0, 0, 113, 0], 3536);
       await candidatesListPage_1.next.click();
 
-      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2 -");
-      await candidatesListPage_2.fillCandidatesAndTotal([3, 1], 4);
+      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
+      await candidatesListPage_2.fillCandidatesAndTotal([28, 4, 2, 2], 36);
       await candidatesListPage_2.next.click();
+
+      const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+      await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
+      await candidatesListPage_3.next.click();
 
       const checkAndSavePage = new CheckAndSavePage(page);
       await expect(checkAndSavePage.fieldset).toBeVisible();

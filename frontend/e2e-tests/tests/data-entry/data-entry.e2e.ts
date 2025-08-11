@@ -1,6 +1,5 @@
 import { expect } from "@playwright/test";
 import { fillCandidatesListPages, fillDataEntryPagesAndSave } from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
-import { formatNumber } from "e2e-tests/helpers-utils/e2e-test-utils";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
@@ -53,37 +52,43 @@ test.describe("full data entry flow", () => {
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.pollCardCount).toBeFocused();
     const voters: VotersCounts = {
-      poll_card_count: 879,
-      proxy_certificate_count: 50,
-      total_admitted_voters_count: 929,
+      poll_card_count: 3450,
+      proxy_certificate_count: 157,
+      total_admitted_voters_count: 3607,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 894,
+      votes_candidates_count: 3572,
       blank_votes_count: 20,
       invalid_votes_count: 15,
-      total_votes_cast_count: 929,
+      total_votes_cast_count: 3607,
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     await votersAndVotesPage.inputVotesCounts(votes);
-    await expect(votersAndVotesPage.pollCardCount).toHaveValue(formatNumber(voters.poll_card_count));
+    await expect(votersAndVotesPage.pollCardCount).toHaveValue(voters.poll_card_count.toString());
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.moreBallotsCount).toBeFocused();
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
     await expect(candidatesListPage_1.getCandidate(0)).toBeFocused();
 
-    await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 890);
+    await candidatesListPage_1.fillCandidatesAndTotal([1337, 423, 300, 236, 533, 205, 103, 286, 0, 0, 113, 0], 3536);
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
     await expect(candidatesListPage_2.getCandidate(0)).toBeFocused();
 
-    await candidatesListPage_2.fillCandidatesAndTotal([3, 1], 4);
-    const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
+    await candidatesListPage_2.fillCandidatesAndTotal([28, 4, 2, 2], 36);
     await candidatesListPage_2.next.click();
+
+    const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+    await expect(candidatesListPage_3.getCandidate(0)).toBeFocused();
+
+    await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
+    const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
+    await candidatesListPage_3.next.click();
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);
@@ -150,16 +155,16 @@ test.describe("full data entry flow", () => {
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     const voters: VotersCounts = {
-      poll_card_count: 1075,
-      proxy_certificate_count: 50,
-      total_admitted_voters_count: 1125,
+      poll_card_count: 3575,
+      proxy_certificate_count: 200,
+      total_admitted_voters_count: 3775,
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 1090,
+      votes_candidates_count: 3740,
       blank_votes_count: 20,
       invalid_votes_count: 15,
-      total_votes_cast_count: 1125,
+      total_votes_cast_count: 3775,
     };
     await votersAndVotesPage.inputVotesCounts(votes);
     await votersAndVotesPage.next.click();
@@ -168,15 +173,20 @@ test.describe("full data entry flow", () => {
     await expect(differencesPage.fieldset).toBeVisible();
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
-    await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
+    await candidatesListPage_1.fillCandidatesAndTotal([1265, 400, 324, 236, 533, 205, 103, 286, 0, 0, 113, 0], 3465);
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
     await expect(candidatesListPage_2.fieldset).toBeVisible();
-    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_2.fillCandidatesAndTotal([220, 50, 5, 0], 275);
     await candidatesListPage_2.next.click();
+
+    const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+    await expect(candidatesListPage_3.fieldset).toBeVisible();
+    await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_3.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -211,16 +221,16 @@ test.describe("full data entry flow", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
 
     const voters: VotersCounts = {
-      poll_card_count: 1075,
-      proxy_certificate_count: 50,
-      total_admitted_voters_count: 1125,
+      poll_card_count: 3575,
+      proxy_certificate_count: 200,
+      total_admitted_voters_count: 3775,
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 1135,
+      votes_candidates_count: 3785,
       blank_votes_count: 10,
       invalid_votes_count: 5,
-      total_votes_cast_count: 1150,
+      total_votes_cast_count: 3800,
     };
     await votersAndVotesPage.inputVotesCounts(votes);
     await votersAndVotesPage.next.click();
@@ -245,15 +255,20 @@ test.describe("full data entry flow", () => {
     await differencesPage.fillMoreBallotsFields(moreBallotsFields);
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
-    await candidatesListPage_1.fillCandidatesAndTotal([902, 233], 1135);
+    await candidatesListPage_1.fillCandidatesAndTotal([1265, 400, 324, 236, 533, 205, 103, 286, 0, 0, 113, 0], 3465);
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
     await expect(candidatesListPage_2.fieldset).toBeVisible();
-    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_2.fillCandidatesAndTotal([265, 50, 5, 0], 320);
     await candidatesListPage_2.next.click();
+
+    const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+    await expect(candidatesListPage_3.fieldset).toBeVisible();
+    await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_3.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -288,17 +303,16 @@ test.describe("full data entry flow", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
 
     const voters: VotersCounts = {
-      poll_card_count: 1095,
-      proxy_certificate_count: 50,
-      total_admitted_voters_count: 1145,
+      poll_card_count: 3595,
+      proxy_certificate_count: 200,
+      total_admitted_voters_count: 3795,
     };
     await votersAndVotesPage.inputVotersCounts(voters);
-
     const votes: VotesCounts = {
-      votes_candidates_count: 1090,
+      votes_candidates_count: 3740,
       blank_votes_count: 20,
       invalid_votes_count: 15,
-      total_votes_cast_count: 1125,
+      total_votes_cast_count: 3775,
     };
     await votersAndVotesPage.inputVotesCounts(votes);
 
@@ -325,15 +339,20 @@ test.describe("full data entry flow", () => {
     await differencesPage.fillFewerBallotsFields(fewerBallotsFields);
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
-    await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
+    await candidatesListPage_1.fillCandidatesAndTotal([1265, 400, 324, 236, 533, 205, 103, 286, 0, 0, 113, 0], 3465);
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
     await expect(candidatesListPage_2.fieldset).toBeVisible();
-    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_2.fillCandidatesAndTotal([220, 50, 5, 0], 275);
     await candidatesListPage_2.next.click();
+
+    const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+    await expect(candidatesListPage_3.fieldset).toBeVisible();
+    await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_3.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -398,15 +417,20 @@ test.describe("full data entry flow", () => {
 
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
     await expect(candidatesListPage_1.fieldset).toBeVisible();
     await candidatesListPage_1.fillCandidatesAndTotal([49, 1], 50);
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
     await expect(candidatesListPage_2.fieldset).toBeVisible();
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_2.next.click();
+
+    const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+    await expect(candidatesListPage_3.fieldset).toBeVisible();
+    await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_3.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -482,19 +506,28 @@ test.describe("full data entry flow", () => {
     await differencesPage.checkAcceptErrorsAndWarnings();
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
     await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 891);
     await candidatesListPage_1.next.click();
     await expect(candidatesListPage_1.error).toBeVisible();
     await candidatesListPage_1.checkAcceptErrorsAndWarnings();
     await candidatesListPage_1.next.click();
 
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_2.next.click();
+
+    const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+    await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_3.next.click();
+
     await expect(candidatesListPage_2.error).toContainText("F.204");
     await candidatesListPage_2.checkAcceptErrorsAndWarnings();
     await candidatesListPage_2.next.click();
+
+    await expect(candidatesListPage_3.error).toContainText("F.204");
+    await candidatesListPage_3.checkAcceptErrorsAndWarnings();
+    await candidatesListPage_3.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -822,15 +855,20 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.fieldset).toBeVisible();
     await differencesPage.next.click();
 
-    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
     // fill counts of List 1 with data that does not match the total votes on candidates
     await candidatesListPage_1.fillCandidatesAndTotal([2, 1], 3);
     await candidatesListPage_1.next.click();
 
     // fill counts of List 2 with 0 so correcting the error is easier
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
+    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_2.next.click();
+
+    // fill counts of List 3 with 0 so correcting the error is easier
+    const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+    await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
+    await candidatesListPage_3.next.click();
 
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
@@ -847,6 +885,9 @@ test.describe("errors and warnings", () => {
 
     await expect(candidatesListPage_2.fieldset).toBeVisible();
     await candidatesListPage_2.next.click();
+
+    await expect(candidatesListPage_3.fieldset).toBeVisible();
+    await candidatesListPage_3.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();
@@ -1207,7 +1248,7 @@ test.describe("navigation", () => {
       await expect(differencesPage.progressList.differencesIcon).toHaveAccessibleName("je bent hier");
       await differencesPage.next.click();
 
-      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Lijst 1 - Political Group A");
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
       await expect(candidatesListPage_1.fieldset).toBeVisible();
       await expect(candidatesListPage_1.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
       await expect(candidatesListPage_1.progressList.differencesIcon).toHaveAccessibleName("leeg");
@@ -1226,7 +1267,7 @@ test.describe("navigation", () => {
       await candidatesListPage_1.fillCandidatesAndTotal([50, 40], 90);
       await candidatesListPage_1.next.click();
 
-      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst 2");
+      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
       await expect(candidatesListPage_2.fieldset).toBeVisible();
       await expect(candidatesListPage_2.progressList.listIcon(2)).toHaveAccessibleName("je bent hier");
       await expect(candidatesListPage_2.progressList.listIcon(1)).toHaveAccessibleName("opgeslagen");

@@ -31,9 +31,6 @@ export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSe
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
-export type ELECTION_CREATE_REQUEST_PARAMS = Record<string, never>;
-export type ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
-export type ELECTION_CREATE_REQUEST_BODY = NewElection;
 
 // /api/elections/import
 export type ELECTION_IMPORT_REQUEST_PARAMS = Record<string, never>;

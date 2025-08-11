@@ -53,6 +53,8 @@ Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the proje
 
 Use `cargo test` to run the tests. The tests are also run in a GitHub Actions workflow.
 
+Typst needs to be installed on your machine, see [Running](#running) for more details.
+
 ### Air gap detection
 
 In production, Abacus must be built with air gap detection enabled. To enforce air gap detection during build, enable the feature `airgap-detection`:

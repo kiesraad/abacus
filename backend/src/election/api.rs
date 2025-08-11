@@ -231,12 +231,8 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<String>, nullable = false)]
     polling_station_data: Option<String>,
-    #[schema(value_type = Option<VoteCountingMethod>, nullable = false)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    counting_method: Option<VoteCountingMethod>,
-    #[schema(nullable = false)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    number_of_voters: Option<u32>,
+    counting_method: VoteCountingMethod,
+    number_of_voters: u32,
     #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
     polling_station_file_name: Option<String>,
@@ -273,8 +269,6 @@ pub async fn election_import(
 
     // Process polling stations
     let mut polling_places = None;
-    let mut number_of_voters = 0;
-
     if let Some(polling_station_data) = edu.polling_station_data {
         // If polling stations are submitted, file name must be also
         if edu.polling_station_file_name.is_none() {
@@ -287,14 +281,7 @@ pub async fn election_import(
 
     // Set counting method
     // Note: not used yet in the frontend, only CSO is implemented for now
-    if let Some(counting_method) = edu.counting_method {
-        new_election.counting_method = counting_method;
-    }
-
-    // override number of voters if provided
-    if let Some(voters) = edu.number_of_voters {
-        number_of_voters = voters;
-    }
+    new_election.counting_method = edu.counting_method;
 
     // Create new election
     let election = crate::election::repository::create(&pool, new_election).await?;
@@ -328,7 +315,7 @@ pub async fn election_import(
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
-            number_of_voters,
+            number_of_voters: edu.number_of_voters,
         },
     )
     .await?;

@@ -11,12 +11,20 @@ import { StringFormData } from "@/utils/stringFormData";
 interface NumberOfVotersFormProps {
   defaultValue?: number;
   instructions: string;
-  hint: string | undefined;
+  hint?: string;
+  error?: string;
   button: string;
   onSubmit: (numberOfVoters: number) => void;
 }
 
-export function NumberOfVotersForm({ defaultValue, instructions, hint, button, onSubmit }: NumberOfVotersFormProps) {
+export function NumberOfVotersForm({
+  defaultValue,
+  instructions,
+  hint,
+  error,
+  button,
+  onSubmit,
+}: NumberOfVotersFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
@@ -36,6 +44,7 @@ export function NumberOfVotersForm({ defaultValue, instructions, hint, button, o
               name="number_of_voters"
               label={t("number_of_voters")}
               hint={hint}
+              error={error}
               fieldWidth="full-field-with-narrow-input"
               numberInput
               defaultValue={defaultValue || ""}

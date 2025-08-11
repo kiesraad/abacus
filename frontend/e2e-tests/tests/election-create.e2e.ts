@@ -55,6 +55,8 @@ test.describe("Election creation", () => {
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
+    await expect(checkAndSavePage.numberOfVoters).toContainText("612.694");
 
     const responsePromise = page.waitForResponse(`/api/elections/import`);
     await checkAndSavePage.save.click();

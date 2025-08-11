@@ -81,7 +81,8 @@
   "number_of_voters": {
     "title": "Hoeveel kiesgerechtigden telt de gemeente?",
     "description": "Voer het aantal kiesgerechtigden in zoals door de gemeenteraad vastgesteld voor de gemeenteraadsverkiezing 2026 in de gemeente {location}",
-    "hint": "Ingelezen uit bestand met stembureaus"
+    "hint": "Ingelezen uit bestand met stembureaus",
+    "error": "Vul het aantal kiesgerechtigden in"
   },
   "invalid_polling_station_definition": {
     "title": "Ongeldig stembureaubestand",

@@ -42,7 +42,17 @@ describe("CreateFirstAdminForm", () => {
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
-    expect(screen.getByTestId("username-hint_or_error")).toHaveTextContent("Dit veld mag niet leeg zijn");
+    const fullnameInput = screen.getByLabelText("Jouw naam (roepnaam + achternaam)");
+    expect(fullnameInput).toBeInvalid();
+    expect(fullnameInput).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+
+    const usernameInput = screen.getByLabelText("Gebruikersnaam");
+    expect(usernameInput).toBeInvalid();
+    expect(usernameInput).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+
+    const passwordInput = screen.getByLabelText("Kies een wachtwoord");
+    expect(passwordInput).toBeInvalid();
+    expect(passwordInput).toHaveAccessibleErrorMessage("Het wachtwoord moet minimaal 13 karakters lang zijn.");
   });
 
   test("Create the first admin user form password errors", async () => {
@@ -55,22 +65,25 @@ describe("CreateFirstAdminForm", () => {
 
     render(<CreateFirstAdminForm next={next} />);
 
+    const passwordInput = screen.getByLabelText("Kies een wachtwoord");
+    const passwordRepeatInput = screen.getByLabelText("Herhaal wachtwoord");
+
     const user = userEvent.setup();
     await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
     await user.type(screen.getByLabelText("Gebruikersnaam"), "firstlast");
-    await user.type(screen.getByLabelText("Kies een wachtwoord"), "password");
-    await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password");
+    await user.type(passwordInput, "password");
+    await user.type(passwordRepeatInput, "password");
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
-    expect(screen.getByTestId("password-hint_or_error")).toHaveTextContent("Gebruik minimaal 13 karakters.");
+    expect(passwordInput).toHaveAccessibleErrorMessage("Het wachtwoord moet minimaal 13 karakters lang zijn.");
 
     // error on password repeat mismatch
-    await user.type(screen.getByLabelText("Kies een wachtwoord"), "password1");
-    await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password2");
+    await user.type(passwordInput, "password1");
+    await user.type(passwordRepeatInput, "password2");
     await user.click(submitButton);
 
-    expect(screen.getByTestId("password_repeat-hint_or_error")).toHaveTextContent("De wachtwoorden komen niet overeen");
+    expect(passwordRepeatInput).toHaveAccessibleErrorMessage("De wachtwoorden komen niet overeen");
   });
 
   test("Create the first admin user api error", async () => {

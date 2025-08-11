@@ -5,6 +5,7 @@ import { isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
+import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t, tx } from "@/i18n/translate";
@@ -57,53 +58,58 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
       </header>
       <main>
         <article>
+          {error ? (
+            <FormLayout.Alert>
+              <Alert type="error">
+                <h2>{t("error.api_error.InvalidUsernameOrPassword")}</h2>
+              </Alert>
+            </FormLayout.Alert>
+          ) : (
+            <FormLayout.Alert>
+              <Alert type="success">
+                <h2>{t("initialise.admin_configured")}</h2>
+              </Alert>
+            </FormLayout.Alert>
+          )}
+
           <Form
             onSubmit={(e) => {
               void handleSubmit(e);
             }}
           >
-            {error ? (
-              <FormLayout.Alert>
-                <Alert type="error">
-                  <h2>{t("initialise.login_error")}</h2>
-                </Alert>
-              </FormLayout.Alert>
-            ) : (
-              <FormLayout.Alert>
-                <Alert type="success">
-                  <h2>{t("initialise.admin_configured")}</h2>
-                </Alert>
-              </FormLayout.Alert>
-            )}
             <FormLayout>
               <FormLayout.Section>
-                <p>{tx("initialise.login_to_finish_setup", { link })}</p>
-              <InputField
-                name="username"
-                label={t("account.username")}
-                hint={t("initialise.username_login_hint")}
-                required={true}
-                value={username}
-                disabled={loading}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                }}
-              />
-              <InputField
-                name="password"
-                label={t("account.password")}
-                hint={t("initialise.password_login_hint")}
-                type="password"
-                required={true}
-                value={password}
-                disabled={loading}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
-              />
-              <Button type="submit" disabled={loading}>
-                {t("account.login")}
-              </Button>
+                {tx("initialise.login_to_finish_setup", { link })}
+
+                <InputField
+                  name="username"
+                  label={t("account.username")}
+                  hint={t("initialise.username_login_hint")}
+                  required={true}
+                  value={username}
+                  disabled={loading}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                  }}
+                />
+                <InputField
+                  name="password"
+                  label={t("account.password")}
+                  hint={t("initialise.password_login_hint")}
+                  type="password"
+                  required={true}
+                  value={password}
+                  disabled={loading}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
+                />
+              </FormLayout.Section>
+              <FormLayout.Controls>
+                <Button type="submit" disabled={loading}>
+                  {t("account.login")}
+                </Button>
+              </FormLayout.Controls>
             </FormLayout>
           </Form>
         </article>

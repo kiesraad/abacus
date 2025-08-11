@@ -9,8 +9,8 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import { CREATE_FIRST_ADMIN_REQUEST_PATH, CreateUserRequest, LoginResponse } from "@/types/generated/openapi";
-
 import { StringFormData } from "@/utils/stringFormData";
+
 import { UserValidationErrors, validateCreateUser } from "../util/validate";
 
 interface CreateFirstAdminFormProps {
@@ -52,7 +52,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
       } else {
         if (result instanceof ApiError && result.reference === "PasswordRejection") {
           setValidationErrors({
-            password: t("account.password_rules"),
+            password: t("initialise.password_rules"),
           });
         } else {
           setApiError(result);
@@ -105,7 +105,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                 <InputField
                   name="password"
                   label={t("initialise.password")}
-                  hint={t("initialise.password_hint")}
+                  hint={t("users.temporary_password_hint")}
                   type="password"
                   error={validationErrors?.password}
                 />
@@ -116,9 +116,9 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                   error={validationErrors?.password_repeat}
                 />
               </FormLayout.Section>
-              <div className="mt-lg">
+              <FormLayout.Controls>
                 <Button type="submit">{t("save")}</Button>
-              </div>
+              </FormLayout.Controls>
             </FormLayout>
           </Form>
         </article>

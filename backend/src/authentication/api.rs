@@ -593,6 +593,7 @@ mod tests {
         APIError,
         authentication::{
             Role, SECURE_COOKIES, api::set_default_cookie_properties, error::AuthenticationError,
+            user::update_last_activity_at,
         },
     };
 
@@ -680,9 +681,7 @@ mod tests {
         assert_eq!(user.username(), "admin2");
 
         // Not allowed to create a new user after the first admin has logged in
-        super::super::user::update_last_activity_at(&pool, user.id())
-            .await
-            .unwrap();
+        update_last_activity_at(&pool, user.id()).await.unwrap();
 
         let create_user_req = super::CreateUserRequest {
             username: "admin2".to_string(),

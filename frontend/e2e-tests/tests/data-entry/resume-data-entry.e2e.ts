@@ -122,7 +122,7 @@ test.describe("resume data entry flow", () => {
       await expect(differencesPage.fieldset).toBeVisible();
       await differencesPage.next.click();
 
-      const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Partijdige Partij");
       await expect(candidatesListPage_1.fieldset).toBeVisible();
       await candidatesListPage_1.progressList.votersAndVotes.click();
 
@@ -421,15 +421,15 @@ test.describe("resume data entry flow", () => {
       const differencesPage = new DifferencesPage(page);
       await differencesPage.next.click();
 
-      const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Partijdige Partij");
       await candidatesListPage_1.fillCandidatesAndTotal([1337, 423, 300, 236, 533, 205, 103, 286, 0, 0, 113, 0], 3536);
       await candidatesListPage_1.next.click();
 
-      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
+      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst van de Kandidaten");
       await candidatesListPage_2.fillCandidatesAndTotal([28, 4, 2, 2], 36);
       await candidatesListPage_2.next.click();
 
-      const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+      const candidatesListPage_3 = new CandidatesListPage(page, 3, "Partij voor de Stemmer");
       await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
       await candidatesListPage_3.next.click();
 
@@ -610,15 +610,15 @@ test.describe("resume data entry flow", () => {
       const differencesPage = new DifferencesPage(page);
       await differencesPage.next.click();
 
-      const candidatesListPage_1 = new CandidatesListPage(page, 1, "GROENLINKS");
+      const candidatesListPage_1 = new CandidatesListPage(page, 1, "Partijdige Partij");
       await candidatesListPage_1.fillCandidatesAndTotal([1337, 423, 300, 236, 533, 205, 103, 286, 0, 0, 113, 0], 3536);
       await candidatesListPage_1.next.click();
 
-      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lokaal Belang Heemdamseburg");
+      const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst van de Kandidaten");
       await candidatesListPage_2.fillCandidatesAndTotal([28, 4, 2, 2], 36);
       await candidatesListPage_2.next.click();
 
-      const candidatesListPage_3 = new CandidatesListPage(page, 3, "D66");
+      const candidatesListPage_3 = new CandidatesListPage(page, 3, "Partij voor de Stemmer");
       await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
       await candidatesListPage_3.next.click();
 

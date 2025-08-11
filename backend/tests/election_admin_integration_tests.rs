@@ -394,6 +394,7 @@ async fn test_election_import_save(pool: SqlitePool) {
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "file_name": "eml110b_test.eml.xml",
         }))
         .send()
         .await
@@ -427,6 +428,7 @@ async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "file_name": "eml110b_test.eml.xml",
         }))
         .send()
         .await
@@ -460,6 +462,7 @@ async fn test_election_import_save_empty_candidate_stubs(pool: SqlitePool) {
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "file_name": "eml110b_test.eml.xml",
         }))
         .send()
         .await
@@ -482,6 +485,40 @@ async fn test_election_import_save_wrong_hash(pool: SqlitePool) {
                 "84c9", "caba", "ff33", "6c42",
                 "1234", "b20c", "2ba9", "1ceb",
                 "3c61", "9b99", "f0a6", "a57e",
+                "cf00", "8930", "9bce", "0c33"
+            ],
+            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_hash": [
+                "6a53", "d681", "aa15", "d6c3",
+                "375a", "48c2", "29c8", "7dcf",
+                "09b2", "5a55", "34a8", "4854",
+                "7643", "3b8f", "cd3e", "6e97"
+            ],
+            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
+            "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "file_name": "eml110b_test.eml.xml",
+        }))
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_election_import_missing_file_name(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/import");
+    let admin_cookie = shared::admin_login(&addr).await;
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", admin_cookie)
+        .json(&serde_json::json!({
+            "election_hash": [
+                "84c9", "caba", "ff33", "6c42",
+                "9825", "b20c", "2ba9", "1ceb",
+                "3c61", "9b99", "8af1", "a57e",
                 "cf00", "8930", "9bce", "0c33"
             ],
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),

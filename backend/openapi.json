@@ -4674,6 +4674,9 @@
               "type": "string"
             }
           },
+          "file_name": {
+            "type": "string"
+          },
           "number_of_voters": {
             "type": "integer",
             "format": "int32",

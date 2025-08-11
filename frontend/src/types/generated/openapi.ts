@@ -568,6 +568,7 @@ export interface ElectionAndCandidatesDefinitionImportRequest {
   counting_method?: VoteCountingMethod;
   election_data: string;
   election_hash: string[];
+  file_name?: string;
   number_of_voters?: number;
   polling_station_data?: string;
 }

@@ -15,7 +15,7 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse,
-    audit_log::{AuditEvent, AuditService},
+    audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     authentication::{Admin, User},
     committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
     election::VoteCountingMethod,
@@ -278,6 +278,9 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
     number_of_voters: Option<u32>,
+    #[schema(nullable = false)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    file_name: Option<String>,
 }
 
 /// Uploads election definition, validates it, saves it to the database, and returns the created election
@@ -312,7 +315,13 @@ pub async fn election_import(
     // Process polling stations
     let mut polling_places = None;
     let mut number_of_voters = 0;
+
     if let Some(polling_station_data) = edu.polling_station_data {
+        // If polling stations are submitted, file name must be also
+        if edu.file_name.is_none() {
+            return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
+        }
+
         number_of_voters = EML110::from_str(&polling_station_data)?.get_number_of_voters()?;
         polling_places = Some(EML110::from_str(&polling_station_data)?.get_polling_stations()?);
     }
@@ -336,7 +345,20 @@ pub async fn election_import(
 
     // Create polling stations
     if let Some(places) = polling_places {
+        let number_of_polling_stations = places.len();
         crate::polling_station::repository::create_many(&pool, election.id, places).await?;
+
+        audit_service
+            .log(
+                &AuditEvent::PollingStationsImported(PollingStationImportDetails {
+                    import_election_id: election.id,
+                    import_file_name: edu.file_name.ok_or(EMLImportError::MissingFileName)?,
+                    import_number_of_polling_stations: u64::try_from(number_of_polling_stations)
+                        .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
+                }),
+                None,
+            )
+            .await?;
     }
 
     // Create first committee session for the election

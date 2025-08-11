@@ -17,8 +17,10 @@ use crate::{
     committee_session::status::{CommitteeSessionStatus, change_committee_session_status},
 };
 
+use crate::audit_log::PollingStationImportDetails;
 use crate::eml::EML110;
 use crate::eml::EMLDocument;
+use crate::eml::EMLImportError;
 
 pub mod repository;
 pub mod structs;
@@ -330,7 +332,7 @@ async fn polling_station_import(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
-    _audit_service: AuditService,
+    audit_service: AuditService,
     Json(polling_stations_request): Json<PollingStationsRequest>,
 ) -> Result<(StatusCode, PollingStationListResponse), APIError> {
     // Create new polling stations
@@ -340,6 +342,19 @@ async fn polling_station_import(
         polling_stations_request.polling_stations,
     )
     .await?;
+
+    // Create audit event
+    audit_service
+        .log(
+            &AuditEvent::PollingStationsImported(PollingStationImportDetails {
+                import_election_id: election_id,
+                import_file_name: polling_stations_request.file_name,
+                import_number_of_polling_stations: u64::try_from(polling_stations.len())
+                    .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
+            }),
+            None,
+        )
+        .await?;
 
     Ok((
         StatusCode::OK,

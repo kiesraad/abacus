@@ -41,7 +41,7 @@ export function ElectionSummaryTable({
           <Table.NumberCell>{formatNumber(votesCounts.total_votes_cast_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
             {numberOfVoters
-              ? `${t("apportionment.turnout")}: ${Number((votesCounts.total_votes_cast_count / numberOfVoters) * 100).toFixed(2)}%`
+              ? `${t("apportionment.turnout")}: ${((votesCounts.total_votes_cast_count / numberOfVoters) * 100).toFixed(2)}%`
               : ""}
           </Table.Cell>
         </Table.Row>
@@ -51,7 +51,7 @@ export function ElectionSummaryTable({
           </Table.HeaderCell>
           <Table.NumberCell>{formatNumber(votesCounts.blank_votes_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {`${Number((votesCounts.blank_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
+            {`${((votesCounts.blank_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
           </Table.Cell>
         </Table.Row>
         <Table.Row>
@@ -60,7 +60,7 @@ export function ElectionSummaryTable({
           </Table.HeaderCell>
           <Table.NumberCell>{formatNumber(votesCounts.invalid_votes_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {`${Number((votesCounts.invalid_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
+            {`${((votesCounts.invalid_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
           </Table.Cell>
         </Table.Row>
         <Table.Row>

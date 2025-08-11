@@ -206,6 +206,7 @@ pub enum EMLImportError {
     Needs110b,
     Needs230b,
     NumberOfSeatsNotInRange,
+    NumberOfPollingStationsNotInRange,
     OnlyMunicipalSupported,
     TooManyPoliticalGroups,
 }

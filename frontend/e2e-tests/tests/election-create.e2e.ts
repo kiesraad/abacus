@@ -59,7 +59,7 @@ test.describe("Election creation", () => {
 
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();
-    await expect(electionRow).toContainText("Gemeenteraad Amsterdam 2022");
+    await expect(electionRow).toContainText("Gemeenteraad Test 2022");
     await expect(electionRow).toContainText("Zitting voorbereiden");
   });
 
@@ -98,7 +98,7 @@ test.describe("Election creation", () => {
 
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();
-    await expect(electionRow).toContainText("Gemeenteraad Amsterdam 2022");
+    await expect(electionRow).toContainText("Gemeenteraad Test 2022");
     await expect(electionRow).toContainText("Zitting voorbereiden");
   });
 

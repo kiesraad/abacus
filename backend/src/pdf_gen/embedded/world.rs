@@ -9,9 +9,7 @@ use typst::{
     utils::LazyHash,
 };
 
-use crate::pdf_gen::PdfGenError;
-
-use super::super::models::PdfModel;
+use crate::pdf_gen::{PdfGenError, models::PdfModel};
 
 /// Contains the context for rendering PDFs.
 #[derive(Clone)]

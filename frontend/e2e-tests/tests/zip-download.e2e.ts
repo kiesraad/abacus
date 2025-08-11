@@ -31,7 +31,7 @@ test.describe("election results zip", () => {
 
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toBe("election_result_GR2026_Test_Location.zip");
+    expect(download.suggestedFilename()).toBe("election_result_GR2022_Test.zip");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 });

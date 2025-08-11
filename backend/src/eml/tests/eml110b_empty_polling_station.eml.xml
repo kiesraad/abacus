@@ -2,7 +2,7 @@
 <EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="110b" SchemaVersion="5">
   <TransactionId>1</TransactionId>
   <ManagingAuthority>
-    <AuthorityIdentifier Id="0363">Amsterdam</AuthorityIdentifier>
+    <AuthorityIdentifier Id="0000">Test</AuthorityIdentifier>
     <AuthorityAddress/>
   </ManagingAuthority>
   <kr:CreationDateTime>2024-05-27T17:05:57</kr:CreationDateTime>
@@ -19,7 +19,7 @@
       <Contest>
         <ContestIdentifier Id="geen"/>
         <ReportingUnit>
-          <ReportingUnitIdentifier Id="0363">Amsterdam</ReportingUnitIdentifier>
+          <ReportingUnitIdentifier Id="0000">Test</ReportingUnitIdentifier>
         </ReportingUnit>
         <VotingMethod />
         <MaxVotes>612694</MaxVotes>

@@ -171,6 +171,7 @@ pub async fn create(
     username: &str,
     fullname: Option<&str>,
     password: &str,
+    needs_password_change: bool,
     role: Role,
 ) -> Result<User, AuthenticationError> {
     let password_hash: HashedPassword =
@@ -178,8 +179,8 @@ pub async fn create(
 
     let user = sqlx::query_as!(
         User,
-        r#"INSERT INTO users (username, fullname, password_hash, role)
-        VALUES (?, ?, ?, ?)
+        r#"INSERT INTO users (username, fullname, password_hash, needs_password_change, role)
+        VALUES (?, ?, ?, ?, ?)
         RETURNING
             id as "id: u32",
             username,
@@ -194,6 +195,7 @@ pub async fn create(
         username,
         fullname,
         password_hash,
+        needs_password_change,
         role,
     )
     .fetch_one(conn)
@@ -418,9 +420,16 @@ mod tests {
     async fn test_create_user(pool: SqlitePool) {
         const USERNAME: &str = "test_user";
 
-        let user = super::create(&pool, USERNAME, None, "TotallyValidP4ssW0rd", Role::Typist)
-            .await
-            .unwrap();
+        let user = super::create(
+            &pool,
+            USERNAME,
+            None,
+            "TotallyValidP4ssW0rd",
+            true,
+            Role::Typist,
+        )
+        .await
+        .unwrap();
 
         assert_eq!(user.username, USERNAME);
 
@@ -448,6 +457,7 @@ mod tests {
             "test_user",
             None,
             "TotallyValidP4ssW0rd",
+            true,
             Role::Typist,
         )
         .await
@@ -461,6 +471,7 @@ mod tests {
             "test_User",
             None,
             "TotallyValidP4ssW0rd",
+            true,
             Role::Typist,
         )
         .await;
@@ -478,6 +489,7 @@ mod tests {
             "test_user",
             Some("Full Name"),
             "TotallyValidP4ssW0rd",
+            true,
             Role::Coordinator,
         )
         .await
@@ -525,6 +537,7 @@ mod tests {
             "test_user",
             Some("Full Name"),
             old_password,
+            true,
             Role::Administrator,
         )
         .await
@@ -558,6 +571,7 @@ mod tests {
             "test_user",
             Some("Full Name"),
             "TotallyValidP4ssW0rd",
+            true,
             Role::Administrator,
         )
         .await
@@ -593,6 +607,7 @@ mod tests {
             "test_user",
             Some("Full Name"),
             "TotallyValidP4ssW0rd",
+            true,
             Role::Administrator,
         )
         .await

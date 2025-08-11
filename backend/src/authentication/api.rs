@@ -245,6 +245,7 @@ async fn create_first_admin(
         &create_user_req.username,
         create_user_req.fullname.as_deref(),
         &create_user_req.temp_password,
+        false,
         Role::Administrator,
     )
     .await?;
@@ -458,6 +459,7 @@ pub async fn user_create(
         &create_user_req.username,
         create_user_req.fullname.as_deref(),
         &create_user_req.temp_password,
+        true,
         create_user_req.role,
     )
     .await?;
@@ -626,6 +628,7 @@ mod tests {
             "admin",
             Some("Admin User"),
             "admin_password",
+            false,
             Role::Administrator,
         )
         .await

@@ -560,6 +560,7 @@ export interface ElectionAndCandidateDefinitionValidateRequest {
   election_hash?: string[];
   number_of_voters?: number;
   polling_station_data?: string;
+  polling_station_file_name?: string;
 }
 
 export interface ElectionAndCandidatesDefinitionImportRequest {
@@ -568,9 +569,9 @@ export interface ElectionAndCandidatesDefinitionImportRequest {
   counting_method?: VoteCountingMethod;
   election_data: string;
   election_hash: string[];
-  file_name?: string;
   number_of_voters?: number;
   polling_station_data?: string;
+  polling_station_file_name?: string;
 }
 
 /**

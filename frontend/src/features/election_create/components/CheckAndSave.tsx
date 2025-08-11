@@ -28,7 +28,7 @@ export function CheckAndSave() {
       candidate_data: state.candidateDefinitionData,
       candidate_hash: state.candidateDefinitionHash,
       polling_station_data: state.pollingStationDefinitionData,
-      file_name: state.pollingStationDefinitionFileName,
+      polling_station_file_name: state.pollingStationDefinitionFileName,
     });
 
     if (isSuccess(response)) {

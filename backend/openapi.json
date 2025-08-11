@@ -4640,6 +4640,9 @@
           },
           "polling_station_data": {
             "type": "string"
+          },
+          "polling_station_file_name": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -4674,15 +4677,15 @@
               "type": "string"
             }
           },
-          "file_name": {
-            "type": "string"
-          },
           "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
           "polling_station_data": {
+            "type": "string"
+          },
+          "polling_station_file_name": {
             "type": "string"
           }
         },

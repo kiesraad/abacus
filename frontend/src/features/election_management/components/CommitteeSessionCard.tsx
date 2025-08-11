@@ -1,7 +1,7 @@
 import { Fragment, HTMLAttributes, ReactNode, useState } from "react";
 import { To, useNavigate } from "react-router";
 
-import { AnyApiError, isSuccess } from "@/api/ApiResult.ts";
+import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { CommitteeSessionStatusLabel } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";

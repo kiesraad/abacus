@@ -6,11 +6,11 @@
     <ElectionEvent>
         <EventIdentifier/>
         <Election>
-            <ElectionIdentifier Id="GR2022_Amsterdam">
-                <ElectionName>Gemeenteraad Amsterdam 2022</ElectionName>
+            <ElectionIdentifier Id="GR2022_Test">
+                <ElectionName>Gemeenteraad Test 2022</ElectionName>
                 <ElectionCategory>GR</ElectionCategory>
                 <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
-                <kr:ElectionDomain Id="0363">Amsterdam</kr:ElectionDomain>
+                <kr:ElectionDomain Id="0000">Test</kr:ElectionDomain>
                 <kr:ElectionDate>2022-03-16</kr:ElectionDate>
                 <kr:NominationDate>2022-01-31</kr:NominationDate>
             </ElectionIdentifier>
@@ -21,87 +21,87 @@
             </Contest>
             <kr:NumberOfSeats>45</kr:NumberOfSeats>
             <kr:ElectionTree>
-                <kr:Region RegionNumber="363" RegionCategory="GEMEENTE">
-                    <kr:RegionName>Amsterdam</kr:RegionName>
+                <kr:Region RegionNumber="000" RegionCategory="GEMEENTE">
+                    <kr:RegionName>Test</kr:RegionName>
                     <kr:Committee CommitteeCategory="CSB"/>
                     <kr:Committee CommitteeCategory="HSB"/>
                 </kr:Region>
             </kr:ElectionTree>
             <kr:RegisteredParties>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>GROENLINKS</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Partijdige Partij</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>D66</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Partij voor de Stemmer</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>VVD</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Stemmmers 22</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>Partij van de Arbeid (P.v.d.A.)</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>STEM</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>SP (Socialistische Partij)</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>De Stemunie</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>Partij voor de Dieren</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Stemalliantie</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>DENK</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Lijst De Partij</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>Forum voor Democratie</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Het Stembiljet</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>CDA</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Partij voor de Opkomst</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>Partij van de Ouderen (P.v.d.O.)</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Kiezers nu!</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>ChristenUnie</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Verkiespartij</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>Amsterdam BIJ1</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>WET</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>50PLUS</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Partij van de Wet</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>De Groenen Basis Piraten</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Stem van de partij</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>ST3M</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Kiesregelingsunie</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>Hart voor Vrijheid Amsterdam</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>De Lijst</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>DE FEESTPARTIJ (DFP)</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Groep De Partij</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>Staatkundig Gereformeerde Partij (SGP)</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Stemmersgroep</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>JA21</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Algemene Partij</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>Belang van Nederland (BVNL)</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Stem voor de Partij</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>LEF - Voor de Nieuwe Generatie</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Partij van de Keuze</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>Volt</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>KEUS</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>GO</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Keuzepartij</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>De Republikeinse Politieke Partij</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>Voorkeurskeuzepartij</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
                 <kr:RegisteredParty>
-                    <kr:RegisteredAppellation>Democratisch Socialisten Amsterdam</kr:RegisteredAppellation>
+                    <kr:RegisteredAppellation>De Kandidatenlijst</kr:RegisteredAppellation>
                 </kr:RegisteredParty>
             </kr:RegisteredParties>
         </Election>

@@ -6,6 +6,7 @@ import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
+import { LinkButton } from "@/components/ui/LinkButton/LinkButton";
 import { Table } from "@/components/ui/Table/Table";
 import { t, tx } from "@/i18n/translate";
 import {
@@ -15,7 +16,6 @@ import {
 } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import cls from "./UploadPollingStationDefinition.module.css";
 
 export function UploadPollingStationDefinition() {
   const { state, dispatch } = useElectionCreateContext();
@@ -126,9 +126,11 @@ export function UploadPollingStationDefinition() {
               </Table.Body>
             </Table>
             <p className="mt-lg">
-              <button id="show-more" className={cls.linkButton} onClick={showAll}>
-                {t("election.polling_stations.show_all", { num: state.pollingStations.length })}
-              </button>
+              <LinkButton
+                id="show-more"
+                text={t("election.polling_stations.show_all", { num: state.pollingStations.length })}
+                onClick={showAll}
+              />
             </p>
           </>
         )}
@@ -162,9 +164,7 @@ export function UploadPollingStationDefinition() {
       </FileInput>
 
       <p className="mt-lg">
-        <button className={cls.linkButton} onClick={() => void skip()}>
-          {t("election.polling_stations.skip_step")}
-        </button>
+        <LinkButton onClick={() => void skip()} text={t("election.polling_stations.skip_step")} />
       </p>
     </section>
   );

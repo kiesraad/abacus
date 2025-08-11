@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
+import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient.ts";
 import { CommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { IconPlus } from "@/components/generated/icons";
@@ -18,11 +19,22 @@ import { Election } from "@/types/generated/openapi";
 export function OverviewPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { committeeSessionList, electionList } = useElectionList();
+  const { committeeSessionList, electionList, refetch } = useElectionList();
   const { isAdministrator, isCoordinator } = useUserRole();
 
   const isNewAccount = location.hash === "#new-account";
   const isAdminOrCoordinator = isAdministrator || isCoordinator;
+
+  // re-fetch statuses when component mounts
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    void refetch(abortController);
+
+    return () => {
+      abortController.abort(DEFAULT_CANCEL_REASON);
+    };
+  }, [refetch]);
 
   interface ElectionRowProps {
     election: Election;

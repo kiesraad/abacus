@@ -36,8 +36,12 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
 
   // throw fatal errors, so the error boundary can catch them and show the full page error
   if (stateAndActions.error instanceof FatalApiError) {
+    // exception for CommitteeSessionPaused error which has to trigger the rendering of a modal
     if (stateAndActions.error.reference === "CommitteeSessionPaused") {
-      return <Navigate to={`/elections/${election.id}/data-entry`} />;
+      // on initial claim, navigate back to DataEntryHomePage (modal is rendered there)
+      if (!stateAndActions.pollingStationResults) {
+        return <Navigate to={`/elections/${election.id}/data-entry`} />;
+      }
     } else {
       throw stateAndActions.error;
     }

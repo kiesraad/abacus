@@ -10,7 +10,7 @@ import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import { CREATE_FIRST_ADMIN_REQUEST_PATH, CreateUserRequest, LoginResponse } from "@/types/generated/openapi";
 
-import { StringFormData } from "../../../utils/stringFormData";
+import { StringFormData } from "@/utils/stringFormData";
 import { UserValidationErrors, validateCreateUser } from "../util/validate";
 
 interface CreateFirstAdminFormProps {

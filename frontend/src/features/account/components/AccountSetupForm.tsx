@@ -11,7 +11,7 @@ import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import { ACCOUNT_UPDATE_REQUEST_PATH, AccountUpdateRequest, LoginResponse } from "@/types/generated/openapi";
 
-import { StringFormData } from "../../../utils/stringFormData";
+import { StringFormData } from "@/utils/stringFormData";
 import { UserValidationErrors, validateUpdateUser } from "../util/validate";
 
 interface AccountSetupFormProps {

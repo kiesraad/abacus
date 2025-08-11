@@ -57,7 +57,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
       </header>
       <main>
         <article>
-          <form
+          <Form
             onSubmit={(e) => {
               void handleSubmit(e);
             }}
@@ -75,8 +75,9 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
                 </Alert>
               </FormLayout.Alert>
             )}
-            <section className="md">{tx("initialise.login_to_finish_setup", { link })}</section>
             <FormLayout>
+              <FormLayout.Section>
+                <p>{tx("initialise.login_to_finish_setup", { link })}</p>
               <InputField
                 name="username"
                 label={t("account.username")}
@@ -104,7 +105,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
                 {t("account.login")}
               </Button>
             </FormLayout>
-          </form>
+          </Form>
         </article>
       </main>
     </>

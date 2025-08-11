@@ -6,6 +6,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import { deformatNumber } from "@/utils/number";
+import { StringFormData } from "@/utils/stringFormData";
 
 interface NumberOfVotersFormProps {
   defaultValue?: number;
@@ -18,9 +19,8 @@ interface NumberOfVotersFormProps {
 export function NumberOfVotersForm({ defaultValue, instructions, hint, button, onSubmit }: NumberOfVotersFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const voters = formData.get("number_of_voters") as string;
+    const formData = new StringFormData(event.currentTarget);
+    const voters = formData.getString("number_of_voters");
     onSubmit(deformatNumber(voters));
   }
 

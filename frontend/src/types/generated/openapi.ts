@@ -138,6 +138,15 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
+// /api/initialise/admin-exists
+export type ADMIN_EXISTS_REQUEST_PARAMS = Record<string, never>;
+export type ADMIN_EXISTS_REQUEST_PATH = `/api/initialise/admin-exists`;
+
+// /api/initialise/first-admin
+export type CREATE_FIRST_ADMIN_REQUEST_PARAMS = Record<string, never>;
+export type CREATE_FIRST_ADMIN_REQUEST_PATH = `/api/initialise/first-admin`;
+export type CREATE_FIRST_ADMIN_REQUEST_BODY = CreateUserRequest;
+
 // /api/initialised
 export type INITIALISED_REQUEST_PARAMS = Record<string, never>;
 export type INITIALISED_REQUEST_PATH = `/api/initialised`;

@@ -34,6 +34,8 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(login))
         .routes(routes!(whoami))
         .routes(routes!(initialised))
+        .routes(routes!(create_first_admin))
+        .routes(routes!(admin_exists))
         .routes(routes!(account_update))
         .routes(routes!(logout))
         .routes(routes!(user_list))
@@ -193,6 +195,7 @@ async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   responses(
       (status = 200, description = "The application is initialised"),
       (status = 418, description = "The application is not initialised", body = ErrorResponse),
+      (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
 async fn initialised(State(pool): State<SqlitePool>) -> Result<impl IntoResponse, APIError> {
@@ -201,6 +204,82 @@ async fn initialised(State(pool): State<SqlitePool>) -> Result<impl IntoResponse
     } else {
         Err(AuthenticationError::NotInitialised.into())
     }
+}
+
+/// Create the first admin user, only allowed if no users exist yet
+#[utoipa::path(
+    post,
+    path = "/api/initialise/first-admin",
+    request_body = CreateUserRequest,
+    responses(
+        (status = 201, description = "First admin user created", body = User),
+        (status = 403, description = "Forbidden, an active user already exists", body = ErrorResponse),
+        (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+async fn create_first_admin(
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Json(create_user_req): Json<CreateUserRequest>,
+) -> Result<(StatusCode, Json<User>), APIError> {
+    if super::user::has_active_users(&pool).await? {
+        return Err(AuthenticationError::AlreadyInitialised.into());
+    }
+
+    // Delete any existing admin user
+    let users = super::user::list(&pool).await?;
+    for user in users {
+        if user.role() == Role::Administrator {
+            super::user::delete(&pool, user.id()).await?;
+
+            audit_service
+                .log(&AuditEvent::UserDeleted(user.into()), None)
+                .await?;
+        }
+    }
+
+    // Create the first admin user
+    let user = super::user::create(
+        &pool,
+        &create_user_req.username,
+        create_user_req.fullname.as_deref(),
+        &create_user_req.temp_password,
+        false,
+        Role::Administrator,
+    )
+    .await?;
+
+    audit_service
+        .log(&AuditEvent::UserCreated(user.clone().into()), None)
+        .await?;
+
+    Ok((StatusCode::CREATED, Json(user)))
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/initialise/admin-exists",
+    responses(
+        (status = 200, description = "First admin user exists"),
+        (status = 403, description = "Forbidden, the application is already initialised", body = ErrorResponse),
+        (status = 404, description = "No admin user exists", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+async fn admin_exists(State(pool): State<SqlitePool>) -> Result<StatusCode, APIError> {
+    if super::user::has_active_users(&pool).await? {
+        return Err(AuthenticationError::AlreadyInitialised.into());
+    }
+
+    if super::user::admin_exists(&pool).await? {
+        return Ok(StatusCode::OK);
+    }
+
+    Err(APIError::NotFound(
+        "No admin user exists".into(),
+        ErrorReference::UserNotFound,
+    ))
 }
 
 /// Update the user's account with a new password and optionally new fullname
@@ -380,6 +459,7 @@ pub async fn user_create(
         &create_user_req.username,
         create_user_req.fullname.as_deref(),
         &create_user_req.temp_password,
+        true,
         create_user_req.role,
     )
     .await?;
@@ -515,6 +595,7 @@ mod tests {
         APIError,
         authentication::{
             Role, SECURE_COOKIES, api::set_default_cookie_properties, error::AuthenticationError,
+            user::update_last_activity_at,
         },
     };
 
@@ -547,6 +628,7 @@ mod tests {
             "admin",
             Some("Admin User"),
             "admin_password",
+            false,
             Role::Administrator,
         )
         .await
@@ -559,5 +641,93 @@ mod tests {
 
         let response = initialised.unwrap().into_response();
         assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[test(sqlx::test)]
+    async fn test_create_first_admin(pool: SqlitePool) {
+        let create_user_req = super::CreateUserRequest {
+            username: "admin".to_string(),
+            fullname: Some("Admin User".to_string()),
+            temp_password: "admin_password".to_string(),
+            role: Role::Administrator,
+        };
+
+        let response = super::create_first_admin(
+            State(pool.clone()),
+            crate::audit_log::AuditService::new(pool.clone(), None, None),
+            axum::Json(create_user_req),
+        )
+        .await;
+
+        assert!(response.is_ok());
+        let (status, user) = response.unwrap();
+        assert_eq!(status, StatusCode::CREATED);
+        assert_eq!(user.username(), "admin");
+
+        // Create a new user again is allowed as long as the admin has not logged in yet
+        let create_user_req = super::CreateUserRequest {
+            username: "admin2".to_string(),
+            fullname: Some("Admin User 2".to_string()),
+            temp_password: "admin_password".to_string(),
+            role: Role::Administrator,
+        };
+        let response = super::create_first_admin(
+            State(pool.clone()),
+            crate::audit_log::AuditService::new(pool.clone(), None, None),
+            axum::Json(create_user_req),
+        )
+        .await;
+
+        assert!(response.is_ok());
+        let (status, user) = response.unwrap();
+        assert_eq!(status, StatusCode::CREATED);
+        assert_eq!(user.username(), "admin2");
+
+        // Not allowed to create a new user after the first admin has logged in
+        update_last_activity_at(&pool, user.id()).await.unwrap();
+
+        let create_user_req = super::CreateUserRequest {
+            username: "admin2".to_string(),
+            fullname: Some("Admin User 3".to_string()),
+            temp_password: "admin_password".to_string(),
+            role: Role::Administrator,
+        };
+        let response = super::create_first_admin(
+            State(pool.clone()),
+            crate::audit_log::AuditService::new(pool.clone(), None, None),
+            axum::Json(create_user_req),
+        )
+        .await;
+
+        assert!(response.is_err());
+    }
+
+    #[test(sqlx::test)]
+    async fn test_admin_exists(pool: SqlitePool) {
+        // No admin user exists yet
+        let response = super::admin_exists(State(pool.clone())).await;
+        assert!(response.is_err());
+        assert!(matches!(response, Err(APIError::NotFound(_, _))));
+
+        // Create an admin user
+        let create_user_req = super::CreateUserRequest {
+            username: "admin".to_string(),
+            fullname: Some("Admin User".to_string()),
+            temp_password: "admin_password".to_string(),
+            role: Role::Administrator,
+        };
+        let response = super::create_first_admin(
+            State(pool.clone()),
+            crate::audit_log::AuditService::new(pool.clone(), None, None),
+            axum::Json(create_user_req),
+        )
+        .await;
+
+        assert!(response.is_ok());
+        let (status, _user) = response.unwrap();
+        assert_eq!(status, StatusCode::CREATED);
+
+        let response = super::admin_exists(State(pool.clone())).await;
+        assert!(response.unwrap() == StatusCode::OK);
     }
 }

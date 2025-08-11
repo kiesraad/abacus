@@ -67,10 +67,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 2rem 5rem;
+    padding: 0 5rem;
     font-size: var(--font-size-sm);
     line-height: 1.25rem;
-    max-height: 5rem;
     a {
       color: var(--color-help-text);
       text-decoration: none;

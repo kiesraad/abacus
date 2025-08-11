@@ -4,6 +4,11 @@ import { ExtraInvestigation } from "@/types/generated/openapi";
 
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
+export const noExtraInvestigation: ExtraInvestigation = {
+  extra_investigation_other_reason: { yes: false, no: true },
+  ballots_recounted_extra_investigation: { yes: false, no: true },
+};
+
 export class ExtraInvestigationPage extends DataEntryBasePage {
   readonly fieldset: Locator;
   readonly extraInvestigationOtherReason: Locator;
@@ -36,7 +41,7 @@ export class ExtraInvestigationPage extends DataEntryBasePage {
     this.next = page.getByRole("button", { name: "Volgende" });
   }
 
-  async inputExtraInvestigation(extraInvestigation: ExtraInvestigation) {
+  async fillAndClickNext(extraInvestigation: ExtraInvestigation) {
     if (extraInvestigation.extra_investigation_other_reason.yes) {
       await this.extraInvestigationOtherReasonYes.check();
     } else {
@@ -60,6 +65,8 @@ export class ExtraInvestigationPage extends DataEntryBasePage {
     } else {
       await this.ballotsRecountedNo.uncheck();
     }
+
+    await this.next.click();
   }
 
   async getExtraInvestigation(): Promise<ExtraInvestigation> {

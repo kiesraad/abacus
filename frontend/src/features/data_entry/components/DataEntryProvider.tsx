@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ApiError, FatalApiError } from "@/api/ApiResult";
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
@@ -35,8 +35,12 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
   }, [election.id, navigate, stateAndActions.error, pollingStationId]);
 
   // throw fatal errors, so the error boundary can catch them and show the full page error
-  if (stateAndActions.error instanceof FatalApiError && stateAndActions.error.reference !== "CommitteeSessionPaused") {
-    throw stateAndActions.error;
+  if (stateAndActions.error instanceof FatalApiError) {
+    if (stateAndActions.error.reference === "CommitteeSessionPaused") {
+      return <Navigate to={`/elections/${election.id}/data-entry`} />;
+    } else {
+      throw stateAndActions.error;
+    }
   }
 
   if (!stateAndActions.pollingStationResults) {

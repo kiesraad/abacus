@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
-import { ApiError } from "@/api/ApiResult";
+import { ApiError, FatalApiError } from "@/api/ApiResult";
+import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal.tsx";
 import { ErrorModal } from "@/components/error/ErrorModal";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
@@ -128,6 +129,9 @@ export function CheckAndSaveForm() {
     >
       <DataEntryNavigation onSubmit={onSubmit} />
 
+      {error instanceof FatalApiError && error.reference === "CommitteeSessionPaused" && (
+        <CommitteeSessionPausedModal showUnsavedChanges />
+      )}
       {error instanceof ApiError && <ErrorModal error={error} />}
 
       {hasErrors && allFeedbackAccepted ? (

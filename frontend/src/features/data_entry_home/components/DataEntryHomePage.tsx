@@ -16,19 +16,20 @@ import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { committeeSession, election, pollingStations } = useElection();
-  const { statuses, refetch } = useElectionStatus();
+  const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
+  const { statuses, refetch: refetchStatuses } = useElectionStatus();
 
   // re-fetch statuses when component mounts
   useEffect(() => {
     const abortController = new AbortController();
 
-    void refetch(abortController);
+    void refetchElection(abortController);
+    void refetchStatuses(abortController);
 
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
-  }, [refetch]);
+  }, [refetchElection, refetchStatuses]);
 
   const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved") ? location.hash : null;
   const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved") ? location.hash : null;

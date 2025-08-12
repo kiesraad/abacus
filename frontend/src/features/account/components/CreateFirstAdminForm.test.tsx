@@ -90,9 +90,9 @@ describe("CreateFirstAdminForm", () => {
     render(<CreateFirstAdminForm next={next} />);
 
     overrideOnce("post", "/api/initialise/first-admin", 400, {
-      error: "Some error occurred",
+      error: "Application already initialised",
       fatal: false,
-      reference: "SomeError",
+      reference: "AlreadyInitialised",
     });
 
     const user = userEvent.setup();
@@ -103,6 +103,8 @@ describe("CreateFirstAdminForm", () => {
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
 
     await user.click(submitButton);
-    expect(screen.getByRole("alert")).toHaveTextContent("Some error occurred");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "De applicatie is al geconfigureerd. Je kan geen nieuwe beheerder aanmaken.",
+    );
   });
 });

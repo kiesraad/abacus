@@ -5078,8 +5078,8 @@
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
           "AirgapViolation",
-          "NotInitialised",
           "AllListsExhausted",
+          "AlreadyInitialised",
           "ApportionmentNotAvailableUntilDataEntryFinalised",
           "CommitteeSessionPaused",
           "DatabaseError",
@@ -5103,6 +5103,7 @@
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
           "InvalidXml",
+          "NotInitialised",
           "OwnAccountCannotBeDeleted",
           "PasswordRejection",
           "PdfGenerationError",

@@ -6,6 +6,7 @@
   },
   "api_error": {
     "AirgapViolation": "Abacus is niet beschikbaar omdat de applicatie verbonden is met het internet. Abacus is alleen bedoeld voor offline gebruik.",
+    "AlreadyInitialised": "De applicatie is al geconfigureerd. Je kan geen nieuwe beheerder aanmaken.",
     "AllListsExhausted": "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
     "ApportionmentNotAvailableUntilDataEntryFinalised": "De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd",
     "CommitteeSessionPaused": "De coördinator heeft het invoeren van stemmen gepauzeerd. Je kan niet meer verder.",

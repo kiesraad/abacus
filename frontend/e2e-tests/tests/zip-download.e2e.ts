@@ -7,7 +7,7 @@ import { stat } from "node:fs/promises";
 import { test } from "../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/coordinator.json",
+  storageState: "e2e-tests/state/coordinator1.json",
 });
 
 test.describe("election results zip", () => {

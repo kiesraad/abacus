@@ -708,8 +708,8 @@ export interface ErrorDetails {
  */
 export type ErrorReference =
   | "AirgapViolation"
-  | "NotInitialised"
   | "AllListsExhausted"
+  | "AlreadyInitialised"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "CommitteeSessionPaused"
   | "DatabaseError"
@@ -733,6 +733,7 @@ export type ErrorReference =
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
   | "InvalidXml"
+  | "NotInitialised"
   | "OwnAccountCannotBeDeleted"
   | "PasswordRejection"
   | "PdfGenerationError"

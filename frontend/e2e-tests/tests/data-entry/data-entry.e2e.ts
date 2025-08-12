@@ -29,7 +29,7 @@ import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 import { test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/typist.json",
+  storageState: "e2e-tests/state/typist1.json",
 });
 
 test.describe("full data entry flow", () => {

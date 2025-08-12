@@ -75,6 +75,7 @@
   "test": "test",
   "to_check": "Te controleren",
   "today": "vandaag",
+  "total": "Totaal",
   "totals_list": "Totaal lijst {group_number}",
   "type": "Soort",
   "typist": "Invoerder",

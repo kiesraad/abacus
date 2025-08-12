@@ -10,7 +10,7 @@
       "blank_votes_count": "Blanco stemmen",
       "invalid_votes_count": "Ongeldige stemmen",
       "total_votes_cast_count": "Totaal uitgebrachte stemmen",
-      "votes_candidates_count": "Stemmen op kandidaten"
+      "total_votes_candidates_count": "Totaal stemmen op kandidaten"
     },
     "differences_counts": {
       "fewer_ballots_count": "Stembiljetten minder geteld",

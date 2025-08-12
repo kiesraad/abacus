@@ -32,6 +32,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
 
   // Log out the current user
   const logout = async () => {
+    setLoading(true);
     const path: LOGOUT_REQUEST_PATH = "/api/user/logout";
     const response = await client.postRequest<null>(path);
 
@@ -39,6 +40,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
       setUser(null);
     }
 
+    setLoading(false);
     return response;
   };
 

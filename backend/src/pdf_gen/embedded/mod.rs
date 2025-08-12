@@ -1,17 +1,20 @@
 use std::{fmt::Debug, time::Instant};
-use tokio::{sync::mpsc::Sender, task::JoinHandle};
 use tracing::{debug, error, info, warn};
 use typst::{comemo, diag::SourceDiagnostic, ecow::EcoVec};
 use typst_pdf::{PdfOptions, PdfStandard, PdfStandards};
 
-use super::{PdfGenResult, models::PdfModel};
-use crate::{APIError, pdf_gen::models::PdfFileModel, zip::FileEntry};
+use crate::zip::{ZipResponseError, ZipResponseWriter};
+
+use super::{
+    PdfGenResult,
+    models::{PdfFileModel, PdfModel},
+};
 
 mod world;
 
 /// Generates a PDF using the embedded typst library.
-pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, APIError> {
-    Ok(tokio::task::spawn_blocking(move || {
+pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, PdfGenError> {
+    tokio::task::spawn_blocking(move || {
         let result = compile_pdf(&mut world::PdfWorld::new(), file_model.model);
 
         // Evict the cache to free up memory + speed up next compile
@@ -20,55 +23,32 @@ pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, APIE
         result
     })
     .await
-    .map_err(PdfGenError::from)??)
+    .map_err(PdfGenError::from)?
 }
 
 /// Generates a ZIP file containing the PDFs for the provided models.
 /// Uses the embedded typst library to generate the PDFs.
-pub fn generate_pdfs(
+pub async fn generate_pdfs(
     models: Vec<PdfFileModel>,
-    sender: Sender<FileEntry>,
-) -> JoinHandle<Result<(), PdfGenError>> {
-    tokio::task::spawn_blocking(move || {
-        if let Err(e) = generate_pdfs_inner(models, sender) {
-            if matches!(e, PdfGenError::ChannelClosed) {
-                error!("Failed to send PDF: {e:?} - the client might have closed the connection");
-            } else {
-                error!("Error generating PDFs: {e:?}");
-            }
-
-            return Err(e);
-        }
-
-        Ok(())
-    })
-}
-
-pub fn generate_pdfs_inner(
-    models: Vec<PdfFileModel>,
-    sender: Sender<FileEntry>,
+    mut zip_writer: ZipResponseWriter,
 ) -> Result<(), PdfGenError> {
-    let mut world = world::PdfWorld::new();
-
     for file_model in models.into_iter() {
-        let file_name = file_model.file_name;
-        let result = compile_pdf(&mut world, file_model.model);
+        let file_name = file_model.file_name.clone();
 
-        // Evict the cache to free up memory + speed up next compile
-        comemo::evict(0);
+        let content = match generate_pdf(file_model).await {
+            Ok(content) => content,
+            Err(e) => {
+                error!("Failed to generate PDF {file_name}: {e:?}");
+                continue;
+            }
+        };
 
-        let content = result?;
-
-        sender
-            .blocking_send(Some((file_name, content.buffer)))
-            .map_err(|_| PdfGenError::ChannelClosed)?;
+        zip_writer.add_file(&file_name, &content.buffer).await?;
     }
 
-    sender
-        .blocking_send(None)
-        .map_err(|_| PdfGenError::ChannelClosed)?;
+    zip_writer.finish().await?;
 
-    Ok(())
+    Ok::<(), PdfGenError>(())
 }
 
 fn get_pdf_options() -> PdfOptions<'static> {
@@ -110,7 +90,7 @@ pub enum PdfGenError {
     Join(tokio::task::JoinError),
     Json(serde_json::Error),
     TemplateNotFound(String),
-    ChannelClosed,
+    ZipError(ZipResponseError),
 }
 
 impl PdfGenError {
@@ -143,5 +123,11 @@ impl From<tokio::task::JoinError> for PdfGenError {
 impl From<serde_json::Error> for PdfGenError {
     fn from(err: serde_json::Error) -> Self {
         PdfGenError::Json(err)
+    }
+}
+
+impl From<ZipResponseError> for PdfGenError {
+    fn from(err: ZipResponseError) -> Self {
+        PdfGenError::ZipError(err)
     }
 }

@@ -99,6 +99,11 @@ test.describe("Election creation", () => {
     await expect(numberOfVotersPage.hint).toBeHidden();
     await numberOfVotersPage.next.click();
 
+    // Expect error, input a value and try clicking Next again
+    await expect(numberOfVotersPage.error).toBeVisible();
+    await numberOfVotersPage.input.fill("1234");
+    await numberOfVotersPage.next.click();
+
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();

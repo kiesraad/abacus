@@ -49,9 +49,10 @@ export function UserCreateRolePage() {
       <main>
         <Form onSubmit={handleSubmit}>
           <FormLayout>
-            <FormLayout.Section>
+            <FormLayout.Section title={t("users.role_title")}>
+              <p>{t("users.role_hint")}</p>
               <ChoiceList>
-                <ChoiceList.Title>{t("users.role_title")}</ChoiceList.Title>
+                <ChoiceList.Title>{t("users.role_label")}</ChoiceList.Title>
                 {error && <ChoiceList.Error id="role-error">{error}</ChoiceList.Error>}
                 <ChoiceList.Radio
                   id={"role-administrator"}
@@ -80,13 +81,12 @@ export function UserCreateRolePage() {
                 >
                   {t("users.role_typist_hint")}
                 </ChoiceList.Radio>
-                {t("users.role_hint")}
               </ChoiceList>
             </FormLayout.Section>
+            <FormLayout.Controls>
+              <Button type="submit">{t("continue")}</Button>
+            </FormLayout.Controls>
           </FormLayout>
-          <FormLayout.Controls>
-            <Button type="submit">{t("continue")}</Button>
-          </FormLayout.Controls>
         </Form>
       </main>
     </>

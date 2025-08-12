@@ -9,7 +9,7 @@ export class UploadPollingStationDefinitionPgObj {
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 2, name: "Importeer stembureaus" });
-    this.error = page.getByRole("heading", { level: 3, name: "Ongeldig stembureaubestand" });
+    this.error = page.getByRole("strong").filter({ hasText: "Ongeldig stembureaubestand" });
     this.upload = page.getByRole("button", { name: "Bestand kiezen" });
     this.skipButton = page.getByRole("button", { name: "Stap overslaan en stembureaus later toevoegen" });
     this.main = page.getByRole("main");

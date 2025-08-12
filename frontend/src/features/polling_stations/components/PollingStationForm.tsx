@@ -93,19 +93,23 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
         <FormLayout.Alert>
           {requestState.error.reference === "EntryNotUnique" ? (
             <Alert type="error">
-              <h2>
-                {t("polling_station.form.not_unique.title", { number: formRef.current?.elements.number.value || "-1" })}
-              </h2>
+              <strong className="heading-md">
+                {t("polling_station.form.not_unique.title", {
+                  number: formRef.current?.elements.number.value || "-1",
+                })}
+              </strong>
               <p>{t("polling_station.form.not_unique.description")}</p>
             </Alert>
           ) : (
             <Alert type="error">
-              {requestState.error.code}: {requestState.error.message}
+              <p>
+                {requestState.error.code}: {requestState.error.message}
+              </p>
             </Alert>
           )}
         </FormLayout.Alert>
       )}
-      <Form onSubmit={handleSubmit} id="polling-station-form" ref={formRef}>
+      <Form title={t("polling_station.details")} onSubmit={handleSubmit} id="polling-station-form" ref={formRef}>
         <FormLayout disabled={requestState.status === "loading"}>
           <FormLayout.Section title={t("general_details")}>
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />
@@ -117,7 +121,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 name="number"
                 label={t("number")}
                 fieldWidth="narrowest"
-                margin="mb-md-lg"
                 defaultValue={pollingStation?.number}
                 error={numberFieldError}
                 hideErrorMessage={
@@ -128,50 +131,47 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 id="name"
                 name="name"
                 label={t("name")}
-                margin="mb-md-lg"
                 defaultValue={pollingStation?.name}
                 error={validationResult.name ? t(`form_errors.${validationResult.name}`) : undefined}
               />
             </FormLayout.Row>
 
-            <FormLayout.Field>
-              <ChoiceList>
-                <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
-                {validationResult.polling_station_type && (
-                  <ChoiceList.Error id="polling-station-type-error">
-                    {t(`form_errors.${validationResult.polling_station_type}`)}
-                  </ChoiceList.Error>
-                )}
-                <ChoiceList.Radio
-                  id={`polling_station_type-FixedLocation`}
-                  name={"polling_station_type"}
-                  defaultValue={"FixedLocation"}
-                  defaultChecked={pollingStation?.polling_station_type === "FixedLocation"}
-                  label={t("polling_station.type.FixedLocation")}
-                />
-                <ChoiceList.Radio
-                  id={`polling_station_type-Special`}
-                  name={"polling_station_type"}
-                  defaultValue={"Special"}
-                  defaultChecked={pollingStation?.polling_station_type === "Special"}
-                  label={t("polling_station.type.SpecialExplanation")}
-                />
-                <ChoiceList.Radio
-                  id={`polling_station_type-Mobile`}
-                  name={"polling_station_type"}
-                  defaultValue={"Mobile"}
-                  defaultChecked={pollingStation?.polling_station_type === "Mobile"}
-                  label={t("polling_station.type.Mobile")}
-                />
-                <ChoiceList.Radio
-                  id={`polling_station_type-Undefined`}
-                  name={"polling_station_type"}
-                  defaultValue={"Undefined"}
-                  defaultChecked={pollingStation?.polling_station_type === undefined}
-                  label={t("polling_station.type.Unknown")}
-                />
-              </ChoiceList>
-            </FormLayout.Field>
+            <ChoiceList>
+              <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
+              {validationResult.polling_station_type && (
+                <ChoiceList.Error id="polling-station-type-error">
+                  {t(`form_errors.${validationResult.polling_station_type}`)}
+                </ChoiceList.Error>
+              )}
+              <ChoiceList.Radio
+                id={`polling_station_type-FixedLocation`}
+                name={"polling_station_type"}
+                defaultValue={"FixedLocation"}
+                defaultChecked={pollingStation?.polling_station_type === "FixedLocation"}
+                label={t("polling_station.type.FixedLocation")}
+              />
+              <ChoiceList.Radio
+                id={`polling_station_type-Special`}
+                name={"polling_station_type"}
+                defaultValue={"Special"}
+                defaultChecked={pollingStation?.polling_station_type === "Special"}
+                label={t("polling_station.type.SpecialExplanation")}
+              />
+              <ChoiceList.Radio
+                id={`polling_station_type-Mobile`}
+                name={"polling_station_type"}
+                defaultValue={"Mobile"}
+                defaultChecked={pollingStation?.polling_station_type === "Mobile"}
+                label={t("polling_station.type.Mobile")}
+              />
+              <ChoiceList.Radio
+                id={`polling_station_type-Undefined`}
+                name={"polling_station_type"}
+                defaultValue={"Undefined"}
+                defaultChecked={pollingStation?.polling_station_type === undefined}
+                label={t("polling_station.type.Unknown")}
+              />
+            </ChoiceList>
 
             <InputField
               id="number_of_voters"
@@ -179,7 +179,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               label={t("number_of_voters")}
               subtext={t("optional")}
               fieldWidth="full-field-with-narrowest-input"
-              margin="mb-md-lg"
               defaultValue={pollingStation?.number_of_voters}
               error={
                 validationResult.number_of_voters ? t(`form_errors.${validationResult.number_of_voters}`) : undefined
@@ -194,7 +193,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 id="address"
                 name="address"
                 fieldWidth="full"
-                margin="mb-md-lg"
                 label={t("polling_station.address")}
                 defaultValue={pollingStation?.address}
                 error={validationResult.address ? t(`form_errors.${validationResult.address}`) : undefined}
@@ -205,7 +203,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 id="postal_code"
                 name="postal_code"
                 fieldWidth="narrowest"
-                margin="mb-md-lg"
                 label={t("polling_station.postal_code")}
                 defaultValue={pollingStation?.postal_code}
                 error={validationResult.postal_code ? t(`form_errors.${validationResult.postal_code}`) : undefined}
@@ -213,7 +210,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               <InputField
                 id="locality"
                 name="locality"
-                margin="mb-md-lg"
                 label={t("polling_station.locality")}
                 defaultValue={pollingStation?.locality}
                 error={validationResult.locality ? t(`form_errors.${validationResult.locality}`) : undefined}

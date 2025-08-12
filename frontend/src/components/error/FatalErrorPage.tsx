@@ -29,10 +29,10 @@ export function FatalErrorPage({ title = "error.title", message, code, reference
             {reference && <strong>{t(`error.api_error.${reference}`)}</strong>}
           </p>
         )}
-        {message && <p>{message}</p>}
+        {message && <p className="mb-lg">{message}</p>}
         {isDevelopment && (
           <>
-            <h4>{t("error.instruction.title")}</h4>
+            <h6>{t("error.instruction.title")}</h6>
             <p>
               {tx("error.instruction.content", {
                 link: (content) => (

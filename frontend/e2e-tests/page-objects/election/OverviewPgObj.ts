@@ -10,7 +10,7 @@ export class OverviewPgObj {
   constructor(protected readonly page: Page) {
     this.main = page.getByRole("main");
     this.header = page.getByRole("heading", { name: "Beheer verkiezingen" });
-    this.alert = page.getByRole("heading", { name: "Je account is ingesteld" });
+    this.alert = page.getByRole("alert").filter({ hasText: "Je account is ingesteld" });
     this.create = page.getByRole("link", { name: "Verkiezing toevoegen" });
     this.elections = page.getByTestId("overview").locator("tbody").getByRole("row");
   }

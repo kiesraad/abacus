@@ -89,22 +89,24 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
     <>
       {error && (
         <FormLayout.Alert>
-          <Alert type="error">{t(`error.api_error.${error.reference}`)}</Alert>
+          <Alert type="error">
+            <strong className="heading-md">{t(`error.api_error.${error.reference}`)}</strong>
+          </Alert>
         </FormLayout.Alert>
       )}
 
       {usernameUniqueError && (
         <FormLayout.Alert>
           <Alert type="error">
-            <h2>{usernameUniqueError}</h2>
+            <strong className="heading-md">{usernameUniqueError}</strong>
             <p>{t("users.username_unique")}</p>
           </Alert>
         </FormLayout.Alert>
       )}
 
-      <Form onSubmit={handleSubmit}>
+      <Form title={t("users.details_title")} onSubmit={handleSubmit}>
         <FormLayout disabled={saving}>
-          <FormLayout.Section title={t("users.details_title")}>
+          <FormLayout.Section>
             <InputField
               id="username"
               name="username"
@@ -129,6 +131,7 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
               label={t("users.temporary_password")}
               hint={t("users.temporary_password_hint")}
               error={validationErrors?.temp_password}
+              margin="mb-0"
             />
           </FormLayout.Section>
           <FormLayout.Controls>

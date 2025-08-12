@@ -63,7 +63,7 @@ rand = "0.9.0"
 cookie = { version = "0.18.1", features = ["percent-encode"] }
 async_zip = { version = "0.0.18", features = ["tokio", "deflate", "chrono"] }
 strum = { version = "0.27", features = ["derive"] }
-tokio-stream = "0.1.17"
+tokio-util = { version = "0.7.16", features = ["io"] }
 
 [dev-dependencies]
 test-log = "0.2.17"

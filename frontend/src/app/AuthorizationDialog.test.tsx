@@ -74,8 +74,9 @@ describe("AuthorizationDialog", () => {
       </TestUserProvider>,
     );
 
-    const loginSuccess = screen.getByRole("alert");
-    expect(await within(loginSuccess).findByRole("heading", { name: "Je bent automatisch uitgelogd" })).toBeVisible();
+    const logoutText = within(await screen.findByRole("alert")).getByRole("strong");
+    expect(logoutText).toHaveTextContent("Je bent automatisch uitgelogd");
+    expect(logoutText).toBeVisible();
   });
 
   test("Redirect should happen when not authorized", async () => {
@@ -97,9 +98,8 @@ describe("AuthorizationDialog", () => {
       </TestUserProvider>,
     );
 
-    const loginSuccess = screen.getByRole("alert");
-    expect(
-      await within(loginSuccess).findByRole("heading", { name: "Je hebt geen toegang tot deze pagina" }),
-    ).toBeVisible();
+    const noAccessText = within(await screen.findByRole("alert")).getByRole("strong");
+    expect(noAccessText).toHaveTextContent("Je hebt geen toegang tot deze pagina");
+    expect(noAccessText).toBeVisible();
   });
 });

@@ -67,10 +67,10 @@ describe("UserCreateDetailsForm", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     const alert = await screen.findByRole("alert");
-    expect(alert).toBeInTheDocument();
-
-    expect(within(alert).getByText("Er bestaat al een gebruiker met gebruikersnaam Dubbel")).toBeInTheDocument();
-    expect(within(alert).getByText("De gebruikersnaam moet uniek zijn")).toBeInTheDocument();
+    expect(within(alert).getByRole("strong")).toHaveTextContent(
+      "Er bestaat al een gebruiker met gebruikersnaam Dubbel",
+    );
+    expect(within(alert).getByRole("paragraph")).toHaveTextContent("De gebruikersnaam moet uniek zijn");
 
     expect(username).toBeInvalid();
     expect(username).toHaveAccessibleErrorMessage("De gebruikersnaam moet uniek zijn");

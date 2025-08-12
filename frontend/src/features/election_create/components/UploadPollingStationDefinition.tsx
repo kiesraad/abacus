@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
+import { PollingStationsPreview } from "@/components/polling_station/PollingStationsPreview";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
@@ -11,7 +12,6 @@ import { t, tx } from "@/i18n/translate";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import { PollingStationsPreview } from "./PollingStationsPreview";
 
 export function UploadPollingStationDefinition() {
   const { state, dispatch } = useElectionCreateContext();

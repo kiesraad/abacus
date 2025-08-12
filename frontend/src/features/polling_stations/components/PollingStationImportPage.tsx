@@ -4,10 +4,10 @@ import { useNavigate } from "react-router";
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { PageTitle } from "@/components/page_title/PageTitle";
+import { PollingStationsPreview } from "@/components/polling_station/PollingStationsPreview";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
-import { Table } from "@/components/ui/Table/Table";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t, tx } from "@/i18n/translate";
@@ -17,8 +17,6 @@ import {
   PollingStationRequestListResponse,
 } from "@/types/generated/openapi";
 
-import { PollingStationsPreview } from "../../election_create/components/PollingStationsPreview";
-
 export function PollingStationImportPage() {
   const { election } = useElection();
   const { pushMessage } = useMessages();
@@ -27,7 +25,6 @@ export function PollingStationImportPage() {
   const [error, setError] = useState<ReactNode | undefined>();
   const [pollingStations, setPollingStations] = useState<PollingStationRequest[]>([]);
   const [pollingStationFileName, setPollingStationFileName] = useState<string | undefined>(undefined);
-  const [showAllPollingPlaces, setShowAllPollingPlaces] = useState<boolean>(false);
 
   const parentUrl = `/elections/${election.id}/polling-stations`;
   const validatePath = `/api/elections/${election.id}/polling_stations/validate-import`;
@@ -35,10 +32,6 @@ export function PollingStationImportPage() {
 
   const postImport = useCrud<PollingStationRequestListResponse>({ create: importPath }).create;
   const postValidate = useCrud<PollingStationListResponse>({ create: validatePath }).create;
-
-  function showAll() {
-    setShowAllPollingPlaces(true);
-  }
 
   /**
    * Import the polling stations

@@ -47,6 +47,12 @@ label.button {
     fill: currentColor;
   }
 
+  &.primary {
+    svg {
+      fill: var(--button-color-primary-active);
+    }
+  }
+
   &.primary-destructive {
     border-color: var(--red-600);
     background: var(--red-600);

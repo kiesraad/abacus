@@ -47,7 +47,6 @@ label.button {
     fill: currentColor;
   }
 
-  /* TODO: Check hoeveel buttons dit potentieel stuk maakt*/
   &.primary {
     svg {
       fill: var(--button-color-primary-active);

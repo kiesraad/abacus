@@ -17,7 +17,7 @@ import {
   PollingStationRequestListResponse,
 } from "@/types/generated/openapi";
 
-import cls from "./PollingStationImportPage.module.css";
+import { PollingStationsPreview } from "../../election_create/components/PollingStationsPreview";
 
 export function PollingStationImportPage() {
   const { election } = useElection();
@@ -139,38 +139,7 @@ export function PollingStationImportPage() {
           })}
         </p>
 
-        {(showAllPollingPlaces || pollingStations.length <= 10) && (
-          <Table className={"table"} id="overview">
-            <Table.Body>
-              {pollingStations.map((pollingStation: PollingStationRequest) => (
-                <Table.Row key={pollingStation.number}>
-                  <Table.NumberCell className="font-number">{pollingStation.number}</Table.NumberCell>
-                  <Table.Cell>{pollingStation.name}</Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
-        )}
-
-        {!showAllPollingPlaces && pollingStations.length > 10 && (
-          <>
-            <Table className={"table"} id="overview">
-              <Table.Body>
-                {pollingStations.slice(0, 10).map((pollingStation: PollingStationRequest) => (
-                  <Table.Row key={pollingStation.number}>
-                    <Table.NumberCell className="font-number">{pollingStation.number}</Table.NumberCell>
-                    <Table.Cell>{pollingStation.name}</Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-            <p className="mt-lg">
-              <button id="show-more" className={cls.linkButton} onClick={showAll}>
-                {t("election.polling_stations.show_all", { num: pollingStations.length })}
-              </button>
-            </p>
-          </>
-        )}
+        <PollingStationsPreview pollingStations={pollingStations} />
 
         <div className="mt-xl">
           <Button onClick={() => void importPollingStations()}>{t("polling_station.import")}</Button>

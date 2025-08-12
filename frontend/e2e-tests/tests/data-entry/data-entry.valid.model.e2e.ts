@@ -143,14 +143,14 @@ const votersEmpty: VotersCounts = {
 };
 
 const votes: VotesCounts = {
-  votes_candidates_count: 100,
+  total_votes_candidates_count: 100,
   blank_votes_count: 0,
   invalid_votes_count: 0,
   total_votes_cast_count: 100,
 };
 
 const votesEmpty: VotesCounts = {
-  votes_candidates_count: 0,
+  total_votes_candidates_count: 0,
   blank_votes_count: 0,
   invalid_votes_count: 0,
   total_votes_cast_count: 0,

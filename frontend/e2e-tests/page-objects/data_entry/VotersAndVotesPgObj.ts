@@ -67,7 +67,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   }
 
   async inputVotesCounts(votesCounts: VotesCounts) {
-    await this.votesCandidatesCount.fill(votesCounts.votes_candidates_count.toString());
+    await this.votesCandidatesCount.fill(votesCounts.total_votes_candidates_count.toString());
     await this.blankVotesCount.fill(votesCounts.blank_votes_count.toString());
     await this.invalidVotesCount.fill(votesCounts.invalid_votes_count.toString());
     await this.totalVotesCastCount.fill(votesCounts.total_votes_cast_count.toString());
@@ -76,7 +76,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   async getVotesCounts(): Promise<VotesCounts> {
     return {
       // using Number() so that "" is parsed to 0
-      votes_candidates_count: Number(await this.votesCandidatesCount.inputValue()),
+      total_votes_candidates_count: Number(await this.votesCandidatesCount.inputValue()),
       blank_votes_count: Number(await this.blankVotesCount.inputValue()),
       invalid_votes_count: Number(await this.invalidVotesCount.inputValue()),
       total_votes_cast_count: Number(await this.totalVotesCastCount.inputValue()),

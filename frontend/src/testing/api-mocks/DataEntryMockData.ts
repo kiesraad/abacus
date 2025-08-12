@@ -31,7 +31,7 @@ export const emptyData: PollingStationResults = {
     total_admitted_voters_count: 0,
   },
   votes_counts: {
-    votes_candidates_count: 0,
+    total_votes_candidates_count: 0,
     blank_votes_count: 0,
     invalid_votes_count: 0,
     total_votes_cast_count: 0,
@@ -83,7 +83,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       total_admitted_voters_count: 2,
     },
     votes_counts: {
-      votes_candidates_count: 2,
+      total_votes_candidates_count: 2,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 2,
@@ -137,7 +137,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       total_admitted_voters_count: 2,
     },
     votes_counts: {
-      votes_candidates_count: 2,
+      total_votes_candidates_count: 2,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 2,

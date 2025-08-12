@@ -42,7 +42,7 @@ test.describe("resume data entry flow", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 100,
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -215,7 +215,7 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 50,
+        total_votes_candidates_count: 50,
         blank_votes_count: 50, // exceeds threshold
         invalid_votes_count: 0,
         total_votes_cast_count: 100,
@@ -249,7 +249,7 @@ test.describe("resume data entry flow", () => {
             total_admitted_voters_count: 100,
           },
           votes_counts: {
-            votes_candidates_count: 50,
+            total_votes_candidates_count: 50,
             blank_votes_count: 50,
             invalid_votes_count: 0,
             total_votes_cast_count: 100,
@@ -258,7 +258,7 @@ test.describe("resume data entry flow", () => {
         validation_results: {
           errors: [
             {
-              fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
+              fields: ["data.votes_counts.total_votes_candidates_count", "data.political_group_votes"],
               code: "F204",
             },
           ],
@@ -354,7 +354,7 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 3607,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 3572,
+        total_votes_candidates_count: 3572,
         blank_votes_count: 20,
         invalid_votes_count: 15,
         total_votes_cast_count: 3607,
@@ -485,7 +485,7 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 50,
+        total_votes_candidates_count: 50,
         blank_votes_count: 50, // exceeds threshold
         invalid_votes_count: 0,
         total_votes_cast_count: 100,
@@ -528,7 +528,7 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 3607,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 3572,
+        total_votes_candidates_count: 3572,
         blank_votes_count: 20,
         invalid_votes_count: 15,
         total_votes_cast_count: 3607,

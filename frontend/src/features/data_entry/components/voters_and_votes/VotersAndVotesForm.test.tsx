@@ -52,7 +52,7 @@ const votersFieldIds = {
 };
 
 const votesFieldIds = {
-  votesCandidatesCount: "data.votes_counts.votes_candidates_count",
+  totalVotesCandidatesCount: "data.votes_counts.total_votes_candidates_count",
   blankVotesCount: "data.votes_counts.blank_votes_count",
   invalidVotesCount: "data.votes_counts.invalid_votes_count",
   totalVotesCastCount: "data.votes_counts.total_votes_cast_count",
@@ -299,7 +299,7 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.totalAdmittedVotersCount,
       ];
       const expectedValidFieldIds = [
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
@@ -328,7 +328,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
@@ -369,7 +369,7 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
@@ -454,7 +454,7 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
@@ -489,7 +489,7 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
@@ -520,7 +520,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
       ];
@@ -552,7 +552,7 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
       ];

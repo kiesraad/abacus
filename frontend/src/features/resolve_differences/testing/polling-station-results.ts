@@ -20,7 +20,7 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
       total_admitted_voters_count: 42,
     },
     votes_counts: {
-      votes_candidates_count: first ? 42 : 44,
+      total_votes_candidates_count: first ? 42 : 44,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: first ? 42 : 44,

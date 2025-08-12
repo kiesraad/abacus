@@ -1195,11 +1195,11 @@ export interface VotesCounts {
   blank_votes_count: number;
   /** Number of invalid votes ("Aantal ongeldige stembiljetten") */
   invalid_votes_count: number;
+  /** Total number of valid votes on candidates
+("Totaal aantal stemmen op kandidaten") */
+  total_votes_candidates_count: number;
   /** Total number of votes cast ("Totaal aantal getelde stemmen") */
   total_votes_cast_count: number;
-  /** Number of valid votes on candidates
-("Aantal stembiljetten met een geldige stem op een kandidaat") */
-  votes_candidates_count: number;
 }
 
 /**

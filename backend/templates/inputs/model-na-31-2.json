@@ -2547,7 +2547,7 @@
             "total_admitted_voters_count": 93477
         },
         "votes_counts": {
-            "votes_candidates_count": 91788,
+            "total_votes_candidates_count": 91788,
             "blank_votes_count": 856,
             "invalid_votes_count": 833,
             "total_votes_cast_count": 93477

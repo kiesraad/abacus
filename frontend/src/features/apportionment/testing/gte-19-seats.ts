@@ -1124,7 +1124,7 @@ export const election_summary: ElectionSummary = {
     total_admitted_voters_count: 1205,
   },
   votes_counts: {
-    votes_candidates_count: 1200,
+    total_votes_candidates_count: 1200,
     blank_votes_count: 2,
     invalid_votes_count: 3,
     total_votes_cast_count: 1205,

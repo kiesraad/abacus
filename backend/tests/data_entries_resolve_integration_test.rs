@@ -120,7 +120,7 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
         serde_json::json!([{
             "code": "F202",
             "fields": [
-                "data.votes_counts.votes_candidates_count",
+                "data.votes_counts.total_votes_candidates_count",
                 "data.votes_counts.blank_votes_count",
                 "data.votes_counts.invalid_votes_count",
                 "data.votes_counts.total_votes_cast_count",

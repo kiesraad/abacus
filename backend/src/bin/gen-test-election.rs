@@ -475,7 +475,7 @@ fn generate_polling_station_results(
             total_admitted_voters_count: number_of_votes,
         },
         votes_counts: VotesCounts {
-            votes_candidates_count: remaining_votes,
+            total_votes_candidates_count: remaining_votes,
             blank_votes_count: blank_votes,
             invalid_votes_count: invalid_votes,
             total_votes_cast_count: number_of_votes,

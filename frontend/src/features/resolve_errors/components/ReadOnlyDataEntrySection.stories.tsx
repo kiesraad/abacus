@@ -23,7 +23,7 @@ const pollingStationResults: PollingStationResults = {
     total_admitted_voters_count: 205,
   },
   votes_counts: {
-    votes_candidates_count: 198,
+    total_votes_candidates_count: 198,
     blank_votes_count: 4,
     invalid_votes_count: 2,
     total_votes_cast_count: 204,

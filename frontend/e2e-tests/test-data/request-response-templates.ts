@@ -42,7 +42,7 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
       total_admitted_voters_count: 0,
     },
     votes_counts: {
-      votes_candidates_count: 0,
+      total_votes_candidates_count: 0,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 0,
@@ -167,7 +167,7 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
     total_admitted_voters_count: 3607,
   },
   votes_counts: {
-    votes_candidates_count: 3572,
+    total_votes_candidates_count: 3572,
     blank_votes_count: 20,
     invalid_votes_count: 15,
     total_votes_cast_count: 3607,

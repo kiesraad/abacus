@@ -157,21 +157,21 @@ const votersError: VotersCounts = {
 };
 
 const votesWarning: VotesCounts = {
-  votes_candidates_count: 65,
+  total_votes_candidates_count: 65,
   blank_votes_count: 0,
   invalid_votes_count: 35,
   total_votes_cast_count: 100,
 };
 
 const votesValid: VotesCounts = {
-  votes_candidates_count: 99,
+  total_votes_candidates_count: 99,
   blank_votes_count: 1,
   invalid_votes_count: 0,
   total_votes_cast_count: 100,
 };
 
 const votesEmpty: VotesCounts = {
-  votes_candidates_count: 0,
+  total_votes_candidates_count: 0,
   blank_votes_count: 0,
   invalid_votes_count: 0,
   total_votes_cast_count: 0,

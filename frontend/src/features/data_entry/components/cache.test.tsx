@@ -39,7 +39,7 @@ describe("Data Entry cache behavior", () => {
       "voters_counts.poll_card_count": "100",
       "voters_counts.proxy_certificate_count": "200",
       "voters_counts.total_admitted_voters_count": "600",
-      "votes_counts.votes_candidates_count": "400",
+      "votes_counts.total_votes_candidates_count": "400",
       "votes_counts.blank_votes_count": "500",
       "votes_counts.invalid_votes_count": "600",
       "votes_counts.total_votes_cast_count": "150",

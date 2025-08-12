@@ -40,7 +40,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
                 total_admitted_voters_count: 1205,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 1200,
+                total_votes_candidates_count: 1200,
                 blank_votes_count: 3,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 1205,
@@ -100,7 +100,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
                 total_admitted_voters_count: 1205,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 1200,
+                total_votes_candidates_count: 1200,
                 blank_votes_count: 3,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 1205,
@@ -180,7 +180,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
                 total_admitted_voters_count: 104,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 102,
+                total_votes_candidates_count: 102,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,

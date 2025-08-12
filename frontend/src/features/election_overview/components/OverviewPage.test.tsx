@@ -1,9 +1,10 @@
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen } from "@/testing/test-utils";
+import { render, renderReturningRouter, screen } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionListResponse } from "@/types/generated/openapi";
 
@@ -48,6 +49,35 @@ describe("OverviewPage", () => {
       ),
     ).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();
+  });
+
+  test("Show no elections message for the administrator", async () => {
+    const user = userEvent.setup();
+    overrideOnce("get", "/api/elections", 200, {
+      committee_sessions: [],
+      elections: [],
+    } satisfies ElectionListResponse);
+
+    const router = renderReturningRouter(
+      <TestUserProvider userRole="administrator">
+        <ElectionListProvider>
+          <OverviewPage />
+        </ElectionListProvider>
+      </TestUserProvider>,
+    );
+
+    expect(await screen.findByText(/Nog geen verkiezingen ingesteld/)).toBeVisible();
+    expect(
+      await screen.findByText(
+        /Om Abacus in te richten voor het invoeren van telresulaten, heb je de volgende bestanden nodig:/,
+      ),
+    ).toBeVisible();
+    expect(screen.queryByRole("table")).toBeNull();
+
+    const button = await screen.findByRole("link", { name: "Verkiezing toevoegen" });
+    await user.click(button);
+
+    expect(router.state.location.pathname).toEqual("/create");
   });
 
   test("Shows create election link", async () => {

@@ -46,6 +46,7 @@ export function UploadPollingStationDefinition() {
         candidate_hash: state.candidateDefinitionHash,
         candidate_data: state.candidateDefinitionData,
         polling_station_data: data,
+        polling_station_file_name: currentFile.name,
       });
 
       if (isSuccess(response)) {

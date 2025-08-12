@@ -4682,6 +4682,9 @@
           },
           "polling_station_data": {
             "type": "string"
+          },
+          "polling_station_file_name": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -4722,6 +4725,9 @@
             "minimum": 0
           },
           "polling_station_data": {
+            "type": "string"
+          },
+          "polling_station_file_name": {
             "type": "string"
           }
         },

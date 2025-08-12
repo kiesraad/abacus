@@ -15,7 +15,7 @@ export interface SessionState {
   user: LoginResponse | null;
   loading: boolean;
   setUser: (user: LoginResponse | null) => void;
-  logout: () => Promise<void>;
+  logout: () => Promise<ApiResult<null>>;
   login: (username: string, password: string) => Promise<ApiResult<LoginResponse>>;
   expiration: Date | null;
   setExpiration: (expiration: Date | null) => void;
@@ -33,11 +33,13 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
   // Log out the current user
   const logout = async () => {
     const path: LOGOUT_REQUEST_PATH = "/api/user/logout";
-    const response = await client.postRequest(path);
+    const response = await client.postRequest<null>(path);
 
     if (isSuccess(response)) {
       setUser(null);
     }
+
+    return response;
   };
 
   // Log in the user with the given credentials

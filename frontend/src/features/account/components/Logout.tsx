@@ -1,15 +1,29 @@
-import { useEffect } from "react";
-import { Navigate } from "react-router";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
+import { AnyApiError, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
+import { Loader } from "@/components/ui/Loader/Loader";
 
 export function Logout() {
   const { logout } = useApiState();
+  const navigate = useNavigate();
+  const [error, setError] = useState<AnyApiError | null>(null);
 
   // logout the user when the component is mounted
   useEffect(() => {
-    void logout();
-  }, [logout]);
+    void logout().then((result) => {
+      if (isError(result)) {
+        setError(result);
+      } else {
+        void navigate("/account/login");
+      }
+    });
+  }, [logout, navigate]);
 
-  return <Navigate to="/account/login" />;
+  if (error) {
+    throw error;
+  }
+
+  return <Loader />;
 }

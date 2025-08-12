@@ -275,7 +275,6 @@ pub async fn election_import(
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
 
-        number_of_voters = EML110::from_str(&polling_station_data)?.get_number_of_voters()?;
         polling_places = Some(EML110::from_str(&polling_station_data)?.get_polling_stations()?);
     }
 

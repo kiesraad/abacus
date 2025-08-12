@@ -24,8 +24,8 @@
     "election_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
     "election_title": "Controleer verkiezingsdefinitie",
     "error": {
-      "title": "Controle digitale vingerafdruk niet gelukt",
-      "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen."
+      "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
+      "title": "Controle digitale vingerafdruk niet gelukt"
     },
     "list_name": "{location}, kandidatenlijst {name}",
     "polling_station_title": "Controleer stembureaus"
@@ -54,10 +54,10 @@
   "location": "Gebied",
   "manage": "Beheer verkiezingen",
   "number_of_voters": {
-    "title": "Hoeveel kiesgerechtigden telt de gemeente?",
     "description": "Voer het aantal kiesgerechtigden in zoals door de gemeenteraad vastgesteld voor de gemeenteraadsverkiezing 2026 in de gemeente {location}",
+    "error": "Vul het aantal kiesgerechtigden in",
     "hint": "Ingelezen uit bestand met stembureaus",
-    "error": "Vul het aantal kiesgerechtigden in"
+    "title": "Hoeveel kiesgerechtigden telt de gemeente?"
   },
   "no_elections_added": "Nog geen verkiezingen ingesteld",
   "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",

@@ -53,8 +53,9 @@ export function LoginForm() {
       setPassword("");
 
       const { fullname, needs_password_change } = result.data;
+
       if (!fullname || needs_password_change) {
-        void navigate("../setup");
+        void navigate("/account/setup");
       } else {
         void navigate("/elections");
       }

@@ -31,9 +31,6 @@ export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSe
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
-export type ELECTION_CREATE_REQUEST_PARAMS = Record<string, never>;
-export type ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
-export type ELECTION_CREATE_REQUEST_BODY = NewElection;
 
 // /api/elections/import
 export type ELECTION_IMPORT_REQUEST_PARAMS = Record<string, never>;
@@ -140,6 +137,15 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
+
+// /api/initialise/admin-exists
+export type ADMIN_EXISTS_REQUEST_PARAMS = Record<string, never>;
+export type ADMIN_EXISTS_REQUEST_PATH = `/api/initialise/admin-exists`;
+
+// /api/initialise/first-admin
+export type CREATE_FIRST_ADMIN_REQUEST_PARAMS = Record<string, never>;
+export type CREATE_FIRST_ADMIN_REQUEST_PATH = `/api/initialise/first-admin`;
+export type CREATE_FIRST_ADMIN_REQUEST_BODY = CreateUserRequest;
 
 // /api/initialised
 export type INITIALISED_REQUEST_PARAMS = Record<string, never>;
@@ -560,6 +566,7 @@ export interface ElectionAndCandidateDefinitionValidateRequest {
   election_hash?: string[];
   number_of_voters?: number;
   polling_station_data?: string;
+  polling_station_file_name?: string;
 }
 
 export interface ElectionAndCandidatesDefinitionImportRequest {
@@ -570,6 +577,7 @@ export interface ElectionAndCandidatesDefinitionImportRequest {
   election_hash: string[];
   number_of_voters?: number;
   polling_station_data?: string;
+  polling_station_file_name?: string;
 }
 
 /**

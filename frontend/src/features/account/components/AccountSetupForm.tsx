@@ -9,12 +9,9 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import { ACCOUNT_UPDATE_REQUEST_PATH, AccountUpdateRequest, LoginResponse } from "@/types/generated/openapi";
+import { StringFormData } from "@/utils/stringFormData";
 
-type ValidationErrors = {
-  fullname?: string;
-  password?: string;
-  password_repeat?: string;
-};
+import { UserValidationErrors, validateUpdateUser } from "../util/validate";
 
 interface AccountSetupFormProps {
   user: LoginResponse;
@@ -23,7 +20,7 @@ interface AccountSetupFormProps {
 
 export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
   const [showLoginSuccess, setShowLoginSuccess] = useState(true);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
+  const [validationErrors, setValidationErrors] = useState<UserValidationErrors | null>(null);
 
   const url: ACCOUNT_UPDATE_REQUEST_PATH = "/api/user/account";
   const { update, requestState } = useCrud<LoginResponse>(url);
@@ -37,19 +34,22 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
     event.preventDefault();
     hideLoginSuccess();
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new StringFormData(event.currentTarget);
     const account: Required<AccountUpdateRequest> = {
       username: user.username,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      fullname: (formData.get("fullname") as string).trim(),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      password: formData.get("password") as string,
+      fullname: formData.getString("fullname"),
+      password: formData.getString("password"),
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    if (!validate(account, formData.get("password_repeat") as string)) {
+    const passwordRepeat = formData.getString("password_repeat");
+    const errors = validateUpdateUser(account, passwordRepeat);
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
       return;
     }
+
+    setValidationErrors(null);
 
     void update(account).then((result) => {
       if (isSuccess(result)) {
@@ -64,27 +64,6 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
         }
       }
     });
-  }
-
-  function validate(accountUpdate: Required<AccountUpdateRequest>, passwordRepeat: string) {
-    const errors: ValidationErrors = {};
-
-    if (accountUpdate.fullname.length === 0) {
-      errors.fullname = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
-    }
-
-    if (accountUpdate.password.length === 0) {
-      errors.password = t("account.password_rules");
-    }
-
-    if (accountUpdate.password !== passwordRepeat) {
-      errors.password = t("account.password_rules");
-      errors.password_repeat = t("account.password_mismatch");
-    }
-
-    const isValid = Object.keys(errors).length === 0;
-    setValidationErrors(isValid ? null : errors);
-    return isValid;
   }
 
   return (

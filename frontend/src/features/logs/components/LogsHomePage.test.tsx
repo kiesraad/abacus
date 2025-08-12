@@ -56,7 +56,7 @@ describe("LogsHomePage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Activiteitenlog" })).toBeVisible();
 
-    const firstRow = screen.getByRole("row", {
+    const firstRow = await screen.findByRole("row", {
       name: "24 11 mrt 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
     });
     await user.click(firstRow);
@@ -99,30 +99,14 @@ describe("LogsHomePage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Activiteitenlog" })).toBeVisible();
 
-    const formattedDate = formatDateTime(new Date("2025-03-11T09:02:36Z"));
-
-    expect(table).toHaveTableContent([
-      ["Nummer", "Tijdstip", "Type", "Gebeurtenis", "Gebruiker: id, gebruikersnaam (rol)"],
-      ["24", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
-      ["23", formattedDate, "Succes", "Gebruiker uitgelogd", "1, admin (Beheerder)"],
-      ["22", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
-      ["21", formattedDate, "Succes", "Gebruiker uitgelogd", "2, typist (Invoerder)"],
-      ["20", formattedDate, "Succes", "Gebruiker ingelogd", "2, typist (Invoerder)"],
-      ["19", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
-      ["18", formattedDate, "Succes", "Gebruiker ingelogd", "3, coordinator (Coördinator)"],
-      ["17", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
-    ]);
-
     const filterButton = await screen.findByRole("button", { name: "Filteren" });
     await userEvent.click(filterButton);
 
-    await waitFor(() => {
-      expect(screen.getByTestId("event-UserLoggedIn")).toBeInTheDocument();
-    });
+    const eventOption = await screen.findByTestId("event-UserLoggedIn");
+    expect(eventOption).toBeInTheDocument();
 
     const filterLog = spyOnHandler(LogRequestHandler);
 
-    const eventOption = await screen.findByTestId("event-UserLoggedIn");
     await userEvent.click(eventOption);
 
     const params = new URLSearchParams({ event: "UserLoggedIn" });

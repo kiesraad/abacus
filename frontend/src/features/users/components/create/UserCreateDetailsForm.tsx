@@ -9,6 +9,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import { CreateUserRequest, Role, User, USER_CREATE_REQUEST_PATH } from "@/types/generated/openapi";
+import { StringFormData } from "@/utils/stringFormData";
 
 export interface UserCreateDetailsFormProps {
   role: Role;
@@ -33,16 +34,13 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
     event.preventDefault();
     setUsernameUniqueError(undefined);
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new StringFormData(event.currentTarget);
 
     const user: CreateUserRequest = {
-      role: role,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      username: (formData.get("username") as string).trim(),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      fullname: (formData.get("fullname") as string | undefined)?.trim(),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      temp_password: (formData.get("temp_password") as string).trim(),
+      role,
+      username: formData.getString("username"),
+      fullname: formData.has("fullname") ? formData.getString("fullname") : undefined,
+      temp_password: formData.getString("temp_password"),
     };
 
     if (!validate(user)) {

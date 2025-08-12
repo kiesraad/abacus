@@ -52,7 +52,7 @@ export const AllRoutes: StoryFn = () => (
           <code>
             {location.pathname} ({location.userRole})
           </code>
-          <NavBar location={location} />
+          <NavBar />
           <br />
         </TestUserProvider>
       </React.Fragment>

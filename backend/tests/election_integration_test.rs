@@ -1,8 +1,6 @@
 #![cfg(test)]
 
 use crate::{shared::create_result, utils::serve_api};
-#[cfg(feature = "dev-database")]
-use abacus::election::ElectionWithPoliticalGroups;
 use abacus::{
     committee_session::status::CommitteeSessionStatus,
     election::{ElectionDetailsResponse, ElectionListResponse},
@@ -70,63 +68,7 @@ async fn test_election_details_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-#[cfg(feature = "dev-database")]
-async fn test_election_create_works(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-
-    let url = format!("http://{addr}/api/elections");
-    let admin_cookie = shared::admin_login(&addr).await;
-    let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
-            "name": "Test Election",
-            "counting_method": "CSO",
-            "election_id": "TestElection_2026",
-            "location": "Test Location",
-            "domain_id": "0000",
-            "category": "Municipal",
-            "number_of_seats": 29,
-            "election_date": "2026-01-01",
-            "nomination_date": "2026-01-01",
-            "political_groups": [
-          {
-            "number": 1,
-            "name": "Political Group A",
-            "candidates": [
-              {
-                "number": 1,
-                "initials": "A.",
-                "first_name": "Alice",
-                "last_name": "Foo",
-                "locality": "Amsterdam",
-                "gender": "Female"
-              },
-              {
-                "number": 2,
-                "initials": "C.",
-                "first_name": "Charlie",
-                "last_name": "Doe",
-                "locality": "Rotterdam",
-                "gender": null
-              }
-            ]
-          }
-        ]
-        }))
-        .send()
-        .await
-        .unwrap();
-
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::CREATED);
-    let body: ElectionWithPoliticalGroups = response.json().await.unwrap();
-    assert_eq!(body.name, "Test Election");
-}
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-#[cfg(feature = "dev-database")]
-async fn test_election_create_payload_too_large(pool: SqlitePool) {
+async fn test_election_import_payload_too_large(pool: SqlitePool) {
     use abacus::MAX_BODY_SIZE_MB;
     use reqwest::Body;
 
@@ -135,7 +77,7 @@ async fn test_election_create_payload_too_large(pool: SqlitePool) {
     // Create a payload that is larger than MAX_BODY_SIZE_MB
     let body = Vec::from_iter((0..MAX_BODY_SIZE_MB * 1024 * 1024 + 1).map(|_| b'a'));
 
-    let url = format!("http://{addr}/api/elections");
+    let url = format!("http://{addr}/api/elections/import");
     let admin_cookie = shared::admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
@@ -151,8 +93,7 @@ async fn test_election_create_payload_too_large(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-#[cfg(feature = "dev-database")]
-async fn test_election_create_payload_not_too_large(pool: SqlitePool) {
+async fn test_election_import_payload_not_too_large(pool: SqlitePool) {
     use abacus::MAX_BODY_SIZE_MB;
     use reqwest::Body;
 
@@ -161,7 +102,7 @@ async fn test_election_create_payload_not_too_large(pool: SqlitePool) {
     // Create a MAX_BODY_SIZE_MB payload (should return a 400 instead of a 413)
     let body = Vec::from_iter((0..MAX_BODY_SIZE_MB * 1024 * 1024).map(|_| b'a'));
 
-    let url = format!("http://{addr}/api/elections");
+    let url = format!("http://{addr}/api/elections/import");
     let admin_cookie = shared::admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)

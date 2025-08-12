@@ -15,7 +15,7 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse,
-    audit_log::{AuditEvent, AuditService},
+    audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     authentication::{Admin, User},
     committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
     election::VoteCountingMethod,
@@ -24,16 +24,11 @@ use crate::{
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
-    let router = OpenApiRouter::default()
+    OpenApiRouter::default()
         .routes(routes!(election_import_validate))
         .routes(routes!(election_import))
         .routes(routes!(election_list))
-        .routes(routes!(election_details));
-
-    #[cfg(feature = "dev-database")]
-    let router = router.routes(routes!(election_create));
-
-    router
+        .routes(routes!(election_details))
 }
 
 /// Election list response
@@ -113,51 +108,6 @@ pub async fn election_details(
     }))
 }
 
-/// Create an election. For test usage only!
-#[utoipa::path(
-    post,
-    path = "/api/elections",
-    request_body = NewElection,
-    responses(
-        (status = 201, description = "Election created", body = ElectionWithPoliticalGroups),
-        (status = 400, description = "Bad request", body = ErrorResponse),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-)]
-#[cfg(feature = "dev-database")]
-pub async fn election_create(
-    _user: Admin,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Json(new_election): Json<NewElection>,
-) -> Result<(StatusCode, ElectionWithPoliticalGroups), APIError> {
-    let election = crate::election::repository::create(&pool, new_election).await?;
-    audit_service
-        .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
-        .await?;
-
-    // Create first committee session for the election
-    let committee_session = crate::committee_session::repository::create(
-        &pool,
-        CommitteeSessionCreateRequest {
-            number: 1,
-            election_id: election.id,
-            number_of_voters: 0,
-        },
-    )
-    .await?;
-    audit_service
-        .log(
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
-            None,
-        )
-        .await?;
-
-    Ok((StatusCode::CREATED, election))
-}
-
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionAndCandidateDefinitionValidateRequest {
@@ -182,6 +132,10 @@ pub struct ElectionAndCandidateDefinitionValidateRequest {
     #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
     number_of_voters: Option<u32>,
+
+    #[schema(nullable = false)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    polling_station_file_name: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -243,6 +197,11 @@ pub async fn election_import_validate(
     let polling_stations;
     let mut number_of_voters = 0;
     if let Some(data) = edu.polling_station_data {
+        // If polling stations are submitted, file name must be also
+        if edu.polling_station_file_name.is_none() {
+            return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
+        }
+
         polling_stations = Some(EML110::from_str(&data)?.get_polling_stations()?);
         number_of_voters = EML110::from_str(&data)?.get_number_of_voters()?;
     } else {
@@ -278,6 +237,9 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
     number_of_voters: Option<u32>,
+    #[schema(nullable = false)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    polling_station_file_name: Option<String>,
 }
 
 /// Uploads election definition, validates it, saves it to the database, and returns the created election
@@ -312,7 +274,13 @@ pub async fn election_import(
     // Process polling stations
     let mut polling_places = None;
     let mut number_of_voters = 0;
+
     if let Some(polling_station_data) = edu.polling_station_data {
+        // If polling stations are submitted, file name must be also
+        if edu.polling_station_file_name.is_none() {
+            return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
+        }
+
         number_of_voters = EML110::from_str(&polling_station_data)?.get_number_of_voters()?;
         polling_places = Some(EML110::from_str(&polling_station_data)?.get_polling_stations()?);
     }
@@ -336,7 +304,22 @@ pub async fn election_import(
 
     // Create polling stations
     if let Some(places) = polling_places {
+        let number_of_polling_stations = places.len();
         crate::polling_station::repository::create_many(&pool, election.id, places).await?;
+
+        audit_service
+            .log(
+                &AuditEvent::PollingStationsImported(PollingStationImportDetails {
+                    import_election_id: election.id,
+                    import_file_name: edu
+                        .polling_station_file_name
+                        .ok_or(EMLImportError::MissingFileName)?,
+                    import_number_of_polling_stations: u64::try_from(number_of_polling_stations)
+                        .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
+                }),
+                None,
+            )
+            .await?;
     }
 
     // Create first committee session for the election

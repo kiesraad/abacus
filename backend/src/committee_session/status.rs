@@ -230,7 +230,10 @@ mod tests {
     }
 
     /// Created --> DataEntryNotStarted: ready for data entry
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_6"))))]
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_6_no_polling_stations")
+    )))]
     async fn committee_session_status_created_to_data_entry_not_started_no_polling_stations(
         pool: SqlitePool,
     ) {

@@ -1,5 +1,6 @@
 {
   "add": "Toevoegen: {name}",
+  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresulaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van de Kiesraad)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
   "abort": {
     "action": "Afbreken",
     "description": "<p>De verkiezing wordt pas opgeslagen als je alle stappen doorlopen hebt. Weet je zeker dat je het aanmaken van de verkiezing wilt afbreken?</p>",

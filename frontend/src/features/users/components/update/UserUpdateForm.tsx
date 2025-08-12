@@ -10,6 +10,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import { UpdateUserRequest, User, USER_UPDATE_REQUEST_PATH } from "@/types/generated/openapi";
+import { StringFormData } from "@/utils/stringFormData";
 
 export interface UserUpdateFormProps {
   user: User;
@@ -31,22 +32,20 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const formData = new StringFormData(event.currentTarget);
 
     const userUpdate: UpdateUserRequest = {};
     const errors: ValidationErrors = {};
 
     if (user.fullname) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      userUpdate.fullname = (formData.get("fullname") as string).trim();
+      userUpdate.fullname = formData.getString("fullname");
       if (userUpdate.fullname.length === 0) {
         errors.fullname = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
       }
     }
 
     if (editPassword) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      userUpdate.temp_password = formData.get("temp_password") as string;
+      userUpdate.temp_password = formData.getString("temp_password");
       if (userUpdate.temp_password.length === 0) {
         errors.temp_password = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
       }

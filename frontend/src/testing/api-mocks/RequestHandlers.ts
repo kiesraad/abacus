@@ -4,6 +4,8 @@ import {
   ACCOUNT_UPDATE_REQUEST_BODY,
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_PATH,
+  ADMIN_EXISTS_REQUEST_PARAMS,
+  ADMIN_EXISTS_REQUEST_PATH,
   AUDIT_LOG_LIST_REQUEST_PARAMS,
   AUDIT_LOG_LIST_REQUEST_PATH,
   AUDIT_LOG_LIST_USERS_REQUEST_PARAMS,
@@ -20,6 +22,9 @@ import {
   COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS,
   COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   CommitteeSessionListResponse,
+  CREATE_FIRST_ADMIN_REQUEST_BODY,
+  CREATE_FIRST_ADMIN_REQUEST_PARAMS,
+  CREATE_FIRST_ADMIN_REQUEST_PATH,
   DataEntryGetDifferencesResponse,
   DataEntryGetErrorsResponse,
   DataEntryStatusResponse,
@@ -208,9 +213,9 @@ export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, 
   () => HttpResponse.json(loginResponseMockData, { status: 200 }),
 );
 
-export const InitialisedHandler = http.get<INITIALISED_REQUEST_PARAMS, INITIALISED_REQUEST_PATH>(
+export const InitialisedHandler = http.get<INITIALISED_REQUEST_PARAMS, null, null, INITIALISED_REQUEST_PATH>(
   "/api/initialised",
-  () => HttpResponse.text("", { status: 200 }),
+  () => new HttpResponse(null, { status: 200 }),
 );
 
 export const PollingStationDataEntryGetDifferencesHandler = http.get<
@@ -328,6 +333,20 @@ export const UserCreateRequestHandler = http.post<
   User,
   USER_CREATE_REQUEST_PATH
 >("/api/user", () => HttpResponse.json(userMockData[0], { status: 200 }));
+
+export const CreateFirstAdminRequestHandler = http.post<
+  ParamsToString<CREATE_FIRST_ADMIN_REQUEST_PARAMS>,
+  CREATE_FIRST_ADMIN_REQUEST_BODY,
+  User,
+  CREATE_FIRST_ADMIN_REQUEST_PATH
+>("/api/initialise/first-admin", () => HttpResponse.json(userMockData[0], { status: 200 }));
+
+export const AdminExistsRequestHandler = http.get<
+  ParamsToString<ADMIN_EXISTS_REQUEST_PARAMS>,
+  null,
+  null,
+  ADMIN_EXISTS_REQUEST_PATH
+>("/api/initialise/admin-exists", () => new HttpResponse(null, { status: 404 }));
 
 export const UserGetRequestHandler = http.get<
   ParamsToString<USER_GET_REQUEST_PARAMS>,

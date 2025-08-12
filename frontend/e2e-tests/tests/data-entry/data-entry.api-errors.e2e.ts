@@ -1,10 +1,10 @@
 import { expect } from "@playwright/test";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
-import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
-import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
+import {
+  ExtraInvestigationPage,
+  noExtraInvestigation,
+} from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
-
-import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
 
@@ -126,36 +126,6 @@ test.describe("data entry - api error responses", () => {
   test("5xx fatal response results in error shown", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
-    const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
-
-    const votersAndVotesPage = new VotersAndVotesPage(page);
-    await expect(votersAndVotesPage.fieldset).toBeVisible();
-    const voters: VotersCounts = {
-      poll_card_count: 99,
-      proxy_certificate_count: 1,
-      total_admitted_voters_count: 100,
-    };
-    const votes: VotesCounts = {
-      votes_candidates_count: 100,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 100,
-    };
-    await votersAndVotesPage.inputVotersCounts(voters);
-    await votersAndVotesPage.inputVotesCounts(votes);
-
     await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1`, async (route) => {
       await route.fulfill({
         status: 500,
@@ -166,13 +136,15 @@ test.describe("data entry - api error responses", () => {
         },
       });
     });
-    await votersAndVotesPage.next.click();
+
+    const extraInvestigationPage = new ExtraInvestigationPage(page);
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     const message = page.getByRole("heading", {
       level: 1,
       name: "Abacus is stuk",
     });
-    await expect(votersAndVotesPage.fieldset).toBeHidden();
+    await expect(extraInvestigationPage.fieldset).toBeHidden();
     await expect(message).toBeVisible();
   });
 });

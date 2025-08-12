@@ -53,6 +53,8 @@ Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the proje
 
 Use `cargo test` to run the tests. The tests are also run in a GitHub Actions workflow.
 
+Typst needs to be installed on your machine, see [Running](#running) for more details.
+
 ### Air gap detection
 
 In production, Abacus must be built with air gap detection enabled. To enforce air gap detection during build, enable the feature `airgap-detection`:
@@ -120,7 +122,7 @@ The following dependencies (crates) are used:
 - `sha2`: generating a hash of the EML_NL XML files for inclusion in the PDF.
 - `sqlx`: async SQL library featuring compile-time checked queries.
 - `tokio`: runtime for writing asynchronous applications.
-- `tokio-stream`: used to wrap an channel to an async stream.
+- `tokio-util`: used for download streaming.
 - `tower`: a library of modular and reusable components for building robust networking clients and servers.
 - `tower-http`: Tower middleware and utilities for HTTP clients and servers.
 - `tracing`: a framework for instrumenting Rust programs to collect structured, event-based diagnostic information.

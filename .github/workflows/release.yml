@@ -92,7 +92,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps --no-shell
       - name: Download abacus
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: abacus-${{ matrix.os }}
           path: builds/backend
@@ -135,7 +135,7 @@ jobs:
       - name: Create release directory
         run: mkdir -p release
       - name: Download abacus
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: abacus-*
           path: release/
@@ -178,7 +178,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download abacus
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: abacus-ubuntu-latest
       - name: Upload binary to test server

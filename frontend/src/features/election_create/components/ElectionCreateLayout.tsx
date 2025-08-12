@@ -42,7 +42,7 @@ export function ElectionCreateLayout() {
   return (
     <ElectionCreateContextProvider>
       <PageTitle title={`${t("election.create")} - Abacus`} />
-      <NavBar location={location} />
+      <NavBar />
       <ElectionHeader />
       <AbortModal />
       <main>

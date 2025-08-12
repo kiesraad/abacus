@@ -8,6 +8,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
 import { Role } from "@/types/generated/openapi";
+import { StringFormData } from "@/utils/stringFormData";
 
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
@@ -18,9 +19,9 @@ export function UserCreateRolePage() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const formData = new StringFormData(event.currentTarget);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const roleValue = formData.get("role") as Role | null;
+    const roleValue = (formData.getString("role") || null) as Role | null;
 
     if (!roleValue) {
       setError(t("users.role_mandatory"));

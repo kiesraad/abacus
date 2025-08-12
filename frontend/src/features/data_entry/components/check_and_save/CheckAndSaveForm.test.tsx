@@ -322,7 +322,7 @@ describe("Test CheckAndSaveForm summary", () => {
     expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
   });
 
-  test("Alert when committee session is paused is shown on save and log out", async () => {
+  test("Alert when committee session is paused is shown on save and then logs out", async () => {
     const user = userEvent.setup();
     overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 409, {
       error: "Committee session data entry is paused",

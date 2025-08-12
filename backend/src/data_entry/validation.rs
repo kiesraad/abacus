@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use super::{
-    CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
+    CandidateVotes, Count, DifferencesCounts, PoliticalGroupCandidateVotes, PollingStationResults,
     VotersCounts, VotesCounts,
     comparison::Compare,
     status::{DataEntryStatus, FirstEntryInProgress},
@@ -672,7 +672,7 @@ impl Validate for DifferencesCounts {
     }
 }
 
-impl Validate for Vec<PoliticalGroupVotes> {
+impl Validate for Vec<PoliticalGroupCandidateVotes> {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
@@ -706,7 +706,7 @@ impl Validate for Vec<PoliticalGroupVotes> {
     }
 }
 
-impl Validate for PoliticalGroupVotes {
+impl Validate for PoliticalGroupCandidateVotes {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
@@ -860,7 +860,10 @@ mod tests {
             voters_counts: Default::default(),
             votes_counts: Default::default(),
             differences_counts: Default::default(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[42])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[42],
+            )],
         };
         let election = election_fixture(&[1]);
         let polling_station = polling_station_fixture(None);
@@ -911,7 +914,10 @@ mod tests {
                 other_explanation_count: 0,
                 no_explanation_count: 0,
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[44])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[44],
+            )],
         };
         let election = election_fixture(&[1]);
         let polling_station = polling_station_fixture(None);
@@ -994,7 +1000,10 @@ mod tests {
                 other_explanation_count: 0,
                 no_explanation_count: 2,
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         polling_station_results
             .validate(
@@ -1047,7 +1056,7 @@ mod tests {
                 other_explanation_count: 2,
                 no_explanation_count: 0,
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[3])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(1, &[3])],
         };
         polling_station_results
             .validate(
@@ -1136,7 +1145,10 @@ mod tests {
                 other_explanation_count: 8,
                 no_explanation_count: 7,
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[82])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[82],
+            )],
         };
         polling_station_results
             .validate(
@@ -1203,7 +1215,10 @@ mod tests {
                 other_explanation_count: 2,
                 no_explanation_count: 2,
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[50])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[50],
+            )],
         };
         let election = election_fixture(&[1]);
         let polling_station = polling_station_fixture(None);
@@ -1264,7 +1279,10 @@ mod tests {
                 other_explanation_count: 2, // F.305 no difference expected
                 no_explanation_count: 2,    // F.305 no difference expected
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[50])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[50],
+            )],
         };
         let election = election_fixture(&[1]);
         let polling_station = polling_station_fixture(None);
@@ -1319,7 +1337,7 @@ mod tests {
                 other_explanation_count: 1, // F.305 no difference expected
                 no_explanation_count: 1,    // F.305 no difference expected
             },
-            political_group_votes: vec![PoliticalGroupVotes {
+            political_group_votes: vec![PoliticalGroupCandidateVotes {
                 number: 1,
                 total: 49, // F.204 incorrect total
                 candidate_votes: vec![CandidateVotes {
@@ -1786,7 +1804,7 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         // create a valid political group votes with two groups and two candidates each
         let mut political_group_votes = vec![
-            PoliticalGroupVotes {
+            PoliticalGroupCandidateVotes {
                 number: 1,
                 total: 25,
                 candidate_votes: vec![
@@ -1800,7 +1818,7 @@ mod tests {
                     },
                 ],
             },
-            PoliticalGroupVotes {
+            PoliticalGroupCandidateVotes {
                 number: 2,
                 total: 1_000_000_000, // out of range
                 candidate_votes: vec![

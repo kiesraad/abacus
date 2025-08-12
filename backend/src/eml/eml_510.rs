@@ -9,7 +9,7 @@ use super::{
     },
 };
 use crate::{
-    data_entry::{PoliticalGroupVotes, PollingStationResults},
+    data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
     polling_station::PollingStation,
     summary::ElectionSummary,
 };
@@ -415,7 +415,7 @@ pub struct Selection {
 impl Selection {
     pub fn from_political_group_votes(
         election: &crate::election::ElectionWithPoliticalGroups,
-        votes: &[PoliticalGroupVotes],
+        votes: &[PoliticalGroupCandidateVotes],
     ) -> Vec<Selection> {
         let mut selections = vec![];
         for pg in votes {

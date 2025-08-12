@@ -5,7 +5,7 @@ import {
   ElectionWithPoliticalGroups,
   PoliticalGroup,
   PoliticalGroupCandidateNomination,
-  PoliticalGroupVotes,
+  PoliticalGroupCandidateVotes,
   SeatAssignmentResult,
   SeatChangeStep,
 } from "@/types/generated/openapi";
@@ -1275,7 +1275,7 @@ export const candidate_nomination: CandidateNominationResult = {
   ],
 };
 
-export const political_group_1_votes: PoliticalGroupVotes = {
+export const political_group_1_votes: PoliticalGroupCandidateVotes = {
   number: 1,
   total: 808,
   candidate_votes: [

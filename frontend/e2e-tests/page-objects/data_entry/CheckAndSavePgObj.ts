@@ -8,8 +8,8 @@ export class CheckAndSavePage extends DataEntryBasePage {
   readonly summaryList: Locator;
   readonly summaryListItemVotersAndVotes: Locator;
   readonly summaryListItemDifferences: Locator;
-  readonly summaryListItemPoliticalGroupVotes1: Locator;
-  readonly summaryListItemPoliticalGroupVotes2: Locator;
+  readonly summaryListItemPoliticalGroupCandidateVotes1: Locator;
+  readonly summaryListItemPoliticalGroupCandidateVotes2: Locator;
   readonly save: Locator;
   readonly complete: Locator;
   readonly acceptErrorsReminder: Locator;
@@ -28,10 +28,10 @@ export class CheckAndSavePage extends DataEntryBasePage {
     this.summaryListItemDifferences = page
       .getByTestId("save-form-summary-list-differences_counts")
       .getByRole("listitem");
-    this.summaryListItemPoliticalGroupVotes1 = page
+    this.summaryListItemPoliticalGroupCandidateVotes1 = page
       .getByTestId("save-form-summary-list-political_group_votes_1")
       .getByRole("listitem");
-    this.summaryListItemPoliticalGroupVotes2 = page
+    this.summaryListItemPoliticalGroupCandidateVotes2 = page
       .getByTestId("save-form-summary-list-political_group_votes_2")
       .getByRole("listitem");
 

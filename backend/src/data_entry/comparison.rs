@@ -1,6 +1,6 @@
 use super::{
-    CandidateVotes, Count, DifferencesCounts, ExtraInvestigation, FieldPath, PoliticalGroupVotes,
-    PollingStationResults, VotersCounts, VotesCounts, YesNo,
+    CandidateVotes, Count, DifferencesCounts, ExtraInvestigation, FieldPath,
+    PoliticalGroupCandidateVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
 };
 
 pub trait Compare {
@@ -181,7 +181,7 @@ impl Compare for DifferencesCounts {
     }
 }
 
-impl Compare for Vec<PoliticalGroupVotes> {
+impl Compare for Vec<PoliticalGroupCandidateVotes> {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         // compare each political group
         for (i, pgv) in self.iter().enumerate() {
@@ -190,7 +190,7 @@ impl Compare for Vec<PoliticalGroupVotes> {
     }
 }
 
-impl Compare for PoliticalGroupVotes {
+impl Compare for PoliticalGroupCandidateVotes {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         // compare all candidates
         for (i, cv) in self.candidate_votes.iter().enumerate() {
@@ -238,7 +238,10 @@ mod tests {
                 total_votes_cast_count: 105,
             },
             differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let second_entry = first_entry.clone();
         second_entry.compare(
@@ -275,7 +278,10 @@ mod tests {
                 other_explanation_count: 2,
                 no_explanation_count: 0,
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let second_entry = first_entry.clone();
         second_entry.compare(
@@ -304,7 +310,10 @@ mod tests {
                 total_votes_cast_count: 104,
             },
             differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let second_entry = first_entry.clone();
         second_entry.compare(
@@ -341,7 +350,10 @@ mod tests {
                 other_explanation_count: 0,
                 no_explanation_count: 0,
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let second_entry = first_entry.clone();
         second_entry.compare(
@@ -370,7 +382,10 @@ mod tests {
                 total_votes_cast_count: 105,
             },
             differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let mut second_entry = first_entry.clone();
         second_entry.voters_counts.poll_card_count = 101;
@@ -417,7 +432,10 @@ mod tests {
                 other_explanation_count: 2,
                 no_explanation_count: 0,
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let mut second_entry = first_entry.clone();
         second_entry.differences_counts = DifferencesCounts {
@@ -467,7 +485,10 @@ mod tests {
                 total_votes_cast_count: 104,
             },
             differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let mut second_entry = first_entry.clone();
         second_entry.voters_counts = VotersCounts {
@@ -540,14 +561,14 @@ mod tests {
                 no_explanation_count: 0,
             },
             political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, &[100, 0]),
-                PoliticalGroupVotes::from_test_data_auto(2, &[0]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[100, 0]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[0]),
             ],
         };
         let mut second_entry = first_entry.clone();
         second_entry.political_group_votes = vec![
-            PoliticalGroupVotes::from_test_data_auto(1, &[50, 30]),
-            PoliticalGroupVotes::from_test_data_auto(2, &[20]),
+            PoliticalGroupCandidateVotes::from_test_data_auto(1, &[50, 30]),
+            PoliticalGroupCandidateVotes::from_test_data_auto(2, &[20]),
         ];
         second_entry.compare(
             &first_entry,

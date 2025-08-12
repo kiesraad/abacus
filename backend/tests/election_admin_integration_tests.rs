@@ -505,6 +505,8 @@ async fn test_election_import_save_wrong_hash(pool: SqlitePool) {
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
+            "number_of_voters": 1234,
+            "counting_method": "CSO",
         }))
         .send()
         .await

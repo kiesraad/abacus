@@ -230,6 +230,25 @@ export const IconFile = (props: React.SVGAttributes<SVGElement>) => (
   </svg>
 );
 
+export const IconFilePlus = (props: React.SVGAttributes<SVGElement>) => (
+  <svg
+    role="img"
+    data-icon="IconFilePlus"
+    {...props}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M16.6663 8.75002V5.66669C16.6663 4.26656 16.6663 3.56649 16.3939 3.03171C16.1542 2.56131 15.7717 2.17885 15.3013 1.93917C14.7665 1.66669 14.0665 1.66669 12.6663 1.66669H7.33301C5.93288 1.66669 5.23281 1.66669 4.69803 1.93917C4.22763 2.17885 3.84517 2.56131 3.60549 3.03171C3.33301 3.56649 3.33301 4.26656 3.33301 5.66669V14.3334C3.33301 15.7335 3.33301 16.4336 3.60549 16.9683C3.84517 17.4387 4.22763 17.8212 4.69803 18.0609C5.23281 18.3334 5.93288 18.3334 7.33301 18.3334H9.99967M11.6663 9.16669H6.66634M8.33301 12.5H6.66634M13.333 5.83335H6.66634M14.9997 17.5V12.5M12.4997 15H17.4997"
+      stroke="white"
+      strokeWidth="1.66667"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const IconFilter = (props: React.SVGAttributes<SVGElement>) => (
   <svg
     role="img"

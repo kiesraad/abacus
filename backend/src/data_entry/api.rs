@@ -817,7 +817,7 @@ pub mod tests {
             status::CommitteeSessionStatus,
             tests::{change_status_committee_session, create_committee_session},
         },
-        data_entry::{DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts},
+        data_entry::{DifferencesCounts, PoliticalGroupCandidateVotes, VotersCounts, VotesCounts},
     };
     use axum::http::StatusCode;
     use http_body_util::BodyExt;
@@ -843,8 +843,8 @@ pub mod tests {
                 },
                 differences_counts: DifferencesCounts::zero(),
                 political_group_votes: vec![
-                    PoliticalGroupVotes::from_test_data_auto(1, &[36, 20]),
-                    PoliticalGroupVotes::from_test_data_auto(2, &[30, 10]),
+                    PoliticalGroupCandidateVotes::from_test_data_auto(1, &[36, 20]),
+                    PoliticalGroupCandidateVotes::from_test_data_auto(2, &[30, 10]),
                 ],
             },
             client_state: ClientState(None),

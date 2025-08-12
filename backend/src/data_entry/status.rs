@@ -683,7 +683,7 @@ mod tests {
 
     use super::*;
     use crate::{
-        data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts},
+        data_entry::{CandidateVotes, PoliticalGroupCandidateVotes, VotersCounts, VotesCounts},
         election::{
             Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup,
             VoteCountingMethod,
@@ -1179,7 +1179,7 @@ mod tests {
                     invalid_votes_count: 0,
                     total_votes_cast_count: 1,
                 },
-                political_group_votes: vec![PoliticalGroupVotes {
+                political_group_votes: vec![PoliticalGroupCandidateVotes {
                     number: 1,
                     total: 0,
                     candidate_votes: vec![CandidateVotes {
@@ -1204,7 +1204,7 @@ mod tests {
                     invalid_votes_count: 0,
                     total_votes_cast_count: 1,
                 },
-                political_group_votes: vec![PoliticalGroupVotes {
+                political_group_votes: vec![PoliticalGroupCandidateVotes {
                     number: 1,
                     total: 1,
                     candidate_votes: vec![CandidateVotes {

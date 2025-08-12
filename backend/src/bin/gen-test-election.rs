@@ -11,7 +11,7 @@ use abacus::{
     },
     create_sqlite_pool,
     data_entry::{
-        CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
+        CandidateVotes, DifferencesCounts, PoliticalGroupCandidateVotes, PollingStationResults,
         VotersCounts, VotesCounts,
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
@@ -493,7 +493,7 @@ fn generate_polling_station_results(
                     candidate_distribution_slope,
                     true,
                 );
-                PoliticalGroupVotes {
+                PoliticalGroupCandidateVotes {
                     number: pg.number,
                     total: votes,
                     candidate_votes: pg

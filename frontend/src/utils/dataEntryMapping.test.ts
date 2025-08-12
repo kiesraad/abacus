@@ -295,7 +295,7 @@ describe("mapSectionValues", () => {
       "political_group_votes[1].total": "50",
     };
 
-    const politicalGroupVotesSection: DataEntrySection = {
+    const politicalGroupCandidateVotesSection: DataEntrySection = {
       id: "political_group_votes_1",
       title: "Political Group Votes Section",
       short_title: "Political Group Votes",
@@ -315,7 +315,7 @@ describe("mapSectionValues", () => {
       ],
     };
 
-    const result = mapSectionValues(current, formValues, politicalGroupVotesSection);
+    const result = mapSectionValues(current, formValues, politicalGroupCandidateVotesSection);
 
     expect(result.political_group_votes).toHaveLength(2);
     expect(result.political_group_votes[0]?.candidate_votes).toHaveLength(2);
@@ -335,7 +335,7 @@ describe("mapSectionValues", () => {
       "political_group_votes[2].total": "12",
     };
 
-    const sparsePoliticalGroupVotesSection: DataEntrySection = {
+    const sparsePoliticalGroupCandidateVotesSection: DataEntrySection = {
       id: "political_group_votes_1",
       title: "Sparse Political Group Votes Section",
       short_title: "Sparse Political Group Votes",
@@ -351,7 +351,7 @@ describe("mapSectionValues", () => {
       ],
     };
 
-    const result = mapSectionValues(current, formValues, sparsePoliticalGroupVotesSection);
+    const result = mapSectionValues(current, formValues, sparsePoliticalGroupCandidateVotesSection);
 
     expect(result.political_group_votes).toHaveLength(3);
     expect(result.political_group_votes[2]?.candidate_votes).toHaveLength(6);

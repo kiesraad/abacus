@@ -5,7 +5,9 @@ use tracing::{debug, info};
 use utoipa::ToSchema;
 
 use super::Fraction;
-use crate::{data_entry::PoliticalGroupVotes, election::PGNumber, summary::ElectionSummary};
+use crate::{
+    data_entry::PoliticalGroupCandidateVotes, election::PGNumber, summary::ElectionSummary,
+};
 
 /// The result of the seat assignment procedure. This contains the number of seats and the quota
 /// that was used. It then contains the initial standing after full seats were assigned,
@@ -82,7 +84,7 @@ pub struct PoliticalGroupStanding {
 impl PoliticalGroupStanding {
     /// Create a new instance computing the whole number of seats that
     /// were assigned to a political group.
-    fn new(pg: &PoliticalGroupVotes, quota: Fraction) -> Self {
+    fn new(pg: &PoliticalGroupCandidateVotes, quota: Fraction) -> Self {
         let votes_cast = Fraction::from(pg.total);
         let pg_seats = if votes_cast > Fraction::ZERO {
             u32::try_from((votes_cast / quota).integer_part()).expect("pg_seats fit in u32")
@@ -313,7 +315,7 @@ pub enum ApportionmentError {
 
 /// Initial construction of the data required per political group
 fn initial_full_seats_per_political_group(
-    pg_votes: &[PoliticalGroupVotes],
+    pg_votes: &[PoliticalGroupCandidateVotes],
     quota: Fraction,
 ) -> Vec<PoliticalGroupStanding> {
     pg_votes

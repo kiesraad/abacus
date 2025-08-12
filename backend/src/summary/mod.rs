@@ -4,8 +4,8 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     data_entry::{
-        CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-        Validate, ValidationResults, VotersCounts, VotesCounts,
+        CandidateVotes, Count, DifferencesCounts, PoliticalGroupCandidateVotes,
+        PollingStationResults, Validate, ValidationResults, VotersCounts, VotesCounts,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -23,7 +23,7 @@ pub struct ElectionSummary {
     /// The differences between voters and votes
     pub differences_counts: SummaryDifferencesCounts,
     /// The summary votes for each political group (and each candidate within)
-    pub political_group_votes: Vec<PoliticalGroupVotes>,
+    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
 impl ElectionSummary {
@@ -57,18 +57,20 @@ impl ElectionSummary {
 
         // initialize political group votes to zero
         for group in election.political_groups.iter() {
-            totals.political_group_votes.push(PoliticalGroupVotes {
-                number: group.number,
-                total: 0,
-                candidate_votes: group
-                    .candidates
-                    .iter()
-                    .map(|c| CandidateVotes {
-                        number: c.number,
-                        votes: 0,
-                    })
-                    .collect(),
-            });
+            totals
+                .political_group_votes
+                .push(PoliticalGroupCandidateVotes {
+                    number: group.number,
+                    total: 0,
+                    candidate_votes: group
+                        .candidates
+                        .iter()
+                        .map(|c| CandidateVotes {
+                            number: c.number,
+                            votes: 0,
+                        })
+                        .collect(),
+                });
         }
 
         // list of polling stations for which we processed results
@@ -241,8 +243,8 @@ mod tests {
                 tmp
             },
             political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, &[18, 3]),
-                PoliticalGroupVotes::from_test_data_auto(2, &[4, 4, 2]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[18, 3]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[4, 4, 2]),
             ],
         }
     }
@@ -268,8 +270,8 @@ mod tests {
                 tmp
             },
             political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, &[10, 6]),
-                PoliticalGroupVotes::from_test_data_auto(2, &[12, 10, 8]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[10, 6]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[12, 10, 8]),
             ],
         }
     }
@@ -486,7 +488,7 @@ mod tests {
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result
             .political_group_votes
-            .push(PoliticalGroupVotes::from_test_data_auto(3, &[0]));
+            .push(PoliticalGroupCandidateVotes::from_test_data_auto(3, &[0]));
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
@@ -501,7 +503,8 @@ mod tests {
         let ps = polling_stations_fixture(&election, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
-        ps2_result.political_group_votes[1] = PoliticalGroupVotes::from_test_data_auto(3, &[0]);
+        ps2_result.political_group_votes[1] =
+            PoliticalGroupCandidateVotes::from_test_data_auto(3, &[0]);
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],

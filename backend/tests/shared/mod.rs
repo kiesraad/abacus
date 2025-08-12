@@ -9,7 +9,7 @@ use abacus::{
     },
     data_entry::{
         CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
-        PoliticalGroupVotes, PollingStationResults, VotersCounts, VotesCounts,
+        PoliticalGroupCandidateVotes, PollingStationResults, VotersCounts, VotesCounts,
         status::{ClientState, DataEntryStatusName},
     },
     election::{CandidateNumber, PGNumber},
@@ -34,8 +34,8 @@ pub fn differences_counts_zero() -> DifferencesCounts {
 pub fn political_group_votes_from_test_data_auto(
     number: PGNumber,
     candidate_votes: &[Count],
-) -> PoliticalGroupVotes {
-    PoliticalGroupVotes {
+) -> PoliticalGroupCandidateVotes {
+    PoliticalGroupCandidateVotes {
         number,
         total: candidate_votes.iter().sum(),
         candidate_votes: candidate_votes

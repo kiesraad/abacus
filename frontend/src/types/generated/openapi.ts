@@ -682,7 +682,7 @@ export interface ElectionSummary {
   /** The differences between voters and votes */
   differences_counts: SummaryDifferencesCounts;
   /** The summary votes for each political group (and each candidate within) */
-  political_group_votes: PoliticalGroupVotes[];
+  political_group_votes: PoliticalGroupCandidateVotes[];
   /** The total number of voters */
   voters_counts: VotersCounts;
   /** The total number of votes */
@@ -875,6 +875,12 @@ export interface PoliticalGroupCandidateNomination {
   updated_candidate_ranking: Candidate[];
 }
 
+export interface PoliticalGroupCandidateVotes {
+  candidate_votes: CandidateVotes[];
+  number: number;
+  total: number;
+}
+
 /**
  * Contains information about the final assignment of seats for a specific political group.
  */
@@ -914,12 +920,6 @@ export interface PoliticalGroupStanding {
   residual_seats: number;
   /** The number of votes cast for this group */
   votes_cast: number;
-}
-
-export interface PoliticalGroupVotes {
-  candidate_votes: CandidateVotes[];
-  number: number;
-  total: number;
 }
 
 /**
@@ -1000,7 +1000,7 @@ export interface PollingStationResults {
   /** Extra investigation ("B1-1 Extra onderzoek") */
   extra_investigation: ExtraInvestigation;
   /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
-  political_group_votes: PoliticalGroupVotes[];
+  political_group_votes: PoliticalGroupCandidateVotes[];
   /** Voters counts ("1. Aantal toegelaten kiezers") */
   voters_counts: VotersCounts;
   /** Votes counts ("2. Aantal getelde stembiljetten") */

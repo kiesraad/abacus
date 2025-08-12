@@ -497,11 +497,11 @@ test.describe("full data entry flow", () => {
       "W.203 Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     ]);
     await expect(checkAndSavePage.summaryListItemDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
-    await expect(checkAndSavePage.summaryListItemPoliticalGroupVotes1).toHaveText([
+    await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes1).toHaveText([
       "F.204 Controleer (totaal) aantal stemmen op kandidaten",
       "F.401 Controleer ingevoerde aantallen",
     ]);
-    await expect(checkAndSavePage.summaryListItemPoliticalGroupVotes2).toHaveText([
+    await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes2).toHaveText([
       "F.204 Controleer (totaal) aantal stemmen op kandidaten",
     ]);
 

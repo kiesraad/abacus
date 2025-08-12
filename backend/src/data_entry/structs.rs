@@ -68,7 +68,7 @@ pub struct PollingStationResults {
     /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
     pub differences_counts: DifferencesCounts,
     /// Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat")
-    pub political_group_votes: Vec<PoliticalGroupVotes>,
+    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
 impl PollingStationResults {
@@ -76,10 +76,10 @@ impl PollingStationResults {
     /// for the given political groups, with all votes set to 0.
     pub fn default_political_group_votes(
         political_groups: &[PoliticalGroup],
-    ) -> Vec<PoliticalGroupVotes> {
+    ) -> Vec<PoliticalGroupCandidateVotes> {
         political_groups
             .iter()
-            .map(|pg| PoliticalGroupVotes {
+            .map(|pg| PoliticalGroupCandidateVotes {
                 number: pg.number,
                 total: 0,
                 candidate_votes: pg
@@ -224,7 +224,7 @@ pub struct CountingDifferencesPollingStation {
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
-pub struct PoliticalGroupVotes {
+pub struct PoliticalGroupCandidateVotes {
     #[schema(value_type = u32)]
     pub number: PGNumber,
     #[schema(value_type = u32)]
@@ -232,7 +232,7 @@ pub struct PoliticalGroupVotes {
     pub candidate_votes: Vec<CandidateVotes>,
 }
 
-impl PoliticalGroupVotes {
+impl PoliticalGroupCandidateVotes {
     pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
         if self.number != other.number {
             return Err(APIError::AddError(
@@ -266,10 +266,10 @@ impl PoliticalGroupVotes {
         Ok(())
     }
 
-    /// Create `PoliticalGroupVotes` from test data with candidate numbers automatically generated starting from 1.
+    /// Create `PoliticalGroupCandidateVotes` from test data with candidate numbers automatically generated starting from 1.
     #[cfg(test)]
     pub fn from_test_data_auto(number: PGNumber, candidate_votes: &[Count]) -> Self {
-        PoliticalGroupVotes {
+        PoliticalGroupCandidateVotes {
             number,
             total: candidate_votes.iter().sum(),
             candidate_votes: candidate_votes

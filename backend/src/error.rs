@@ -16,7 +16,7 @@ use utoipa::ToSchema;
 use crate::{
     MAX_BODY_SIZE_MB, apportionment::ApportionmentError,
     authentication::error::AuthenticationError, committee_session::CommitteeSessionError,
-    data_entry::DataError, eml::EMLImportError, pdf_gen::PdfGenError,
+    data_entry::DataError, eml::EMLImportError, pdf_gen::PdfGenError, zip::ZipResponseError,
 };
 
 /// Error reference used to show the corresponding error message to the end-user
@@ -100,7 +100,7 @@ pub enum APIError {
     StdError(Box<dyn Error>),
     XmlDeError(DeError),
     XmlError(SeError),
-    ZipError(String),
+    ZipError(ZipResponseError),
 }
 
 impl IntoResponse for APIError {
@@ -426,6 +426,12 @@ impl From<serde_json::Error> for APIError {
 impl From<PdfGenError> for APIError {
     fn from(err: PdfGenError) -> Self {
         APIError::PdfGenError(err)
+    }
+}
+
+impl From<ZipResponseError> for APIError {
+    fn from(err: ZipResponseError) -> Self {
+        APIError::ZipError(err)
     }
 }
 

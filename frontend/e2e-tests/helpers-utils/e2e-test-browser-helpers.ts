@@ -19,9 +19,7 @@ import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: PollingStationResults) {
   const extraInvestigationPage = new ExtraInvestigationPage(page);
-  await expect(extraInvestigationPage.fieldset).toBeVisible();
-  await extraInvestigationPage.inputExtraInvestigation(results.extra_investigation);
-  await extraInvestigationPage.next.click();
+  await extraInvestigationPage.fillAndClickNext(results.extra_investigation);
 
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();

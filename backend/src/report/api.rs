@@ -19,7 +19,7 @@ use crate::{
     },
     polling_station::structs::PollingStation,
     summary::ElectionSummary,
-    zip::{ZipStream, slugify_filename},
+    zip::{ZipResponse, ZipResponseError, slugify_filename},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -162,18 +162,20 @@ async fn election_download_zip_results(
     let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
     let content = generate_pdf(model).await?;
 
-    let zip_stream = ZipStream::new(&zip_filename).await;
+    let (zip_response, mut zip_writer) = ZipResponse::new(&zip_filename);
 
-    zip_stream
-        .add_file(pdf_filename.clone(), content.buffer)
-        .await?;
-    zip_stream
-        .add_file(xml_filename.clone(), xml_string.into_bytes())
-        .await?;
+    tokio::spawn(async move {
+        zip_writer.add_file(&pdf_filename, &content.buffer).await?;
+        zip_writer
+            .add_file(&xml_filename, xml_string.as_bytes())
+            .await?;
 
-    zip_stream.finish().await?;
+        zip_writer.finish().await?;
 
-    Ok(zip_stream)
+        Ok::<(), ZipResponseError>(())
+    });
+
+    Ok(zip_response)
 }
 
 /// Download a generated PDF with election results

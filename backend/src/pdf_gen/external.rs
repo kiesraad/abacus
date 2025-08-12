@@ -1,65 +1,48 @@
 use rand::{Rng, distr::Alphanumeric};
 use std::{path::PathBuf, time::Instant};
-use tokio::{sync::mpsc::Sender, task::JoinHandle};
 use tracing::{error, info};
 
 use super::PdfGenResult;
-use crate::{APIError, pdf_gen::models::PdfFileModel, zip::FileEntry};
-
-/// Generates a PDF using an external typst binary.
-/// Uses environment variables `ABACUS_TYPST_BIN` (`typst` by default)
-/// and `ABACUS_TEMPLATES_DIR` (`./templates` by default) to
-pub async fn generate_pdf(model: PdfFileModel) -> Result<PdfGenResult, APIError> {
-    Ok(generate_pdf_internal(model).await?)
-}
+use crate::{
+    pdf_gen::models::PdfFileModel,
+    zip::{ZipResponseError, ZipResponseWriter},
+};
 
 /// Create a PDF file for each model in the provided vector and send them through the provided channel.
-pub fn generate_pdfs(
+pub async fn generate_pdfs(
     models: Vec<PdfFileModel>,
-    sender: Sender<FileEntry>,
-) -> JoinHandle<Result<(), PdfGenError>> {
-    tokio::spawn(async move {
-        for file_model in models.into_iter() {
-            let file_name = file_model.file_name.clone();
-            let start = Instant::now();
+    mut zip_writer: ZipResponseWriter,
+) -> Result<(), PdfGenError> {
+    for file_model in models.into_iter() {
+        let file_name = file_model.file_name.clone();
+        let start = Instant::now();
 
-            let content = match generate_pdf_internal(file_model).await {
-                Ok(content) => content,
-                Err(e) => {
-                    error!("Failed to generate PDF {file_name}: {e:?}");
-                    continue;
-                }
-            };
-
-            info!(
-                "Generated PDF {file_name} in {} ms",
-                start.elapsed().as_millis()
-            );
-
-            if let Err(e) = sender.send(Some((file_name, content.buffer))).await {
-                error!("Failed to send PDF: {e} - the client might have closed the connection");
-
-                return Err(PdfGenError::ChannelClosed);
+        let content = match generate_pdf(file_model).await {
+            Ok(content) => content,
+            Err(e) => {
+                error!("Failed to generate PDF {file_name}: {e:?}");
+                continue;
             }
-        }
+        };
 
-        if let Err(e) = sender.send(None).await {
-            error!(
-                "Failed to send finish signal: {e} - the client might have closed the connection"
-            );
+        info!(
+            "Generated PDF {file_name} in {} ms",
+            start.elapsed().as_millis()
+        );
 
-            return Err(PdfGenError::ChannelClosed);
-        }
+        zip_writer.add_file(&file_name, &content.buffer).await?;
+    }
 
-        info!("All PDFs generated and sent to the channel");
+    zip_writer.finish().await?;
 
-        Ok::<(), PdfGenError>(())
-    })
+    info!("All PDFs generated and sent to the channel");
+
+    Ok::<(), PdfGenError>(())
 }
 
 /// Uses environment variables `ABACUS_TYPST_BIN` (`typst` by default) and `ABACUS_TEMPLATES_DIR` (`./templates` by
 /// default) to generate a PDF using an external binary of typst.
-async fn generate_pdf_internal(file_model: PdfFileModel) -> Result<PdfGenResult, PdfGenError> {
+pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, PdfGenError> {
     // create a temporary copy of the template files
     let tmp_path = tokio::task::spawn_blocking(prep_tmp_templates_dir).await??;
 
@@ -155,6 +138,7 @@ pub enum PdfGenError {
     Join(tokio::task::JoinError),
     Json(serde_json::Error),
     CompilationFailed(String),
+    ZipError(ZipResponseError),
     ChannelClosed,
 }
 
@@ -173,5 +157,11 @@ impl From<serde_json::Error> for PdfGenError {
 impl From<tokio::task::JoinError> for PdfGenError {
     fn from(err: tokio::task::JoinError) -> Self {
         PdfGenError::Join(err)
+    }
+}
+
+impl From<ZipResponseError> for PdfGenError {
+    fn from(err: ZipResponseError) -> Self {
+        PdfGenError::ZipError(err)
     }
 }

@@ -4,6 +4,7 @@ use axum::{
 };
 use chrono::Datelike;
 use sqlx::SqlitePool;
+use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -14,7 +15,7 @@ use crate::{
         generate_pdfs,
         models::{ModelN10_2Input, ModelNa31_2Bijlage1Input, ToPdfFileModel},
     },
-    zip::ZipStream,
+    zip::ZipResponse,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -84,11 +85,15 @@ async fn election_download_na_31_2_bijlage1(
         })
         .collect::<Vec<_>>();
 
-    let zip_stream = ZipStream::new(&zip_filename).await;
+    let (zip_response, zip_writer) = ZipResponse::new(&zip_filename);
 
-    generate_pdfs(models, zip_stream.sender());
+    tokio::spawn(async move {
+        if let Err(e) = generate_pdfs(models, zip_writer).await {
+            error!("Failed to generate PDFs: {e:?}");
+        }
+    });
 
-    Ok(zip_stream)
+    Ok(zip_response)
 }
 
 #[utoipa::path(
@@ -153,9 +158,13 @@ async fn election_download_n_10_2(
         })
         .collect::<Vec<_>>();
 
-    let zip_stream = ZipStream::new(&zip_filename).await;
+    let (zip_response, zip_writer) = ZipResponse::new(&zip_filename);
 
-    generate_pdfs(models, zip_stream.sender());
+    tokio::spawn(async move {
+        if let Err(e) = generate_pdfs(models, zip_writer).await {
+            error!("Failed to generate PDFs: {e:?}");
+        }
+    });
 
-    Ok(zip_stream)
+    Ok(zip_response)
 }

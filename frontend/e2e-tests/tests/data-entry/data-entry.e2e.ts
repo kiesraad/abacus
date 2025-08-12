@@ -8,7 +8,10 @@ import {
   FewerBallotsFields,
   MoreBallotsFields,
 } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
-import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
+import {
+  ExtraInvestigationPage,
+  noExtraInvestigation,
+} from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import {
@@ -36,18 +39,7 @@ test.describe("full data entry flow", () => {
     await dataEntryHomePage.clickStart();
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.pollCardCount).toBeFocused();
@@ -139,18 +131,7 @@ test.describe("full data entry flow", () => {
     await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -204,18 +185,7 @@ test.describe("full data entry flow", () => {
     await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -286,18 +256,7 @@ test.describe("full data entry flow", () => {
     await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -365,18 +324,7 @@ test.describe("full data entry flow", () => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -470,18 +418,7 @@ test.describe("full data entry flow", () => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
@@ -617,18 +554,7 @@ test.describe("second data entry", () => {
 
     // fill first section equal to first data entry
     const extraInvestigationPage = new ExtraInvestigationPage(typistPage);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     // fill form with data that is different from first data entry
     const votersAndVotesPage = new VotersAndVotesPage(typistPage);
@@ -696,18 +622,7 @@ test.describe("second data entry", () => {
 
     // fill first section equal to first data entry
     const extraInvestigationPage = new ExtraInvestigationPage(typistPage);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     // fill form with data that is different from first data entry
     const votersAndVotesPage = new VotersAndVotesPage(typistPage);
@@ -766,18 +681,7 @@ test.describe("errors and warnings", () => {
 
     // fill first section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     // fill form with data that results in an error
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -824,18 +728,7 @@ test.describe("errors and warnings", () => {
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
@@ -902,18 +795,7 @@ test.describe("errors and warnings", () => {
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -974,18 +856,7 @@ test.describe("errors and warnings", () => {
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -1041,18 +912,7 @@ test.describe("errors and warnings", () => {
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     // fill form with data that results in an error
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -1089,18 +949,7 @@ test.describe("navigation", () => {
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -1142,18 +991,7 @@ test.describe("navigation", () => {
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await expect(extraInvestigationPage.fieldset).toBeVisible();
-    await extraInvestigationPage.inputExtraInvestigation({
-      extra_investigation_other_reason: {
-        yes: false,
-        no: true,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: true,
-      },
-    });
-    await extraInvestigationPage.next.click();
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -1198,19 +1036,9 @@ test.describe("navigation", () => {
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
-      await expect(extraInvestigationPage.fieldset).toBeVisible();
-      await extraInvestigationPage.inputExtraInvestigation({
-        extra_investigation_other_reason: {
-          yes: false,
-          no: true,
-        },
-        ballots_recounted_extra_investigation: {
-          yes: false,
-          no: true,
-        },
-      });
       await expect(extraInvestigationPage.progressList.extraInvestigationIcon).toHaveAccessibleName("je bent hier");
-      await extraInvestigationPage.next.click();
+
+      await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
       await expect(extraInvestigationPage.progressList.extraInvestigationIcon).toHaveAccessibleName("opgeslagen");
 
       const votersAndVotesPage = new VotersAndVotesPage(page);

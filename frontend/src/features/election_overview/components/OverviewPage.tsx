@@ -9,12 +9,29 @@ import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { useElectionList } from "@/hooks/election/useElectionList";
 import { useUserRole } from "@/hooks/user/useUserRole";
-import { t } from "@/i18n/translate";
+import { t, tx } from "@/i18n/translate";
 import { Election } from "@/types/generated/openapi";
+
+function AddFirstElection() {
+  const { isAdministrator } = useUserRole();
+
+  return (
+    <FormLayout>
+      <FormLayout.Section>
+        <h2>{t("election.no_elections_added")}</h2>
+        {tx("election.add_first_election")}
+      </FormLayout.Section>
+      <FormLayout.Controls>
+        {isAdministrator && <Button.Link to={"./create"}>{t("election.create")}</Button.Link>}
+      </FormLayout.Controls>
+    </FormLayout>
+  );
+}
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -104,38 +121,39 @@ export function OverviewPage() {
       )}
       <main>
         <article>
-          <Toolbar>
-            {isAdministrator && (
-              <Button.Link variant="secondary" size="sm" to={"./create"}>
-                <IconPlus /> {t("election.create")}
-              </Button.Link>
-            )}
-          </Toolbar>
           {!electionList.length ? (
-            !isAdminOrCoordinator ? (
+            isAdminOrCoordinator ? (
+              <AddFirstElection />
+            ) : (
               <>
                 <h2 className="mb-lg">{t("election.not_ready_for_use")}</h2>
                 <p className="md form-paragraph">{t("election.please_wait_for_coordinator")}</p>
               </>
-            ) : (
-              <h2>{t("election.no_elections_added")}</h2>
-              // TODO: To be expanded in issue #888
             )
           ) : (
-            <Table id="overview">
-              <Table.Header>
-                <Table.HeaderCell>{t("election.title.singular")}</Table.HeaderCell>
-                <Table.HeaderCell>
-                  {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
-                </Table.HeaderCell>
-                <Table.HeaderCell>{t("election_status.label")}</Table.HeaderCell>
-              </Table.Header>
-              <Table.Body className="fs-md">
-                {electionList.map((election) => (
-                  <ElectionRow key={election.id} election={election} />
-                ))}
-              </Table.Body>
-            </Table>
+            <>
+              <Toolbar>
+                {isAdministrator && (
+                  <Button.Link variant="secondary" size="sm" to={"./create"}>
+                    <IconPlus /> {t("election.create")}
+                  </Button.Link>
+                )}
+              </Toolbar>
+              <Table id="overview">
+                <Table.Header>
+                  <Table.HeaderCell>{t("election.title.singular")}</Table.HeaderCell>
+                  <Table.HeaderCell>
+                    {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
+                  </Table.HeaderCell>
+                  <Table.HeaderCell>{t("election_status.label")}</Table.HeaderCell>
+                </Table.Header>
+                <Table.Body className="fs-md">
+                  {electionList.map((election) => (
+                    <ElectionRow key={election.id} election={election} />
+                  ))}
+                </Table.Body>
+              </Table>
+            </>
           )}
         </article>
       </main>

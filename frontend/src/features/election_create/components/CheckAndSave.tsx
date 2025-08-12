@@ -17,7 +17,7 @@ export function CheckAndSave() {
   const path: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
   const { create } = useCrud<ElectionAndCandidatesDefinitionImportRequest>({ create: path });
 
-  // if no election, election data or candidate data is found in the state, go back to the beginning
+  // if no election, election data, candidate data or counting method is found in the state, go back to the beginning
   if (!state.election || !state.electionDefinitionData || !state.candidateDefinitionData || !state.countingMethod) {
     return <Navigate to="/elections/create" />;
   }

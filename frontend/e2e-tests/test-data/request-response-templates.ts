@@ -276,7 +276,7 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
 };
 
 export const dataEntryRequest: DataEntry = {
-  progress: 86,
+  progress: 88,
   data: noRecountNoDifferencesDataEntry,
   client_state: {
     furthest: "political_group_votes_3",

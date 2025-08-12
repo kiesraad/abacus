@@ -1,6 +1,7 @@
 import { expect, Page } from "@playwright/test";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
+import { CountingDifferencesPollingStationPage } from "e2e-tests/page-objects/data_entry/CountingDifferencesPollingStationPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
@@ -20,6 +21,9 @@ import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
 export async function fillDataEntryPages(page: Page, results: PollingStationResults) {
   const extraInvestigationPage = new ExtraInvestigationPage(page);
   await extraInvestigationPage.fillAndClickNext(results.extra_investigation);
+
+  const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+  await countingDifferencesPollingStationPage.fillAndClickNext(results.counting_differences_polling_station);
 
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();

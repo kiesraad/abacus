@@ -4,6 +4,8 @@ export class ProgressList {
   readonly navElement: Locator;
   readonly extraInvestigation: Locator;
   readonly extraInvestigationIcon: Locator;
+  readonly countingDifferencesPollingStation: Locator;
+  readonly countingDifferencesPollingStationIcon: Locator;
   readonly votersAndVotes: Locator;
   readonly votersAndVotesIcon: Locator;
   readonly differences: Locator;
@@ -14,13 +16,17 @@ export class ProgressList {
   constructor(protected readonly page: Page) {
     this.navElement = page.getByRole("navigation");
 
-    this.extraInvestigation = this.navElement.getByRole("listitem").filter({ hasText: "Extra onderzoek" });
+    this.extraInvestigation = this.navElement.getByRole("listitem").filter({ hasText: /Extra onderzoek$/ });
     this.extraInvestigationIcon = this.extraInvestigation.getByRole("img");
-    this.votersAndVotes = this.navElement.getByRole("listitem").filter({ hasText: "Aantal kiezers en stemmen" });
+    this.countingDifferencesPollingStation = this.navElement
+      .getByRole("listitem")
+      .filter({ hasText: /Verschillen met stembureau$/ });
+    this.countingDifferencesPollingStationIcon = this.countingDifferencesPollingStation.getByRole("img");
+    this.votersAndVotes = this.navElement.getByRole("listitem").filter({ hasText: /Aantal kiezers en stemmen$/ });
     this.votersAndVotesIcon = this.votersAndVotes.getByRole("img");
-    this.differences = this.navElement.getByRole("listitem").filter({ hasText: "Verschillen" });
+    this.differences = this.navElement.getByRole("listitem").filter({ hasText: /Verschillen$/ });
     this.differencesIcon = this.differences.getByRole("img");
-    this.checkAndSave = this.navElement.getByRole("listitem").filter({ hasText: "Controleren en opslaan" });
+    this.checkAndSave = this.navElement.getByRole("listitem").filter({ hasText: /Controleren en opslaan$/ });
     this.checkAndSaveIcon = this.checkAndSave.getByRole("img");
   }
 

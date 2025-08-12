@@ -2,6 +2,10 @@ import { expect } from "@playwright/test";
 import { fillCandidatesListPages, fillDataEntryPagesAndSave } from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
+import {
+  CountingDifferencesPollingStationPage,
+  noDifferences,
+} from "e2e-tests/page-objects/data_entry/CountingDifferencesPollingStationPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import {
   DifferencesPage,
@@ -40,6 +44,9 @@ test.describe("full data entry flow", () => {
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.pollCardCount).toBeFocused();
@@ -133,6 +140,9 @@ test.describe("full data entry flow", () => {
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     const voters: VotersCounts = {
@@ -186,6 +196,9 @@ test.describe("full data entry flow", () => {
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -258,6 +271,9 @@ test.describe("full data entry flow", () => {
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
 
@@ -325,6 +341,9 @@ test.describe("full data entry flow", () => {
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -419,6 +438,9 @@ test.describe("full data entry flow", () => {
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
@@ -556,6 +578,9 @@ test.describe("second data entry", () => {
     const extraInvestigationPage = new ExtraInvestigationPage(typistPage);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(typistPage);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
     // fill form with data that is different from first data entry
     const votersAndVotesPage = new VotersAndVotesPage(typistPage);
     const voters = noRecountNoDifferencesDataEntry.voters_counts;
@@ -624,6 +649,10 @@ test.describe("second data entry", () => {
     const extraInvestigationPage = new ExtraInvestigationPage(typistPage);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+    // fill second section equal to first data entry
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(typistPage);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
     // fill form with data that is different from first data entry
     const votersAndVotesPage = new VotersAndVotesPage(typistPage);
     const voters = noRecountNoDifferencesDataEntry.voters_counts;
@@ -683,6 +712,9 @@ test.describe("errors and warnings", () => {
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
     // fill form with data that results in an error
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
@@ -729,6 +761,9 @@ test.describe("errors and warnings", () => {
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
@@ -797,6 +832,9 @@ test.describe("errors and warnings", () => {
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
@@ -858,6 +896,9 @@ test.describe("errors and warnings", () => {
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
     // fill form with data that results in a warning
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
@@ -914,6 +955,9 @@ test.describe("errors and warnings", () => {
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
     // fill form with data that results in an error
     const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
@@ -950,6 +994,9 @@ test.describe("navigation", () => {
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -992,6 +1039,9 @@ test.describe("navigation", () => {
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -1040,6 +1090,16 @@ test.describe("navigation", () => {
 
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
       await expect(extraInvestigationPage.progressList.extraInvestigationIcon).toHaveAccessibleName("opgeslagen");
+
+      const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+      await expect(
+        countingDifferencesPollingStationPage.progressList.countingDifferencesPollingStationIcon,
+      ).toHaveAccessibleName("je bent hier");
+
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+      await expect(
+        countingDifferencesPollingStationPage.progressList.countingDifferencesPollingStationIcon,
+      ).toHaveAccessibleName("opgeslagen");
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();

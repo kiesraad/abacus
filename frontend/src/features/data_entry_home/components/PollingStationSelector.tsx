@@ -149,6 +149,7 @@ export function PollingStationSelector({
           }
         }}
         onBlur={reset}
+        margin="mb-lg"
       />
 
       {pollingStationNumber.trim() !== "" && getFeedbackContent()}

@@ -50,7 +50,7 @@ test.describe("authentication", () => {
     await accountSetupPage.fullname.fill(newTypist.fullname!);
     await accountSetupPage.password.fill(password);
     await accountSetupPage.passwordRepeat.fill(password);
-    await accountSetupPage.nextBtn.click();
+    await accountSetupPage.saveBtn.click();
 
     const navBar = new TypistNavBar(page);
     await expect(navBar.username).toHaveText(newTypist.fullname!);

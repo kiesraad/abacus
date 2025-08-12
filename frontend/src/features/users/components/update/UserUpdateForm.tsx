@@ -73,13 +73,15 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
     <>
       {error && (
         <FormLayout.Alert>
-          <Alert type="error">{t(`error.api_error.${error.reference}`)}</Alert>
+          <Alert type="error">
+            <strong className="heading-md">{t(`error.api_error.${error.reference}`)}</strong>
+          </Alert>
         </FormLayout.Alert>
       )}
 
-      <Form onSubmit={handleSubmit}>
+      <Form title={t("users.details_title")} onSubmit={handleSubmit}>
         <FormLayout disabled={saving}>
-          <FormLayout.Section title={t("users.details_title")}>
+          <FormLayout.Section>
             <InputField
               id="username"
               name="username"
@@ -125,16 +127,14 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
                 </Button>
               </FormLayout.Field>
             )}
-
             <FormLayout.Field label={t("role")}>{t(user.role)}</FormLayout.Field>
-
-            <FormLayout.Controls>
-              <Button type="submit">{t("save_changes")}</Button>
-              <Button type="button" variant="secondary" onClick={onAbort}>
-                {t("cancel")}
-              </Button>
-            </FormLayout.Controls>
           </FormLayout.Section>
+          <FormLayout.Controls>
+            <Button type="submit">{t("save_changes")}</Button>
+            <Button type="button" variant="secondary" onClick={onAbort}>
+              {t("cancel")}
+            </Button>
+          </FormLayout.Controls>
         </FormLayout>
       </Form>
     </>

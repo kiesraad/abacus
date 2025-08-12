@@ -16,7 +16,7 @@ describe("LogsHomePage", () => {
   test("Show audit log events", async () => {
     render(<LogsHomePage />);
 
-    expect(await screen.findByRole("heading", { name: "Activiteitenlog" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 1, name: "Activiteitenlog" })).toBeVisible();
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
@@ -54,7 +54,7 @@ describe("LogsHomePage", () => {
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
 
-    expect(await screen.findByRole("heading", { name: "Activiteitenlog" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 1, name: "Activiteitenlog" })).toBeVisible();
 
     const firstRow = await screen.findByRole("row", {
       name: "24 11 mrt 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
@@ -97,7 +97,7 @@ describe("LogsHomePage", () => {
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
 
-    expect(await screen.findByRole("heading", { name: "Activiteitenlog" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 1, name: "Activiteitenlog" })).toBeVisible();
 
     const filterButton = await screen.findByRole("button", { name: "Filteren" });
     await userEvent.click(filterButton);

@@ -112,62 +112,63 @@ export function CommitteeSessionDetailsPage() {
       <header>
         <section>
           <h1>
-            {t("election_management.custom_committee_session_details", {
-              sessionLabel: sessionLabel,
-            })}
+            {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+            {t("GSB")} {election.location}
           </h1>
         </section>
       </header>
       <main>
         <article>
-          <Form className={cls.detailsForm} onSubmit={handleSubmit}>
-            {errorAlert && (
-              <FormLayout.Alert>
-                <Alert type="error">{errorAlert}</Alert>
-              </FormLayout.Alert>
-            )}
+          {errorAlert && (
+            <FormLayout.Alert>
+              <Alert type="error">
+                <strong className="heading-md">{errorAlert}</strong>
+              </Alert>
+            </FormLayout.Alert>
+          )}
+          <Form
+            title={t("election_management.custom_committee_session_details", {
+              sessionLabel: sessionLabel,
+            })}
+            className={cls.detailsForm}
+            onSubmit={handleSubmit}
+          >
             <FormLayout>
-              <h2>{t("election_management.where_is_the_committee_session", { sessionLabel: sessionLabel })}</h2>
-              <InputField
-                id="location"
-                name="location"
-                label={t("election_management.session_location")}
-                hint={tx("election_management.add_the_location")}
-                fieldWidth="wide"
-                error={validationErrors?.location}
-                defaultValue={committeeSession.location || ""}
-              />
-              <h2>
-                {t("election_management.when_is_the_committee_session", {
-                  verb:
-                    committeeSession.status === "created" || committeeSession.status === "data_entry_not_started"
-                      ? t("election_management.starts")
-                      : t("election_management.started"),
-                  sessionLabel: sessionLabel,
-                })}
-              </h2>
-              <FormLayout.Row>
+              <FormLayout.Section>
                 <InputField
-                  id="start_date"
-                  name="start_date"
-                  label={t("election_management.date")}
-                  hint={t("election_management.date_hint")}
-                  fieldWidth="average"
-                  error={validationErrors?.start_date}
-                  defaultValue={defaultDate}
-                  placeholder="dd-mm-jjjj"
+                  id="location"
+                  name="location"
+                  label={t("election_management.session_location")}
+                  hint={tx("election_management.add_the_location")}
+                  fieldWidth="wide"
+                  error={validationErrors?.location}
+                  defaultValue={committeeSession.location || ""}
                 />
-                <InputField
-                  id="start_time"
-                  name="start_time"
-                  label={t("election_management.time")}
-                  hint={t("election_management.time_hint")}
-                  fieldWidth="narrowish"
-                  error={validationErrors?.start_time}
-                  defaultValue={committeeSession.start_time || ""}
-                  placeholder="uu:mm"
-                />
-              </FormLayout.Row>
+              </FormLayout.Section>
+              <FormLayout.Section title={t("election_management.session_start")}>
+                <FormLayout.Row>
+                  <InputField
+                    id="start_date"
+                    name="start_date"
+                    label={t("election_management.date")}
+                    hint={t("election_management.date_hint")}
+                    fieldWidth="average"
+                    error={validationErrors?.start_date}
+                    defaultValue={defaultDate}
+                    placeholder="dd-mm-jjjj"
+                  />
+                  <InputField
+                    id="start_time"
+                    name="start_time"
+                    label={t("election_management.time")}
+                    hint={t("election_management.time_hint")}
+                    fieldWidth="narrowish"
+                    error={validationErrors?.start_time}
+                    defaultValue={committeeSession.start_time || ""}
+                    placeholder="uu:mm"
+                  />
+                </FormLayout.Row>
+              </FormLayout.Section>
               <FormLayout.Controls>
                 <Button type="submit">
                   {redirectToReportPage ? t("election_management.to_report") : t("save_changes")}

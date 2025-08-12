@@ -5,6 +5,7 @@
   "current_form": "het huidige formulier",
   "delete": "Stembureau verwijderen?",
   "delete_are_you_sure": "Je kan dit niet ongedaan maken. Weet je zeker dat je dit stembureau wilt verwijderen?",
+  "details": "Details van het stembureau",
   "empty": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
   "form": {
     "create": "Stembureau toevoegen",
@@ -47,6 +48,6 @@
   },
   "unsaved_changes_title": "Let op: niet opgeslagen wijzigingen",
   "unsaved_changes_message": "Je hebt in <strong>{name}</strong> wijzigingen gemaakt die nog niet zijn opgeslagen.",
-  "update": "Stembureau wijzigen",
+  "update": "Stembureaugegevens wijzigen",
   "voters_and_vote_count": "Aantal kiezers en stemmen"
 }

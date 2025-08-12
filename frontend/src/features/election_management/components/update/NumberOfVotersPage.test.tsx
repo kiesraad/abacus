@@ -24,7 +24,9 @@ async function renderPage() {
       <NumberOfVotersPage />
     </ElectionProvider>,
   );
-  expect(await screen.findByRole("heading", { name: "Heemdamseburg" })).toBeInTheDocument();
+  expect(
+    await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
+  ).toBeInTheDocument();
 }
 
 describe("NumberOfVotersPage", () => {

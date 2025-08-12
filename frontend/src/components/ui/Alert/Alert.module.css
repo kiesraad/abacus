@@ -68,13 +68,6 @@
     }
   }
 
-  section,
-  header {
-    h2 {
-      margin-bottom: 0;
-    }
-  }
-
   &.error {
     border-color: var(--color-error-darker);
     background-color: var(--color-error-bg);

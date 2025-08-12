@@ -3,7 +3,6 @@ import { FormEvent, useState } from "react";
 import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
-import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
@@ -72,30 +71,29 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
       {showLoginSuccess && (
         <FormLayout.Alert>
           <Alert type="success" onClose={hideLoginSuccess}>
-            <h2>{t("account.login_success")}</h2>
+            <strong className="heading-md">{t("account.login_success")}</strong>
             <p>{t("account.setting_up_account")}</p>
           </Alert>
         </FormLayout.Alert>
       )}
-
       {validationErrors && (
         <FormLayout.Alert>
           <Alert type="error">
-            <h2>{t("account.not_saved")}</h2>
+            <strong className="heading-md">{t("account.not_saved")}</strong>
             <p>{t("account.check_fields")}</p>
           </Alert>
         </FormLayout.Alert>
       )}
-
       {apiError && (
         <FormLayout.Alert>
-          <Alert type="error">{apiError.message}</Alert>
+          <Alert type="error">
+            <strong className="heading-md">{apiError.message}</strong>
+          </Alert>
         </FormLayout.Alert>
       )}
-
-      <Form onSubmit={handleSubmit}>
+      <Form title={t("account.personalize_account")} onSubmit={handleSubmit}>
         <FormLayout disabled={requestState.status === "loading"}>
-          <FormLayout.Section title={t("account.personalize_account")}>
+          <FormLayout.Section>
             <InputField
               name="username"
               label={t("account.username")}
@@ -125,11 +123,9 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
               error={validationErrors?.password_repeat}
             />
           </FormLayout.Section>
-          <BottomBar type="footer">
-            <BottomBar.Row>
-              <Button type="submit">{t("next")}</Button>
-            </BottomBar.Row>
-          </BottomBar>
+          <FormLayout.Controls>
+            <Button type="submit">{t("save")}</Button>
+          </FormLayout.Controls>
         </FormLayout>
       </Form>
     </>

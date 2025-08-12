@@ -46,7 +46,10 @@ export function NumberOfVotersPage() {
     <>
       <header>
         <section>
-          <h1>{election.location}</h1>
+          <h1>
+            {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+            {t("GSB")} {election.location}
+          </h1>
         </section>
       </header>
       <main>

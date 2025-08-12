@@ -96,7 +96,7 @@ export function UploadElectionDefinition() {
 
   return (
     <section className="md">
-      <h2>{t("election.import_eml")}</h2>
+      <h2>{t("election.import_election_eml")}</h2>
       <div className="mt-lg mb-lg">
         {error && (
           <Alert type="error" title={t("election.invalid_election_definition.title")} inline>

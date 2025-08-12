@@ -1,10 +1,9 @@
 import { FormEvent, useState } from "react";
-import { Location, useLocation, useNavigate } from "react-router";
+import { Form, Location, useLocation, useNavigate } from "react-router";
 
 import { AnyApiError, FatalError, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { Alert } from "@/components/ui/Alert/Alert";
-import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
@@ -67,59 +66,58 @@ export function LoginForm() {
   }
 
   return (
-    <form
-      className="no_footer"
+    <Form
       onSubmit={(e) => {
         void handleSubmit(e);
       }}
     >
+      {notification && (
+        <FormLayout.Alert>
+          <Alert type="notify">
+            <strong className="heading-md">{t(`${notification}_title`)}</strong>
+            <p>{tx(notification)}</p>
+          </Alert>
+        </FormLayout.Alert>
+      )}
+      {error && (
+        <FormLayout.Alert>
+          <Alert type="error">
+            <strong className="heading-md">{t(`error.api_error.${error.reference}`)}</strong>
+          </Alert>
+        </FormLayout.Alert>
+      )}
       <FormLayout>
-        {notification && (
-          <FormLayout.Alert>
-            <Alert type="notify">
-              <h2>{t(`${notification}_title`)}</h2>
-              <p>{tx(notification)}</p>
-            </Alert>
-          </FormLayout.Alert>
-        )}
-        {error && (
-          <FormLayout.Alert>
-            <Alert type="error">
-              <h2>{t(`error.api_error.${error.reference}`)}</h2>
-            </Alert>
-          </FormLayout.Alert>
-        )}
-        <InputField
-          name="username"
-          label={t("account.username")}
-          hint={t("account.username_login_hint")}
-          readOnly={loading}
-          required={true}
-          value={username}
-          onChange={(e) => {
-            setUsername(e.target.value);
-          }}
-        />
-        <InputField
-          name="password"
-          label={t("account.password")}
-          hint={t("account.password_login_hint")}
-          type="password"
-          readOnly={loading}
-          required={true}
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-        />
-      </FormLayout>
-      <BottomBar type="footer">
-        <BottomBar.Row>
+        <FormLayout.Section>
+          <InputField
+            name="username"
+            label={t("account.username")}
+            hint={t("account.username_login_hint")}
+            readOnly={loading}
+            required={true}
+            value={username}
+            onChange={(e) => {
+              setUsername(e.target.value);
+            }}
+          />
+          <InputField
+            name="password"
+            label={t("account.password")}
+            hint={t("account.password_login_hint")}
+            type="password"
+            readOnly={loading}
+            required={true}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          />
+        </FormLayout.Section>
+        <FormLayout.Controls>
           <Button type="submit" disabled={loading}>
             {t("account.login")}
           </Button>
-        </BottomBar.Row>
-      </BottomBar>
-    </form>
+        </FormLayout.Controls>
+      </FormLayout>
+    </Form>
   );
 }

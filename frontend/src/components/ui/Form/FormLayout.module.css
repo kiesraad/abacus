@@ -1,6 +1,4 @@
 .formLayout {
-  margin-bottom: var(--space-md);
-
   h1,
   h2,
   h3,
@@ -18,17 +16,9 @@
 }
 
 .formSection {
-  margin-bottom: var(--space-md);
-
-  &:not(:first-child) {
-    margin-top: var(--space-xl);
-  }
-
-  h2.formSectionTitle {
-    font-size: 1.5rem;
-    line-height: 2rem;
-    margin-bottom: var(--space-md-lg);
-  }
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md-lg);
 }
 
 .formRow {
@@ -39,9 +29,7 @@
 .formField {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
-
-  margin-bottom: var(--space-lg);
+  gap: var(--space-sm);
 }
 
 .formField > label {
@@ -51,6 +39,9 @@
 .rootFieldset {
   border: none;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 
 .formAlert {

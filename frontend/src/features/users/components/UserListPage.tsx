@@ -48,21 +48,21 @@ export function UserListPage() {
 
       {createdMessage && (
         <Alert type="success" onClose={clearCreatedMessage}>
-          <h2>{t("users.user_created")}</h2>
+          <strong className="heading-md">{t("users.user_created")}</strong>
           <p>{createdMessage}</p>
         </Alert>
       )}
 
       {updatedMessage && (
         <Alert type="success" onClose={clearUpdatedMessage}>
-          <h2>{t("users.user_updated")}</h2>
+          <strong className="heading-md">{t("users.user_updated")}</strong>
           <p>{updatedMessage}</p>
         </Alert>
       )}
 
       {deletedMessage && (
         <Alert type="success" onClose={clearDeletedMessage}>
-          <h2>{t("users.user_deleted")}</h2>
+          <strong className="heading-md">{t("users.user_deleted")}</strong>
           <p>{deletedMessage}</p>
         </Alert>
       )}

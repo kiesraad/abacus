@@ -34,13 +34,9 @@
   > main {
     flex: 1 1 auto;
     display: flex;
-    padding: 2.5rem 5rem 0 5rem;
+    padding: 2.5rem 5rem 5rem 5rem;
     gap: 2rem;
     background-color: var(--bg-gray);
-
-    &:has(+ footer) {
-      padding-bottom: 2.5rem;
-    }
 
     > nav {
       overflow: hidden;
@@ -54,15 +50,6 @@
     > article {
       flex: 1 1 auto;
       background-color: var(--bg-gray);
-      &.no_footer {
-        padding-bottom: 0;
-      }
-      > form:global(.no_footer) {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
     }
   }
 
@@ -80,7 +67,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 2rem 5rem;
+    padding: 0 5rem;
     font-size: var(--font-size-sm);
     line-height: 1.25rem;
     a {

@@ -156,7 +156,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       {inProgressCurrentUser.length > 0 && (
         <div className="mb-lg" id="unfinished-list">
           <Alert type="notify" variant="no-icon">
-            <h2>{t("polling_station_choice.unfinished_input_title")}</h2>
+            <strong className="heading-md">{t("polling_station_choice.unfinished_input_title")}</strong>
             <p>{t("polling_station_choice.unfinished_input_content")}</p>
             {inProgressCurrentUser.map((pollingStation) => (
               <PollingStationLink
@@ -169,8 +169,10 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         </div>
       )}
       <fieldset>
-        <legend className="heading-lg mb-lg">
-          {anotherEntry ? t("polling_station_choice.insert_another") : t("polling_station_choice.insert_title")}
+        <legend className="mb-sm">
+          <h2>
+            {anotherEntry ? t("polling_station_choice.insert_another") : t("polling_station_choice.insert_title")}
+          </h2>
         </legend>
         <PollingStationSelector
           pollingStationNumber={pollingStationNumber}
@@ -214,7 +216,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
               {t("polling_station_choice.view_list")}
             </span>
           </summary>
-          <h2 className={cls.formTitle}>{t("polling_station_choice.choose_polling_station")}</h2>
+          <h3 className="mb-lg">{t("polling_station_choice.choose_polling_station")}</h3>
           {!pollingStations.length ? (
             <Alert type="error" small>
               <p>{t("polling_station_choice.no_polling_stations_found")}</p>

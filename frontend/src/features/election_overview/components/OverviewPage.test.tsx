@@ -124,6 +124,10 @@ describe("OverviewPage", () => {
       </TestUserProvider>,
     );
 
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Verkiezing toevoegen" })).not.toBeInTheDocument();
+
     expect(await screen.findByText(/Abacus is nog niet klaar voor gebruik/)).toBeVisible();
     expect(await screen.findByText(/De configuratie van Abacus is nog niet afgerond./)).toBeVisible();
     expect(await screen.findByText(/Je kan nog geen telresultaten invoeren./)).toBeVisible();
@@ -143,6 +147,10 @@ describe("OverviewPage", () => {
         </ElectionListProvider>
       </TestUserProvider>,
     );
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Verkiezing toevoegen" })).not.toBeInTheDocument();
 
     expect(await screen.findByText(/Abacus is nog niet klaar voor gebruik/)).toBeVisible();
     expect(await screen.findByText(/De configuratie van Abacus is nog niet afgerond./)).toBeVisible();
@@ -164,6 +172,10 @@ describe("OverviewPage", () => {
         </ElectionListProvider>
       </TestUserProvider>,
     );
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen beheren" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Verkiezing toevoegen" })).not.toBeInTheDocument();
 
     expect(await screen.findByText(/Nog geen verkiezingen ingesteld/)).toBeVisible();
     expect(

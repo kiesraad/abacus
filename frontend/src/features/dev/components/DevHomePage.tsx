@@ -70,7 +70,7 @@ function AdministratorCoordinatorLinks() {
         {isAdministrator && (
           <>
             <li>
-              <Link to={`/users`}>{t("users.management")}</Link>
+              <Link to={`/users`}>{t("users.manage")}</Link>
             </li>
           </>
         )}

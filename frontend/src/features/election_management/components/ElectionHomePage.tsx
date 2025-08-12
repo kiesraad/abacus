@@ -51,7 +51,7 @@ export function ElectionHomePage() {
           </strong>
           <p id="noPollingStationsWarningAlertDescription">{t("election_management.add_polling_stations_first")}</p>
           <p>
-            <Link to="polling-stations">{t("election_management.manage_polling_stations")}</Link> →
+            <Link to="polling-stations">{t("polling_station.manage")}</Link> →
           </p>
         </Alert>
       )}

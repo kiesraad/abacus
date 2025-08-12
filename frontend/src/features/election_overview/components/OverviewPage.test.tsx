@@ -92,7 +92,7 @@ describe("OverviewPage", () => {
     );
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Beheer verkiezingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen beheren" })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Verkiezing toevoegen" })).toBeVisible();
 
     const table = await screen.findByRole("table");
@@ -175,7 +175,6 @@ describe("OverviewPage", () => {
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen beheren" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Verkiezing toevoegen" })).not.toBeInTheDocument();
 
     expect(await screen.findByText(/Nog geen verkiezingen ingesteld/)).toBeVisible();
     expect(

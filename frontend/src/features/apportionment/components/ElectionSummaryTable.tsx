@@ -65,9 +65,9 @@ export function ElectionSummaryTable({
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
-            {t("voters_votes_counts.votes_counts.votes_candidates_count")}
+            {t("voters_votes_counts.votes_counts.total_votes_candidates_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>{formatNumber(votesCounts.votes_candidates_count)}</Table.NumberCell>
+          <Table.NumberCell>{formatNumber(votesCounts.total_votes_candidates_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm" />
         </Table.Row>
         <Table.Row>

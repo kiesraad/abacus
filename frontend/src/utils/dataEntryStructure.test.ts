@@ -5,13 +5,14 @@ import { Candidate, ElectionWithPoliticalGroups } from "@/types/generated/openap
 
 import {
   createPoliticalGroupSections,
+  createVotersAndVotesSection,
   differencesSection,
   getDataEntryStructure,
-  votersAndVotesSection,
 } from "./dataEntryStructure";
 
 describe("votersAndVotesSection", () => {
   test("should have correct structure", () => {
+    const votersAndVotesSection = createVotersAndVotesSection(electionMockData);
     expect(votersAndVotesSection.id).toBe("voters_votes_counts");
     expect(votersAndVotesSection.subsections).toHaveLength(1);
     expect(votersAndVotesSection.subsections[0]?.type).toBe("inputGrid");
@@ -29,12 +30,14 @@ describe("votersAndVotesSection", () => {
   });
 
   test("should have autoFocusInput on first row", () => {
+    const votersAndVotesSection = createVotersAndVotesSection(electionMockData);
     if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
       expect(votersAndVotesSection.subsections[0].rows[0]?.autoFocusInput).toBe(true);
     }
   });
 
   test("should have correct row codes", () => {
+    const votersAndVotesSection = createVotersAndVotesSection(electionMockData);
     if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
       const codes = votersAndVotesSection.subsections[0].rows.map((row) => row.code);
       expect(codes).toEqual(["A", "B", "D", "E", "F", "G", "H"]);

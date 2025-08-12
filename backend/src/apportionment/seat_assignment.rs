@@ -435,7 +435,7 @@ fn reassign_residual_seat_for_absolute_majority(
     standings: Vec<PoliticalGroupStanding>,
 ) -> Result<(Vec<PoliticalGroupStanding>, Option<SeatChange>), ApportionmentError> {
     let half_of_votes_count: Fraction =
-        Fraction::from(totals.votes_counts.votes_candidates_count) * Fraction::new(1, 2);
+        Fraction::from(totals.votes_counts.total_votes_candidates_count) * Fraction::new(1, 2);
 
     // Find political group with an absolute majority of votes. Return early if we find none
     let Some(majority_pg_votes) = totals
@@ -592,14 +592,15 @@ pub fn seat_assignment(
     info!("Seat assignment");
     info!("Seats: {}", seats);
 
-    if totals.votes_counts.votes_candidates_count == 0 {
+    if totals.votes_counts.total_votes_candidates_count == 0 {
         info!("No votes on candidates cast");
         return Err(ApportionmentError::ZeroVotesCast);
     }
 
     // [Artikel P 5 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_5&z=2025-02-12&g=2025-02-12)
     // Calculate electoral quota (kiesdeler) as a proper fraction
-    let quota = Fraction::from(totals.votes_counts.votes_candidates_count) / Fraction::from(seats);
+    let quota =
+        Fraction::from(totals.votes_counts.total_votes_candidates_count) / Fraction::from(seats);
     info!("Quota: {}", quota);
 
     // [Artikel P 6 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_6&z=2025-02-12&g=2025-02-12)

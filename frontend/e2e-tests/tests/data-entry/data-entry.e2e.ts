@@ -49,7 +49,7 @@ test.describe("full data entry flow", () => {
       total_admitted_voters_count: 3607,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 3572,
+      total_votes_candidates_count: 3572,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 3607,
@@ -142,7 +142,7 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 3740,
+      total_votes_candidates_count: 3740,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 3775,
@@ -197,7 +197,7 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 3785,
+      total_votes_candidates_count: 3785,
       blank_votes_count: 10,
       invalid_votes_count: 5,
       total_votes_cast_count: 3800,
@@ -268,7 +268,7 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 3740,
+      total_votes_candidates_count: 3740,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 3775,
@@ -334,7 +334,7 @@ test.describe("full data entry flow", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 50,
+      total_votes_candidates_count: 50,
       blank_votes_count: 50,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -427,7 +427,7 @@ test.describe("full data entry flow", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 10,
@@ -691,7 +691,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -737,7 +737,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -805,7 +805,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 90,
     };
     const votes = {
-      votes_candidates_count: 100,
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -866,7 +866,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 90,
     };
     const votes = {
-      votes_candidates_count: 100,
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -922,7 +922,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 10,
@@ -959,7 +959,7 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 100,
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -1001,7 +1001,7 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 100,
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -1051,7 +1051,7 @@ test.describe("navigation", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 90,
+        total_votes_candidates_count: 90,
         blank_votes_count: 10,
         invalid_votes_count: 0,
         total_votes_cast_count: 100,

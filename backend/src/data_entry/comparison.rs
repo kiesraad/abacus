@@ -117,10 +117,10 @@ impl Compare for VotersCounts {
 impl Compare for VotesCounts {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         // compare all counts
-        self.votes_candidates_count.compare(
-            &first_entry.votes_candidates_count,
+        self.total_votes_candidates_count.compare(
+            &first_entry.total_votes_candidates_count,
             different_fields,
-            &path.field("votes_candidates_count"),
+            &path.field("total_votes_candidates_count"),
         );
         self.blank_votes_count.compare(
             &first_entry.blank_votes_count,
@@ -232,7 +232,7 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                total_votes_candidates_count: 100,
                 blank_votes_count: 3,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 105,
@@ -261,7 +261,7 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                total_votes_candidates_count: 100,
                 blank_votes_count: 1,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 103,
@@ -298,7 +298,7 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 104,
@@ -327,7 +327,7 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 3,
                 total_votes_cast_count: 105,
@@ -364,7 +364,7 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                total_votes_candidates_count: 100,
                 blank_votes_count: 3,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 105,
@@ -403,7 +403,7 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                total_votes_candidates_count: 100,
                 blank_votes_count: 1,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 103,
@@ -461,7 +461,7 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 104,
@@ -476,7 +476,7 @@ mod tests {
             total_admitted_voters_count: 102,
         };
         second_entry.votes_counts = VotesCounts {
-            votes_candidates_count: 100,
+            total_votes_candidates_count: 100,
             blank_votes_count: 1,
             invalid_votes_count: 1,
             total_votes_cast_count: 102,
@@ -525,7 +525,7 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 3,
                 total_votes_cast_count: 105,

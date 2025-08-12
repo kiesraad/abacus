@@ -25,7 +25,7 @@ pub(crate) mod test_helpers {
                 total_admitted_voters_count: total_votes,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: total_votes,
+                total_votes_candidates_count: total_votes,
                 blank_votes_count: 0,
                 invalid_votes_count: 0,
                 total_votes_cast_count: total_votes,

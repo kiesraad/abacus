@@ -16,14 +16,14 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
   F202: {
     fields: [
       "data.votes_counts.total_votes_cast_count",
-      "data.votes_counts.votes_candidates_count",
+      "data.votes_counts.total_votes_candidates_count",
       "data.votes_counts.blank_votes_count",
       "data.votes_counts.invalid_votes_count",
     ],
     code: "F202",
   },
   F204: {
-    fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes[0].total"],
+    fields: ["data.votes_counts.total_votes_candidates_count", "data.political_group_votes[0].total"],
     code: "F204",
   },
   F301: { fields: ["data.differences_counts.more_ballots_count"], code: "F301" },

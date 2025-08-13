@@ -10,7 +10,7 @@ export const createVotersAndVotesSection = (election: ElectionWithPoliticalGroup
     const title = `${t("total")} ${formatPoliticalGroupName(politicalGroup)}`;
     rowsPerPoliticalGroup.push({
       code: `E.${politicalGroup.number}`,
-      path: `votes_counts.political_group_candidate_votes[${politicalGroup.number - 1}].total`,
+      path: `votes_counts.political_group_total_votes[${politicalGroup.number - 1}].total`,
       title,
       addSeparator: index === election.political_groups.length - 1,
     });

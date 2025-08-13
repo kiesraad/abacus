@@ -11,7 +11,7 @@ import {
 } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 
-import { PollingStation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
+import { ClaimDataEntryResponse, PollingStation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
 import { emptyDataEntryResponse } from "../../test-data/request-response-templates";
@@ -35,6 +35,7 @@ test.describe("resume data entry flow", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
+      political_group_total_votes: [{ number: 1, total: 100 }],
       total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
@@ -93,7 +94,7 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.proxyCertificateCount).toHaveValue("1");
       await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveValue("100");
 
-      await expect(votersAndVotesPage.votesCandidatesCount).toHaveValue("100");
+      await expect(votersAndVotesPage.totalVotesCandidatesCount).toHaveValue("100");
       await expect(votersAndVotesPage.blankVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.invalidVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.totalVotesCastCount).toHaveValue("100");
@@ -201,6 +202,11 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
+        political_group_total_votes: [
+          { number: 1, total: 50 },
+          { number: 2, total: 0 },
+          { number: 3, total: 0 },
+        ],
         total_votes_candidates_count: 50,
         blank_votes_count: 50, // exceeds threshold
         invalid_votes_count: 0,
@@ -226,7 +232,7 @@ test.describe("resume data entry flow", () => {
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
-          ...emptyDataEntryResponse.data,
+          ...emptyDataEntryResponse.data!,
           extra_investigation: noExtraInvestigation,
           voters_counts: {
             poll_card_count: 100,
@@ -234,6 +240,11 @@ test.describe("resume data entry flow", () => {
             total_admitted_voters_count: 100,
           },
           votes_counts: {
+            political_group_total_votes: [
+              { number: 1, total: 50 },
+              { number: 2, total: 0 },
+              { number: 3, total: 0 },
+            ],
             total_votes_candidates_count: 50,
             blank_votes_count: 50,
             invalid_votes_count: 0,
@@ -254,7 +265,7 @@ test.describe("resume data entry flow", () => {
             },
           ],
         },
-      });
+      } satisfies Partial<ClaimDataEntryResponse>);
 
       await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -330,6 +341,11 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 3607,
       };
       const votes: VotesCounts = {
+        political_group_total_votes: [
+          { number: 1, total: 3536 },
+          { number: 2, total: 36 },
+          { number: 3, total: 0 },
+        ],
         total_votes_candidates_count: 3572,
         blank_votes_count: 20,
         invalid_votes_count: 15,
@@ -446,6 +462,11 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
+        political_group_total_votes: [
+          { number: 1, total: 50 },
+          { number: 2, total: 0 },
+          { number: 3, total: 0 },
+        ],
         total_votes_candidates_count: 50,
         blank_votes_count: 50, // exceeds threshold
         invalid_votes_count: 0,
@@ -486,6 +507,11 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 3607,
       };
       const votes: VotesCounts = {
+        political_group_total_votes: [
+          { number: 1, total: 3536 },
+          { number: 2, total: 36 },
+          { number: 3, total: 0 },
+        ],
         total_votes_candidates_count: 3572,
         blank_votes_count: 20,
         invalid_votes_count: 15,

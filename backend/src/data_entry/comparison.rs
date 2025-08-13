@@ -218,6 +218,8 @@ impl Compare for CandidateVotes {
 mod tests {
     use test_log::test;
 
+    use crate::data_entry::PoliticalGroupTotalVotes;
+
     use super::*;
 
     /// Tests that polling station results with equal data and no differences counts are correctly identified as equal.
@@ -232,6 +234,10 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
                 total_votes_candidates_count: 100,
                 blank_votes_count: 3,
                 invalid_votes_count: 2,
@@ -264,6 +270,10 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
                 total_votes_candidates_count: 100,
                 blank_votes_count: 1,
                 invalid_votes_count: 2,
@@ -304,6 +314,10 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
                 total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 2,
@@ -336,6 +350,10 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
                 total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 3,
@@ -376,6 +394,10 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
                 total_votes_candidates_count: 100,
                 blank_votes_count: 3,
                 invalid_votes_count: 2,
@@ -418,6 +440,10 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
                 total_votes_candidates_count: 100,
                 blank_votes_count: 1,
                 invalid_votes_count: 2,
@@ -479,6 +505,10 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
                 total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 2,
@@ -497,6 +527,10 @@ mod tests {
             total_admitted_voters_count: 102,
         };
         second_entry.votes_counts = VotesCounts {
+            political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                number: 1,
+                total: 100,
+            }],
             total_votes_candidates_count: 100,
             blank_votes_count: 1,
             invalid_votes_count: 1,
@@ -546,6 +580,16 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 100,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 0,
+                    },
+                ],
                 total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 3,

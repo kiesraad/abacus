@@ -805,7 +805,8 @@ mod tests {
 
     use super::*;
     use crate::{
-        election::tests::election_fixture, polling_station::structs::tests::polling_station_fixture,
+        data_entry::PoliticalGroupTotalVotes, election::tests::election_fixture,
+        polling_station::structs::tests::polling_station_fixture,
     };
 
     /// Tests that ValidationResults can be appended together, combining errors and warnings.
@@ -900,6 +901,10 @@ mod tests {
                 total_admitted_voters_count: 35, // F.201 incorrect total & W.203 above threshold in absolute numbers
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 44,
+                }],
                 total_votes_candidates_count: 44,
                 blank_votes_count: 1,
                 invalid_votes_count: 4,
@@ -986,6 +991,10 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
                 total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 2,
@@ -1042,6 +1051,10 @@ mod tests {
                 total_admitted_voters_count: 5, // F.201 incorrect total & W.204 above threshold in percentage
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 3,
+                }],
                 total_votes_candidates_count: 3,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
@@ -1131,6 +1144,10 @@ mod tests {
                 total_admitted_voters_count: 102, // Fixed: 100 + 2 = 102
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 82,
+                }],
                 total_votes_candidates_count: 82,
                 blank_votes_count: 1,
                 invalid_votes_count: 2,
@@ -1201,6 +1218,10 @@ mod tests {
                 total_admitted_voters_count: 56, // W.203 above threshold in percentage
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 50,
+                }],
                 total_votes_candidates_count: 50,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
@@ -1265,6 +1286,10 @@ mod tests {
                 total_admitted_voters_count: 52,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 50,
+                }],
                 total_votes_candidates_count: 50,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
@@ -1323,6 +1348,10 @@ mod tests {
                 total_admitted_voters_count: 52,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 40,
+                }],
                 total_votes_candidates_count: 50,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
@@ -1444,6 +1473,7 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         // test out of range
         let mut votes_counts = VotesCounts {
+            political_group_total_votes: vec![],
             total_votes_candidates_count: 1_000_000_001, // out of range
             blank_votes_count: 2,
             invalid_votes_count: 3,
@@ -1462,6 +1492,7 @@ mod tests {
         // test F.202 incorrect total
         validation_results = ValidationResults::default();
         votes_counts = VotesCounts {
+            political_group_total_votes: vec![],
             total_votes_candidates_count: 5,
             blank_votes_count: 6,
             invalid_votes_count: 7,
@@ -1494,6 +1525,7 @@ mod tests {
         // test W.201 high number of blank votes
         validation_results = ValidationResults::default();
         votes_counts = VotesCounts {
+            political_group_total_votes: vec![],
             total_votes_candidates_count: 100,
             blank_votes_count: 10, // W.201 above threshold
             invalid_votes_count: 1,
@@ -1521,6 +1553,7 @@ mod tests {
         // test W.202 high number of invalid votes
         validation_results = ValidationResults::default();
         votes_counts = VotesCounts {
+            political_group_total_votes: vec![],
             total_votes_candidates_count: 100,
             blank_votes_count: 1,
             invalid_votes_count: 10, // W.202 above threshold
@@ -1548,6 +1581,7 @@ mod tests {
         // test W.205 total votes cast should not be zero
         validation_results = ValidationResults::default();
         votes_counts = VotesCounts {
+            political_group_total_votes: vec![],
             total_votes_candidates_count: 0,
             blank_votes_count: 0,
             invalid_votes_count: 0,

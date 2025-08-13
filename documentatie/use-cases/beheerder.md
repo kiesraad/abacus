@@ -7,14 +7,15 @@ _Niveau:_ hoog-over, wolk, ☁️
 ### Hoofdscenario en uitbreidingen
 
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
-2. [De beheerder zet de verkiezingen in de applicatie.](#de-beheerder-zet-de-verkiezingen-in-de-applicatie-zee)
-3. De beheerder leest de kandidatenlijst in.
-4. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
-5. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
+2. De beheerder maakt voor zichzelf een eerste account en wachtwoord aan.
+3. [De beheerder zet de verkiezingen in de applicatie.](#de-beheerder-zet-de-verkiezingen-in-de-applicatie-zee)
+4. De beheerder leest de kandidatenlijst in.
+5. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
+6. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
 
 __Uitbreidingen:__  
 
-3a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
+4a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
 
 ### Niet in scope
 
@@ -34,9 +35,8 @@ __Hoofdscenario:__
 2. De beheerder downloadt de applicatie.
 3. De beheerder plaatst de applicatie op de server.
 4. De beheerder start de applicatie.
-5. De beheerder maakt een eerste account en wachtwoord aan.
-6. (voor elk invoerstation) De beheerder bereidt de computer als invoerstation voor.
-7. (voor elk invoerstation) De beheerder zorgt dat het invoerstation met de server kan verbinden.
+5. (voor elk invoerstation) De beheerder bereidt de computer als invoerstation voor.
+6. (voor elk invoerstation) De beheerder zorgt dat het invoerstation met de server kan verbinden.
 
 __Uitbreidingen:__  
 1a. De beheerder bereidt één of meerdere reserve-servers voor:

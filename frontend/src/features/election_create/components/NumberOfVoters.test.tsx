@@ -1,8 +1,6 @@
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
-import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 import { NewElection } from "@/types/generated/openapi";
 
@@ -20,10 +18,6 @@ async function renderPage() {
 const election = { name: "Naam", location: "Plek" } as NewElection;
 
 describe("NumberOfVoters component", () => {
-  beforeEach(() => {
-    server.use(ElectionRequestHandler);
-  });
-
   test("should dispatch number of voters", async () => {
     const state = { election, numberOfVoters: 0 };
     const dispatch = vi.fn();

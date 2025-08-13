@@ -1,10 +1,7 @@
 .container {
   width: 37.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 
   legend {
-    color: var(--gray-900);
+    font-weight: inherit;
   }
 }

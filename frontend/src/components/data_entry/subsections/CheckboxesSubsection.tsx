@@ -24,8 +24,8 @@ export function CheckboxesSubsectionComponent({
 
   return (
     <div className={cls.container}>
-      {subsection.title && <legend>{subsection.title}</legend>}
       <ChoiceList>
+        {subsection.title && <ChoiceList.Title>{subsection.title}</ChoiceList.Title>}
         {hasErrorOrWarning && (
           <ChoiceList.Error id={`${subsection.error_path}-error`}>{subsection.error_message}</ChoiceList.Error>
         )}

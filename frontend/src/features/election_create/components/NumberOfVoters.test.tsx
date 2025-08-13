@@ -1,7 +1,6 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
@@ -11,11 +10,7 @@ import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
 import { NumberOfVoters } from "./NumberOfVoters";
 
 async function renderPage() {
-  render(
-    <ElectionProvider electionId={1}>
-      <NumberOfVoters />
-    </ElectionProvider>,
-  );
+  render(<NumberOfVoters />);
 
   expect(
     await screen.findByRole("heading", { name: "Hoeveel kiesgerechtigden telt de gemeente?" }),

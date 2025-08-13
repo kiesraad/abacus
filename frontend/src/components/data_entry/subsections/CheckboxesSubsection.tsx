@@ -23,7 +23,7 @@ export function CheckboxesSubsectionComponent({
     subsection.options.some((option) => errorsAndWarnings?.get(`data.${option.path}`));
 
   return (
-    <fieldset className={cls.container}>
+    <div className={cls.container}>
       {subsection.title && <legend>{subsection.title}</legend>}
       <ChoiceList>
         {hasErrorOrWarning && (
@@ -45,6 +45,6 @@ export function CheckboxesSubsectionComponent({
           />
         ))}
       </ChoiceList>
-    </fieldset>
+    </div>
   );
 }

@@ -1,5 +1,3 @@
 .message {
-  font-size: var(--font-size-md);
   color: var(--gray-900);
-  margin-bottom: 1.5rem;
 }

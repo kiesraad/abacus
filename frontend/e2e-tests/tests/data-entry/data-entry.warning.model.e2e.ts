@@ -18,10 +18,7 @@ import { createMachine } from "xstate";
 import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
-import {
-  getStatesAndEventsFromMachineDefinition,
-  getStatesAndEventsFromTest,
-} from "../../helpers-utils/xstate-helpers";
+import { assertMachineAndImplementationMatches } from "../../helpers-utils/xstate-helpers";
 
 /*
 This model-based e2e test covers the state changes from one section (the voters and votes page) that trigger warnings.
@@ -136,7 +133,6 @@ const dataEntryMachineDefinition = {
 };
 
 const machine = createMachine(dataEntryMachineDefinition);
-const { machineStates, machineEvents } = getStatesAndEventsFromMachineDefinition(dataEntryMachineDefinition);
 
 const voters: VotersCounts = {
   poll_card_count: 90,
@@ -427,25 +423,6 @@ test.describe("Data entry model test - warnings", () => {
           },
         };
 
-        const { states, events } = getStatesAndEventsFromTest(
-          [
-            pollingStationsPageStates,
-            countingDifferencesPollingStationPageStates,
-            votersVotesPageStates,
-            differencesPageStates,
-            abortInputModalStates,
-          ],
-          [
-            PollingStationsPageEvents,
-            countingDifferencesPollingStationPageEvents,
-            votersAndVotesPageEvents,
-            differencesPageEvents,
-            abortInputModalEvents,
-          ],
-        );
-        expect(new Set(states)).toEqual(new Set(machineStates));
-        expect(new Set(events)).toEqual(new Set(machineEvents));
-
         type MachineStates = typeof dataEntryMachineDefinition.states;
         type MachineStateKey = keyof MachineStates;
         type MachineEventKey = {
@@ -454,22 +431,25 @@ test.describe("Data entry model test - warnings", () => {
             : never;
         }[MachineStateKey];
 
-        await path.test({
-          states: {
-            ...pollingStationsPageStates,
-            ...countingDifferencesPollingStationPageStates,
-            ...votersVotesPageStates,
-            ...differencesPageStates,
-            ...abortInputModalStates,
-          } satisfies Record<MachineStateKey, () => void>,
-          events: {
-            ...countingDifferencesPollingStationPageEvents,
-            ...votersAndVotesPageEvents,
-            ...differencesPageEvents,
-            ...abortInputModalEvents,
-            ...PollingStationsPageEvents,
-          } satisfies Record<MachineEventKey, () => void>,
-        });
+        const states: Record<MachineStateKey, () => Promise<void>> = {
+          ...pollingStationsPageStates,
+          ...countingDifferencesPollingStationPageStates,
+          ...votersVotesPageStates,
+          ...differencesPageStates,
+          ...abortInputModalStates,
+        };
+
+        const events: Record<MachineEventKey, () => Promise<void>> = {
+          ...countingDifferencesPollingStationPageEvents,
+          ...votersAndVotesPageEvents,
+          ...differencesPageEvents,
+          ...abortInputModalEvents,
+          ...PollingStationsPageEvents,
+        };
+
+        assertMachineAndImplementationMatches(dataEntryMachineDefinition, states, events);
+
+        await path.test({ states, events });
       });
     });
 });

@@ -1,3 +1,5 @@
+import { expect } from "@playwright/test";
+
 export type TestStates = Record<string, () => Promise<void>>;
 export type TestEvents = Record<string, () => Promise<void>>;
 
@@ -9,27 +11,35 @@ interface MyMachineConfig {
 }
 
 export function getStatesAndEventsFromMachineDefinition(machineDef: MyMachineConfig) {
-  const machineStates: string[] = Object.keys(machineDef.states);
-
+  const machineFromStates: string[] = Object.keys(machineDef.states);
   let machineEvents: string[] = [];
+  let machineToStates: string[] = [];
+
   Object.values(machineDef.states).forEach((value) => {
     if ("on" in value) {
       machineEvents = [...machineEvents, ...Object.keys(value.on!)];
+      machineToStates = [...machineToStates, ...Object.values(value.on!)];
     }
   });
 
-  return { machineStates, machineEvents };
+  return { machineFromStates, machineEvents, machineToStates };
 }
 
-export function getStatesAndEventsFromTest(testStates: TestStates[], testEvents: TestEvents[]) {
-  let states: string[] = [];
-  testStates.forEach((element) => {
-    states = [...states, ...Object.keys(element)];
-  });
-  let events: string[] = [];
-  testEvents.forEach((element) => {
-    events = [...events, ...Object.keys(element)];
-  });
+export function assertMachineAndImplementationMatches(
+  dataEntryMachineDefinition: MyMachineConfig,
+  states: TestStates,
+  events: TestEvents,
+) {
+  const { machineFromStates, machineToStates, machineEvents } =
+    getStatesAndEventsFromMachineDefinition(dataEntryMachineDefinition);
 
-  return { states, events };
+  expect(new Set(machineFromStates), "Machine definition from states and to states do not match").toEqual(
+    new Set(machineToStates),
+  );
+  expect(new Set(Object.keys(states)), "Implemented states and machine definition states do not match").toEqual(
+    new Set(machineFromStates),
+  );
+  expect(new Set(Object.keys(events)), "Implemented events and machine definition events do not match").toEqual(
+    new Set(machineEvents),
+  );
 }

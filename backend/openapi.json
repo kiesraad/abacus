@@ -5608,6 +5608,26 @@
         },
         "additionalProperties": false
       },
+      "PoliticalGroupTotalVotes": {
+        "type": "object",
+        "required": [
+          "number",
+          "total"
+        ],
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
       "PollingStation": {
         "type": "object",
         "description": "Polling station of a certain [crate::election::Election]",
@@ -6436,8 +6456,9 @@
       },
       "VotesCounts": {
         "type": "object",
-        "description": "Votes counts, part of the polling station results.",
+        "description": "Votes counts, part of the polling station results.\nFollowing the fields in Model CSO Na 31-2 Bijlage 1.",
         "required": [
+          "political_group_total_votes",
           "total_votes_candidates_count",
           "blank_votes_count",
           "invalid_votes_count",
@@ -6447,25 +6468,32 @@
           "blank_votes_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of blank votes (\"Aantal blanco stembiljetten\")",
+            "description": "Number of blank votes (\"Blanco stembiljetten\")",
             "minimum": 0
           },
           "invalid_votes_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of invalid votes (\"Aantal ongeldige stembiljetten\")",
+            "description": "Number of invalid votes (\"Ongeldige stembiljetten\")",
             "minimum": 0
+          },
+          "political_group_total_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupTotalVotes"
+            },
+            "description": "Total votes per list"
           },
           "total_votes_candidates_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Total number of valid votes on candidates\n(\"Totaal aantal stemmen op kandidaten\")",
+            "description": "Total number of valid votes on candidates\n(\"Totaal stemmen op kandidaten\")",
             "minimum": 0
           },
           "total_votes_cast_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Total number of votes cast (\"Totaal aantal getelde stemmen\")",
+            "description": "Total number of votes cast (\"Totaal uitgebrachte stemmen\")",
             "minimum": 0
           }
         },

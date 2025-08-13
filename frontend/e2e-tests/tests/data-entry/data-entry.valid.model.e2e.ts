@@ -143,6 +143,11 @@ const votersEmpty: VotersCounts = {
 };
 
 const votes: VotesCounts = {
+  political_group_total_votes: [
+    { number: 1, total: 50 },
+    { number: 2, total: 50 },
+    { number: 3, total: 0 },
+  ],
   total_votes_candidates_count: 100,
   blank_votes_count: 0,
   invalid_votes_count: 0,
@@ -150,6 +155,11 @@ const votes: VotesCounts = {
 };
 
 const votesEmpty: VotesCounts = {
+  political_group_total_votes: [
+    { number: 1, total: 0 },
+    { number: 2, total: 0 },
+    { number: 3, total: 0 },
+  ],
   total_votes_candidates_count: 0,
   blank_votes_count: 0,
   invalid_votes_count: 0,

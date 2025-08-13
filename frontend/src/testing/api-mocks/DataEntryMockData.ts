@@ -31,6 +31,10 @@ export const emptyData: PollingStationResults = {
     total_admitted_voters_count: 0,
   },
   votes_counts: {
+    political_group_total_votes: electionMockData.political_groups.map((pg) => ({
+      number: pg.number,
+      total: 0,
+    })),
     total_votes_candidates_count: 0,
     blank_votes_count: 0,
     invalid_votes_count: 0,
@@ -83,6 +87,10 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       total_admitted_voters_count: 2,
     },
     votes_counts: {
+      political_group_total_votes: [
+        { number: 1, total: 0 },
+        { number: 2, total: 2 },
+      ],
       total_votes_candidates_count: 2,
       blank_votes_count: 0,
       invalid_votes_count: 0,
@@ -137,6 +145,10 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       total_admitted_voters_count: 2,
     },
     votes_counts: {
+      political_group_total_votes: [
+        { number: 1, total: 0 },
+        { number: 2, total: 2 },
+      ],
       total_votes_candidates_count: 2,
       blank_votes_count: 0,
       invalid_votes_count: 0,

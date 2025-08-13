@@ -922,6 +922,11 @@ export interface PoliticalGroupStanding {
   votes_cast: number;
 }
 
+export interface PoliticalGroupTotalVotes {
+  number: number;
+  total: number;
+}
+
 /**
  * Polling station of a certain [crate::election::Election]
  */
@@ -1189,16 +1194,19 @@ export interface VotersCounts {
 
 /**
  * Votes counts, part of the polling station results.
+ * Following the fields in Model CSO Na 31-2 Bijlage 1.
  */
 export interface VotesCounts {
-  /** Number of blank votes ("Aantal blanco stembiljetten") */
+  /** Number of blank votes ("Blanco stembiljetten") */
   blank_votes_count: number;
-  /** Number of invalid votes ("Aantal ongeldige stembiljetten") */
+  /** Number of invalid votes ("Ongeldige stembiljetten") */
   invalid_votes_count: number;
+  /** Total votes per list */
+  political_group_total_votes: PoliticalGroupTotalVotes[];
   /** Total number of valid votes on candidates
-("Totaal aantal stemmen op kandidaten") */
+("Totaal stemmen op kandidaten") */
   total_votes_candidates_count: number;
-  /** Total number of votes cast ("Totaal aantal getelde stemmen") */
+  /** Total number of votes cast ("Totaal uitgebrachte stemmen") */
   total_votes_cast_count: number;
 }
 

@@ -79,6 +79,22 @@ export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: s
   }
 }
 
+export async function userTypeInputsArray<T extends Record<string, string | number>>(
+  user: UserEvent,
+  inputArray: T[],
+  fieldPath: string,
+  valueKey: keyof T,
+  indexKey?: keyof T,
+) {
+  for (const [i, item] of Object.entries(inputArray)) {
+    const index = indexKey && Number.isInteger(item[indexKey]) ? Number(item[indexKey]) - 1 : i;
+    const input = await screen.findByTestId(`${fieldPath}[${index}].${valueKey.toString()}`);
+    await user.clear(input);
+    await user.type(input, String(item[valueKey]));
+    expect(input).toHaveValue(String(item[valueKey]));
+  }
+}
+
 export function spyOnHandler(handler: HttpHandler) {
   const { method, path } = handler.info;
 

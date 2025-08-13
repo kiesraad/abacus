@@ -1785,6 +1785,16 @@ export const election_summary: ElectionSummary = {
     total_admitted_voters_count: 15002,
   },
   votes_counts: {
+    political_group_total_votes: [
+      { number: 1, total: 7501 },
+      { number: 2, total: 1249 },
+      { number: 3, total: 1249 },
+      { number: 4, total: 1249 },
+      { number: 5, total: 1249 },
+      { number: 6, total: 1249 },
+      { number: 7, total: 1248 },
+      { number: 8, total: 7 },
+    ],
     total_votes_candidates_count: 15001,
     blank_votes_count: 0,
     invalid_votes_count: 1,

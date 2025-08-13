@@ -36,6 +36,7 @@ impl ElectionSummary {
                 total_admitted_voters_count: 0,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![],
                 total_votes_candidates_count: 0,
                 blank_votes_count: 0,
                 invalid_votes_count: 0,
@@ -220,7 +221,10 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::{election::tests::election_fixture, pdf_gen::tests::polling_stations_fixture};
+    use crate::{
+        data_entry::PoliticalGroupTotalVotes, election::tests::election_fixture,
+        pdf_gen::tests::polling_stations_fixture,
+    };
 
     fn polling_station_results_fixture_a() -> PollingStationResults {
         PollingStationResults {
@@ -232,6 +236,16 @@ mod tests {
                 total_admitted_voters_count: 35,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 21,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 10,
+                    },
+                ],
                 total_votes_candidates_count: 31,
                 blank_votes_count: 2,
                 invalid_votes_count: 3,
@@ -259,6 +273,16 @@ mod tests {
                 total_admitted_voters_count: 50,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 16,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 30,
+                    },
+                ],
                 total_votes_candidates_count: 46,
                 blank_votes_count: 2,
                 invalid_votes_count: 0,

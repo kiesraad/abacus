@@ -183,6 +183,10 @@ describe("Test DifferencesForm", () => {
           total_admitted_voters_count: 53,
         },
         votes_counts: {
+          political_group_total_votes: [
+            { number: 1, total: 52 },
+            { number: 2, total: 0 },
+          ],
           total_votes_candidates_count: 52,
           blank_votes_count: 1,
           invalid_votes_count: 2,

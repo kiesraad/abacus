@@ -17,7 +17,8 @@ use abacus::{
         ElectionApportionmentResponse, Fraction, get_total_seats_from_apportionment_result,
     },
     data_entry::{
-        DataEntry, PollingStationResults, VotersCounts, VotesCounts, status::ClientState,
+        DataEntry, PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
+        status::ClientState,
     },
 };
 
@@ -40,6 +41,40 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
                 total_admitted_voters_count: 1205,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 808,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 60,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 3,
+                        total: 58,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 4,
+                        total: 57,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 5,
+                        total: 56,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 6,
+                        total: 55,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 7,
+                        total: 54,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 8,
+                        total: 52,
+                    },
+                ],
                 total_votes_candidates_count: 1200,
                 blank_votes_count: 3,
                 invalid_votes_count: 2,
@@ -100,6 +135,28 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
                 total_admitted_voters_count: 1205,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 592,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 302,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 3,
+                        total: 98,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 4,
+                        total: 99,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 5,
+                        total: 101,
+                    },
+                ],
                 total_votes_candidates_count: 1200,
                 blank_votes_count: 3,
                 invalid_votes_count: 2,
@@ -180,6 +237,16 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
                 total_admitted_voters_count: 104,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 51,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 51,
+                    },
+                ],
                 total_votes_candidates_count: 102,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,

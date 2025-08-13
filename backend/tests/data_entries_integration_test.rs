@@ -71,6 +71,16 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
           "total_admitted_voters_count": 4
         },
         "votes_counts": {
+          "political_group_total_votes": [
+            {
+              "number": 1,
+              "total": 11,
+            },
+            {
+              "number": 2,
+              "total": 11,
+            }
+          ],
           "total_votes_candidates_count": 5,
           "blank_votes_count": 6,
           "invalid_votes_count": 7,

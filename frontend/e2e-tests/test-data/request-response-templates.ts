@@ -42,6 +42,11 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
       total_admitted_voters_count: 0,
     },
     votes_counts: {
+      political_group_total_votes: [
+        { number: 1, total: 0 },
+        { number: 2, total: 0 },
+        { number: 3, total: 0 },
+      ],
       total_votes_candidates_count: 0,
       blank_votes_count: 0,
       invalid_votes_count: 0,
@@ -167,6 +172,11 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
     total_admitted_voters_count: 3607,
   },
   votes_counts: {
+    political_group_total_votes: [
+      { number: 1, total: 3536 },
+      { number: 2, total: 36 },
+      { number: 3, total: 0 },
+    ],
     total_votes_candidates_count: 3572,
     blank_votes_count: 20,
     invalid_votes_count: 15,

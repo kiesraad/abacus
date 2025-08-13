@@ -23,6 +23,10 @@ const pollingStationResults: PollingStationResults = {
     total_admitted_voters_count: 205,
   },
   votes_counts: {
+    political_group_total_votes: [
+      { number: 1, total: 142 },
+      { number: 2, total: 56 },
+    ],
     total_votes_candidates_count: 198,
     blank_votes_count: 4,
     invalid_votes_count: 2,

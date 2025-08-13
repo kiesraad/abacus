@@ -33,6 +33,7 @@ const createBasePollingStationResults = (): PollingStationResults => ({
     total_admitted_voters_count: 0,
   },
   votes_counts: {
+    political_group_total_votes: [],
     total_votes_candidates_count: 0,
     blank_votes_count: 0,
     invalid_votes_count: 0,
@@ -514,6 +515,10 @@ describe("mapResultsToSectionValues", () => {
       total_admitted_voters_count: 235,
     };
     results.votes_counts = {
+      political_group_total_votes: [
+        { number: 1, total: 50 },
+        { number: 2, total: 150 },
+      ],
       total_votes_candidates_count: 200,
       blank_votes_count: 5,
       invalid_votes_count: 3,
@@ -528,6 +533,8 @@ describe("mapResultsToSectionValues", () => {
     expect(formValues["voters_counts.total_admitted_voters_count"]).toBe("235");
 
     // Check votes_counts fields
+    expect(formValues["votes_counts.political_group_total_votes[0].total"]).toBe("50");
+    expect(formValues["votes_counts.political_group_total_votes[1].total"]).toBe("150");
     expect(formValues["votes_counts.total_votes_candidates_count"]).toBe("200");
     expect(formValues["votes_counts.blank_votes_count"]).toBe("5");
     expect(formValues["votes_counts.invalid_votes_count"]).toBe("3");

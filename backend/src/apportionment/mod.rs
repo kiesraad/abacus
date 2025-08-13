@@ -8,7 +8,10 @@ mod seat_assignment;
 #[cfg(test)]
 pub(crate) mod test_helpers {
     use crate::{
-        data_entry::{Count, PoliticalGroupCandidateVotes, VotersCounts, VotesCounts},
+        data_entry::{
+            Count, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts,
+            VotesCounts,
+        },
         election::PGNumber,
         summary::{ElectionSummary, SummaryDifferencesCounts},
     };
@@ -25,6 +28,13 @@ pub(crate) mod test_helpers {
                 total_admitted_voters_count: total_votes,
             },
             votes_counts: VotesCounts {
+                political_group_total_votes: political_group_votes
+                    .iter()
+                    .map(|pg| PoliticalGroupTotalVotes {
+                        number: pg.number,
+                        total: pg.total,
+                    })
+                    .collect(),
                 total_votes_candidates_count: total_votes,
                 blank_votes_count: 0,
                 invalid_votes_count: 0,

@@ -189,7 +189,7 @@ async fn polling_station_data_entry_claim(
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: Default::default(),
-            votes_counts: Default::default(),
+            votes_counts: PollingStationResults::default_votes_counts(&election.political_groups),
             differences_counts: Default::default(),
             political_group_votes: PollingStationResults::default_political_group_votes(
                 &election.political_groups,
@@ -817,7 +817,10 @@ pub mod tests {
             status::CommitteeSessionStatus,
             tests::{change_status_committee_session, create_committee_session},
         },
-        data_entry::{DifferencesCounts, PoliticalGroupCandidateVotes, VotersCounts, VotesCounts},
+        data_entry::{
+            DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+            VotersCounts, VotesCounts,
+        },
     };
     use axum::http::StatusCode;
     use http_body_util::BodyExt;
@@ -836,6 +839,16 @@ pub mod tests {
                     total_admitted_voters_count: 100,
                 },
                 votes_counts: VotesCounts {
+                    political_group_total_votes: vec![
+                        PoliticalGroupTotalVotes {
+                            number: 1,
+                            total: 56,
+                        },
+                        PoliticalGroupTotalVotes {
+                            number: 2,
+                            total: 40,
+                        },
+                    ],
                     total_votes_candidates_count: 96,
                     blank_votes_count: 2,
                     invalid_votes_count: 2,

@@ -20,6 +20,10 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
       total_admitted_voters_count: 42,
     },
     votes_counts: {
+      political_group_total_votes: [
+        { number: 1, total: first ? 1512 : 1481 },
+        { number: 2, total: 2 },
+      ],
       total_votes_candidates_count: first ? 42 : 44,
       blank_votes_count: 0,
       invalid_votes_count: 0,

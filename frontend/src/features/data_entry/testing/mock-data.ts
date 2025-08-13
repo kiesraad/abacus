@@ -22,6 +22,10 @@ export function getInitialValues(): PollingStationResults {
       total_admitted_voters_count: 0,
     },
     votes_counts: {
+      political_group_total_votes: electionMockData.political_groups.map((pg) => ({
+        number: pg.number,
+        total: 0,
+      })),
       total_votes_candidates_count: 0,
       blank_votes_count: 0,
       invalid_votes_count: 0,

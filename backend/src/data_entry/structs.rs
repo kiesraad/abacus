@@ -93,6 +93,23 @@ impl PollingStationResults {
             })
             .collect()
     }
+
+    /// Create a default value for `votes_counts` (type `VotesCounts`)
+    pub fn default_votes_counts(political_groups: &[PoliticalGroup]) -> VotesCounts {
+        VotesCounts {
+            political_group_total_votes: political_groups
+                .iter()
+                .map(|pg| PoliticalGroupTotalVotes {
+                    number: pg.number,
+                    total: 0,
+                })
+                .collect(),
+            total_votes_candidates_count: Default::default(),
+            blank_votes_count: Default::default(),
+            invalid_votes_count: Default::default(),
+            total_votes_cast_count: Default::default(),
+        }
+    }
 }
 
 pub type Count = u32;
@@ -121,20 +138,23 @@ impl AddAssign<&VotersCounts> for VotersCounts {
 }
 
 /// Votes counts, part of the polling station results.
+/// Following the fields in Model CSO Na 31-2 Bijlage 1.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct VotesCounts {
+    /// Total votes per list
+    pub political_group_total_votes: Vec<PoliticalGroupTotalVotes>,
     /// Total number of valid votes on candidates
-    /// ("Totaal aantal stemmen op kandidaten")
+    /// ("Totaal stemmen op kandidaten")
     #[schema(value_type = u32)]
     pub total_votes_candidates_count: Count,
-    /// Number of blank votes ("Aantal blanco stembiljetten")
+    /// Number of blank votes ("Blanco stembiljetten")
     #[schema(value_type = u32)]
     pub blank_votes_count: Count,
-    /// Number of invalid votes ("Aantal ongeldige stembiljetten")
+    /// Number of invalid votes ("Ongeldige stembiljetten")
     #[schema(value_type = u32)]
     pub invalid_votes_count: Count,
-    /// Total number of votes cast ("Totaal aantal getelde stemmen")
+    /// Total number of votes cast ("Totaal uitgebrachte stemmen")
     #[schema(value_type = u32)]
     pub total_votes_cast_count: Count,
 }
@@ -284,6 +304,15 @@ impl PoliticalGroupCandidateVotes {
     }
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct PoliticalGroupTotalVotes {
+    #[schema(value_type = u32)]
+    pub number: PGNumber,
+    #[schema(value_type = u32)]
+    pub total: Count,
+}
+
 #[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CandidateVotes {
@@ -302,6 +331,16 @@ mod tests {
     #[test]
     fn test_votes_addition() {
         let mut curr_votes = VotesCounts {
+            political_group_total_votes: vec![
+                PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 10,
+                },
+                PoliticalGroupTotalVotes {
+                    number: 2,
+                    total: 20,
+                },
+            ],
             total_votes_candidates_count: 2,
             blank_votes_count: 3,
             invalid_votes_count: 4,
@@ -309,6 +348,16 @@ mod tests {
         };
 
         curr_votes += &VotesCounts {
+            political_group_total_votes: vec![
+                PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 11,
+                },
+                PoliticalGroupTotalVotes {
+                    number: 2,
+                    total: 12,
+                },
+            ],
             total_votes_candidates_count: 1,
             blank_votes_count: 2,
             invalid_votes_count: 3,

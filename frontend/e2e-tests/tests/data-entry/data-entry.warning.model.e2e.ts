@@ -157,6 +157,11 @@ const votersError: VotersCounts = {
 };
 
 const votesWarning: VotesCounts = {
+  political_group_total_votes: [
+    { number: 1, total: 50 },
+    { number: 2, total: 15 },
+    { number: 3, total: 0 },
+  ],
   total_votes_candidates_count: 65,
   blank_votes_count: 0,
   invalid_votes_count: 35,
@@ -164,6 +169,11 @@ const votesWarning: VotesCounts = {
 };
 
 const votesValid: VotesCounts = {
+  political_group_total_votes: [
+    { number: 1, total: 55 },
+    { number: 2, total: 44 },
+    { number: 3, total: 0 },
+  ],
   total_votes_candidates_count: 99,
   blank_votes_count: 1,
   invalid_votes_count: 0,
@@ -171,6 +181,11 @@ const votesValid: VotesCounts = {
 };
 
 const votesEmpty: VotesCounts = {
+  political_group_total_votes: [
+    { number: 1, total: 0 },
+    { number: 2, total: 0 },
+    { number: 3, total: 0 },
+  ],
   total_votes_candidates_count: 0,
   blank_votes_count: 0,
   invalid_votes_count: 0,

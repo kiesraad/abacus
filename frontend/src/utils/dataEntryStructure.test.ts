@@ -18,7 +18,7 @@ describe("votersAndVotesSection", () => {
     expect(votersAndVotesSection.subsections[0]?.type).toBe("inputGrid");
 
     if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
-      expect(votersAndVotesSection.subsections[0].rows).toHaveLength(7);
+      expect(votersAndVotesSection.subsections[0].rows).toHaveLength(9);
       // Check that it has the basic voter and vote count rows
       expect(
         votersAndVotesSection.subsections[0].rows.some((row) => row.path === "voters_counts.poll_card_count"),
@@ -26,6 +26,12 @@ describe("votersAndVotesSection", () => {
       expect(
         votersAndVotesSection.subsections[0].rows.some((row) => row.path === "votes_counts.total_votes_cast_count"),
       ).toBe(true);
+      // Check that it has the correct amount of political group rows
+      expect(
+        votersAndVotesSection.subsections[0].rows.filter((row) =>
+          row.path.startsWith("votes_counts.political_group_total_votes["),
+        ).length,
+      ).toBe(2);
     }
   });
 
@@ -40,7 +46,7 @@ describe("votersAndVotesSection", () => {
     const votersAndVotesSection = createVotersAndVotesSection(electionMockData);
     if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
       const codes = votersAndVotesSection.subsections[0].rows.map((row) => row.code);
-      expect(codes).toEqual(["A", "B", "D", "E", "F", "G", "H"]);
+      expect(codes).toEqual(["A", "B", "D", "E.1", "E.2", "E", "F", "G", "H"]);
     }
   });
 });

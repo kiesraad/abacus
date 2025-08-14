@@ -71,7 +71,7 @@ export function assertMachineAndImplementationMatches(
     getStatesAndEventsFromMachineDefinition(machineDefinition);
 
   expect(new Set(machineStates), "Machine definition states and target states do not match").toEqual(
-    new Set(machineTargetStates),
+    new Set(machineTargetStates).add(machineDefinition.initial),
   );
   expect(new Set(machineStates), "Machine definition states and implemented states do not match").toEqual(
     new Set(Object.keys(states)),

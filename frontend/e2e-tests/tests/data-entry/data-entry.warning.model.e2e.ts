@@ -36,22 +36,24 @@ to the data entry homepage.
 const dataEntryMachineDefinition = {
   initial: "voterVotesPageEmpty",
   states: {
-    pollingStationsPageWarningSaved: {
+    dataEntryHomePageWarningSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeWarning",
       },
     },
-    pollingStationsPageDiscarded: {},
-    pollingStationsPageChangedToWarningSaved: {
+    dataEntryHomePageDiscarded: {},
+    dataEntryHomePageChangedToWarningSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChangedToWarning",
       },
     },
-    countingDifferencesPollingStationPageFilled: {
+    countingDifferencesPollingStationPageWarningSubmitted: {
       on: {
-        SUBMIT: "voterVotesPageEmpty",
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageWarningSubmitted",
       },
     },
+    countingDifferencesPollingStationPageChangedToWarningSubmitted: {},
+    countingDifferencesPollingStationPageChangedToWarningDiscarded: {},
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_WARNING: "votersVotesPageWarningFilled",
@@ -69,8 +71,9 @@ const dataEntryMachineDefinition = {
         ACCEPT_WARNING: "voterVotesPageWarningAccepted",
         CORRECT_WARNING: "voterVotesPageWarningCorrected",
         CHANGE_TO_ERROR_AND_SUBMIT: "votersVotesPageError",
+        GO_TO_PREVIOUS_PAGE: "countingDifferencesPollingStationPageWarningSubmitted",
         CLICK_ABORT: "abortInputModalWarning",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalWarning",
+        NAV_TO_HOME_PAGE: "abortInputModalWarning",
       },
     },
     voterVotesPageWarningAccepted: {
@@ -97,11 +100,12 @@ const dataEntryMachineDefinition = {
     votersVotesPageChangedToWarning: {
       on: {
         SUBMIT: "votersVotesPageChangedToWarningSubmitted",
+        GO_TO_PREVIOUS_PAGE: "unsavedChangesModalChangedToWarning",
       },
     },
     votersVotesPageChangedToWarningSubmitted: {
       on: {
-        ABORT_AND_SAVE: "pollingStationsPageChangedToWarningSaved",
+        ABORT_AND_SAVE: "dataEntryHomePageChangedToWarningSaved",
       },
     },
     votersVotesPageWarningReminder: {
@@ -112,6 +116,12 @@ const dataEntryMachineDefinition = {
     votersVotesPageError: {},
     votersVotesPageAfterResumeWarning: {},
     votersVotesPageAfterResumeChangedToWarning: {},
+    unsavedChangesModalChangedToWarning: {
+      on: {
+        SAVE_UNSUBMITTED_CHANGES: "countingDifferencesPollingStationPageChangedToWarningSubmitted",
+        DISCARD_UNSUBMITTED_CHANGES: "countingDifferencesPollingStationPageChangedToWarningDiscarded",
+      },
+    },
     differencesPageWarningAccepted: {
       on: {
         GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageWarningAccepted",
@@ -125,8 +135,8 @@ const dataEntryMachineDefinition = {
     differencesPageCorrected: {},
     abortInputModalWarning: {
       on: {
-        SAVE_INPUT: "pollingStationsPageWarningSaved",
-        DISCARD_INPUT: "pollingStationsPageDiscarded",
+        SAVE_INPUT: "dataEntryHomePageWarningSaved",
+        DISCARD_INPUT: "dataEntryHomePageDiscarded",
       },
     },
   },
@@ -196,41 +206,67 @@ test.describe("Data entry model test - warnings", () => {
         await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
         await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
-        const pollingStationsPageStates = {
-          pollingStationsPageWarningSaved: async () => {
+        const dataEntryHomePageStates = {
+          dataEntryHomePageWarningSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
-          pollingStationsPageChangedToWarningSaved: async () => {
+          dataEntryHomePageChangedToWarningSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
-          pollingStationsPageDiscarded: async () => {
+          dataEntryHomePageDiscarded: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.alertDataEntryInProgress).toBeHidden();
           },
         };
-        const PollingStationsPageEvents = {
+
+        const dataEntryHomePageEvents = {
           RESUME_DATA_ENTRY: async () => {
             await dataEntryHomePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
           },
         };
 
         const countingDifferencesPollingStationPageStates = {
-          countingDifferencesPollingStationPageFilled: async () => {
+          countingDifferencesPollingStationPageWarningSubmitted: async () => {
             await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
             const countingDifferencesFields =
               await countingDifferencesPollingStationPage.getCountingDifferencesPollingStation();
-            expect(countingDifferencesFields).toStrictEqual(noExtraInvestigation);
+
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+            await expect(countingDifferencesPollingStationPage.progressList.votersAndVotesIcon).toHaveAccessibleName(
+              "bevat een waarschuwing",
+            );
+          },
+          countingDifferencesPollingStationPageChangedToWarningSubmitted: async () => {
+            await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
+            const countingDifferencesFields =
+              await countingDifferencesPollingStationPage.getCountingDifferencesPollingStation();
+
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+            await expect(countingDifferencesPollingStationPage.progressList.votersAndVotesIcon).toHaveAccessibleName(
+              "bevat een waarschuwing",
+            );
+          },
+          countingDifferencesPollingStationPageChangedToWarningDiscarded: async () => {
+            await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
+            const countingDifferencesFields =
+              await countingDifferencesPollingStationPage.getCountingDifferencesPollingStation();
+
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+            await expect(countingDifferencesPollingStationPage.progressList.votersAndVotesIcon).toHaveAccessibleName(
+              "opgeslagen",
+            );
           },
         };
+
         const countingDifferencesPollingStationPageEvents = {
-          SUBMIT: async () => {
-            await countingDifferencesPollingStationPage.next.click();
+          GO_TO_VOTERS_VOTES_PAGE: async () => {
+            await countingDifferencesPollingStationPage.progressList.votersAndVotes.click();
           },
         };
 
@@ -335,6 +371,9 @@ test.describe("Data entry model test - warnings", () => {
           abortInputModalWarning: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
+          unsavedChangesModalChangedToWarning: async () => {
+            await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
+          },
         };
 
         const votersAndVotesPageEvents = {
@@ -370,6 +409,9 @@ test.describe("Data entry model test - warnings", () => {
             await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
             await votersAndVotesPage.next.click();
           },
+          GO_TO_PREVIOUS_PAGE: async () => {
+            await votersAndVotesPage.progressList.countingDifferencesPollingStation.click();
+          },
           CLICK_ABORT: async () => {
             await votersAndVotesPage.abortInput.click();
           },
@@ -377,8 +419,14 @@ test.describe("Data entry model test - warnings", () => {
             await votersAndVotesPage.abortInput.click();
             await abortModal.saveInput.click();
           },
-          NAV_TO_POLLING_STATION_PAGE: async () => {
+          NAV_TO_HOME_PAGE: async () => {
             await navBar.clickElection(election.election.location, election.election.name);
+          },
+          SAVE_UNSUBMITTED_CHANGES: async () => {
+            await votersAndVotesPage.unsavedChangesModal.saveInput.click();
+          },
+          DISCARD_UNSUBMITTED_CHANGES: async () => {
+            await votersAndVotesPage.unsavedChangesModal.discardInput.click();
           },
         };
 
@@ -403,13 +451,13 @@ test.describe("Data entry model test - warnings", () => {
         };
 
         const abortInputModalStates = {
-          pollingStationsPageWarningSaved: async () => {
+          dataEntryHomePageWarningSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
-          pollingStationsPageDiscarded: async () => {
+          dataEntryHomePageDiscarded: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.alertDataEntryInProgress).toBeHidden();
           },
@@ -432,7 +480,7 @@ test.describe("Data entry model test - warnings", () => {
         }[MachineStateKey];
 
         const states: Record<MachineStateKey, () => Promise<void>> = {
-          ...pollingStationsPageStates,
+          ...dataEntryHomePageStates,
           ...countingDifferencesPollingStationPageStates,
           ...votersVotesPageStates,
           ...differencesPageStates,
@@ -440,11 +488,11 @@ test.describe("Data entry model test - warnings", () => {
         };
 
         const events: Record<MachineEventKey, () => Promise<void>> = {
+          ...dataEntryHomePageEvents,
           ...countingDifferencesPollingStationPageEvents,
           ...votersAndVotesPageEvents,
           ...differencesPageEvents,
           ...abortInputModalEvents,
-          ...PollingStationsPageEvents,
         };
 
         assertMachineAndImplementationMatches(dataEntryMachineDefinition, states, events);

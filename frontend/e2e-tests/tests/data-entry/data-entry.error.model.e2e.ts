@@ -36,22 +36,26 @@ to the data entry homepage.
 const dataEntryMachineDefinition = {
   initial: "voterVotesPageEmpty",
   states: {
-    pollingStationsPageErrorSaved: {
+    dataEntryHomePageErrorSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeError",
       },
     },
-    pollingStationsPageChangedToErrorSaved: {
+    dataEntryHomePageChangedToErrorSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeErrorChanged",
       },
     },
-    pollingStationsPageDiscarded: {},
-    countingDifferencesPollingStationPageFilledValid: {
+    dataEntryHomePageDiscarded: {},
+    countingDifferencesPollingStationPageErrorSubmitted: {
       on: {
-        SUBMIT: "voterVotesPageEmpty",
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageErrorSubmitted",
       },
     },
+    countingDifferencesPollingStationPageChangedToErrorSubmitted: {},
+    countingDifferencesPollingStationPageChangedToErrorDiscarded: {},
+    countingDifferencesPollingStationPageFilledError: {},
+    countingDifferencesPollingStationPageCorrected: {},
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilledValid",
@@ -72,11 +76,13 @@ const dataEntryMachineDefinition = {
       on: {
         SUBMIT: "votersVotesPageChangedToErrorSubmitted",
         CLICK_ABORT: "abortInputModalChangedToErrorSubmitted",
+        GO_TO_PREVIOUS_PAGE: "unsavedChangesModalChangedToError",
       },
     },
     VotersVotesPageFilledError: {
       on: {
         SUBMIT: "votersVotesPageErrorSubmitted",
+        GO_TO_PREVIOUS_PAGE: "countingDifferencesPollingStationPageFilledError",
       },
     },
     votersVotesPageErrorSubmitted: {
@@ -84,7 +90,8 @@ const dataEntryMachineDefinition = {
         CORRECT_ERROR_DATA: "votersVotesPageCorrected",
         CHANGE_TO_WARNING_AND_SUBMIT: "votersVotesPageWarningSubmitted",
         CLICK_ABORT: "abortInputModalErrorSubmitted",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalErrorSubmitted",
+        NAV_TO_HOME_PAGE: "abortInputModalErrorSubmitted",
+        GO_TO_PREVIOUS_PAGE: "countingDifferencesPollingStationPageErrorSubmitted",
         // no GO_TO_DIFFERENCES_PAGE, because unreachable
       },
     },
@@ -92,19 +99,15 @@ const dataEntryMachineDefinition = {
       on: {
         CORRECT_ERROR_DATA: "votersVotesPageCorrected",
         CLICK_ABORT: "abortInputModalChangedToErrorSubmitted",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalChangedToErrorSubmitted",
-        // no GO_TO_RECOUNTED_PAGE because too similar to same action on votersVotesPageErrorSubmitted
+        NAV_TO_HOME_PAGE: "abortInputModalChangedToErrorSubmitted",
+        // no GO_TO_PREVIOUS_PAGE because too similar to same action on votersVotesPageErrorSubmitted
         GO_TO_DIFFERENCES_PAGE: "differencesPageError",
       },
     },
     votersVotesPageCorrected: {
       on: {
         SUBMIT: "differencesPageCorrected",
-      },
-    },
-    votersVotesPageCorrectBackToValid: {
-      on: {
-        SUBMIT: "differencesPageCorrected",
+        GO_TO_PREVIOUS_PAGE: "unsavedChangesModalCorrected",
       },
     },
     votersVotesPageWarningSubmitted: {},
@@ -119,14 +122,25 @@ const dataEntryMachineDefinition = {
     differencesPageError: {},
     abortInputModalErrorSubmitted: {
       on: {
-        SAVE_INPUT: "pollingStationsPageErrorSaved",
-        DISCARD_INPUT: "pollingStationsPageDiscarded",
+        SAVE_INPUT: "dataEntryHomePageErrorSaved",
+        DISCARD_INPUT: "dataEntryHomePageDiscarded",
       },
     },
     abortInputModalChangedToErrorSubmitted: {
       on: {
-        SAVE_INPUT: "pollingStationsPageChangedToErrorSaved",
-        DISCARD_INPUT: "pollingStationsPageDiscarded",
+        SAVE_INPUT: "dataEntryHomePageChangedToErrorSaved",
+        DISCARD_INPUT: "dataEntryHomePageDiscarded",
+      },
+    },
+    unsavedChangesModalChangedToError: {
+      on: {
+        SAVE_UNSUBMITTED_CHANGES: "countingDifferencesPollingStationPageChangedToErrorSubmitted",
+        DISCARD_UNSUBMITTED_CHANGES: "countingDifferencesPollingStationPageChangedToErrorDiscarded",
+      },
+    },
+    unsavedChangesModalCorrected: {
+      on: {
+        SAVE_UNSUBMITTED_CHANGES: "countingDifferencesPollingStationPageCorrected",
       },
     },
   },
@@ -191,7 +205,7 @@ test.describe("Data entry model test - errors", () => {
       test(path.description, async ({ page, pollingStation, election }) => {
         const dataEntryHomePage = new DataEntryHomePage(page);
         const extraInvestigationPage = new ExtraInvestigationPage(page);
-        const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+        const countingDifferencesPage = new CountingDifferencesPollingStationPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
         const abortModal = new AbortInputModal(page);
@@ -200,43 +214,74 @@ test.describe("Data entry model test - errors", () => {
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
         await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
         await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
-        await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+        await countingDifferencesPage.fillAndClickNext(noDifferences);
 
-        const pollingStationsPageStates = {
-          pollingStationsPageErrorSaved: async () => {
+        const dataEntryHomePageStates = {
+          dataEntryHomePageErrorSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
-          pollingStationsPageChangedToErrorSaved: async () => {
+          dataEntryHomePageChangedToErrorSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
-          pollingStationsPageDiscarded: async () => {
+          dataEntryHomePageDiscarded: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.alertDataEntryInProgress).toBeHidden();
           },
         };
-        const PollingStationsPageEvents = {
+        const dataEntryHomePageEvents = {
           RESUME_DATA_ENTRY: async () => {
             await dataEntryHomePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
           },
         };
 
         const countingDifferencesPollingStationPageStates = {
-          countingDifferencesPollingStationPageFilledValid: async () => {
-            await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
-            const countingDifferencesFields =
-              await countingDifferencesPollingStationPage.getCountingDifferencesPollingStation();
-            expect(countingDifferencesFields).toStrictEqual(noExtraInvestigation);
+          countingDifferencesPollingStationPageErrorSubmitted: async () => {
+            await expect(countingDifferencesPage.fieldset).toBeVisible();
+            const countingDifferencesFields = await countingDifferencesPage.getCountingDifferencesPollingStation();
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+            await expect(countingDifferencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName(
+              "bevat een fout",
+            );
+          },
+          countingDifferencesPollingStationPageChangedToErrorSubmitted: async () => {
+            await expect(countingDifferencesPage.fieldset).toBeVisible();
+            const countingDifferencesFields = await countingDifferencesPage.getCountingDifferencesPollingStation();
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+            await expect(countingDifferencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName(
+              "bevat een fout",
+            );
+          },
+          countingDifferencesPollingStationPageFilledError: async () => {
+            await expect(countingDifferencesPage.fieldset).toBeVisible();
+            const countingDifferencesFields = await countingDifferencesPage.getCountingDifferencesPollingStation();
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+            await expect(countingDifferencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName(
+              "nog niet afgerond",
+            );
+          },
+          countingDifferencesPollingStationPageChangedToErrorDiscarded: async () => {
+            await expect(countingDifferencesPage.fieldset).toBeVisible();
+            const countingDifferencesFields = await countingDifferencesPage.getCountingDifferencesPollingStation();
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+            await expect(countingDifferencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+          },
+          countingDifferencesPollingStationPageCorrected: async () => {
+            await expect(countingDifferencesPage.fieldset).toBeVisible();
+            const countingDifferencesFields = await countingDifferencesPage.getCountingDifferencesPollingStation();
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+            await expect(countingDifferencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
         };
+
         const countingDifferencesPollingStationPageEvents = {
-          SUBMIT: async () => {
-            await countingDifferencesPollingStationPage.next.click();
+          GO_TO_VOTERS_VOTES_PAGE: async () => {
+            await countingDifferencesPage.progressList.votersAndVotes.click();
           },
         };
 
@@ -287,11 +332,6 @@ test.describe("Data entry model test - errors", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersChanged, votes });
           },
-          votersVotesPageCorrectBackToValid: async () => {
-            await expect(votersAndVotesPage.fieldset).toBeVisible();
-            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
-            expect(votersVotesFields).toStrictEqual({ voters: votersChanged, votes });
-          },
           votersVotesPageAfterResumeError: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
@@ -313,6 +353,12 @@ test.describe("Data entry model test - errors", () => {
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.",
             );
+          },
+          unsavedChangesModalChangedToError: async () => {
+            await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
+          },
+          unsavedChangesModalCorrected: async () => {
+            await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
           },
         };
         const votersAndVotesPageEvents = {
@@ -341,11 +387,20 @@ test.describe("Data entry model test - errors", () => {
           CLICK_ABORT: async () => {
             await votersAndVotesPage.abortInput.click();
           },
-          NAV_TO_POLLING_STATION_PAGE: async () => {
+          NAV_TO_HOME_PAGE: async () => {
             await navBar.clickElection(election.election.location, election.election.name);
+          },
+          GO_TO_PREVIOUS_PAGE: async () => {
+            await votersAndVotesPage.progressList.countingDifferencesPollingStation.click();
           },
           GO_TO_DIFFERENCES_PAGE: async () => {
             await votersAndVotesPage.progressList.differences.click();
+          },
+          SAVE_UNSUBMITTED_CHANGES: async () => {
+            await votersAndVotesPage.unsavedChangesModal.saveInput.click();
+          },
+          DISCARD_UNSUBMITTED_CHANGES: async () => {
+            await votersAndVotesPage.unsavedChangesModal.discardInput.click();
           },
         };
 
@@ -395,7 +450,7 @@ test.describe("Data entry model test - errors", () => {
         }[MachineStateKey];
 
         const states: Record<MachineStateKey, () => Promise<void>> = {
-          ...pollingStationsPageStates,
+          ...dataEntryHomePageStates,
           ...countingDifferencesPollingStationPageStates,
           ...votersVotesPageStates,
           ...differencesPageStates,
@@ -403,11 +458,11 @@ test.describe("Data entry model test - errors", () => {
         };
 
         const events: Record<MachineEventKey, () => Promise<void>> = {
+          ...dataEntryHomePageEvents,
           ...countingDifferencesPollingStationPageEvents,
           ...votersAndVotesPageEvents,
           ...differencesPageEvents,
           ...abortInputModalEvents,
-          ...PollingStationsPageEvents,
         };
 
         assertMachineAndImplementationMatches(dataEntryMachineDefinition, states, events);

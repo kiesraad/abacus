@@ -187,6 +187,7 @@ async fn polling_station_data_entry_claim(
         user_id: user.0.id(),
         entry: PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: Default::default(),
             votes_counts: Default::default(),
             differences_counts: Default::default(),
@@ -828,6 +829,7 @@ pub mod tests {
             progress: 100,
             data: PollingStationResults {
                 extra_investigation: Default::default(),
+                counting_differences_polling_station: Default::default(),
                 voters_counts: VotersCounts {
                     poll_card_count: 99,
                     proxy_certificate_count: 1,

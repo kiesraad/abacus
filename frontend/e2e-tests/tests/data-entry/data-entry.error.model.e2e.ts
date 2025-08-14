@@ -1,6 +1,10 @@
 import { expect } from "@playwright/test";
 import { createTestModel } from "@xstate/graph";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
+import {
+  CountingDifferencesPollingStationPage,
+  noDifferences,
+} from "e2e-tests/page-objects/data_entry/CountingDifferencesPollingStationPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import {
@@ -46,7 +50,7 @@ const dataEntryMachineDefinition = {
       },
     },
     pollingStationsPageDiscarded: {},
-    extraInvestigationPageFilledValid: {
+    countingDifferencesPollingStationPageFilledValid: {
       on: {
         SUBMIT: "voterVotesPageEmpty",
       },
@@ -191,6 +195,7 @@ test.describe("Data entry model test - errors", () => {
       test(path.description, async ({ page, pollingStation, election }) => {
         const dataEntryHomePage = new DataEntryHomePage(page);
         const extraInvestigationPage = new ExtraInvestigationPage(page);
+        const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
         const abortModal = new AbortInputModal(page);
@@ -199,6 +204,7 @@ test.describe("Data entry model test - errors", () => {
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
         await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
         await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+        await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
         const pollingStationsPageStates = {
           pollingStationsPageErrorSaved: async () => {
@@ -224,16 +230,17 @@ test.describe("Data entry model test - errors", () => {
           },
         };
 
-        const extraInvestigationPageStates = {
-          extraInvestigationPageFilledValid: async () => {
-            await expect(extraInvestigationPage.fieldset).toBeVisible();
-            const extraInvestigationFields = await extraInvestigationPage.getExtraInvestigation();
-            expect(extraInvestigationFields).toStrictEqual(noExtraInvestigation);
+        const countingDifferencesPollingStationPageStates = {
+          countingDifferencesPollingStationPageFilledValid: async () => {
+            await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
+            const countingDifferencesFields =
+              await countingDifferencesPollingStationPage.getCountingDifferencesPollingStation();
+            expect(countingDifferencesFields).toStrictEqual(noExtraInvestigation);
           },
         };
-        const extraInvestigationPageEvents = {
+        const countingDifferencesPollingStationPageEvents = {
           SUBMIT: async () => {
-            await extraInvestigationPage.next.click();
+            await countingDifferencesPollingStationPage.next.click();
           },
         };
 
@@ -388,14 +395,14 @@ test.describe("Data entry model test - errors", () => {
         const { states, events } = getStatesAndEventsFromTest(
           [
             pollingStationsPageStates,
-            extraInvestigationPageStates,
+            countingDifferencesPollingStationPageStates,
             votersVotesPageStates,
             differencesPageStates,
             abortInputModalStates,
           ],
           [
             PollingStationsPageEvents,
-            extraInvestigationPageEvents,
+            countingDifferencesPollingStationPageEvents,
             votersAndVotesPageEvents,
             differencesPageEvents,
             abortInputModalEvents,
@@ -415,13 +422,13 @@ test.describe("Data entry model test - errors", () => {
         await path.test({
           states: {
             ...pollingStationsPageStates,
-            ...extraInvestigationPageStates,
+            ...countingDifferencesPollingStationPageStates,
             ...votersVotesPageStates,
             ...differencesPageStates,
             ...abortInputModalStates,
           } satisfies Record<MachineStateKey, () => void>,
           events: {
-            ...extraInvestigationPageEvents,
+            ...countingDifferencesPollingStationPageEvents,
             ...votersAndVotesPageEvents,
             ...differencesPageEvents,
             ...abortInputModalEvents,

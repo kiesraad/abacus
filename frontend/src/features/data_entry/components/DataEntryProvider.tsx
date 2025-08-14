@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ApiError, FatalApiError } from "@/api/ApiResult";
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
@@ -36,7 +36,15 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
 
   // throw fatal errors, so the error boundary can catch them and show the full page error
   if (stateAndActions.error instanceof FatalApiError) {
-    throw stateAndActions.error;
+    // exception for CommitteeSessionPaused error which has to trigger the rendering of a modal
+    if (stateAndActions.error.reference === "CommitteeSessionPaused") {
+      // on initial claim, navigate back to DataEntryHomePage (modal is rendered there)
+      if (!stateAndActions.pollingStationResults) {
+        return <Navigate to={`/elections/${election.id}/data-entry`} />;
+      }
+    } else {
+      throw stateAndActions.error;
+    }
   }
 
   if (!stateAndActions.pollingStationResults) {

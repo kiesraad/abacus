@@ -32,13 +32,21 @@ import {
   ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PARAMS,
   ELECTION_DETAILS_REQUEST_PATH,
+  ELECTION_IMPORT_REQUEST_BODY,
+  ELECTION_IMPORT_REQUEST_PARAMS,
+  ELECTION_IMPORT_REQUEST_PATH,
+  ELECTION_IMPORT_VALIDATE_REQUEST_BODY,
+  ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS,
+  ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
   ELECTION_LIST_REQUEST_PARAMS,
   ELECTION_LIST_REQUEST_PATH,
   ELECTION_STATUS_REQUEST_PARAMS,
   ELECTION_STATUS_REQUEST_PATH,
+  ElectionDefinitionValidateResponse,
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionStatusResponse,
+  ElectionWithPoliticalGroups,
   ErrorResponse,
   INITIALISED_REQUEST_PARAMS,
   INITIALISED_REQUEST_PATH,
@@ -104,7 +112,12 @@ import {
   dataEntryStatusDifferences,
   saveDataEntryResponse,
 } from "./DataEntryMockData";
-import { electionDetailsMockResponse, electionListMockResponse } from "./ElectionMockData";
+import {
+  electionDetailsMockResponse,
+  electionImportMockResponse,
+  electionImportValidateMockResponse,
+  electionListMockResponse,
+} from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
 import { logMockResponse } from "./LogMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
@@ -207,6 +220,20 @@ export const ElectionStatusRequestHandler = http.get<
   ElectionStatusResponse,
   ELECTION_STATUS_REQUEST_PATH
 >("/api/elections/1/status", () => HttpResponse.json(statusResponseMock, { status: 200 }));
+
+export const ElectionImportRequestHandler = http.post<
+  ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
+  ELECTION_IMPORT_REQUEST_BODY,
+  ElectionWithPoliticalGroups,
+  ELECTION_IMPORT_REQUEST_PATH
+>("/api/elections/import", () => HttpResponse.json(electionImportMockResponse, { status: 201 }));
+
+export const ElectionImportValidateRequestHandler = http.post<
+  ParamsToString<ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS>,
+  ELECTION_IMPORT_VALIDATE_REQUEST_BODY,
+  ElectionDefinitionValidateResponse,
+  ELECTION_IMPORT_VALIDATE_REQUEST_PATH
+>("/api/elections/import/validate", () => HttpResponse.json(electionImportValidateMockResponse, { status: 200 }));
 
 export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse, LOGIN_REQUEST_PATH>(
   "/api/user/login",
@@ -395,6 +422,8 @@ export const handlers: HttpHandler[] = [
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  ElectionImportRequestHandler,
+  ElectionImportValidateRequestHandler,
   LoginHandler,
   PollingStationDataEntryGetDifferencesHandler,
   PollingStationDataEntryGetErrorsHandler,

@@ -387,10 +387,10 @@ async fn test_election_import_save(pool: SqlitePool) {
             ],
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
-                "a0b9", "6a6e", "5d3c", "17fd",
-                "6aeb", "3b89", "48df", "2f7a",
-                "2165", "7f17", "11a1", "d379",
-                "f7cf", "07ef", "7f7a", "cfa2"
+                "146d", "3784", "efa2", "93b5",
+                "721a", "7578", "a43f", "0636",
+                "7281", "66a0", "acf1", "55d3",
+                "ab25", "083c", "c000", "7096"
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
@@ -421,10 +421,10 @@ async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
             ],
             "election_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "candidate_hash": [
-                "a0b9", "6a6e", "5d3c", "17fd",
-                "6aeb", "3b89", "48df", "2f7a",
-                "2165", "7f17", "11a1", "d379",
-                "f7cf", "07ef", "7f7a", "cfa2"
+                "146d", "3784", "efa2", "93b5",
+                "721a", "7578", "a43f", "0636",
+                "7281", "66a0", "acf1", "55d3",
+                "ab25", "083c", "c000", "7096"
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
@@ -455,10 +455,10 @@ async fn test_election_import_save_empty_candidate_stubs(pool: SqlitePool) {
             ],
             "election_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "candidate_hash": [
-                "a0b9", "6a6e", "5d3c", "17fd",
-                "6aeb", "3b89", "48df", "",
-                "2165", "7f17", "11a1", "d379",
-                "f7cf", "07ef", "", "cfa2"
+                "146d", "3784", "efa2", "93b5",
+                "", "7578", "a43f", "0636",
+                "7281", "66a0", "acf1", "55d3",
+                "ab25", "083c", "c000", ""
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
@@ -523,10 +523,10 @@ async fn test_election_import_missing_file_name(pool: SqlitePool) {
             ],
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
-                "6a53", "d681", "aa15", "d6c3",
-                "375a", "48c2", "29c8", "7dcf",
-                "09b2", "5a55", "34a8", "4854",
-                "7643", "3b8f", "cd3e", "6e97"
+                "146d", "3784", "efa2", "93b5",
+                "721a", "7578", "a43f", "0636",
+                "7281", "66a0", "acf1", "55d3",
+                "ab25", "083c", "c000", "7096"
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
@@ -555,10 +555,10 @@ async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
           ],
           "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
-                "a0b9", "6a6e", "5d3c", "17fd",
-                "6aeb", "3b89", "48df", "2f7a",
-                "2165", "7f17", "11a1", "d379",
-                "f7cf", "07ef", "7f7a", "cfa2"
+                "146d", "3784", "efa2", "93b5",
+                "721a", "7578", "a43f", "0636",
+                "7281", "66a0", "acf1", "55d3",
+                "ab25", "083c", "c000", "7096"
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
@@ -589,10 +589,10 @@ async fn test_election_polling_stations_validate_missing_filename(pool: SqlitePo
           ],
           "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
-                "6a53", "d681", "aa15", "d6c3",
-                "375a", "48c2", "29c8", "7dcf",
-                "09b2", "5a55", "34a8", "4854",
-                "7643", "3b8f", "cd3e", "6e97"
+                "146d", "3784", "efa2", "93b5",
+                "721a", "7578", "a43f", "0636",
+                "7281", "66a0", "acf1", "55d3",
+                "ab25", "083c", "c000", "7096"
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
@@ -622,10 +622,10 @@ async fn test_election_polling_stations_validate_invalid(pool: SqlitePool) {
           ],
           "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
-                "a0b9", "6a6e", "5d3c", "17fd",
-                "6aeb", "3b89", "48df", "2f7a",
-                "2165", "7f17", "11a1", "d379",
-                "f7cf", "07ef", "7f7a", "cfa2"
+                "146d", "3784", "efa2", "93b5",
+                "721a", "7578", "a43f", "0636",
+                "7281", "66a0", "acf1", "55d3",
+                "ab25", "083c", "c000", "7096"
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),

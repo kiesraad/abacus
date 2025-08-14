@@ -1,9 +1,10 @@
 import userEvent from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
-import { overrideOnce, server } from "@/testing/server";
+import { server } from "@/testing/server";
 import { render, renderReturningRouter, screen } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionListResponse } from "@/types/generated/openapi";
@@ -31,10 +32,17 @@ describe("OverviewPage", () => {
   });
 
   test("Show no elections message", async () => {
-    overrideOnce("get", "/api/elections", 200, {
-      committee_sessions: [],
-      elections: [],
-    } satisfies ElectionListResponse);
+    server.use(
+      http.get("/api/elections", () =>
+        HttpResponse.json(
+          {
+            committee_sessions: [],
+            elections: [],
+          } satisfies ElectionListResponse,
+          { status: 200 },
+        ),
+      ),
+    );
 
     render(
       <ElectionListProvider>
@@ -53,10 +61,17 @@ describe("OverviewPage", () => {
 
   test("Show no elections message for the administrator", async () => {
     const user = userEvent.setup();
-    overrideOnce("get", "/api/elections", 200, {
-      committee_sessions: [],
-      elections: [],
-    } satisfies ElectionListResponse);
+    server.use(
+      http.get("/api/elections", () =>
+        HttpResponse.json(
+          {
+            committee_sessions: [],
+            elections: [],
+          } satisfies ElectionListResponse,
+          { status: 200 },
+        ),
+      ),
+    );
 
     const router = renderReturningRouter(
       <TestUserProvider userRole="administrator">

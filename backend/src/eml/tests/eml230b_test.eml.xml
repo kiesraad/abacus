@@ -37,9 +37,12 @@
             </CandidateFullName>
             <Gender>female</Gender>
             <QualifyingAddress>
-              <xal:Locality>
-                <xal:LocalityName>Heemdamseburg</xal:LocalityName>
-              </xal:Locality>
+              <xal:Country>
+                <xal:CountryNameCode>NL</xal:CountryNameCode>
+                <xal:Locality>
+                  <xal:LocalityName>Heemdamseburg</xal:LocalityName>
+                </xal:Locality>
+              </xal:Country>
             </QualifyingAddress>
           </Candidate>
           <Candidate>
@@ -55,7 +58,7 @@
             <Gender>female</Gender>
             <QualifyingAddress>
               <xal:Locality>
-                <xal:LocalityName>Heemdamseburg</xal:LocalityName>
+                <xal:LocalityName>Heemdamseburgsebuurt</xal:LocalityName>
               </xal:Locality>
             </QualifyingAddress>
           </Candidate>

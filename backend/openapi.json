@@ -4342,6 +4342,25 @@
         },
         "additionalProperties": false
       },
+      "CountingDifferencesPollingStation": {
+        "type": "object",
+        "description": "Counting Differences Polling Station,\npart of the polling station results (\"B1-2 Verschillen met telresultaten van het stembureau\")",
+        "required": [
+          "unexplained_difference_ballots_voters",
+          "difference_ballots_per_list"
+        ],
+        "properties": {
+          "difference_ballots_per_list": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether there was a difference between the total votes per list as determined by the polling station and by the typist\n(\"Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?\")"
+          },
+          "unexplained_difference_ballots_voters": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether there was an unexplained difference between the number of voters and votes\n(\"Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateUserRequest": {
         "type": "object",
         "required": [
@@ -5793,12 +5812,17 @@
         "description": "PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
         "required": [
           "extra_investigation",
+          "counting_differences_polling_station",
           "voters_counts",
           "votes_counts",
           "differences_counts",
           "political_group_votes"
         ],
         "properties": {
+          "counting_differences_polling_station": {
+            "$ref": "#/components/schemas/CountingDifferencesPollingStation",
+            "description": "Counting Differences Polling Station (\"B1-2 Verschillen met telresultaten van het stembureau\")"
+          },
           "differences_counts": {
             "$ref": "#/components/schemas/DifferencesCounts",
             "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"

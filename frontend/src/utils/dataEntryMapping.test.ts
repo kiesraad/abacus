@@ -8,6 +8,14 @@ import { differencesSection, votersAndVotesSection } from "./dataEntryStructure"
 
 // Helper function to create a base PollingStationResults object for testing
 const createBasePollingStationResults = (): PollingStationResults => ({
+  extra_investigation: {
+    extra_investigation_other_reason: { yes: false, no: false },
+    ballots_recounted_extra_investigation: { yes: false, no: false },
+  },
+  counting_differences_polling_station: {
+    unexplained_difference_ballots_voters: { yes: false, no: false },
+    difference_ballots_per_list: { yes: false, no: false },
+  },
   differences_counts: {
     more_ballots_count: 0,
     fewer_ballots_count: 0,
@@ -16,16 +24,6 @@ const createBasePollingStationResults = (): PollingStationResults => ({
     too_many_ballots_handed_out_count: 0,
     other_explanation_count: 0,
     no_explanation_count: 0,
-  },
-  extra_investigation: {
-    extra_investigation_other_reason: {
-      yes: false,
-      no: false,
-    },
-    ballots_recounted_extra_investigation: {
-      yes: false,
-      no: false,
-    },
   },
   political_group_votes: [],
   voters_counts: {

@@ -857,6 +857,7 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: Default::default(),
             votes_counts: Default::default(),
             differences_counts: Default::default(),
@@ -891,6 +892,7 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 29,
                 proxy_certificate_count: 2,
@@ -974,6 +976,7 @@ mod tests {
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
@@ -1027,6 +1030,7 @@ mod tests {
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 4,
                 proxy_certificate_count: 2,
@@ -1116,6 +1120,7 @@ mod tests {
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
@@ -1183,6 +1188,7 @@ mod tests {
     fn test_differences() {
         let polling_station_results = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 54,
                 proxy_certificate_count: 2,
@@ -1244,6 +1250,7 @@ mod tests {
     fn test_no_differences_expected() {
         let polling_station_results = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 50,
                 proxy_certificate_count: 2,
@@ -1299,6 +1306,7 @@ mod tests {
     fn test_no_differences_expected_and_incorrect_total() {
         let polling_station_results = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 50,
                 proxy_certificate_count: 2,

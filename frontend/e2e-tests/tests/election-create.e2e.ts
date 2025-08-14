@@ -58,6 +58,25 @@ test.describe("Election creation", () => {
     await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
     await expect(checkAndSavePage.numberOfVoters).toContainText("612.694");
 
+    // Now go back and fill the number of voters with a custom value
+    await page.goBack();
+    await expect(numberOfVotersPage.header).toBeVisible();
+    await expect(numberOfVotersPage.hint).toBeVisible();
+    await numberOfVotersPage.input.fill("1234");
+    await numberOfVotersPage.next.click();
+
+    // Check that the value is updated
+    await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.numberOfVoters).toContainText("1.234");
+
+    // Go back another time to check that the hint is gone (since now it's not an imported value anymore)
+    // It should also still show the updated value
+    await page.goBack();
+    await expect(numberOfVotersPage.input).toHaveValue("1234");
+    await expect(numberOfVotersPage.hint).toBeHidden();
+    await numberOfVotersPage.next.click();
+
+    // Back to the check and save page to test saving the election
     const responsePromise = page.waitForResponse(`/api/elections/import`);
     await checkAndSavePage.save.click();
     await expect(overviewPage.header).toBeVisible();

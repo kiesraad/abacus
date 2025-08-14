@@ -87,7 +87,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
                   hint={t("initialise.username_login_hint")}
                   required={true}
                   value={username}
-                  disabled={loading}
+                  readOnly={loading}
                   onChange={(e) => {
                     setUsername(e.target.value);
                   }}
@@ -99,7 +99,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
                   type="password"
                   required={true}
                   value={password}
-                  disabled={loading}
+                  readOnly={loading}
                   onChange={(e) => {
                     setPassword(e.target.value);
                   }}

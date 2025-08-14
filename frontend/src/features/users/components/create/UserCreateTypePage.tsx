@@ -47,7 +47,7 @@ export function UserCreateTypePage() {
             <FormLayout.Section>
               <p>{t("users.type_hint")}</p>
               <ChoiceList>
-                <ChoiceList.Title>{t("users.type_label")}</ChoiceList.Title>
+                <ChoiceList.Legend>{t("users.type_label")}</ChoiceList.Legend>
                 <ChoiceList.Radio
                   id={"role-fullname"}
                   name={"type"}

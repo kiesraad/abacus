@@ -22,10 +22,9 @@ export function RadioSubsectionComponent({
   readOnly = false,
 }: RadioSubsectionProps) {
   return (
-    <fieldset className={cls.container}>
-      {subsection.title && <legend>{subsection.title}</legend>}
-      {subsection.description && <p>{subsection.description}</p>}
+    <div className={cls.container}>
       <ChoiceList>
+        {subsection.title && <ChoiceList.Legend>{subsection.title}</ChoiceList.Legend>}
         {defaultProps.errorsAndWarnings?.get(`data.${subsection.path}`) && (
           <ChoiceList.Error id={`${subsection.path}-error`}>{subsection.error}</ChoiceList.Error>
         )}
@@ -45,6 +44,6 @@ export function RadioSubsectionComponent({
           />
         ))}
       </ChoiceList>
-    </fieldset>
+    </div>
   );
 }

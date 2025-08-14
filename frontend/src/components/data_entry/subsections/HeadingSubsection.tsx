@@ -5,5 +5,5 @@ export interface HeadingSubsectionProps {
 }
 
 export function HeadingSubsectionComponent({ subsection }: HeadingSubsectionProps) {
-  return <h2 className="mt-lg">{subsection.title}</h2>;
+  return <h3>{subsection.title}</h3>;
 }

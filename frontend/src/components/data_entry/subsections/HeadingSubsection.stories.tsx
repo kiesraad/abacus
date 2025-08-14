@@ -13,7 +13,7 @@ export const Heading: Story = {
   args: {
     subsection: {
       type: "heading",
-      title: "voters_votes_counts.form_title",
+      title: "This is a heading",
     },
   },
 };

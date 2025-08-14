@@ -123,7 +123,7 @@ export const extraInvestigationSection: DataEntrySection = {
     },
     {
       type: "checkboxes",
-      description: t("extra_investigation.extra_investigation_other_reason.description"),
+      title: t("extra_investigation.extra_investigation_other_reason.title"),
       short_title: t("extra_investigation.extra_investigation_other_reason.short_title"),
       error_path: "extra_investigation.extra_investigation_other_reason",
       error_message: t("extra_investigation.validation_error"),
@@ -143,7 +143,7 @@ export const extraInvestigationSection: DataEntrySection = {
     },
     {
       type: "checkboxes",
-      description: t("extra_investigation.ballots_recounted_extra_investigation.description"),
+      title: t("extra_investigation.ballots_recounted_extra_investigation.title"),
       short_title: t("extra_investigation.ballots_recounted_extra_investigation.short_title"),
       error_path: "extra_investigation.ballots_recounted_extra_investigation",
       error_message: t("extra_investigation.validation_error"),
@@ -174,9 +174,12 @@ export const countingDifferencesPollingStation: DataEntrySection = {
       message: t("counting_differences_polling_station.form_description"),
     },
     {
+      type: "heading",
+      title: t("counting_differences_polling_station.heading_voters_and_votes"),
+    },
+    {
       type: "checkboxes",
       title: t("counting_differences_polling_station.unexplained_difference_ballots_voters.title"),
-      description: t("counting_differences_polling_station.unexplained_difference_ballots_voters.description"),
       short_title: t("counting_differences_polling_station.unexplained_difference_ballots_voters.short_title"),
       error_path: "counting_differences_polling_station.unexplained_difference_ballots_voters",
       error_message: t("counting_differences_polling_station.validation_error"),
@@ -195,9 +198,12 @@ export const countingDifferencesPollingStation: DataEntrySection = {
       ],
     },
     {
+      type: "heading",
+      title: t("counting_differences_polling_station.heading_counts_on_lists"),
+    },
+    {
       type: "checkboxes",
       title: t("counting_differences_polling_station.difference_ballots_per_list.title"),
-      description: t("counting_differences_polling_station.difference_ballots_per_list.description"),
       short_title: t("counting_differences_polling_station.difference_ballots_per_list.short_title"),
       error_path: "counting_differences_polling_station.difference_ballots_per_list",
       error_message: t("counting_differences_polling_station.validation_error"),

@@ -1,24 +1,26 @@
 .resolveErrors {
   p {
     max-width: 37.5rem;
-    font-size: var(--font-size-md);
     color: var(--text-color-header);
-    line-height: 1.5rem;
-  }
-
-  form {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
 
   .resolveForm {
+    margin-top: 1.5rem;
     padding: 1.5rem;
     background-color: var(--base-white);
     border-radius: 1rem;
 
+    p {
+      margin-bottom: 0;
+    }
+
     fieldset {
-      margin-top: 2rem;
-      margin-bottom: 1.5rem;
       max-width: 37.5rem;
+
+      section {
+        gap: var(--space-md);
+      }
     }
   }
 }

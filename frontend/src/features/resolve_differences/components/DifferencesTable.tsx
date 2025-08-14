@@ -52,10 +52,8 @@ export function DifferencesTable({ title, headers, rows, action }: DifferencesTa
   const discardSecond = action === "keep_first_entry" || action === "discard_both_entries";
 
   return (
-    <section className="mt-lg mb-xl">
-      <h3 className="heading-lg" id={id}>
-        {title}
-      </h3>
+    <section>
+      <h3 id={id}>{title}</h3>
       <div>
         <Table className={cls.differencesTable} aria-labelledby={id}>
           <Table.Header>

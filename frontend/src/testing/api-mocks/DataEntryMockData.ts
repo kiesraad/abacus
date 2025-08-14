@@ -17,6 +17,14 @@ export const emptyValidationResults: ValidationResults = {
 };
 
 export const emptyData: PollingStationResults = {
+  extra_investigation: {
+    extra_investigation_other_reason: { yes: false, no: false },
+    ballots_recounted_extra_investigation: { yes: false, no: false },
+  },
+  counting_differences_polling_station: {
+    unexplained_difference_ballots_voters: { yes: false, no: false },
+    difference_ballots_per_list: { yes: false, no: false },
+  },
   voters_counts: {
     poll_card_count: 0,
     proxy_certificate_count: 0,
@@ -36,16 +44,6 @@ export const emptyData: PollingStationResults = {
     too_many_ballots_handed_out_count: 0,
     other_explanation_count: 0,
     no_explanation_count: 0,
-  },
-  extra_investigation: {
-    extra_investigation_other_reason: {
-      yes: false,
-      no: false,
-    },
-    ballots_recounted_extra_investigation: {
-      yes: false,
-      no: false,
-    },
   },
   political_group_votes: electionMockData.political_groups.map((group) => ({
     number: group.number,
@@ -71,6 +69,14 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
   first_entry_user_id: 3,
   second_entry_user_id: 4,
   first_entry: {
+    extra_investigation: {
+      extra_investigation_other_reason: { yes: false, no: false },
+      ballots_recounted_extra_investigation: { yes: false, no: false },
+    },
+    counting_differences_polling_station: {
+      unexplained_difference_ballots_voters: { yes: false, no: false },
+      difference_ballots_per_list: { yes: false, no: false },
+    },
     voters_counts: {
       poll_card_count: 2,
       proxy_certificate_count: 0,
@@ -90,16 +96,6 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       too_many_ballots_handed_out_count: 0,
       other_explanation_count: 0,
       no_explanation_count: 0,
-    },
-    extra_investigation: {
-      extra_investigation_other_reason: {
-        yes: false,
-        no: false,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: false,
-      },
     },
     political_group_votes: [
       {
@@ -127,6 +123,14 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
     ],
   },
   second_entry: {
+    extra_investigation: {
+      extra_investigation_other_reason: { yes: false, no: false },
+      ballots_recounted_extra_investigation: { yes: false, no: false },
+    },
+    counting_differences_polling_station: {
+      unexplained_difference_ballots_voters: { yes: false, no: false },
+      difference_ballots_per_list: { yes: false, no: false },
+    },
     voters_counts: {
       poll_card_count: 2,
       proxy_certificate_count: 0,
@@ -146,16 +150,6 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       too_many_ballots_handed_out_count: 0,
       other_explanation_count: 0,
       no_explanation_count: 0,
-    },
-    extra_investigation: {
-      extra_investigation_other_reason: {
-        yes: false,
-        no: false,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: false,
-      },
     },
     political_group_votes: [
       {

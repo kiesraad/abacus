@@ -14,7 +14,7 @@ import {
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, spyOnHandler, within } from "@/testing/test-utils";
-import { DataEntryStatusResponse } from "@/types/generated/openapi";
+import { DataEntryStatusResponse, ErrorResponse } from "@/types/generated/openapi";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import { getDefaultDataEntryState, getEmptyDataEntryRequest, getInitialValues } from "../../testing/mock-data";
@@ -320,5 +320,34 @@ describe("Test CheckAndSaveForm summary", () => {
     const differencesItem = screen.getByTestId("section-status-differences_counts");
     expect(differencesItem).toHaveTextContent("Controleer waarschuwingen bij");
     expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
+  });
+
+  test("Alert when committee session is paused is shown on save and then logs out", async () => {
+    const user = userEvent.setup();
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 409, {
+      error: "Committee session data entry is paused",
+      fatal: true,
+      reference: "CommitteeSessionPaused",
+    } satisfies ErrorResponse);
+
+    const router = renderForm();
+
+    // Wait for the page to be loaded
+    const title = await screen.findByText("Controleren en opslaan");
+    expect(title).toBeInTheDocument();
+
+    const submitButton = screen.getByRole("button", { name: "Opslaan" });
+    await user.click(submitButton);
+
+    const pausedModal = await screen.findByRole("dialog");
+    expect(within(pausedModal).getByRole("heading", { level: 2, name: "Invoer gepauzeerd" })).toBeVisible();
+    expect(within(pausedModal).getByRole("paragraph")).toHaveTextContent(
+      "De coördinator heeft het invoeren van stemmen gepauzeerd. Je kan niet meer verder. [Je laatste wijzigingen worden niet opgeslagen.]",
+    );
+    expect(within(pausedModal).getByRole("link", { name: "Naar startscherm" })).toBeVisible();
+    const logoutButton = within(pausedModal).getByRole("link", { name: "Afmelden" });
+    await user.click(logoutButton);
+
+    expect(router.state.location.pathname).toEqual("/account/logout");
   });
 });

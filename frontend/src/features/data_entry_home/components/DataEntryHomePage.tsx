@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
+import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -15,19 +16,20 @@ import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { election, pollingStations } = useElection();
-  const { statuses, refetch } = useElectionStatus();
+  const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
+  const { statuses, refetch: refetchStatuses } = useElectionStatus();
 
   // re-fetch statuses when component mounts
   useEffect(() => {
     const abortController = new AbortController();
 
-    void refetch(abortController);
+    void refetchElection(abortController);
+    void refetchStatuses(abortController);
 
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
-  }, [refetch]);
+  }, [refetchElection, refetchStatuses]);
 
   const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved") ? location.hash : null;
   const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved") ? location.hash : null;
@@ -69,6 +71,7 @@ export function DataEntryHomePage() {
           <h1>{election.name}</h1>
         </section>
       </header>
+      {committeeSession.status === "data_entry_paused" && <CommitteeSessionPausedModal />}
       {dataEntryDone && (
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
           <strong className="heading-md">{t("data_entry.entry_saved")}</strong>

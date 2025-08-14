@@ -368,7 +368,9 @@ pub enum QualifyingAddressData {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Country {
+    #[serde(rename(serialize = "xal:CountryNameCode", deserialize = "CountryNameCode"))]
     pub country_name_code: String,
+    #[serde(rename(serialize = "xal:Locality", deserialize = "Locality"))]
     pub locality: Locality,
 }
 

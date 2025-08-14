@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { ApiError } from "@/api/ApiResult";
+import { ApiError, FatalApiError } from "@/api/ApiResult";
+import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
 import { DataEntrySubsections } from "@/components/data_entry/DataEntrySubsections";
 import { ErrorModal } from "@/components/error/ErrorModal";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -80,6 +81,9 @@ export function DataEntrySection() {
       </legend>
       <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />
       <div className={cls.formContainer}>
+        {error instanceof FatalApiError && error.reference === "CommitteeSessionPaused" && (
+          <CommitteeSessionPausedModal showUnsavedChanges />
+        )}
         {error instanceof ApiError && <ErrorModal error={error} />}
         {formSection.isSaved && memoizedErrorCodes.length > 0 && (
           <Feedback

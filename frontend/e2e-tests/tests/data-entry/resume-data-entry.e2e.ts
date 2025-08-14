@@ -3,6 +3,10 @@ import { loginAs } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
+import {
+  CountingDifferencesPollingStationPage,
+  noDifferences,
+} from "e2e-tests/page-objects/data_entry/CountingDifferencesPollingStationPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import {
@@ -26,6 +30,9 @@ test.describe("resume data entry flow", () => {
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -131,6 +138,9 @@ test.describe("resume data entry flow", () => {
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+      const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       await votersAndVotesPage.proxyCertificateCount.fill("1000");
@@ -157,6 +167,7 @@ test.describe("resume data entry flow", () => {
         data: {
           ...emptyDataEntryResponse.data,
           extra_investigation: noExtraInvestigation,
+          counting_differences_polling_station: noDifferences,
           voters_counts: {
             poll_card_count: 0,
             proxy_certificate_count: 1000,
@@ -193,6 +204,9 @@ test.describe("resume data entry flow", () => {
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+      const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       const voters: VotersCounts = {
@@ -228,6 +242,7 @@ test.describe("resume data entry flow", () => {
         data: {
           ...emptyDataEntryResponse.data,
           extra_investigation: noExtraInvestigation,
+          counting_differences_polling_station: noDifferences,
           voters_counts: {
             poll_card_count: 100,
             proxy_certificate_count: 0,
@@ -266,6 +281,9 @@ test.describe("resume data entry flow", () => {
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
+      const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       const voters: VotersCounts = {
@@ -293,6 +311,9 @@ test.describe("resume data entry flow", () => {
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+      const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -322,6 +343,9 @@ test.describe("resume data entry flow", () => {
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+      const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       const voters: VotersCounts = {
@@ -395,6 +419,15 @@ test.describe("resume data entry flow", () => {
       await expect(extraInvestigationPage.ballotsRecountedNo).not.toBeChecked();
       await extraInvestigationPage.next.click();
 
+      // counting differences polling station section should be empty
+      const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+      await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
+      await expect(countingDifferencesPollingStationPage.differenceBallotsPerListYes).not.toBeChecked();
+      await expect(countingDifferencesPollingStationPage.differenceBallotsPerListNo).not.toBeChecked();
+      await expect(countingDifferencesPollingStationPage.unexplainedDifferenceBallotsVotersYes).not.toBeChecked();
+      await expect(countingDifferencesPollingStationPage.unexplainedDifferenceBallotsVotersNo).not.toBeChecked();
+      await countingDifferencesPollingStationPage.next.click();
+
       // voters and votes page should have empty fields
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.pollCardCount).toBeEmpty();
@@ -408,6 +441,9 @@ test.describe("resume data entry flow", () => {
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+      const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -437,6 +473,9 @@ test.describe("resume data entry flow", () => {
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+      const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -478,6 +517,9 @@ test.describe("resume data entry flow", () => {
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+      const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       const voters: VotersCounts = {

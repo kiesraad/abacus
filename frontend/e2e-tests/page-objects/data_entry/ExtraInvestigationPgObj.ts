@@ -26,14 +26,15 @@ export class ExtraInvestigationPage extends DataEntryBasePage {
       name: /^Extra onderzoek B1-1/,
     });
 
-    this.extraInvestigationOtherReason = this.fieldset.getByRole("group", {
-      name: "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
+    this.extraInvestigationOtherReason = this.fieldset.getByRole("group").filter({
+      hasText:
+        "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
     });
     this.extraInvestigationOtherReasonYes = this.extraInvestigationOtherReason.getByLabel("Ja");
     this.extraInvestigationOtherReasonNo = this.extraInvestigationOtherReason.getByLabel("Nee");
 
-    this.ballotsRecounted = this.fieldset.getByRole("group", {
-      name: "Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?",
+    this.ballotsRecounted = this.fieldset.getByRole("group").filter({
+      hasText: "Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?",
     });
     this.ballotsRecountedYes = this.ballotsRecounted.getByLabel("Ja");
     this.ballotsRecountedNo = this.ballotsRecounted.getByLabel("Nee");

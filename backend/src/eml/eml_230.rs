@@ -326,6 +326,24 @@ mod tests {
                 .as_ref()
                 .unwrap()
                 .country_name_code(),
+            Some("NL")
+        );
+
+        let second_candidate = first_pg.candidates.get(1).unwrap();
+        assert_eq!(
+            second_candidate
+                .qualifying_address
+                .as_ref()
+                .unwrap()
+                .locality_name(),
+            "Heemdamseburgsebuurt"
+        );
+        assert_eq!(
+            second_candidate
+                .qualifying_address
+                .as_ref()
+                .unwrap()
+                .country_name_code(),
             None
         );
 

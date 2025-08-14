@@ -8,6 +8,14 @@ import { DataEntryState, DataEntryStateAndActionsLoaded, FormSection } from "../
 
 export function getInitialValues(): PollingStationResults {
   return {
+    extra_investigation: {
+      extra_investigation_other_reason: { yes: false, no: false },
+      ballots_recounted_extra_investigation: { yes: false, no: false },
+    },
+    counting_differences_polling_station: {
+      unexplained_difference_ballots_voters: { yes: false, no: false },
+      difference_ballots_per_list: { yes: false, no: false },
+    },
     voters_counts: {
       poll_card_count: 0,
       proxy_certificate_count: 0,
@@ -27,16 +35,6 @@ export function getInitialValues(): PollingStationResults {
       too_many_ballots_handed_out_count: 0,
       other_explanation_count: 0,
       no_explanation_count: 0,
-    },
-    extra_investigation: {
-      extra_investigation_other_reason: {
-        yes: false,
-        no: false,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: false,
-      },
     },
     political_group_votes: electionMockData.political_groups.map((pg) => ({
       number: pg.number,

@@ -9,7 +9,8 @@ import { CheckboxesSubsectionComponent } from "./CheckboxesSubsection";
 
 const checkboxesSubsection: CheckboxesSubsection = {
   type: "checkboxes",
-  title: "This is the title above the checkboxes",
+  title: "2.1 This is the title",
+  description: "This is the description above the checkboxes",
   short_title: "voters_votes_counts.short_title",
   error_path: "voters_counts.poll_card_count",
   error_message: "This is an error message",

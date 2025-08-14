@@ -4,11 +4,11 @@
   "form_description": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
   "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
   "extra_investigation_other_reason": {
-    "title": "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
+    "description": "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
     "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?"
   },
   "ballots_recounted_extra_investigation": {
-    "title": "Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?",
+    "description": "Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?",
     "short_title": "Stembiljetten na onderzoek (deels) herteld?"
   }
 }

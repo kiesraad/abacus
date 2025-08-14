@@ -22,6 +22,7 @@ export function NumberOfVoters() {
       dispatch({
         type: "SET_NUMBER_OF_VOTERS",
         numberOfVoters,
+        isNumberOfVotersUserEdited: numberOfVoters !== state.numberOfVoters,
       });
       await navigate("/elections/create/check-and-save");
     } else {
@@ -39,7 +40,7 @@ export function NumberOfVoters() {
         })}
         button="Volgende"
         onSubmit={(value) => void handleSubmit(value)}
-        hint={state.numberOfVoters ? t("election.number_of_voters.hint") : undefined}
+        hint={state.isNumberOfVotersUserEdited ? undefined : t("election.number_of_voters.hint")}
         error={error}
       />
     </section>

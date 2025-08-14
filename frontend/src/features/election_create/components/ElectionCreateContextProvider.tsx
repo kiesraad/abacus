@@ -44,6 +44,7 @@ export type ElectionCreateAction =
   | {
       type: "SET_NUMBER_OF_VOTERS";
       numberOfVoters: number;
+      isNumberOfVotersUserEdited: boolean;
     }
   | {
       type: "RESET";
@@ -64,6 +65,7 @@ export interface ElectionCreateState {
   pollingStationDefinitionFileName?: string;
   countingMethod?: VoteCountingMethod;
   numberOfVoters?: number;
+  isNumberOfVotersUserEdited?: boolean;
 }
 
 function reducer(state: ElectionCreateState, action: ElectionCreateAction): ElectionCreateState {
@@ -80,6 +82,7 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         candidateDefinitionRedactedHash: undefined,
         candidateDefinitionData: undefined,
         candidateDefinitionFileName: undefined,
+        isNumberOfVotersUserEdited: false,
       };
     case "SET_ELECTION_DEFINITION_HASH":
       return {
@@ -107,6 +110,7 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         pollingStationDefinitionData: action.pollingStationDefinitionData,
         pollingStationDefinitionFileName: action.pollingStationDefinitionFileName,
         numberOfVoters: action.response.number_of_voters,
+        isNumberOfVotersUserEdited: false,
       };
     case "SET_COUNTING_METHOD_TYPE":
       return {
@@ -117,6 +121,7 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
       return {
         ...state,
         numberOfVoters: action.numberOfVoters,
+        isNumberOfVotersUserEdited: action.isNumberOfVotersUserEdited,
       };
     // Empty the state
     case "RESET":

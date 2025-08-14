@@ -42,16 +42,20 @@ StatusList.Title = function StatusListTitle({ id, children }: { id?: string; chi
   );
 };
 
-// Use around StatusList.Title and StatusList components
-StatusList.Container = function StatusListContainer({ key, children }: { key: string; children: React.ReactNode }) {
+export interface StatusListSectionProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+}
+
+// Use to wrap StatusList.Title and StatusList components
+StatusList.Section = function StatusListContainer({ children, ...props }: StatusListSectionProps) {
   return (
-    <div key={key} className={cls.container}>
+    <section className={cls.container} {...props}>
       {children}
-    </div>
+    </section>
   );
 };
 
-// Use around multiple StatusList.Container components
+// Use to wrap multiple StatusList.Section components
 StatusList.Wrapper = function StatusListWrapper({ children }: { children: React.ReactNode }) {
   return <div className={cls.wrapper}>{children}</div>;
 };

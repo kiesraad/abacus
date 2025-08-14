@@ -23,7 +23,7 @@ export function ResolveErrorsOverview({ structure, results }: ResolveErrorsOverv
   return (
     <StatusList.Wrapper>
       {sections.map(({ section, errors, warnings }) => (
-        <StatusList.Container key={section.id} aria-labelledby={`${section.id}_title`}>
+        <StatusList.Section key={section.id} aria-labelledby={`${section.id}_title`}>
           <StatusList.Title id={`${section.id}_title`}>
             <Link to={`./${section.id}`}>{section.title}</Link>
           </StatusList.Title>
@@ -35,7 +35,7 @@ export function ResolveErrorsOverview({ structure, results }: ResolveErrorsOverv
               <OverviewItem key={code} code={code} status={"warning"} />
             ))}
           </StatusList>
-        </StatusList.Container>
+        </StatusList.Section>
       ))}
     </StatusList.Wrapper>
   );

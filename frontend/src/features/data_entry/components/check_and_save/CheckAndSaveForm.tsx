@@ -141,8 +141,8 @@ export function CheckAndSaveForm() {
             {notableFormSections.map((section) => {
               const title = dataEntryStructure.find((s) => s.id === section.id)?.title || section.id;
               return (
-                <StatusList.Container key={section.id}>
-                  <StatusList.Title>
+                <StatusList.Section key={section.id} aria-labelledby={`${section.id}_title`}>
+                  <StatusList.Title id={`${section.id}_title`}>
                     <Link to={getUrlForFormSection(section.id)}>{title}</Link>
                   </StatusList.Title>
                   <StatusList id={`save-form-summary-list-${section.id}`}>
@@ -165,7 +165,7 @@ export function CheckAndSaveForm() {
                       );
                     })}
                   </StatusList>
-                </StatusList.Container>
+                </StatusList.Section>
               );
             })}
           </StatusList.Wrapper>

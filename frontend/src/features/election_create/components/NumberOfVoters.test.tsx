@@ -32,6 +32,7 @@ describe("NumberOfVoters component", () => {
     expect(dispatch).toHaveBeenCalledExactlyOnceWith({
       type: "SET_NUMBER_OF_VOTERS",
       numberOfVoters: 1337,
+      isNumberOfVotersUserEdited: true,
     });
   });
 
@@ -57,5 +58,6 @@ describe("NumberOfVoters component", () => {
     await renderPage();
 
     expect(screen.getByLabelText("Aantal kiesgerechtigden")).toHaveValue("1234");
+    expect(screen.getByText("Ingelezen uit bestand met stembureaus")).toBeVisible();
   });
 });

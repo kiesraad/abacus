@@ -25,6 +25,7 @@ export function CheckboxesSubsectionComponent({
   return (
     <fieldset className={cls.container}>
       {subsection.title && <legend>{subsection.title}</legend>}
+      {subsection.description && <p>{subsection.description}</p>}
       <ChoiceList>
         {hasErrorOrWarning && (
           <ChoiceList.Error id={`${subsection.error_path}-error`}>{subsection.error_message}</ChoiceList.Error>

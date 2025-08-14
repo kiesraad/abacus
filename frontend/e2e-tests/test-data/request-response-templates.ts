@@ -29,14 +29,12 @@ export const pollingStationRequests: PollingStationRequest[] = [
 export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
   data: {
     extra_investigation: {
-      extra_investigation_other_reason: {
-        yes: false,
-        no: false,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: false,
-      },
+      extra_investigation_other_reason: { yes: false, no: false },
+      ballots_recounted_extra_investigation: { yes: false, no: false },
+    },
+    counting_differences_polling_station: {
+      unexplained_difference_ballots_voters: { yes: false, no: false },
+      difference_ballots_per_list: { yes: false, no: false },
     },
     voters_counts: {
       poll_card_count: 0,
@@ -156,14 +154,12 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
 
 export const noRecountNoDifferencesDataEntry: PollingStationResults = {
   extra_investigation: {
-    extra_investigation_other_reason: {
-      yes: false,
-      no: true,
-    },
-    ballots_recounted_extra_investigation: {
-      yes: false,
-      no: true,
-    },
+    extra_investigation_other_reason: { yes: false, no: true },
+    ballots_recounted_extra_investigation: { yes: false, no: true },
+  },
+  counting_differences_polling_station: {
+    unexplained_difference_ballots_voters: { yes: false, no: true },
+    difference_ballots_per_list: { yes: false, no: true },
   },
   voters_counts: {
     poll_card_count: 3450,
@@ -280,7 +276,7 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
 };
 
 export const dataEntryRequest: DataEntry = {
-  progress: 86,
+  progress: 88,
   data: noRecountNoDifferencesDataEntry,
   client_state: {
     furthest: "political_group_votes_3",
@@ -291,7 +287,7 @@ export const dataEntryRequest: DataEntry = {
 };
 
 export const dataEntryWithErrorRequest: DataEntry = {
-  progress: 83,
+  progress: 86,
   data: {
     ...noRecountNoDifferencesDataEntry,
     voters_counts: {
@@ -309,7 +305,7 @@ export const dataEntryWithErrorRequest: DataEntry = {
 };
 
 export const dataEntryWithDifferencesRequest: DataEntry = {
-  progress: 83,
+  progress: 86,
   data: {
     ...noRecountNoDifferencesDataEntry,
     voters_counts: {

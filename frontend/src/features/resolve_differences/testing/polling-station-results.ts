@@ -6,6 +6,14 @@ import { PollingStationResults } from "@/types/generated/openapi";
  */
 export function pollingStationResultsMockData(first: boolean): PollingStationResults {
   return {
+    extra_investigation: {
+      extra_investigation_other_reason: { yes: !first, no: first },
+      ballots_recounted_extra_investigation: { yes: false, no: !first },
+    },
+    counting_differences_polling_station: {
+      unexplained_difference_ballots_voters: { yes: false, no: false },
+      difference_ballots_per_list: { yes: false, no: false },
+    },
     voters_counts: {
       poll_card_count: 42,
       proxy_certificate_count: 0,
@@ -25,16 +33,6 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
       too_many_ballots_handed_out_count: 0,
       other_explanation_count: 0,
       no_explanation_count: 0,
-    },
-    extra_investigation: {
-      extra_investigation_other_reason: {
-        yes: !first,
-        no: first,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: false,
-        no: !first,
-      },
     },
     political_group_votes: [
       {

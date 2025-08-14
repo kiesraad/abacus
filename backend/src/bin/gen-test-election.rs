@@ -468,6 +468,7 @@ fn generate_polling_station_results(
     let pg_votes = distribute_fill_weights(rng, group_weights, remaining_votes, false);
     PollingStationResults {
         extra_investigation: Default::default(),
+        counting_differences_polling_station: Default::default(),
         voters_counts: VotersCounts {
             poll_card_count: number_of_votes,
             proxy_certificate_count: 0,

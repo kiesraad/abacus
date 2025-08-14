@@ -24,6 +24,7 @@ export function RadioSubsectionComponent({
   return (
     <fieldset className={cls.container}>
       {subsection.title && <legend>{subsection.title}</legend>}
+      {subsection.description && <p>{subsection.description}</p>}
       <ChoiceList>
         {defaultProps.errorsAndWarnings?.get(`data.${subsection.path}`) && (
           <ChoiceList.Error id={`${subsection.path}-error`}>{subsection.error}</ChoiceList.Error>

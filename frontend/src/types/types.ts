@@ -27,6 +27,8 @@ export interface RadioSubsection {
   type: "radio";
   /** Title to display above the radio buttons */
   title?: string;
+  /** Description to display above the checkboxes */
+  description?: string;
   /** Short title for differences view */
   short_title: string;
   error: string;
@@ -47,6 +49,8 @@ export interface CheckboxesSubsection {
   type: "checkboxes";
   /** Title to display above the checkboxes */
   title?: string;
+  /** Description to display above the checkboxes */
+  description?: string;
   /** Short title for differences view */
   short_title: string;
   /** Path in results object that will indicate an error */

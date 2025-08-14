@@ -1,6 +1,7 @@
 use super::{
-    CandidateVotes, Count, DifferencesCounts, ExtraInvestigation, FieldPath, PoliticalGroupVotes,
-    PollingStationResults, VotersCounts, VotesCounts, YesNo,
+    CandidateVotes, Count, CountingDifferencesPollingStation, DifferencesCounts,
+    ExtraInvestigation, FieldPath, PoliticalGroupVotes, PollingStationResults, VotersCounts,
+    VotesCounts, YesNo,
 };
 
 pub trait Compare {
@@ -9,6 +10,18 @@ pub trait Compare {
 
 impl Compare for PollingStationResults {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        self.extra_investigation.compare(
+            &first_entry.extra_investigation,
+            different_fields,
+            &path.field("extra_investigation"),
+        );
+
+        self.counting_differences_polling_station.compare(
+            &first_entry.counting_differences_polling_station,
+            different_fields,
+            &path.field("counting_differences_polling_station"),
+        );
+
         self.voters_counts.compare(
             &first_entry.voters_counts,
             different_fields,
@@ -32,12 +45,6 @@ impl Compare for PollingStationResults {
             different_fields,
             &path.field("political_group_votes"),
         );
-
-        self.extra_investigation.compare(
-            &first_entry.extra_investigation,
-            different_fields,
-            &path.field("extra_investigation"),
-        );
     }
 }
 
@@ -53,6 +60,22 @@ impl Compare for ExtraInvestigation {
             &first_entry.ballots_recounted_extra_investigation,
             different_fields,
             &path.field("ballots_recounted_extra_investigation"),
+        );
+    }
+}
+
+impl Compare for CountingDifferencesPollingStation {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        self.unexplained_difference_ballots_voters.compare(
+            &first_entry.unexplained_difference_ballots_voters,
+            different_fields,
+            &path.field("unexplained_difference_ballots_voters"),
+        );
+
+        self.difference_ballots_per_list.compare(
+            &first_entry.difference_ballots_per_list,
+            different_fields,
+            &path.field("difference_ballots_per_list"),
         );
     }
 }
@@ -226,6 +249,7 @@ mod tests {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
@@ -255,6 +279,7 @@ mod tests {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
@@ -292,6 +317,7 @@ mod tests {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
@@ -321,6 +347,7 @@ mod tests {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
@@ -358,6 +385,7 @@ mod tests {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
@@ -397,6 +425,7 @@ mod tests {
         let mut different_fields: Vec<String> = vec![];
         let first_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
@@ -455,6 +484,7 @@ mod tests {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
@@ -519,6 +549,7 @@ mod tests {
         let mut different_fields = vec![];
         let first_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,

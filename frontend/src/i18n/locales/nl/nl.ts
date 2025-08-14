@@ -4,6 +4,7 @@ import candidate from "./candidate.json";
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
 import committee_session_status from "./committee_session_status.json";
+import counting_differences_polling_station from "./counting_differences_polling_station.json";
 import data_entry from "./data_entry.json";
 import differences_counts from "./differences_counts.json";
 import election from "./election.json";
@@ -35,6 +36,7 @@ const nl = {
   candidates_votes,
   check_and_save,
   committee_session_status,
+  counting_differences_polling_station,
   data_entry,
   differences_counts,
   election,

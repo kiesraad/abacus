@@ -694,6 +694,7 @@ mod tests {
     fn polling_station_result() -> PollingStationResults {
         PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: Default::default(),
             votes_counts: Default::default(),
             differences_counts: Default::default(),
@@ -927,6 +928,7 @@ mod tests {
         // Create data with validation errors that will trigger FirstEntryHasErrors
         let invalid_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 10,
                 proxy_certificate_count: 5,
@@ -1328,6 +1330,7 @@ mod tests {
         let first_entry = polling_station_result();
         let second_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 1,
                 proxy_certificate_count: 0,
@@ -1369,6 +1372,7 @@ mod tests {
         // Create second entry with validation errors that will trigger FirstEntryHasErrors
         let second_entry = PollingStationResults {
             extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
                 poll_card_count: 5,
                 proxy_certificate_count: 3,

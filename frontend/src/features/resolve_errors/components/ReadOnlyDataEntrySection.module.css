@@ -1,0 +1,15 @@
+.titleContainer {
+  margin-bottom: 1.5rem;
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0;
+  }
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}

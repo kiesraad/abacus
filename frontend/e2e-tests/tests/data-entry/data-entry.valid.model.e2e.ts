@@ -18,7 +18,10 @@ import { createMachine } from "xstate";
 import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
-import { assertMachineAndImplementationMatches } from "../../helpers-utils/xstate-helpers";
+import {
+  assertMachineAndImplementationMatches,
+  typeCheckedMachineDefinition,
+} from "../../helpers-utils/xstate-helpers";
 
 /*
 This model-based e2e test covers the state changes from one section (the voters and votes page) that do not trigger any warnings or errors.
@@ -33,7 +36,7 @@ changed the initial input on the voters and votes page, and we have saved it as 
 to the data entry homepage.
 */
 
-const dataEntryMachineDefinition = {
+const dataEntryMachineDefinition = typeCheckedMachineDefinition({
   initial: "voterVotesPageEmpty",
   states: {
     countingDifferencesPollingStationPageFilled: {
@@ -116,7 +119,7 @@ const dataEntryMachineDefinition = {
       },
     },
   },
-};
+} as const);
 
 const machine = createMachine(dataEntryMachineDefinition);
 

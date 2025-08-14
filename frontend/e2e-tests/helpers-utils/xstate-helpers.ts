@@ -3,43 +3,80 @@ import { expect } from "@playwright/test";
 export type TestStates = Record<string, () => Promise<void>>;
 export type TestEvents = Record<string, () => Promise<void>>;
 
-interface MyMachineConfig {
+export interface MachineDefinition {
   initial: string;
   states: {
     [key: string]: { on?: Record<string, string> };
   };
 }
 
-export function getStatesAndEventsFromMachineDefinition(machineDef: MyMachineConfig) {
-  const machineFromStates: string[] = Object.keys(machineDef.states);
+// To be able to show a "custom error message" in the type error
+type ErrorMessage<T extends string> = { __errorMessage__: T };
+
+type ReferencedTargets<TStates> = {
+  [K in keyof TStates]: TStates[K] extends { on: infer TOn } ? TOn[keyof TOn] : never;
+}[keyof TStates];
+
+type RequireStateForAllTargets<TStates> = {
+  // Check if the state exists in the list of all target states
+  [K in Exclude<keyof TStates, symbol>]: K extends ReferencedTargets<TStates>
+    ? unknown
+    : ErrorMessage<`State '${K}' is not used as a target state`>;
+};
+
+type RequireReferencedTargetExists<TStates> = {
+  [K in keyof TStates]: TStates[K] extends { on: infer TOn }
+    ? // If "on" is...
+      TOn extends Record<string, string>
+      ? // Then replace "on" with a validation type
+        Omit<TStates[K], "on"> & { on: ValidateOn<TStates, TOn> }
+      : TStates[K]
+    : TStates[K];
+};
+
+// Check if the on target states exist in the keyof of the machine definition states
+type ValidateOn<TStates, O extends Record<string, string>> = {
+  [E in Exclude<keyof O, symbol>]: O[E] extends keyof TStates
+    ? O[E]
+    : ErrorMessage<`State '${E}' has a target state '${O[E]}' that does not exist`>;
+};
+
+export const typeCheckedMachineDefinition = <T extends MachineDefinition>(
+  dataEntryMachineDefinition: T & {
+    states: RequireStateForAllTargets<T["states"]> & RequireReferencedTargetExists<T["states"]>;
+  },
+) => dataEntryMachineDefinition;
+
+export function getStatesAndEventsFromMachineDefinition(machineDef: MachineDefinition) {
+  const machineStates: string[] = Object.keys(machineDef.states);
   let machineEvents: string[] = [];
-  let machineToStates: string[] = [];
+  let machineTargetStates: string[] = [];
 
   Object.values(machineDef.states).forEach((value) => {
     if ("on" in value) {
       machineEvents = [...machineEvents, ...Object.keys(value.on!)];
-      machineToStates = [...machineToStates, ...Object.values(value.on!)];
+      machineTargetStates = [...machineTargetStates, ...Object.values(value.on!)];
     }
   });
 
-  return { machineFromStates, machineEvents, machineToStates };
+  return { machineStates, machineEvents, machineTargetStates };
 }
 
 export function assertMachineAndImplementationMatches(
-  dataEntryMachineDefinition: MyMachineConfig,
+  machineDefinition: MachineDefinition,
   states: TestStates,
   events: TestEvents,
 ) {
-  const { machineFromStates, machineToStates, machineEvents } =
-    getStatesAndEventsFromMachineDefinition(dataEntryMachineDefinition);
+  const { machineStates, machineEvents, machineTargetStates } =
+    getStatesAndEventsFromMachineDefinition(machineDefinition);
 
-  expect(new Set(machineFromStates), "Machine definition from states and to states do not match").toEqual(
-    new Set(machineToStates),
+  expect(new Set(machineStates), "Machine definition states and target states do not match").toEqual(
+    new Set(machineTargetStates),
   );
-  expect(new Set(Object.keys(states)), "Implemented states and machine definition states do not match").toEqual(
-    new Set(machineFromStates),
+  expect(new Set(machineStates), "Machine definition states and implemented states do not match").toEqual(
+    new Set(Object.keys(states)),
   );
-  expect(new Set(Object.keys(events)), "Implemented events and machine definition events do not match").toEqual(
-    new Set(machineEvents),
+  expect(new Set(machineEvents), "Machine definition events and implemented events do not match").toEqual(
+    new Set(Object.keys(events)),
   );
 }

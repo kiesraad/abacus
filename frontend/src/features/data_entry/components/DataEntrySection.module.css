@@ -8,18 +8,6 @@
   }
 }
 
-.badge {
-  font-family: var(--font-text);
-  font-size: 1.25rem;
-  font-weight: bold;
-  line-height: 1.75rem;
-  padding: 0 0.5rem;
-  border-radius: 0.25rem;
-  background: var(--blue-300);
-  color: var(--base-black);
-  white-space: nowrap;
-}
-
 .formContainer {
   display: flex;
   flex-direction: column;

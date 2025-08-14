@@ -5,6 +5,7 @@ import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSe
 import { DataEntrySubsections } from "@/components/data_entry/DataEntrySubsections";
 import { ErrorModal } from "@/components/error/ErrorModal";
 import { Alert } from "@/components/ui/Alert/Alert";
+import { SectionNumber } from "@/components/ui/Badge/SectionNumber";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
@@ -76,7 +77,7 @@ export function DataEntrySection() {
     <Form onSubmit={handleSubmit} ref={formRef} id={formId}>
       <legend className={cls.titleContainer}>
         <h2>
-          {section.title} {section.sectionNumber && <span className={cls.badge}>{section.sectionNumber}</span>}
+          {section.title} {section.sectionNumber && <SectionNumber>{section.sectionNumber}</SectionNumber>}
         </h2>
       </legend>
       <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />

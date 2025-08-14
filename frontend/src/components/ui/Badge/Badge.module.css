@@ -1,4 +1,4 @@
-.pollingstation {
+.polling_station {
   text-align: center;
   font-family: var(--font-header);
   font-size: 1.5rem;
@@ -8,6 +8,18 @@
   padding: 0.5rem 1rem;
   background: var(--badge-polling-station-bg);
   color: var(--badge-polling-station);
+}
+
+.data_entry_section {
+  font-family: var(--font-text);
+  font-size: 1.25rem;
+  font-weight: bold;
+  line-height: 1.75rem;
+  padding: 0 0.5rem;
+  border-radius: 0.25rem;
+  background: var(--blue-300);
+  color: var(--base-black);
+  white-space: nowrap;
 }
 
 .badge {

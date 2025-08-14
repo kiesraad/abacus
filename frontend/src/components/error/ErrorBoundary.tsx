@@ -1,7 +1,7 @@
 import { Navigate, useRouteError } from "react-router";
 
 import { ApiError, FatalApiError, NetworkError, NotFoundError } from "@/api/ApiResult";
-import { t } from "@/i18n/translate.ts";
+import { t } from "@/i18n/translate";
 
 import { FatalErrorPage } from "./FatalErrorPage";
 import { NotFoundPage } from "./NotFoundPage";
@@ -38,19 +38,10 @@ export function ErrorBoundary() {
     );
   }
 
-  if (error instanceof FatalApiError && error.reference === "InvalidCommitteeSessionStatus") {
-    return (
-      <FatalErrorPage
-        title="error.not_possible"
-        reference={error.reference}
-        code={error.code}
-        message={t("error.forbidden_message")}
-      />
-    );
-  }
-
-  // TODO: This will be shown as a modal in issue 1852
-  if (error instanceof FatalApiError && error.reference === "CommitteeSessionPaused") {
+  if (
+    error instanceof FatalApiError &&
+    (error.reference === "InvalidCommitteeSessionStatus" || error.reference === "CommitteeSessionPaused")
+  ) {
     return (
       <FatalErrorPage
         title="error.not_possible"

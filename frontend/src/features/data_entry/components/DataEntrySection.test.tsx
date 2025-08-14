@@ -1,28 +1,27 @@
-import { useParams } from "react-router";
+import * as reactRouter from "react-router";
 
+import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { useUser } from "@/hooks/user/useUser";
+import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
-import { render, screen } from "@/testing/test-utils";
+import { overrideOnce, server } from "@/testing/server";
+import { renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
+import { ErrorResponse } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { DataEntryProvider } from "./DataEntryProvider";
 import { DataEntrySection } from "./DataEntrySection";
 
-vi.mock("@/hooks/user/useUser");
-vi.mock("react-router");
-
 function renderComponent(sectionId: string) {
-  vi.mocked(useParams).mockReturnValue({ sectionId });
+  vi.spyOn(reactRouter, "useParams").mockReturnValue({ sectionId });
 
-  return render(
+  return renderReturningRouter(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
       <DataEntrySection />
     </DataEntryProvider>,
@@ -31,7 +30,7 @@ function renderComponent(sectionId: string) {
 
 describe("DataEntrySection", () => {
   beforeEach(() => {
-    vi.mocked(useUser).mockReturnValue(getTypistUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 
@@ -76,6 +75,49 @@ describe("DataEntrySection", () => {
       expect(section?.sectionNumber).toBeUndefined();
 
       expect(screen.queryByText(/B1-.*/)).not.toBeInTheDocument();
+    });
+
+    test("Redirect when committee session is paused is returned on claim", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+        error: "Committee session data entry is paused",
+        fatal: true,
+        reference: "CommitteeSessionPaused",
+      } satisfies ErrorResponse);
+
+      const router = renderComponent("extra_investigation");
+
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe("/elections/1/data-entry");
+      });
+    });
+
+    test("Alert when committee session is paused is shown on save and navigate back to overview", async () => {
+      const user = userEvent.setup();
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 409, {
+        error: "Committee session data entry is paused",
+        fatal: true,
+        reference: "CommitteeSessionPaused",
+      } satisfies ErrorResponse);
+
+      const router = renderComponent("extra_investigation");
+
+      // Wait for the page to be loaded
+      const title = await screen.findByText("Extra onderzoek");
+      expect(title).toBeInTheDocument();
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const pausedModal = await screen.findByRole("dialog");
+      expect(within(pausedModal).getByRole("heading", { level: 2, name: "Invoer gepauzeerd" })).toBeVisible();
+      expect(within(pausedModal).getByRole("paragraph")).toHaveTextContent(
+        "De coördinator heeft het invoeren van stemmen gepauzeerd. Je kan niet meer verder. [Je laatste wijzigingen worden niet opgeslagen.]",
+      );
+      expect(within(pausedModal).getByRole("link", { name: "Afmelden" })).toBeVisible();
+      const backToOverviewButton = within(pausedModal).getByRole("link", { name: "Naar startscherm" });
+      await user.click(backToOverviewButton);
+
+      expect(router.state.location.pathname).toEqual("/elections");
     });
   });
 });

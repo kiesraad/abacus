@@ -1,5 +1,6 @@
 import {
   CommitteeSession,
+  ElectionDefinitionValidateResponse,
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionWithPoliticalGroups,
@@ -287,3 +288,27 @@ export const newElectionMockData = {
   ...electionDetailsMockResponse.election,
   polling_stations: pollingStationMockData,
 } as Required<NewElection>;
+
+export const electionImportMockResponse: ElectionWithPoliticalGroups = {
+  id: 2,
+  name: "Gemeenteraad Test 2022",
+  counting_method: "CSO",
+  election_id: "GR2022_Test",
+  location: "Test",
+  domain_id: "0000",
+  category: "Municipal",
+  number_of_seats: 45,
+  election_date: "2022-03-16",
+  nomination_date: "2022-01-31",
+  political_groups: politicalGroupsMockData,
+};
+
+export const electionImportValidateMockResponse: ElectionDefinitionValidateResponse = {
+  hash: {
+    chunks: new Array<string>(16).fill("0000"),
+    redacted_indexes: [3, 11],
+  },
+  election: electionImportMockResponse,
+  polling_stations: pollingStationMockData,
+  number_of_voters: 612694,
+};

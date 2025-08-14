@@ -16,8 +16,8 @@ export function NumberOfVoters() {
     return <Navigate to="/elections/create" />;
   }
 
-  async function handleSubmit(numberOfVoters: number | undefined) {
-    if (numberOfVoters && numberOfVoters > 0) {
+  async function handleSubmit(numberOfVoters: number) {
+    if (numberOfVoters > 0) {
       setError(undefined);
       dispatch({
         type: "SET_NUMBER_OF_VOTERS",

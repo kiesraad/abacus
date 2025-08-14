@@ -27,7 +27,7 @@ export function ResolveErrorsOverview({ structure, results }: ResolveErrorsOverv
           <StatusList.Title id={`${section.id}_title`}>
             <Link to={`./${section.id}`}>{section.title}</Link>
           </StatusList.Title>
-          <StatusList id={`overview-${section.id}`}>
+          <StatusList id={`overview-${section.id}`} gap="sm">
             {errors.getCodes().map((code) => (
               <OverviewItem key={code} code={code} status={"error"} />
             ))}

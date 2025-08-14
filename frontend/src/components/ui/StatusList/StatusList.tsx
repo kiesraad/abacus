@@ -7,11 +7,12 @@ import { StatusIcon } from "../Icon/StatusIcon";
 import cls from "./StatusList.module.css";
 
 export interface StatusListProps extends React.HTMLAttributes<HTMLUListElement> {
+  gap?: "sm" | "md";
   children: React.ReactNode;
 }
-export function StatusList({ children, ...props }: StatusListProps) {
+export function StatusList({ gap = "md", children, ...props }: StatusListProps) {
   return (
-    <ul className={cls.list} {...props}>
+    <ul className={cn(cls.list, cls[gap])} {...props}>
       {children}
     </ul>
   );

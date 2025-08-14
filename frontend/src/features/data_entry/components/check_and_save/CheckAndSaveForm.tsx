@@ -145,7 +145,7 @@ export function CheckAndSaveForm() {
                   <StatusList.Title id={`${section.id}_title`}>
                     <Link to={getUrlForFormSection(section.id)}>{title}</Link>
                   </StatusList.Title>
-                  <StatusList id={`save-form-summary-list-${section.id}`}>
+                  <StatusList id={`save-form-summary-list-${section.id}`} gap="sm">
                     {section.errors.getCodes().map((code) => {
                       return (
                         <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>

@@ -20,13 +20,12 @@ export function StatusList({ children, ...props }: StatusListProps) {
 export interface StatusListItemProps extends React.HTMLAttributes<HTMLLIElement> {
   status: MenuStatus;
   children: React.ReactNode;
-  emphasis?: boolean;
-  padding?: boolean;
+  className?: string;
 }
 
-StatusList.Item = function StatusListItem({ status, children, emphasis, padding, ...props }: StatusListItemProps) {
+StatusList.Item = function StatusListItem({ status, children, className, ...props }: StatusListItemProps) {
   return (
-    <li className={cn(status, { emphasis: !!emphasis }, { padding: !!padding })} {...props}>
+    <li className={cn(status, className)} {...props}>
       <aside>
         <StatusIcon status={status} />
       </aside>
@@ -41,4 +40,18 @@ StatusList.Title = function StatusListTitle({ id, children }: { id?: string; chi
       {children}
     </div>
   );
+};
+
+// Use around StatusList.Title and StatusList components
+StatusList.Container = function StatusListContainer({ key, children }: { key: string; children: React.ReactNode }) {
+  return (
+    <div key={key} className={cls.container}>
+      {children}
+    </div>
+  );
+};
+
+// Use around multiple StatusList.Container components
+StatusList.Wrapper = function StatusListWrapper({ children }: { children: React.ReactNode }) {
+  return <div className={cls.wrapper}>{children}</div>;
 };

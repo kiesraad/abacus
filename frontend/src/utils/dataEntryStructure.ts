@@ -199,7 +199,7 @@ export const countingDifferencesPollingStation: DataEntrySection = {
     },
     {
       type: "heading",
-      title: t("counting_differences_polling_station.heading_counts_on_lists"),
+      title: t("counting_differences_polling_station.heading_counts_of_lists"),
     },
     {
       type: "checkboxes",

@@ -49,7 +49,7 @@ export interface StatusListSectionProps extends React.HTMLAttributes<HTMLDivElem
 // Use to wrap StatusList.Title and StatusList components
 StatusList.Section = function StatusListContainer({ children, ...props }: StatusListSectionProps) {
   return (
-    <section className={cls.container} {...props}>
+    <section className={cls.section} {...props}>
       {children}
     </section>
   );

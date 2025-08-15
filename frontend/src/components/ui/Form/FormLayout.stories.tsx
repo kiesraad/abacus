@@ -27,7 +27,7 @@ export const DefaultFormLayout: StoryFn = () => (
       <FormLayout.Section title="Section 3">
         <FormLayout.Field>
           <ChoiceList>
-            <ChoiceList.Title>Choose an option</ChoiceList.Title>
+            <ChoiceList.Legend>Choose an option</ChoiceList.Legend>
             <ChoiceList.Radio id="option1" label="Option 1">
               Some radio option with quite a large description about the results of picking this option
             </ChoiceList.Radio>

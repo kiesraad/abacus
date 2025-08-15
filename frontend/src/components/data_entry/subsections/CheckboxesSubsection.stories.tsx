@@ -9,21 +9,20 @@ import { CheckboxesSubsectionComponent } from "./CheckboxesSubsection";
 
 const checkboxesSubsection: CheckboxesSubsection = {
   type: "checkboxes",
-  title: "2.1 This is the title",
-  description: "This is the description above the checkboxes",
-  short_title: "voters_votes_counts.short_title",
-  error_path: "voters_counts.poll_card_count",
+  title: "This is the very long legend for the form page",
+  short_title: "This is the short legend",
+  error_path: "test.checkbox",
   error_message: "This is an error message",
   options: [
     {
-      path: "voters_counts.poll_card_count",
-      label: "voters_votes_counts.voters_counts.poll_card_count",
-      short_label: "voters_votes_counts.voters_counts.poll_card_count",
+      path: "test.yes",
+      label: "yes",
+      short_label: "yes",
     },
     {
-      path: "voters_counts.proxy_certificate_count",
-      label: "voters_votes_counts.voters_counts.proxy_certificate_count",
-      short_label: "voters_votes_counts.voters_counts.proxy_certificate_count",
+      path: "test.no",
+      label: "no",
+      short_label: "no",
     },
   ],
 };
@@ -61,7 +60,7 @@ type Story = StoryObj<typeof meta>;
 export const Checkboxes: Story = {
   render: function Render(args) {
     const [currentValues, setCurrentValues] = useState<SectionValues>({
-      "voters_counts.proxy_certificate_count": "true",
+      "test.no": "true",
     });
 
     const setValues = (path: string, value: string) => {

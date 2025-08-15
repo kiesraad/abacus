@@ -21,13 +21,13 @@ export function ResolveErrorsOverview({ structure, results }: ResolveErrorsOverv
     .filter(({ errors, warnings }) => !errors.isEmpty() || !warnings.isEmpty());
 
   return (
-    <>
+    <StatusList.Wrapper>
       {sections.map(({ section, errors, warnings }) => (
-        <section key={section.id} aria-labelledby={`${section.id}_title`}>
+        <StatusList.Section key={section.id} aria-labelledby={`${section.id}_title`}>
           <StatusList.Title id={`${section.id}_title`}>
             <Link to={`./${section.id}`}>{section.title}</Link>
           </StatusList.Title>
-          <StatusList id={`overview-${section.id}`}>
+          <StatusList id={`overview-${section.id}`} gap="sm">
             {errors.getCodes().map((code) => (
               <OverviewItem key={code} code={code} status={"error"} />
             ))}
@@ -35,16 +35,16 @@ export function ResolveErrorsOverview({ structure, results }: ResolveErrorsOverv
               <OverviewItem key={code} code={code} status={"warning"} />
             ))}
           </StatusList>
-        </section>
+        </StatusList.Section>
       ))}
-    </>
+    </StatusList.Wrapper>
   );
 }
 
 function OverviewItem({ code, status }: { code: ValidationResultCode; status: "error" | "warning" }) {
   return (
     <StatusList.Item status={status}>
-      <div className="font-bold">
+      <div className="bold">
         {dottedCode(code)} {t(`feedback.${code}.coordinator.title`)}
       </div>
       <div>

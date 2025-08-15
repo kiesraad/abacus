@@ -5,7 +5,7 @@ import { StatusList } from "./StatusList";
 export const DefaultStatusList: StoryFn = () => (
   <StatusList>
     <StatusList.Item status="accept">Accepted</StatusList.Item>
-    <StatusList.Item status="active" emphasis>
+    <StatusList.Item status="active" className="bold">
       Active with Emphasis
     </StatusList.Item>
     <StatusList.Item status="empty">Empty</StatusList.Item>

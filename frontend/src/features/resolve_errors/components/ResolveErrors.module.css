@@ -1,10 +1,4 @@
 .resolveErrors {
-  p {
-    max-width: 37.5rem;
-    color: var(--text-color-header);
-    margin-bottom: 1rem;
-  }
-
   .resolveForm {
     margin-top: 1.5rem;
     padding: 1.5rem;

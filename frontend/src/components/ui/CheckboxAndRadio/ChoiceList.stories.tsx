@@ -10,7 +10,7 @@ type Props = {
 export const DefaultChoiceListCheckbox: StoryObj<Props> = {
   render: ({ label, error }) => (
     <ChoiceList>
-      <ChoiceList.Title>ChoiceList Checkbox Title</ChoiceList.Title>
+      <ChoiceList.Legend>ChoiceList Checkbox Legend</ChoiceList.Legend>
       {error && <ChoiceList.Error id="choicelist-error">{error}</ChoiceList.Error>}
       <ChoiceList.Checkbox id="default-checkbox" defaultChecked={false} label={label} />
       <ChoiceList.Checkbox id="default-checkbox-with-description" defaultChecked={false} label={label}>
@@ -29,7 +29,7 @@ export const DefaultChoiceListCheckbox: StoryObj<Props> = {
 export const DefaultChoiceListRadio: StoryObj<Props> = {
   render: ({ label, error }) => (
     <ChoiceList>
-      <ChoiceList.Title>ChoiceList Radio Title</ChoiceList.Title>
+      <ChoiceList.Legend>ChoiceList Radio Legend</ChoiceList.Legend>
       {error && <ChoiceList.Error id="choicelist-error">{error}</ChoiceList.Error>}
       <ChoiceList.Radio id="default-radio" defaultChecked={false} label={label} />
       <ChoiceList.Radio id="default-radio-with-description" defaultChecked={false} label={label}>

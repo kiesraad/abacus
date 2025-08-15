@@ -1,16 +1,16 @@
 {
   "difference_ballots_per_list": {
-    "description": "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
     "short_title": "Verschil tussen totalen per lijst op stembureau en gemeentelijk stembureau?",
-    "title": "2.3 Tellingen op lijstniveau"
+    "title": "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?"
   },
   "form_description": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
   "form_title": "Verschillen met telresultaten van het stembureau",
+  "heading_counts_of_lists": "2.3 Tellingen op lijstniveau",
+  "heading_voters_and_votes": "2.1  Aantallen kiezers en stemmen",
   "short_title": "Verschillen met stembureau",
   "unexplained_difference_ballots_voters": {
-    "description": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?",
     "short_title": "Verschil tussen getelde stembiljetten en toegelaten kiezers?",
-    "title": "2.1  Aantallen kiezers en stemmen"
+    "title": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?"
   },
   "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal"
 }

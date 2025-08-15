@@ -52,7 +52,7 @@ export function UserCreateRolePage() {
             <FormLayout.Section title={t("users.role_title")}>
               <p>{t("users.role_hint")}</p>
               <ChoiceList>
-                <ChoiceList.Title>{t("users.role_label")}</ChoiceList.Title>
+                <ChoiceList.Legend>{t("users.role_label")}</ChoiceList.Legend>
                 {error && <ChoiceList.Error id="role-error">{error}</ChoiceList.Error>}
                 <ChoiceList.Radio
                   id={"role-administrator"}

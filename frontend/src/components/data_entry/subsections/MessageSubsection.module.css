@@ -1,5 +1,4 @@
 .message {
-  font-size: var(--font-size-md);
   color: var(--gray-900);
-  margin-bottom: 2rem;
+  width: 37.5rem;
 }

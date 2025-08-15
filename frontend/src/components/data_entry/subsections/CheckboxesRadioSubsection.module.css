@@ -1,15 +1,7 @@
 .container {
   width: 37.5rem;
-  margin-bottom: 2rem;
-
-  legend,
-  p {
-    font-size: var(--font-size-md);
-    color: var(--gray-900);
-    margin-bottom: 1rem;
-  }
 
   legend {
-    font-weight: bold;
+    font-weight: inherit;
   }
 }

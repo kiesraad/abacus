@@ -137,7 +137,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
             </FormLayout.Row>
 
             <ChoiceList>
-              <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
+              <ChoiceList.Legend>{t("polling_station.title.type")}</ChoiceList.Legend>
               {validationResult.polling_station_type && (
                 <ChoiceList.Error id="polling-station-type-error">
                   {t(`form_errors.${validationResult.polling_station_type}`)}

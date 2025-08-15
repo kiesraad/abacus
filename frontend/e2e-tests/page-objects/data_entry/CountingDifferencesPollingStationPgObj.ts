@@ -26,14 +26,16 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
       name: /^Verschillen met telresultaten van het stembureau B1-2/,
     });
 
-    this.differenceBallotsPerList = this.fieldset.getByRole("group", {
-      name: "2.1  Aantallen kiezers en stemmen",
+    this.differenceBallotsPerList = this.fieldset.getByRole("group").filter({
+      hasText:
+        "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?",
     });
     this.differenceBallotsPerListYes = this.differenceBallotsPerList.getByLabel("Ja");
     this.differenceBallotsPerListNo = this.differenceBallotsPerList.getByLabel("Nee");
 
-    this.unexplainedDifferenceBallotsVoters = this.fieldset.getByRole("group", {
-      name: "2.3 Tellingen op lijstniveau",
+    this.unexplainedDifferenceBallotsVoters = this.fieldset.getByRole("group").filter({
+      hasText:
+        "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
     });
     this.unexplainedDifferenceBallotsVotersYes = this.unexplainedDifferenceBallotsVoters.getByLabel("Ja");
     this.unexplainedDifferenceBallotsVotersNo = this.unexplainedDifferenceBallotsVoters.getByLabel("Nee");

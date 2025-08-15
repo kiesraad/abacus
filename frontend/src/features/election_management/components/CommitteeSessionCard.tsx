@@ -69,7 +69,7 @@ function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
               void navigate(buttonLink.to);
             }}
           >
-            <span className={cn(firstRowBold && index === 0 && "font-bold")}>{buttonLink.label}</span>
+            <span className={cn(firstRowBold && index === 0 && "bold")}>{buttonLink.label}</span>
           </button>
         </Fragment>
       ))}

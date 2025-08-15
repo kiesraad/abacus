@@ -7,11 +7,12 @@ import { StatusIcon } from "../Icon/StatusIcon";
 import cls from "./StatusList.module.css";
 
 export interface StatusListProps extends React.HTMLAttributes<HTMLUListElement> {
+  gap?: "sm" | "md";
   children: React.ReactNode;
 }
-export function StatusList({ children, ...props }: StatusListProps) {
+export function StatusList({ gap = "md", children, ...props }: StatusListProps) {
   return (
-    <ul className={cls.list} {...props}>
+    <ul className={cn(cls.list, cls[gap])} {...props}>
       {children}
     </ul>
   );
@@ -20,13 +21,12 @@ export function StatusList({ children, ...props }: StatusListProps) {
 export interface StatusListItemProps extends React.HTMLAttributes<HTMLLIElement> {
   status: MenuStatus;
   children: React.ReactNode;
-  emphasis?: boolean;
-  padding?: boolean;
+  className?: string;
 }
 
-StatusList.Item = function StatusListItem({ status, children, emphasis, padding, ...props }: StatusListItemProps) {
+StatusList.Item = function StatusListItem({ status, children, className, ...props }: StatusListItemProps) {
   return (
-    <li className={cn(status, { emphasis: !!emphasis }, { padding: !!padding })} {...props}>
+    <li className={cn(status, className)} {...props}>
       <aside>
         <StatusIcon status={status} />
       </aside>
@@ -41,4 +41,22 @@ StatusList.Title = function StatusListTitle({ id, children }: { id?: string; chi
       {children}
     </div>
   );
+};
+
+export interface StatusListSectionProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+}
+
+// Use to wrap StatusList.Title and StatusList components
+StatusList.Section = function StatusListContainer({ children, ...props }: StatusListSectionProps) {
+  return (
+    <section className={cls.section} {...props}>
+      {children}
+    </section>
+  );
+};
+
+// Use to wrap multiple StatusList.Section components
+StatusList.Wrapper = function StatusListWrapper({ children }: { children: React.ReactNode }) {
+  return <div className={cls.wrapper}>{children}</div>;
 };

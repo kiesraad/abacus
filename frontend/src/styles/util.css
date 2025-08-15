@@ -48,10 +48,6 @@
   background-color: var(--yellow-200);
 }
 
-.font-bold {
-  font-weight: bold;
-}
-
 .font-italic {
   font-style: italic;
 }

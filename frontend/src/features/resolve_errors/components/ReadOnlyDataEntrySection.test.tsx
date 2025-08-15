@@ -25,16 +25,26 @@ describe("ReadOnlyDataEntrySection", () => {
     return render(<ReadOnlyDataEntrySection section={section} data={data} validationResults={validationResults} />);
   };
 
-  test("renders section with title", () => {
+  test("renders section with title", async () => {
     renderComponent();
 
-    expect(screen.getByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Toegelaten kiezers en uitgebrachte stemmen B1-3.1 en 3.2",
+      }),
+    ).toBeVisible();
   });
 
-  test("renders without any feedback when no validation results", () => {
+  test("renders without any feedback when no validation results", async () => {
     renderComponent();
 
-    expect(screen.getByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Toegelaten kiezers en uitgebrachte stemmen B1-3.1 en 3.2",
+      }),
+    ).toBeVisible();
 
     expect(screen.queryByTestId("feedback-error")).not.toBeInTheDocument();
     expect(screen.queryByText(/F\./)).not.toBeInTheDocument();

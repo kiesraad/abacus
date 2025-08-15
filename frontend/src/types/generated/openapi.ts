@@ -585,10 +585,10 @@ export interface ElectionAndCandidateDefinitionValidateRequest {
 export interface ElectionAndCandidatesDefinitionImportRequest {
   candidate_data: string;
   candidate_hash: string[];
-  counting_method?: VoteCountingMethod;
+  counting_method: VoteCountingMethod;
   election_data: string;
   election_hash: string[];
-  number_of_voters?: number;
+  number_of_voters: number;
   polling_station_data?: string;
   polling_station_file_name?: string;
 }

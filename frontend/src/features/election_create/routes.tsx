@@ -3,6 +3,7 @@ import { RouteObject } from "react-router";
 import { CheckAndSave } from "./components/CheckAndSave";
 import { CountingMethodType } from "./components/CountingMethodType";
 import { ElectionCreateLayout } from "./components/ElectionCreateLayout";
+import { NumberOfVoters } from "./components/NumberOfVoters";
 import { UploadCandidatesDefinition } from "./components/UploadCandidatesDefinition";
 import { UploadElectionDefinition } from "./components/UploadElectionDefinition";
 import { UploadPollingStationDefinition } from "./components/UploadPollingStationDefinition";
@@ -15,6 +16,7 @@ export const electionCreateRoutes: RouteObject[] = [
       { path: "list-of-candidates", Component: UploadCandidatesDefinition },
       { path: "polling-stations", Component: UploadPollingStationDefinition },
       { path: "counting-method-type", Component: CountingMethodType },
+      { path: "number-of-voters", Component: NumberOfVoters },
       { path: "check-and-save", Component: CheckAndSave },
     ],
   },

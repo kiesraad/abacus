@@ -101,6 +101,8 @@ export const test = base.extend<Fixtures>({
         election_hash: eml110a.fullHash,
         candidate_data,
         candidate_hash: eml230b.fullHash,
+        number_of_voters: 1234,
+        counting_method: "CSO",
       },
     });
     expect(electionResponse.ok()).toBeTruthy();

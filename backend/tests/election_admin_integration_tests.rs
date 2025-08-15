@@ -361,6 +361,8 @@ async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
             ],
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_empty_candidates.eml.xml"),
+            "number_of_voters": 1234,
+            "counting_method": "CSO",
         }))
         .send()
         .await
@@ -395,6 +397,8 @@ async fn test_election_import_save(pool: SqlitePool) {
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
+            "number_of_voters": 1234,
+            "counting_method": "CSO",
         }))
         .send()
         .await
@@ -429,6 +433,8 @@ async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
+            "number_of_voters": 1234,
+            "counting_method": "CSO",
         }))
         .send()
         .await
@@ -463,6 +469,8 @@ async fn test_election_import_save_empty_candidate_stubs(pool: SqlitePool) {
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
+            "number_of_voters": 1234,
+            "counting_method": "CSO",
         }))
         .send()
         .await
@@ -497,6 +505,8 @@ async fn test_election_import_save_wrong_hash(pool: SqlitePool) {
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
+            "number_of_voters": 1234,
+            "counting_method": "CSO",
         }))
         .send()
         .await
@@ -530,6 +540,8 @@ async fn test_election_import_missing_file_name(pool: SqlitePool) {
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "number_of_voters": 1234,
+            "counting_method": "CSO",
         }))
         .send()
         .await
@@ -563,6 +575,8 @@ async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
+            "number_of_voters": 1234,
+            "counting_method": "CSO",
         }))
         .send()
         .await
@@ -629,6 +643,8 @@ async fn test_election_polling_stations_validate_invalid(pool: SqlitePool) {
             ],
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+            "number_of_voters": 1234,
+            "counting_method": "CSO",
         }))
         .send()
         .await

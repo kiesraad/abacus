@@ -12,7 +12,7 @@ import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
  * NOTE: DSO is currently unsupported by Abacus, so it is disabled by default
  */
 export function CountingMethodType() {
-  const { state } = useElectionCreateContext();
+  const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
 
   // if no election data was stored, navigate back to beginning
@@ -22,7 +22,12 @@ export function CountingMethodType() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await navigate("/elections/create/check-and-save");
+    dispatch({
+      type: "SET_COUNTING_METHOD_TYPE",
+      // This is hardcoded to CSO until we have support for DSO
+      countingMethod: "CSO",
+    });
+    await navigate("/elections/create/number-of-voters");
   }
 
   return (

@@ -30,6 +30,8 @@ export function NumberOfVoters() {
     }
   }
 
+  const showHint = !state.isNumberOfVotersUserEdited && state.numberOfVoters !== undefined;
+
   return (
     <section className="md">
       <NumberOfVotersForm
@@ -40,7 +42,7 @@ export function NumberOfVoters() {
         })}
         button="Volgende"
         onSubmit={(value) => void handleSubmit(value)}
-        hint={state.isNumberOfVotersUserEdited ? undefined : t("election.number_of_voters.hint")}
+        hint={showHint ? t("election.number_of_voters.hint") : undefined}
         error={error}
       />
     </section>

@@ -53,6 +53,52 @@ async fn test_election_committee_session_list_not_found(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_committee_session_create_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let election_id = 2;
+
+    shared::change_status_committee_session(
+        &addr,
+        &cookie,
+        election_id,
+        CommitteeSessionStatus::DataEntryFinished,
+    )
+    .await;
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryFinished
+    );
+
+    let url = format!("http://{addr}/api/committee_sessions");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", &cookie)
+        .json(&CommitteeSessionCreateRequest {
+            number: 2,
+            election_id,
+            number_of_voters: 0,
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(
+        response.status(),
+        StatusCode::CREATED,
+        "Unexpected response status"
+    );
+    let body: CommitteeSession = response.json().await.unwrap();
+    assert_eq!(body.id, 3);
+    assert_eq!(body.number, 2);
+    assert_eq!(body.election_id, election_id);
+    assert_eq!(body.status, CommitteeSessionStatus::Created);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_committee_session_create_current_committee_session_not_finalised(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/committee_sessions");
     let coordinator_cookie = shared::coordinator_login(&addr).await;
@@ -71,14 +117,9 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
     // Ensure the response is what we expect
     assert_eq!(
         response.status(),
-        StatusCode::CREATED,
+        StatusCode::CONFLICT,
         "Unexpected response status"
     );
-    let body: CommitteeSession = response.json().await.unwrap();
-    assert_eq!(body.id, 3);
-    assert_eq!(body.number, 2);
-    assert_eq!(body.election_id, 2);
-    assert_eq!(body.status, CommitteeSessionStatus::Created);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

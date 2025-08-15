@@ -31,7 +31,9 @@ export function TestUserProvider({ userRole, children, overrideExpiration }: Tes
           username: "test",
         }
       : null,
-    logout: async () => {},
+    logout: async () => {
+      return Promise.resolve({} as ApiResult<null>);
+    },
     login: async () => {
       return Promise.resolve({} as ApiResult<LoginResponse>);
     },

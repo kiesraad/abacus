@@ -13,7 +13,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-    status::change_committee_session_status,
+    status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
     APIError, AppState, ErrorResponse,
@@ -97,6 +97,7 @@ pub async fn election_committee_session_list(
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -106,17 +107,28 @@ pub async fn committee_session_create(
     audit_service: AuditService,
     Json(committee_session_request): Json<CommitteeSessionCreateRequest>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
-    let committee_session =
-        crate::committee_session::repository::create(&pool, committee_session_request).await?;
+    let committee_session = crate::committee_session::repository::get_election_committee_session(
+        &pool,
+        committee_session_request.election_id,
+    )
+    .await?;
+    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        let committee_session =
+            crate::committee_session::repository::create(&pool, committee_session_request).await?;
 
-    audit_service
-        .log(
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
-            None,
-        )
-        .await?;
+        audit_service
+            .log(
+                &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+                None,
+            )
+            .await?;
 
-    Ok((StatusCode::CREATED, committee_session))
+        Ok((StatusCode::CREATED, committee_session))
+    } else {
+        Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ))
+    }
 }
 
 /// Update a [CommitteeSession].

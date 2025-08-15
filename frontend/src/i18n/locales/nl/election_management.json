@@ -18,6 +18,8 @@
   "enter_a_number": "Voer een getal in",
   "enter_number_of_voters": "Voer het aantal kiesgerechtigden in zoals door de gemeenteraad vastgesteld voor de {name} in de gemeente {location}.",
   "how_many_voters": "Hoeveel kiesgerechtigden telt de gemeente?",
+  "if_gsb_correction": "Wil het Gemeentelijk Stembureau zelf een fout herstellen en is de zitting nog niet afgesloten door de voorzitter? Ga dan verder in de eerste zitting.",
+  "investigation_ordered_by_csb": "Onderzoek in opdracht van het CSB?",
   "lists_and_candidates": "Lijsten en kandidaten",
   "manage_polling_stations": "Stembureaus beheren",
   "model_name": "Model",
@@ -25,6 +27,8 @@
   "na_31_2_bijlage_1": "Verslagen van tellingen van stembureau",
   "n_10_2": "Processen-verbaal per stembureau",
   "no_polling_stations": "Geen stembureaus",
+  "only_add_if_ordered": "Voeg alleen een nieuwe zitting toe als het Centraal Stembureau hier opdracht voor heeft gegeven.",
+  "prepare_new_session": "Nieuwe zitting voorbereiden",
   "results_and_documents": "Resultaten en documenten",
   "resume_or_check_progress": "Hervatten of voortgang bekijken",
   "select_polling_stations": "Selecteer stembureaus",
@@ -41,5 +45,6 @@
   "to_do_data_entry_for": "Invoer doen voor",
   "to_report": "Naar proces-verbaal",
   "view_data_entry": "Steminvoer bekijken",
-  "view_progress": "Bekijk voortgang"
+  "view_progress": "Bekijk voortgang",
+  "yes_add_session": "Ja, zitting toevoegen"
 }

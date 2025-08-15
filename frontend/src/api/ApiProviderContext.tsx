@@ -9,7 +9,7 @@ export interface ApiState {
   client: ApiClient;
   user: LoginResponse | null;
   setUser: (user: LoginResponse | null) => void;
-  logout: () => Promise<void>;
+  logout: () => Promise<ApiResult<null>>;
   login: (username: string, password: string) => Promise<ApiResult<LoginResponse>>;
   loading: boolean;
   expiration: Date | null;

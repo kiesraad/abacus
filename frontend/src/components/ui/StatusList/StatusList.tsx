@@ -22,22 +22,11 @@ export interface StatusListItemProps extends React.HTMLAttributes<HTMLLIElement>
   children: React.ReactNode;
   emphasis?: boolean;
   padding?: boolean;
-  smallerMargin?: boolean;
 }
 
-StatusList.Item = function StatusListItem({
-  status,
-  children,
-  emphasis,
-  padding,
-  smallerMargin,
-  ...props
-}: StatusListItemProps) {
+StatusList.Item = function StatusListItem({ status, children, emphasis, padding, ...props }: StatusListItemProps) {
   return (
-    <li
-      className={cn(status, { emphasis: !!emphasis }, { padding: !!padding }, { smallerMargin: !!smallerMargin })}
-      {...props}
-    >
+    <li className={cn(status, { emphasis: !!emphasis }, { padding: !!padding })} {...props}>
       <aside>
         <StatusIcon status={status} />
       </aside>

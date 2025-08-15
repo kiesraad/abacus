@@ -147,12 +147,7 @@ export function CheckAndSaveForm() {
                 <StatusList id={`save-form-summary-list-${section.id}`}>
                   {section.errors.getCodes().map((code) => {
                     return (
-                      <StatusList.Item
-                        key={code}
-                        status="error"
-                        id={`section-error-${section.id}-${code}`}
-                        smallerMargin
-                      >
+                      <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>
                         <strong>{dottedCode(code)}</strong>
                         &nbsp;
                         {tx(`feedback.${code}.typist.title`)}
@@ -161,12 +156,7 @@ export function CheckAndSaveForm() {
                   })}
                   {section.warnings.getCodes().map((code) => {
                     return (
-                      <StatusList.Item
-                        key={code}
-                        status="warning"
-                        id={`section-error-${section.id}-${code}`}
-                        smallerMargin
-                      >
+                      <StatusList.Item key={code} status="warning" id={`section-error-${section.id}-${code}`}>
                         <strong>{dottedCode(code)}</strong>
                         &nbsp;
                         {tx(`feedback.${code}.typist.title`)}
@@ -180,7 +170,7 @@ export function CheckAndSaveForm() {
         </>
       ) : (
         <>
-          <div id="save-form-summary-text">
+          <section className="md" id="save-form-summary-text">
             {!hasErrors && allFeedbackAccepted && <p className="md">{t("check_and_save.counts_add_up.no_warnings")}</p>}
             {!hasErrors && hasWarnings && !allFeedbackAccepted && (
               <>
@@ -194,7 +184,7 @@ export function CheckAndSaveForm() {
                 <p className="md">{t("check_and_save.fix_the_errors")}</p>
               </>
             )}
-          </div>
+          </section>
           <StatusList id="save-form-summary-list">
             {!hasErrors && <StatusList.Item status="accept">{t("check_and_save.counts_add_up_title")}</StatusList.Item>}
 

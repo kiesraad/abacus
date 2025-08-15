@@ -127,7 +127,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 ### Regels voor totalen (reeks F.2xx)
 
-#### F.201: `stempassen + volmachten <> totaal toegelaten kiezers`
+#### CSO en DSO | F.201: `stempassen + volmachten <> totaal toegelaten kiezers`
 
 > Invoerder: **Controleer toegelaten kiezers** (F.201)  
 > De invoer bij A, B of D klopt niet.  
@@ -140,7 +140,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 Velden markeren: A, B en D  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-#### F.202: `E.1 t/m E.n tellen niet op naar E`
+#### CSO en DSO | F.202: `E.1 t/m E.n tellen niet op naar E`
 
 > Invoerder **Controleer de stemmen op lijsten en totaal stemmen op kandidaten** (F.202)
 
@@ -152,7 +152,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 Velden markeren: E.1 t/m E.n en E  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
 
-#### F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen`
+#### CSO en DSO | F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen`
 
 > Invoerder: **Controleer uitgebrachte stemmen** (F.203)  
 > De invoer bij E, F, G of H klopt niet.  
@@ -168,7 +168,7 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 ### Regels voor verschillen (reeks F.3xx)
 
-#### F.301 "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
+#### CSO en DSO | F.301 "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
 
 > Invoerder: **Controleer je antwoorden** (F.301)
 

@@ -30,6 +30,7 @@
     "list_name": "{location}, kandidatenlijst {name}",
     "polling_station_title": "Controleer stembureaus"
   },
+  "configuration_not_finished": "De configuratie van Abacus is nog niet afgerond.",
   "create": "Verkiezing toevoegen",
   "import_candidates_eml": "Importeer kandidatenlijst",
   "import_election_eml": "Importeer verkiezingsdefinitie",
@@ -51,7 +52,7 @@
   },
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",
-  "manage": "Beheer verkiezingen",
+  "manage": "Verkiezingen beheren",
   "no_elections_added": "Nog geen verkiezingen ingesteld",
   "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",
   "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
@@ -85,5 +86,6 @@
     "dso_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
     "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
     "title": "Type stemopneming in"
-  }
+  },
+  "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."
 }

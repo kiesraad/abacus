@@ -6,9 +6,9 @@ import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ApiProvider } from "@/api/ApiProvider.tsx";
-import { ErrorBoundary } from "@/components/error/ErrorBoundary.tsx";
-import { electionManagementRoutes } from "@/features/election_management/routes.tsx";
+import { ApiProvider } from "@/api/ApiProvider";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
@@ -17,7 +17,7 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { getRouter, Router } from "@/testing/router.tsx";
+import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import {
   expectConflictErrorPage,
@@ -27,8 +27,8 @@ import {
   spyOnHandler,
   waitFor,
 } from "@/testing/test-utils";
-import { TestUserProvider } from "@/testing/TestUserProvider.tsx";
-import { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi.ts";
+import { TestUserProvider } from "@/testing/TestUserProvider";
+import { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { ElectionReportPage } from "./ElectionReportPage";
 

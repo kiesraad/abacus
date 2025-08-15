@@ -6,8 +6,6 @@ import { Modal } from "@/components/ui/Modal/Modal";
 import { TranslationPath } from "@/i18n/i18n.types";
 import { t } from "@/i18n/translate";
 
-import cls from "./ErrorModal.module.css";
-
 interface ErrorModalProps {
   error: AnyApiError;
 }
@@ -34,16 +32,14 @@ export function ErrorModal({ error }: ErrorModalProps) {
     if (key !== t(key)) {
       return (
         <Modal title={t("something_went_wrong")} onClose={hideModal}>
-          <div id="error-modal" className={cls.error}>
-            <p>
-              <strong>{t(key)}</strong>
-            </p>
-            <nav>
-              <Button size="md" onClick={hideModal}>
-                {t("close_message")}
-              </Button>
-            </nav>
-          </div>
+          <p>
+            <strong>{t(key)}</strong>
+          </p>
+          <nav>
+            <Button size="md" onClick={hideModal}>
+              {t("close_message")}
+            </Button>
+          </nav>
         </Modal>
       );
     }
@@ -51,21 +47,19 @@ export function ErrorModal({ error }: ErrorModalProps) {
 
   return (
     <Modal title={t("something_went_wrong")} onClose={hideModal}>
-      <div id="error-modal" className={cls.error}>
-        {error instanceof ApiError && error.code && (
-          <p>
-            <strong>
-              {t("error_code")}: <code>{error.code}</code>
-            </strong>
-          </p>
-        )}
-        <p>{error.message}</p>
-        <nav>
-          <Button size="md" onClick={hideModal}>
-            {t("close_message")}
-          </Button>
-        </nav>
-      </div>
+      {error instanceof ApiError && error.code && (
+        <p>
+          <strong>
+            {t("error_code")}: <code>{error.code}</code>
+          </strong>
+        </p>
+      )}
+      <p>{error.message}</p>
+      <nav>
+        <Button size="md" onClick={hideModal}>
+          {t("close_message")}
+        </Button>
+      </nav>
     </Modal>
   );
 }

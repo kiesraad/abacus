@@ -122,7 +122,7 @@ describe("User create pages integration test", () => {
       await user.type(detailsPage.password(), "Geluksdubbeltje10");
       await user.click(detailsPage.save());
 
-      expect(await screen.findByRole("heading", { level: 1, name: "Gebruikersbeheer" })).toBeInTheDocument();
+      expect(await screen.findByRole("heading", { level: 1, name: "Gebruikers beheren" })).toBeInTheDocument();
       const alert = await screen.findByRole("alert");
       expect(within(alert).getByRole("strong")).toHaveTextContent("Gebruiker toegevoegd");
       expect(within(alert).getByRole("paragraph")).toHaveTextContent("GuusGeluk is toegevoegd met de rol Beheerder");

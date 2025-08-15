@@ -75,7 +75,7 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
           />
         )}
         <div className={cls.modalBody}>
-          <h2 id="modal-title" tabIndex={-1}>
+          <h2 id="modal-title" className="heading-md" tabIndex={-1}>
             {title}
           </h2>
           {noFlex ? <div className={cls.noFlex}>{children}</div> : children}

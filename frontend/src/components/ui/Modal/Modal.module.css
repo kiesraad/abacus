@@ -50,6 +50,7 @@
     }
 
     > nav {
+      margin-top: var(--space-sm);
       display: flex;
       align-items: center;
       min-height: 4rem;

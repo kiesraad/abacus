@@ -24,6 +24,8 @@ describe("PollingStationListPage", () => {
       </ElectionProvider>,
     );
 
+    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
+
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
@@ -50,6 +52,7 @@ describe("PollingStationListPage", () => {
       </ElectionProvider>,
     );
 
+    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
     expect(await screen.findByText(/Er zijn nog geen stembureaus ingevoerd/)).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();
   });

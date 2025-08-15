@@ -20,6 +20,7 @@
   "house_number": "Huisnummer",
   "house_number_addition": "Toevoeging",
   "locality": "Plaats",
+  "manage": "Stembureaus beheren",
   "message": {
     "delete_error": "Het stembureau kan niet meer verwijderd worden. De invoerfase is al gestart.",
     "delete_error_title": "Stembureau kan niet verwijderd worden",

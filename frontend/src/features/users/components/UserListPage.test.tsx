@@ -15,6 +15,8 @@ describe("PollingStationListPage", () => {
   test("Show users", async () => {
     render(<UserListPage />);
 
+    expect(await screen.findByRole("heading", { level: 1, name: "Gebruikers beheren" })).toBeVisible();
+
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
@@ -31,6 +33,8 @@ describe("PollingStationListPage", () => {
     const users = [userMockData[2], userMockData[1], userMockData[4], userMockData[0], userMockData[3]];
     overrideOnce("get", "/api/user", 200, { users });
     render(<UserListPage />);
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Gebruikers beheren" })).toBeVisible();
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();

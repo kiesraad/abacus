@@ -17,6 +17,13 @@
   width: 58.5rem;
 }
 
+.downloadModels {
+  p {
+    width: 32rem;
+    margin-bottom: var(--space-md);
+  }
+}
+
 .reportInfoSection {
   margin-bottom: 2rem;
   width: 37.5rem;

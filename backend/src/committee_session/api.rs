@@ -13,9 +13,8 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-    status::change_committee_session_status,
+    status::{CommitteeSessionStatus, change_committee_session_status},
 };
-use crate::committee_session::status::CommitteeSessionStatus::DataEntryFinished;
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
@@ -113,7 +112,7 @@ pub async fn committee_session_create(
         committee_session_request.election_id,
     )
     .await?;
-    if committee_session.status == DataEntryFinished {
+    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
         let committee_session =
             crate::committee_session::repository::create(&pool, committee_session_request).await?;
 

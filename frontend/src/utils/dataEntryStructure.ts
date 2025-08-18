@@ -36,6 +36,7 @@ export const createVotersAndVotesSection = (election: ElectionWithPoliticalGroup
             code: "B",
             path: "voters_counts.proxy_certificate_count",
             title: t("voters_votes_counts.voters_counts.proxy_certificate_count"),
+            addSeparator: true,
           },
           {
             code: "D",

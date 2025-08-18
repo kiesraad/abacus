@@ -139,7 +139,6 @@ impl Compare for VotersCounts {
 
 impl Compare for VotesCounts {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        // TODO impl comparison for PoliticalGroupTotalVotes + adjust/add tests
         self.political_group_total_votes.compare(
             &first_entry.political_group_total_votes,
             different_fields,
@@ -172,18 +171,14 @@ impl Compare for VotesCounts {
 
 impl Compare for Vec<PoliticalGroupTotalVotes> {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        // compare each political group
+        // compare total of each political group
         for (i, pgv) in self.iter().enumerate() {
-            pgv.compare(&first_entry[i], different_fields, &path.index(i));
+            pgv.total.compare(
+                &first_entry[i].total,
+                different_fields,
+                &path.index(i).field("total"),
+            );
         }
-    }
-}
-
-impl Compare for PoliticalGroupTotalVotes {
-    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        // compare the total votes for the political group
-        self.total
-            .compare(&first_entry.total, different_fields, &path.field("total"));
     }
 }
 
@@ -264,8 +259,6 @@ impl Compare for CandidateVotes {
 #[cfg(test)]
 mod tests {
     use test_log::test;
-
-    use crate::data_entry::PoliticalGroupTotalVotes;
 
     use super::*;
 

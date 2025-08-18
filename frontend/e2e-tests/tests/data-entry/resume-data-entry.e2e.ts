@@ -101,6 +101,7 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.proxyCertificateCount).toHaveValue("1");
       await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveValue("100");
 
+      await expect(votersAndVotesPage.politicalGroupTotalVotes.nth(0)).toHaveValue("100");
       await expect(votersAndVotesPage.totalVotesCandidatesCount).toHaveValue("100");
       await expect(votersAndVotesPage.blankVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.invalidVotesCount).toBeEmpty();

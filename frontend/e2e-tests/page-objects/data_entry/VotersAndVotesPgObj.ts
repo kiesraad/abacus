@@ -70,7 +70,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
 
   async inputVotesCounts(votesCounts: VotesCounts) {
     for (const [i, politicalGroup] of votesCounts.political_group_total_votes.entries()) {
-      const input = this.politicalGroupTotalVotes.nth(Number(i));
+      const input = this.politicalGroupTotalVotes.nth(i);
       await input.fill(politicalGroup.total.toString());
     }
 

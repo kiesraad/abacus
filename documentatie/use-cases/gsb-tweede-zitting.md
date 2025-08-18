@@ -66,7 +66,8 @@ __Uitbreidingen:__
 &emsp; 1b3. Het corrigendum corrigeert het aantal stemmen bij dit stembureau van 0 naar het werkelijke aantal.  
 
 1c. De coördinator GSB ontdekt dat het stembureau niet onder de goede naam in Abacus is opgenomen.  
-&emsp; 1c1. De coördinator GSB corrigeert de typfouten.  
+&emsp; 1c1. De coördinator GSB corrigeert de typfouten.
+&emsp; 1c2. Het nummer van het stembureau kan niet worden aangepast.
 
 1d. De coördinator GSB ontdekt dat een stembureau ten onrechte is meegenomen in een eerdere zitting.  
 &emsp; 1d1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau.  

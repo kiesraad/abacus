@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 
 import { CreateFirstAdminRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, spyOnHandler } from "@/testing/test-utils";
+import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 
 import { CreateFirstAdminForm } from "./CreateFirstAdminForm";
 
@@ -75,6 +75,10 @@ describe("CreateFirstAdminForm", () => {
     await user.type(passwordRepeatInput, "password");
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(passwordInput).toBeInvalid();
+    });
 
     expect(passwordInput).toHaveAccessibleErrorMessage("Het wachtwoord moet minimaal 13 karakters lang zijn.");
 

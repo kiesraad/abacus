@@ -3,7 +3,7 @@ import { APIRequestContext } from "@playwright/test";
 import { dataEntryRequest } from "../test-data/request-response-templates";
 import { DataEntryApiClient } from "./api-clients";
 
-export function getTestPassword(username: string, prefix = "") {
+export function getTestPassword(username: string, prefix = ""): string {
   const capitalizedUsername = username.charAt(0).toUpperCase() + username.slice(1);
   return `${prefix}${capitalizedUsername}Password01`;
 }

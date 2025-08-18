@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ApiProvider } from "@/api/ApiProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { electionManagementRoutes } from "@/features/election_management/routes";
+import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import {
@@ -27,7 +28,6 @@ import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler,
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { CommitteeSessionListResponse, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
 
-import { CommitteeSessionListProvider } from "../../../hooks/committee_session/CommitteeSessionListProvider";
 import { ElectionHomePage } from "./ElectionHomePage";
 
 const renderPage = async (userRole: Role) => {

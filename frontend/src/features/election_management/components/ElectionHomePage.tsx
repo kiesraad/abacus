@@ -10,7 +10,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { Table } from "@/components/ui/Table/Table";
-import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
+import { useCommitteeSessionList } from "@/hooks/committee_session/useCommitteeSessionList";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
@@ -21,13 +21,14 @@ import {
 import { cn } from "@/utils/classnames";
 
 import { directDownload } from "../utils/download";
-import { CommitteeSessionCards } from "./CommitteeSessionCards";
+import { CommitteeSessionCard } from "./CommitteeSessionCard";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
 
 export function ElectionHomePage() {
   const client = useApiClient();
-  const { committeeSession, election, pollingStations, refetch } = useElection();
+  const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
+  const { committeeSessions, refetch: refetchCommitteeSessions } = useCommitteeSessionList();
   const { isTypist, isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const [createCommitteeSessionError, setCreateCommitteeSessionError] = useState<AnyApiError | null>(null);
@@ -40,12 +41,13 @@ export function ElectionHomePage() {
   useEffect(() => {
     const abortController = new AbortController();
 
-    void refetch(abortController);
+    void refetchElection(abortController);
+    void refetchCommitteeSessions(abortController);
 
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
-  }, [refetch]);
+  }, [refetchElection, refetchCommitteeSessions]);
 
   if (isTypist) {
     return <Navigate to="data-entry" />;
@@ -64,11 +66,9 @@ export function ElectionHomePage() {
     };
     void client
       .postRequest(url, body)
-      .then((result) => {
+      .then(async (result) => {
         if (isSuccess(result)) {
-          // Reload is needed here because the committee session list needs a refetch
-          // and this is located inside the child component CommitteeSessionCards
-          window.location.reload();
+          await refetchCommitteeSessions();
         } else {
           throw result;
         }
@@ -77,7 +77,7 @@ export function ElectionHomePage() {
   }
 
   return (
-    <CommitteeSessionListProvider electionId={election.id}>
+    <>
       <PageTitle title={`${t("election.title.details")} - Abacus`} />
       <header>
         <section>
@@ -128,7 +128,13 @@ export function ElectionHomePage() {
           </div>
           <div id="committee-sessions" className={cn(cls.sessions, "mb-xl")}>
             <div id="committee-session-cards" className={cls.cards}>
-              <CommitteeSessionCards />
+              {committeeSessions.map((committeeSession, index) => (
+                <CommitteeSessionCard
+                  key={committeeSession.id}
+                  committeeSession={committeeSession}
+                  currentSession={index === 0}
+                />
+              ))}
             </div>
             {isCoordinator && committeeSession.status === "data_entry_finished" && (
               <Button variant="secondary" size="sm" onClick={toggleAddCommitteeSessionModal}>
@@ -178,6 +184,6 @@ export function ElectionHomePage() {
         </article>
       </main>
       <Footer />
-    </CommitteeSessionListProvider>
+    </>
   );
 }

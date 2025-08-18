@@ -11,7 +11,7 @@ export interface CommitteeSessionListProviderProps {
 }
 
 export function CommitteeSessionListProvider({ children, electionId }: CommitteeSessionListProviderProps) {
-  const { requestState } = useCommitteeSessionListRequest(electionId);
+  const { requestState, refetch } = useCommitteeSessionListRequest(electionId);
 
   return (
     <RequestStateHandler
@@ -19,7 +19,7 @@ export function CommitteeSessionListProvider({ children, electionId }: Committee
       notFoundMessage="error.committee_session_not_found"
       isFoundCheck={(data) => typeof data === "object"}
       renderOnSuccess={(data) => (
-        <CommitteeSessionListProviderContext.Provider value={{ committeeSessions: data.committee_sessions }}>
+        <CommitteeSessionListProviderContext.Provider value={{ committeeSessions: data.committee_sessions, refetch }}>
           {children}
         </CommitteeSessionListProviderContext.Provider>
       )}

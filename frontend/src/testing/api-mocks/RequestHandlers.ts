@@ -208,7 +208,7 @@ export const CommitteeSessionCreateHandler = http.post<
   COMMITTEE_SESSION_CREATE_REQUEST_PATH
 >("/api/committee_sessions", () => {
   const response: CommitteeSession = getCommitteeSessionMockData({ id: 2, number: 2, status: "created" });
-  new HttpResponse(response, { status: 201 });
+  return HttpResponse.json(response, { status: 201 });
 });
 
 // get election list handler

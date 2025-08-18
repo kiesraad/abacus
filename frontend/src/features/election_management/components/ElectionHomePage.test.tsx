@@ -27,6 +27,7 @@ import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler,
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { CommitteeSessionListResponse, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
 
+import { CommitteeSessionListProvider } from "../../../hooks/committee_session/CommitteeSessionListProvider";
 import { ElectionHomePage } from "./ElectionHomePage";
 
 const renderPage = async (userRole: Role) => {
@@ -34,7 +35,9 @@ const renderPage = async (userRole: Role) => {
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <ElectionHomePage />
+          <CommitteeSessionListProvider electionId={1}>
+            <ElectionHomePage />
+          </CommitteeSessionListProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
@@ -181,7 +184,9 @@ describe("ElectionHomePage", () => {
           <TestUserProvider userRole="coordinator">
             <ElectionProvider electionId={1}>
               <ElectionStatusProvider electionId={1}>
-                <RouterProvider router={router} />
+                <CommitteeSessionListProvider electionId={1}>
+                  <RouterProvider router={router} />
+                </CommitteeSessionListProvider>
               </ElectionStatusProvider>
             </ElectionProvider>
           </TestUserProvider>

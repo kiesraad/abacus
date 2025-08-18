@@ -10,7 +10,7 @@ export function useCommitteeSessionList() {
     throw new Error("useCommitteeSessionList must be used within a CommitteeSessionListProvider");
   }
 
-  const { committeeSessions } = context;
+  const { committeeSessions, refetch } = context;
 
-  return { committeeSessions };
+  return { committeeSessions, refetch };
 }

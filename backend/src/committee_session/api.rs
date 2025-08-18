@@ -15,7 +15,6 @@ use super::{
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
-use crate::committee_session::status::CommitteeSessionStatus;
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},

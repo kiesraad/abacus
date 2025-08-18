@@ -144,7 +144,7 @@ describe("UI component: CommitteeSessionCard", () => {
     await user.click(statusButton);
 
     expect(statusChange).not.toHaveBeenCalled();
-    expect(navigate).toHaveBeenCalledWith("status");
+    expect(navigate).toHaveBeenCalledWith("status", {});
   });
 
   test("The card renders with status data_entry_paused for administrator", async () => {
@@ -169,7 +169,7 @@ describe("UI component: CommitteeSessionCard", () => {
     await user.click(statusButton);
 
     expect(statusChange).not.toHaveBeenCalled();
-    expect(navigate).toHaveBeenCalledWith("status");
+    expect(navigate).toHaveBeenCalledWith("status", {});
   });
 
   test("The card renders with status data_entry_finished for coordinator", async () => {
@@ -196,7 +196,7 @@ describe("UI component: CommitteeSessionCard", () => {
     await user.click(viewStatusButton);
 
     expect(statusChange).not.toHaveBeenCalled();
-    expect(navigate).toHaveBeenCalledWith("status");
+    expect(navigate).toHaveBeenCalledWith("status", {});
   });
 
   test("The card renders with status data_entry_finished for administrator", async () => {
@@ -223,7 +223,7 @@ describe("UI component: CommitteeSessionCard", () => {
     await user.click(viewStatusButton);
 
     expect(statusChange).not.toHaveBeenCalled();
-    expect(navigate).toHaveBeenCalledWith("status");
+    expect(navigate).toHaveBeenCalledWith("status", {});
   });
 
   test("The card renders with status data_entry_finished not current session and details already saved", async () => {
@@ -251,6 +251,6 @@ describe("UI component: CommitteeSessionCard", () => {
     await user.click(reportButton);
 
     expect(statusChange).not.toHaveBeenCalled();
-    expect(navigate).toHaveBeenCalledWith("report/download");
+    expect(navigate).toHaveBeenCalledWith("report/download", {});
   });
 });

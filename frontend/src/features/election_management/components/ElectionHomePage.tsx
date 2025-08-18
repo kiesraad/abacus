@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router";
+import { Link, Location, Navigate, useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { Footer } from "@/components/footer/Footer";
+import { IconTrash } from "@/components/generated/icons.tsx";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -18,18 +19,27 @@ import { t } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_CREATE_REQUEST_BODY,
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
+  COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   CommitteeSession,
   ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
+import { committeeSessionLabel } from "@/utils/committeeSession.ts";
 
 import { directDownload } from "../utils/download";
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
 
+interface ShowDeleteModalState {
+  showDeleteModal?: boolean;
+}
+
 export function ElectionHomePage() {
   const client = useApiClient();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  const location = useLocation() as Location<null | ShowDeleteModalState>;
+  const navigate = useNavigate();
   const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
   const { requestState: getCommitteeSessions, refetch: refetchCommitteeSessions } = useInitialApiGet<{
     committee_sessions: CommitteeSession[];
@@ -37,9 +47,14 @@ export function ElectionHomePage() {
   const { isTypist, isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const [createCommitteeSessionError, setCreateCommitteeSessionError] = useState<AnyApiError | null>(null);
+  const [deleteCommitteeSessionError, setDeleteCommitteeSessionError] = useState<AnyApiError | null>(null);
 
   if (createCommitteeSessionError) {
     throw createCommitteeSessionError;
+  }
+
+  if (deleteCommitteeSessionError) {
+    throw deleteCommitteeSessionError;
   }
 
   // re-fetch election when component mounts
@@ -87,6 +102,25 @@ export function ElectionHomePage() {
       .catch(setCreateCommitteeSessionError);
   }
 
+  function toggleDeleteCommitteeSessionModal() {
+    void navigate(".", { replace: true });
+  }
+
+  function handleCommitteeSessionDelete() {
+    const url: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}`;
+    void client
+      .deleteRequest(url)
+      .then(async (result) => {
+        if (isSuccess(result)) {
+          await refetchElection();
+          await refetchCommitteeSessions();
+        } else {
+          throw result;
+        }
+      })
+      .catch(setDeleteCommitteeSessionError);
+  }
+
   return (
     <>
       <PageTitle title={`${t("election.title.details")} - Abacus`} />
@@ -111,6 +145,31 @@ export function ElectionHomePage() {
               {t("election_management.yes_add_session")}
             </Button>
             <Button variant="secondary" onClick={toggleAddCommitteeSessionModal}>
+              {t("cancel")}
+            </Button>
+          </nav>
+        </Modal>
+      )}
+      {location.state?.showDeleteModal === true && (
+        <Modal title={`${t("election_management.delete_session")}?`} onClose={toggleDeleteCommitteeSessionModal}>
+          <p>
+            {t("election_management.delete_session_are_you_sure", {
+              sessionLabel: committeeSessionLabel(committeeSession.number, true).toLowerCase(),
+            })}
+          </p>
+          <nav>
+            <Button
+              leftIcon={<IconTrash />}
+              variant="primary-destructive"
+              size="xl"
+              onClick={() => {
+                handleCommitteeSessionDelete();
+                toggleDeleteCommitteeSessionModal();
+              }}
+            >
+              {t("election_management.yes_delete_session")}
+            </Button>
+            <Button variant="secondary" onClick={toggleDeleteCommitteeSessionModal}>
               {t("cancel")}
             </Button>
           </nav>

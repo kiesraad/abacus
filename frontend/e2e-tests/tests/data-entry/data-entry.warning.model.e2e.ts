@@ -18,7 +18,10 @@ import { createMachine } from "xstate";
 import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
-import { assertMachineAndImplementationMatches } from "../../helpers-utils/xstate-helpers";
+import {
+  assertMachineAndImplementationMatches,
+  typeCheckedMachineDefinition,
+} from "../../helpers-utils/xstate-helpers";
 
 /*
 This model-based e2e test covers the state changes from one section (the voters and votes page) that trigger warnings.
@@ -33,8 +36,8 @@ changed the initial input on the voters and votes page, and we have saved it as 
 to the data entry homepage.
 */
 
-const dataEntryMachineDefinition = {
-  initial: "voterVotesPageEmpty",
+const dataEntryMachineDefinition = typeCheckedMachineDefinition({
+  initial: "votersVotesPageEmpty",
   states: {
     dataEntryHomePageWarningSaved: {
       on: {
@@ -54,7 +57,7 @@ const dataEntryMachineDefinition = {
     },
     countingDifferencesPollingStationPageChangedToWarningSubmitted: {},
     countingDifferencesPollingStationPageChangedToWarningDiscarded: {},
-    voterVotesPageEmpty: {
+    votersVotesPageEmpty: {
       on: {
         FILL_WITH_WARNING: "votersVotesPageWarningFilled",
         FILL_VALID_DATA_AND_SUBMIT: "differencesPageValidSubmitted",
@@ -68,15 +71,15 @@ const dataEntryMachineDefinition = {
     votersVotesPageWarningSubmitted: {
       on: {
         SUBMIT: "votersVotesPageWarningReminder",
-        ACCEPT_WARNING: "voterVotesPageWarningAccepted",
-        CORRECT_WARNING: "voterVotesPageWarningCorrected",
+        ACCEPT_WARNING: "votersVotesPageWarningAccepted",
+        CORRECT_WARNING: "votersVotesPageWarningCorrected",
         CHANGE_TO_ERROR_AND_SUBMIT: "votersVotesPageError",
         GO_TO_PREVIOUS_PAGE: "countingDifferencesPollingStationPageWarningSubmitted",
         CLICK_ABORT: "abortInputModalWarning",
         NAV_TO_HOME_PAGE: "abortInputModalWarning",
       },
     },
-    voterVotesPageWarningAccepted: {
+    votersVotesPageWarningAccepted: {
       on: {
         SUBMIT: "differencesPageWarningAccepted",
         UNACCEPT_WARNING: "votersVotesPageWarningUnaccepted",
@@ -87,7 +90,7 @@ const dataEntryMachineDefinition = {
         SUBMIT: "votersVotesPageWarningReminder",
       },
     },
-    voterVotesPageWarningCorrected: {
+    votersVotesPageWarningCorrected: {
       on: {
         SUBMIT: "differencesPageCorrected",
       },
@@ -110,7 +113,7 @@ const dataEntryMachineDefinition = {
     },
     votersVotesPageWarningReminder: {
       on: {
-        ACCEPT_WARNING: "voterVotesPageWarningAccepted",
+        ACCEPT_WARNING: "votersVotesPageWarningAccepted",
       },
     },
     votersVotesPageError: {},
@@ -124,7 +127,7 @@ const dataEntryMachineDefinition = {
     },
     differencesPageWarningAccepted: {
       on: {
-        GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageWarningAccepted",
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageWarningAccepted",
       },
     },
     differencesPageValidSubmitted: {
@@ -140,7 +143,7 @@ const dataEntryMachineDefinition = {
       },
     },
   },
-};
+} as const);
 
 const machine = createMachine(dataEntryMachineDefinition);
 
@@ -271,7 +274,7 @@ test.describe("Data entry model test - warnings", () => {
         };
 
         const votersVotesPageStates = {
-          voterVotesPageEmpty: async () => {
+          votersVotesPageEmpty: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
@@ -304,7 +307,7 @@ test.describe("Data entry model test - warnings", () => {
             );
             await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
           },
-          voterVotesPageWarningAccepted: async () => {
+          votersVotesPageWarningAccepted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
@@ -326,7 +329,7 @@ test.describe("Data entry model test - warnings", () => {
             await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
             await expect(votersAndVotesPage.acceptErrorsAndWarningsReminder).toBeVisible();
           },
-          voterVotesPageWarningCorrected: async () => {
+          votersVotesPageWarningCorrected: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
               "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",

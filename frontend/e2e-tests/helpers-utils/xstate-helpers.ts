@@ -17,9 +17,9 @@ type ReferencedTargets<TStates> = {
   [K in keyof TStates]: TStates[K] extends { on: infer TOn } ? TOn[keyof TOn] : never;
 }[keyof TStates];
 
-type RequireStateForAllTargets<TStates> = {
+type RequireStateForAllTargets<TStates, TInitial> = {
   // Check if the state exists in the list of all target states
-  [K in Exclude<keyof TStates, symbol>]: K extends ReferencedTargets<TStates>
+  [K in Exclude<keyof TStates, symbol>]: K extends ReferencedTargets<TStates> | TInitial
     ? unknown
     : ErrorMessage<`State '${K}' is not used as a target state`>;
 };
@@ -43,7 +43,7 @@ type ValidateOn<TStates, O extends Record<string, string>> = {
 
 export const typeCheckedMachineDefinition = <T extends MachineDefinition>(
   dataEntryMachineDefinition: T & {
-    states: RequireStateForAllTargets<T["states"]> & RequireReferencedTargetExists<T["states"]>;
+    states: RequireStateForAllTargets<T["states"], T["initial"]> & RequireReferencedTargetExists<T["states"]>;
   },
 ) => dataEntryMachineDefinition;
 

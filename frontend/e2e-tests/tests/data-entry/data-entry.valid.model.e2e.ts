@@ -18,7 +18,10 @@ import { createMachine } from "xstate";
 import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
-import { assertMachineAndImplementationMatches } from "../../helpers-utils/xstate-helpers";
+import {
+  assertMachineAndImplementationMatches,
+  typeCheckedMachineDefinition,
+} from "../../helpers-utils/xstate-helpers";
 
 /*
 This model-based e2e test covers the state changes from one section (the voters and votes page) that do not trigger any warnings or errors.
@@ -33,8 +36,8 @@ changed the initial input on the voters and votes page, and we have saved it as 
 to the data entry homepage.
 */
 
-const dataEntryMachineDefinition = {
-  initial: "voterVotesPageEmpty",
+const dataEntryMachineDefinition = typeCheckedMachineDefinition({
+  initial: "votersVotesPageEmpty",
   states: {
     dataEntryHomePageDiscarded: {},
     dataEntryHomePageEmptySaved: {
@@ -65,15 +68,15 @@ const dataEntryMachineDefinition = {
     },
     countingDifferencesPollingStationPageCached: {
       on: {
-        GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageCached",
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageCached",
       },
     },
-    voterVotesPageCached: {
+    votersVotesPageCached: {
       on: {
         SUBMIT: "differencesPage",
       },
     },
-    voterVotesPageEmpty: {
+    votersVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilled",
         CLICK_ABORT: "abortInputModalEmpty",
@@ -136,7 +139,7 @@ const dataEntryMachineDefinition = {
       },
     },
   },
-};
+} as const);
 
 const machine = createMachine(dataEntryMachineDefinition);
 
@@ -266,12 +269,12 @@ test.describe("Data entry model test - valid data", () => {
         };
 
         const votersVotesPageStates = {
-          voterVotesPageCached: async () => {
+          votersVotesPageCached: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes });
           },
-          voterVotesPageEmpty: async () => {
+          votersVotesPageEmpty: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });

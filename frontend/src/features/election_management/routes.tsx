@@ -4,23 +4,13 @@ import { NotAvailableInMock } from "@/components/error/NotAvailableInMock";
 import { t } from "@/i18n/translate";
 
 import { ElectionHomePage } from "./components/ElectionHomePage";
-import { ElectionLayout } from "./components/ElectionLayout";
 import { ElectionReportPage } from "./components/report/ElectionReportPage";
 import { FinishDataEntryPage } from "./components/report/FinishDataEntryPage";
 import { CommitteeSessionDetailsPage } from "./components/update/CommitteeSessionDetailsPage";
 import { NumberOfVotersPage } from "./components/update/NumberOfVotersPage";
 
 export const electionManagementRoutes: RouteObject[] = [
-  {
-    path: "",
-    Component: ElectionLayout,
-    children: [
-      {
-        index: true,
-        Component: ElectionHomePage,
-      },
-    ],
-  },
+  { index: true, Component: ElectionHomePage },
   { path: "details", Component: CommitteeSessionDetailsPage },
   { path: "number-of-voters", Component: NumberOfVotersPage },
   {

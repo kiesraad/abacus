@@ -4,19 +4,22 @@ import { Link, Navigate } from "react-router";
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
+import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { Table } from "@/components/ui/Table/Table";
-import { useCommitteeSessionList } from "@/hooks/committee_session/useCommitteeSessionList";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_CREATE_REQUEST_BODY,
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
+  CommitteeSession,
+  ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
@@ -28,7 +31,9 @@ import cls from "./ElectionManagement.module.css";
 export function ElectionHomePage() {
   const client = useApiClient();
   const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
-  const { committeeSessions, refetch: refetchCommitteeSessions } = useCommitteeSessionList();
+  const { requestState: getCommitteeSessions, refetch: refetchCommitteeSessions } = useInitialApiGet<{
+    committee_sessions: CommitteeSession[];
+  }>(`/api/elections/${election.id}/committee_sessions` satisfies ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH);
   const { isTypist, isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const [createCommitteeSessionError, setCreateCommitteeSessionError] = useState<AnyApiError | null>(null);
@@ -48,6 +53,16 @@ export function ElectionHomePage() {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
   }, [refetchElection, refetchCommitteeSessions]);
+
+  if (getCommitteeSessions.status === "api-error") {
+    throw getCommitteeSessions.error;
+  }
+
+  if (getCommitteeSessions.status === "loading") {
+    return <Loader />;
+  }
+
+  const committeeSessions = getCommitteeSessions.data.committee_sessions;
 
   if (isTypist) {
     return <Navigate to="data-entry" />;

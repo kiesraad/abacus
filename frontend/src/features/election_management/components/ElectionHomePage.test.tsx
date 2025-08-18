@@ -9,7 +9,6 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ApiProvider } from "@/api/ApiProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { electionManagementRoutes } from "@/features/election_management/routes";
-import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import {
@@ -35,9 +34,7 @@ const renderPage = async (userRole: Role) => {
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <CommitteeSessionListProvider electionId={1}>
-            <ElectionHomePage />
-          </CommitteeSessionListProvider>
+          <ElectionHomePage />
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
@@ -184,9 +181,7 @@ describe("ElectionHomePage", () => {
           <TestUserProvider userRole="coordinator">
             <ElectionProvider electionId={1}>
               <ElectionStatusProvider electionId={1}>
-                <CommitteeSessionListProvider electionId={1}>
-                  <RouterProvider router={router} />
-                </CommitteeSessionListProvider>
+                <RouterProvider router={router} />
               </ElectionStatusProvider>
             </ElectionProvider>
           </TestUserProvider>

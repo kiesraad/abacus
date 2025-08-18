@@ -74,11 +74,7 @@ export function ElectionHomePage() {
 
   function handleCommitteeSessionCreate() {
     const url: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
-    const body: COMMITTEE_SESSION_CREATE_REQUEST_BODY = {
-      election_id: election.id,
-      number: committeeSession.number + 1,
-      number_of_voters: committeeSession.number_of_voters,
-    };
+    const body: COMMITTEE_SESSION_CREATE_REQUEST_BODY = { election_id: election.id };
     void client
       .postRequest(url, body)
       .then(async (result) => {

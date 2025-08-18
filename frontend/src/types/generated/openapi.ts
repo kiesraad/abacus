@@ -5,7 +5,7 @@
 // /api/committee_sessions
 export type COMMITTEE_SESSION_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
-export type COMMITTEE_SESSION_CREATE_REQUEST_BODY = CommitteeSessionCreateRequest;
+export type COMMITTEE_SESSION_CREATE_REQUEST_BODY = NewCommitteeSessionRequest;
 
 // /api/committee_sessions/{committee_session_id}
 export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
@@ -400,15 +400,6 @@ export interface CommitteeSession {
   start_date: string;
   start_time: string;
   status: CommitteeSessionStatus;
-}
-
-/**
- * Committee session create request
- */
-export interface CommitteeSessionCreateRequest {
-  election_id: number;
-  number: number;
-  number_of_voters: number;
 }
 
 export interface CommitteeSessionDetails {
@@ -829,6 +820,13 @@ export interface LoginResponse {
   role: Role;
   user_id: number;
   username: string;
+}
+
+/**
+ * New committee session request
+ */
+export interface NewCommitteeSessionRequest {
+  election_id: number;
 }
 
 /**

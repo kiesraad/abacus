@@ -58,7 +58,7 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
   }, [dialogRef, onClose]);
 
   return (
-    <dialog id="modal-dialog" className={cls.modal} ref={dialogRef}>
+    <dialog id="modal-dialog" className={cls.modal} ref={dialogRef} aria-labelledby="modal-title">
       <div className={cls.modalContainer}>
         {onClose && (
           <IconButton
@@ -75,9 +75,9 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
           />
         )}
         <div className={cls.modalBody}>
-          <h2 id="modal-title" className="heading-md" tabIndex={-1}>
+          <h3 id="modal-title" tabIndex={-1}>
             {title}
-          </h2>
+          </h3>
           {noFlex ? <div className={cls.noFlex}>{children}</div> : children}
         </div>
       </div>

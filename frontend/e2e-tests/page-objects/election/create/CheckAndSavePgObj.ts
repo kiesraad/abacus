@@ -1,4 +1,6 @@
-import { type Locator, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
+
+import { Election } from "@/types/generated/openapi";
 
 export class CheckAndSavePgObj {
   readonly header: Locator;
@@ -11,5 +13,15 @@ export class CheckAndSavePgObj {
     this.numberOfVoters = page.getByTestId("number-of-voters");
     this.countingMethod = page.getByTestId("counting-method");
     this.save = page.getByRole("button", { name: "Opslaan" });
+  }
+
+  async saveElection(): Promise<Election> {
+    const responsePromise = this.page.waitForResponse(`/api/elections/import`);
+    await this.save.click();
+
+    const response = await responsePromise;
+    expect(response.status()).toBe(201);
+
+    return (await response.json()) as Election;
   }
 }

@@ -17,8 +17,6 @@ import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/elec
 import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
 
-import { Election } from "@/types/generated/openapi";
-
 import { test } from "../fixtures";
 import { eml110a, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
 
@@ -77,13 +75,8 @@ test.describe("Election creation", () => {
     await numberOfVotersPage.next.click();
 
     // Back to the check and save page to test saving the election
-    const responsePromise = page.waitForResponse(`/api/elections/import`);
-    await checkAndSavePage.save.click();
-    await expect(overviewPage.header).toBeVisible();
-
-    const response = await responsePromise;
-    expect(response.status()).toBe(201);
-    const election = (await response.json()) as Election;
+    const election = await checkAndSavePage.saveElection();
+    await expect(overviewPage.adminHeader).toBeVisible();
 
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();
@@ -127,13 +120,8 @@ test.describe("Election creation", () => {
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
 
-    const responsePromise = page.waitForResponse(`/api/elections/import`);
-    await checkAndSavePage.save.click();
-    await expect(overviewPage.header).toBeVisible();
-
-    const response = await responsePromise;
-    expect(response.status()).toBe(201);
-    const election = (await response.json()) as Election;
+    const election = await checkAndSavePage.saveElection();
+    await expect(overviewPage.adminHeader).toBeVisible();
 
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();
@@ -277,7 +265,7 @@ test.describe("Election creation", () => {
 
     // Click delete, assert we are back at the overview
     await abortModal.deleteButton.click();
-    await expect(overviewPage.header).toBeVisible();
+    await expect(overviewPage.adminHeader).toBeVisible();
   });
 
   test("uploading a candidate list, then navigating should trigger the modal", async ({ page }) => {
@@ -420,7 +408,7 @@ test.describe("Election creation", () => {
     await checkAndSavePage.save.click();
 
     // Redefine the Overview page, so we can locate the newly
-    await expect(overviewPage.header).toBeVisible();
+    await expect(overviewPage.adminHeader).toBeVisible();
 
     // Back button
     await page.goBack();

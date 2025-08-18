@@ -39,7 +39,7 @@ test.describe("initialisation", () => {
 
     // check that we have logged in successfully and logout again
     const electionsPage = new OverviewPgObj(page);
-    await expect(electionsPage.header).toBeVisible();
+    await expect(electionsPage.adminHeader).toBeVisible();
 
     const navBar = new AdminNavBar(page);
     await navBar.logout.click();

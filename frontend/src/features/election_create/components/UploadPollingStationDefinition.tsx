@@ -15,7 +15,6 @@ import {
 } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import cls from "./UploadPollingStationDefinition.module.css";
 
 export function UploadPollingStationDefinition() {
   const { state, dispatch } = useElectionCreateContext();
@@ -126,9 +125,9 @@ export function UploadPollingStationDefinition() {
               </Table.Body>
             </Table>
             <p className="mt-lg">
-              <button id="show-more" className={cls.linkButton} onClick={showAll}>
+              <Button id="show-more" size="md" variant="underlined" onClick={showAll}>
                 {t("election.polling_stations.show_all", { num: state.pollingStations.length })}
-              </button>
+              </Button>
             </p>
           </>
         )}
@@ -162,9 +161,9 @@ export function UploadPollingStationDefinition() {
       </FileInput>
 
       <p className="mt-lg">
-        <button className={cls.linkButton} onClick={() => void skip()}>
+        <Button variant="underlined" size="md" onClick={() => void skip()}>
           {t("election.polling_stations.skip_step")}
-        </button>
+        </Button>
       </p>
     </section>
   );

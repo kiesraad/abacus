@@ -120,7 +120,7 @@ describe("ElectionHomePage", () => {
     expect(addButton).toBeVisible();
     await user.click(addButton);
 
-    expect(sessionCreateRequestSpy).toHaveBeenCalledWith({ election_id: 1, number: 2, number_of_voters: 2000 });
+    expect(sessionCreateRequestSpy).toHaveBeenCalledWith({ election_id: 1 });
   });
 
   test("Does not shows create new committee session button for administrator", async () => {

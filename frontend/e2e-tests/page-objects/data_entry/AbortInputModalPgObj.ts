@@ -11,7 +11,7 @@ export class AbortInputModal {
     this.modal = page.getByRole("dialog");
     this.close = this.modal.getByRole("button", { name: "Annuleren" });
     this.heading = this.modal.getByRole("heading", {
-      level: 2,
+      level: 3,
       name: "Wat wil je doen met je invoer?",
     });
     this.saveInput = this.modal.getByRole("button", { name: "Invoer bewaren" });

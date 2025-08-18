@@ -6,7 +6,6 @@ import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
-import { LinkButton } from "@/components/ui/LinkButton/LinkButton";
 import { Table } from "@/components/ui/Table/Table";
 import { t, tx } from "@/i18n/translate";
 import {
@@ -126,11 +125,9 @@ export function UploadPollingStationDefinition() {
               </Table.Body>
             </Table>
             <p className="mt-lg">
-              <LinkButton
-                id="show-more"
-                text={t("election.polling_stations.show_all", { num: state.pollingStations.length })}
-                onClick={showAll}
-              />
+              <Button id="show-more" size="md" variant="underlined" onClick={showAll}>
+                {t("election.polling_stations.show_all", { num: state.pollingStations.length })}
+              </Button>
             </p>
           </>
         )}
@@ -164,7 +161,10 @@ export function UploadPollingStationDefinition() {
       </FileInput>
 
       <p className="mt-lg">
-        <LinkButton onClick={() => void skip()} text={t("election.polling_stations.skip_step")} />
+        <Button variant="underlined" size="md" onClick={() => void skip()}>
+          {" "}
+          {t("election.polling_stations.skip_step")}{" "}
+        </Button>
       </p>
     </section>
   );

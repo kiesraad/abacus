@@ -162,8 +162,7 @@ export function UploadPollingStationDefinition() {
 
       <p className="mt-lg">
         <Button variant="underlined" size="md" onClick={() => void skip()}>
-          {" "}
-          {t("election.polling_stations.skip_step")}{" "}
+          {t("election.polling_stations.skip_step")}
         </Button>
       </p>
     </section>

@@ -24,13 +24,14 @@
     "election_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
     "election_title": "Controleer verkiezingsdefinitie",
     "error": {
-      "title": "Controle digitale vingerafdruk niet gelukt",
-      "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen."
+      "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
+      "title": "Controle digitale vingerafdruk niet gelukt"
     },
     "list_name": "{location}, kandidatenlijst {name}",
     "polling_station_title": "Controleer stembureaus"
   },
   "create": "Verkiezing toevoegen",
+  "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
   "import_candidates_eml": "Importeer kandidatenlijst",
   "import_election_eml": "Importeer verkiezingsdefinitie",
   "import_polling_station_eml": "Importeer stembureaus gemeente {location}",
@@ -52,6 +53,12 @@
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",
   "manage": "Beheer verkiezingen",
+  "number_of_voters": {
+    "description": "Voer het aantal kiesgerechtigden in zoals door de gemeenteraad vastgesteld voor de gemeenteraadsverkiezing 2026 in de gemeente {location}",
+    "error": "Vul het aantal kiesgerechtigden in",
+    "hint": "Ingelezen uit bestand met stembureaus",
+    "title": "Hoeveel kiesgerechtigden telt de gemeente?"
+  },
   "no_elections_added": "Nog geen verkiezingen ingesteld",
   "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",
   "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
@@ -74,8 +81,8 @@
     "plural": "Verkiezingen",
     "singular": "Verkiezing"
   },
-  "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
   "use_instructions_to_import_candidates_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de kandidatenlijst kunt downloaden. Zet het bestand op deze computer en importeer het.",
+  "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
   "use_instructions_to_import_polling_stations_eml": "Importeer het bestand met stembureaus. Heb je geen bestand met stembureaus? Je kan ze later nog handmatig invoeren. Sla deze stap dan over.",
   "voting_method_type": {
     "cso": "Centrale stemopneming (CSO)",

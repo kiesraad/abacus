@@ -4714,7 +4714,9 @@
           "election_hash",
           "election_data",
           "candidate_hash",
-          "candidate_data"
+          "candidate_data",
+          "counting_method",
+          "number_of_voters"
         ],
         "properties": {
           "candidate_data": {

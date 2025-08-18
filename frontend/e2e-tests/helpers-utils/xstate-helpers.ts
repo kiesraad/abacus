@@ -43,6 +43,9 @@ type ValidateOn<TStates, O extends Record<string, string>> = {
 
 export const typeCheckedMachineDefinition = <T extends MachineDefinition>(
   dataEntryMachineDefinition: T & {
+    initial: T["initial"] extends keyof T["states"]
+      ? T["initial"]
+      : ErrorMessage<`Initial state '${T["initial"]}' does not exist`>;
     states: RequireStateForAllTargets<T["states"], T["initial"]> & RequireReferencedTargetExists<T["states"]>;
   },
 ) => dataEntryMachineDefinition;

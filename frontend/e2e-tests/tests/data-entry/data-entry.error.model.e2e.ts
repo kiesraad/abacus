@@ -58,7 +58,6 @@ const dataEntryMachineDefinition = typeCheckedMachineDefinition({
     countingDifferencesPollingStationPageChangedToErrorSubmitted: {},
     countingDifferencesPollingStationPageChangedToErrorDiscarded: {},
     countingDifferencesPollingStationPageFilledError: {},
-    countingDifferencesPollingStationPageCorrected: {},
     votersVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilledValid",
@@ -110,7 +109,6 @@ const dataEntryMachineDefinition = typeCheckedMachineDefinition({
     votersVotesPageCorrected: {
       on: {
         SUBMIT: "differencesPageCorrected",
-        GO_TO_PREVIOUS_PAGE: "unsavedChangesModalCorrected",
       },
     },
     votersVotesPageWarningSubmitted: {},
@@ -139,11 +137,6 @@ const dataEntryMachineDefinition = typeCheckedMachineDefinition({
       on: {
         SAVE_UNSUBMITTED_CHANGES: "countingDifferencesPollingStationPageChangedToErrorSubmitted",
         DISCARD_UNSUBMITTED_CHANGES: "countingDifferencesPollingStationPageChangedToErrorDiscarded",
-      },
-    },
-    unsavedChangesModalCorrected: {
-      on: {
-        SAVE_UNSUBMITTED_CHANGES: "countingDifferencesPollingStationPageCorrected",
       },
     },
   },
@@ -274,12 +267,6 @@ test.describe("Data entry model test - errors", () => {
             expect(countingDifferencesFields).toStrictEqual(noDifferences);
             await expect(countingDifferencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },
-          countingDifferencesPollingStationPageCorrected: async () => {
-            await expect(countingDifferencesPage.fieldset).toBeVisible();
-            const countingDifferencesFields = await countingDifferencesPage.getCountingDifferencesPollingStation();
-            expect(countingDifferencesFields).toStrictEqual(noDifferences);
-            await expect(countingDifferencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
-          },
         };
 
         const countingDifferencesPollingStationPageEvents = {
@@ -358,9 +345,6 @@ test.describe("Data entry model test - errors", () => {
             );
           },
           unsavedChangesModalChangedToError: async () => {
-            await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
-          },
-          unsavedChangesModalCorrected: async () => {
             await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
           },
         };

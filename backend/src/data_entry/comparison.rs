@@ -1,7 +1,7 @@
 use super::{
     CandidateVotes, Count, CountingDifferencesPollingStation, DifferencesCounts,
-    ExtraInvestigation, FieldPath, PoliticalGroupCandidateVotes, PollingStationResults,
-    VotersCounts, VotesCounts, YesNo,
+    ExtraInvestigation, FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+    PollingStationResults, VotersCounts, VotesCounts, YesNo,
 };
 
 pub trait Compare {
@@ -140,6 +140,11 @@ impl Compare for VotersCounts {
 impl Compare for VotesCounts {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         // TODO impl comparison for PoliticalGroupTotalVotes + adjust/add tests
+        self.political_group_total_votes.compare(
+            &first_entry.political_group_total_votes,
+            different_fields,
+            &path.field("political_group_total_votes"),
+        );
 
         // compare all counts
         self.total_votes_candidates_count.compare(
@@ -162,6 +167,23 @@ impl Compare for VotesCounts {
             different_fields,
             &path.field("total_votes_cast_count"),
         );
+    }
+}
+
+impl Compare for Vec<PoliticalGroupTotalVotes> {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        // compare each political group
+        for (i, pgv) in self.iter().enumerate() {
+            pgv.compare(&first_entry[i], different_fields, &path.index(i));
+        }
+    }
+}
+
+impl Compare for PoliticalGroupTotalVotes {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        // compare the total votes for the political group
+        self.total
+            .compare(&first_entry.total, different_fields, &path.field("total"));
     }
 }
 
@@ -561,19 +583,20 @@ mod tests {
         second_entry.votes_counts = VotesCounts {
             political_group_total_votes: vec![PoliticalGroupTotalVotes {
                 number: 1,
-                total: 100,
+                total: 101,
             }],
-            total_votes_candidates_count: 100,
+            total_votes_candidates_count: 101,
             blank_votes_count: 1,
             invalid_votes_count: 1,
-            total_votes_cast_count: 102,
+            total_votes_cast_count: 103,
         };
         second_entry.compare(
             &first_entry,
             &mut different_fields,
             &"polling_station_results".into(),
         );
-        assert_eq!(different_fields.len(), 6);
+        assert_eq!(different_fields.len(), 8);
+        dbg!(&different_fields);
         assert_eq!(
             different_fields[0],
             "polling_station_results.voters_counts.poll_card_count"
@@ -588,14 +611,22 @@ mod tests {
         );
         assert_eq!(
             different_fields[3],
-            "polling_station_results.votes_counts.blank_votes_count"
+            "polling_station_results.votes_counts.political_group_total_votes[0].total"
         );
         assert_eq!(
             different_fields[4],
-            "polling_station_results.votes_counts.invalid_votes_count"
+            "polling_station_results.votes_counts.total_votes_candidates_count"
         );
         assert_eq!(
             different_fields[5],
+            "polling_station_results.votes_counts.blank_votes_count"
+        );
+        assert_eq!(
+            different_fields[6],
+            "polling_station_results.votes_counts.invalid_votes_count"
+        );
+        assert_eq!(
+            different_fields[7],
             "polling_station_results.votes_counts.total_votes_cast_count"
         );
     }

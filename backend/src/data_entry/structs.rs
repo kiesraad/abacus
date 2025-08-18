@@ -1,4 +1,4 @@
-use std::ops::AddAssign;
+use std::{collections::HashSet, ops::AddAssign};
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -94,21 +94,17 @@ impl PollingStationResults {
             .collect()
     }
 
-    /// Create a default value for `votes_counts` (type `VotesCounts`)
-    pub fn default_votes_counts(political_groups: &[PoliticalGroup]) -> VotesCounts {
-        VotesCounts {
-            political_group_total_votes: political_groups
-                .iter()
-                .map(|pg| PoliticalGroupTotalVotes {
-                    number: pg.number,
-                    total: 0,
-                })
-                .collect(),
-            total_votes_candidates_count: Default::default(),
-            blank_votes_count: Default::default(),
-            invalid_votes_count: Default::default(),
-            total_votes_cast_count: Default::default(),
-        }
+    /// Create a default value for `political_group_total_votes` in `votes_counts`
+    pub fn default_political_group_total_votes(
+        political_groups: &[PoliticalGroup],
+    ) -> Vec<PoliticalGroupTotalVotes> {
+        political_groups
+            .iter()
+            .map(|pg| PoliticalGroupTotalVotes {
+                number: pg.number,
+                total: 0,
+            })
+            .collect()
     }
 }
 
@@ -159,12 +155,62 @@ pub struct VotesCounts {
     pub total_votes_cast_count: Count,
 }
 
-impl AddAssign<&VotesCounts> for VotesCounts {
-    fn add_assign(&mut self, other: &Self) {
+impl VotesCounts {
+    pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
+        // Get sets of political group numbers from both collections
+        let self_numbers: HashSet<_> = self
+            .political_group_total_votes
+            .iter()
+            .map(|pg| pg.number)
+            .collect();
+        let other_numbers: HashSet<_> = other
+            .political_group_total_votes
+            .iter()
+            .map(|pg| pg.number)
+            .collect();
+
+        // Check that both have exactly the same political groups
+        if self_numbers != other_numbers {
+            let missing_in_self: Vec<_> = other_numbers.difference(&self_numbers).collect();
+            let missing_in_other: Vec<_> = self_numbers.difference(&other_numbers).collect();
+
+            if !missing_in_self.is_empty() {
+                return Err(APIError::AddError(
+                    format!(
+                        "Political group(s) {:?} exist in source but not in target",
+                        missing_in_self
+                    ),
+                    ErrorReference::InvalidVoteGroup,
+                ));
+            }
+            if !missing_in_other.is_empty() {
+                return Err(APIError::AddError(
+                    format!(
+                        "Political group(s) {:?} exist in target but not in source",
+                        missing_in_other
+                    ),
+                    ErrorReference::InvalidVoteGroup,
+                ));
+            }
+        }
+
+        // Add totals of political groups with the same number
+        for pg in &other.political_group_total_votes {
+            if let Some(existing) = self
+                .political_group_total_votes
+                .iter_mut()
+                .find(|e| e.number == pg.number)
+            {
+                existing.total += pg.total;
+            }
+        }
+
         self.total_votes_candidates_count += other.total_votes_candidates_count;
         self.blank_votes_count += other.blank_votes_count;
         self.invalid_votes_count += other.invalid_votes_count;
         self.total_votes_cast_count += other.total_votes_cast_count;
+
+        Ok(())
     }
 }
 
@@ -347,27 +393,63 @@ mod tests {
             total_votes_cast_count: 9,
         };
 
-        curr_votes += &VotesCounts {
-            political_group_total_votes: vec![
-                PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 11,
-                },
-                PoliticalGroupTotalVotes {
-                    number: 2,
-                    total: 12,
-                },
-            ],
-            total_votes_candidates_count: 1,
-            blank_votes_count: 2,
-            invalid_votes_count: 3,
-            total_votes_cast_count: 5,
-        };
+        curr_votes
+            .add(&VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 11,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 12,
+                    },
+                ],
+                total_votes_candidates_count: 1,
+                blank_votes_count: 2,
+                invalid_votes_count: 3,
+                total_votes_cast_count: 5,
+            })
+            .unwrap();
+
+        assert_eq!(curr_votes.political_group_total_votes.len(), 2);
+        assert_eq!(curr_votes.political_group_total_votes[0].total, 21);
+        assert_eq!(curr_votes.political_group_total_votes[1].total, 32);
 
         assert_eq!(curr_votes.total_votes_candidates_count, 3);
         assert_eq!(curr_votes.blank_votes_count, 5);
         assert_eq!(curr_votes.invalid_votes_count, 7);
         assert_eq!(curr_votes.total_votes_cast_count, 14);
+    }
+
+    #[test]
+    fn test_votes_addition_error() {
+        let mut curr_votes = VotesCounts {
+            political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                number: 1,
+                total: 10,
+            }],
+            total_votes_candidates_count: 2,
+            blank_votes_count: 3,
+            invalid_votes_count: 4,
+            total_votes_cast_count: 9,
+        };
+
+        let result = curr_votes.add(&VotesCounts {
+            political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                number: 2,
+                total: 20,
+            }],
+            total_votes_candidates_count: 1,
+            blank_votes_count: 2,
+            invalid_votes_count: 3,
+            total_votes_cast_count: 5,
+        });
+        assert!(result.is_err());
+        assert!(matches!(
+            result,
+            Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
+        ));
     }
 
     #[test]

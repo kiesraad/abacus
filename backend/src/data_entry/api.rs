@@ -25,6 +25,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
+    data_entry::VotesCounts,
     election::ElectionWithPoliticalGroups,
     error::{ErrorReference, ErrorResponse},
     polling_station::PollingStation,
@@ -189,7 +190,13 @@ async fn polling_station_data_entry_claim(
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: Default::default(),
-            votes_counts: PollingStationResults::default_votes_counts(&election.political_groups),
+            votes_counts: VotesCounts {
+                political_group_total_votes:
+                    PollingStationResults::default_political_group_total_votes(
+                        &election.political_groups,
+                    ),
+                ..Default::default()
+            },
             differences_counts: Default::default(),
             political_group_votes: PollingStationResults::default_political_group_votes(
                 &election.political_groups,

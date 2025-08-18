@@ -10,7 +10,8 @@ use super::{
     status::{DataEntryStatus, FirstEntryInProgress},
 };
 use crate::{
-    data_entry::status::FirstEntryHasErrors, election::ElectionWithPoliticalGroups,
+    data_entry::{PoliticalGroupTotalVotes, status::FirstEntryHasErrors},
+    election::ElectionWithPoliticalGroups,
     polling_station::PollingStation,
 };
 
@@ -502,6 +503,12 @@ impl Validate for VotesCounts {
         path: &FieldPath,
     ) -> Result<(), DataError> {
         // validate all counts
+        self.political_group_total_votes.validate(
+            election,
+            polling_station,
+            validation_results,
+            &path.field("political_group_total_votes"),
+        )?;
         self.total_votes_candidates_count.validate(
             election,
             polling_station,
@@ -569,6 +576,34 @@ impl Validate for VotesCounts {
                 fields: vec![path.field("total_votes_cast_count").to_string()],
                 code: ValidationResultCode::W205,
             });
+        }
+        Ok(())
+    }
+}
+
+impl Validate for Vec<PoliticalGroupTotalVotes> {
+    fn validate(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        _polling_station: &PollingStation,
+        _validation_results: &mut ValidationResults,
+        _path: &FieldPath,
+    ) -> Result<(), DataError> {
+        // check if the list of political groups has the correct length
+        if election.political_groups.len() != self.len() {
+            return Err(DataError::new(
+                "list of political groups does not have correct length",
+            ));
+        }
+
+        // check each political group
+        for (i, pgv) in self.iter().enumerate() {
+            let number = pgv.number;
+            if number as usize != i + 1 {
+                return Err(DataError::new(
+                    "political group numbers are not consecutive",
+                ));
+            }
         }
         Ok(())
     }
@@ -860,7 +895,13 @@ mod tests {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: Default::default(),
-            votes_counts: Default::default(),
+            votes_counts: VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 0,
+                }],
+                ..Default::default()
+            },
             differences_counts: Default::default(),
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
                 1,

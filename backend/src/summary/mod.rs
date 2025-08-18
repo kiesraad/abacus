@@ -5,7 +5,8 @@ use crate::{
     APIError,
     data_entry::{
         CandidateVotes, Count, DifferencesCounts, PoliticalGroupCandidateVotes,
-        PollingStationResults, Validate, ValidationResults, VotersCounts, VotesCounts,
+        PoliticalGroupTotalVotes, PollingStationResults, Validate, ValidationResults, VotersCounts,
+        VotesCounts,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -59,6 +60,14 @@ impl ElectionSummary {
         // initialize political group votes to zero
         for group in election.political_groups.iter() {
             totals
+                .votes_counts
+                .political_group_total_votes
+                .push(PoliticalGroupTotalVotes {
+                    number: group.number,
+                    total: 0,
+                });
+
+            totals
                 .political_group_votes
                 .push(PoliticalGroupCandidateVotes {
                     number: group.number,
@@ -107,7 +116,7 @@ impl ElectionSummary {
 
             // add voters and votes to the total
             totals.voters_counts += &result.voters_counts;
-            totals.votes_counts += &result.votes_counts;
+            totals.votes_counts.add(&result.votes_counts)?;
 
             // add any differences noted to the total
             totals
@@ -339,6 +348,7 @@ mod tests {
             (ps[0].clone(), polling_station_results_fixture_a()),
             (ps[1].clone(), polling_station_results_fixture_b()),
         ];
+        dbg!(&results);
         let totals = ElectionSummary::from_results(&election, &results).unwrap();
 
         // check values in the differences counts
@@ -441,6 +451,8 @@ mod tests {
         ps_results.political_group_votes[1].candidate_votes[0].votes = 0;
         ps_results.political_group_votes[1].candidate_votes[1].votes = 0;
         ps_results.political_group_votes[1].candidate_votes[2].votes = 0;
+        ps_results.votes_counts.political_group_total_votes[0].total = 999_999_998;
+        ps_results.votes_counts.political_group_total_votes[1].total = 0;
         ps_results.votes_counts.total_votes_cast_count = 999_999_998;
         ps_results.votes_counts.total_votes_candidates_count = 999_999_998;
         ps_results.votes_counts.blank_votes_count = 0;
@@ -490,6 +502,78 @@ mod tests {
     }
 
     #[test]
+    fn test_missing_votes_count_political_groups_total() {
+        let election = election_fixture(&[2, 3]);
+        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let ps1_result = polling_station_results_fixture_a();
+        let mut ps2_result = polling_station_results_fixture_b();
+        ps2_result.votes_counts.political_group_total_votes.pop();
+        let totals = ElectionSummary::from_results(
+            &election,
+            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+        );
+
+        assert!(totals.is_err());
+    }
+
+    #[test]
+    fn test_too_many_votes_count_political_groups_total() {
+        let election = election_fixture(&[2, 3]);
+        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let ps1_result = polling_station_results_fixture_a();
+        let mut ps2_result = polling_station_results_fixture_b();
+        ps2_result
+            .votes_counts
+            .political_group_total_votes
+            .push(PoliticalGroupTotalVotes {
+                number: 3,
+                total: 0,
+            });
+        let totals = ElectionSummary::from_results(
+            &election,
+            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+        );
+
+        assert!(totals.is_err());
+    }
+
+    #[test]
+    fn test_duplicate_votes_count_political_groups_total() {
+        let election = election_fixture(&[2, 3]);
+        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let ps1_result = polling_station_results_fixture_a();
+        let mut ps2_result = polling_station_results_fixture_b();
+        ps2_result
+            .votes_counts
+            .political_group_total_votes
+            .push(ps2_result.votes_counts.political_group_total_votes[1].clone());
+        let totals = ElectionSummary::from_results(
+            &election,
+            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+        );
+
+        assert!(totals.is_err());
+    }
+
+    #[test]
+    fn test_invalid_votes_count_political_group_total() {
+        let election = election_fixture(&[2, 3]);
+        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let ps1_result = polling_station_results_fixture_a();
+        let mut ps2_result = polling_station_results_fixture_b();
+        ps2_result.votes_counts.political_group_total_votes[1] = PoliticalGroupTotalVotes {
+            number: 3,
+            total: 0,
+        };
+        let totals = ElectionSummary::from_results(
+            &election,
+            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+        );
+
+        assert!(totals.is_err());
+    }
+
+    #[test]
     fn test_missing_political_groups() {
         let election = election_fixture(&[2, 3]);
         let ps = polling_stations_fixture(&election, &[20, 20]);
@@ -517,6 +601,27 @@ mod tests {
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
         );
+
+        assert!(totals.is_err());
+    }
+
+    #[test]
+    fn test_duplicate_political_group() {
+        let election = election_fixture(&[2, 3]);
+        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let mut ps1_result = polling_station_results_fixture_a();
+        let mut ps2_result = polling_station_results_fixture_b();
+        ps1_result
+            .political_group_votes
+            .push(ps1_result.political_group_votes[1].clone());
+        ps2_result
+            .political_group_votes
+            .push(ps2_result.political_group_votes[1].clone());
+        let totals = ElectionSummary::from_results(
+            &election,
+            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+        );
+        dbg!(&totals);
 
         assert!(totals.is_err());
     }

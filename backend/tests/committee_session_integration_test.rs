@@ -6,9 +6,9 @@ use test_log::test;
 
 use crate::utils::serve_api;
 use abacus::committee_session::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionListResponse,
-    CommitteeSessionNumberOfVotersChangeRequest, CommitteeSessionStatusChangeRequest,
-    CommitteeSessionUpdateRequest, status::CommitteeSessionStatus,
+    CommitteeSession, CommitteeSessionListResponse, CommitteeSessionNumberOfVotersChangeRequest,
+    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
+    status::CommitteeSessionStatus,
 };
 
 pub mod shared;
@@ -74,11 +74,7 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", &cookie)
-        .json(&CommitteeSessionCreateRequest {
-            number: 2,
-            election_id,
-            number_of_voters: 0,
-        })
+        .json(&NewCommitteeSessionRequest { election_id })
         .send()
         .await
         .unwrap();
@@ -105,11 +101,7 @@ async fn test_committee_session_create_current_committee_session_not_finalised(p
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", coordinator_cookie)
-        .json(&CommitteeSessionCreateRequest {
-            number: 2,
-            election_id: 2,
-            number_of_voters: 0,
-        })
+        .json(&NewCommitteeSessionRequest { election_id: 2 })
         .send()
         .await
         .unwrap();

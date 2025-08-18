@@ -148,4 +148,23 @@ label.button {
   &.xl {
     min-width: 13rem;
   }
+
+  &.underlined {
+    font-weight: 400;
+    background-color: transparent;
+    border: none;
+    color: var(--interactive-default);
+    cursor: pointer;
+    padding: 0;
+    box-shadow: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus {
+      text-decoration: underline;
+      box-shadow: 0 0 0 4px var(--shadow-color-focus);
+    }
+  }
 }

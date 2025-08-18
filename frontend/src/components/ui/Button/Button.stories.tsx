@@ -18,6 +18,7 @@ const buttonVariants: ButtonVariant[] = [
   "secondary",
   "tertiary",
   "tertiary-destructive",
+  "underlined",
 ];
 
 export const Buttons: StoryObj<Props> = {

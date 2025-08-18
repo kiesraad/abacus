@@ -1,10 +1,9 @@
 import { useState } from "react";
 
+import { Button } from "@/components/ui/Button/Button";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import { PollingStationRequest } from "@/types/generated/openapi";
-
-import cls from "./PollingStationsPreview.module.css";
 
 export interface PollingStationsPreviewProps {
   pollingStations: PollingStationRequest[];
@@ -45,9 +44,9 @@ export function PollingStationsPreview({ pollingStations }: PollingStationsPrevi
             </Table.Body>
           </Table>
           <p className="mt-lg">
-            <button id="show-more" className={cls.linkButton} onClick={showAll}>
+            <Button id="show-more" variant="underlined" size="md" onClick={showAll}>
               {t("election.polling_stations.show_all", { num: pollingStations.length })}
-            </button>
+            </Button>
           </p>
         </>
       )}

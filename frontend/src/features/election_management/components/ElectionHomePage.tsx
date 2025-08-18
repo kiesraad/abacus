@@ -94,6 +94,7 @@ export function ElectionHomePage() {
       .postRequest(url, body)
       .then(async (result) => {
         if (isSuccess(result)) {
+          await refetchElection();
           await refetchCommitteeSessions();
         } else {
           throw result;

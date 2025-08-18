@@ -32,10 +32,10 @@ export function PollingStationListPage() {
 
   return (
     <>
-      <PageTitle title={`${t("polling_station.title.plural")} - Abacus`} />
+      <PageTitle title={`${t("polling_station.manage")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("polling_station.title.plural")}</h1>
+          <h1>{t("polling_station.manage")}</h1>
         </section>
       </header>
 

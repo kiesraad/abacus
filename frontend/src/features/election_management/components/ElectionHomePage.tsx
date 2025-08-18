@@ -51,7 +51,7 @@ export function ElectionHomePage() {
           </strong>
           <p id="noPollingStationsWarningAlertDescription">{t("election_management.add_polling_stations_first")}</p>
           <p>
-            <Link to="polling-stations">{t("election_management.manage_polling_stations")}</Link> →
+            <Link to="polling-stations">{t("polling_station.manage")}</Link> →
           </p>
         </Alert>
       )}
@@ -77,11 +77,9 @@ export function ElectionHomePage() {
               numberOfVoters={committeeSession.number_of_voters}
             />
           </div>
-          <div className="mb-xl">
+          <div className={cls.downloadModels}>
             <h3 className={cls.tableTitle}>{t("election_management.empty_models")}</h3>
-            <section className="md">
-              <p>{t("election_management.empty_models_description")}</p>
-            </section>
+            <p>{t("election_management.empty_models_description")}</p>
             <Table className={cn(cls.electionInformationTable)}>
               <Table.Header>
                 <Table.HeaderCell scope="col">{t("election_management.model_name")}</Table.HeaderCell>

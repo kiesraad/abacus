@@ -340,7 +340,7 @@ describe("Test CheckAndSaveForm summary", () => {
     await user.click(submitButton);
 
     const pausedModal = await screen.findByRole("dialog");
-    expect(within(pausedModal).getByRole("heading", { level: 2, name: "Invoer gepauzeerd" })).toBeVisible();
+    expect(within(pausedModal).getByRole("heading", { level: 3, name: "Invoer gepauzeerd" })).toBeVisible();
     expect(within(pausedModal).getByRole("paragraph")).toHaveTextContent(
       "De coördinator heeft het invoeren van stemmen gepauzeerd. Je kan niet meer verder. [Je laatste wijzigingen worden niet opgeslagen.]",
     );

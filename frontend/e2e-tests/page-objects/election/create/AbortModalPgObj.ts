@@ -7,7 +7,7 @@ export class AbortModalPgObj {
   readonly cancelButton: Locator;
 
   constructor(protected readonly page: Page) {
-    this.header = page.getByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" });
+    this.header = page.getByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" });
     this.deleteButton = page.getByRole("button", { name: "Verkiezing niet opslaan" });
     this.closeButton = page.getByRole("dialog").getByRole("button", { name: "Annuleren" }).first();
     this.cancelButton = page.getByRole("dialog").getByRole("button", { name: "Annuleren" }).nth(1);

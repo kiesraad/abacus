@@ -9,7 +9,7 @@ export class UnsavedChangesModal {
   constructor(protected readonly page: Page) {
     this.modal = page.getByRole("dialog");
     this.heading = this.modal.getByRole("heading", {
-      level: 2,
+      level: 3,
       name: "Let op: niet opgeslagen wijzigingen",
     });
     this.saveInput = this.modal.getByRole("button", { name: "Wijzigingen opslaan" });

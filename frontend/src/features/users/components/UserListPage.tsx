@@ -39,10 +39,10 @@ export function UserListPage() {
 
   return (
     <>
-      <PageTitle title={`${t("users.management")} - Abacus`} />
+      <PageTitle title={`${t("users.manage")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("users.management")}</h1>
+          <h1>{t("users.manage")}</h1>
         </section>
       </header>
 

@@ -244,6 +244,15 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 Veld markeren: I en/of J (als ingevuld)
 
+#### DSO | F.355 (Als D = H) I en/of J zijn ingevuld
+
+> Invoerder: Controleer je antwoorden (F.355)
+
+> Coördinator: Controleer I en J (F.355)
+> De getallen bij D en H zijn gelijk. Er zijn geen stemmen meer of minder geteld.
+> Corrigeer de rekenfout door op een corrigendum I en/of J leeg te (laten) maken.
+> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2). Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is. Vul nieuwe telresultaten op het corrigendum in.
+
 #### CSO | F.306 (Als H > D) `I <> H - D`
 
 > Invoerder: **Controleer I (stembiljetten meer geteld)** (F.306)

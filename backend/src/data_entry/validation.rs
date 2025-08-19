@@ -589,19 +589,19 @@ impl Validate for Vec<PoliticalGroupTotalVotes> {
         _validation_results: &mut ValidationResults,
         _path: &FieldPath,
     ) -> Result<(), DataError> {
-        // check if the list of political groups has the correct length
+        // check if the list of political group total votes has the correct length
         if election.political_groups.len() != self.len() {
             return Err(DataError::new(
-                "list of political groups does not have correct length",
+                "list of political group total votes does not have correct length",
             ));
         }
 
-        // check each political group
+        // check each political group total votes
         for (i, pgv) in self.iter().enumerate() {
             let number = pgv.number;
             if number as usize != i + 1 {
                 return Err(DataError::new(
-                    "political group numbers are not consecutive",
+                    "political group total votes numbers are not consecutive",
                 ));
             }
         }

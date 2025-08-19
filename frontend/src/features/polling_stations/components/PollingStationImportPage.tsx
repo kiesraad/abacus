@@ -30,8 +30,8 @@ export function PollingStationImportPage() {
   const validatePath = `/api/elections/${election.id}/polling_stations/validate-import`;
   const importPath = `/api/elections/${election.id}/polling_stations/import`;
 
-  const postImport = useCrud<PollingStationRequestListResponse>({ create: importPath }).create;
-  const postValidate = useCrud<PollingStationListResponse>({ create: validatePath }).create;
+  const postImport = useCrud<PollingStationListResponse>({ create: importPath }).create;
+  const postValidate = useCrud<PollingStationRequestListResponse>({ create: validatePath }).create;
 
   /**
    * Import the polling stations

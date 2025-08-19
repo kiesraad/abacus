@@ -21,8 +21,14 @@ const commonConfig: PlaywrightTestConfig = defineConfig({
       name: "initialise",
       workers: 1,
       testMatch: /initialise\.ts/,
-      // the initialise project runs only once (on the most popular browser engine)
       use: { ...devices["Desktop Chrome"], channel: "chromium" },
+    },
+    {
+      name: "test-users",
+      workers: 1,
+      testMatch: /test-users\.ts/,
+      use: { ...devices["Desktop Chrome"], channel: "chromium" },
+      dependencies: ["initialise"],
     },
     {
       name: "chrome",
@@ -33,17 +39,17 @@ const commonConfig: PlaywrightTestConfig = defineConfig({
         ...devices["Desktop Chrome"],
         channel: "chromium",
       },
-      dependencies: ["initialise"],
+      dependencies: ["test-users"],
     },
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"] },
-      dependencies: ["initialise"],
+      dependencies: ["test-users"],
     },
     {
       name: "safari",
       use: { ...devices["Desktop Safari"] },
-      dependencies: ["initialise"],
+      dependencies: ["test-users"],
     },
   ],
 });

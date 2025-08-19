@@ -173,9 +173,9 @@
   )
 }
 
-#let correction_title_grid() = {
+#let correction_title_grid(correction_width: 8em, input_width: 8em) = {
   grid(
-    columns: (8em, 8em, 3.5em, 1fr),
+    columns: (correction_width, input_width, 3.5em, 1fr),
     grid.cell(inset: 8pt, align(right, small_header_text[Oorspronkelijk])),
     grid.cell(inset: 8pt, align(right, small_header_text[Gecorrigeerd])),
     [],

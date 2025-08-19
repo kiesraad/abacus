@@ -123,7 +123,7 @@ gemeentelijke stembureau/stembureau voor het openbaar lichaam zijn vastgesteld.
 #checkbox[H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 #box(width: 500pt, inset: (left: 3em, bottom: 1em))[
     #grid(
-      correction_title_grid(),
+      correction_title_grid(correction_width: 6em, input_width: 6em),
       empty_letterbox(cells: 3, original: 10, light: false, "I")[Aantal méér getelde stemmen (bereken: H _min_ D)],
     )
 ]
@@ -131,7 +131,7 @@ gemeentelijke stembureau/stembureau voor het openbaar lichaam zijn vastgesteld.
 #checkbox[H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)]
 #box(width: 500pt, inset: (left: 3em, bottom: 1em))[
   #grid(
-    correction_title_grid(),
+    correction_title_grid(correction_width: 6em, input_width: 6em),
     empty_letterbox(cells: 3, original: 10, light: false, "J")[Aantal minder getelde stemmen (bereken: D _min_ H)]
   )
 ]

@@ -35,9 +35,9 @@ describe("ResolveDifferencesTables", () => {
       ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
       ["E.1", "1.512", "1.481", "Totaal Lijst 1 - Vurige Vleugels Partij"],
       [""],
-      ["E", "42", "44", "Totaal stemmen op kandidaten"],
+      ["E", "1.514", "1.483", "Totaal stemmen op kandidaten"],
       [""],
-      ["H", "42", "44", "Totaal uitgebrachte stemmen"],
+      ["H", "1.514", "1.483", "Totaal uitgebrachte stemmen"],
     ]);
 
     const differencesCountsTable = screen.queryByRole("table", {

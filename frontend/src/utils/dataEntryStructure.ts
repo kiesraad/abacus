@@ -5,16 +5,12 @@ import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 
 export const createVotersAndVotesSection = (election: ElectionWithPoliticalGroups): DataEntrySection => {
-  const rowsPerPoliticalGroup: InputGridSubsectionRow[] = [];
-  election.political_groups.forEach((politicalGroup, index) => {
-    const title = `${t("total")} ${formatPoliticalGroupName(politicalGroup)}`;
-    rowsPerPoliticalGroup.push({
-      code: `E.${politicalGroup.number}`,
-      path: `votes_counts.political_group_total_votes[${politicalGroup.number - 1}].total`,
-      title,
-      addSeparator: index === election.political_groups.length - 1,
-    });
-  });
+  const rowsPerPoliticalGroup: InputGridSubsectionRow[] = election.political_groups.map((politicalGroup, index) => ({
+    code: `E.${politicalGroup.number}`,
+    path: `votes_counts.political_group_total_votes[${politicalGroup.number - 1}].total`,
+    title: `${t("total")} ${formatPoliticalGroupName(politicalGroup)}`,
+    addSeparator: index === election.political_groups.length - 1,
+  }));
 
   return {
     id: "voters_votes_counts",

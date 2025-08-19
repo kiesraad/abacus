@@ -589,7 +589,6 @@ mod tests {
             &"polling_station_results".into(),
         );
         assert_eq!(different_fields.len(), 8);
-        dbg!(&different_fields);
         assert_eq!(
             different_fields[0],
             "polling_station_results.voters_counts.poll_card_count"

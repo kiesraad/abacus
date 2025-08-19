@@ -348,7 +348,6 @@ mod tests {
             (ps[0].clone(), polling_station_results_fixture_a()),
             (ps[1].clone(), polling_station_results_fixture_b()),
         ];
-        dbg!(&results);
         let totals = ElectionSummary::from_results(&election, &results).unwrap();
 
         // check values in the differences counts
@@ -621,7 +620,6 @@ mod tests {
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
         );
-        dbg!(&totals);
 
         assert!(totals.is_err());
     }

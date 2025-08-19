@@ -15,19 +15,19 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
       difference_ballots_per_list: { yes: false, no: false },
     },
     voters_counts: {
-      poll_card_count: 42,
+      poll_card_count: 1514,
       proxy_certificate_count: 0,
-      total_admitted_voters_count: 42,
+      total_admitted_voters_count: 1514,
     },
     votes_counts: {
       political_group_total_votes: [
         { number: 1, total: first ? 1512 : 1481 },
         { number: 2, total: 2 },
       ],
-      total_votes_candidates_count: first ? 42 : 44,
+      total_votes_candidates_count: first ? 1514 : 1483,
       blank_votes_count: 0,
       invalid_votes_count: 0,
-      total_votes_cast_count: first ? 42 : 44,
+      total_votes_cast_count: first ? 1514 : 1483,
     },
     differences_counts: {
       more_ballots_count: 0,

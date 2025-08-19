@@ -62,6 +62,8 @@
 }
 
 .dataEntryList {
+  margin-top: 2.5rem;
+
   details[open] {
     summary {
       display: none;

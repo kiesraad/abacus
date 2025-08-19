@@ -48,8 +48,11 @@ describe("ResolveErrorsSectionPage", () => {
 
     // Verify the section renders with the correct title
     expect(
-      await screen.findByRole("group", { name: "Toegelaten kiezers en uitgebrachte stemmen" }),
-    ).toBeInTheDocument();
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Toegelaten kiezers en uitgebrachte stemmen B1-3.1 en 3.2",
+      }),
+    ).toBeVisible();
 
     // Verify some expected content is present
     expect(screen.getByText("Controleer toegelaten kiezers")).toBeInTheDocument();

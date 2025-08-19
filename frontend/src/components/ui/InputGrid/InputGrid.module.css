@@ -1,5 +1,4 @@
 .inputGrid {
-  margin-top: 1rem;
   width: 100%;
   border-spacing: 0;
   th {
@@ -127,5 +126,4 @@
 
 div:global(#missing-total-error) {
   padding-left: 6.5rem;
-  padding-top: 1.5rem;
 }

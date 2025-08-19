@@ -1,9 +1,9 @@
 import { expect } from "@playwright/test";
 
-export type TestStates = Record<string, () => Promise<void>>;
-export type TestEvents = Record<string, () => Promise<void>>;
+type TestStates = Record<string, () => Promise<void>>;
+type TestEvents = Record<string, () => Promise<void>>;
 
-export interface MachineDefinition {
+interface MachineDefinition {
   initial: string;
   states: {
     [key: string]: { on?: Record<string, string> };
@@ -50,7 +50,7 @@ export const typeCheckedMachineDefinition = <T extends MachineDefinition>(
   },
 ) => dataEntryMachineDefinition;
 
-export function getStatesAndEventsFromMachineDefinition(machineDef: MachineDefinition) {
+function getStatesAndEventsFromMachineDefinition(machineDef: MachineDefinition) {
   const machineStates: string[] = Object.keys(machineDef.states);
   let machineEvents: string[] = [];
   let machineTargetStates: string[] = [];

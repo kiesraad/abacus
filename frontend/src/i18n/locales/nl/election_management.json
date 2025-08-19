@@ -13,7 +13,7 @@
   "date_hint": "dd-mm-jjjj, bijvoorbeeld 18-03-2026",
   "date_error": "Vul de datum in als: dd-mm-jjjj",
   "delete_session": "Zitting verwijderen",
-  "delete_session_are_you_sure": "Weet je zeker dat je de {sessionLabel} wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
+  "delete_session_are_you_sure": "Weet je zeker dat je {sessionLabel} wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
   "electoral_area": "Kiesgebied",
   "empty_models": "Lege modellen voor deze verkiezing",
   "empty_models_description": "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",

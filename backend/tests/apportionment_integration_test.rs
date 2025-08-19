@@ -16,7 +16,6 @@ use abacus::{
     apportionment::{
         ElectionApportionmentResponse, Fraction, get_total_seats_from_apportionment_result,
     },
-    committee_session::status::CommitteeSessionStatus,
     data_entry::{
         DataEntry, PollingStationResults, VotersCounts, VotesCounts, status::ClientState,
     },
@@ -88,14 +87,6 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
 async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
-
-    shared::change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        5,
-        CommitteeSessionStatus::DataEntryInProgress,
-    )
-    .await;
 
     let data_entry = DataEntry {
         progress: 100,

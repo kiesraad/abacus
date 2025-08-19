@@ -121,6 +121,21 @@ async fn test_committee_session_delete_ok(pool: SqlitePool) {
     let election_id = 5;
     let committee_session_id = 6;
 
+    shared::change_status_committee_session(
+        &addr,
+        &cookie,
+        committee_session_id,
+        CommitteeSessionStatus::Created,
+    )
+    .await;
+    shared::change_status_committee_session(
+        &addr,
+        &cookie,
+        committee_session_id,
+        CommitteeSessionStatus::DataEntryNotStarted,
+    )
+    .await;
+
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(
@@ -158,14 +173,6 @@ async fn test_committee_session_delete_committee_session_not_status_created_or_d
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
     let committee_session_id = 6;
-
-    shared::change_status_committee_session(
-        &addr,
-        &cookie,
-        committee_session_id,
-        CommitteeSessionStatus::DataEntryInProgress,
-    )
-    .await;
 
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;

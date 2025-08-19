@@ -49,20 +49,22 @@ const config: PlaywrightTestConfig = defineConfig({
       ],
   projects: [
     {
-      name: "initialise",
+      name: "initialisation-test",
       workers: 1,
-      testMatch: /initialise\.ts/,
+      testMatch: /initialisation\.e2e\.ts/,
       use: { ...devices["Desktop Chrome"], channel: "chromium" },
     },
     {
-      name: "test-users",
+      name: "setup-test-users",
       workers: 1,
-      testMatch: /test-users\.ts/,
+      testMatch: /setup-test-users\.ts/,
       use: { ...devices["Desktop Chrome"], channel: "chromium" },
-      dependencies: ["initialise"],
+      dependencies: ["initialisation-test"],
     },
     {
       name: "chrome",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
       use: {
         contextOptions: {
           permissions: ["clipboard-read", "clipboard-write"],
@@ -70,17 +72,19 @@ const config: PlaywrightTestConfig = defineConfig({
         ...devices["Desktop Chrome"],
         channel: "chromium",
       },
-      dependencies: ["test-users"],
+      dependencies: ["setup-test-users"],
     },
     {
       name: "firefox",
+      testIgnore: /initialisation\.e2e\.ts/,
       use: { ...devices["Desktop Firefox"] },
-      dependencies: ["test-users"],
+      dependencies: ["setup-test-users"],
     },
     {
       name: "safari",
+      testIgnore: /initialisation\.e2e\.ts/,
       use: { ...devices["Desktop Safari"] },
-      dependencies: ["test-users"],
+      dependencies: ["setup-test-users"],
     },
   ],
 });

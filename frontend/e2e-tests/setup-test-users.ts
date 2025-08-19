@@ -3,7 +3,7 @@ import { expect, request, test } from "@playwright/test";
 import { getTestPassword, loginAs } from "./helpers-utils/e2e-test-api-helpers";
 import { testUsers } from "./test-data/users";
 
-test.describe("test users", () => {
+test.describe("setup test users", () => {
   test("create test user accounts", async () => {
     // create a new APIRequestContext
     const adminContext = await request.newContext();

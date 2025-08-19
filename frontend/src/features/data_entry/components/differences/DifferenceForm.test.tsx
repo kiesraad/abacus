@@ -48,11 +48,6 @@ function renderForm() {
 const differencesFieldIds = {
   moreBallotsCount: "data.differences_counts.more_ballots_count",
   fewerBallotsCount: "data.differences_counts.fewer_ballots_count",
-  unreturnedBallotsCount: "data.differences_counts.unreturned_ballots_count",
-  tooFewBallotsHandedOutCount: "data.differences_counts.too_few_ballots_handed_out_count",
-  tooManyBallotsHandedOutCount: "data.differences_counts.too_many_ballots_handed_out_count",
-  otherExplanationCount: "data.differences_counts.other_explanation_count",
-  noExplanationCount: "data.differences_counts.no_explanation_count",
 };
 
 describe("Test DifferencesForm", () => {
@@ -71,7 +66,7 @@ describe("Test DifferencesForm", () => {
       });
       renderForm();
 
-      const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
+      const moreBallotsCount = await screen.findByRole("textbox", { name: "I Aantal méér getelde stemmen" });
       await user.type(moreBallotsCount, "12345");
       expect(moreBallotsCount).toHaveValue("12345");
 
@@ -92,7 +87,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
       const spy = vi.spyOn(global, "fetch");
 
-      const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
+      const moreBallotsCount = await screen.findByRole("textbox", { name: "I Aantal méér getelde stemmen" });
       await user.type(moreBallotsCount, "12345");
       expect(moreBallotsCount).toHaveValue("12345");
 
@@ -113,59 +108,22 @@ describe("Test DifferencesForm", () => {
       });
       renderForm();
 
-      const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
-      expect(moreBallotsCount.closest("fieldset")).toHaveAccessibleName(
-        "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen B1-3.3",
-      );
-      expect(moreBallotsCount).toHaveAccessibleName("I Stembiljetten méér geteld");
-      expect(moreBallotsCount).toHaveFocus();
+      const admitedVotersEqualsVotesCastCheckbox = await screen.findByRole("checkbox", {
+        name: "D en H zijn gelijk",
+      });
+      expect(admitedVotersEqualsVotesCastCheckbox).not.toBeChecked();
+
+      const moreBallotsCount = await screen.findByRole("textbox", { name: "I Aantal méér getelde stemmen" });
+      expect(moreBallotsCount).toHaveAccessibleName("I Aantal méér getelde stemmen");
       await user.type(moreBallotsCount, "12345");
       expect(moreBallotsCount).toHaveValue("12345");
 
       await user.keyboard("{enter}");
 
-      const fewerBallotsCount = screen.getByRole("textbox", { name: "J Stembiljetten minder geteld" });
+      const fewerBallotsCount = screen.getByRole("textbox", { name: "J Aantal minder getelde stemmen" });
       expect(fewerBallotsCount).toHaveFocus();
       await user.paste("6789");
       expect(fewerBallotsCount).toHaveValue("6789");
-
-      await user.keyboard("{enter}");
-
-      const unreturnedBallotsCount = screen.getByRole("textbox", { name: "K Niet ingeleverde stembiljetten" });
-      expect(unreturnedBallotsCount).toHaveFocus();
-      await user.type(unreturnedBallotsCount, "123");
-      expect(unreturnedBallotsCount).toHaveValue("123");
-
-      await user.keyboard("{enter}");
-
-      const tooFewBallotsHandedOutCount = screen.getByRole("textbox", {
-        name: "L Te weinig uitgereikte stembiljetten",
-      });
-      expect(tooFewBallotsHandedOutCount).toHaveFocus();
-      await user.paste("4242");
-      expect(tooFewBallotsHandedOutCount).toHaveValue("4242");
-
-      await user.keyboard("{enter}");
-
-      const tooManyBallotsHandedOutCount = screen.getByRole("textbox", { name: "M Te veel uitgereikte stembiljetten" });
-      expect(tooManyBallotsHandedOutCount).toHaveFocus();
-      await user.type(tooManyBallotsHandedOutCount, "12");
-      expect(tooManyBallotsHandedOutCount).toHaveValue("12");
-
-      await user.keyboard("{enter}");
-
-      const otherExplanationCount = screen.getByRole("textbox", { name: "N Andere verklaring voor het verschil" });
-      expect(otherExplanationCount).toHaveFocus();
-      // Test if maxLength on field works
-      await user.type(otherExplanationCount, "1234567890");
-      expect(otherExplanationCount).toHaveValue("123456789");
-
-      await user.keyboard("{enter}");
-
-      const noExplanationCount = screen.getByRole("textbox", { name: "O Geen verklaring voor het verschil" });
-      expect(noExplanationCount).toHaveFocus();
-      await user.type(noExplanationCount, "3");
-      expect(noExplanationCount).toHaveValue("3");
 
       await user.keyboard("{enter}");
 
@@ -197,11 +155,10 @@ describe("Test DifferencesForm", () => {
           differences_counts: {
             more_ballots_count: 2,
             fewer_ballots_count: 0,
-            unreturned_ballots_count: 0,
-            too_few_ballots_handed_out_count: 0,
-            too_many_ballots_handed_out_count: 1,
-            other_explanation_count: 0,
-            no_explanation_count: 1,
+            admitted_voters_equals_votes_cast: { yes: true, no: true },
+            votes_cast_greater_than_admitted_voters: { yes: true, no: true },
+            votes_cast_smaller_than_admitted_voters: { yes: true, no: true },
+            difference_completely_accounted_for: { yes: true, no: true },
           },
         },
         client_state: {},
@@ -219,8 +176,38 @@ describe("Test DifferencesForm", () => {
 
       await screen.findByTestId("differences_counts_form");
       const spy = vi.spyOn(global, "fetch");
+      await userTypeInputs(
+        user,
+        {
+          more_ballots_count: expectedRequest.data.differences_counts.more_ballots_count,
+          fewer_ballots_count: expectedRequest.data.differences_counts.fewer_ballots_count,
+        },
+        "data.differences_counts.",
+      );
 
-      await userTypeInputs(user, expectedRequest.data.differences_counts, "data.differences_counts.");
+      const admittedVotersEqualsVotesCastCheckbox = screen.getByRole("checkbox", { name: "D en H zijn gelijk" });
+      expect(admittedVotersEqualsVotesCastCheckbox).not.toBeChecked();
+
+      const votesCastGreaterThanAdmittedVotersCheckbox = screen.getByRole("checkbox", {
+        name: "H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
+      });
+      expect(votesCastGreaterThanAdmittedVotersCheckbox).not.toBeChecked();
+
+      const votesCastSmallerThanAdmittedVotersCheckbox = screen.getByRole("checkbox", {
+        name: "H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
+      });
+      expect(votesCastSmallerThanAdmittedVotersCheckbox).not.toBeChecked();
+
+      // const differenceCompletelyAccountedForFieldset = screen.getByRole("group", {
+      //   name: "3.3.2 Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?",
+      // });
+      // console.log(differenceCompletelyAccountedForFieldset);
+      // expect(differenceCompletelyAccountedForFieldset.closest("checkbox")).toHaveAccessibleName("Ja");
+
+      // const differenceCompletelyAccountedForCheckbox = differenceCompletelyAccountedForFieldset.closest("checkbox", {
+      //   name: "differences_counts.difference_completely_accounted_for.yes",
+      // });
+      // expect(differenceCompletelyAccountedForFieldset.closest("checkbox")).not.toBeChecked();
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -257,14 +244,7 @@ describe("Test DifferencesForm", () => {
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [differencesFieldIds.moreBallotsCount];
-      const expectedValidFieldIds = [
-        differencesFieldIds.fewerBallotsCount,
-        differencesFieldIds.unreturnedBallotsCount,
-        differencesFieldIds.tooFewBallotsHandedOutCount,
-        differencesFieldIds.tooManyBallotsHandedOutCount,
-        differencesFieldIds.otherExplanationCount,
-        differencesFieldIds.noExplanationCount,
-      ];
+      const expectedValidFieldIds = [differencesFieldIds.fewerBallotsCount];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -292,14 +272,7 @@ describe("Test DifferencesForm", () => {
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
-      const expectedValidFieldIds = [
-        differencesFieldIds.moreBallotsCount,
-        differencesFieldIds.unreturnedBallotsCount,
-        differencesFieldIds.tooFewBallotsHandedOutCount,
-        differencesFieldIds.tooManyBallotsHandedOutCount,
-        differencesFieldIds.otherExplanationCount,
-        differencesFieldIds.noExplanationCount,
-      ];
+      const expectedValidFieldIds = [differencesFieldIds.moreBallotsCount];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -329,14 +302,7 @@ describe("Test DifferencesForm", () => {
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
-      const expectedValidFieldIds = [
-        differencesFieldIds.moreBallotsCount,
-        differencesFieldIds.unreturnedBallotsCount,
-        differencesFieldIds.tooFewBallotsHandedOutCount,
-        differencesFieldIds.tooManyBallotsHandedOutCount,
-        differencesFieldIds.otherExplanationCount,
-        differencesFieldIds.noExplanationCount,
-      ];
+      const expectedValidFieldIds = [differencesFieldIds.moreBallotsCount];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -366,14 +332,7 @@ describe("Test DifferencesForm", () => {
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [differencesFieldIds.moreBallotsCount];
-      const expectedValidFieldIds = [
-        differencesFieldIds.fewerBallotsCount,
-        differencesFieldIds.unreturnedBallotsCount,
-        differencesFieldIds.tooFewBallotsHandedOutCount,
-        differencesFieldIds.tooManyBallotsHandedOutCount,
-        differencesFieldIds.otherExplanationCount,
-        differencesFieldIds.noExplanationCount,
-      ];
+      const expectedValidFieldIds = [differencesFieldIds.fewerBallotsCount];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -402,14 +361,7 @@ describe("Test DifferencesForm", () => {
         "Controleer ingevulde verschillenF.305Je hebt bij Aantal kiezers en stemmers ingevuld dat er evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFieldIds = [
-        differencesFieldIds.fewerBallotsCount,
-        differencesFieldIds.unreturnedBallotsCount,
-        differencesFieldIds.tooFewBallotsHandedOutCount,
-        differencesFieldIds.tooManyBallotsHandedOutCount,
-        differencesFieldIds.otherExplanationCount,
-        differencesFieldIds.noExplanationCount,
-      ];
+      const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
       const expectedValidFieldIds = [differencesFieldIds.moreBallotsCount];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
@@ -442,14 +394,7 @@ describe("Test DifferencesForm", () => {
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFieldIds = [
-        differencesFieldIds.moreBallotsCount,
-        differencesFieldIds.unreturnedBallotsCount,
-        differencesFieldIds.tooFewBallotsHandedOutCount,
-        differencesFieldIds.tooManyBallotsHandedOutCount,
-        differencesFieldIds.otherExplanationCount,
-        differencesFieldIds.noExplanationCount,
-      ];
+      const expectedInvalidFieldIds = [differencesFieldIds.moreBallotsCount];
       let expectedValidFieldIds = [differencesFieldIds.fewerBallotsCount];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
@@ -499,14 +444,7 @@ describe("Test DifferencesForm", () => {
         "Controleer ingevulde verschillenW.301De invoer bij I, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFieldIds = [
-        differencesFieldIds.moreBallotsCount,
-        differencesFieldIds.unreturnedBallotsCount,
-        differencesFieldIds.tooFewBallotsHandedOutCount,
-        differencesFieldIds.tooManyBallotsHandedOutCount,
-        differencesFieldIds.otherExplanationCount,
-        differencesFieldIds.noExplanationCount,
-      ];
+      const expectedInvalidFieldIds = [differencesFieldIds.moreBallotsCount];
       const expectedValidFieldIds = [differencesFieldIds.fewerBallotsCount];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
@@ -536,14 +474,7 @@ describe("Test DifferencesForm", () => {
         "Controleer ingevulde verschillenW.302De invoer bij J, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFieldIds = [
-        differencesFieldIds.fewerBallotsCount,
-        differencesFieldIds.unreturnedBallotsCount,
-        differencesFieldIds.tooFewBallotsHandedOutCount,
-        differencesFieldIds.tooManyBallotsHandedOutCount,
-        differencesFieldIds.otherExplanationCount,
-        differencesFieldIds.noExplanationCount,
-      ];
+      const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
       const expectedValidFieldIds = [differencesFieldIds.moreBallotsCount];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
@@ -573,16 +504,6 @@ describe("Test DifferencesForm", () => {
       });
     });
 
-    test("checkbox should disappear when filling in any form input", async () => {
-      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
-      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
-
-      const input = screen.getByLabelText("O Geen verklaring voor het verschil");
-      await user.type(input, "1");
-
-      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
-    });
-
     test("checkbox with error should disappear when filling in any form input", async () => {
       expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
       expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
@@ -594,12 +515,6 @@ describe("Test DifferencesForm", () => {
         description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
       });
       expect(acceptErrorsAndWarningsError).toBeVisible();
-
-      const input = screen.getByLabelText("O Geen verklaring voor het verschil");
-      await user.type(input, "1");
-
-      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
-      expect(acceptErrorsAndWarningsError).not.toBeVisible();
     });
 
     test("error should not immediately disappear when checkbox is checked", async () => {

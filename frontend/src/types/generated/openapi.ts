@@ -539,20 +539,22 @@ export interface DataEntryStatusResponse {
  * Differences counts, part of the polling station results.
  */
 export interface DifferencesCounts {
+  /** Whether total of admitted voters and total of votes cast match.
+("D en H zijn gelijk") */
+  admitted_voters_equals_votes_cast: YesNo;
+  /** Whether the difference between the total of admitted voters and total of votes cast is explained.
+("Verschil tussen D en H volledig verklaard?") */
+  difference_completely_accounted_for: YesNo;
   /** Number of fewer counted ballots ("Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld") */
   fewer_ballots_count: number;
   /** Number of more counted ballots ("Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?") */
   more_ballots_count: number;
-  /** Number of no explanations ("Hoe vaak is er geen verklaring voor het verschil?") */
-  no_explanation_count: number;
-  /** Number of other explanations ("Hoe vaak is er een andere verklaring voor het verschil?") */
-  other_explanation_count: number;
-  /** Number of fewer ballots handed out ("Hoe vaak is er een stembiljet te weinig uitgereikt?") */
-  too_few_ballots_handed_out_count: number;
-  /** Number of more ballots handed out ("Hoe vaak is er een stembiljet te veel uitgereikt?") */
-  too_many_ballots_handed_out_count: number;
-  /** Number of unreturned ballots ("Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?") */
-  unreturned_ballots_count: number;
+  /** Whether total of admitted voters is greater than total of votes cast match.
+("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)") */
+  votes_cast_greater_than_admitted_voters: YesNo;
+  /** Whether total of admitted voters is less than total of votes cast match.
+("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)") */
+  votes_cast_smaller_than_admitted_voters: YesNo;
 }
 
 /**
@@ -1092,13 +1094,12 @@ export interface SumCount {
  * Contains a summary of the differences, containing which polling stations had differences.
  */
 export interface SummaryDifferencesCounts {
+  admitted_voters_equals_votes_cast: YesNo;
+  difference_completely_accounted_for: YesNo;
   fewer_ballots_count: SumCount;
   more_ballots_count: SumCount;
-  no_explanation_count: SumCount;
-  other_explanation_count: SumCount;
-  too_few_ballots_handed_out_count: SumCount;
-  too_many_ballots_handed_out_count: SumCount;
-  unreturned_ballots_count: SumCount;
+  votes_cast_greater_than_admitted_voters: YesNo;
+  votes_cast_smaller_than_admitted_voters: YesNo;
 }
 
 export interface UpdateUserRequest {

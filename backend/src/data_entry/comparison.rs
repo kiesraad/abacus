@@ -176,30 +176,25 @@ impl Compare for DifferencesCounts {
             different_fields,
             &path.field("fewer_ballots_count"),
         );
-        self.unreturned_ballots_count.compare(
-            &first_entry.unreturned_ballots_count,
+        self.admitted_voters_equals_votes_cast.compare(
+            &first_entry.admitted_voters_equals_votes_cast,
             different_fields,
-            &path.field("unreturned_ballots_count"),
+            &path.field("admitted_voters_equals_votes_cast"),
         );
-        self.too_few_ballots_handed_out_count.compare(
-            &first_entry.too_few_ballots_handed_out_count,
+        self.votes_cast_greater_than_admitted_voters.compare(
+            &first_entry.votes_cast_greater_than_admitted_voters,
             different_fields,
-            &path.field("too_few_ballots_handed_out_count"),
+            &path.field("votes_cast_greater_than_admitted_voters"),
         );
-        self.too_many_ballots_handed_out_count.compare(
-            &first_entry.too_many_ballots_handed_out_count,
+        self.votes_cast_smaller_than_admitted_voters.compare(
+            &first_entry.votes_cast_smaller_than_admitted_voters,
             different_fields,
-            &path.field("too_many_ballots_handed_out_count"),
+            &path.field("votes_cast_smaller_than_admitted_voters"),
         );
-        self.other_explanation_count.compare(
-            &first_entry.other_explanation_count,
+        self.difference_completely_accounted_for.compare(
+            &first_entry.difference_completely_accounted_for,
             different_fields,
-            &path.field("other_explanation_count"),
-        );
-        self.no_explanation_count.compare(
-            &first_entry.no_explanation_count,
-            different_fields,
-            &path.field("no_explanation_count"),
+            &path.field("difference_completely_accounted_for"),
         );
     }
 }
@@ -294,11 +289,10 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 2,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 2,
-                no_explanation_count: 0,
+                admitted_voters_equals_votes_cast: Default::default(),
+                votes_cast_greater_than_admitted_voters: Default::default(),
+                votes_cast_smaller_than_admitted_voters: Default::default(),
+                difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
         };
@@ -362,11 +356,10 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 1,
                 fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 1,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
+                admitted_voters_equals_votes_cast: Default::default(),
+                votes_cast_greater_than_admitted_voters: Default::default(),
+                votes_cast_smaller_than_admitted_voters: Default::default(),
+                difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
         };
@@ -440,11 +433,10 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 2,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 2,
-                no_explanation_count: 0,
+                admitted_voters_equals_votes_cast: Default::default(),
+                votes_cast_greater_than_admitted_voters: Default::default(),
+                votes_cast_smaller_than_admitted_voters: Default::default(),
+                difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
         };
@@ -452,11 +444,10 @@ mod tests {
         second_entry.differences_counts = DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 2,
-            unreturned_ballots_count: 0,
-            too_few_ballots_handed_out_count: 1,
-            too_many_ballots_handed_out_count: 0,
-            other_explanation_count: 0,
-            no_explanation_count: 1,
+            admitted_voters_equals_votes_cast: Default::default(),
+            votes_cast_greater_than_admitted_voters: Default::default(),
+            votes_cast_smaller_than_admitted_voters: Default::default(),
+            difference_completely_accounted_for: Default::default(),
         };
         second_entry.compare(
             &first_entry,
@@ -466,15 +457,15 @@ mod tests {
         assert_eq!(different_fields.len(), 3);
         assert_eq!(
             different_fields[0],
-            "polling_station_results.differences_counts.too_few_ballots_handed_out_count"
+            "polling_station_results.differences_counts.admitted_voters_equals_votes_cast"
         );
         assert_eq!(
             different_fields[1],
-            "polling_station_results.differences_counts.other_explanation_count"
+            "polling_station_results.differences_counts.votes_cast_greater_than_admitted_voters"
         );
         assert_eq!(
             different_fields[2],
-            "polling_station_results.differences_counts.no_explanation_count"
+            "polling_station_results.differences_counts.votes_cast_smaller_than_admitted_voters"
         );
     }
 
@@ -564,11 +555,10 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 1,
                 fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 1,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
+                admitted_voters_equals_votes_cast: Default::default(),
+                votes_cast_greater_than_admitted_voters: Default::default(),
+                votes_cast_smaller_than_admitted_voters: Default::default(),
+                difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![
                 PoliticalGroupVotes::from_test_data_auto(1, &[100, 0]),

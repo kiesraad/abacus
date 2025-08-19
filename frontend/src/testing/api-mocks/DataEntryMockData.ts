@@ -39,11 +39,10 @@ export const emptyData: PollingStationResults = {
   differences_counts: {
     more_ballots_count: 0,
     fewer_ballots_count: 0,
-    unreturned_ballots_count: 0,
-    too_few_ballots_handed_out_count: 0,
-    too_many_ballots_handed_out_count: 0,
-    other_explanation_count: 0,
-    no_explanation_count: 0,
+    admitted_voters_equals_votes_cast: { yes: false, no: false },
+    votes_cast_greater_than_admitted_voters: { yes: false, no: false },
+    votes_cast_smaller_than_admitted_voters: { yes: false, no: false },
+    difference_completely_accounted_for: { yes: false, no: false },
   },
   political_group_votes: electionMockData.political_groups.map((group) => ({
     number: group.number,
@@ -91,11 +90,10 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
     differences_counts: {
       more_ballots_count: 0,
       fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
+      admitted_voters_equals_votes_cast: { yes: false, no: false },
+      votes_cast_greater_than_admitted_voters: { yes: false, no: false },
+      votes_cast_smaller_than_admitted_voters: { yes: false, no: false },
+      difference_completely_accounted_for: { yes: false, no: false },
     },
     political_group_votes: [
       {
@@ -145,11 +143,10 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
     differences_counts: {
       more_ballots_count: 0,
       fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
+      admitted_voters_equals_votes_cast: { yes: false, no: false },
+      votes_cast_greater_than_admitted_voters: { yes: false, no: false },
+      votes_cast_smaller_than_admitted_voters: { yes: false, no: false },
+      difference_completely_accounted_for: { yes: false, no: false },
     },
     political_group_votes: [
       {

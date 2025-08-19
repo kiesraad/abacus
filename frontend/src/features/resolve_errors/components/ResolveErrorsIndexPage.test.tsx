@@ -68,7 +68,7 @@ describe("ResolveErrorsPage", () => {
     expect(voters_votes_counts).toBeInTheDocument();
 
     const differences_counts = screen.queryByRole("region", {
-      name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen",
     });
     expect(differences_counts).toBeInTheDocument();
 

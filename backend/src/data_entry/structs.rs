@@ -158,21 +158,18 @@ pub struct DifferencesCounts {
     /// Number of fewer counted ballots ("Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld")
     #[schema(value_type = u32)]
     pub fewer_ballots_count: Count,
-    /// Number of unreturned ballots ("Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?")
-    #[schema(value_type = u32)]
-    pub unreturned_ballots_count: Count,
-    /// Number of fewer ballots handed out ("Hoe vaak is er een stembiljet te weinig uitgereikt?")
-    #[schema(value_type = u32)]
-    pub too_few_ballots_handed_out_count: Count,
-    /// Number of more ballots handed out ("Hoe vaak is er een stembiljet te veel uitgereikt?")
-    #[schema(value_type = u32)]
-    pub too_many_ballots_handed_out_count: Count,
-    /// Number of other explanations ("Hoe vaak is er een andere verklaring voor het verschil?")
-    #[schema(value_type = u32)]
-    pub other_explanation_count: Count,
-    /// Number of no explanations ("Hoe vaak is er geen verklaring voor het verschil?")
-    #[schema(value_type = u32)]
-    pub no_explanation_count: Count,
+    /// Whether total of admitted voters and total of votes cast match.
+    /// ("D en H zijn gelijk")
+    pub admitted_voters_equals_votes_cast: YesNo,
+    /// Whether total of admitted voters is greater than total of votes cast match.
+    /// ("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)")
+    pub votes_cast_greater_than_admitted_voters: YesNo,
+    /// Whether total of admitted voters is less than total of votes cast match.
+    /// ("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)")
+    pub votes_cast_smaller_than_admitted_voters: YesNo,
+    /// Whether the difference between the total of admitted voters and total of votes cast is explained.
+    /// ("Verschil tussen D en H volledig verklaard?")
+    pub difference_completely_accounted_for: YesNo,
 }
 
 impl DifferencesCounts {
@@ -180,11 +177,10 @@ impl DifferencesCounts {
         DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 0,
-            unreturned_ballots_count: 0,
-            too_few_ballots_handed_out_count: 0,
-            too_many_ballots_handed_out_count: 0,
-            other_explanation_count: 0,
-            no_explanation_count: 0,
+            admitted_voters_equals_votes_cast: Default::default(),
+            votes_cast_greater_than_admitted_voters: Default::default(),
+            votes_cast_smaller_than_admitted_voters: Default::default(),
+            difference_completely_accounted_for: Default::default(),
         }
     }
 }

@@ -1,14 +1,30 @@
 {
-  "form_title": "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
-  "short_title": "Verschillen",
+  "form_title": "Verschillen tussen aantal kiezers en uitgebrachte stemmen",
+  "short_title": "Verschillen D&H",
+  "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
   "section_number": "B1-3.3",
   "differences_counts": {
-    "more_ballots_count": "Stembiljetten méér geteld",
-    "fewer_ballots_count": "Stembiljetten minder geteld",
-    "unreturned_ballots_count": "Niet ingeleverde stembiljetten",
-    "too_few_ballots_handed_out_count": "Te weinig uitgereikte stembiljetten",
-    "too_many_ballots_handed_out_count": "Te veel uitgereikte stembiljetten",
-    "other_explanation_count": "Andere verklaring voor het verschil",
-    "no_explanation_count": "Geen verklaring voor het verschil"
+    "more_ballots_count": "Aantal méér getelde stemmen",
+    "fewer_ballots_count": "Aantal minder getelde stemmen"
+  },
+  "compare_votes_cast_admitted_voters": {
+    "title": "<strong>3.3.1</strong> Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)",
+    "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?"
+  },
+  "admitted_voters_equals_votes_cast": {
+    "title": "D en H zijn gelijk",
+    "short_title": "D en H zijn gelijk"
+  },
+  "votes_cast_greater_than_admitted_voters": {
+    "title": "H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
+    "short_title": "H is groter dan D"
+  },
+  "votes_cast_smaller_than_admitted_voters": {
+    "title": "H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
+    "short_title": "H is kleiner dan D"
+  },
+  "difference_completely_accounted_for": {
+    "title": "<strong>3.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H <strong>volledig</strong> verklaren?",
+    "short_title": "Verschil tussen D en H volledig verklaard?"
   }
 }

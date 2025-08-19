@@ -23,11 +23,10 @@ pub fn differences_counts_zero() -> DifferencesCounts {
     DifferencesCounts {
         more_ballots_count: 0,
         fewer_ballots_count: 0,
-        unreturned_ballots_count: 0,
-        too_few_ballots_handed_out_count: 0,
-        too_many_ballots_handed_out_count: 0,
-        other_explanation_count: 0,
-        no_explanation_count: 0,
+        admitted_voters_equals_votes_cast: Default::default(),
+        votes_cast_greater_than_admitted_voters: Default::default(),
+        votes_cast_smaller_than_admitted_voters: Default::default(),
+        difference_completely_accounted_for: Default::default(),
     }
 }
 

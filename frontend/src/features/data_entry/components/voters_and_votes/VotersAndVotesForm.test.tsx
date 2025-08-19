@@ -252,7 +252,6 @@ describe("Test VotersAndVotesForm", () => {
         political_group_total_votes,
         "data.votes_counts.political_group_total_votes",
         "total",
-        "number",
       );
 
       const spy = vi.spyOn(global, "fetch");

@@ -1,6 +1,4 @@
-import { defineConfig, type PlaywrightTestConfig } from "@playwright/test";
-
-import commonConfig from "./playwright.common.config";
+import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/test";
 
 function returnWebserverCommand(): string {
   // CI: use existing backend build, reset and seed database
@@ -19,7 +17,14 @@ function returnWebserverCommand(): string {
 }
 
 const config: PlaywrightTestConfig = defineConfig({
-  ...commonConfig,
+  // Fail the build on CI if you accidentally left test.only in the source code
+  forbidOnly: !!process.env.CI,
+  // Retry on CI only
+  retries: process.env.CI ? 2 : 0,
+  // Use all available cores on GitHub Actions. Default is 50%, use that locally.
+  workers: process.env.CI ? "100%" : undefined,
+  fullyParallel: true,
+  // ...commonConfig,
   // Increase the test timeout on CI, which is usually slower
   timeout: process.env.CI ? 30_000 : 20_000,
   reporter: process.env.CI
@@ -29,7 +34,8 @@ const config: PlaywrightTestConfig = defineConfig({
   outputDir: "./test-results/e2e-tests",
   testMatch: /\.e2e\.ts/,
   use: {
-    ...commonConfig.use,
+    trace: "retain-on-first-failure",
+    testIdAttribute: "id",
     baseURL: process.env.DEBUG_DEVELOPMENT ? "http://localhost:3000" : "http://127.0.0.1:8081",
   },
   webServer: process.env.DEBUG_DEVELOPMENT
@@ -41,6 +47,42 @@ const config: PlaywrightTestConfig = defineConfig({
           stdout: process.env.LOCAL_CI ? "pipe" : "ignore",
         },
       ],
+  projects: [
+    {
+      name: "initialise",
+      workers: 1,
+      testMatch: /initialise\.ts/,
+      use: { ...devices["Desktop Chrome"], channel: "chromium" },
+    },
+    {
+      name: "test-users",
+      workers: 1,
+      testMatch: /test-users\.ts/,
+      use: { ...devices["Desktop Chrome"], channel: "chromium" },
+      dependencies: ["initialise"],
+    },
+    {
+      name: "chrome",
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+      },
+      dependencies: ["test-users"],
+    },
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+      dependencies: ["test-users"],
+    },
+    {
+      name: "safari",
+      use: { ...devices["Desktop Safari"] },
+      dependencies: ["test-users"],
+    },
+  ],
 });
 
 export default config;

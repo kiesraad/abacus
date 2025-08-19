@@ -271,7 +271,7 @@ test.describe("resume data entry flow", () => {
           errors: [
             {
               fields: ["data.votes_counts.total_votes_candidates_count", "data.political_group_votes"],
-              code: "F204",
+              code: "F202",
             },
           ],
           warnings: [

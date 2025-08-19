@@ -49,7 +49,7 @@ pub struct ValidationResult {
 pub enum ValidationResultCode {
     F201,
     F202,
-    F204,
+    F203,
     F301,
     F302,
     F303,
@@ -414,7 +414,7 @@ impl Validate for PollingStationResults {
             &path.field("political_group_votes"),
         )?;
 
-        // F.204 validate that the total number of valid votes is equal to the sum of all political group totals
+        // F.202 validate that the total number of valid votes is equal to the sum of all political group totals
         if self.votes_counts.total_votes_candidates_count as u64
             != self
                 .political_group_votes
@@ -429,7 +429,7 @@ impl Validate for PollingStationResults {
                         .to_string(),
                     path.field("political_group_votes").to_string(),
                 ],
-                code: ValidationResultCode::F204,
+                code: ValidationResultCode::F202,
             });
         }
         Ok(())
@@ -534,7 +534,7 @@ impl Validate for VotesCounts {
             &path.field("total_votes_cast_count"),
         )?;
 
-        // F.202 validate that total_votes_cast_count == total_votes_candidates_count + blank_votes_count + invalid_votes_count
+        // F.203 validate that total_votes_cast_count == total_votes_candidates_count + blank_votes_count + invalid_votes_count
         if self.total_votes_candidates_count + self.blank_votes_count + self.invalid_votes_count
             != self.total_votes_cast_count
         {
@@ -545,7 +545,7 @@ impl Validate for VotesCounts {
                     path.field("invalid_votes_count").to_string(),
                     path.field("total_votes_cast_count").to_string(),
                 ],
-                code: ValidationResultCode::F202,
+                code: ValidationResultCode::F203,
             });
         }
 
@@ -858,7 +858,7 @@ mod tests {
         let mut result2 = ValidationResults {
             errors: vec![ValidationResult {
                 fields: vec!["field2".to_string()],
-                code: ValidationResultCode::F202,
+                code: ValidationResultCode::F203,
             }],
             warnings: vec![],
         };
@@ -922,7 +922,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::F204
+            ValidationResultCode::F202
         );
         assert_eq!(
             validation_results.warnings[0].code,
@@ -931,7 +931,7 @@ mod tests {
     }
 
     /// Tests validation of polling station results with incorrect totals and differences.
-    /// Covers F.201 (incorrect voters total), F.202 (incorrect votes total), F.301-F.305 (difference errors), and W.203 (threshold warnings).
+    /// Covers F.201 (incorrect voters total), F.203 (incorrect votes total), F.301-F.305 (difference errors), and W.203 (threshold warnings).
     #[test]
     fn test_incorrect_total_and_difference() {
         let mut validation_results = ValidationResults::default();
@@ -951,7 +951,7 @@ mod tests {
                 total_votes_candidates_count: 44,
                 blank_votes_count: 1,
                 invalid_votes_count: 4,
-                total_votes_cast_count: 50, // F.202 incorrect total & W.203 above threshold in absolute numbers
+                total_votes_cast_count: 50, // F.203 incorrect total & W.203 above threshold in absolute numbers
             },
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0, // F.301 incorrect difference
@@ -981,7 +981,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::F202
+            ValidationResultCode::F203
         );
         assert_eq!(
             validation_results.errors[0].fields,
@@ -1085,7 +1085,7 @@ mod tests {
             vec!["polling_station_results.differences_counts.more_ballots_count"]
         );
 
-        // test F.201 incorrect total, F.202 incorrect total, F.301 incorrect difference, F.302 should be empty & W.203 above threshold in percentage
+        // test F.201 incorrect total, F.203 incorrect total, F.301 incorrect difference, F.302 should be empty & W.203 above threshold in percentage
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             extra_investigation: Default::default(),
@@ -1103,7 +1103,7 @@ mod tests {
                 total_votes_candidates_count: 3,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
-                total_votes_cast_count: 6, // F.202 incorrect total & W.204 above threshold in percentage
+                total_votes_cast_count: 6, // F.203 incorrect total & W.204 above threshold in percentage
             },
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,  // F.301 incorrect difference
@@ -1128,7 +1128,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::F202
+            ValidationResultCode::F203
         );
         assert_eq!(
             validation_results.errors[0].fields,
@@ -1385,7 +1385,7 @@ mod tests {
     }
 
     /// Tests validation when no differences are expected (F.305)
-    /// and an incorrect total (F.204)
+    /// and an incorrect total (F.202)
     #[test]
     fn test_no_differences_expected_and_incorrect_total() {
         let polling_station_results = PollingStationResults {
@@ -1417,7 +1417,7 @@ mod tests {
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes {
                 number: 1,
-                total: 49, // F.204 incorrect total
+                total: 49, // F.202 incorrect total
                 candidate_votes: vec![CandidateVotes {
                     number: 1,
                     votes: 49,
@@ -1453,7 +1453,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.errors[1].code,
-            ValidationResultCode::F204
+            ValidationResultCode::F202
         );
         assert_eq!(
             validation_results.errors[1].fields,
@@ -1515,7 +1515,7 @@ mod tests {
         );
     }
 
-    /// Tests validation of VotesCounts including out-of-range values, incorrect totals (F.202),
+    /// Tests validation of VotesCounts including out-of-range values, incorrect totals (F.203),
     /// and warnings for high blank votes (W.201), invalid votes (W.202), and zero total (W.205).
     #[test]
     fn test_votes_counts_validation() {
@@ -1538,14 +1538,14 @@ mod tests {
         );
         assert!(res.is_err());
 
-        // test F.202 incorrect total
+        // test F.203 incorrect total
         validation_results = ValidationResults::default();
         votes_counts = VotesCounts {
             political_group_total_votes: vec![],
             total_votes_candidates_count: 5,
             blank_votes_count: 6,
             invalid_votes_count: 7,
-            total_votes_cast_count: 20, // F.202 incorrect total
+            total_votes_cast_count: 20, // F.203 incorrect total
         };
         votes_counts
             .validate(
@@ -1559,7 +1559,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::F202
+            ValidationResultCode::F203
         );
         assert_eq!(
             validation_results.errors[0].fields,

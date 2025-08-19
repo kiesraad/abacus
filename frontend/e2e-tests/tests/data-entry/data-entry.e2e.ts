@@ -510,11 +510,11 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_3.next.click();
 
-    await expect(candidatesListPage_2.error).toContainText("F.204");
+    await expect(candidatesListPage_2.error).toContainText("F.202");
     await candidatesListPage_2.checkAcceptErrorsAndWarnings();
     await candidatesListPage_2.next.click();
 
-    await expect(candidatesListPage_3.error).toContainText("F.204");
+    await expect(candidatesListPage_3.error).toContainText("F.202");
     await candidatesListPage_3.checkAcceptErrorsAndWarnings();
     await candidatesListPage_3.next.click();
 
@@ -522,17 +522,17 @@ test.describe("full data entry flow", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
 
     await expect(checkAndSavePage.summaryListItemVotersAndVotes).toHaveText([
-      "F.202 Controleer uitgebrachte stemmen",
-      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
+      "F.203 Controleer uitgebrachte stemmen",
+      "F.202 Controleer (totaal) aantal stemmen op kandidaten",
       "W.203 Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     ]);
     await expect(checkAndSavePage.summaryListItemDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
     await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes1).toHaveText([
-      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
+      "F.202 Controleer (totaal) aantal stemmen op kandidaten",
       "F.401 Controleer ingevoerde aantallen",
     ]);
     await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes2).toHaveText([
-      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
+      "F.202 Controleer (totaal) aantal stemmen op kandidaten",
     ]);
 
     await expect(checkAndSavePage.complete).toBeVisible();
@@ -786,7 +786,7 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
-  test("correct error F.204", async ({ page, pollingStation }) => {
+  test("correct error F.202", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
     // fill extra investigation section without errors or warnings
@@ -833,7 +833,7 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.error).toContainText(
-      "Controleer (totaal) aantal stemmen op kandidatenF.204De optelling van alle lijsten is niet gelijk aan de invoer bij E.Check of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
+      "Controleer (totaal) aantal stemmen op kandidatenF.202De optelling van alle lijsten is niet gelijk aan de invoer bij E.Check of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
     );
     await expect(votersAndVotesPage.warning).toBeHidden();
 
@@ -1010,7 +1010,7 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
 
     await expect(votersAndVotesPage.error).toContainText(
-      "Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.",
+      "Controleer uitgebrachte stemmenF.203De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.",
     );
 
     await votersAndVotesPage.acceptErrorsAndWarnings.click();

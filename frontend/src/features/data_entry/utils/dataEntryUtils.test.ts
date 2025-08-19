@@ -216,7 +216,7 @@ describe("addValidationResultToFormState", () => {
     formState.sections.voters_votes_counts!.isSaved = true;
     if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
 
-    const validationResults: ValidationResult[] = [validationResultMockData.F204];
+    const validationResults: ValidationResult[] = [validationResultMockData.F202];
 
     addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 

@@ -49,7 +49,7 @@ export class ValidationResultSet {
  * Global validation results are only shown when the entire data entry form is completed.
  */
 export function isGlobalValidationResult(validationResult: ValidationResult): boolean {
-  return validationResult.code === "F204";
+  return validationResult.code === "F202";
 }
 
 /*

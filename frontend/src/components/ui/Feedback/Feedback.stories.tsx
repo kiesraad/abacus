@@ -13,7 +13,7 @@ type Props = {
 };
 
 export const SingleError: StoryFn = () => {
-  return <Feedback id="feedback-error" type="error" data={["F202"]} userRole="typist" />;
+  return <Feedback id="feedback-error" type="error" data={["F203"]} userRole="typist" />;
 };
 
 export const SingleErrorCustomAction: StoryFn = () => {
@@ -21,7 +21,7 @@ export const SingleErrorCustomAction: StoryFn = () => {
 };
 
 export const MultipleErrors: StoryFn = () => {
-  return <Feedback id="feedback-error" type="error" data={["F201", "F202"]} userRole="typist" />;
+  return <Feedback id="feedback-error" type="error" data={["F201", "F203"]} userRole="typist" />;
 };
 
 export const SingleWarning: StoryFn = () => {
@@ -46,7 +46,7 @@ export const CustomizableWarnings: StoryObj<Props> = {
 
 export default {
   args: {
-    data: ["F201", "F202", "F204", "F301", "F302", "F303", "F304", "F305", "F401"],
+    data: ["F201", "F202", "F203", "F301", "F302", "F303", "F304", "F305", "F401"],
     userRole: "typist",
   },
   argTypes: {
@@ -54,7 +54,7 @@ export default {
       options: [
         "F201",
         "F202",
-        "F204",
+        "F203",
         "F301",
         "F302",
         "F303",

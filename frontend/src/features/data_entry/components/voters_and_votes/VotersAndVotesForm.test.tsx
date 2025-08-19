@@ -355,21 +355,21 @@ describe("Test VotersAndVotesForm", () => {
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
-    test("F.202 IncorrectTotal Votes counts", async () => {
+    test("F.203 IncorrectTotal Votes counts", async () => {
       const user = userEvent.setup();
 
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [validationResultMockData.F202], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F203], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer uitgebrachte stemmenF.203De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [

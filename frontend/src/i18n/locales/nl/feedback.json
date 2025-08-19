@@ -11,22 +11,22 @@
   },
   "F202": {
     "typist": {
-      "title": "Controleer uitgebrachte stemmen",
-      "content": "De invoer bij E, F, G of H klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer (totaal) aantal stemmen op kandidaten",
+      "content": "De optelling van alle lijsten is niet gelijk aan de invoer bij E.\nCheck of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd."
     },
     "coordinator": {
-      "title": "Controleer uitgebrachte stemmen",
-      "content": "De invoer bij E, F, G of H klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer (totaal) aantal stemmen op kandidaten",
+      "content": "De optelling van alle lijsten is niet gelijk aan de invoer bij E.\nCheck of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd."
     }
   },
-  "F204": {
+  "F203": {
     "typist": {
-      "title": "Controleer (totaal) aantal stemmen op kandidaten",
-      "content": "De optelling van alle lijsten is niet gelijk aan de invoer bij E.\nCheck of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd."
+      "title": "Controleer uitgebrachte stemmen",
+      "content": "De invoer bij E, F, G of H klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     },
     "coordinator": {
-      "title": "Controleer (totaal) aantal stemmen op kandidaten",
-      "content": "De optelling van alle lijsten is niet gelijk aan de invoer bij E.\nCheck of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd."
+      "title": "Controleer uitgebrachte stemmen",
+      "content": "De invoer bij E, F, G of H klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
     }
   },
   "F301": {

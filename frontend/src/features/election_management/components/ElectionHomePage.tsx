@@ -1,49 +1,121 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
+import { AnyApiError, isSuccess } from "@/api/ApiResult";
+import { useApiClient } from "@/api/useApiClient";
+import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
+import { Loader } from "@/components/ui/Loader/Loader";
+import { Modal } from "@/components/ui/Modal/Modal";
 import { Table } from "@/components/ui/Table/Table";
-import { CommitteeSessionListProvider } from "@/hooks/committee_session/CommitteeSessionListProvider";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
+import {
+  COMMITTEE_SESSION_CREATE_REQUEST_BODY,
+  COMMITTEE_SESSION_CREATE_REQUEST_PATH,
+  CommitteeSession,
+  ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
+} from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
 import { directDownload } from "../utils/download";
-import { CommitteeSessionCards } from "./CommitteeSessionCards";
+import { CommitteeSessionCard } from "./CommitteeSessionCard";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
 
 export function ElectionHomePage() {
-  const { isTypist } = useUserRole();
-  const { committeeSession, election, pollingStations, refetch } = useElection();
+  const client = useApiClient();
+  const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
+  const { requestState: getCommitteeSessions, refetch: refetchCommitteeSessions } = useInitialApiGet<{
+    committee_sessions: CommitteeSession[];
+  }>(`/api/elections/${election.id}/committee_sessions` satisfies ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH);
+  const { isTypist, isCoordinator } = useUserRole();
+  const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
+  const [createCommitteeSessionError, setCreateCommitteeSessionError] = useState<AnyApiError | null>(null);
+
+  if (createCommitteeSessionError) {
+    throw createCommitteeSessionError;
+  }
 
   // re-fetch election when component mounts
   useEffect(() => {
     const abortController = new AbortController();
 
-    void refetch(abortController);
+    void refetchElection(abortController);
+    void refetchCommitteeSessions(abortController);
 
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
-  }, [refetch]);
+  }, [refetchElection, refetchCommitteeSessions]);
+
+  if (getCommitteeSessions.status === "api-error") {
+    throw getCommitteeSessions.error;
+  }
+
+  if (getCommitteeSessions.status === "loading") {
+    return <Loader />;
+  }
+
+  const committeeSessions = getCommitteeSessions.data.committee_sessions;
 
   if (isTypist) {
     return <Navigate to="data-entry" />;
   }
 
+  function toggleAddCommitteeSessionModal() {
+    setShowAddCommitteeSessionModal(!showAddCommitteeSessionModal);
+  }
+
+  function handleCommitteeSessionCreate() {
+    const url: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
+    const body: COMMITTEE_SESSION_CREATE_REQUEST_BODY = { election_id: election.id };
+    void client
+      .postRequest(url, body)
+      .then(async (result) => {
+        if (isSuccess(result)) {
+          await refetchCommitteeSessions();
+        } else {
+          throw result;
+        }
+      })
+      .catch(setCreateCommitteeSessionError);
+  }
+
   return (
-    <CommitteeSessionListProvider electionId={election.id}>
+    <>
       <PageTitle title={`${t("election.title.details")} - Abacus`} />
       <header>
         <section>
           <h1>{election.name}</h1>
         </section>
       </header>
+      {showAddCommitteeSessionModal && (
+        <Modal title={t("election_management.investigation_ordered_by_csb")} onClose={toggleAddCommitteeSessionModal}>
+          <p>{t("election_management.only_add_if_ordered")}</p>
+          <p>{t("election_management.if_gsb_correction")}</p>
+          <nav>
+            <Button
+              variant="primary"
+              size="xl"
+              onClick={() => {
+                handleCommitteeSessionCreate();
+                toggleAddCommitteeSessionModal();
+              }}
+            >
+              {t("election_management.yes_add_session")}
+            </Button>
+            <Button variant="secondary" onClick={toggleAddCommitteeSessionModal}>
+              {t("cancel")}
+            </Button>
+          </nav>
+        </Modal>
+      )}
       {pollingStations.length === 0 && (
         <Alert type="warning">
           <strong className="heading-md" id="noPollingStationsWarningAlertTitle">
@@ -65,8 +137,21 @@ export function ElectionHomePage() {
               </h2>
             </div>
           </div>
-          <div id="committee-session-cards" className={cn(cls.cards, "mb-xl")}>
-            <CommitteeSessionCards />
+          <div id="committee-sessions" className={cn(cls.sessions, "mb-xl")}>
+            <div id="committee-session-cards" className={cls.cards}>
+              {committeeSessions.map((committeeSession, index) => (
+                <CommitteeSessionCard
+                  key={committeeSession.id}
+                  committeeSession={committeeSession}
+                  currentSession={index === 0}
+                />
+              ))}
+            </div>
+            {isCoordinator && committeeSession.status === "data_entry_finished" && (
+              <Button variant="secondary" size="sm" onClick={toggleAddCommitteeSessionModal}>
+                {t("election_management.prepare_new_session")}
+              </Button>
+            )}
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>
           <div className="mb-xl">
@@ -108,6 +193,6 @@ export function ElectionHomePage() {
         </article>
       </main>
       <Footer />
-    </CommitteeSessionListProvider>
+    </>
   );
 }

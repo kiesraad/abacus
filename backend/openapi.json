@@ -18,7 +18,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CommitteeSessionCreateRequest"
+                "$ref": "#/components/schemas/NewCommitteeSessionRequest"
               }
             }
           },
@@ -57,6 +57,16 @@
           },
           "403": {
             "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
             "content": {
               "application/json": {
                 "schema": {
@@ -4191,33 +4201,6 @@
         },
         "additionalProperties": false
       },
-      "CommitteeSessionCreateRequest": {
-        "type": "object",
-        "description": "Committee session create request",
-        "required": [
-          "number",
-          "election_id",
-          "number_of_voters"
-        ],
-        "properties": {
-          "election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
       "CommitteeSessionDetails": {
         "type": "object",
         "required": [
@@ -5337,6 +5320,21 @@
           },
           "username": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NewCommitteeSessionRequest": {
+        "type": "object",
+        "description": "New committee session request",
+        "required": [
+          "election_id"
+        ],
+        "properties": {
+          "election_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         },
         "additionalProperties": false

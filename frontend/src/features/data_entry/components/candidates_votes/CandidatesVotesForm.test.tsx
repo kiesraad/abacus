@@ -468,11 +468,12 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan." +
-        "F.401" +
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.",
+        "F.401",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
@@ -503,9 +504,10 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer ingevoerde aantallen. De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk." +
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.";
+      const feedbackMessage = [
+        "Controleer ingevoerde aantallen. De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+      ].join("");
 
       expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
@@ -541,11 +543,12 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan." +
-        "F.401" +
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.",
+        "F.401",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
 
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();

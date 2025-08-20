@@ -256,11 +256,12 @@ describe("Test DifferencesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer je antwoorden" +
-        "F.301" +
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.301",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
@@ -295,11 +296,12 @@ describe("Test DifferencesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer je antwoorden" +
-        "F.302" +
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.302",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
@@ -336,11 +338,12 @@ describe("Test DifferencesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer je antwoorden" +
-        "F.303" +
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.303",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
@@ -377,11 +380,12 @@ describe("Test DifferencesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer je antwoorden" +
-        "F.304" +
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.304",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
@@ -418,11 +422,12 @@ describe("Test DifferencesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer je antwoorden" +
-        "F.305" +
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.305",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();

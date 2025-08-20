@@ -4976,7 +4976,7 @@
           "political_group_votes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PoliticalGroupVotes"
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
             },
             "description": "The summary votes for each political group (and each candidate within)"
           },
@@ -5473,6 +5473,33 @@
         },
         "additionalProperties": false
       },
+      "PoliticalGroupCandidateVotes": {
+        "type": "object",
+        "required": [
+          "number",
+          "total",
+          "candidate_votes"
+        ],
+        "properties": {
+          "candidate_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateVotes"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
       "PoliticalGroupSeatAssignment": {
         "type": "object",
         "description": "Contains information about the final assignment of seats for a specific political group.",
@@ -5579,20 +5606,13 @@
         },
         "additionalProperties": false
       },
-      "PoliticalGroupVotes": {
+      "PoliticalGroupTotalVotes": {
         "type": "object",
         "required": [
           "number",
-          "total",
-          "candidate_votes"
+          "total"
         ],
         "properties": {
-          "candidate_votes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CandidateVotes"
-            }
-          },
           "number": {
             "type": "integer",
             "format": "int32",
@@ -5834,7 +5854,7 @@
           "political_group_votes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PoliticalGroupVotes"
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
             },
             "description": "Vote counts per list and candidate (5. \"Aantal stemmen per lijst en kandidaat\")"
           },
@@ -6434,9 +6454,10 @@
       },
       "VotesCounts": {
         "type": "object",
-        "description": "Votes counts, part of the polling station results.",
+        "description": "Votes counts, part of the polling station results.\nFollowing the fields in Model CSO Na 31-2 Bijlage 1.",
         "required": [
-          "votes_candidates_count",
+          "political_group_total_votes",
+          "total_votes_candidates_count",
           "blank_votes_count",
           "invalid_votes_count",
           "total_votes_cast_count"
@@ -6445,25 +6466,32 @@
           "blank_votes_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of blank votes (\"Aantal blanco stembiljetten\")",
+            "description": "Number of blank votes (\"Blanco stembiljetten\")",
             "minimum": 0
           },
           "invalid_votes_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of invalid votes (\"Aantal ongeldige stembiljetten\")",
+            "description": "Number of invalid votes (\"Ongeldige stembiljetten\")",
+            "minimum": 0
+          },
+          "political_group_total_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupTotalVotes"
+            },
+            "description": "Total votes per list"
+          },
+          "total_votes_candidates_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total number of valid votes on candidates\n(\"Totaal stemmen op kandidaten\")",
             "minimum": 0
           },
           "total_votes_cast_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Total number of votes cast (\"Totaal aantal getelde stemmen\")",
-            "minimum": 0
-          },
-          "votes_candidates_count": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Number of valid votes on candidates\n(\"Aantal stembiljetten met een geldige stem op een kandidaat\")",
+            "description": "Total number of votes cast (\"Totaal uitgebrachte stemmen\")",
             "minimum": 0
           }
         },

@@ -33,6 +33,7 @@
         border-right: 1px solid var(--bg-gray-darkest);
         text-align: right;
         color: var(--color-help-text);
+        font-weight: bold;
       }
 
       /* Input */
@@ -91,9 +92,6 @@
       td {
         background-color: var(--bg-highlight);
         color: var(--base-black);
-      }
-      td:first-of-type {
-        font-weight: bold;
       }
     }
 

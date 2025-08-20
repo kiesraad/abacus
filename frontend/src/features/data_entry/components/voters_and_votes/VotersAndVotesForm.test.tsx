@@ -11,8 +11,19 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
-import { getUrlMethodAndBody, render, screen, userTypeInputs, waitFor } from "@/testing/test-utils";
-import { LoginResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import {
+  getUrlMethodAndBody,
+  render,
+  screen,
+  userTypeInputs,
+  userTypeInputsArray,
+  waitFor,
+} from "@/testing/test-utils";
+import {
+  LoginResponse,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  PollingStationResults,
+} from "@/types/generated/openapi";
 
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
@@ -52,7 +63,9 @@ const votersFieldIds = {
 };
 
 const votesFieldIds = {
-  votesCandidatesCount: "data.votes_counts.votes_candidates_count",
+  politicalGroup1TotalVotes: "data.votes_counts.political_group_total_votes[0].total",
+  politicalGroup2TotalVotes: "data.votes_counts.political_group_total_votes[1].total",
+  totalVotesCandidatesCount: "data.votes_counts.total_votes_candidates_count",
   blankVotesCount: "data.votes_counts.blank_votes_count",
   invalidVotesCount: "data.votes_counts.invalid_votes_count",
   totalVotesCastCount: "data.votes_counts.total_votes_cast_count",
@@ -147,10 +160,28 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const votesOnCandidates = screen.getByRole("textbox", { name: "E Stemmen op kandidaten" });
-      expect(votesOnCandidates).toHaveFocus();
-      await user.type(votesOnCandidates, "12");
-      expect(votesOnCandidates).toHaveValue("12");
+      const totalVotesOnPoliticalParty1 = screen.getByRole("textbox", {
+        name: "E.1 Totaal Lijst 1 - Vurige Vleugels Partij",
+      });
+      expect(totalVotesOnPoliticalParty1).toHaveFocus();
+      await user.type(totalVotesOnPoliticalParty1, "12");
+      expect(totalVotesOnPoliticalParty1).toHaveValue("12");
+
+      await user.keyboard("{enter}");
+
+      const totalVotesOnPoliticalParty2 = screen.getByRole("textbox", {
+        name: "E.2 Totaal Lijst 2 - Wijzen van Water en Wind",
+      });
+      expect(totalVotesOnPoliticalParty2).toHaveFocus();
+      await user.type(totalVotesOnPoliticalParty2, "34");
+      expect(totalVotesOnPoliticalParty2).toHaveValue("34");
+
+      await user.keyboard("{enter}");
+
+      const totalVotesOnCandidates = screen.getByRole("textbox", { name: "E Totaal stemmen op kandidaten" });
+      expect(totalVotesOnCandidates).toHaveFocus();
+      await user.type(totalVotesOnCandidates, "56");
+      expect(totalVotesOnCandidates).toHaveValue("56");
 
       await user.keyboard("{enter}");
 
@@ -192,12 +223,16 @@ describe("Test VotersAndVotesForm", () => {
             total_admitted_voters_count: 6,
           },
           votes_counts: {
-            votes_candidates_count: 4,
+            political_group_total_votes: [
+              { number: 1, total: 3 },
+              { number: 2, total: 1 },
+            ],
+            total_votes_candidates_count: 4,
             blank_votes_count: 5,
             invalid_votes_count: 6,
             total_votes_cast_count: 15,
           },
-        },
+        } satisfies PollingStationResults,
         client_state: {},
       };
 
@@ -209,7 +244,15 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       await userTypeInputs(user, expectedRequest.data.voters_counts, "data.voters_counts.");
-      await userTypeInputs(user, expectedRequest.data.votes_counts, "data.votes_counts.");
+
+      const { political_group_total_votes, ...votes_counts } = expectedRequest.data.votes_counts;
+      await userTypeInputs(user, votes_counts, "data.votes_counts.");
+      await userTypeInputsArray(
+        user,
+        political_group_total_votes,
+        "data.votes_counts.political_group_total_votes",
+        "total",
+      );
 
       const spy = vi.spyOn(global, "fetch");
 
@@ -299,7 +342,9 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.totalAdmittedVotersCount,
       ];
       const expectedValidFieldIds = [
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
@@ -328,12 +373,14 @@ describe("Test VotersAndVotesForm", () => {
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
       const expectedValidFieldIds = [
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
@@ -369,7 +416,9 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
@@ -454,7 +503,9 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
@@ -489,7 +540,9 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
@@ -520,7 +573,9 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
       ];
@@ -552,7 +607,9 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
       ];

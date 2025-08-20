@@ -71,7 +71,17 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
           "total_admitted_voters_count": 4
         },
         "votes_counts": {
-          "votes_candidates_count": 5,
+          "political_group_total_votes": [
+            {
+              "number": 1,
+              "total": 11,
+            },
+            {
+              "number": 2,
+              "total": 11,
+            }
+          ],
+          "total_votes_candidates_count": 5,
           "blank_votes_count": 6,
           "invalid_votes_count": 7,
           "total_votes_cast_count": 8
@@ -149,7 +159,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         errors[1].fields,
         vec![
-            "data.votes_counts.votes_candidates_count",
+            "data.votes_counts.total_votes_candidates_count",
             "data.votes_counts.blank_votes_count",
             "data.votes_counts.invalid_votes_count",
             "data.votes_counts.total_votes_cast_count",
@@ -160,7 +170,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         errors[2].fields,
         vec![
-            "data.votes_counts.votes_candidates_count",
+            "data.votes_counts.total_votes_candidates_count",
             "data.political_group_votes"
         ]
     );

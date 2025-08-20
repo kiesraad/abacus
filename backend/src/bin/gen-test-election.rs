@@ -11,8 +11,8 @@ use abacus::{
     },
     create_sqlite_pool,
     data_entry::{
-        CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-        VotersCounts, VotesCounts,
+        CandidateVotes, DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+        PollingStationResults, VotersCounts, VotesCounts,
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
     election::{
@@ -475,7 +475,15 @@ fn generate_polling_station_results(
             total_admitted_voters_count: number_of_votes,
         },
         votes_counts: VotesCounts {
-            votes_candidates_count: remaining_votes,
+            political_group_total_votes: political_groups
+                .iter()
+                .zip(pg_votes.clone())
+                .map(|(pg, votes)| PoliticalGroupTotalVotes {
+                    number: pg.number,
+                    total: votes,
+                })
+                .collect(),
+            total_votes_candidates_count: remaining_votes,
             blank_votes_count: blank_votes,
             invalid_votes_count: invalid_votes,
             total_votes_cast_count: number_of_votes,
@@ -493,7 +501,7 @@ fn generate_polling_station_results(
                     candidate_distribution_slope,
                     true,
                 );
-                PoliticalGroupVotes {
+                PoliticalGroupCandidateVotes {
                     number: pg.number,
                     total: votes,
                     candidate_votes: pg

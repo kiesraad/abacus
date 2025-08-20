@@ -56,7 +56,12 @@ test.describe("full data entry flow", () => {
       total_admitted_voters_count: 3607,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 3572,
+      political_group_total_votes: [
+        { number: 1, total: 3536 },
+        { number: 2, total: 36 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 3572,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 3607,
@@ -152,7 +157,12 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 3740,
+      political_group_total_votes: [
+        { number: 1, total: 3465 },
+        { number: 2, total: 275 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 3740,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 3775,
@@ -210,7 +220,12 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 3785,
+      political_group_total_votes: [
+        { number: 1, total: 3465 },
+        { number: 2, total: 320 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 3785,
       blank_votes_count: 10,
       invalid_votes_count: 5,
       total_votes_cast_count: 3800,
@@ -284,7 +299,12 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 3740,
+      political_group_total_votes: [
+        { number: 1, total: 3465 },
+        { number: 2, total: 275 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 3740,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 3775,
@@ -353,7 +373,12 @@ test.describe("full data entry flow", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 50,
+      political_group_total_votes: [
+        { number: 1, total: 50 },
+        { number: 2, total: 0 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 50,
       blank_votes_count: 50,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -449,7 +474,12 @@ test.describe("full data entry flow", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [
+        { number: 1, total: 891 },
+        { number: 2, total: 0 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 10,
@@ -497,11 +527,11 @@ test.describe("full data entry flow", () => {
       "W.203 Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     ]);
     await expect(checkAndSavePage.summaryListItemDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
-    await expect(checkAndSavePage.summaryListItemPoliticalGroupVotes1).toHaveText([
+    await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes1).toHaveText([
       "F.204 Controleer (totaal) aantal stemmen op kandidaten",
       "F.401 Controleer ingevoerde aantallen",
     ]);
-    await expect(checkAndSavePage.summaryListItemPoliticalGroupVotes2).toHaveText([
+    await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes2).toHaveText([
       "F.204 Controleer (totaal) aantal stemmen op kandidaten",
     ]);
 
@@ -723,7 +753,8 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -772,7 +803,8 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -843,7 +875,8 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 90,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -907,7 +940,8 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 90,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -966,7 +1000,8 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 10,
@@ -1006,7 +1041,8 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -1051,7 +1087,8 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -1111,7 +1148,8 @@ test.describe("navigation", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 90,
+        political_group_total_votes: [{ number: 1, total: 100 }],
+        total_votes_candidates_count: 90,
         blank_votes_count: 10,
         invalid_votes_count: 0,
         total_votes_cast_count: 100,

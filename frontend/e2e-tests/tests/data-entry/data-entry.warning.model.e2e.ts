@@ -166,21 +166,36 @@ const votersError: VotersCounts = {
 };
 
 const votesWarning: VotesCounts = {
-  votes_candidates_count: 65,
+  political_group_total_votes: [
+    { number: 1, total: 50 },
+    { number: 2, total: 15 },
+    { number: 3, total: 0 },
+  ],
+  total_votes_candidates_count: 65,
   blank_votes_count: 0,
   invalid_votes_count: 35,
   total_votes_cast_count: 100,
 };
 
 const votesValid: VotesCounts = {
-  votes_candidates_count: 99,
+  political_group_total_votes: [
+    { number: 1, total: 55 },
+    { number: 2, total: 44 },
+    { number: 3, total: 0 },
+  ],
+  total_votes_candidates_count: 99,
   blank_votes_count: 1,
   invalid_votes_count: 0,
   total_votes_cast_count: 100,
 };
 
 const votesEmpty: VotesCounts = {
-  votes_candidates_count: 0,
+  political_group_total_votes: [
+    { number: 1, total: 0 },
+    { number: 2, total: 0 },
+    { number: 3, total: 0 },
+  ],
+  total_votes_candidates_count: 0,
   blank_votes_count: 0,
   invalid_votes_count: 0,
   total_votes_cast_count: 0,

@@ -39,7 +39,9 @@ describe("Data Entry cache behavior", () => {
       "voters_counts.poll_card_count": "100",
       "voters_counts.proxy_certificate_count": "200",
       "voters_counts.total_admitted_voters_count": "600",
-      "votes_counts.votes_candidates_count": "400",
+      "votes_counts.political_group_total_votes[0].total": "150",
+      "votes_counts.political_group_total_votes[1].total": "250",
+      "votes_counts.total_votes_candidates_count": "400",
       "votes_counts.blank_votes_count": "500",
       "votes_counts.invalid_votes_count": "600",
       "votes_counts.total_votes_cast_count": "150",
@@ -71,8 +73,14 @@ describe("Data Entry cache behavior", () => {
     const totalAdmittedVoters = screen.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
     expect(totalAdmittedVoters).toHaveValue("600");
 
-    const votesOnCandidates = screen.getByRole("textbox", { name: "E Stemmen op kandidaten" });
-    expect(votesOnCandidates).toHaveValue("400");
+    const totalVotesOnParty1 = screen.getByRole("textbox", { name: "E.1 Totaal Lijst 1 - Vurige Vleugels Partij" });
+    expect(totalVotesOnParty1).toHaveValue("150");
+
+    const totalVotesOnParty2 = screen.getByRole("textbox", { name: "E.2 Totaal Lijst 2 - Wijzen van Water en Wind" });
+    expect(totalVotesOnParty2).toHaveValue("250");
+
+    const totalVotesOnCandidates = screen.getByRole("textbox", { name: "E Totaal stemmen op kandidaten" });
+    expect(totalVotesOnCandidates).toHaveValue("400");
 
     const blankVotes = screen.getByRole("textbox", { name: "F Blanco stemmen" });
     expect(blankVotes).toHaveValue("500");

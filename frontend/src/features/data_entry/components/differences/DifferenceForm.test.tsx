@@ -257,7 +257,11 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer I (stembiljetten meer geteld)F.301Je hebt bij Aantal kiezers en stemmers ingevuld dat er meer stemmen dan kiezers waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer je antwoorden" +
+        "F.301" +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [differencesFieldIds.moreBallotsCount];
@@ -292,7 +296,11 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer J (stembiljetten minder geteld)F.302Je hebt bij Aantal kiezers en stemmers ingevuld dat er meer stemmen dan kiezers waren. Daarom mag J niet ingevuld zijn.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer je antwoorden" +
+        "F.302" +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
@@ -329,7 +337,11 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer J (stembiljetten minder geteld)F.303Je hebt bij Aantal kiezers en stemmers ingevuld dat er minder stemmen dan kiezers waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde stembiljetten.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer je antwoorden" +
+        "F.303" +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
@@ -366,7 +378,11 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer I (stembiljetten meer geteld)F.304Je hebt bij Aantal kiezers en stemmers ingevuld dat er minder stemmen dan kiezers waren. Daarom mag I niet ingevuld zijn.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer je antwoorden" +
+        "F.304" +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [differencesFieldIds.moreBallotsCount];
@@ -403,7 +419,11 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer ingevulde verschillenF.305Je hebt bij Aantal kiezers en stemmers ingevuld dat er evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer je antwoorden" +
+        "F.305" +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [

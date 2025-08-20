@@ -333,7 +333,12 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer toegelaten kiezers" +
+        "F.201" +
+        "De invoer bij A, B of D klopt niet." +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [
@@ -369,7 +374,12 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer uitgebrachte stemmenF.203De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer uitgebrachte stemmen" +
+        "F.203" +
+        "De invoer bij E, F, G of H klopt niet." +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [
@@ -407,7 +417,12 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+        "Controleer aantal blanco stemmen" +
+        "W.201" +
+        "Check of je het papieren proces-verbaal goed hebt overgenomen." +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
@@ -495,7 +510,12 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+        "Controleer aantal blanco stemmen" +
+        "W.201" +
+        "Check of je het papieren proces-verbaal goed hebt overgenomen." +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFieldIds = [votesFieldIds.blankVotesCount];
@@ -532,7 +552,12 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+        "Controleer aantal ongeldige stemmen" +
+        "W.202" +
+        "Check of je het papieren proces-verbaal goed hebt overgenomen." +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFieldIds = [votesFieldIds.invalidVotesCount];
@@ -566,7 +591,12 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmenW.203Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen" +
+        "W.203" +
+        "Check of je het papieren proces-verbaal goed hebt overgenomen." +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFieldIds = [votesFieldIds.totalVotesCastCount, votersFieldIds.totalAdmittedVotersCount];
@@ -599,7 +629,12 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage =
-        "Controleer aantal uitgebrachte stemmenW.205Het totaal aantal uitgebrachte stemmen (H) is nul.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+        "Controleer aantal uitgebrachte stemmen" +
+        "W.205" +
+        "Check of je het papieren proces-verbaal goed hebt overgenomen." +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFieldIds = [votesFieldIds.totalVotesCastCount];
@@ -711,9 +746,18 @@ describe("Test VotersAndVotesForm", () => {
       await userEvent.click(submitButton);
 
       const errorFeedbackMessage =
-        "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+        "Controleer toegelaten kiezers" +
+        "F.201" +
+        "De invoer bij A, B of D klopt niet." +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+
       const warningFeedbackMessage =
-        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+        "Controleer aantal blanco stemmen" +
+        "W.201" +
+        "Check of je het papieren proces-verbaal goed hebt overgenomen." +
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder." +
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(errorFeedbackMessage);
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(warningFeedbackMessage);

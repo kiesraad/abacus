@@ -355,9 +355,8 @@ test.describe("Data entry model test - errors", () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
-            await expect(votersAndVotesPage.warning).toContainText(
-              "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.",
-            );
+            await expect(votersAndVotesPage.warning).toContainText("W.201");
+            await expect(votersAndVotesPage.warning).toContainText("Controleer aantal blanco stemmen");
           },
           unsavedChangesModalChangedToError: async () => {
             await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();

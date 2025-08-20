@@ -49,10 +49,10 @@ export function PollingStationListPage() {
 
             <Toolbar>
               <Toolbar.Section>
-                <Button.Link variant="primary" size="sm" to="./import">
+                <Button.Link variant="primary" size="md" to="./import">
                   <IconFilePlus /> {t("import_from_file")}
                 </Button.Link>
-                <Button.Link variant="secondary" size="sm" to="./create">
+                <Button.Link variant="secondary" size="md" to="./create">
                   <IconPlus /> {t("manual_input")}
                 </Button.Link>
               </Toolbar.Section>

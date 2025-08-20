@@ -105,7 +105,7 @@ export function PollingStationImportPage() {
         </div>
       )}
 
-      <p className="mb-lg">{t("election.use_instructions_to_import_polling_stations_eml")}</p>
+      <p className="mb-lg">{t("polling_station.import_instructions")}</p>
       <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
         {t("select_file")}
       </FileInput>

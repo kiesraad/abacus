@@ -31,7 +31,7 @@
     "polling_station_created": "Stembureau {number} ({name}) toegevoegd",
     "polling_station_deleted": "Stembureau {number} ({name}) verwijderd",
     "polling_station_updated": "Wijzigingen stembureau {number} ({name}) opgeslagen",
-    "polling_stations_imported": "Er zijn {number} stembureaus opgeslagen"
+    "polling_stations_imported": "Er zijn {number} stembureaus geïmporteerd"
   },
   "postal_code": "Postcode",
   "recounted_question": "Is er herteld?",

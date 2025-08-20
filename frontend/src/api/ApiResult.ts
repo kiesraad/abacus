@@ -25,8 +25,8 @@ export class ApiError extends Error {
 // Generic application error
 export class ApplicationError extends FatalError {
   constructor(
-    public message = "Unknown error",
-    public reference: ErrorReference = "InternalServerError",
+    public message: string,
+    public reference: ErrorReference,
   ) {
     super(message);
   }

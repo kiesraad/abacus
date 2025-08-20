@@ -28,7 +28,7 @@ export function ErrorBoundary() {
   }
 
   if (error instanceof ApplicationError) {
-    return <FatalErrorPage title="error.not_possible" reference={error.reference} />;
+    return <FatalErrorPage title="error.not_possible" message={error.message} reference={error.reference} />;
   }
 
   if (error instanceof FatalApiError && error.reference === "Forbidden") {

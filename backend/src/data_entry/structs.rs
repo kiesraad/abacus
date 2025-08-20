@@ -160,13 +160,13 @@ pub struct DifferencesCounts {
     pub fewer_ballots_count: Count,
     /// Whether total of admitted voters and total of votes cast match.
     /// ("D en H zijn gelijk")
-    pub admitted_voters_equals_votes_cast: YesNo,
+    pub admitted_voters_equals_votes_cast: bool,
     /// Whether total of admitted voters is greater than total of votes cast match.
     /// ("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)")
-    pub votes_cast_greater_than_admitted_voters: YesNo,
+    pub votes_cast_greater_than_admitted_voters: bool,
     /// Whether total of admitted voters is less than total of votes cast match.
     /// ("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)")
-    pub votes_cast_smaller_than_admitted_voters: YesNo,
+    pub votes_cast_smaller_than_admitted_voters: bool,
     /// Whether the difference between the total of admitted voters and total of votes cast is explained.
     /// ("Verschil tussen D en H volledig verklaard?")
     pub difference_completely_accounted_for: YesNo,

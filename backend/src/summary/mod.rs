@@ -138,9 +138,9 @@ impl ElectionSummary {
 pub struct SummaryDifferencesCounts {
     pub more_ballots_count: SumCount,
     pub fewer_ballots_count: SumCount,
-    pub admitted_voters_equals_votes_cast: YesNo,
-    pub votes_cast_greater_than_admitted_voters: YesNo,
-    pub votes_cast_smaller_than_admitted_voters: YesNo,
+    pub admitted_voters_equals_votes_cast: bool,
+    pub votes_cast_greater_than_admitted_voters: bool,
+    pub votes_cast_smaller_than_admitted_voters: bool,
     pub difference_completely_accounted_for: YesNo,
 }
 

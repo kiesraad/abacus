@@ -4564,7 +4564,7 @@
         ],
         "properties": {
           "admitted_voters_equals_votes_cast": {
-            "$ref": "#/components/schemas/YesNo",
+            "type": "boolean",
             "description": "Whether total of admitted voters and total of votes cast match.\n(\"D en H zijn gelijk\")"
           },
           "difference_completely_accounted_for": {
@@ -4584,11 +4584,11 @@
             "minimum": 0
           },
           "votes_cast_greater_than_admitted_voters": {
-            "$ref": "#/components/schemas/YesNo",
+            "type": "boolean",
             "description": "Whether total of admitted voters is greater than total of votes cast match.\n(\"H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)\")"
           },
           "votes_cast_smaller_than_admitted_voters": {
-            "$ref": "#/components/schemas/YesNo",
+            "type": "boolean",
             "description": "Whether total of admitted voters is less than total of votes cast match.\n(\"H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)\")"
           }
         },
@@ -6157,7 +6157,7 @@
         ],
         "properties": {
           "admitted_voters_equals_votes_cast": {
-            "$ref": "#/components/schemas/YesNo"
+            "type": "boolean"
           },
           "difference_completely_accounted_for": {
             "$ref": "#/components/schemas/YesNo"
@@ -6169,10 +6169,10 @@
             "$ref": "#/components/schemas/SumCount"
           },
           "votes_cast_greater_than_admitted_voters": {
-            "$ref": "#/components/schemas/YesNo"
+            "type": "boolean"
           },
           "votes_cast_smaller_than_admitted_voters": {
-            "$ref": "#/components/schemas/YesNo"
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -6349,9 +6349,7 @@
           "W201",
           "W202",
           "W203",
-          "W205",
-          "W301",
-          "W302"
+          "W205"
         ]
       },
       "ValidationResults": {

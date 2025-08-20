@@ -433,9 +433,9 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 2,
-                admitted_voters_equals_votes_cast: Default::default(),
-                votes_cast_greater_than_admitted_voters: Default::default(),
-                votes_cast_smaller_than_admitted_voters: Default::default(),
+                admitted_voters_equals_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: true,
+                votes_cast_smaller_than_admitted_voters: true,
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
@@ -444,9 +444,9 @@ mod tests {
         second_entry.differences_counts = DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 2,
-            admitted_voters_equals_votes_cast: Default::default(),
-            votes_cast_greater_than_admitted_voters: Default::default(),
-            votes_cast_smaller_than_admitted_voters: Default::default(),
+            admitted_voters_equals_votes_cast: true,
+            votes_cast_greater_than_admitted_voters: false,
+            votes_cast_smaller_than_admitted_voters: false,
             difference_completely_accounted_for: Default::default(),
         };
         second_entry.compare(

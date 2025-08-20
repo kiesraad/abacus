@@ -541,7 +541,7 @@ export interface DataEntryStatusResponse {
 export interface DifferencesCounts {
   /** Whether total of admitted voters and total of votes cast match.
 ("D en H zijn gelijk") */
-  admitted_voters_equals_votes_cast: YesNo;
+  admitted_voters_equals_votes_cast: boolean;
   /** Whether the difference between the total of admitted voters and total of votes cast is explained.
 ("Verschil tussen D en H volledig verklaard?") */
   difference_completely_accounted_for: YesNo;
@@ -551,10 +551,10 @@ export interface DifferencesCounts {
   more_ballots_count: number;
   /** Whether total of admitted voters is greater than total of votes cast match.
 ("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)") */
-  votes_cast_greater_than_admitted_voters: YesNo;
+  votes_cast_greater_than_admitted_voters: boolean;
   /** Whether total of admitted voters is less than total of votes cast match.
 ("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)") */
-  votes_cast_smaller_than_admitted_voters: YesNo;
+  votes_cast_smaller_than_admitted_voters: boolean;
 }
 
 /**
@@ -1094,12 +1094,12 @@ export interface SumCount {
  * Contains a summary of the differences, containing which polling stations had differences.
  */
 export interface SummaryDifferencesCounts {
-  admitted_voters_equals_votes_cast: YesNo;
+  admitted_voters_equals_votes_cast: boolean;
   difference_completely_accounted_for: YesNo;
   fewer_ballots_count: SumCount;
   more_ballots_count: SumCount;
-  votes_cast_greater_than_admitted_voters: YesNo;
-  votes_cast_smaller_than_admitted_voters: YesNo;
+  votes_cast_greater_than_admitted_voters: boolean;
+  votes_cast_smaller_than_admitted_voters: boolean;
 }
 
 export interface UpdateUserRequest {
@@ -1165,9 +1165,7 @@ export type ValidationResultCode =
   | "W201"
   | "W202"
   | "W203"
-  | "W205"
-  | "W301"
-  | "W302";
+  | "W205";
 
 export interface ValidationResults {
   errors: ValidationResult[];

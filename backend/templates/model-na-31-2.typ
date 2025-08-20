@@ -304,7 +304,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[Twee][Vier] eden van het #location_type
+=== #is_municipality[Twee][Vier] leden van het #location_type
 
 #stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 

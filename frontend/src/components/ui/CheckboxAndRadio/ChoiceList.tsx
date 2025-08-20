@@ -29,6 +29,7 @@ ChoiceList.Checkbox = ({
   label,
   children,
   disabled,
+  autoFocus,
   defaultChecked,
   hasError,
   reference,
@@ -40,6 +41,7 @@ ChoiceList.Checkbox = ({
     name={name}
     label={label}
     disabled={disabled}
+    autoFocus={autoFocus}
     defaultChecked={defaultChecked}
     hasError={hasError}
     ref={reference}

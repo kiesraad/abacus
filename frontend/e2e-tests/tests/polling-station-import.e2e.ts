@@ -33,6 +33,6 @@ test.describe("Polling station import", () => {
     // Check for confirmation on the list page
     const listPage = new PollingStationListPgObj(page);
     await expect(listPage.header).toBeVisible();
-    await expect(listPage.alert).toContainText(/Er zijn \d+ stembureaus opgeslagen/);
+    await expect(listPage.alert).toContainText(/Er zijn \d+ stembureaus geïmporteerd/);
   });
 });

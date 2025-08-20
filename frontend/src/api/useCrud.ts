@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { ApiRequestState, isFatalRequestState } from "./ApiRequestState";
+import { ApiRequestState, ApiRequestStateWithoutFatalErrors, isFatalRequestState } from "./ApiRequestState";
 import { ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
 import { handleApiResult } from "./useInitialApiGet";
@@ -14,7 +14,7 @@ export interface UseCrudReturn<T> {
   create: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
   update: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
   remove: (controller?: AbortController) => Promise<ApiResult<T>>;
-  requestState: ApiRequestIdleState | ApiRequestState<T>;
+  requestState: ApiRequestIdleState | ApiRequestStateWithoutFatalErrors<T>;
 }
 
 export type ApiPaths =
@@ -33,11 +33,9 @@ export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
   const paths = typeof path === "string" ? { get: path, create: path, update: path, remove: path } : path;
 
   // throw fatal errors
-  useEffect(() => {
-    if ("error" in requestState && isFatalRequestState(requestState)) {
-      throw requestState.error;
-    }
-  }, [requestState]);
+  if ("error" in requestState && isFatalRequestState(requestState)) {
+    throw requestState.error;
+  }
 
   // Get a resource
   const get = async (controller?: AbortController) => {

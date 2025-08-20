@@ -678,7 +678,7 @@ export interface ElectionSummary {
   /** The differences between voters and votes */
   differences_counts: SummaryDifferencesCounts;
   /** The summary votes for each political group (and each candidate within) */
-  political_group_votes: PoliticalGroupVotes[];
+  political_group_votes: PoliticalGroupCandidateVotes[];
   /** The total number of voters */
   voters_counts: VotersCounts;
   /** The total number of votes */
@@ -713,8 +713,8 @@ export interface ErrorDetails {
  */
 export type ErrorReference =
   | "AirgapViolation"
-  | "NotInitialised"
   | "AllListsExhausted"
+  | "AlreadyInitialised"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "CommitteeSessionPaused"
   | "DatabaseError"
@@ -738,6 +738,7 @@ export type ErrorReference =
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
   | "InvalidXml"
+  | "NotInitialised"
   | "OwnAccountCannotBeDeleted"
   | "PasswordRejection"
   | "PdfGenerationError"
@@ -878,6 +879,12 @@ export interface PoliticalGroupCandidateNomination {
   updated_candidate_ranking: Candidate[];
 }
 
+export interface PoliticalGroupCandidateVotes {
+  candidate_votes: CandidateVotes[];
+  number: number;
+  total: number;
+}
+
 /**
  * Contains information about the final assignment of seats for a specific political group.
  */
@@ -919,8 +926,7 @@ export interface PoliticalGroupStanding {
   votes_cast: number;
 }
 
-export interface PoliticalGroupVotes {
-  candidate_votes: CandidateVotes[];
+export interface PoliticalGroupTotalVotes {
   number: number;
   total: number;
 }
@@ -1003,7 +1009,7 @@ export interface PollingStationResults {
   /** Extra investigation ("B1-1 Extra onderzoek") */
   extra_investigation: ExtraInvestigation;
   /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
-  political_group_votes: PoliticalGroupVotes[];
+  political_group_votes: PoliticalGroupCandidateVotes[];
   /** Voters counts ("1. Aantal toegelaten kiezers") */
   voters_counts: VotersCounts;
   /** Votes counts ("2. Aantal getelde stembiljetten") */
@@ -1192,17 +1198,20 @@ export interface VotersCounts {
 
 /**
  * Votes counts, part of the polling station results.
+ * Following the fields in Model CSO Na 31-2 Bijlage 1.
  */
 export interface VotesCounts {
-  /** Number of blank votes ("Aantal blanco stembiljetten") */
+  /** Number of blank votes ("Blanco stembiljetten") */
   blank_votes_count: number;
-  /** Number of invalid votes ("Aantal ongeldige stembiljetten") */
+  /** Number of invalid votes ("Ongeldige stembiljetten") */
   invalid_votes_count: number;
-  /** Total number of votes cast ("Totaal aantal getelde stemmen") */
+  /** Total votes per list */
+  political_group_total_votes: PoliticalGroupTotalVotes[];
+  /** Total number of valid votes on candidates
+("Totaal stemmen op kandidaten") */
+  total_votes_candidates_count: number;
+  /** Total number of votes cast ("Totaal uitgebrachte stemmen") */
   total_votes_cast_count: number;
-  /** Number of valid votes on candidates
-("Aantal stembiljetten met een geldige stem op een kandidaat") */
-  votes_candidates_count: number;
 }
 
 /**

@@ -202,7 +202,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
       letterbox(
         "E",
         light: false,
-        value: input.summary.votes_counts.votes_candidates_count,
+        value: input.summary.votes_counts.total_votes_candidates_count,
       )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
     ),
     letterbox("F", value: input.summary.votes_counts.blank_votes_count)[Blanco stemmen],

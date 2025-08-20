@@ -10,7 +10,8 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   readonly pollCardCount: Locator;
   readonly proxyCertificateCount: Locator;
   readonly totalAdmittedVotersCount: Locator;
-  readonly votesCandidatesCount: Locator;
+  readonly politicalGroupTotalVotes: Locator;
+  readonly totalVotesCandidatesCount: Locator;
   readonly blankVotesCount: Locator;
   readonly invalidVotesCount: Locator;
   readonly totalVotesCastCount: Locator;
@@ -36,7 +37,8 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     this.totalAdmittedVotersCount = page.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
 
     // votes counts
-    this.votesCandidatesCount = page.getByRole("textbox", { name: "E Stemmen op kandidaten" });
+    this.politicalGroupTotalVotes = this.page.getByRole("textbox", { name: new RegExp(`E\\.\\d+\\sTotaal Lijst`) });
+    this.totalVotesCandidatesCount = page.getByRole("textbox", { name: "E Totaal stemmen op kandidaten" });
     this.blankVotesCount = page.getByRole("textbox", { name: "F Blanco stemmen" });
     this.invalidVotesCount = page.getByRole("textbox", { name: "G Ongeldige stemmen" });
     this.totalVotesCastCount = page.getByRole("textbox", { name: "H Totaal uitgebrachte stemmen" });
@@ -67,16 +69,27 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   }
 
   async inputVotesCounts(votesCounts: VotesCounts) {
-    await this.votesCandidatesCount.fill(votesCounts.votes_candidates_count.toString());
+    for (const [i, politicalGroup] of votesCounts.political_group_total_votes.entries()) {
+      const input = this.politicalGroupTotalVotes.nth(i);
+      await input.fill(politicalGroup.total.toString());
+    }
+
+    await this.totalVotesCandidatesCount.fill(votesCounts.total_votes_candidates_count.toString());
     await this.blankVotesCount.fill(votesCounts.blank_votes_count.toString());
     await this.invalidVotesCount.fill(votesCounts.invalid_votes_count.toString());
     await this.totalVotesCastCount.fill(votesCounts.total_votes_cast_count.toString());
   }
 
   async getVotesCounts(): Promise<VotesCounts> {
+    // using Number() so that "" is parsed to 0
     return {
-      // using Number() so that "" is parsed to 0
-      votes_candidates_count: Number(await this.votesCandidatesCount.inputValue()),
+      political_group_total_votes: await Promise.all(
+        (await this.politicalGroupTotalVotes.all()).map(async (input, index) => ({
+          number: index + 1,
+          total: Number(await input.inputValue()),
+        })),
+      ),
+      total_votes_candidates_count: Number(await this.totalVotesCandidatesCount.inputValue()),
       blank_votes_count: Number(await this.blankVotesCount.inputValue()),
       invalid_votes_count: Number(await this.invalidVotesCount.inputValue()),
       total_votes_cast_count: Number(await this.totalVotesCastCount.inputValue()),

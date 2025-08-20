@@ -683,7 +683,10 @@ mod tests {
 
     use super::*;
     use crate::{
-        data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts},
+        data_entry::{
+            CandidateVotes, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts,
+            VotesCounts,
+        },
         election::{
             Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup,
             VoteCountingMethod,
@@ -935,7 +938,8 @@ mod tests {
                 total_admitted_voters_count: 20,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 10,
+                political_group_total_votes: vec![],
+                total_votes_candidates_count: 10,
                 blank_votes_count: 0,
                 invalid_votes_count: 0,
                 total_votes_cast_count: 20,
@@ -1120,7 +1124,8 @@ mod tests {
         let first_entry = polling_station_result();
         let different_second_entry = PollingStationResults {
             votes_counts: VotesCounts {
-                votes_candidates_count: 0,
+                political_group_total_votes: vec![],
+                total_votes_candidates_count: 0,
                 blank_votes_count: 1, // Different from first entry which has blank_votes_count: 0
                 invalid_votes_count: 0,
                 total_votes_cast_count: 1,
@@ -1174,12 +1179,16 @@ mod tests {
                     total_admitted_voters_count: 1,
                 },
                 votes_counts: VotesCounts {
-                    votes_candidates_count: 0,
+                    political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 0,
+                    }],
+                    total_votes_candidates_count: 0,
                     blank_votes_count: 1,
                     invalid_votes_count: 0,
                     total_votes_cast_count: 1,
                 },
-                political_group_votes: vec![PoliticalGroupVotes {
+                political_group_votes: vec![PoliticalGroupCandidateVotes {
                     number: 1,
                     total: 0,
                     candidate_votes: vec![CandidateVotes {
@@ -1199,12 +1208,16 @@ mod tests {
                     total_admitted_voters_count: 1,
                 },
                 votes_counts: VotesCounts {
-                    votes_candidates_count: 1,
+                    political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 1,
+                    }],
+                    total_votes_candidates_count: 1,
                     blank_votes_count: 0,
                     invalid_votes_count: 0,
                     total_votes_cast_count: 1,
                 },
-                political_group_votes: vec![PoliticalGroupVotes {
+                political_group_votes: vec![PoliticalGroupCandidateVotes {
                     number: 1,
                     total: 1,
                     candidate_votes: vec![CandidateVotes {
@@ -1297,7 +1310,8 @@ mod tests {
         let first_entry = polling_station_result();
         let second_entry = PollingStationResults {
             votes_counts: VotesCounts {
-                votes_candidates_count: 1,
+                political_group_total_votes: vec![],
+                total_votes_candidates_count: 1,
                 blank_votes_count: 0,
                 invalid_votes_count: 0,
                 total_votes_cast_count: 1,
@@ -1337,7 +1351,8 @@ mod tests {
                 total_admitted_voters_count: 1,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 0,
+                political_group_total_votes: vec![],
+                total_votes_candidates_count: 0,
                 blank_votes_count: 1,
                 invalid_votes_count: 0,
                 total_votes_cast_count: 1,
@@ -1379,7 +1394,8 @@ mod tests {
                 total_admitted_voters_count: 10,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 4,
+                political_group_total_votes: vec![],
+                total_votes_candidates_count: 4,
                 blank_votes_count: 2,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 10,

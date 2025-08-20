@@ -56,4 +56,20 @@ describe("PollingStationListPage", () => {
     expect(await screen.findByText(/Er zijn nog geen stembureaus ingevoerd/)).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();
   });
+
+  test("Show add and import buttons", async () => {
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, {
+      polling_stations: [],
+    } satisfies PollingStationListResponse);
+
+    render(
+      <ElectionProvider electionId={1}>
+        <PollingStationListPage />
+      </ElectionProvider>,
+    );
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
+    expect(screen.getByText("Handmatig invullen")).toBeVisible();
+    expect(screen.getByText("Importeren uit een bestand")).toBeVisible();
+  });
 });

@@ -9,7 +9,8 @@ use abacus::{
     },
     data_entry::{
         CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
-        PoliticalGroupVotes, PollingStationResults, VotersCounts, VotesCounts,
+        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+        VotersCounts, VotesCounts,
         status::{ClientState, DataEntryStatusName},
     },
     election::{CandidateNumber, PGNumber},
@@ -34,8 +35,8 @@ pub fn differences_counts_zero() -> DifferencesCounts {
 pub fn political_group_votes_from_test_data_auto(
     number: PGNumber,
     candidate_votes: &[Count],
-) -> PoliticalGroupVotes {
-    PoliticalGroupVotes {
+) -> PoliticalGroupCandidateVotes {
+    PoliticalGroupCandidateVotes {
         number,
         total: candidate_votes.iter().sum(),
         candidate_votes: candidate_votes
@@ -62,7 +63,17 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
                 total_admitted_voters_count: 104,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 102,
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 60,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 52,
+                    },
+                ],
+                total_votes_candidates_count: 102,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,

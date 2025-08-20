@@ -21,7 +21,7 @@ import { test } from "../../fixtures";
 import { emptyDataEntryResponse } from "../../test-data/request-response-templates";
 
 test.use({
-  storageState: "e2e-tests/state/typist.json",
+  storageState: "e2e-tests/state/typist1.json",
 });
 
 test.describe("resume data entry flow", () => {

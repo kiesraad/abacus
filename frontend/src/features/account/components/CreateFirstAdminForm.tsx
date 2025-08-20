@@ -1,6 +1,6 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
-import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
+import { ApiError } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -22,7 +22,21 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
 
   const url: CREATE_FIRST_ADMIN_REQUEST_PATH = "/api/initialise/first-admin";
   const { create, requestState } = useCrud<LoginResponse>(url);
-  const [apiError, setApiError] = useState<AnyApiError | null>(null);
+  const [apiError, setApiError] = useState<ApiError | null>(null);
+
+  useEffect(() => {
+    if (requestState.status === "success") {
+      next();
+    } else if (requestState.status === "api-error") {
+      if (requestState.error.reference === "PasswordRejection") {
+        setValidationErrors({
+          password: t("initialise.password_rules"),
+        });
+      } else {
+        setApiError(requestState.error);
+      }
+    }
+  }, [requestState, next]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,19 +60,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
 
     setValidationErrors(null);
 
-    void create(account).then((result) => {
-      if (isSuccess(result)) {
-        next();
-      } else {
-        if (result instanceof ApiError && result.reference === "PasswordRejection") {
-          setValidationErrors({
-            password: t("initialise.password_rules"),
-          });
-        } else {
-          setApiError(result);
-        }
-      }
-    });
+    void create(account);
   }
 
   return (
@@ -82,7 +84,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
           {apiError && (
             <FormLayout.Alert>
               <Alert type="error">
-                <p>{apiError.message}</p>
+                <p>{t(`error.api_error.${apiError.reference}`)}</p>
               </Alert>
             </FormLayout.Alert>
           )}

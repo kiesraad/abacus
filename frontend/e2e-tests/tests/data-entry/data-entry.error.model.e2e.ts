@@ -205,7 +205,7 @@ const votesEmpty: VotesCounts = {
 };
 
 test.use({
-  storageState: "e2e-tests/state/typist.json",
+  storageState: "e2e-tests/state/typist1.json",
 });
 
 test.describe("Data entry model test - errors", () => {

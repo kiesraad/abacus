@@ -29,7 +29,7 @@ import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 import { test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/typist.json",
+  storageState: "e2e-tests/state/typist1.json",
 });
 
 test.describe("full data entry flow", () => {
@@ -510,10 +510,12 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_3.next.click();
 
+    await expect(candidatesListPage_2.fieldset).toBeVisible();
     await expect(candidatesListPage_2.error).toContainText("F.204");
     await candidatesListPage_2.checkAcceptErrorsAndWarnings();
     await candidatesListPage_2.next.click();
 
+    await expect(candidatesListPage_3.fieldset).toBeVisible();
     await expect(candidatesListPage_3.error).toContainText("F.204");
     await candidatesListPage_3.checkAcceptErrorsAndWarnings();
     await candidatesListPage_3.next.click();

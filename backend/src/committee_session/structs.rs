@@ -44,6 +44,13 @@ impl IntoResponse for CommitteeSession {
     }
 }
 
+/// New committee session request
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
+pub struct NewCommitteeSessionRequest {
+    pub election_id: u32,
+}
+
 /// Committee session create request
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
 #[serde(deny_unknown_fields)]

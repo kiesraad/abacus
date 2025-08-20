@@ -25,6 +25,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
+    data_entry::VotesCounts,
     election::ElectionWithPoliticalGroups,
     error::{ErrorReference, ErrorResponse},
     polling_station::PollingStation,
@@ -189,7 +190,13 @@ async fn polling_station_data_entry_claim(
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: Default::default(),
-            votes_counts: Default::default(),
+            votes_counts: VotesCounts {
+                political_group_total_votes:
+                    PollingStationResults::default_political_group_total_votes(
+                        &election.political_groups,
+                    ),
+                ..Default::default()
+            },
             differences_counts: Default::default(),
             political_group_votes: PollingStationResults::default_political_group_votes(
                 &election.political_groups,
@@ -817,7 +824,10 @@ pub mod tests {
             status::CommitteeSessionStatus,
             tests::{change_status_committee_session, create_committee_session},
         },
-        data_entry::{DifferencesCounts, PoliticalGroupVotes, VotersCounts, VotesCounts},
+        data_entry::{
+            DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+            VotersCounts, VotesCounts,
+        },
     };
     use axum::http::StatusCode;
     use http_body_util::BodyExt;
@@ -836,15 +846,25 @@ pub mod tests {
                     total_admitted_voters_count: 100,
                 },
                 votes_counts: VotesCounts {
-                    votes_candidates_count: 96,
+                    political_group_total_votes: vec![
+                        PoliticalGroupTotalVotes {
+                            number: 1,
+                            total: 56,
+                        },
+                        PoliticalGroupTotalVotes {
+                            number: 2,
+                            total: 40,
+                        },
+                    ],
+                    total_votes_candidates_count: 96,
                     blank_votes_count: 2,
                     invalid_votes_count: 2,
                     total_votes_cast_count: 100,
                 },
                 differences_counts: DifferencesCounts::zero(),
                 political_group_votes: vec![
-                    PoliticalGroupVotes::from_test_data_auto(1, &[36, 20]),
-                    PoliticalGroupVotes::from_test_data_auto(2, &[30, 10]),
+                    PoliticalGroupCandidateVotes::from_test_data_auto(1, &[36, 20]),
+                    PoliticalGroupCandidateVotes::from_test_data_auto(2, &[30, 10]),
                 ],
             },
             client_state: ClientState(None),

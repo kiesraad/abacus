@@ -4,58 +4,71 @@ import { DataEntrySection, DataEntryStructure, InputGridSubsectionRow } from "@/
 import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 
-export const votersAndVotesSection: DataEntrySection = {
-  id: "voters_votes_counts",
-  title: t("voters_votes_counts.form_title"),
-  short_title: t("voters_votes_counts.short_title"),
-  sectionNumber: t("voters_votes_counts.section_number"),
-  subsections: [
-    {
-      type: "inputGrid",
-      headers: [t("field"), t("counted_number"), t("description")],
-      rows: [
-        {
-          code: "A",
-          path: "voters_counts.poll_card_count",
-          title: t("voters_votes_counts.voters_counts.poll_card_count"),
-          autoFocusInput: true,
-        },
-        {
-          code: "B",
-          path: "voters_counts.proxy_certificate_count",
-          title: t("voters_votes_counts.voters_counts.proxy_certificate_count"),
-        },
-        {
-          code: "D",
-          path: "voters_counts.total_admitted_voters_count",
-          title: t("voters_votes_counts.voters_counts.total_admitted_voters_count"),
-          isTotal: true,
-          addSeparator: true,
-        },
-        {
-          code: "E",
-          path: "votes_counts.votes_candidates_count",
-          title: t("voters_votes_counts.votes_counts.votes_candidates_count"),
-        },
-        {
-          code: "F",
-          path: "votes_counts.blank_votes_count",
-          title: t("voters_votes_counts.votes_counts.blank_votes_count"),
-        },
-        {
-          code: "G",
-          path: "votes_counts.invalid_votes_count",
-          title: t("voters_votes_counts.votes_counts.invalid_votes_count"),
-        },
-        {
-          code: "H",
-          path: "votes_counts.total_votes_cast_count",
-          title: t("voters_votes_counts.votes_counts.total_votes_cast_count"),
-          isTotal: true,
-        },
-      ],
-    },
-  ],
+export const createVotersAndVotesSection = (election: ElectionWithPoliticalGroups): DataEntrySection => {
+  const rowsPerPoliticalGroup: InputGridSubsectionRow[] = election.political_groups.map((politicalGroup, index) => ({
+    code: `E.${politicalGroup.number}`,
+    path: `votes_counts.political_group_total_votes[${politicalGroup.number - 1}].total`,
+    title: `${t("total")} ${formatPoliticalGroupName(politicalGroup)}`,
+    addSeparator: index === election.political_groups.length - 1,
+  }));
+
+  return {
+    id: "voters_votes_counts",
+    title: t("voters_votes_counts.form_title"),
+    short_title: t("voters_votes_counts.short_title"),
+    sectionNumber: t("voters_votes_counts.section_number"),
+    subsections: [
+      {
+        type: "inputGrid",
+        headers: [t("field"), t("counted_number"), t("description")],
+        rows: [
+          {
+            code: "A",
+            path: "voters_counts.poll_card_count",
+            title: t("voters_votes_counts.voters_counts.poll_card_count"),
+            autoFocusInput: true,
+          },
+          {
+            code: "B",
+            path: "voters_counts.proxy_certificate_count",
+            title: t("voters_votes_counts.voters_counts.proxy_certificate_count"),
+            addSeparator: true,
+          },
+          {
+            code: "D",
+            path: "voters_counts.total_admitted_voters_count",
+            title: t("voters_votes_counts.voters_counts.total_admitted_voters_count"),
+            isTotal: true,
+            addSeparator: true,
+          },
+          ...rowsPerPoliticalGroup,
+          {
+            code: "E",
+            path: "votes_counts.total_votes_candidates_count",
+            title: t("voters_votes_counts.votes_counts.total_votes_candidates_count"),
+            isTotal: true,
+          },
+          {
+            code: "F",
+            path: "votes_counts.blank_votes_count",
+            title: t("voters_votes_counts.votes_counts.blank_votes_count"),
+          },
+          {
+            code: "G",
+            path: "votes_counts.invalid_votes_count",
+            title: t("voters_votes_counts.votes_counts.invalid_votes_count"),
+            addSeparator: true,
+          },
+          {
+            code: "H",
+            path: "votes_counts.total_votes_cast_count",
+            title: t("voters_votes_counts.votes_counts.total_votes_cast_count"),
+            isTotal: true,
+          },
+        ],
+      },
+    ],
+  };
 };
 
 export const differencesSection: DataEntrySection = {
@@ -123,7 +136,7 @@ export const extraInvestigationSection: DataEntrySection = {
     },
     {
       type: "checkboxes",
-      description: t("extra_investigation.extra_investigation_other_reason.description"),
+      title: t("extra_investigation.extra_investigation_other_reason.title"),
       short_title: t("extra_investigation.extra_investigation_other_reason.short_title"),
       error_path: "extra_investigation.extra_investigation_other_reason",
       error_message: t("extra_investigation.validation_error"),
@@ -143,7 +156,7 @@ export const extraInvestigationSection: DataEntrySection = {
     },
     {
       type: "checkboxes",
-      description: t("extra_investigation.ballots_recounted_extra_investigation.description"),
+      title: t("extra_investigation.ballots_recounted_extra_investigation.title"),
       short_title: t("extra_investigation.ballots_recounted_extra_investigation.short_title"),
       error_path: "extra_investigation.ballots_recounted_extra_investigation",
       error_message: t("extra_investigation.validation_error"),
@@ -174,9 +187,12 @@ export const countingDifferencesPollingStation: DataEntrySection = {
       message: t("counting_differences_polling_station.form_description"),
     },
     {
+      type: "heading",
+      title: t("counting_differences_polling_station.heading_voters_and_votes"),
+    },
+    {
       type: "checkboxes",
       title: t("counting_differences_polling_station.unexplained_difference_ballots_voters.title"),
-      description: t("counting_differences_polling_station.unexplained_difference_ballots_voters.description"),
       short_title: t("counting_differences_polling_station.unexplained_difference_ballots_voters.short_title"),
       error_path: "counting_differences_polling_station.unexplained_difference_ballots_voters",
       error_message: t("counting_differences_polling_station.validation_error"),
@@ -195,9 +211,12 @@ export const countingDifferencesPollingStation: DataEntrySection = {
       ],
     },
     {
+      type: "heading",
+      title: t("counting_differences_polling_station.heading_counts_of_lists"),
+    },
+    {
       type: "checkboxes",
       title: t("counting_differences_polling_station.difference_ballots_per_list.title"),
-      description: t("counting_differences_polling_station.difference_ballots_per_list.description"),
       short_title: t("counting_differences_polling_station.difference_ballots_per_list.short_title"),
       error_path: "counting_differences_polling_station.difference_ballots_per_list",
       error_message: t("counting_differences_polling_station.validation_error"),
@@ -264,7 +283,7 @@ function buildDataEntryStructure(election: ElectionWithPoliticalGroups): DataEnt
   return [
     extraInvestigationSection,
     countingDifferencesPollingStation,
-    votersAndVotesSection,
+    createVotersAndVotesSection(election),
     differencesSection,
     ...createPoliticalGroupSections(election),
   ];

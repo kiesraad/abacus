@@ -7,7 +7,7 @@ import { PollingStationListPgObj } from "../page-objects/polling_station/Polling
 import { eml110a, eml110b } from "../test-data/eml-files";
 
 test.use({
-  storageState: "e2e-tests/state/coordinator.json",
+  storageState: "e2e-tests/state/coordinator1.json",
 });
 
 test.describe("Polling station import", () => {

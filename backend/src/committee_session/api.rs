@@ -12,8 +12,8 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
-    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-    status::change_committee_session_status,
+    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
+    status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
     APIError, AppState, ErrorResponse,
@@ -91,12 +91,13 @@ pub async fn election_committee_session_list(
 #[utoipa::path(
     post,
     path = "/api/committee_sessions",
-    request_body = CommitteeSessionCreateRequest,
+    request_body = NewCommitteeSessionRequest,
     responses(
         (status = 201, description = "Committee session created", body = CommitteeSession),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -104,19 +105,36 @@ pub async fn committee_session_create(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Json(committee_session_request): Json<CommitteeSessionCreateRequest>,
+    Json(request): Json<NewCommitteeSessionRequest>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
-    let committee_session =
-        crate::committee_session::repository::create(&pool, committee_session_request).await?;
-
-    audit_service
-        .log(
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
-            None,
-        )
+    let committee_session = crate::committee_session::repository::get_election_committee_session(
+        &pool,
+        request.election_id,
+    )
+    .await?;
+    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        let committee_session = crate::committee_session::repository::create(&pool, {
+            CommitteeSessionCreateRequest {
+                election_id: request.election_id,
+                number: committee_session.number + 1,
+                number_of_voters: committee_session.number_of_voters,
+            }
+        })
         .await?;
 
-    Ok((StatusCode::CREATED, committee_session))
+        audit_service
+            .log(
+                &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+                None,
+            )
+            .await?;
+
+        Ok((StatusCode::CREATED, committee_session))
+    } else {
+        Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ))
+    }
 }
 
 /// Update a [CommitteeSession].

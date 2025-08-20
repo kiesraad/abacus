@@ -23,7 +23,7 @@ import { test } from "../fixtures";
 import { eml110a, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
 
 test.use({
-  storageState: "e2e-tests/state/admin.json",
+  storageState: "e2e-tests/state/admin1.json",
 });
 
 test.describe("Election creation", () => {

@@ -19,8 +19,8 @@ import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
 import {
-  getStatesAndEventsFromMachineDefinition,
-  getStatesAndEventsFromTest,
+  assertMachineAndImplementationMatches,
+  typeCheckedMachineDefinition,
 } from "../../helpers-utils/xstate-helpers";
 
 /*
@@ -36,47 +36,60 @@ changed the initial input on the voters and votes page, and we have saved it as 
 to the data entry homepage.
 */
 
-const dataEntryMachineDefinition = {
-  initial: "voterVotesPageEmpty",
+const dataEntryMachineDefinition = typeCheckedMachineDefinition({
+  initial: "votersVotesPageEmpty",
   states: {
-    countingDifferencesPollingStationPageFilled: {
-      on: {
-        SUBMIT: "voterVotesPageEmpty",
-      },
-    },
-    pollingStationsPageDiscarded: {},
-    pollingStationsPageEmptySaved: {
+    dataEntryHomePageDiscarded: {},
+    dataEntryHomePageEmptySaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeEmpty",
       },
     },
-    pollingStationsPageFilledSaved: {
+    dataEntryHomePageFilledSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeSaved",
       },
     },
-    pollingStationsPageChangedSaved: {
+    dataEntryHomePageChangedSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChanged",
       },
     },
-    voterVotesPageCached: {
+    countingDifferencesPollingStationPageEmpty: {},
+    countingDifferencesPollingStationPageSaved: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageChangedSubmitted",
+      },
+    },
+    countingDifferencesPollingStationPageDiscarded: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageSubmitted",
+      },
+    },
+    countingDifferencesPollingStationPageCached: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageCached",
+      },
+    },
+    votersVotesPageCached: {
       on: {
         SUBMIT: "differencesPage",
       },
     },
-    voterVotesPageEmpty: {
+    votersVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilled",
         CLICK_ABORT: "abortInputModalEmpty",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalEmpty",
+        NAV_TO_HOME_PAGE: "abortInputModalEmpty",
+        GO_TO_PREVIOUS_PAGE: "countingDifferencesPollingStationPageEmpty",
       },
     },
     votersVotesPageFilled: {
       on: {
         SUBMIT: "differencesPage",
         CLICK_ABORT: "abortInputModalFilled",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalFilled",
+        NAV_TO_HOME_PAGE: "abortInputModalFilled",
+        GO_TO_PREVIOUS_PAGE: "countingDifferencesPollingStationPageCached",
       },
     },
     votersVotesPageSubmitted: {
@@ -89,7 +102,8 @@ const dataEntryMachineDefinition = {
       on: {
         SUBMIT: "differencesPage",
         CLICK_ABORT: "abortInputModalChanged",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalChanged",
+        NAV_TO_HOME_PAGE: "abortInputModalChanged",
+        GO_TO_PREVIOUS_PAGE: "unsavedChangesModalChanged",
       },
     },
     votersVotesPageAfterResumeSaved: {},
@@ -102,27 +116,32 @@ const dataEntryMachineDefinition = {
     },
     abortInputModalFilled: {
       on: {
-        SAVE_INPUT: "pollingStationsPageFilledSaved",
-        DISCARD_INPUT: "pollingStationsPageDiscarded",
+        SAVE_INPUT: "dataEntryHomePageFilledSaved",
+        DISCARD_INPUT: "dataEntryHomePageDiscarded",
       },
     },
     abortInputModalEmpty: {
       on: {
-        SAVE_INPUT: "pollingStationsPageEmptySaved",
-        DISCARD_INPUT: "pollingStationsPageDiscarded",
+        SAVE_INPUT: "dataEntryHomePageEmptySaved",
+        DISCARD_INPUT: "dataEntryHomePageDiscarded",
       },
     },
     abortInputModalChanged: {
       on: {
-        SAVE_INPUT: "pollingStationsPageChangedSaved",
-        DISCARD_INPUT: "pollingStationsPageDiscarded",
+        SAVE_INPUT: "dataEntryHomePageChangedSaved",
+        DISCARD_INPUT: "dataEntryHomePageDiscarded",
+      },
+    },
+    unsavedChangesModalChanged: {
+      on: {
+        SAVE_UNSUBMITTED_CHANGES: "countingDifferencesPollingStationPageSaved",
+        DISCARD_UNSUBMITTED_CHANGES: "countingDifferencesPollingStationPageDiscarded",
       },
     },
   },
-};
+} as const);
 
 const machine = createMachine(dataEntryMachineDefinition);
-const { machineStates, machineEvents } = getStatesAndEventsFromMachineDefinition(dataEntryMachineDefinition);
 
 const voters: VotersCounts = {
   poll_card_count: 90,
@@ -143,21 +162,31 @@ const votersEmpty: VotersCounts = {
 };
 
 const votes: VotesCounts = {
-  votes_candidates_count: 100,
+  political_group_total_votes: [
+    { number: 1, total: 50 },
+    { number: 2, total: 50 },
+    { number: 3, total: 0 },
+  ],
+  total_votes_candidates_count: 100,
   blank_votes_count: 0,
   invalid_votes_count: 0,
   total_votes_cast_count: 100,
 };
 
 const votesEmpty: VotesCounts = {
-  votes_candidates_count: 0,
+  political_group_total_votes: [
+    { number: 1, total: 0 },
+    { number: 2, total: 0 },
+    { number: 3, total: 0 },
+  ],
+  total_votes_candidates_count: 0,
   blank_votes_count: 0,
   invalid_votes_count: 0,
   total_votes_cast_count: 0,
 };
 
 test.use({
-  storageState: "e2e-tests/state/typist.json",
+  storageState: "e2e-tests/state/typist1.json",
 });
 
 test.describe("Data entry model test - valid data", () => {
@@ -179,24 +208,24 @@ test.describe("Data entry model test - valid data", () => {
         await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
         await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
-        const pollingStationsPageStates = {
-          pollingStationsPageDiscarded: async () => {
+        const dataEntryHomePageStates = {
+          dataEntryHomePageDiscarded: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.alertDataEntryInProgress).toBeHidden();
           },
-          pollingStationsPageEmptySaved: async () => {
+          dataEntryHomePageEmptySaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
-          pollingStationsPageFilledSaved: async () => {
+          dataEntryHomePageFilledSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
-          pollingStationsPageChangedSaved: async () => {
+          dataEntryHomePageChangedSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
@@ -204,33 +233,58 @@ test.describe("Data entry model test - valid data", () => {
           },
         };
 
-        const PollingStationsPageEvents = {
+        const dataEntryHomePageEvents = {
           RESUME_DATA_ENTRY: async () => {
             await dataEntryHomePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
           },
         };
 
         const countingDifferencesPollingStationPageStates = {
-          countingDifferencesPollingStationPageFilled: async () => {
+          countingDifferencesPollingStationPageEmpty: async () => {
             await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
             const countingDifferencesFields =
               await countingDifferencesPollingStationPage.getCountingDifferencesPollingStation();
             expect(countingDifferencesFields).toStrictEqual(noDifferences);
           },
+          countingDifferencesPollingStationPageSaved: async () => {
+            await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
+            const countingDifferencesFields =
+              await countingDifferencesPollingStationPage.getCountingDifferencesPollingStation();
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+          },
+          countingDifferencesPollingStationPageDiscarded: async () => {
+            await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
+            const countingDifferencesFields =
+              await countingDifferencesPollingStationPage.getCountingDifferencesPollingStation();
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+          },
+          countingDifferencesPollingStationPageCached: async () => {
+            await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
+            const countingDifferencesFields =
+              await countingDifferencesPollingStationPage.getCountingDifferencesPollingStation();
+            expect(countingDifferencesFields).toStrictEqual(noDifferences);
+          },
+          unsavedChangesModalChanged: async () => {
+            await expect(countingDifferencesPollingStationPage.unsavedChangesModal.heading).toBeVisible();
+          },
         };
+
         const countingDifferencesPollingStationPageEvents = {
-          SUBMIT: async () => {
-            await countingDifferencesPollingStationPage.next.click();
+          SAVE_UNSUBMITTED_CHANGES: async () => {
+            await countingDifferencesPollingStationPage.unsavedChangesModal.saveInput.click();
+          },
+          DISCARD_UNSUBMITTED_CHANGES: async () => {
+            await countingDifferencesPollingStationPage.unsavedChangesModal.discardInput.click();
           },
         };
 
         const votersVotesPageStates = {
-          voterVotesPageCached: async () => {
+          votersVotesPageCached: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes });
           },
-          voterVotesPageEmpty: async () => {
+          votersVotesPageEmpty: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
@@ -283,8 +337,11 @@ test.describe("Data entry model test - valid data", () => {
           CLICK_ABORT: async () => {
             await votersAndVotesPage.abortInput.click();
           },
-          NAV_TO_POLLING_STATION_PAGE: async () => {
+          NAV_TO_HOME_PAGE: async () => {
             await navBar.clickElection(election.election.location, election.election.name);
+          },
+          GO_TO_PREVIOUS_PAGE: async () => {
+            await votersAndVotesPage.progressList.countingDifferencesPollingStation.click();
           },
           SUBMIT: async () => {
             await votersAndVotesPage.next.click();
@@ -323,27 +380,6 @@ test.describe("Data entry model test - valid data", () => {
           },
         };
 
-        // check that events and states used by the machine are equal to
-        // the events and states specified in the test
-        const { states, events } = getStatesAndEventsFromTest(
-          [
-            pollingStationsPageStates,
-            countingDifferencesPollingStationPageStates,
-            votersVotesPageStates,
-            differencesPageStates,
-            abortInputModalStates,
-          ],
-          [
-            PollingStationsPageEvents,
-            countingDifferencesPollingStationPageEvents,
-            votersAndVotesPageEvents,
-            differencesPageEvents,
-            abortInputModalEvents,
-          ],
-        );
-        expect(new Set(states)).toEqual(new Set(machineStates));
-        expect(new Set(events)).toEqual(new Set(machineEvents));
-
         type MachineStates = typeof dataEntryMachineDefinition.states;
         type MachineStateKey = keyof MachineStates;
         type MachineEventKey = {
@@ -352,22 +388,25 @@ test.describe("Data entry model test - valid data", () => {
             : never;
         }[MachineStateKey];
 
-        await path.test({
-          states: {
-            ...pollingStationsPageStates,
-            ...countingDifferencesPollingStationPageStates,
-            ...votersVotesPageStates,
-            ...differencesPageStates,
-            ...abortInputModalStates,
-          } satisfies Record<MachineStateKey, () => void>,
-          events: {
-            ...countingDifferencesPollingStationPageEvents,
-            ...votersAndVotesPageEvents,
-            ...differencesPageEvents,
-            ...abortInputModalEvents,
-            ...PollingStationsPageEvents,
-          } satisfies Record<MachineEventKey, () => void>,
-        });
+        const states: Record<MachineStateKey, () => Promise<void>> = {
+          ...dataEntryHomePageStates,
+          ...countingDifferencesPollingStationPageStates,
+          ...votersVotesPageStates,
+          ...differencesPageStates,
+          ...abortInputModalStates,
+        };
+
+        const events: Record<MachineEventKey, () => Promise<void>> = {
+          ...dataEntryHomePageEvents,
+          ...countingDifferencesPollingStationPageEvents,
+          ...votersAndVotesPageEvents,
+          ...differencesPageEvents,
+          ...abortInputModalEvents,
+        };
+
+        assertMachineAndImplementationMatches(dataEntryMachineDefinition, states, events);
+
+        await path.test({ states, events });
       });
     });
 });

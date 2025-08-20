@@ -13,7 +13,7 @@ export const Message: Story = {
   args: {
     subsection: {
       type: "message",
-      message: "data_entry.continue_after_check",
+      message: "This is a message",
     },
   },
 };

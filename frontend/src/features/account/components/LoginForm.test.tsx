@@ -78,7 +78,7 @@ describe("LoginForm", () => {
     await user.type(await screen.findByLabelText("Wachtwoord"), "Wachtwoord");
     await user.click(await screen.findByRole("button", { name: "Inloggen" }));
 
-    expect(navigate).toHaveBeenCalledWith("../setup");
+    expect(navigate).toHaveBeenCalledWith("/account/setup");
   });
 
   test("Navigate to account setup when fullname has to be entered", async () => {
@@ -97,7 +97,7 @@ describe("LoginForm", () => {
     await user.type(await screen.findByLabelText("Wachtwoord"), "Wachtwoord");
     await user.click(await screen.findByRole("button", { name: "Inloggen" }));
 
-    expect(navigate).toHaveBeenCalledWith("../setup");
+    expect(navigate).toHaveBeenCalledWith("/account/setup");
   });
 
   test("Navigate to data entry when no account setup needed", async () => {

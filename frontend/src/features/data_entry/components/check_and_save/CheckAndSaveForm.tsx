@@ -137,40 +137,42 @@ export function CheckAndSaveForm() {
       {hasErrors && allFeedbackAccepted ? (
         <>
           <p className="md">{t("check_and_save.accepted_errors")}</p>
-          {notableFormSections.map((section) => {
-            const title = dataEntryStructure.find((s) => s.id === section.id)?.title || section.id;
-            return (
-              <React.Fragment key={section.id}>
-                <StatusList.Title>
-                  <Link to={getUrlForFormSection(section.id)}>{title}</Link>
-                </StatusList.Title>
-                <StatusList id={`save-form-summary-list-${section.id}`}>
-                  {section.errors.getCodes().map((code) => {
-                    return (
-                      <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>
-                        <strong>{dottedCode(code)}</strong>
-                        &nbsp;
-                        {tx(`feedback.${code}.typist.title`)}
-                      </StatusList.Item>
-                    );
-                  })}
-                  {section.warnings.getCodes().map((code) => {
-                    return (
-                      <StatusList.Item key={code} status="warning" id={`section-error-${section.id}-${code}`}>
-                        <strong>{dottedCode(code)}</strong>
-                        &nbsp;
-                        {tx(`feedback.${code}.typist.title`)}
-                      </StatusList.Item>
-                    );
-                  })}
-                </StatusList>
-              </React.Fragment>
-            );
-          })}
+          <StatusList.Wrapper>
+            {notableFormSections.map((section) => {
+              const title = dataEntryStructure.find((s) => s.id === section.id)?.title || section.id;
+              return (
+                <StatusList.Section key={section.id} aria-labelledby={`${section.id}_title`}>
+                  <StatusList.Title id={`${section.id}_title`}>
+                    <Link to={getUrlForFormSection(section.id)}>{title}</Link>
+                  </StatusList.Title>
+                  <StatusList id={`save-form-summary-list-${section.id}`} gap="sm">
+                    {section.errors.getCodes().map((code) => {
+                      return (
+                        <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>
+                          <strong>{dottedCode(code)}</strong>
+                          &nbsp;
+                          {tx(`feedback.${code}.typist.title`)}
+                        </StatusList.Item>
+                      );
+                    })}
+                    {section.warnings.getCodes().map((code) => {
+                      return (
+                        <StatusList.Item key={code} status="warning" id={`section-error-${section.id}-${code}`}>
+                          <strong>{dottedCode(code)}</strong>
+                          &nbsp;
+                          {tx(`feedback.${code}.typist.title`)}
+                        </StatusList.Item>
+                      );
+                    })}
+                  </StatusList>
+                </StatusList.Section>
+              );
+            })}
+          </StatusList.Wrapper>
         </>
       ) : (
         <>
-          <section className="md" id="save-form-summary-text">
+          <div id="save-form-summary-text">
             {!hasErrors && allFeedbackAccepted && <p className="md">{t("check_and_save.counts_add_up.no_warnings")}</p>}
             {!hasErrors && hasWarnings && !allFeedbackAccepted && (
               <>
@@ -184,7 +186,7 @@ export function CheckAndSaveForm() {
                 <p className="md">{t("check_and_save.fix_the_errors")}</p>
               </>
             )}
-          </section>
+          </div>
           <StatusList id="save-form-summary-list">
             {!hasErrors && <StatusList.Item status="accept">{t("check_and_save.counts_add_up_title")}</StatusList.Item>}
 
@@ -225,11 +227,11 @@ export function CheckAndSaveForm() {
               </StatusList.Item>
             )}
             {!allFeedbackAccepted ? (
-              <StatusList.Item status={hasErrors ? "error" : "warning"} id="form-cannot-be-saved" emphasis padding>
+              <StatusList.Item status={hasErrors ? "error" : "warning"} id="form-cannot-be-saved" className="bold">
                 {t("check_and_save.can_not_save")}
               </StatusList.Item>
             ) : (
-              <StatusList.Item status="accept" id="form-can-be-saved" emphasis padding>
+              <StatusList.Item status="accept" id="form-can-be-saved" className="bold">
                 {t("check_and_save.can_save")}
               </StatusList.Item>
             )}
@@ -268,7 +270,6 @@ export function CheckAndSaveForm() {
               label={t("data_entry.form_accept_errors")}
             />
           </BottomBar.Row>
-
           <BottomBar.Row>
             <Button type="submit" disabled={status === "finalising"}>
               {t("complete")}

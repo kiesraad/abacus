@@ -12,7 +12,7 @@
 
 #show: doc => conf(doc, header: location_name, footer: [
   #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
-  #add-dashes(input.hash)
+  #input.hash
 ])
 
 #set heading(numbering: none)

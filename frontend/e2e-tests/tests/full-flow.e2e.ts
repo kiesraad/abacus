@@ -50,11 +50,13 @@ test.describe("full flow", () => {
 
     const numberOfVotersPage = new NumberOfVotersPgObj(page);
     await expect(numberOfVotersPage.header).toBeVisible();
+    await expect(numberOfVotersPage.input).toHaveValue("612694"); // value comes from eml110b
     await numberOfVotersPage.input.fill("61269");
     await numberOfVotersPage.next.click();
 
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.numberOfVoters).toHaveText("61.269 kiesgerechtigden");
     const election = await checkAndSavePage.saveElection();
 
     electionId = election.id;

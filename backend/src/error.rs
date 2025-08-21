@@ -24,8 +24,8 @@ use crate::{
 #[serde(deny_unknown_fields)]
 pub enum ErrorReference {
     AirgapViolation,
-    NotInitialised,
     AllListsExhausted,
+    AlreadyInitialised,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     CommitteeSessionPaused,
     DatabaseError,
@@ -49,6 +49,7 @@ pub enum ErrorReference {
     InvalidVoteCandidate,
     InvalidVoteGroup,
     InvalidXml,
+    NotInitialised,
     OwnAccountCannotBeDeleted,
     PasswordRejection,
     PdfGenerationError,
@@ -258,7 +259,7 @@ impl IntoResponse for APIError {
                         StatusCode::FORBIDDEN,
                         to_error(
                             "Application already initialised",
-                            ErrorReference::Forbidden,
+                            ErrorReference::AlreadyInitialised,
                             false,
                         ),
                     ),

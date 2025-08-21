@@ -46,7 +46,7 @@ export const DefaultModal: StoryObj = {
       // Test modal is initially visible and heading is focused
       const modal = canvas.getByRole("dialog");
       await expect(modal).toBeVisible();
-      const heading = within(modal).getByRole("heading", { level: 2 });
+      const heading = within(modal).getByRole("heading", { level: 3 });
       await expect(heading).toHaveFocus();
 
       // Test closing modal with X button
@@ -62,7 +62,7 @@ export const DefaultModal: StoryObj = {
       // Check that modal is visible and heading is focused
       const reopenedModal = canvas.getByRole("dialog");
       await expect(reopenedModal).toBeVisible();
-      const reopenedHeading = within(reopenedModal).getByRole("heading", { level: 2 });
+      const reopenedHeading = within(reopenedModal).getByRole("heading", { level: 3 });
       await expect(reopenedHeading).toHaveFocus();
 
       // Close modal with Escape key
@@ -76,7 +76,7 @@ export const DefaultModal: StoryObj = {
 
       // Check that modal is visible and heading is focused
       const finalModal = canvas.getByRole("dialog");
-      const finalHeading = within(finalModal).getByRole("heading", { level: 2 });
+      const finalHeading = within(finalModal).getByRole("heading", { level: 3 });
       await expect(finalHeading).toHaveFocus();
     });
   },

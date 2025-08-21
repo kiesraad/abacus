@@ -1,7 +1,7 @@
 import { Fragment, HTMLAttributes, ReactNode, useState } from "react";
 import { To, useNavigate } from "react-router";
 
-import { AnyApiError, isSuccess } from "@/api/ApiResult.ts";
+import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { CommitteeSessionStatusLabel } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";
@@ -69,7 +69,7 @@ function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
               void navigate(buttonLink.to);
             }}
           >
-            <span className={cn(firstRowBold && index === 0 && "font-bold")}>{buttonLink.label}</span>
+            <span className={cn(firstRowBold && index === 0 && "bold")}>{buttonLink.label}</span>
           </button>
         </Fragment>
       ))}
@@ -156,7 +156,7 @@ export function CommitteeSessionCard({
         buttonLinks.push({
           id: committeeSession.id,
           label: t("election_management.results_and_documents"),
-          to: "report/download", // TODO: change link when reports are linked to committee sessions
+          to: "report/download", // TODO: change link in #1791 when reports are linked to committee sessions
         });
       }
       if (currentSession) {

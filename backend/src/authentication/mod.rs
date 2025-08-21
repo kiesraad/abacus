@@ -199,7 +199,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         assert_eq!(
             response.headers()["clear-site-data"],
-            r#""cache","cookies","storage""#
+            r#""cookies","storage""#
         );
         let set_cookie_header = response
             .headers()
@@ -229,7 +229,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         assert_eq!(
             response.headers()["clear-site-data"],
-            r#""cache","cookies","storage""#
+            r#""cookies","storage""#
         );
     }
 

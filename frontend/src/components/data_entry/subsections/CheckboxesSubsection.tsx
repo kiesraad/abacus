@@ -23,10 +23,9 @@ export function CheckboxesSubsectionComponent({
     subsection.options.some((option) => errorsAndWarnings?.get(`data.${option.path}`));
 
   return (
-    <fieldset className={cls.container}>
-      {subsection.title && <legend>{subsection.title}</legend>}
-      {subsection.description && <p>{subsection.description}</p>}
+    <div className={cls.container}>
       <ChoiceList>
+        {subsection.title && <ChoiceList.Legend>{subsection.title}</ChoiceList.Legend>}
         {hasErrorOrWarning && (
           <ChoiceList.Error id={`${subsection.error_path}-error`}>{subsection.error_message}</ChoiceList.Error>
         )}
@@ -46,6 +45,6 @@ export function CheckboxesSubsectionComponent({
           />
         ))}
       </ChoiceList>
-    </fieldset>
+    </div>
   );
 }

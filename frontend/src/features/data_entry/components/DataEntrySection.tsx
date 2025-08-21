@@ -5,6 +5,7 @@ import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSe
 import { DataEntrySubsections } from "@/components/data_entry/DataEntrySubsections";
 import { ErrorModal } from "@/components/error/ErrorModal";
 import { Alert } from "@/components/ui/Alert/Alert";
+import { SectionNumber } from "@/components/ui/Badge/SectionNumber";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
@@ -61,7 +62,7 @@ export function DataEntrySection() {
         acceptCheckboxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       });
     }
-  }, [formSection.acceptErrorsAndWarningsError]);
+  }, [formSection]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -75,45 +76,53 @@ export function DataEntrySection() {
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id={formId}>
       <legend className={cls.titleContainer}>
-        <span className={cls.title}>{section.title}</span>
-        {section.sectionNumber && <span className={cls.badge}>{section.sectionNumber}</span>}
+        <h2>
+          {section.title} {section.sectionNumber && <SectionNumber>{section.sectionNumber}</SectionNumber>}
+        </h2>
       </legend>
       <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />
-      {error instanceof FatalApiError && error.reference === "CommitteeSessionPaused" && (
-        <CommitteeSessionPausedModal showUnsavedChanges />
-      )}
-      {error instanceof ApiError && <ErrorModal error={error} />}
-      {formSection.isSaved && memoizedErrorCodes.length > 0 && (
-        <Feedback id="feedback-error" type="error" data={memoizedErrorCodes} userRole={user.role} shouldFocus={true} />
-      )}
-      {formSection.isSaved && !formSection.warnings.isEmpty() && (
-        <Feedback
-          id="feedback-warning"
-          type="warning"
-          data={memoizedWarningCodes}
-          userRole={user.role}
-          shouldFocus={formSection.errors.isEmpty()}
+      <div className={cls.formContainer}>
+        {error instanceof FatalApiError && error.reference === "CommitteeSessionPaused" && (
+          <CommitteeSessionPausedModal showUnsavedChanges />
+        )}
+        {error instanceof ApiError && <ErrorModal error={error} />}
+        {formSection.isSaved && memoizedErrorCodes.length > 0 && (
+          <Feedback
+            id="feedback-error"
+            type="error"
+            data={memoizedErrorCodes}
+            userRole={user.role}
+            shouldFocus={true}
+          />
+        )}
+        {formSection.isSaved && !formSection.warnings.isEmpty() && (
+          <Feedback
+            id="feedback-warning"
+            type="warning"
+            data={memoizedWarningCodes}
+            userRole={user.role}
+            shouldFocus={formSection.errors.isEmpty()}
+          />
+        )}
+
+        <DataEntrySubsections
+          section={section}
+          currentValues={currentValues}
+          setValues={setValues}
+          defaultProps={defaultProps}
+          missingTotalError={missingTotalError}
         />
-      )}
 
-      <DataEntrySubsections
-        section={section}
-        currentValues={currentValues}
-        setValues={setValues}
-        defaultProps={defaultProps}
-        missingTotalError={missingTotalError}
-      />
-
-      {missingTotalError && (
-        <div id="missing-total-error">
-          <Alert type="error" small>
-            <p>
-              {t(`feedback.F402.typist.title`)}. {t(`feedback.F402.typist.content`)}
-            </p>
-          </Alert>
-        </div>
-      )}
-
+        {missingTotalError && (
+          <div id="missing-total-error">
+            <Alert type="error" small>
+              <p>
+                {t(`feedback.F402.typist.title`)}. {t(`feedback.F402.typist.content`)}
+              </p>
+            </Alert>
+          </div>
+        )}
+      </div>
       <BottomBar type={bottomBarType}>
         {formSection.acceptErrorsAndWarningsError && (
           <BottomBar.Row>

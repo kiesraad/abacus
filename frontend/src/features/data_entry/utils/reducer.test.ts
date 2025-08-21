@@ -44,7 +44,11 @@ export function _getInitialValues(
       total_admitted_voters_count: 0,
     },
     votes_counts: {
-      votes_candidates_count: 0,
+      political_group_total_votes: election.political_groups.map((pg) => ({
+        number: pg.number,
+        total: 0,
+      })),
+      total_votes_candidates_count: 0,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 0,
@@ -258,7 +262,9 @@ describe("onSubmitForm", () => {
           "voters_counts.poll_card_count": "1",
           "voters_counts.proxy_certificate_count": "2",
           "voters_counts.total_admitted_voters_count": "4",
-          "votes_counts.votes_candidates_count": "5",
+          "votes_counts.political_group_total_votes[0].total": "5",
+          "votes_counts.political_group_total_votes[1].total": "0",
+          "votes_counts.total_votes_candidates_count": "5",
           "votes_counts.blank_votes_count": "6",
           "votes_counts.invalid_votes_count": "7",
           "votes_counts.total_votes_cast_count": "8",
@@ -295,7 +301,11 @@ describe("onSubmitForm", () => {
         total_admitted_voters_count: 4,
       },
       votes_counts: {
-        votes_candidates_count: 5,
+        political_group_total_votes: [
+          { number: 1, total: 5 },
+          { number: 2, total: 0 },
+        ],
+        total_votes_candidates_count: 5,
         blank_votes_count: 6,
         invalid_votes_count: 7,
         total_votes_cast_count: 8,

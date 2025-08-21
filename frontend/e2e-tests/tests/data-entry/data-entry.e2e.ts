@@ -29,7 +29,7 @@ import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 import { test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/typist.json",
+  storageState: "e2e-tests/state/typist1.json",
 });
 
 test.describe("full data entry flow", () => {
@@ -56,7 +56,12 @@ test.describe("full data entry flow", () => {
       total_admitted_voters_count: 3607,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 3572,
+      political_group_total_votes: [
+        { number: 1, total: 3536 },
+        { number: 2, total: 36 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 3572,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 3607,
@@ -153,7 +158,12 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 3740,
+      political_group_total_votes: [
+        { number: 1, total: 3465 },
+        { number: 2, total: 275 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 3740,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 3775,
@@ -211,7 +221,12 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 3785,
+      political_group_total_votes: [
+        { number: 1, total: 3465 },
+        { number: 2, total: 320 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 3785,
       blank_votes_count: 10,
       invalid_votes_count: 5,
       total_votes_cast_count: 3800,
@@ -222,7 +237,7 @@ test.describe("full data entry flow", () => {
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText("W.203");
     await expect(votersAndVotesPage.warning).toContainText(
-      "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
+      "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     );
     await votersAndVotesPage.checkAcceptErrorsAndWarnings();
     await votersAndVotesPage.next.click();
@@ -283,7 +298,12 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_count: 3740,
+      political_group_total_votes: [
+        { number: 1, total: 3465 },
+        { number: 2, total: 275 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 3740,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 3775,
@@ -295,7 +315,7 @@ test.describe("full data entry flow", () => {
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText("W.203");
     await expect(votersAndVotesPage.warning).toContainText(
-      "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
+      "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     );
     await votersAndVotesPage.checkAcceptErrorsAndWarnings();
     await votersAndVotesPage.next.click();
@@ -348,7 +368,12 @@ test.describe("full data entry flow", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 50,
+      political_group_total_votes: [
+        { number: 1, total: 50 },
+        { number: 2, total: 0 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 50,
       blank_votes_count: 50,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -357,16 +382,8 @@ test.describe("full data entry flow", () => {
 
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
-    await expect(votersAndVotesPage.warning).toContainText(
-      [
-        "Controleer aantal blanco stemmen",
-        "W.201",
-        "Het aantal blanco stemmen is erg hoog.",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      ].join(""),
-    );
+    await expect(votersAndVotesPage.warning).toContainText("W.201");
+    await expect(votersAndVotesPage.warning).toContainText("Controleer aantal blanco stemmen");
 
     // accept the warning
     await votersAndVotesPage.checkAcceptErrorsAndWarnings();
@@ -444,7 +461,12 @@ test.describe("full data entry flow", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [
+        { number: 1, total: 891 },
+        { number: 2, total: 0 },
+        { number: 3, total: 0 },
+      ],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 10,
@@ -477,11 +499,13 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
     await candidatesListPage_3.next.click();
 
-    await expect(candidatesListPage_2.error).toContainText("F.204");
+    await expect(candidatesListPage_2.fieldset).toBeVisible();
+    await expect(candidatesListPage_2.error).toContainText("F.202");
     await candidatesListPage_2.checkAcceptErrorsAndWarnings();
     await candidatesListPage_2.next.click();
 
-    await expect(candidatesListPage_3.error).toContainText("F.204");
+    await expect(candidatesListPage_3.fieldset).toBeVisible();
+    await expect(candidatesListPage_3.error).toContainText("F.202");
     await candidatesListPage_3.checkAcceptErrorsAndWarnings();
     await candidatesListPage_3.next.click();
 
@@ -489,17 +513,17 @@ test.describe("full data entry flow", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
 
     await expect(checkAndSavePage.summaryListItemVotersAndVotes).toHaveText([
-      "F.202 Controleer uitgebrachte stemmen",
-      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
+      "F.202 Controleer de stemmen op lijsten en totaal stemmen op kandidaten",
+      "F.203 Controleer uitgebrachte stemmen",
       "W.203 Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     ]);
     await expect(checkAndSavePage.summaryListItemDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
-    await expect(checkAndSavePage.summaryListItemPoliticalGroupVotes1).toHaveText([
-      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
-      "F.401 Controleer ingevoerde aantallen",
+    await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes1).toHaveText([
+      "F.202 Controleer de stemmen op lijsten en totaal stemmen op kandidaten",
+      "F.401 Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.",
     ]);
-    await expect(checkAndSavePage.summaryListItemPoliticalGroupVotes2).toHaveText([
-      "F.204 Controleer (totaal) aantal stemmen op kandidaten",
+    await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes2).toHaveText([
+      "F.202 Controleer de stemmen op lijsten en totaal stemmen op kandidaten",
     ]);
 
     await expect(checkAndSavePage.complete).toBeVisible();
@@ -720,7 +744,8 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -729,9 +754,8 @@ test.describe("errors and warnings", () => {
 
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
-    await expect(votersAndVotesPage.error).toContainText(
-      "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
-    );
+    await expect(votersAndVotesPage.error).toContainText("F.201");
+    await expect(votersAndVotesPage.error).toContainText("Controleer toegelaten kiezers");
     await expect(votersAndVotesPage.warning).toBeHidden();
 
     // fill form with corrected data (no errors, no warnings)
@@ -752,7 +776,7 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
-  test("correct error F.204", async ({ page, pollingStation }) => {
+  test("correct error F.202", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
     // fill extra investigation section without errors or warnings
@@ -769,7 +793,8 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -797,8 +822,9 @@ test.describe("errors and warnings", () => {
 
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
+    await expect(votersAndVotesPage.error).toContainText("F.202");
     await expect(votersAndVotesPage.error).toContainText(
-      "Controleer (totaal) aantal stemmen op kandidatenF.204De optelling van alle lijsten is niet gelijk aan de invoer bij E.Check of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
+      "Controleer de stemmen op lijsten en totaal stemmen op kandidaten",
     );
     await expect(votersAndVotesPage.warning).toBeHidden();
 
@@ -840,7 +866,8 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 90,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -849,15 +876,9 @@ test.describe("errors and warnings", () => {
 
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
+    await expect(votersAndVotesPage.warning).toContainText("W.203");
     await expect(votersAndVotesPage.warning).toContainText(
-      [
-        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
-        "W.203",
-        "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      ].join(""),
+      "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     );
     await expect(votersAndVotesPage.error).toBeHidden();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
@@ -904,7 +925,8 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 90,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -913,15 +935,9 @@ test.describe("errors and warnings", () => {
 
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
+    await expect(votersAndVotesPage.warning).toContainText("W.203");
     await expect(votersAndVotesPage.warning).toContainText(
-      [
-        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
-        "W.203",
-        "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      ].join(""),
+      "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     );
 
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
@@ -931,15 +947,9 @@ test.describe("errors and warnings", () => {
     // Tab press needed for page to register change after Playwright's fill()
     await votersAndVotesPage.proxyCertificateCount.press("Tab");
     await expect(votersAndVotesPage.fieldset).toBeVisible();
+    await expect(votersAndVotesPage.warning).toContainText("W.203");
     await expect(votersAndVotesPage.warning).toContainText(
-      [
-        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
-        "W.203",
-        "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      ].join(""),
+      "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     );
 
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
@@ -963,7 +973,8 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 10,
@@ -971,9 +982,8 @@ test.describe("errors and warnings", () => {
     await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
 
-    await expect(votersAndVotesPage.error).toContainText(
-      "Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.",
-    );
+    await expect(votersAndVotesPage.error).toContainText("F.203");
+    await expect(votersAndVotesPage.error).toContainText("Controleer uitgebrachte stemmen");
 
     await votersAndVotesPage.acceptErrorsAndWarnings.click();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeChecked();
@@ -1003,7 +1013,8 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -1048,7 +1059,8 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -1108,7 +1120,8 @@ test.describe("navigation", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 90,
+        political_group_total_votes: [{ number: 1, total: 100 }],
+        total_votes_candidates_count: 90,
         blank_votes_count: 10,
         invalid_votes_count: 0,
         total_votes_cast_count: 100,

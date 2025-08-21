@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-import { AnyApiError, ApiResponseStatus, FatalApiError, isSuccess } from "@/api/ApiResult.ts";
+import { AnyApiError, ApiResponseStatus, FatalApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";

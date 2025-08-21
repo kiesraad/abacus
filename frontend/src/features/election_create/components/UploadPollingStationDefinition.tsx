@@ -3,19 +3,14 @@ import { Navigate, useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
+import { PollingStationsPreview } from "@/components/polling_station/PollingStationsPreview";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
-import { Table } from "@/components/ui/Table/Table";
 import { t, tx } from "@/i18n/translate";
-import {
-  ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
-  ElectionDefinitionValidateResponse,
-  PollingStationRequest,
-} from "@/types/generated/openapi";
+import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import cls from "./UploadPollingStationDefinition.module.css";
 
 export function UploadPollingStationDefinition() {
   const { state, dispatch } = useElectionCreateContext();
@@ -23,7 +18,6 @@ export function UploadPollingStationDefinition() {
 
   const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const [error, setError] = useState<ReactNode | undefined>();
-  const [showAllPollingPlaces, setShowAllPollingPlaces] = useState<boolean>(false);
 
   const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
 
@@ -87,10 +81,6 @@ export function UploadPollingStationDefinition() {
       await navigate("/elections/create/counting-method-type");
     }
 
-    function showAll() {
-      setShowAllPollingPlaces(true);
-    }
-
     return (
       <section className="md">
         <h2>{t("election.polling_stations.check.title")}</h2>
@@ -100,38 +90,7 @@ export function UploadPollingStationDefinition() {
           })}
         </p>
 
-        {(showAllPollingPlaces || state.pollingStations.length <= 10) && (
-          <Table className={"table"} id="overview">
-            <Table.Body>
-              {state.pollingStations.map((pollingStation: PollingStationRequest) => (
-                <Table.Row key={pollingStation.number}>
-                  <Table.NumberCell className="bold">{pollingStation.number}</Table.NumberCell>
-                  <Table.Cell>{pollingStation.name}</Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
-        )}
-
-        {!showAllPollingPlaces && state.pollingStations.length > 10 && (
-          <>
-            <Table className={"table"} id="overview">
-              <Table.Body>
-                {state.pollingStations.slice(0, 10).map((pollingStation: PollingStationRequest) => (
-                  <Table.Row key={pollingStation.number}>
-                    <Table.NumberCell className="bold">{pollingStation.number}</Table.NumberCell>
-                    <Table.Cell>{pollingStation.name}</Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-            <p className="mt-lg">
-              <button id="show-more" className={cls.linkButton} onClick={showAll}>
-                {t("election.polling_stations.show_all", { num: state.pollingStations.length })}
-              </button>
-            </p>
-          </>
-        )}
+        <PollingStationsPreview pollingStations={state.pollingStations} />
 
         <div className="mt-xl">
           <Button onClick={() => void next()}>{t("next")}</Button>
@@ -162,9 +121,9 @@ export function UploadPollingStationDefinition() {
       </FileInput>
 
       <p className="mt-lg">
-        <button className={cls.linkButton} onClick={() => void skip()}>
+        <Button variant="underlined" size="md" onClick={() => void skip()}>
           {t("election.polling_stations.skip_step")}
-        </button>
+        </Button>
       </p>
     </section>
   );

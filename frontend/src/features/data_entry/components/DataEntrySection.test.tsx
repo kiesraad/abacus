@@ -1,6 +1,6 @@
 import * as reactRouter from "react-router";
 
-import { userEvent } from "@testing-library/user-event";
+import { UserEvent, userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as useUser from "@/hooks/user/useUser";
@@ -9,10 +9,11 @@ import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
-import { renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
+import { renderReturningRouter, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import { ErrorResponse } from "@/types/generated/openapi";
+import { ErrorResponse, SaveDataEntryResponse } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { DataEntryProvider } from "./DataEntryProvider";
@@ -76,7 +77,9 @@ describe("DataEntrySection", () => {
 
       expect(screen.queryByText(/B1-.*/)).not.toBeInTheDocument();
     });
+  });
 
+  describe("Session paused", () => {
     test("Redirect when committee session is paused is returned on claim", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
         error: "Committee session data entry is paused",
@@ -109,7 +112,7 @@ describe("DataEntrySection", () => {
       await user.click(submitButton);
 
       const pausedModal = await screen.findByRole("dialog");
-      expect(within(pausedModal).getByRole("heading", { level: 2, name: "Invoer gepauzeerd" })).toBeVisible();
+      expect(within(pausedModal).getByRole("heading", { level: 3, name: "Invoer gepauzeerd" })).toBeVisible();
       expect(within(pausedModal).getByRole("paragraph")).toHaveTextContent(
         "De coördinator heeft het invoeren van stemmen gepauzeerd. Je kan niet meer verder. [Je laatste wijzigingen worden niet opgeslagen.]",
       );
@@ -118,6 +121,58 @@ describe("DataEntrySection", () => {
       await user.click(backToOverviewButton);
 
       expect(router.state.location.pathname).toEqual("/elections");
+    });
+  });
+
+  test("Shift+enter submits", async () => {
+    const user = userEvent.setup();
+    renderComponent("extra_investigation");
+
+    const saveHandler = spyOnHandler(PollingStationDataEntrySaveHandler);
+    await user.keyboard("{shift>}{enter}{/shift}");
+
+    expect(saveHandler).toHaveBeenCalledOnce();
+  });
+
+  describe("Shift+enter with validation warnings/errors", () => {
+    let user: UserEvent;
+    let acceptErrorsAndWarningsCheckbox: HTMLInputElement;
+
+    beforeEach(async () => {
+      user = userEvent.setup();
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [], warnings: [validationResultMockData.W001] },
+      } satisfies SaveDataEntryResponse);
+      renderComponent("voters_votes_counts");
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      acceptErrorsAndWarningsCheckbox = await screen.findByRole("checkbox", {
+        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+      });
+    });
+
+    test("focuses on checkbox when pressed shift+enter", async () => {
+      expect(acceptErrorsAndWarningsCheckbox).not.toHaveFocus();
+
+      await user.keyboard("{shift>}{enter}{/shift}");
+      expect(acceptErrorsAndWarningsCheckbox).toHaveFocus();
+    });
+
+    test("focuses on checkbox again after refocusing to another element and pressing shift+enter", async () => {
+      expect(acceptErrorsAndWarningsCheckbox).not.toHaveFocus();
+      await user.keyboard("{shift>}{enter}{/shift}");
+      expect(acceptErrorsAndWarningsCheckbox).toHaveFocus();
+
+      // Refocus to first input
+      const firstInput = await screen.findByRole("textbox", { name: "A Stempassen" });
+      await user.click(firstInput);
+      expect(acceptErrorsAndWarningsCheckbox).not.toHaveFocus();
+
+      // Try again
+      await user.keyboard("{shift>}{enter}{/shift}");
+      expect(acceptErrorsAndWarningsCheckbox).toHaveFocus();
     });
   });
 });

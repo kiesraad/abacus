@@ -33,9 +33,11 @@ describe("ResolveDifferencesTables", () => {
     expect(votersVotesCountsTable).toBeVisible();
     expect(votersVotesCountsTable).toHaveTableContent([
       ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
-      ["E", "42", "44", "Stemmen op kandidaten"],
+      ["E.1", "1.512", "1.481", "Totaal Lijst 1 - Vurige Vleugels Partij"],
       [""],
-      ["H", "42", "44", "Totaal uitgebrachte stemmen"],
+      ["E", "1.514", "1.483", "Totaal stemmen op kandidaten"],
+      [""],
+      ["H", "1.514", "1.483", "Totaal uitgebrachte stemmen"],
     ]);
 
     const differencesCountsTable = screen.queryByRole("table", {

@@ -1,10 +1,11 @@
 import { describe, expect, test } from "vitest";
 
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { PollingStationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 
 import { mapResultsToSectionValues, mapSectionValues } from "./dataEntryMapping";
-import { differencesSection, votersAndVotesSection } from "./dataEntryStructure";
+import { createVotersAndVotesSection, differencesSection } from "./dataEntryStructure";
 
 // Helper function to create a base PollingStationResults object for testing
 const createBasePollingStationResults = (): PollingStationResults => ({
@@ -31,7 +32,8 @@ const createBasePollingStationResults = (): PollingStationResults => ({
     total_admitted_voters_count: 0,
   },
   votes_counts: {
-    votes_candidates_count: 0,
+    political_group_total_votes: [],
+    total_votes_candidates_count: 0,
     blank_votes_count: 0,
     invalid_votes_count: 0,
     total_votes_cast_count: 0,
@@ -206,7 +208,7 @@ describe("mapSectionValues", () => {
   test("should handle votes_counts fields", () => {
     const current = createBasePollingStationResults();
     const formValues = {
-      "votes_counts.votes_candidates_count": "200",
+      "votes_counts.total_votes_candidates_count": "200",
       "votes_counts.blank_votes_count": "5",
       "votes_counts.invalid_votes_count": "3",
       "votes_counts.total_votes_cast_count": "208",
@@ -221,7 +223,7 @@ describe("mapSectionValues", () => {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
-            { code: "A", path: "votes_counts.votes_candidates_count", title: "Test Title" },
+            { code: "A", path: "votes_counts.total_votes_candidates_count", title: "Test Title" },
             { code: "B", path: "votes_counts.blank_votes_count", title: "Test Title" },
             { code: "C", path: "votes_counts.invalid_votes_count", title: "Test Title" },
             { code: "D", path: "votes_counts.total_votes_cast_count", title: "Test Title" },
@@ -232,7 +234,7 @@ describe("mapSectionValues", () => {
 
     const result = mapSectionValues(current, formValues, votesCountsSection);
 
-    expect(result.votes_counts.votes_candidates_count).toBe(200);
+    expect(result.votes_counts.total_votes_candidates_count).toBe(200);
     expect(result.votes_counts.blank_votes_count).toBe(5);
     expect(result.votes_counts.invalid_votes_count).toBe(3);
     expect(result.votes_counts.total_votes_cast_count).toBe(208);
@@ -321,7 +323,7 @@ describe("mapSectionValues", () => {
       "political_group_votes[1].total": "50",
     };
 
-    const politicalGroupVotesSection: DataEntrySection = {
+    const politicalGroupCandidateVotesSection: DataEntrySection = {
       id: "political_group_votes_1",
       title: "Political Group Votes Section",
       short_title: "Political Group Votes",
@@ -341,7 +343,7 @@ describe("mapSectionValues", () => {
       ],
     };
 
-    const result = mapSectionValues(current, formValues, politicalGroupVotesSection);
+    const result = mapSectionValues(current, formValues, politicalGroupCandidateVotesSection);
 
     expect(result.political_group_votes).toHaveLength(2);
     expect(result.political_group_votes[0]?.candidate_votes).toHaveLength(2);
@@ -361,7 +363,7 @@ describe("mapSectionValues", () => {
       "political_group_votes[2].total": "12",
     };
 
-    const sparsePoliticalGroupVotesSection: DataEntrySection = {
+    const sparsePoliticalGroupCandidateVotesSection: DataEntrySection = {
       id: "political_group_votes_1",
       title: "Sparse Political Group Votes Section",
       short_title: "Sparse Political Group Votes",
@@ -377,7 +379,7 @@ describe("mapSectionValues", () => {
       ],
     };
 
-    const result = mapSectionValues(current, formValues, sparsePoliticalGroupVotesSection);
+    const result = mapSectionValues(current, formValues, sparsePoliticalGroupCandidateVotesSection);
 
     expect(result.political_group_votes).toHaveLength(3);
     expect(result.political_group_votes[2]?.candidate_votes).toHaveLength(6);
@@ -389,7 +391,7 @@ describe("mapSectionValues", () => {
     const current = createBasePollingStationResults();
     const formValues = {
       "voters_counts.poll_card_count": "1234",
-      "votes_counts.votes_candidates_count": "2567",
+      "votes_counts.total_votes_candidates_count": "2567",
       "political_group_votes[0].candidate_votes[0].votes": "89",
     };
 
@@ -403,7 +405,7 @@ describe("mapSectionValues", () => {
           headers: ["field", "counted_number", "description"],
           rows: [
             { code: "A", path: "voters_counts.poll_card_count", title: "Test Title" },
-            { code: "B", path: "votes_counts.votes_candidates_count", title: "Test Title" },
+            { code: "B", path: "votes_counts.total_votes_candidates_count", title: "Test Title" },
             { code: "C", path: "political_group_votes[0].candidate_votes[0].votes", title: "Test Title" },
           ],
         },
@@ -413,7 +415,7 @@ describe("mapSectionValues", () => {
     const result = mapSectionValues(current, formValues, numbersSection);
 
     expect(result.voters_counts.poll_card_count).toBe(1234);
-    expect(result.votes_counts.votes_candidates_count).toBe(2567);
+    expect(result.votes_counts.total_votes_candidates_count).toBe(2567);
     expect(result.political_group_votes[0]?.candidate_votes[0]?.votes).toBe(89);
   });
 
@@ -540,13 +542,17 @@ describe("mapResultsToSectionValues", () => {
       total_admitted_voters_count: 235,
     };
     results.votes_counts = {
-      votes_candidates_count: 200,
+      political_group_total_votes: [
+        { number: 1, total: 50 },
+        { number: 2, total: 150 },
+      ],
+      total_votes_candidates_count: 200,
       blank_votes_count: 5,
       invalid_votes_count: 3,
       total_votes_cast_count: 208,
     };
 
-    const formValues = mapResultsToSectionValues(votersAndVotesSection, results);
+    const formValues = mapResultsToSectionValues(createVotersAndVotesSection(electionMockData), results);
 
     // Check voters_counts fields
     expect(formValues["voters_counts.poll_card_count"]).toBe("123");
@@ -554,7 +560,9 @@ describe("mapResultsToSectionValues", () => {
     expect(formValues["voters_counts.total_admitted_voters_count"]).toBe("235");
 
     // Check votes_counts fields
-    expect(formValues["votes_counts.votes_candidates_count"]).toBe("200");
+    expect(formValues["votes_counts.political_group_total_votes[0].total"]).toBe("50");
+    expect(formValues["votes_counts.political_group_total_votes[1].total"]).toBe("150");
+    expect(formValues["votes_counts.total_votes_candidates_count"]).toBe("200");
     expect(formValues["votes_counts.blank_votes_count"]).toBe("5");
     expect(formValues["votes_counts.invalid_votes_count"]).toBe("3");
     expect(formValues["votes_counts.total_votes_cast_count"]).toBe("208");
@@ -691,7 +699,7 @@ describe("mapResultsToSectionValues", () => {
   test("should handle zero values", () => {
     const results = createBasePollingStationResults();
 
-    const formValues = mapResultsToSectionValues(votersAndVotesSection, results);
+    const formValues = mapResultsToSectionValues(createVotersAndVotesSection(electionMockData), results);
 
     expect(formValues["voters_counts.poll_card_count"]).toBe("");
     expect(formValues["votes_counts.blank_votes_count"]).toBe("");

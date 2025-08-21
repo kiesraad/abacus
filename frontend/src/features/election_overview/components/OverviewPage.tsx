@@ -37,7 +37,7 @@ export function OverviewPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { committeeSessionList, electionList, refetch } = useElectionList();
-  const { isAdministrator, isCoordinator } = useUserRole();
+  const { isTypist, isAdministrator, isCoordinator } = useUserRole();
 
   const isNewAccount = location.hash === "#new-account";
   const isAdminOrCoordinator = isAdministrator || isCoordinator;
@@ -62,7 +62,7 @@ export function OverviewPage() {
       return (
         <>
           <Table.Cell>{election.name}</Table.Cell>
-          <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
+          <Table.Cell>{isTypist ? election.location : ""}</Table.Cell>
           <Table.Cell>{committeeSessionStatus}</Table.Cell>
         </>
       );
@@ -110,7 +110,7 @@ export function OverviewPage() {
       <NavBar />
       <header>
         <section>
-          <h1>{isAdminOrCoordinator ? t("election.manage") : t("election.title.plural")}</h1>
+          <h1>{isAdministrator ? t("election.manage") : t("election.title.plural")}</h1>
         </section>
       </header>
       {isNewAccount && (
@@ -122,28 +122,30 @@ export function OverviewPage() {
       <main>
         <article>
           {!electionList.length ? (
-            isAdminOrCoordinator ? (
+            isAdministrator ? (
               <AddFirstElection />
             ) : (
               <>
                 <h2 className="mb-lg">{t("election.not_ready_for_use")}</h2>
-                <p className="md form-paragraph">{t("election.please_wait_for_coordinator")}</p>
+                <p className="md">
+                  {t("election.configuration_not_finished")} {isTypist && t("election.you_cannot_start_data_entry_yet")}
+                </p>
               </>
             )
           ) : (
             <>
-              <Toolbar>
-                {isAdministrator && (
+              {isAdministrator && (
+                <Toolbar>
                   <Button.Link variant="secondary" size="sm" to={"./create"}>
                     <IconPlus /> {t("election.create")}
                   </Button.Link>
-                )}
-              </Toolbar>
+                </Toolbar>
+              )}
               <Table id="overview">
                 <Table.Header>
                   <Table.HeaderCell>{t("election.title.singular")}</Table.HeaderCell>
                   <Table.HeaderCell>
-                    {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
+                    {isTypist ? t("election.location") : t("election.level_polling_station")}
                   </Table.HeaderCell>
                   <Table.HeaderCell>{t("election_status.label")}</Table.HeaderCell>
                 </Table.Header>

@@ -341,11 +341,10 @@ async fn logout(
     audit_service: AuditService,
     jar: CookieJar,
 ) -> Result<impl IntoResponse, APIError> {
-    // Ask browser to remove all browsing data
+    // Ask browser to remove cookies and storage data
     // https://owasp.org/www-project-secure-headers/#clear-site-data
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Clear-Site-Data
-    const CLEAR_SITE_DATA_HEADER: (&str, &str) =
-        ("Clear-Site-Data", r#""cache","cookies","storage""#);
+    const CLEAR_SITE_DATA_HEADER: (&str, &str) = ("Clear-Site-Data", r#""cookies","storage""#);
 
     let Some(mut cookie) = jar.get(SESSION_COOKIE_NAME).cloned() else {
         // no cookie found, return OK

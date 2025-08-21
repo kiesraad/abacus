@@ -403,7 +403,7 @@ describe("Election create pages", () => {
     const button = screen.getByText("Afbreken");
     expect(button).toBeVisible();
     await user.click(button);
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
   });
 
   test("It shows the confirmation modal when attempting to navigate away", async () => {
@@ -432,7 +432,7 @@ describe("Election create pages", () => {
     await user.click(button);
 
     // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
   });
 
   test("It does not show the confirmation modal when attempting to navigate away if nothing was done", async () => {
@@ -482,7 +482,7 @@ describe("Election create pages", () => {
     await user.click(button);
 
     // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
     // Close button should keep us at the import page
     const closeButton = screen.getByText("Annuleren");
@@ -517,7 +517,7 @@ describe("Election create pages", () => {
     await user.click(button);
 
     // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
     // Delete button should move away from the import page
     const deleteButton = screen.getByText("Verkiezing niet opslaan");
@@ -552,7 +552,7 @@ describe("Election create pages", () => {
     await user.click(button);
 
     // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
     // Delete button should move away from the import page
     const closeButton = screen.getByTitle("Annuleren");

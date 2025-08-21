@@ -39,7 +39,7 @@ jobs:
       SQLX_OFFLINE: "true"
       NODE_ENV: production
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -82,7 +82,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -121,7 +121,7 @@ jobs:
       # contents write permission is needed to push the tag
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Determine release tag
         run: |
           VERSION=$(sed -n '/version\s*=\s*"\([^"]*\)"/{s//\1/p;q}' Cargo.toml)

@@ -5,7 +5,7 @@ import {
   ElectionWithPoliticalGroups,
   PoliticalGroup,
   PoliticalGroupCandidateNomination,
-  PoliticalGroupVotes,
+  PoliticalGroupCandidateVotes,
   SeatAssignmentResult,
   SeatChangeStep,
 } from "@/types/generated/openapi";
@@ -1275,7 +1275,7 @@ export const candidate_nomination: CandidateNominationResult = {
   ],
 };
 
-export const political_group_1_votes: PoliticalGroupVotes = {
+export const political_group_1_votes: PoliticalGroupCandidateVotes = {
   number: 1,
   total: 808,
   candidate_votes: [
@@ -1337,7 +1337,17 @@ export const election_summary: ElectionSummary = {
     total_admitted_voters_count: 1205,
   },
   votes_counts: {
-    votes_candidates_count: 1200,
+    political_group_total_votes: [
+      { number: 1, total: 808 },
+      { number: 2, total: 60 },
+      { number: 3, total: 58 },
+      { number: 4, total: 57 },
+      { number: 5, total: 56 },
+      { number: 6, total: 55 },
+      { number: 7, total: 54 },
+      { number: 8, total: 52 },
+    ],
+    total_votes_candidates_count: 1200,
     blank_votes_count: 3,
     invalid_votes_count: 2,
     total_votes_cast_count: 1205,

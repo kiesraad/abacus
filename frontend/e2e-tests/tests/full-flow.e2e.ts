@@ -15,9 +15,9 @@ import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/Numb
 import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObject";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
+import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntryPgObj";
-import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
@@ -37,8 +37,8 @@ test.describe("full flow", () => {
     await loginPage.password.fill(getTestPassword("admin1"));
     await loginPage.loginBtn.click();
 
-    const overviewPage = new OverviewPgObj(page);
-    await overviewPage.create.click();
+    const electionsOverviewPage = new ElectionsOverviewPgObj(page);
+    await electionsOverviewPage.create.click();
 
     await uploadElectionAndInputHash(page);
     await uploadCandidatesAndInputHash(page);
@@ -59,8 +59,8 @@ test.describe("full flow", () => {
 
     electionId = election.id;
 
-    await expect(overviewPage.adminHeader).toBeVisible();
-    await overviewPage.findElectionRowById(electionId).click();
+    await expect(electionsOverviewPage.adminHeader).toBeVisible();
+    await electionsOverviewPage.findElectionRowById(electionId).click();
 
     const electionHomePage = new ElectionHome(page);
     await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
@@ -87,7 +87,7 @@ test.describe("full flow", () => {
     await loginPage.password.fill(getTestPassword("coordinator1"));
     await loginPage.loginBtn.click();
 
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
@@ -119,7 +119,7 @@ test.describe("full flow", () => {
       await loginPage.password.fill(getTestPassword("typist1"));
       await loginPage.loginBtn.click();
 
-      const overviewPage = new OverviewPgObj(page);
+      const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
       await overviewPage.findElectionRowById(electionId!).click();
 
@@ -140,7 +140,7 @@ test.describe("full flow", () => {
       await loginPage.password.fill(getTestPassword("typist2"));
       await loginPage.loginBtn.click();
 
-      const overviewPage = new OverviewPgObj(page);
+      const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
       await overviewPage.findElectionRowById(electionId!).click();
 
@@ -162,7 +162,7 @@ test.describe("full flow", () => {
     await loginPage.password.fill(getTestPassword("coordinator1"));
     await loginPage.loginBtn.click();
 
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 

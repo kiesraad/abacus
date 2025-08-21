@@ -14,7 +14,7 @@ import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/Numb
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
-import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
+import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
 
 import { test } from "../fixtures";
@@ -27,7 +27,7 @@ test.use({
 test.describe("Election creation", () => {
   test("it uploads an election file, candidate list and polling stations", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -86,7 +86,7 @@ test.describe("Election creation", () => {
 
   test("it uploads an election file, candidate list but skips polling stations", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -131,7 +131,7 @@ test.describe("Election creation", () => {
 
   test("it fails on incorrect hash", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // Upload election
@@ -148,7 +148,7 @@ test.describe("Election creation", () => {
 
   test("it fails on valid, but incorrect file", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // Incorrect file
@@ -160,7 +160,7 @@ test.describe("Election creation", () => {
 
   test("it fails on incorrect hash for candidate list", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -180,7 +180,7 @@ test.describe("Election creation", () => {
 
   test("it fails on valid, but incorrect file for candidate list", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -195,7 +195,7 @@ test.describe("Election creation", () => {
 
   test("warning modal close button should stay on page", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
@@ -220,7 +220,7 @@ test.describe("Election creation", () => {
 
   test("warning modal cancel button should stay on page", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
@@ -245,7 +245,7 @@ test.describe("Election creation", () => {
 
   test("warning modal delete button should continue navigation", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
@@ -270,7 +270,7 @@ test.describe("Election creation", () => {
 
   test("uploading a candidate list, then navigating should trigger the modal", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -292,7 +292,7 @@ test.describe("Election creation", () => {
 
   test("after election upload, moving back to election page resets election", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -311,7 +311,7 @@ test.describe("Election creation", () => {
 
   test("after candidate upload, moving back to candidate page resets candidates", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -352,7 +352,7 @@ test.describe("Election creation", () => {
   // use browser back button should redirect back to election
   test("after resetting an election upload, the back button should redirect to the beginning", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -380,7 +380,7 @@ test.describe("Election creation", () => {
     page,
   }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -420,7 +420,7 @@ test.describe("Election creation", () => {
 
   test("it fails on valid, but incorrect polling station file", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -439,7 +439,7 @@ test.describe("Election creation", () => {
 
   test("show more button should show full list of polling stations", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -468,7 +468,7 @@ test.describe("Election creation", () => {
 
   test("no show more button should be visible is <10 polling stations", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash

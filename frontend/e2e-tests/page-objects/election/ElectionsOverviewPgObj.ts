@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-export class OverviewPgObj {
+export class ElectionsOverviewPgObj {
   readonly main: Locator;
   readonly adminHeader: Locator;
   readonly header: Locator;

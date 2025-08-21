@@ -55,6 +55,6 @@ describe("ResolveErrorsSectionPage", () => {
     ).toBeVisible();
 
     // Verify some expected content is present
-    expect(screen.getByText("Controleer toegelaten kiezers")).toBeInTheDocument();
+    expect(screen.getByText("A en B tellen niet op tot D")).toBeInTheDocument();
   });
 });

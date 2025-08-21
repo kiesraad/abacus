@@ -147,9 +147,8 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       await votersAndVotesPage.proxyCertificateCount.fill("1000");
       await votersAndVotesPage.next.click();
-      await expect(votersAndVotesPage.error).toContainText(
-        "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
-      );
+      await expect(votersAndVotesPage.error).toContainText("F.201");
+      await expect(votersAndVotesPage.error).toContainText("Controleer toegelaten kiezers");
 
       await votersAndVotesPage.abortInput.click();
 
@@ -228,9 +227,8 @@ test.describe("resume data entry flow", () => {
         total_votes_cast_count: 100,
       };
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
-      await expect(votersAndVotesPage.warning).toContainText(
-        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      );
+      await expect(votersAndVotesPage.warning).toContainText("W.201");
+      await expect(votersAndVotesPage.warning).toContainText("Controleer aantal blanco stemmen");
 
       await votersAndVotesPage.abortInput.click();
 
@@ -271,7 +269,7 @@ test.describe("resume data entry flow", () => {
           errors: [
             {
               fields: ["data.votes_counts.total_votes_candidates_count", "data.political_group_votes"],
-              code: "F204",
+              code: "F202",
             },
           ],
           warnings: [
@@ -513,9 +511,8 @@ test.describe("resume data entry flow", () => {
         total_votes_cast_count: 100,
       };
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
-      await expect(votersAndVotesPage.warning).toContainText(
-        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      );
+      await expect(votersAndVotesPage.warning).toContainText("W.201");
+      await expect(votersAndVotesPage.warning).toContainText("Controleer aantal blanco stemmen");
 
       await votersAndVotesPage.abortInput.click();
 

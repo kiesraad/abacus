@@ -13,18 +13,18 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     ],
     code: "F201",
   },
-  F202: {
+  F203: {
     fields: [
       "data.votes_counts.total_votes_cast_count",
       "data.votes_counts.total_votes_candidates_count",
       "data.votes_counts.blank_votes_count",
       "data.votes_counts.invalid_votes_count",
     ],
-    code: "F202",
+    code: "F203",
   },
-  F204: {
+  F202: {
     fields: ["data.votes_counts.total_votes_candidates_count", "data.political_group_votes[0].total"],
-    code: "F204",
+    code: "F202",
   },
   F301: { fields: ["data.differences_counts.more_ballots_count"], code: "F301" },
   F302: { fields: ["data.differences_counts.fewer_ballots_count"], code: "F302" },

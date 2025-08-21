@@ -1165,7 +1165,9 @@ export type ValidationResultCode =
   | "W201"
   | "W202"
   | "W203"
-  | "W205";
+  | "W205"
+  | "W301"
+  | "W302";
 
 export interface ValidationResults {
   errors: ValidationResult[];

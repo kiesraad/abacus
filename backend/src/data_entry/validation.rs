@@ -61,6 +61,8 @@ pub enum ValidationResultCode {
     W202,
     W203,
     W205,
+    W301,
+    W302,
 }
 
 /// Validate that a value is equal to or above a certain percentage threshold of the total,
@@ -559,6 +561,32 @@ impl Validate for DifferencesCounts {
             &path.field("fewer_ballots_count"),
         )?;
 
+        // W.301 validate that more_ballots_count == too_many_ballots_handed_out_count + other_explanation_count + no_explanation_count - unreturned_ballots_count - too_few_ballots_handed_out_count
+        if self.more_ballots_count != 0
+            && (self.votes_cast_greater_than_admitted_voters
+                && !self.admitted_voters_equals_votes_cast
+                && !self.votes_cast_smaller_than_admitted_voters
+                && !self.difference_completely_accounted_for.yes
+                && self.difference_completely_accounted_for.no)
+        {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![path.field("more_ballots_count").to_string()],
+                code: ValidationResultCode::W301,
+            });
+        }
+        // W.302 validate that fewer_ballots_count == unreturned_ballots_count + too_few_ballots_handed_out_count + other_explanation_count + no_explanation_count
+        if self.fewer_ballots_count != 0
+            && (self.votes_cast_smaller_than_admitted_voters
+                && !self.admitted_voters_equals_votes_cast
+                && !self.votes_cast_greater_than_admitted_voters
+                && !self.difference_completely_accounted_for.yes
+                && self.difference_completely_accounted_for.no)
+        {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![path.field("fewer_ballots_count").to_string()],
+                code: ValidationResultCode::W302,
+            });
+        }
         Ok(())
     }
 }
@@ -695,6 +723,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
+    use crate::data_entry::YesNo;
     use crate::{
         election::tests::election_fixture, polling_station::structs::tests::polling_station_fixture,
     };
@@ -798,9 +827,9 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0, // F.301 incorrect difference
                 fewer_ballots_count: 0,
-                admitted_voters_equals_votes_cast: Default::default(),
-                votes_cast_greater_than_admitted_voters: Default::default(),
-                votes_cast_smaller_than_admitted_voters: Default::default(),
+                admitted_voters_equals_votes_cast: true,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: false,
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[44])],
@@ -881,10 +910,13 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 2,  // F.304 should be empty
                 fewer_ballots_count: 0, // F.303 incorrect difference
-                admitted_voters_equals_votes_cast: Default::default(),
-                votes_cast_greater_than_admitted_voters: Default::default(),
-                votes_cast_smaller_than_admitted_voters: Default::default(),
-                difference_completely_accounted_for: Default::default(),
+                admitted_voters_equals_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: true,
+                votes_cast_smaller_than_admitted_voters: false,
+                difference_completely_accounted_for: YesNo {
+                    yes: false,
+                    no: true,
+                },
             },
             political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
         };
@@ -897,7 +929,7 @@ mod tests {
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 2);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F303
@@ -934,10 +966,13 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,  // F.301 incorrect difference
                 fewer_ballots_count: 2, // F.302 should be empty
-                admitted_voters_equals_votes_cast: Default::default(),
-                votes_cast_greater_than_admitted_voters: Default::default(),
-                votes_cast_smaller_than_admitted_voters: Default::default(),
-                difference_completely_accounted_for: Default::default(),
+                admitted_voters_equals_votes_cast: true,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: false,
+                difference_completely_accounted_for: YesNo {
+                    yes: true,
+                    no: false,
+                },
             },
             political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[3])],
         };
@@ -1023,9 +1058,9 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 15, // F.304 should be empty
                 fewer_ballots_count: 0, // F.303 incorrect difference
-                admitted_voters_equals_votes_cast: Default::default(),
-                votes_cast_greater_than_admitted_voters: Default::default(),
-                votes_cast_smaller_than_admitted_voters: Default::default(),
+                admitted_voters_equals_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: false,
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[82])],
@@ -1072,7 +1107,6 @@ mod tests {
     /// Tests validation when differences are incorrectly specified (F.304)
     /// and the difference between voters counts and votes counts is >2% (W.203).
     #[test]
-    #[ignore]
     fn test_differences() {
         let polling_station_results = PollingStationResults {
             extra_investigation: Default::default(),
@@ -1092,8 +1126,8 @@ mod tests {
                 more_ballots_count: 4, // F.304 should be empty
                 fewer_ballots_count: 4,
                 admitted_voters_equals_votes_cast: false,
-                votes_cast_greater_than_admitted_voters: true,
-                votes_cast_smaller_than_admitted_voters: true,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: false,
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[50])],
@@ -1497,9 +1531,9 @@ mod tests {
         let mut differences_counts = DifferencesCounts {
             more_ballots_count: 1_000_000_002, // correct but out of range
             fewer_ballots_count: 0,
-            admitted_voters_equals_votes_cast: Default::default(),
-            votes_cast_greater_than_admitted_voters: Default::default(),
-            votes_cast_smaller_than_admitted_voters: Default::default(),
+            admitted_voters_equals_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: false,
+            votes_cast_smaller_than_admitted_voters: false,
             difference_completely_accounted_for: Default::default(),
         };
         let election = election_fixture(&[]);
@@ -1515,12 +1549,15 @@ mod tests {
         // test calculation for more_ballots_count does not add up and becomes minus
         validation_results = ValidationResults::default();
         differences_counts = DifferencesCounts {
-            more_ballots_count: 1, // W.301 incorrect total
+            more_ballots_count: 111, // W.301 incorrect total
             fewer_ballots_count: 0,
-            admitted_voters_equals_votes_cast: Default::default(),
-            votes_cast_greater_than_admitted_voters: Default::default(),
-            votes_cast_smaller_than_admitted_voters: Default::default(),
-            difference_completely_accounted_for: Default::default(),
+            admitted_voters_equals_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: true,
+            votes_cast_smaller_than_admitted_voters: false,
+            difference_completely_accounted_for: YesNo {
+                yes: false,
+                no: true,
+            },
         };
         differences_counts
             .validate(
@@ -1531,17 +1568,28 @@ mod tests {
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 0);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W301
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec!["differences_counts.more_ballots_count",]
+        );
 
         // test W.301 incorrect total
         validation_results = ValidationResults::default();
         differences_counts = DifferencesCounts {
             more_ballots_count: 5, // W.301 incorrect total
             fewer_ballots_count: 0,
-            admitted_voters_equals_votes_cast: Default::default(),
-            votes_cast_greater_than_admitted_voters: Default::default(),
-            votes_cast_smaller_than_admitted_voters: Default::default(),
-            difference_completely_accounted_for: Default::default(),
+            admitted_voters_equals_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: true,
+            votes_cast_smaller_than_admitted_voters: false,
+            difference_completely_accounted_for: YesNo {
+                yes: false,
+                no: true,
+            },
         };
         differences_counts
             .validate(
@@ -1552,17 +1600,28 @@ mod tests {
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 0);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W301
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec!["differences_counts.more_ballots_count",]
+        );
 
         // test calculation for fewer_ballots_count does not add up and becomes minus
         validation_results = ValidationResults::default();
         differences_counts = DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 1, // W.302 incorrect total
-            admitted_voters_equals_votes_cast: Default::default(),
-            votes_cast_greater_than_admitted_voters: Default::default(),
-            votes_cast_smaller_than_admitted_voters: Default::default(),
-            difference_completely_accounted_for: Default::default(),
+            admitted_voters_equals_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: false,
+            votes_cast_smaller_than_admitted_voters: true,
+            difference_completely_accounted_for: YesNo {
+                yes: false,
+                no: true,
+            },
         };
         differences_counts
             .validate(
@@ -1573,17 +1632,28 @@ mod tests {
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 0);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W302
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec!["differences_counts.fewer_ballots_count",]
+        );
 
         // test W.302 incorrect total
         validation_results = ValidationResults::default();
         differences_counts = DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 5, // W.302 incorrect total
-            admitted_voters_equals_votes_cast: Default::default(),
-            votes_cast_greater_than_admitted_voters: Default::default(),
-            votes_cast_smaller_than_admitted_voters: Default::default(),
-            difference_completely_accounted_for: Default::default(),
+            admitted_voters_equals_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: false,
+            votes_cast_smaller_than_admitted_voters: true,
+            difference_completely_accounted_for: YesNo {
+                yes: false,
+                no: true,
+            },
         };
         differences_counts
             .validate(
@@ -1594,7 +1664,15 @@ mod tests {
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 0);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W302
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec!["differences_counts.fewer_ballots_count",]
+        );
     }
 
     /// Tests validation of political group votes including out-of-range values, incorrect totals (F.401),
@@ -1757,5 +1835,65 @@ mod tests {
 
         assert!(!result2.has_warnings());
         assert!(!result2.has_errors());
+    }
+
+    /// Tests that when more_ballots_count exactly matches the calculated difference, warning W.301 is avoided.
+    #[test]
+    fn test_exact_correct_count_avoids_w301() {
+        let election = election_fixture(&[]);
+        let polling_station = polling_station_fixture(None);
+        let mut validation_results = ValidationResults::default();
+
+        // Difference is 10
+        let differences_counts = DifferencesCounts {
+            more_ballots_count: 10, // W.301 correct total
+            fewer_ballots_count: 0,
+            admitted_voters_equals_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: true,
+            votes_cast_smaller_than_admitted_voters: false,
+            difference_completely_accounted_for: YesNo {
+                yes: false,
+                no: true,
+            },
+        };
+        differences_counts
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                &"differences_counts".into(),
+            )
+            .unwrap();
+
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+    }
+
+    /// Tests that when fewer_ballots_count exactly matches the calculated difference, warning W.302 is avoided.
+    #[test]
+    fn test_exact_correct_count_avoids_w302() {
+        let election = election_fixture(&[]);
+        let polling_station = polling_station_fixture(None);
+        let mut validation_results = ValidationResults::default();
+
+        // 3 + 3 + 3 + 3 - 2 = 10
+        let differences_counts = DifferencesCounts {
+            more_ballots_count: 0,
+            fewer_ballots_count: 10,
+            admitted_voters_equals_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: false,
+            votes_cast_smaller_than_admitted_voters: false,
+            difference_completely_accounted_for: Default::default(),
+        };
+        differences_counts
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                &"differences_counts".into(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 0);
     }
 }

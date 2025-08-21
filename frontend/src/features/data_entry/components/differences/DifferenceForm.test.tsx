@@ -108,11 +108,6 @@ describe("Test DifferencesForm", () => {
       });
       renderForm();
 
-      const admitedVotersEqualsVotesCastCheckbox = await screen.findByRole("checkbox", {
-        name: "D en H zijn gelijk",
-      });
-      expect(admitedVotersEqualsVotesCastCheckbox).not.toBeChecked();
-
       const moreBallotsCount = await screen.findByRole("textbox", { name: "I Aantal méér getelde stemmen" });
       expect(moreBallotsCount).toHaveAccessibleName("I Aantal méér getelde stemmen");
       await user.type(moreBallotsCount, "12345");
@@ -155,10 +150,10 @@ describe("Test DifferencesForm", () => {
           differences_counts: {
             more_ballots_count: 2,
             fewer_ballots_count: 0,
-            admitted_voters_equals_votes_cast: { yes: true, no: true },
-            votes_cast_greater_than_admitted_voters: { yes: true, no: true },
-            votes_cast_smaller_than_admitted_voters: { yes: true, no: true },
-            difference_completely_accounted_for: { yes: true, no: true },
+            admitted_voters_equals_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: false,
+            votes_cast_smaller_than_admitted_voters: false,
+            difference_completely_accounted_for: { yes: false, no: false },
           },
         },
         client_state: {},
@@ -184,30 +179,6 @@ describe("Test DifferencesForm", () => {
         },
         "data.differences_counts.",
       );
-
-      const admittedVotersEqualsVotesCastCheckbox = screen.getByRole("checkbox", { name: "D en H zijn gelijk" });
-      expect(admittedVotersEqualsVotesCastCheckbox).not.toBeChecked();
-
-      const votesCastGreaterThanAdmittedVotersCheckbox = screen.getByRole("checkbox", {
-        name: "H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
-      });
-      expect(votesCastGreaterThanAdmittedVotersCheckbox).not.toBeChecked();
-
-      const votesCastSmallerThanAdmittedVotersCheckbox = screen.getByRole("checkbox", {
-        name: "H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
-      });
-      expect(votesCastSmallerThanAdmittedVotersCheckbox).not.toBeChecked();
-
-      // const differenceCompletelyAccountedForFieldset = screen.getByRole("group", {
-      //   name: "3.3.2 Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?",
-      // });
-      // console.log(differenceCompletelyAccountedForFieldset);
-      // expect(differenceCompletelyAccountedForFieldset.closest("checkbox")).toHaveAccessibleName("Ja");
-
-      // const differenceCompletelyAccountedForCheckbox = differenceCompletelyAccountedForFieldset.closest("checkbox", {
-      //   name: "differences_counts.difference_completely_accounted_for.yes",
-      // });
-      // expect(differenceCompletelyAccountedForFieldset.closest("checkbox")).not.toBeChecked();
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);

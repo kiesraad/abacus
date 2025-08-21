@@ -31,18 +31,9 @@ const pollingStationResults: PollingStationResults = {
   differences_counts: {
     more_ballots_count: 0,
     fewer_ballots_count: 2,
-    admitted_voters_equals_votes_cast: {
-      no: true,
-      yes: true,
-    },
-    votes_cast_greater_than_admitted_voters: {
-      no: true,
-      yes: true,
-    },
-    votes_cast_smaller_than_admitted_voters: {
-      no: true,
-      yes: true,
-    },
+    admitted_voters_equals_votes_cast: false,
+    votes_cast_greater_than_admitted_voters: false,
+    votes_cast_smaller_than_admitted_voters: false,
     difference_completely_accounted_for: {
       no: true,
       yes: true,

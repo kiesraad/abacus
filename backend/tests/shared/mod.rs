@@ -23,9 +23,9 @@ pub fn differences_counts_zero() -> DifferencesCounts {
     DifferencesCounts {
         more_ballots_count: 0,
         fewer_ballots_count: 0,
-        admitted_voters_equals_votes_cast: Default::default(),
-        votes_cast_greater_than_admitted_voters: Default::default(),
-        votes_cast_smaller_than_admitted_voters: Default::default(),
+        admitted_voters_equals_votes_cast: false,
+        votes_cast_greater_than_admitted_voters: false,
+        votes_cast_smaller_than_admitted_voters: false,
         difference_completely_accounted_for: Default::default(),
     }
 }

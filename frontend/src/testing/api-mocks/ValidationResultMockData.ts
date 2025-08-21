@@ -31,13 +31,7 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
   F303: { fields: ["data.differences_counts.fewer_ballots_count"], code: "F303" },
   F304: { fields: ["data.differences_counts.more_ballots_count"], code: "F304" },
   F305: {
-    fields: [
-      "data.differences_counts.fewer_ballots_count",
-      "data.differences_counts.admitted_voters_equals_votes_cast",
-      "data.differences_counts.votes_cast_greater_than_admitted_voters",
-      "data.differences_counts.votes_cast_smaller_than_admitted_voters",
-      "data.differences_counts.difference_completely_accounted_for",
-    ],
+    fields: ["data.differences_counts.fewer_ballots_count"],
     code: "F305",
   },
   F401: { fields: ["data.political_group_votes[0]"], code: "F401" },
@@ -51,23 +45,11 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
   },
   W205: { fields: ["data.votes_counts.total_votes_cast_count"], code: "W205" },
   W301: {
-    fields: [
-      "data.differences_counts.more_ballots_count",
-      "data.differences_counts.admitted_voters_equals_votes_cast",
-      "data.differences_counts.votes_cast_greater_than_admitted_voters",
-      "data.differences_counts.votes_cast_smaller_than_admitted_voters",
-      "data.differences_counts.difference_completely_accounted_for",
-    ],
+    fields: ["data.differences_counts.more_ballots_count"],
     code: "W301",
   },
   W302: {
-    fields: [
-      "data.differences_counts.fewer_ballots_count",
-      "data.differences_counts.admitted_voters_equals_votes_cast",
-      "data.differences_counts.votes_cast_greater_than_admitted_voters",
-      "data.differences_counts.votes_cast_smaller_than_admitted_voters",
-      "data.differences_counts.difference_completely_accounted_for",
-    ],
+    fields: ["data.differences_counts.fewer_ballots_count"],
     code: "W302",
   },
 };

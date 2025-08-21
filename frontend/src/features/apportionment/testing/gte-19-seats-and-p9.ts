@@ -1799,26 +1799,10 @@ export const election_summary: ElectionSummary = {
       count: 0,
       polling_stations: [],
     },
-    unreturned_ballots_count: {
-      count: 0,
-      polling_stations: [],
-    },
-    too_few_ballots_handed_out_count: {
-      count: 0,
-      polling_stations: [],
-    },
-    too_many_ballots_handed_out_count: {
-      count: 0,
-      polling_stations: [],
-    },
-    other_explanation_count: {
-      count: 0,
-      polling_stations: [],
-    },
-    no_explanation_count: {
-      count: 0,
-      polling_stations: [],
-    },
+    admitted_voters_equals_votes_cast: false,
+    difference_completely_accounted_for: { yes: false, no: false },
+    votes_cast_greater_than_admitted_voters: false,
+    votes_cast_smaller_than_admitted_voters: false,
   },
   political_group_votes: [
     {

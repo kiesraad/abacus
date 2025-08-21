@@ -24,7 +24,7 @@ export class ProgressList {
     this.countingDifferencesPollingStationIcon = this.countingDifferencesPollingStation.getByRole("img");
     this.votersAndVotes = this.navElement.getByRole("listitem").filter({ hasText: /Aantal kiezers en stemmen$/ });
     this.votersAndVotesIcon = this.votersAndVotes.getByRole("img");
-    this.differences = this.navElement.getByRole("listitem").filter({ hasText: /Verschillen$/ });
+    this.differences = this.navElement.getByRole("listitem").filter({ hasText: /Verschillen D&H$/ });
     this.differencesIcon = this.differences.getByRole("img");
     this.checkAndSave = this.navElement.getByRole("listitem").filter({ hasText: /Controleren en opslaan$/ });
     this.checkAndSaveIcon = this.checkAndSave.getByRole("img");

@@ -11,8 +11,9 @@ _Niveau:_ hoog-over, wolk, ☁️
 3. [De beheerder zet de verkiezingen in de applicatie.](#de-beheerder-zet-de-verkiezingen-in-de-applicatie-zee)
 4. De beheerder leest de kandidatenlijst in.
 5. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
-6. De beheerder vult het aantal kiesgerechtigden in de gemeente in.
-7. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
+6. De beheerder selecteert het type stemopneming.
+7. De beheerder vult het aantal kiesgerechtigden in de gemeente in.
+8. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
 
 __Uitbreidingen:__  
 

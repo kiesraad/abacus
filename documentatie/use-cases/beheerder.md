@@ -74,8 +74,8 @@ __Niveau:__ subfunctie, vis, 🐟
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
-1. De beheerder importeert het EML_NL-bestand met de stembureaus en het aantal kiesgerechtigden op gemeenteniveau in.
-2. De applicatie stelt vast dat de stembureaus aan de validatieregels voldoen.
+1. De beheerder importeert het bestand met de stembureaus en het aantal kiesgerechtigden op gemeenteniveau.
+2. De applicatie stelt vast dat het bestand aan de validatieregels voldoet.
 3. De beheerder stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
 __Uitbreidingen:__  
@@ -98,9 +98,9 @@ __Precondities:__
 
 __Hoofdscenario:__
 
-1. De beheerder importeert het bestand met de stembureaus en het aantal kiesgerechtigden op gemeenteniveau in.
-2. De applicatie negeert het aantal kiesgerechtigden in het bestand.
-3. De applicatie stelt vast dat de stembureaus aan de validatieregels voldoen.
+1. De beheerder importeert het bestand met de stembureaus en het aantal kiesgerechtigden op gemeenteniveau.
+2. De applicatie stelt vast dat het bestand aan de validatieregels voldoet.
+3. De applicatie negeert het aantal kiesgerechtigden in het bestand.
 4. De beheerder stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
 __Uitbreidingen:__  
@@ -108,7 +108,7 @@ __Uitbreidingen:__
 1a. Er is geen te importeren bestand met stembureaus:  
 &emsp; 1a1. De beheerder of coördinator voert de stembureaus handmatig in.
 
-3a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
+2a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
 
 4a. De lijst met stembureaus moet aangepast worden:  
 &emsp; 4a1. De beheerder of coördinator past de stembureaus aan.

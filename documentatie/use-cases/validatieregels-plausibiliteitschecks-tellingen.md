@@ -99,8 +99,9 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 > Coördinator: **Onterecht corrigendum?** (F.154)  
 > Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.
-> Als er geen gecorrigeerde telresultaten zijn, dan hoort er ook geen corrigendum te zijn. Verwijder het corrigendum, of geef op het inlegvel aan dat
-> er wel gecorrigeerde telresultaten zijn. Geef daarna de invoer terug aan de invoerder.
+> Als er geen gecorrigeerde telresultaten zijn, dan hoort er ook geen corrigendum te zijn.
+> Verwijder het corrigendum, of geef op het inlegvel aan dat er wel gecorrigeerde telresultaten zijn.
+> Geef daarna de invoer terug aan de invoerder.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
@@ -133,8 +134,8 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > De invoer bij A, B of D klopt niet.  
 
 > Coördinator: **A en B tellen niet op tot D** (F.201)  
-> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.
-> Zo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.
+> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.  
+> Zo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.  
 > Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: A, B en D  
@@ -145,8 +146,8 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > Invoerder **Controleer de stemmen op lijsten en totaal stemmen op kandidaten** (F.202)
 
 > Coördinator: **De stemmen op lijsten tellen niet op tot E** (F.202)  
-> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en H worden ingevuld.
-> Zo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.
+> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en H worden ingevuld.  
+> Zo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.  
 > Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: E.1 t/m E.n en E  
@@ -158,8 +159,8 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > De invoer bij E, F, G of H klopt niet.  
 
 > Coördinator: **E, F en G tellen niet op tot H** (F.203)  
-> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij H wordt ingevuld.
-> Zo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.
+> Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij H wordt ingevuld.  
+> Zo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.  
 > Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: E, F, G en H  
@@ -173,8 +174,8 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > Invoerder: **Controleer je antwoorden** (F.301)
 
 > Coördinator: **De getallen die zijn ingevuld bij D en H zijn niet gelijk** (F.301)  
-> Herstel de fout door op papier het juiste getal in te (laten) vullen.
-> Controleer ook of er een onverklaard verschil ontstaat.
+> Herstel de fout door op papier het juiste getal in te (laten) vullen.  
+> Controleer ook of er een onverklaard verschil ontstaat.  
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H  
@@ -229,7 +230,7 @@ Veld markeren: foutmelding op checkboxgroup Vergelijk D en H
 > Invoerder: **Controleer je antwoorden** (F.354)
 
 > Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.354)  
-> Is op het proces-verbaal duidelijk aangegeven welk van de opties bedoeld is?
+> Is op het proces-verbaal duidelijk aangegeven welk van de opties bedoeld is?  
 > Laat dat dan overnemen in Abacus. Zo niet, maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
 Veld markeren: foutmelding op checkboxgroup Vergelijk D en H  
@@ -248,18 +249,21 @@ Veld markeren: I en/of J (als ingevuld)
 
 > Invoerder: Controleer je antwoorden (F.355)
 
-> Coördinator: Controleer I en J (F.355)
-> De getallen bij D en H zijn gelijk. Er zijn geen stemmen meer of minder geteld.
-> Corrigeer de rekenfout door op een corrigendum I en/of J leeg te (laten) maken.
-> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2). Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is. Vul nieuwe telresultaten op het corrigendum in.
+> Coördinator: Controleer I en J (F.355)  
+> De getallen bij D en H zijn gelijk. Er zijn geen stemmen meer of minder geteld.  
+> Corrigeer de rekenfout door op een corrigendum I en/of J leeg te (laten) maken.  
+> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).
+> Hertel dan de stembiljetten en het aantal toegelaten kiezers.
+> Hertel tot de fout gevonden is, of alles één keer herteld is.
+> Vul nieuwe telresultaten op het corrigendum in.
 
 #### CSO | F.306 (Als H > D) `I <> H - D`
 
 > Invoerder: **Controleer I (stembiljetten meer geteld)** (F.306)
 
 > Coördinator: **Controleer I (stembiljetten meer geteld)** (F.306)  
-> Herstel de fout door op papier het juiste getal in te (laten) vullen.
-> Controleer ook of het verschil nog volledig verklaard is.
+> Herstel de fout door op papier het juiste getal in te (laten) vullen.  
+> Controleer ook of het verschil nog volledig verklaard is.  
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Veld markeren: I  
@@ -268,9 +272,12 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 #### DSO | F.356 (Als H > D) `I <> H - D`
 > Invoerder: **Controleer I (stembiljetten meer geteld)** (F.356)
 
-> Coördinator: **Controleer I (stembiljetten meer geteld)** (F.356)
+> Coördinator: **Controleer I (stembiljetten meer geteld)** (F.356)  
 > Corrigeer de rekenfout in een corrigendum.  
-> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2). Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is. Vul nieuwe telresultaten op het corrigendum in.
+> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).
+> Hertel dan de stembiljetten en het aantal toegelaten kiezers.
+> Hertel tot de fout gevonden is, of alles één keer herteld is.
+> Vul nieuwe telresultaten op het corrigendum in.
 
 Veld markeren: I  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
@@ -280,9 +287,9 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > Invoerder: **Controleer I en J** (F.307)
 
 > Coördinator: **Controleer of I en J verwisseld zijn** (F.307)  
-> Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.
-> Controleer ook of het verschil nog volledig verklaard is.
-> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan. 
+> Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.  
+> Controleer ook of het verschil nog volledig verklaard is.  
+> Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Veld markeren: I, J  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
@@ -292,7 +299,10 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 > Coördinator: **Controleer of I en J verwisseld zijn** (F.357)  
 > Corrigeer de rekenfout in een corrigendum.  
-> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2). Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is. Vul nieuwe telresultaten op het corrigendum in.
+> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).
+> Hertel dan de stembiljetten en het aantal toegelaten kiezers.
+> Hertel tot de fout gevonden is, of alles één keer herteld is.
+> Vul nieuwe telresultaten op het corrigendum in.
 
 Veld markeren: I, J  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
@@ -301,8 +311,8 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > Invoerder: **Controleer J** (F.308)
 
 > Coördinator: **Controleer J (stembiljetten meer geteld)** (F.308)  
-> Herstel de fout door op papier het juiste getal in te (laten) vullen.
-> Controleer ook of het verschil nog volledig verklaard is.
+> Herstel de fout door op papier het juiste getal in te (laten) vullen.  
+> Controleer ook of het verschil nog volledig verklaard is.  
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Veld markeren: J  
@@ -313,7 +323,10 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 > Coördinator: **Controleer J (stembiljetten meer geteld)** (F.358)  
 > Corrigeer de rekenfout in een corrigendum.  
-> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2). Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is. Vul nieuwe telresultaten op het corrigendum in.
+> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).
+> Hertel dan de stembiljetten en het aantal toegelaten kiezers.
+> Hertel tot de fout gevonden is, of alles één keer herteld is.
+> Vul nieuwe telresultaten op het corrigendum in.
 
 Veld markeren: J  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
@@ -322,8 +335,8 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > Invoerder: **Controleer I en J** (F.309)  
 
 > Coördinator: **Controleer of I en J verwisseld zijn** (F.309)  
-> Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.
-> Controleer ook of het verschil nog volledig verklaard is.
+> Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.  
+> Controleer ook of het verschil nog volledig verklaard is.  
 > Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
 Veld markeren: I, J  
@@ -335,7 +348,10 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 > Coördinator: **Controleer of I en J verwisseld zijn** (F.359)  
 > Corrigeer de rekenfout in een corrigendum.  
-> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2). Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is. Vul nieuwe telresultaten op het corrigendum in.
+> Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).
+> Hertel dan de stembiljetten en het aantal toegelaten kiezers.
+> Hertel tot de fout gevonden is, of alles één keer herteld is.
+> Vul nieuwe telresultaten op het corrigendum in.
 
 Veld markeren: I, J  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
@@ -352,9 +368,11 @@ Veld markeren: 3.3.2
 
 > Invoerder: **Controleer je antwoorden** (F.360)
 
-> Coördinator: **Hertel onverklaard verschil** (F.360)
+> Coördinator: **Hertel onverklaard verschil** (F.360)  
 > Er is een onverklaard verschil dat herteld moet worden.  
-> Hertel de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is. Vul nieuwe telresultaten op een corrigendum in.  
+> Hertel de stembiljetten en het aantal toegelaten kiezers.
+> Hertel tot de fout gevonden is, of alles één keer herteld is.
+> Vul nieuwe telresultaten op een corrigendum in.  
 > Is er al herteld? Zorg dan dat het inlegvel 'controles en correcties' wordt ingevuld en toegevoegd aan het proces-verbaal van het stembureau.
 
 Veld markeren: 2.3.2  
@@ -366,10 +384,10 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.** (F.401)
 
 > Coördinator: **Het totaal van de lijst is niet ingevuld.** (F.401)  
-> Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.{x} in rubriek 3.2)
-> Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.
-> - Zo ja: corrigeer de optelfout op het papieren proces-verbaal.
-> - Zo nee: Onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
+> Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.{x} in rubriek 3.2)  
+> Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.  
+> Zo ja: corrigeer de optelfout op het papieren proces-verbaal.  
+> Zo nee: Onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: totaal van de lijst 
 N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding _bij invoerders_ onderaan de pagina, onder het totaal-veld ([Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11))  
@@ -380,8 +398,8 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
 > Coördinator: **Het totaal van de lijst is niet ingevuld.** (F.451)  
 > Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 2.3 wegneemt.  
-> - Zo ja: Maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.
-> - Zo nee: Tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
+> Zo ja: Maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.  
+> Zo nee: Tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: totaal van de lijst 
 N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding _bij invoerders_ onderaan de pagina, onder het totaal-veld ([Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11))  
@@ -397,8 +415,8 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 > Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld.  
 > Reken de optelling in het papieren proces-verbaal na.  
 > Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.  
-> - Zo ja: Corrigeer de optelfout op het papieren proces-verbaal.  
-> - Zo nee: Onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
+> Zo ja: Corrigeer de optelfout op het papieren proces-verbaal.  
+> Zo nee: Onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina) [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=1635-58277&t=zTY4ajWtsFkiTOYP-4)  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
@@ -412,8 +430,8 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 > Coördinator: **De optelling van de stemmen op kandidaten komt niet overeen met het ingevulde lijsttotaal** (F.452)  
 > Reken de optelling in het papieren proces-verbaal na.  
 > Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 2.3 wegneemt.  
-> - Zo ja: Maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.
-> - Zo nee: Tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
+> Zo ja: Maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.  
+> Zo nee: Tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina) [Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=1635-58277&t=zTY4ajWtsFkiTOYP-4)  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
@@ -437,8 +455,8 @@ Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutme
 
 > Coördinator: **Controleer het totaal van de lijst en E.{x} in rubriek 2.2** (F.453)  
 > Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 2.3 wegneemt.  
-> - Zo ja: Maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.  
-> - Zo nee: Tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.  
+> Zo ja: Maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.  
+> Zo nee: Tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.  
 
 Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen  
 Het standaard handelingsperspectief _voor de coördinator_ wordt bij deze foutmelding niet getoond (voor invoerder wel).
@@ -450,7 +468,7 @@ Plausibiliteitschecks vragen de gebruiker de invoer extra te controleren. Ze res
 De foutmelding die wordt getoond bestaat uit dezelfde onderdelen als bij de validatieregels. Het handelingsperspectief voor alle plausibiliteitschecks is als volgt:
 
 > Invoerder:
-> - Heb je iets niet goed overgenomen? Herstel de fout en ga verder.
+> - Heb je iets niet goed overgenomen? Herstel de fout en ga verder.  
 > - Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.
 
 > Coördinator:
@@ -490,7 +508,7 @@ Veld markeren: F
 
 #### CSO en DSO | W.202: Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
 
-> Invoerder: **Controleer aantal ongeldige stemmen** (W.202)
+> Invoerder: **Controleer aantal ongeldige stemmen** (W.202)  
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
 > Coördinator: **Het aantal ongeldige stemmen is erg hoog** (W.202)  
@@ -508,9 +526,9 @@ Veld markeren: G
 
 > Coördinator: **Groot verschil tussen aantal toegelaten kiezers en aantal uitgebrachte stemmen** (W.203)  
 > Er is een groot verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).  
-> Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitslag per lijst.
-> Verklaar in het proces-verbaal van het GSB (rubriek 1.2) zo goed mogelijk wat de oorzaak van de opmerkelijke uitslag is.
-> Schrijf ook op welke stappen het GSB heeft gezet om deze te hertellen en onderzoeken. 
+> Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitslag per lijst.  
+> Verklaar in het proces-verbaal van het GSB (rubriek 1.2) zo goed mogelijk wat de oorzaak van de opmerkelijke uitslag is.  
+> Schrijf ook op welke stappen het GSB heeft gezet om deze te hertellen en onderzoeken.
 
 Velden markeren: D en H
 
@@ -520,8 +538,8 @@ Velden markeren: D en H
 > Check of je het papieren proces-verbaal goed hebt overgenomen.
 
 > Coördinator: **Het totaal aantal uitgebrachte stemmen (H) is nul** (W.205)  
-> Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.
-> Zo nee: Verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.
+> Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.  
+> Zo nee: Verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.  
 > Zo ja: Verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht.
 
 Veld markeren: H

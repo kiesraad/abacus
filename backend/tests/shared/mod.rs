@@ -75,7 +75,7 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
                     },
                     PoliticalGroupTotalVotes {
                         number: 2,
-                        total: 52,
+                        total: 42,
                     },
                 ],
                 total_votes_candidates_count: 102,

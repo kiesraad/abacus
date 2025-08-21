@@ -160,8 +160,9 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         errors[1].fields,
         vec![
-            "data.votes_counts.total_votes_candidates_count",
-            "data.political_group_votes"
+            "data.votes_counts.political_group_total_votes[0].total",
+            "data.votes_counts.political_group_total_votes[1].total",
+            "data.votes_counts.total_votes_candidates_count"
         ]
     );
     // error 3

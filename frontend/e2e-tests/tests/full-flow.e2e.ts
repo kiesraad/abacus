@@ -33,9 +33,7 @@ test.describe("full flow", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.username.fill("admin1");
-    await loginPage.password.fill(getTestPassword("admin1"));
-    await loginPage.loginBtn.click();
+    await loginPage.login("admin1", getTestPassword("admin1"));
 
     const electionsOverviewPage = new ElectionsOverviewPgObj(page);
     await electionsOverviewPage.create.click();
@@ -85,9 +83,7 @@ test.describe("full flow", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.username.fill("coordinator1");
-    await loginPage.password.fill(getTestPassword("coordinator1"));
-    await loginPage.loginBtn.click();
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -117,9 +113,7 @@ test.describe("full flow", () => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);
-      await loginPage.username.fill("typist1");
-      await loginPage.password.fill(getTestPassword("typist1"));
-      await loginPage.loginBtn.click();
+      await loginPage.login("typist1", getTestPassword("typist1"));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -138,9 +132,7 @@ test.describe("full flow", () => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);
-      await loginPage.username.fill("typist2");
-      await loginPage.password.fill(getTestPassword("typist2"));
-      await loginPage.loginBtn.click();
+      await loginPage.login("typist2", getTestPassword("typist2"));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -160,9 +152,7 @@ test.describe("full flow", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.username.fill("coordinator1");
-    await loginPage.password.fill(getTestPassword("coordinator1"));
-    await loginPage.loginBtn.click();
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();

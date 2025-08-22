@@ -163,10 +163,8 @@ describe("ElectionHomePage", () => {
   });
 
   test("Shows error page when start data entry call returns an error", async () => {
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const Providers = ({
       children,
       router = getRouter(children),

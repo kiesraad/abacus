@@ -1,5 +1,7 @@
+import * as ReactRouter from "react-router";
+
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   AdminExistsRequestHandler,
@@ -13,12 +15,11 @@ import { InitialiseApplicationPage } from "./InitialiseApplicationPage";
 
 const navigate = vi.fn();
 
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 describe("InitialiseApplicationPage", () => {
+  beforeEach(() => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+  });
+
   test("Enter form field values", async () => {
     server.use(CreateFirstAdminRequestHandler, AdminExistsRequestHandler, LoginHandler);
 

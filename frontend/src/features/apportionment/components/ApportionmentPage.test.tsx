@@ -222,10 +222,8 @@ describe("ApportionmentPage", () => {
     });
 
     test("Internal Server Error renders error page", async () => {
-      // Since we test what happens after an error, we want vitest to ignore them
-      vi.spyOn(console, "error").mockImplementation(() => {
-        /* do nothing */
-      });
+      // error is expected
+      vi.spyOn(console, "error").mockImplementation(() => {});
       const router = setupTestRouter([
         {
           Component: null,

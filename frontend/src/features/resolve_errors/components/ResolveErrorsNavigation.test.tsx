@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -10,8 +10,6 @@ import { DataEntryStructure } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { ResolveErrorsNavigation } from "./ResolveErrorsNavigation";
-
-vi.mock("react-router");
 
 describe("ResolveErrorsNavigation", () => {
   const electionMockData = getElectionMockData().election;
@@ -37,7 +35,7 @@ describe("ResolveErrorsNavigation", () => {
   };
 
   beforeEach(() => {
-    vi.mocked(useParams).mockReturnValue({
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({
       electionId: "1",
       pollingStationId: "5",
       sectionId: undefined,
@@ -85,7 +83,7 @@ describe("ResolveErrorsNavigation", () => {
   });
 
   test("shows overview link as active when sectionId param is null", () => {
-    vi.mocked(useParams).mockReturnValue({
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({
       electionId: "1",
       pollingStationId: "5",
       sectionId: undefined,
@@ -98,7 +96,7 @@ describe("ResolveErrorsNavigation", () => {
   });
 
   test("shows section link as active when sectionId param is not null", () => {
-    vi.mocked(useParams).mockReturnValue({
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({
       electionId: "1",
       pollingStationId: "5",
       sectionId: "voters_votes_counts",

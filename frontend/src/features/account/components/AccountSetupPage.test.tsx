@@ -1,3 +1,5 @@
+import * as ReactRouter from "react-router";
+
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
@@ -9,12 +11,6 @@ import { render, screen } from "@/testing/test-utils";
 import { AccountSetupPage } from "./AccountSetupPage";
 
 const navigate = vi.fn();
-
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 const setUser = vi.fn();
 
 vi.mock("@/api/useApiState", async (importOriginal) => ({
@@ -25,6 +21,8 @@ vi.mock("@/api/useApiState", async (importOriginal) => ({
 describe("AccountSetupPage", () => {
   test("Update user in api state and navigate to data entry", async () => {
     server.use(AccountUpdateRequestHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+
     render(<AccountSetupPage />);
 
     const user = userEvent.setup();

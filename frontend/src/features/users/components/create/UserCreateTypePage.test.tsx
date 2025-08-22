@@ -1,5 +1,7 @@
+import * as ReactRouter from "react-router";
+
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
 
@@ -7,15 +9,6 @@ import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateCon
 import { UserCreateTypePage } from "./UserCreateTypePage";
 
 const navigate = vi.fn();
-
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  Navigate: ({ to }) => {
-    navigate(to);
-    return null;
-  },
-  useNavigate: () => navigate,
-}));
 
 function renderPage(context: Partial<IUserCreateContext>) {
   return render(
@@ -26,6 +19,14 @@ function renderPage(context: Partial<IUserCreateContext>) {
 }
 
 describe("UserCreateTypePage", () => {
+  beforeEach(() => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
+      navigate(props.to);
+      return null;
+    });
+  });
+
   test("Redirect to start when no role in context", () => {
     renderPage({});
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create");

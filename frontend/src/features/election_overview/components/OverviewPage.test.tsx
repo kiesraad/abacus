@@ -1,3 +1,5 @@
+import * as ReactRouter from "react-router";
+
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { within } from "storybook/test";
@@ -14,14 +16,10 @@ import { OverviewPage } from "./OverviewPage";
 
 const navigate = vi.fn();
 
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 describe("OverviewPage", () => {
   beforeEach(() => {
     server.use(ElectionListRequestHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
   test("Renders elections for typist", async () => {
@@ -40,13 +38,11 @@ describe("OverviewPage", () => {
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
-      ["Verkiezing", "Gebied", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Je kan invoeren"],
-    ]);
-
     const tableRows = within(table).queryAllByRole("row");
-    await user.click(tableRows[1]!);
+    expect(tableRows[0]).toHaveTextContent(["Verkiezing", "Gebied", "Status"].join(""));
+    const firstRow = tableRows[1]!;
+    expect(firstRow).toHaveTextContent(["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Je kan invoeren"].join(""));
+    await user.click(firstRow);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/data-entry");
@@ -69,13 +65,11 @@ describe("OverviewPage", () => {
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
-      ["Verkiezing", "Niveau stembureau", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"],
-    ]);
-
     const tableRows = within(table).queryAllByRole("row");
-    await user.click(tableRows[1]!);
+    expect(tableRows[0]).toHaveTextContent(["Verkiezing", "Niveau stembureau", "Status"].join(""));
+    const firstRow = tableRows[1]!;
+    expect(firstRow).toHaveTextContent(["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"].join(""));
+    await user.click(firstRow);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1");
@@ -98,13 +92,11 @@ describe("OverviewPage", () => {
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
-      ["Verkiezing", "Niveau stembureau", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"],
-    ]);
-
     const tableRows = within(table).queryAllByRole("row");
-    await user.click(tableRows[1]!);
+    expect(tableRows[0]).toHaveTextContent(["Verkiezing", "Niveau stembureau", "Status"].join(""));
+    const firstRow = tableRows[1]!;
+    expect(firstRow).toHaveTextContent(["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"].join(""));
+    await user.click(firstRow);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1");

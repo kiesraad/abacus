@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { useQueryParam } from "./useQueryParam";
 
-vi.mock(import("react-router"), async (importOriginal) => ({
+vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
   useSearchParams: vi.fn(),
 }));

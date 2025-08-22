@@ -1,7 +1,9 @@
+import * as ReactRouter from "react-router";
+
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { useUser } from "@/hooks/user/useUser";
+import * as useUser from "@/hooks/user/useUser";
 import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { CommitteeSessionStatusChangeRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
@@ -12,19 +14,14 @@ import { CommitteeSessionCard } from "./CommitteeSessionCard";
 
 const navigate = vi.fn();
 
-vi.mock("@/hooks/user/useUser");
-vi.mock("react-router", async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 describe("UI component: CommitteeSessionCard", () => {
   beforeEach(() => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
   test("The card renders with status created committee session number 1", () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "created",
@@ -39,7 +36,7 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status created committee session number 2", () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const committeeSession = getCommitteeSessionMockData({
       number: 2,
       status: "created",
@@ -54,7 +51,7 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_not_started for coordinator", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
@@ -79,7 +76,7 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_not_started for administrator", () => {
-    vi.mocked(useUser).mockReturnValue(getAdminUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_not_started",
@@ -96,7 +93,7 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_in_progress", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
@@ -123,7 +120,7 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_paused for coordinator", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
@@ -148,7 +145,7 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_paused for administrator", async () => {
-    vi.mocked(useUser).mockReturnValue(getAdminUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
@@ -173,7 +170,7 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_finished for coordinator", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
@@ -200,7 +197,7 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_finished for administrator", async () => {
-    vi.mocked(useUser).mockReturnValue(getAdminUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({
@@ -227,7 +224,7 @@ describe("UI component: CommitteeSessionCard", () => {
   });
 
   test("The card renders with status data_entry_finished not current session and details already saved", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const committeeSession = getCommitteeSessionMockData({

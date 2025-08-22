@@ -25,13 +25,13 @@ export const getCommitteeSessionListMockData = (
     committee_sessions: [
       {
         ...committeeSessionMockData,
-        status: "data_entry_finished",
-      },
-      {
-        ...committeeSessionMockData,
         id: 2,
         number: 2,
         ...committeeSession,
+      },
+      {
+        ...committeeSessionMockData,
+        status: "data_entry_finished",
       },
     ],
   };

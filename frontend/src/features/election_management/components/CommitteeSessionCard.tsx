@@ -121,6 +121,18 @@ export function CommitteeSessionCard({
   const buttonLinks: ButtonLink[] = [];
   let button = undefined;
 
+  const detailsButtonLink: ButtonLink = {
+    id: committeeSession.id,
+    label: t("election_management.committee_session_details"),
+    to: "details",
+  };
+  const deleteButtonLink: ButtonLink = {
+    id: committeeSession.id,
+    label: t("election_management.delete_session"),
+    to: ".",
+    options: { state: { showDeleteModal: true } },
+  };
+
   switch (committeeSession.status) {
     case "created":
       // TODO: Add in issue #1716 with link
@@ -128,35 +140,17 @@ export function CommitteeSessionCard({
       //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.select_polling_stations"), to: ""});
       // }
       if (isCoordinator && currentSession) {
-        buttonLinks.push({
-          id: committeeSession.id,
-          label: t("election_management.committee_session_details"),
-          to: "details",
-        });
+        buttonLinks.push(detailsButtonLink);
         if (committeeSession.number > 1) {
-          buttonLinks.push({
-            id: committeeSession.id,
-            label: t("election_management.delete_session"),
-            to: ".",
-            options: { state: { showDeleteModal: true } },
-          });
+          buttonLinks.push(deleteButtonLink);
         }
       }
       break;
     case "data_entry_not_started":
       if (isCoordinator && currentSession) {
-        buttonLinks.push({
-          id: committeeSession.id,
-          label: t("election_management.committee_session_details"),
-          to: "details",
-        });
+        buttonLinks.push(detailsButtonLink);
         if (committeeSession.number > 1) {
-          buttonLinks.push({
-            id: committeeSession.id,
-            label: t("election_management.delete_session"),
-            to: ".",
-            options: { state: { showDeleteModal: true } },
-          });
+          buttonLinks.push(deleteButtonLink);
         }
       }
       if (isCoordinator) {
@@ -169,11 +163,7 @@ export function CommitteeSessionCard({
       break;
     case "data_entry_in_progress":
       if (isCoordinator && currentSession) {
-        buttonLinks.push({
-          id: committeeSession.id,
-          label: t("election_management.committee_session_details"),
-          to: "details",
-        });
+        buttonLinks.push(detailsButtonLink);
       }
       button = (
         <Button.Link size="sm" to="status">
@@ -190,11 +180,7 @@ export function CommitteeSessionCard({
         to: "status",
       });
       if (isCoordinator && currentSession) {
-        buttonLinks.push({
-          id: committeeSession.id,
-          label: t("election_management.committee_session_details"),
-          to: "details",
-        });
+        buttonLinks.push(detailsButtonLink);
       }
       break;
     case "data_entry_finished":

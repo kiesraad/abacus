@@ -223,12 +223,12 @@ export function ElectionHomePage() {
             />
           </div>
           <div className={cls.downloadModels}>
-            <h3 className={cls.tableTitle}>{t("election_management.empty_models")}</h3>
-            <p>{t("election_management.empty_models_description")}</p>
-            <Table className={cn(cls.electionInformationTable)}>
+            <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
+            <p>{t("election_management.empty_documents_description")}</p>
+            <Table className={cn(cls.electionInformationTable)} variant="information">
               <Table.Header>
-                <Table.HeaderCell scope="col">{t("election_management.model_name")}</Table.HeaderCell>
-                <Table.HeaderCell scope="col">{t("election_management.model_purpose")}</Table.HeaderCell>
+                <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+                <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
               </Table.Header>
               <Table.Body>
                 <Table.ClickRow
@@ -237,7 +237,7 @@ export function ElectionHomePage() {
                   }}
                 >
                   <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
-                  <Table.Cell>{t("election_management.na_31_2_bijlage_1")}</Table.Cell>
+                  <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
                 </Table.ClickRow>
                 <Table.ClickRow
                   onClick={() => {
@@ -245,7 +245,7 @@ export function ElectionHomePage() {
                   }}
                 >
                   <Table.Cell>N 10-2</Table.Cell>
-                  <Table.Cell>{t("election_management.n_10_2")}</Table.Cell>
+                  <Table.Cell>{t("election_management.document_n_10_2")}</Table.Cell>
                 </Table.ClickRow>
               </Table.Body>
             </Table>

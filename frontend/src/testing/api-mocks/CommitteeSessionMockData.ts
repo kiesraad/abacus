@@ -35,14 +35,12 @@ export const getCommitteeSessionListMockData = (
         id: 3,
         number: 3,
         status: "data_entry_finished",
-        ...committeeSession,
       },
       {
         ...committeeSessionMockData,
         id: 2,
         number: 2,
         status: "data_entry_finished",
-        ...committeeSession,
       },
       {
         ...committeeSessionMockData,

@@ -12,13 +12,13 @@
   Gemeente #input.election.domain_id #input.election.location \
   Stembureau #input.polling_station.number
 ]), footer: [
-  Corrigendum van een #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam] \
+  Corrigendum van een #location_type \
   Model Na 14-2
 ])
 
 = Bijlage 1
 
-== Verslagen van tellingen van stembureaus die zijn herteld door het #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+== Verslagen van tellingen van stembureaus die zijn herteld door het #location_type
 
 #pagebreak(weak: true)
 
@@ -28,7 +28,7 @@
 
 == Over deze bijlage
 
-Het #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam] heeft de telresultaten van dit stembureau onderzocht en is tot een ander resultaat gekomen. De nieuwe telresultaten van het stembureau zijn opgenomen in deze bijlage. Deze bijlage is bij het proces-verbaal van het stembureau gevoegd.
+Het #location_type heeft de telresultaten van dit stembureau onderzocht en is tot een ander resultaat gekomen. De nieuwe telresultaten van het stembureau zijn opgenomen in deze bijlage. Deze bijlage is bij het proces-verbaal van het stembureau gevoegd.
 
 #show: doc => attachement_numbering(doc, "B1")
 
@@ -39,14 +39,14 @@ Geef aan *waarom* de resultaten van dit stembureau zijn onderzocht. Denk bijvoor
 ==== Aanleiding en opdracht van het centraal stembureau
 #empty_lines(5)
 
-Schrijf op wat de *uitkomst* van het onderzoek door het #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam] was.
+Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
 
 ==== Bevindingen
 #empty_lines(5)
 
 Is er een *gecorrigeerde uitslag*?
 
-#checkbox[Nee #sym.arrow.long.r *Neem de uitkomst van het onderzoek over in het proces-verbaal van het #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam] (nieuwe zitting). Deze bijlage hoeft verder niet ingevuld te worden.*]
+#checkbox[Nee #sym.arrow.long.r *Neem de uitkomst van het onderzoek over in het proces-verbaal van het #location_type (nieuwe zitting). Deze bijlage hoeft verder niet ingevuld te worden.*]
 
 #checkbox[Ja #sym.arrow.long.r *Ga verder met B1 - #ref(<corrected_results>)*]
 
@@ -58,13 +58,12 @@ Is er een *gecorrigeerde uitslag*?
   Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere
   telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de
   kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste
-  zitting door het gemeentelijke stembureau/stembureau voor het openbaar
-  lichaam zijn vastgesteld.
+  zitting door het #location_type zijn vastgesteld.
 ]
 
 == Toegelaten kiezers
 
-Het totaal van alle getelde geldige stempassen en Volmachtbewijzen
+Het totaal van alle getelde geldige stempassen en volmachtbewijzen
 
 #sum(
   with_correction_title: true,
@@ -80,8 +79,7 @@ Het totaal van alle getelde geldige stempassen en Volmachtbewijzen
 == Uitgebrachte stemmen <cast_votes>
 
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
-ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het
-gemeentelijke stembureau/stembureau voor het openbaar lichaam zijn vastgesteld.
+ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
 
 #if input.election.political_groups.len() > 0 [
   #sum(
@@ -113,8 +111,7 @@ gemeentelijke stembureau/stembureau voor het openbaar lichaam zijn vastgesteld.
 == Verschillen tussen aantal kiezers en uitgebrachte stemmen
 
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
-ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het
-gemeentelijke stembureau/stembureau voor het openbaar lichaam zijn vastgesteld.
+ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
 
@@ -163,7 +160,7 @@ gemeentelijke stembureau/stembureau voor het openbaar lichaam zijn vastgesteld.
     sum_total: columns => [Totaal lijst (kolom #columns)],
     total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
     explainer_text: [
-      Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #is_municipality[gemeentelijke stembureau][stembureau voor het openbaar lichaam] zijn vastgesteld.
+      Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
     ],
     break_count: (20, 20, 20, 20)
   )

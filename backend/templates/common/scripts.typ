@@ -27,7 +27,7 @@
   )
 }
 
-/// Conditionally render the body if the condition is true, used to conditinally
+/// Conditionally render the body if the condition is true, used to conditionally
 /// render cells in grids or tables. The result should always be spread using
 /// e.g. `..cell_if(condition, body)`. Can be used with either a single cell or
 /// an array of cells for the body.

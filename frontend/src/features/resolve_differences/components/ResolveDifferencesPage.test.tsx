@@ -55,11 +55,7 @@ describe("ResolveDifferencesPage", () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "3" });
     vi.spyOn(ReactRouter, "useLocation").mockReturnValue({
       pathname: "/",
-      search: "",
-      state: {},
-      hash: "",
-      key: "default",
-    });
+    } as Partial<ReactRouter.Location> as ReactRouter.Location);
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,

@@ -1,7 +1,7 @@
 import { ReactElement, useEffect, useRef } from "react";
 import { Link } from "react-router";
 
-import { t, tx } from "@/i18n/translate";
+import { hasTranslation, t, tx } from "@/i18n/translate";
 import { Role, ValidationResultCode } from "@/types/generated/openapi";
 import { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
@@ -25,14 +25,15 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
   // NOTE: administrator roles are always mapped to coordinator here
   const role = userRole === "administrator" ? "coordinator" : userRole;
   const feedbackList: FeedbackItem[] =
-    data?.map(
-      (code: ValidationResultCode): FeedbackItem => ({
+    data?.map((code: ValidationResultCode): FeedbackItem => {
+      const content = `feedback.${code}.${role}.content`;
+      return {
         title: t(`feedback.${code}.${role}.title`),
         code: dottedCode(code),
-        content: tx(`feedback.${code}.${role}.content`, { link }),
+        content: hasTranslation(content) ? tx(content, { link }) : undefined,
         action: undefined,
-      }),
-    ) || [];
+      };
+    }) || [];
 
   useEffect(() => {
     if (shouldFocus) {
@@ -51,7 +52,7 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
             </h3>
             {feedback.code && <span>{feedback.code}</span>}
           </header>
-          <div className="content">{feedback.content}</div>
+          {feedback.content && <div className="content">{feedback.content}</div>}
         </div>
       ))}
       {role === "typist" && feedbackList.length > 0 && (
@@ -68,7 +69,7 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
           {feedbackList.length > 1 || !feedbackList[0]?.action ? (
             <ul>
               <li>{t("feedback.made_a_mistake")}</li>
-              {type === "error" ? <li>{t("feedback.error_remains")}</li> : <li>{t("feedback.warning_remains")}</li>}
+              <li>{t("feedback.error_or_warning_remains")}</li>
             </ul>
           ) : (
             feedbackList[0].action

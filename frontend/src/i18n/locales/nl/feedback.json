@@ -1,102 +1,178 @@
 {
+  "F101": {
+    "typist": {
+      "title": "Controleer je antwoorden"
+    },
+    "coordinator": {
+      "title": "Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden. Als er geen extra onderzoek is gedaan, moeten deze vragen overgeslagen worden."
+    }
+  },
+  "F102": {
+    "typist": {
+      "title": "Controleer je antwoorden"
+    },
+    "coordinator": {
+      "title": "Er mag maar één antwoord per vraag worden gegeven."
+    }
+  },
+  "F111": {
+    "typist": {
+      "title": "Controleer je antwoorden"
+    },
+    "coordinator": {
+      "title": "Bij beide vragen moet een antwoord gegeven worden."
+    }
+  },
+  "F112": {
+    "typist": {
+      "title": "Controleer je antwoorden"
+    },
+    "coordinator": {
+      "title": "Er mag maar één antwoord per vraag worden gegeven."
+    }
+  },
   "F201": {
     "typist": {
       "title": "Controleer toegelaten kiezers",
-      "content": "De invoer bij A, B of D klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "content": "De invoer bij A, B of D klopt niet."
     },
     "coordinator": {
-      "title": "Controleer toegelaten kiezers",
-      "content": "De invoer bij A, B of D klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "A en B tellen niet op tot D",
+      "content": "Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.\nZo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.\nZo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is."
     }
   },
   "F202": {
     "typist": {
-      "title": "Controleer uitgebrachte stemmen",
-      "content": "De invoer bij E, F, G of H klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer de stemmen op lijsten en totaal stemmen op kandidaten"
     },
     "coordinator": {
-      "title": "Controleer uitgebrachte stemmen",
-      "content": "De invoer bij E, F, G of H klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "De stemmen op lijsten tellen niet op tot E",
+      "content": "Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en H worden ingevuld.\nZo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.\nZo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is."
     }
   },
-  "F204": {
+  "F203": {
     "typist": {
-      "title": "Controleer (totaal) aantal stemmen op kandidaten",
-      "content": "De optelling van alle lijsten is niet gelijk aan de invoer bij E.\nCheck of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd."
+      "title": "Controleer uitgebrachte stemmen",
+      "content": "De invoer bij E, F, G of H klopt niet."
     },
     "coordinator": {
-      "title": "Controleer (totaal) aantal stemmen op kandidaten",
-      "content": "De optelling van alle lijsten is niet gelijk aan de invoer bij E.\nCheck of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd."
+      "title": "E, F en G tellen niet op tot H",
+      "content": "Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij H wordt ingevuld.\nZo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.\nZo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is."
     }
   },
   "F301": {
     "typist": {
-      "title": "Controleer I (stembiljetten meer geteld)",
-      "content": "Je hebt bij <link>Aantal kiezers en stemmers</link> ingevuld dat er meer stemmen dan kiezers waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Controleer I (stembiljetten meer geteld)",
-      "content": "Je hebt bij <link>Aantal kiezers en stemmers</link> ingevuld dat er meer stemmen dan kiezers waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "De getallen die zijn ingevuld bij D en H zijn niet gelijk",
+      "content": "> Herstel de fout door op papier het juiste getal in te (laten) vullen.Controleer ook of er een onverklaard verschil ontstaat.Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.\n"
     }
   },
   "F302": {
     "typist": {
-      "title": "Controleer J (stembiljetten minder geteld)",
-      "content": "Je hebt bij <link>Aantal kiezers en stemmers</link> ingevuld dat er meer stemmen dan kiezers waren. Daarom mag J niet ingevuld zijn.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Controleer J (stembiljetten minder geteld)",
-      "content": "Je hebt bij <link>Aantal kiezers en stemmers</link> ingevuld dat er meer stemmen dan kiezers waren. Daarom mag J niet ingevuld zijn.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Het getal dat is ingevuld bij H is niet groter dan D"
     }
   },
   "F303": {
     "typist": {
-      "title": "Controleer J (stembiljetten minder geteld)",
-      "content": "Je hebt bij <link>Aantal kiezers en stemmers</link> ingevuld dat er minder stemmen dan kiezers waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde stembiljetten.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Controleer J (stembiljetten minder geteld)",
-      "content": "Je hebt bij <link>Aantal kiezers en stemmers</link> ingevuld dat er minder stemmen dan kiezers waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde stembiljetten.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Het getal dat is ingevuld bij H is niet kleiner dan D"
     }
   },
   "F304": {
     "typist": {
-      "title": "Controleer I (stembiljetten meer geteld)",
-      "content": "Je hebt bij <link>Aantal kiezers en stemmers</link> ingevuld dat er minder stemmen dan kiezers waren. Daarom mag I niet ingevuld zijn.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Controleer I (stembiljetten meer geteld)",
-      "content": "Je hebt bij <link>Aantal kiezers en stemmers</link> ingevuld dat er minder stemmen dan kiezers waren. Daarom mag I niet ingevuld zijn.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Er moet precies 1 antwoord op deze vraag gegeven zijn"
     }
   },
   "F305": {
     "typist": {
-      "title": "Controleer ingevulde verschillen",
-      "content": "Je hebt bij <link>Aantal kiezers en stemmers</link> ingevuld dat er evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Controleer ingevulde verschillen",
-      "content": "Je hebt bij <link>Aantal kiezers en stemmers</link> ingevuld dat er evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer I en J",
+      "content": "De getallen bij D en H zijn gelijk. Er zijn geen stemmen meer of minder geteld.Herstel de fout door op papier I en J leeg te (laten) maken.Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan."
+    }
+  },
+  "F306": {
+    "typist": {
+      "title": "Controleer I (stembiljetten meer geteld)"
+    },
+    "coordinator": {
+      "title": "Controleer I (stembiljetten meer geteld)",
+      "content": "Herstel de fout door op papier het juiste getal in te (laten) vullen.Controleer ook of het verschil nog volledig verklaard is.Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan."
+    }
+  },
+  "F307": {
+    "typist": {
+      "title": "Controleer I en J"
+    },
+    "coordinator": {
+      "title": "Controleer of I en J verwisseld zijn",
+      "content": "Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.Controleer ook of het verschil nog volledig verklaard is.Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan."
+    }
+  },
+  "F308": {
+    "typist": {
+      "title": "Controleer J"
+    },
+    "coordinator": {
+      "title": "Controleer J (stembiljetten meer geteld)",
+      "content": "Herstel de fout door op papier het juiste getal in te (laten) vullen.Controleer ook of het verschil nog volledig verklaard is.Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan."
+    }
+  },
+  "F309": {
+    "typist": {
+      "title": "Controleer I en J"
+    },
+    "coordinator": {
+      "title": "Controleer of I en J verwisseld zijn",
+      "content": "Herstel de fout door op papier het verschil op de juiste plek in te (laten) vullen.Controleer ook of het verschil nog volledig verklaard is.Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan."
+    }
+  },
+  "F310": {
+    "typist": {
+      "title": "Controleer je antwoorden"
+    },
+    "coordinator": {
+      "title": "Er moet precies 1 antwoord op deze vraag gegeven zijn"
     }
   },
   "F401": {
     "typist": {
-      "title": "Controleer ingevoerde aantallen",
-      "content": "De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan."
     },
     "coordinator": {
-      "title": "Controleer ingevoerde aantallen",
-      "content": "De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Het totaal van de lijst is niet ingevuld",
+      "content": "Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.{x} in rubriek 3.2)Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.- Zo ja: corrigeer de optelfout op het papieren proces-verbaal.- Zo nee: Onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is."
     }
   },
   "F402": {
     "typist": {
-      "title": "Controleer het totaal van de lijst",
-      "content": "Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.402)"
+      "title": "Controleer ingevoerde aantallen",
+      "content": "De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.Check of je het papieren proces-verbaal goed hebt overgenomen."
     },
     "coordinator": {
+      "title": "De optelling van de stemmen op kandidaten komt niet overeen met het ingevulde lijsttotaal",
+      "content": "Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld.Reken de optelling in het papieren proces-verbaal na.Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.- Zo ja: corrigeer de optelfout op het papieren proces-verbaal.- Zo nee: Onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is."
+    }
+  },
+  "F403": {
+    "typist": {
       "title": "Controleer het totaal van de lijst",
-      "content": "Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.402)"
+      "content": "Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij <link>Aantal kiezers en stemmen</link>."
+    },
+    "coordinator": {
+      "title": "Controleer het totaal van de lijst en E.{x} in rubriek 3.2",
+      "content": "Controleer wat er fout is gegaan in rubriek 3.2 en herstel de fout.Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan."
     }
   },
   "W001": {
@@ -105,48 +181,48 @@
       "content": "Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal."
     },
     "coordinator": {
-      "title": "Verschil met eerste invoer. Extra controle nodig",
-      "content": "Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal."
+      "title": "",
+      "content": ""
     }
   },
   "W201": {
     "typist": {
       "title": "Controleer aantal blanco stemmen",
-      "content": "Het aantal blanco stemmen is erg hoog.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "content": "Check of je het papieren proces-verbaal goed hebt overgenomen."
     },
     "coordinator": {
-      "title": "Controleer aantal blanco stemmen",
-      "content": "Het aantal blanco stemmen is erg hoog.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Het aantal blanco stemmen is erg hoog",
+      "content": "Hertel de blanco stemmen of geef een verklaring voor het hoge aantal. Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2)."
     }
   },
   "W202": {
     "typist": {
       "title": "Controleer aantal ongeldige stemmen",
-      "content": "Het aantal ongeldige stemmen is erg hoog.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "content": "Check of je het papieren proces-verbaal goed hebt overgenomen."
     },
     "coordinator": {
-      "title": "Controleer aantal ongeldige stemmen",
-      "content": "Het aantal ongeldige stemmen is erg hoog.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Het aantal ongeldige stemmen is erg hoog",
+      "content": "Hertel de ongeldige stemmen of geef een verklaring voor het hoge aantal. Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2)."
     }
   },
   "W203": {
     "typist": {
       "title": "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
-      "content": "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "content": "Check of je het papieren proces-verbaal goed hebt overgenomen."
     },
     "coordinator": {
-      "title": "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
-      "content": "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Groot verschil tussen aantal toegelaten kiezers en aantal uitgebrachte stemmen",
+      "content": "Er is een groot verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H). Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitslag per lijst.Verklaar in het proces-verbaal van het GSB (rubriek 1.2) zo goed mogelijk wat de oorzaak van de opmerkelijke uitslag is.Schrijf ook op welke stappen het GSB heeft gezet om deze te hertellen en onderzoeken."
     }
   },
   "W205": {
     "typist": {
       "title": "Controleer aantal uitgebrachte stemmen",
-      "content": "Het totaal aantal uitgebrachte stemmen (H) is nul.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "content": "Check of je het papieren proces-verbaal goed hebt overgenomen."
     },
     "coordinator": {
-      "title": "Controleer aantal uitgebrachte stemmen",
-      "content": "Het totaal aantal uitgebrachte stemmen (H) is nul.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Het totaal aantal uitgebrachte stemmen (H) is nul",
+      "content": "Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.Zo nee: Verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.Zo ja: Verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht."
     }
   },
   "W301": {
@@ -173,6 +249,5 @@
   "warnings": "waarschuwingen",
   "multiple_action_title": "Voor alle {type} geldt het volgende:",
   "made_a_mistake": "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
-  "error_remains": "Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
-  "warning_remains": "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder."
+  "error_or_warning_remains": "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder."
 }

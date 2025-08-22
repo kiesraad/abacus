@@ -160,18 +160,18 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         errors[1].fields,
         vec![
             "data.votes_counts.total_votes_candidates_count",
-            "data.votes_counts.blank_votes_count",
-            "data.votes_counts.invalid_votes_count",
-            "data.votes_counts.total_votes_cast_count",
+            "data.political_group_votes"
         ]
     );
     // error 3
-    assert_eq!(errors[2].code, ValidationResultCode::F204);
+    assert_eq!(errors[2].code, ValidationResultCode::F203);
     assert_eq!(
         errors[2].fields,
         vec![
             "data.votes_counts.total_votes_candidates_count",
-            "data.political_group_votes"
+            "data.votes_counts.blank_votes_count",
+            "data.votes_counts.invalid_votes_count",
+            "data.votes_counts.total_votes_cast_count",
         ]
     );
     // error 4

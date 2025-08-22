@@ -41,6 +41,7 @@ export function CheckAndSaveForm() {
     pollingStationId,
     entryNumber,
   } = useDataEntryContext();
+  const acceptCheckboxRef = React.useRef<HTMLInputElement>(null);
 
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId ?? null;
@@ -79,6 +80,16 @@ export function CheckAndSaveForm() {
     }
     return [sections, hasWarnings, hasErrors, allFeedbackAccepted];
   }, [formState]);
+
+  // Scroll unaccepted warnings/errors checkbox into view when error for it is triggered
+  React.useEffect(() => {
+    if (isConfirmedError) {
+      acceptCheckboxRef.current?.focus();
+      requestAnimationFrame(() => {
+        acceptCheckboxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
+  }, [isConfirmedError]);
 
   // save the current state, without finalising (for the abort dialog)
   const onSubmit = async (options?: SubmitCurrentFormOptions) => {
@@ -262,8 +273,9 @@ export function CheckAndSaveForm() {
           <BottomBar.Row>
             <Checkbox
               id="check_and_save_form_errors_confirmed"
+              ref={acceptCheckboxRef}
               checked={isConfirmed}
-              hasError={false}
+              hasError={!!isConfirmedError}
               onChange={(e) => {
                 setIsConfirmed(e.target.checked);
               }}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="110b" SchemaVersion="5">
+  <TransactionId>1</TransactionId>
+  <ManagingAuthority>
+    <AuthorityIdentifier Id="0000">Test</AuthorityIdentifier>
+    <AuthorityAddress/>
+  </ManagingAuthority>
+  <kr:CreationDateTime>2024-05-27T17:05:57</kr:CreationDateTime>
+  <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+  <ElectionEvent>
+    <EventIdentifier/>
+    <Election>
+      <ElectionIdentifier Id="GR2022">
+        <ElectionName>Gemeenteraad Test 2022</ElectionName>
+        <ElectionCategory>GR</ElectionCategory>
+        <kr:ElectionSubcategory>GR1</kr:ElectionSubcategory>
+        <kr:ElectionDate>2022-03-16</kr:ElectionDate>
+      </ElectionIdentifier>
+      <Contest>
+        <ContestIdentifier Id="geen"/>
+        <ReportingUnit>
+          <ReportingUnitIdentifier Id="0000">Test</ReportingUnitIdentifier>
+        </ReportingUnit>
+        <VotingMethod />
+        <MaxVotes>612694</MaxVotes>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Stadhuis</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1011 PN</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="1">1273</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+      </Contest>
+    </Election>
+  </ElectionEvent>
+</EML>

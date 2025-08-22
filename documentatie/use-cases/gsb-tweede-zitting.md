@@ -42,7 +42,6 @@ __Uitbreidingen:__
 &emsp; 7a1. Het GSB stelt het bezwaar vast.  
 &emsp; 7a2. Het GSB gaat over tot hertelling.
 
-
 ## De coördinator GSB bereidt de documenten voor de zitting voor (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
@@ -97,3 +96,7 @@ __Uitbreidingen:__
 4a. Het GSB bevestigt het oorspronkelijke resultaat in de hertelling:  
 &emsp; 4a1. De coördinator GSB voert de uitkomst van het onderzoek in de applicatie in.  
 &emsp; 4a2. Het GSB voegt het corrigendum toe aan de PV's van de zitting.  
+
+6a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
+&emsp; 6a1. De coördinator GSB pauzeert de invoer.  
+&emsp; 6a2. De applicatie blokkeert verdere invoer.  

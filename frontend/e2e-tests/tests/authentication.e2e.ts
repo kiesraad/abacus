@@ -3,7 +3,7 @@ import { expect } from "@playwright/test";
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
 import { AccountSetupPgObj } from "../page-objects/authentication/AccountSetupPgObj";
 import { LoginPgObj } from "../page-objects/authentication/LoginPgObj";
-import { OverviewPgObj } from "../page-objects/election/OverviewPgObj";
+import { ElectionsOverviewPgObj } from "../page-objects/election/ElectionsOverviewPgObj";
 import { AdminNavBar } from "../page-objects/nav_bar/AdminNavBarPgObj";
 import { TypistNavBar } from "../page-objects/nav_bar/TypistNavBarPgObj";
 
@@ -55,7 +55,7 @@ test.describe("authentication", () => {
     const navBar = new TypistNavBar(page);
     await expect(navBar.username).toHaveText(newTypist.fullname!);
 
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(navBar.username).toHaveText(newTypist.fullname!);
     await expect(overviewPage.alert).toBeVisible();
   });

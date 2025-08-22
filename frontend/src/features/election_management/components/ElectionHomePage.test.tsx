@@ -18,6 +18,7 @@ import {
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionCreateHandler,
+  CommitteeSessionDeleteHandler,
   ElectionCommitteeSessionListRequestHandler,
   ElectionRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
@@ -75,6 +76,7 @@ describe("ElectionHomePage", () => {
     );
 
     expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
     expect(await screen.findByRole("heading", { level: 3, name: "Over deze verkiezing" })).toBeVisible();
     const election_information_table = await screen.findByTestId("election-information-table");
@@ -116,6 +118,7 @@ describe("ElectionHomePage", () => {
     expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
       /Eerste zitting — Steminvoer afgerond/,
     );
+    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
     const createButton = screen.getByRole("button", { name: "Nieuwe zitting voorbereiden" });
     expect(createButton).toBeVisible();
@@ -154,10 +157,12 @@ describe("ElectionHomePage", () => {
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    const session4 = within(committee_session_cards).getByTestId("session-1");
-    expect(session4).toHaveTextContent(/Eerste zitting — Steminvoer afgerond/);
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
 
     expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
     expect(await screen.findByRole("heading", { level: 3, name: "Over deze verkiezing" })).toBeVisible();
     const election_information_table = await screen.findByTestId("election-information-table");
@@ -171,6 +176,95 @@ describe("ElectionHomePage", () => {
       ["Stembureaus", "8 stembureaus"],
       ["Type stemopneming", "Centrale stemopneming"],
     ]);
+  });
+
+  test("Shows delete committee session button and clicking it deletes the current committee session", async () => {
+    const user = userEvent.setup();
+    server.use(CommitteeSessionDeleteHandler);
+    const sessionDeleteRequestSpy = spyOnHandler(CommitteeSessionDeleteHandler);
+    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+    server.use(
+      http.get("/api/elections/1/committee_sessions", () =>
+        HttpResponse.json(getCommitteeSessionListMockData({ status: "created" }), {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    const committee_session_cards = await screen.findByTestId("committee-session-cards");
+    expect(committee_session_cards).toBeVisible();
+    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
+      /Vierde zitting — Zitting voorbereiden/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
+      /Derde zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
+      /Tweede zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
+    expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+
+    const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
+    expect(deleteButton).toBeVisible();
+
+    await user.click(deleteButton);
+
+    const modal = await screen.findByRole("dialog");
+    expect(modal).toBeVisible();
+    const title = within(modal).getByText("Zitting verwijderen?");
+    expect(title).toBeVisible();
+
+    const confirmButton = within(modal).getByRole("button", { name: "Verwijder zitting" });
+    expect(confirmButton).toBeVisible();
+    await user.click(confirmButton);
+
+    expect(sessionDeleteRequestSpy).toHaveBeenCalledOnce();
+  });
+
+  test("Does not show delete committee session button for administrator", async () => {
+    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+    server.use(
+      http.get("/api/elections/1/committee_sessions", () =>
+        HttpResponse.json(getCommitteeSessionListMockData({ status: "created" }), {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage("administrator");
+
+    const committee_session_cards = await screen.findByTestId("committee-session-cards");
+    expect(committee_session_cards).toBeVisible();
+    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
+      /Vierde zitting — Zitting voorbereiden/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
+      /Derde zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
+      /Tweede zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
+
+    expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
   });
 
   test("Shows error page when start data entry call returns an error", async () => {
@@ -287,5 +381,38 @@ describe("ElectionHomePage", () => {
       ["Stembureaus", "0 stembureaus"],
       ["Type stemopneming", "Centrale stemopneming"],
     ]);
+  });
+
+  test("Shows empty documents section for first committee session", async () => {
+    const electionDataFirstSession = getElectionMockData({}, { number: 1 });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    expect(
+      await screen.findByRole("heading", { level: 3, name: "Lege documenten voor deze verkiezing" }),
+    ).toBeVisible();
+    expect(screen.getByText("Na 31-2 Bijlage 1")).toBeVisible();
+    expect(screen.getByText("N 10-2")).toBeVisible();
+  });
+
+  test("Does not show empty documents section for second committee session", async () => {
+    const electionDataSecondSession = getElectionMockData({}, { number: 2 });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    expect(
+      screen.queryByRole("heading", { level: 3, name: "Lege documenten voor deze verkiezing" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
   });
 });

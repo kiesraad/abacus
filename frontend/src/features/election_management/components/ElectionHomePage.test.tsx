@@ -61,10 +61,20 @@ describe("ElectionHomePage", () => {
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByText("Tweede zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer bezig")).toBeVisible();
-    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeVisible();
+
+    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
+      /Vierde zitting — Steminvoer bezig/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
+      /Derde zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
+      /Tweede zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
+
     expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
@@ -105,8 +115,9 @@ describe("ElectionHomePage", () => {
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeVisible();
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
     const createButton = screen.getByRole("button", { name: "Nieuwe zitting voorbereiden" });
@@ -146,8 +157,9 @@ describe("ElectionHomePage", () => {
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeVisible();
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
 
     expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
@@ -188,10 +200,18 @@ describe("ElectionHomePage", () => {
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByText("Tweede zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Zitting voorbereiden")).toBeVisible();
-    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeVisible();
+    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
+      /Vierde zitting — Zitting voorbereiden/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
+      /Derde zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
+      /Tweede zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
     expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
 
     const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
@@ -230,10 +250,18 @@ describe("ElectionHomePage", () => {
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByText("Tweede zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Zitting voorbereiden")).toBeVisible();
-    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeVisible();
+    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
+      /Vierde zitting — Zitting voorbereiden/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
+      /Derde zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
+      /Tweede zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
 
     expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
@@ -290,7 +318,7 @@ describe("ElectionHomePage", () => {
         HttpResponse.json(committeeSessionsData satisfies CommitteeSessionListResponse, { status: 200 }),
       ),
     );
-    overrideOnce("put", "/api/committee_sessions/2/status", 409, {
+    overrideOnce("put", "/api/committee_sessions/4/status", 409, {
       error: "Invalid committee session status",
       fatal: true,
       reference: "InvalidCommitteeSessionStatus",
@@ -307,12 +335,10 @@ describe("ElectionHomePage", () => {
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByText("Tweede zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Klaar voor steminvoer")).toBeVisible();
-    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeVisible();
+    const session4 = within(committee_session_cards).getByTestId("session-4");
+    expect(session4).toHaveTextContent(/Vierde zitting — Klaar voor steminvoer/);
 
-    const startButton = screen.getByRole("button", { name: "Start steminvoer" });
+    const startButton = within(session4).getByRole("button", { name: "Start steminvoer" });
     expect(startButton).toBeVisible();
 
     await user.click(startButton);
@@ -342,10 +368,6 @@ describe("ElectionHomePage", () => {
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByText("Tweede zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer bezig")).toBeInTheDocument();
-    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeInTheDocument();
 
     expect(await screen.findByRole("heading", { level: 3, name: "Over deze verkiezing" })).toBeVisible();
     const election_information_table = await screen.findByTestId("election-information-table");

@@ -1,4 +1,4 @@
-use sqlx::{Error, query_as};
+use sqlx::{Error, query, query_as};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
@@ -155,6 +155,16 @@ pub async fn create(
     )
     .fetch_one(conn)
     .await
+}
+
+/// Delete a committee session
+pub async fn delete(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, Error> {
+    let rows_affected = query!(r#"DELETE FROM committee_sessions WHERE id = ?"#, id,)
+        .execute(conn)
+        .await?
+        .rows_affected();
+
+    Ok(rows_affected > 0)
 }
 
 pub async fn update(

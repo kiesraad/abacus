@@ -1,8 +1,8 @@
 import { type Locator, type Page } from "@playwright/test";
 
 export class PollingStationListPgObj {
-  readonly alert: Locator;
   readonly header: Locator;
+  readonly alert: Locator;
   readonly createPollingStation: Locator;
 
   constructor(protected readonly page: Page) {

@@ -5,7 +5,7 @@ import { CreateFirstAdminPgObj } from "../page-objects/authentication/CreateFirs
 import { FirstLoginPgObj } from "../page-objects/authentication/FirstLoginPgObj";
 import { InitialiseWelcomePgObj } from "../page-objects/authentication/InitialiseWelcomePgObj";
 import { LoginPgObj } from "../page-objects/authentication/LoginPgObj";
-import { OverviewPgObj } from "../page-objects/election/OverviewPgObj";
+import { ElectionsOverviewPgObj } from "../page-objects/election/ElectionsOverviewPgObj";
 import { AdminNavBar } from "../page-objects/nav_bar/AdminNavBarPgObj";
 import { firstAdmin } from "../test-data/users";
 
@@ -38,8 +38,8 @@ test.describe("initialisation", () => {
     await firstLoginPage.loginBtn.click();
 
     // check that we have logged in successfully and logout again
-    const electionsPage = new OverviewPgObj(page);
-    await expect(electionsPage.header).toBeVisible();
+    const electionsPage = new ElectionsOverviewPgObj(page);
+    await expect(electionsPage.adminHeader).toBeVisible();
 
     const navBar = new AdminNavBar(page);
     await navBar.logout.click();

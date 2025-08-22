@@ -283,4 +283,37 @@ describe("ElectionHomePage", () => {
       ["Type stemopneming", "Centrale stemopneming"],
     ]);
   });
+
+  test("Shows empty documents section for first committee session", async () => {
+    const electionDataFirstSession = getElectionMockData({}, { number: 1 });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    expect(
+      await screen.findByRole("heading", { level: 3, name: "Lege documenten voor deze verkiezing" }),
+    ).toBeVisible();
+    expect(screen.getByText("Na 31-2 Bijlage 1")).toBeVisible();
+    expect(screen.getByText("N 10-2")).toBeVisible();
+  });
+
+  test("Does not show empty documents section for second committee session", async () => {
+    const electionDataSecondSession = getElectionMockData({}, { number: 2 });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    expect(
+      screen.queryByRole("heading", { level: 3, name: "Lege documenten voor deze verkiezing" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
+  });
 });

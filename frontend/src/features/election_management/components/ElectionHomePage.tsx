@@ -63,6 +63,7 @@ export function ElectionHomePage() {
   }
 
   const committeeSessions = getCommitteeSessions.data.committee_sessions;
+  const isFirstCommitteeSession = committeeSession.number === 1;
 
   if (isTypist) {
     return <Navigate to="data-entry" />;
@@ -162,34 +163,36 @@ export function ElectionHomePage() {
               numberOfVoters={committeeSession.number_of_voters}
             />
           </div>
-          <div className={cls.downloadModels}>
-            <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
-            <p>{t("election_management.empty_documents_description")}</p>
-            <Table className={cn(cls.electionInformationTable)} variant="information">
-              <Table.Header>
-                <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
-                <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
-              </Table.Header>
-              <Table.Body>
-                <Table.ClickRow
-                  onClick={() => {
-                    directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
-                  }}
-                >
-                  <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
-                  <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
-                </Table.ClickRow>
-                <Table.ClickRow
-                  onClick={() => {
-                    directDownload(`/api/elections/${election.id}/download_n_10_2`);
-                  }}
-                >
-                  <Table.Cell>N 10-2</Table.Cell>
-                  <Table.Cell>{t("election_management.document_n_10_2")}</Table.Cell>
-                </Table.ClickRow>
-              </Table.Body>
-            </Table>
-          </div>
+          {isFirstCommitteeSession && (
+            <div className={cls.downloadModels}>
+              <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
+              <p>{t("election_management.empty_documents_description")}</p>
+              <Table className={cn(cls.electionInformationTable)} variant="information">
+                <Table.Header>
+                  <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+                  <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
+                </Table.Header>
+                <Table.Body>
+                  <Table.ClickRow
+                    onClick={() => {
+                      directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
+                    }}
+                  >
+                    <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
+                    <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
+                  </Table.ClickRow>
+                  <Table.ClickRow
+                    onClick={() => {
+                      directDownload(`/api/elections/${election.id}/download_n_10_2`);
+                    }}
+                  >
+                    <Table.Cell>N 10-2</Table.Cell>
+                    <Table.Cell>{t("election_management.document_n_10_2")}</Table.Cell>
+                  </Table.ClickRow>
+                </Table.Body>
+              </Table>
+            </div>
+          )}
         </article>
       </main>
       <Footer />

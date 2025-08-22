@@ -15,7 +15,7 @@ export function CommitteeSessionPausedModal({ showUnsavedChanges }: CommitteeSes
         {showUnsavedChanges && ` [${t("data_entry.changes_are_not_saved")}]`}
       </p>
       <nav>
-        <Button.Link variant="primary" size="xl" to="/elections">
+        <Button.Link variant="primary" size="xl" to="/elections" state={{ refetchElections: true }}>
           {t("data_entry.to_overview")}
         </Button.Link>
         <Button.Link variant="secondary" size="xl" to="/account/logout">

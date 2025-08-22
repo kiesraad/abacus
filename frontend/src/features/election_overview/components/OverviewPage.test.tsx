@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { render, renderReturningRouter, screen, waitFor } from "@/testing/test-utils";
+import { render, renderReturningRouter, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionListResponse } from "@/types/generated/openapi";
 
@@ -202,5 +202,34 @@ describe("OverviewPage", () => {
     await user.click(button);
 
     expect(router.state.location.pathname).toEqual("/create");
+  });
+
+  test("Refetches data every 30 seconds", async () => {
+    vi.useFakeTimers();
+    render(
+      <TestUserProvider userRole="typist">
+        <ElectionListProvider>
+          <OverviewPage />
+        </ElectionListProvider>
+      </TestUserProvider>,
+    );
+
+    // Wait for the page to be loaded
+    await vi.waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
+    });
+
+    const electionListRequestSpy = spyOnHandler(ElectionListRequestHandler);
+
+    // Test 3 intervals of 30 seconds each
+    for (let i = 1; i <= 3; i++) {
+      vi.advanceTimersByTime(30_000);
+
+      await vi.waitFor(() => {
+        expect(electionListRequestSpy).toHaveBeenCalledTimes(i);
+      });
+    }
+
+    vi.useRealTimers();
   });
 });

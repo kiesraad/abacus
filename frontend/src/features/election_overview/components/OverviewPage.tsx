@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { Location, useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { CommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
@@ -16,6 +16,10 @@ import { useElectionList } from "@/hooks/election/useElectionList";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t, tx } from "@/i18n/translate";
 import { Election } from "@/types/generated/openapi";
+
+interface RefetchElectionsState {
+  refetchElections?: boolean;
+}
 
 function AddFirstElection() {
   const { isAdministrator } = useUserRole();
@@ -35,23 +39,32 @@ function AddFirstElection() {
 
 export function OverviewPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { committeeSessionList, electionList, refetch } = useElectionList();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  const location = useLocation() as Location<null | RefetchElectionsState>;
+  const { committeeSessionList, electionList, refetch: refetchElections } = useElectionList();
   const { isTypist, isAdministrator, isCoordinator } = useUserRole();
 
   const isNewAccount = location.hash === "#new-account";
   const isAdminOrCoordinator = isAdministrator || isCoordinator;
 
-  // re-fetch statuses when component mounts
+  // re-fetch elections if state contains refetchElections and every 30 seconds
   useEffect(() => {
     const abortController = new AbortController();
 
-    void refetch(abortController);
+    const refetch = () => {
+      void refetchElections(abortController);
+    };
+
+    if (location.state?.refetchElections === true) {
+      refetch();
+    }
+    const refetchInterval = setInterval(refetch, 30_000);
 
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
+      clearInterval(refetchInterval);
     };
-  }, [refetch]);
+  }, [location.state?.refetchElections, refetchElections]);
 
   interface ElectionRowProps {
     election: Election;

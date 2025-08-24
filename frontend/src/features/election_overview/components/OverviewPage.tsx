@@ -1,7 +1,8 @@
 import { ReactNode, useEffect } from "react";
-import { Location, useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
+import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { CommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { IconPlus } from "@/components/generated/icons";
@@ -10,16 +11,12 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
-import { useElectionList } from "@/hooks/election/useElectionList";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t, tx } from "@/i18n/translate";
-import { Election } from "@/types/generated/openapi";
-
-interface RefetchElectionsState {
-  refetchElections?: boolean;
-}
+import { Election, ELECTION_LIST_REQUEST_PATH, ElectionListResponse } from "@/types/generated/openapi";
 
 function AddFirstElection() {
   const { isAdministrator } = useUserRole();
@@ -39,15 +36,16 @@ function AddFirstElection() {
 
 export function OverviewPage() {
   const navigate = useNavigate();
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  const location = useLocation() as Location<null | RefetchElectionsState>;
-  const { committeeSessionList, electionList, refetch: refetchElections } = useElectionList();
+  const location = useLocation();
+  const { requestState: getElections, refetch: refetchElections } = useInitialApiGet<ElectionListResponse>(
+    `/api/elections` satisfies ELECTION_LIST_REQUEST_PATH,
+  );
   const { isTypist, isAdministrator, isCoordinator } = useUserRole();
 
   const isNewAccount = location.hash === "#new-account";
   const isAdminOrCoordinator = isAdministrator || isCoordinator;
 
-  // re-fetch elections if state contains refetchElections and every 30 seconds
+  // re-fetch elections every 30 seconds
   useEffect(() => {
     const abortController = new AbortController();
 
@@ -55,16 +53,24 @@ export function OverviewPage() {
       void refetchElections(abortController);
     };
 
-    if (location.state?.refetchElections === true) {
-      refetch();
-    }
     const refetchInterval = setInterval(refetch, 30_000);
 
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
       clearInterval(refetchInterval);
     };
-  }, [location.state?.refetchElections, refetchElections]);
+  }, [refetchElections]);
+
+  if (getElections.status === "api-error") {
+    throw getElections.error;
+  }
+
+  if (getElections.status === "loading") {
+    return <Loader />;
+  }
+
+  const committeeSessionList = getElections.data.committee_sessions;
+  const electionList = getElections.data.elections;
 
   interface ElectionRowProps {
     election: Election;

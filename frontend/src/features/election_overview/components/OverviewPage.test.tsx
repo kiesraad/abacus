@@ -5,7 +5,6 @@ import { http, HttpResponse } from "msw";
 import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, renderReturningRouter, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
@@ -26,9 +25,7 @@ describe("OverviewPage", () => {
     const user = userEvent.setup();
     render(
       <TestUserProvider userRole="typist">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -53,9 +50,7 @@ describe("OverviewPage", () => {
     const user = userEvent.setup();
     render(
       <TestUserProvider userRole="coordinator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -80,9 +75,7 @@ describe("OverviewPage", () => {
     const user = userEvent.setup();
     render(
       <TestUserProvider userRole="administrator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -118,9 +111,7 @@ describe("OverviewPage", () => {
 
     render(
       <TestUserProvider userRole="typist">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -149,9 +140,7 @@ describe("OverviewPage", () => {
 
     render(
       <TestUserProvider userRole="coordinator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -181,9 +170,7 @@ describe("OverviewPage", () => {
 
     const router = renderReturningRouter(
       <TestUserProvider userRole="administrator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -208,9 +195,7 @@ describe("OverviewPage", () => {
     vi.useFakeTimers();
     render(
       <TestUserProvider userRole="typist">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 

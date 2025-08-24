@@ -18,7 +18,7 @@ import { t } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_CREATE_REQUEST_BODY,
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
-  CommitteeSession,
+  CommitteeSessionListResponse,
   ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
@@ -31,9 +31,10 @@ import cls from "./ElectionManagement.module.css";
 export function ElectionHomePage() {
   const client = useApiClient();
   const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
-  const { requestState: getCommitteeSessions, refetch: refetchCommitteeSessions } = useInitialApiGet<{
-    committee_sessions: CommitteeSession[];
-  }>(`/api/elections/${election.id}/committee_sessions` satisfies ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH);
+  const { requestState: getCommitteeSessions, refetch: refetchCommitteeSessions } =
+    useInitialApiGet<CommitteeSessionListResponse>(
+      `/api/elections/${election.id}/committee_sessions` satisfies ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
+    );
   const { isTypist, isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const [createCommitteeSessionError, setCreateCommitteeSessionError] = useState<AnyApiError | null>(null);

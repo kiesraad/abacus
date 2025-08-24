@@ -170,6 +170,78 @@
             }
           }
         }
+      },
+      "delete": {
+        "summary": "Delete a [CommitteeSession].",
+        "operationId": "committee_session_delete",
+        "parameters": [
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "description": "Committee session database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committee session deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Committee session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/committee_sessions/{committee_session_id}/status": {
@@ -3532,6 +3604,27 @@
                     "type": "string",
                     "enum": [
                       "CommitteeSessionCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommitteeSessionDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "CommitteeSessionDeleted"
                     ]
                   }
                 }

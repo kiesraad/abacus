@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router";
+import { Link, Location, Navigate, useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { Footer } from "@/components/footer/Footer";
+import { IconTrash } from "@/components/generated/icons.tsx";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -18,18 +19,27 @@ import { t } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_CREATE_REQUEST_BODY,
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
+  COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   CommitteeSessionListResponse,
   ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
+import { committeeSessionLabel } from "@/utils/committeeSession.ts";
 
 import { directDownload } from "../utils/download";
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
 
+interface ShowDeleteModalState {
+  showDeleteModal?: boolean;
+}
+
 export function ElectionHomePage() {
   const client = useApiClient();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  const location = useLocation() as Location<null | ShowDeleteModalState>;
+  const navigate = useNavigate();
   const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
   const { requestState: getCommitteeSessions, refetch: refetchCommitteeSessions } =
     useInitialApiGet<CommitteeSessionListResponse>(
@@ -38,9 +48,14 @@ export function ElectionHomePage() {
   const { isTypist, isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const [createCommitteeSessionError, setCreateCommitteeSessionError] = useState<AnyApiError | null>(null);
+  const [deleteCommitteeSessionError, setDeleteCommitteeSessionError] = useState<AnyApiError | null>(null);
 
   if (createCommitteeSessionError) {
     throw createCommitteeSessionError;
+  }
+
+  if (deleteCommitteeSessionError) {
+    throw deleteCommitteeSessionError;
   }
 
   // re-fetch election when component mounts
@@ -64,6 +79,7 @@ export function ElectionHomePage() {
   }
 
   const committeeSessions = getCommitteeSessions.data.committee_sessions;
+  const isFirstCommitteeSession = committeeSession.number === 1;
 
   if (isTypist) {
     return <Navigate to="data-entry" />;
@@ -80,12 +96,32 @@ export function ElectionHomePage() {
       .postRequest(url, body)
       .then(async (result) => {
         if (isSuccess(result)) {
+          await refetchElection();
           await refetchCommitteeSessions();
         } else {
           throw result;
         }
       })
       .catch(setCreateCommitteeSessionError);
+  }
+
+  function toggleDeleteCommitteeSessionModal() {
+    void navigate(".", { replace: true });
+  }
+
+  function handleCommitteeSessionDelete() {
+    const url: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}`;
+    void client
+      .deleteRequest(url)
+      .then(async (result) => {
+        if (isSuccess(result)) {
+          await refetchElection();
+          await refetchCommitteeSessions();
+        } else {
+          throw result;
+        }
+      })
+      .catch(setDeleteCommitteeSessionError);
   }
 
   return (
@@ -112,6 +148,31 @@ export function ElectionHomePage() {
               {t("election_management.yes_add_session")}
             </Button>
             <Button variant="secondary" onClick={toggleAddCommitteeSessionModal}>
+              {t("cancel")}
+            </Button>
+          </nav>
+        </Modal>
+      )}
+      {location.state?.showDeleteModal === true && (
+        <Modal title={`${t("election_management.delete_session")}?`} onClose={toggleDeleteCommitteeSessionModal}>
+          <p>
+            {t("election_management.delete_session_are_you_sure", {
+              sessionLabel: committeeSessionLabel(committeeSession.number, true).toLowerCase(),
+            })}
+          </p>
+          <nav>
+            <Button
+              leftIcon={<IconTrash />}
+              variant="primary-destructive"
+              size="xl"
+              onClick={() => {
+                handleCommitteeSessionDelete();
+                toggleDeleteCommitteeSessionModal();
+              }}
+            >
+              {t("election_management.yes_delete_session")}
+            </Button>
+            <Button variant="secondary" onClick={toggleDeleteCommitteeSessionModal}>
               {t("cancel")}
             </Button>
           </nav>
@@ -163,34 +224,36 @@ export function ElectionHomePage() {
               numberOfVoters={committeeSession.number_of_voters}
             />
           </div>
-          <div className={cls.downloadModels}>
-            <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
-            <p>{t("election_management.empty_documents_description")}</p>
-            <Table className={cn(cls.electionInformationTable)} variant="information">
-              <Table.Header>
-                <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
-                <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
-              </Table.Header>
-              <Table.Body>
-                <Table.ClickRow
-                  onClick={() => {
-                    directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
-                  }}
-                >
-                  <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
-                  <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
-                </Table.ClickRow>
-                <Table.ClickRow
-                  onClick={() => {
-                    directDownload(`/api/elections/${election.id}/download_n_10_2`);
-                  }}
-                >
-                  <Table.Cell>N 10-2</Table.Cell>
-                  <Table.Cell>{t("election_management.document_n_10_2")}</Table.Cell>
-                </Table.ClickRow>
-              </Table.Body>
-            </Table>
-          </div>
+          {isFirstCommitteeSession && (
+            <div className={cls.downloadModels}>
+              <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
+              <p>{t("election_management.empty_documents_description")}</p>
+              <Table className={cn(cls.electionInformationTable)} variant="information">
+                <Table.Header>
+                  <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+                  <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
+                </Table.Header>
+                <Table.Body>
+                  <Table.ClickRow
+                    onClick={() => {
+                      directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
+                    }}
+                  >
+                    <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
+                    <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
+                  </Table.ClickRow>
+                  <Table.ClickRow
+                    onClick={() => {
+                      directDownload(`/api/elections/${election.id}/download_n_10_2`);
+                    }}
+                  >
+                    <Table.Cell>N 10-2</Table.Cell>
+                    <Table.Cell>{t("election_management.document_n_10_2")}</Table.Cell>
+                  </Table.ClickRow>
+                </Table.Body>
+              </Table>
+            </div>
+          )}
         </article>
       </main>
       <Footer />

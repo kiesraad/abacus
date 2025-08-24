@@ -29,6 +29,7 @@
   "event": {
     "ApportionmentCreated": "Zetelverdeling gemaakt",
     "CommitteeSessionCreated": "Zitting aangemaakt",
+    "CommitteeSessionDeleted": "Zitting verwijderd",
     "CommitteeSessionUpdated": "Zitting bijgewerkt",
     "DataEntryClaimed": "Invoer geclaimd",
     "DataEntryDeleted": "Invoer verwijderd",

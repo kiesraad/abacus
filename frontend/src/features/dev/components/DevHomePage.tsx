@@ -214,7 +214,7 @@ function DevLinks() {
           </ul>
         </>
       )}
-      {__API_MSW__ || (user && <Links />)}
+      {(__API_MSW__ || user) && <Links />}
     </>
   );
 }

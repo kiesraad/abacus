@@ -1,9 +1,9 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { UserEvent, userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { useUser } from "@/hooks/user/useUser";
+import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -25,9 +25,6 @@ import {
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
 
-vi.mock("@/hooks/user/useUser");
-vi.mock("react-router");
-
 const testUser: LoginResponse = {
   username: "test-user-1",
   user_id: 1,
@@ -36,7 +33,7 @@ const testUser: LoginResponse = {
 };
 
 function renderForm() {
-  vi.mocked(useParams).mockReturnValue({ sectionId: "differences_counts" });
+  vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "differences_counts" });
 
   return render(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
@@ -52,7 +49,7 @@ const differencesFieldIds = {
 
 describe("Test DifferencesForm", () => {
   beforeEach(() => {
-    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
+    vi.spyOn(useUser, "useUser").mockReturnValue(testUser);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 

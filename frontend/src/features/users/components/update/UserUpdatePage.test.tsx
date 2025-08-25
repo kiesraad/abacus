@@ -1,3 +1,5 @@
+import * as ReactRouter from "react-router";
+
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -13,18 +15,11 @@ import { UserUpdatePage } from "./UserUpdatePage";
 
 const navigate = vi.fn();
 
-vi.mock(import("@/hooks/useNumericParam"), () => ({
-  useNumericParam: () => 1,
-}));
-
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 describe("UserUpdatePage", () => {
   beforeEach(() => {
     server.use(UserGetRequestHandler, UserUpdateRequestHandler, UserDeleteRequestHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ userId: "1" });
   });
 
   test("update user", async () => {

@@ -1,5 +1,5 @@
 import { Fragment, HTMLAttributes, ReactNode, useState } from "react";
-import { To, useNavigate } from "react-router";
+import { NavigateOptions, To, useNavigate } from "react-router";
 
 import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -50,6 +50,7 @@ export interface ButtonLink {
   id: number;
   label: string;
   to: To;
+  options?: NavigateOptions;
 }
 
 export interface ButtonLinkListProps {
@@ -66,7 +67,7 @@ function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
           {index !== 0 && <div className={cls.border}></div>}
           <button
             onClick={() => {
-              void navigate(buttonLink.to);
+              void navigate(buttonLink.to, buttonLink.options || {});
             }}
           >
             <span className={cn(firstRowBold && index === 0 && "bold")}>{buttonLink.label}</span>
@@ -119,14 +120,39 @@ export function CommitteeSessionCard({
     : undefined;
   const buttonLinks: ButtonLink[] = [];
   let button = undefined;
+
+  const detailsButtonLink: ButtonLink = {
+    id: committeeSession.id,
+    label: t("election_management.committee_session_details"),
+    to: "details",
+  };
+  const deleteButtonLink: ButtonLink = {
+    id: committeeSession.id,
+    label: t("election_management.delete_session"),
+    to: ".",
+    options: { state: { showDeleteModal: true } },
+  };
+
   switch (committeeSession.status) {
     case "created":
       // TODO: Add in issue #1716 with link
       // if (committeeSession.number > 1 && currentSession) {
-      //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.select_polling_stations"), to: "" });
+      //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.select_polling_stations"), to: ""});
       // }
+      if (isCoordinator && currentSession) {
+        buttonLinks.push(detailsButtonLink);
+        if (committeeSession.number > 1) {
+          buttonLinks.push(deleteButtonLink);
+        }
+      }
       break;
     case "data_entry_not_started":
+      if (isCoordinator && currentSession) {
+        buttonLinks.push(detailsButtonLink);
+        if (committeeSession.number > 1) {
+          buttonLinks.push(deleteButtonLink);
+        }
+      }
       if (isCoordinator) {
         button = (
           <Button size="sm" onClick={handleStart}>
@@ -136,6 +162,9 @@ export function CommitteeSessionCard({
       }
       break;
     case "data_entry_in_progress":
+      if (isCoordinator && currentSession) {
+        buttonLinks.push(detailsButtonLink);
+      }
       button = (
         <Button.Link size="sm" to="status">
           {t("election_management.view_progress")}
@@ -150,6 +179,9 @@ export function CommitteeSessionCard({
           : t("election_management.view_progress"),
         to: "status",
       });
+      if (isCoordinator && currentSession) {
+        buttonLinks.push(detailsButtonLink);
+      }
       break;
     case "data_entry_finished":
       if (isCoordinator) {
@@ -164,17 +196,20 @@ export function CommitteeSessionCard({
       }
       break;
   }
-  if (isCoordinator && currentSession) {
-    buttonLinks.push({
-      id: committeeSession.id,
-      label: t("election_management.committee_session_details"),
-      to: "details",
-    });
-  }
 
   return (
-    <Card icon={icon} label={label} status={status} date={date} button={button} {...props}>
-      {buttonLinks.length > 0 && <ButtonLinkList buttonLinks={buttonLinks} firstRowBold={currentSession} />}
+    <Card
+      icon={icon}
+      label={label}
+      status={status}
+      date={date}
+      button={button}
+      id={`session-${committeeSession.number}`}
+      {...props}
+    >
+      {buttonLinks.length > 0 && (
+        <ButtonLinkList buttonLinks={buttonLinks} firstRowBold={currentSession && button === undefined} />
+      )}
     </Card>
   );
 }

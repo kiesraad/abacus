@@ -1,3 +1,5 @@
+import * as ReactRouter from "react-router";
+
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { within } from "storybook/test";
@@ -14,14 +16,10 @@ import { OverviewPage } from "./OverviewPage";
 
 const navigate = vi.fn();
 
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 describe("OverviewPage", () => {
   beforeEach(() => {
     server.use(ElectionListRequestHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
   test("Renders elections for typist", async () => {

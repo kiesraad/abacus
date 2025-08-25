@@ -95,11 +95,11 @@ export async function uploadCandidatesAndInputHash(page: Page) {
   await checkCandidateDefinitionPage.inputHash(eml230b.hashInput1, eml230b.hashInput2);
 }
 
-export async function uploadPollingStations(page: Page) {
+export async function uploadPollingStations(page: Page, eml = eml110b) {
   const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
   await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  await uploadElectionDefinitionPage.uploadFile(page, eml110b.path);
-  await expect(uploadElectionDefinitionPage.main).toContainText(eml110b.filename);
+  await uploadElectionDefinitionPage.uploadFile(page, eml.path);
+  await expect(uploadElectionDefinitionPage.main).toContainText(eml.filename);
 
   const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();

@@ -13,6 +13,10 @@ export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
 }
 export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
+export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 
 // /api/committee_sessions/{committee_session_id}/status
 export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
@@ -290,6 +294,7 @@ export type AuditEvent =
   | (UserDetails & { event_type: "UserDeleted" })
   | (ElectionDetails & { event_type: "ElectionCreated" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionCreated" })
+  | (CommitteeSessionDetails & { event_type: "CommitteeSessionDeleted" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
   | (PollingStationDetails & { event_type: "PollingStationCreated" })

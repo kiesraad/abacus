@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -15,8 +15,6 @@ import { overrideServerClaimDataEntryResponse } from "../testing/test.utils";
 import { FormState } from "../types/types";
 import { DataEntryProgress } from "./DataEntryProgress";
 import { DataEntryProvider } from "./DataEntryProvider";
-
-vi.mock("react-router");
 
 function renderForm() {
   return render(
@@ -67,11 +65,10 @@ const pollingStationResults = {
 describe("DataEntryProgress", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler);
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });
   });
 
   test("shows different states for entries", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
     const formState = getDefaultFormState();
 
     formState.furthest = "political_group_votes_2";
@@ -125,7 +122,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("Prioritise errors over warnings", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
     const formState = getDefaultFormState();
 
     formState.furthest = "political_group_votes_2";
@@ -157,7 +154,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("shows links to other pages when on last page", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "save" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "save" });
     const formState = getDefaultFormState();
 
     formState.furthest = "save";
@@ -205,7 +202,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("shows links when navigating to earlier page", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_1" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_1" });
     const formState = getDefaultFormState();
 
     formState.furthest = "save";
@@ -249,7 +246,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("Mismatch between election data and formState", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });
     const formState = getDefaultFormState();
     delete formState.sections.political_group_votes_2;
     formState.sections.political_group_votes_3 = getDefaultFormSection("political_group_votes_3", 6);

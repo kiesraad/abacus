@@ -1,12 +1,14 @@
+import * as ReactRouter from "react-router";
+
 import { within } from "@testing-library/dom";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import cls from "@/features/resolve_differences/components/ResolveDifferences.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { useMessages } from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   ElectionListRequestHandler,
@@ -24,15 +26,6 @@ import { DataEntryStatusName } from "@/types/generated/openapi";
 import { ResolveDifferencesPage } from "./ResolveDifferencesPage";
 
 const navigate = vi.fn();
-
-vi.mock("react-router", async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-  useParams: () => ({ pollingStationId: "3" }),
-  useLocation: () => ({ pathname: "/" }),
-}));
-
-vi.mock("@/hooks/messages/useMessages");
 
 const renderPage = async () => {
   render(
@@ -57,8 +50,12 @@ describe("ResolveDifferencesPage", () => {
   const pushMessage = vi.fn();
 
   beforeEach(() => {
-    vi.mocked(useMessages).mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
-
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "3" });
+    vi.spyOn(ReactRouter, "useLocation").mockReturnValue({
+      pathname: "/",
+    } as Partial<ReactRouter.Location> as ReactRouter.Location);
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,

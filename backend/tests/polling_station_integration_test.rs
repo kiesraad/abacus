@@ -79,7 +79,7 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
         "Unexpected response status"
     );
     let body: PollingStation = response.json().await.unwrap();
-    assert_eq!(body.election_id, election_id);
+    assert_eq!(body.committee_session_id, committee_session.id);
     assert_eq!(body.name, "New Polling Station");
     assert_eq!(
         body.polling_station_type,
@@ -139,7 +139,7 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
         "Unexpected response status"
     );
     let body: PollingStation = response.json().await.unwrap();
-    assert_eq!(body.election_id, election_id);
+    assert_eq!(body.committee_session_id, committee_session.id);
     assert_eq!(body.name, "New Polling Station");
     assert_eq!(
         body.polling_station_type,
@@ -159,6 +159,7 @@ async fn test_polling_station_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
+    let committee_session_id = 2;
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/2");
 
     let response = reqwest::Client::new()
@@ -174,7 +175,7 @@ async fn test_polling_station_get(pool: SqlitePool) {
         "Unexpected response status"
     );
     let body: PollingStation = response.json().await.unwrap();
-    assert_eq!(body.election_id, election_id);
+    assert_eq!(body.committee_session_id, committee_session_id);
     assert_eq!(body.name, "Testplek");
     assert_eq!(body.polling_station_type, Some(PollingStationType::Special));
 }

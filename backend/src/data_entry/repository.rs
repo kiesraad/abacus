@@ -111,11 +111,16 @@ pub async fn statuses(
     query!(
         r#"
             SELECT
-                id AS "polling_station_id: u32",
-                de.state AS "state: Option<Json<DataEntryStatus>>"
+                p.id AS "polling_station_id: u32",
+                de.state AS "state: Json<DataEntryStatus>"
             FROM polling_stations AS p
+            LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
             LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
-            WHERE election_id = $1
+            WHERE c.election_id = $1 AND c.number = (
+                SELECT MAX(c2.number)
+                FROM committee_sessions AS c2
+                WHERE c2.election_id = c.election_id
+            )
         "#,
         election_id
     )
@@ -142,7 +147,7 @@ pub async fn make_definitive(
     new_state: &DataEntryStatus,
     definitive_entry: &PollingStationResults,
 ) -> Result<(), sqlx::Error> {
-    let mut tx = conn.begin().await?;
+    let mut tx = conn.begin_immediate().await?;
     let definitive_entry = Json(definitive_entry);
     query!(
         "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES ($1, $2, $3)",
@@ -189,7 +194,12 @@ pub async fn list_entries(
             r.created_at as "created_at: NaiveDateTime"
         FROM polling_station_results AS r
         LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
-        WHERE p.election_id = $1
+        LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        WHERE c.election_id = $1 AND c.number = (
+            SELECT MAX(c2.number)
+            FROM committee_sessions AS c2
+            WHERE c2.election_id = c.election_id
+        )
         "#,
         election_id
     )

@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                p.id AS \"polling_station_id: u32\",\n                de.state AS \"state: Json<DataEntryStatus>\"\n            FROM polling_stations AS p\n            LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id\n            LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id\n            WHERE c.election_id = $1 AND c.number = (\n                SELECT MAX(c2.number)\n                FROM committee_sessions AS c2\n                WHERE c2.election_id = c.election_id\n            )\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "polling_station_id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "state: Json<DataEntryStatus>",
+        "ordinal": 1,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      true
+    ]
+  },
+  "hash": "0c646ab0e13f7c93909c18f650f373664689d623ec702a01e3bd9c1a858c46b5"
+}

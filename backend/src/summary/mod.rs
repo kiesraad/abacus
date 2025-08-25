@@ -231,8 +231,8 @@ mod tests {
 
     use super::*;
     use crate::{
-        data_entry::PoliticalGroupTotalVotes, election::tests::election_fixture,
-        pdf_gen::tests::polling_stations_fixture,
+        committee_session::tests::committee_session_fixture, data_entry::PoliticalGroupTotalVotes,
+        election::tests::election_fixture, pdf_gen::tests::polling_stations_fixture,
     };
 
     fn polling_station_results_fixture_a() -> PollingStationResults {
@@ -318,7 +318,9 @@ mod tests {
             tmp
         };
 
-        let mut ps = polling_stations_fixture(&election_fixture(&[1, 2]), &[20, 20]);
+        let election = election_fixture(&[1, 2]);
+        let committee_session = committee_session_fixture(election.id);
+        let mut ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         ps[0].number = 123;
 
         diff.add_polling_station_results(&ps[0], &diff2);
@@ -343,7 +345,8 @@ mod tests {
     #[test]
     fn test_political_group_counting() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let results = vec![
             (ps[0].clone(), polling_station_results_fixture_a()),
             (ps[1].clone(), polling_station_results_fixture_b()),
@@ -420,7 +423,8 @@ mod tests {
     #[test]
     fn test_adding_many_polling_stations() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20; 600]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20; 600]);
         let results_ps = polling_station_results_fixture_a();
         let results = ps
             .iter()
@@ -441,7 +445,8 @@ mod tests {
     #[should_panic]
     fn test_too_high_polling_station_numbers() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20; 5]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20; 5]);
         let mut ps_results = polling_station_results_fixture_a();
         ps_results.political_group_votes[0].total = 999_999_998;
         ps_results.political_group_votes[0].candidate_votes[0].votes = 999_999_998;
@@ -471,7 +476,8 @@ mod tests {
     #[test]
     fn test_invalid_polling_station_data_does_not_add() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps_results = polling_station_results_fixture_a();
         let mut ps_results2 = ps_results.clone();
         ps_results2.votes_counts.total_votes_cast_count = 0;
@@ -487,7 +493,8 @@ mod tests {
     #[test]
     fn test_repeated_polling_stations() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let totals = ElectionSummary::from_results(
             &election,
             &[
@@ -503,7 +510,8 @@ mod tests {
     #[test]
     fn test_missing_votes_count_political_groups_total() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result.votes_counts.political_group_total_votes.pop();
@@ -518,7 +526,8 @@ mod tests {
     #[test]
     fn test_too_many_votes_count_political_groups_total() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result
@@ -539,7 +548,8 @@ mod tests {
     #[test]
     fn test_duplicate_votes_count_political_groups_total() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result
@@ -557,7 +567,8 @@ mod tests {
     #[test]
     fn test_invalid_votes_count_political_group_total() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result.votes_counts.political_group_total_votes[1] = PoliticalGroupTotalVotes {
@@ -575,7 +586,8 @@ mod tests {
     #[test]
     fn test_missing_political_groups() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result.political_group_votes.pop();
@@ -590,7 +602,8 @@ mod tests {
     #[test]
     fn test_too_many_political_groups() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result
@@ -607,7 +620,8 @@ mod tests {
     #[test]
     fn test_duplicate_political_group() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let mut ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps1_result
@@ -627,7 +641,8 @@ mod tests {
     #[test]
     fn test_invalid_political_group() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result.political_group_votes[1] =
@@ -643,7 +658,8 @@ mod tests {
     #[test]
     fn test_invalid_number_of_candidates() {
         let election = election_fixture(&[2, 3]);
-        let ps = polling_stations_fixture(&election, &[20, 20]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result.political_group_votes[1].candidate_votes.pop();

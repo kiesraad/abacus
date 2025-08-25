@@ -13,17 +13,20 @@ pub async fn list(
         PollingStation,
         r#"
         SELECT
-            id AS "id: u32",
-            election_id AS "election_id: u32",
-            name,
-            number,
-            number_of_voters,
-            polling_station_type AS "polling_station_type: _",
-            address,
-            postal_code,
-            locality
-        FROM polling_stations
-        WHERE election_id = $1
+            p.id AS "id: u32",
+            c.election_id AS "election_id: u32",
+            p.committee_session_id AS "committee_session_id: u32",
+            p.id_prev_session AS "id_prev_session: _",
+            p.name,
+            p.number,
+            p.number_of_voters,
+            p.polling_station_type AS "polling_station_type: _",
+            p.address,
+            p.postal_code,
+            p.locality
+        FROM polling_stations AS p
+        JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        WHERE c.election_id = $1
         "#,
         election_id
     )
@@ -37,17 +40,20 @@ pub async fn get(conn: impl DbConnLike<'_>, id: u32) -> Result<PollingStation, s
         PollingStation,
         r#"
         SELECT
-            id AS "id: u32",
-            election_id AS "election_id: u32",
-            name,
-            number,
-            number_of_voters,
-            polling_station_type AS "polling_station_type: _",
-            address,
-            postal_code,
-            locality
-        FROM polling_stations
-        WHERE id = $1
+            p.id AS "id: u32",
+            c.election_id AS "election_id: u32",
+            p.committee_session_id AS "committee_session_id: u32",
+            p.id_prev_session AS "id_prev_session: _",
+            p.name,
+            p.number,
+            p.number_of_voters,
+            p.polling_station_type AS "polling_station_type: _",
+            p.address,
+            p.postal_code,
+            p.locality
+        FROM polling_stations AS p
+        JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        WHERE p.id = $1
         "#,
         id
     )
@@ -65,17 +71,20 @@ pub async fn get_for_election(
         PollingStation,
         r#"
         SELECT
-            id AS "id: u32",
-            election_id AS "election_id: u32",
-            name,
-            number,
-            number_of_voters,
-            polling_station_type AS "polling_station_type: _",
-            address,
-            postal_code,
-            locality
-        FROM polling_stations
-        WHERE id = $1 AND election_id = $2
+            p.id AS "id: u32",
+            c.election_id AS "election_id: u32",
+            p.committee_session_id AS "committee_session_id: u32",
+            p.id_prev_session AS "id_prev_session: _",
+            p.name,
+            p.number,
+            p.number_of_voters,
+            p.polling_station_type AS "polling_station_type: _",
+            p.address,
+            p.postal_code,
+            p.locality
+        FROM polling_stations AS p
+        JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        WHERE p.id = $1 AND c.election_id = $2
         "#,
         id,
         election_id
@@ -90,11 +99,17 @@ pub async fn create(
     election_id: u32,
     new_polling_station: PollingStationRequest,
 ) -> Result<PollingStation, sqlx::Error> {
-    query_as!(
+    let mut tx = conn.begin_immediate().await?;
+    let committee_session_id =
+        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
+            .await?;
+
+    let res = query_as!(
         PollingStation,
         r#"
         INSERT INTO polling_stations (
-            election_id,
+            committee_session_id,
+            id_prev_session,
             name,
             number,
             number_of_voters,
@@ -102,10 +117,12 @@ pub async fn create(
             address,
             postal_code,
             locality
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING
             id AS "id: u32",
-            election_id AS "election_id: u32",
+            ? AS "election_id!: u32", -- Workaround to get election_id in the result without a temporary struct
+            committee_session_id AS "committee_session_id: u32",
+            id_prev_session AS "id_prev_session: _",
             name,
             number,
             number_of_voters,
@@ -114,7 +131,8 @@ pub async fn create(
             postal_code,
             locality
         "#,
-        election_id,
+        committee_session_id,
+        None::<u32> as _,
         new_polling_station.name,
         new_polling_station.number,
         new_polling_station.number_of_voters,
@@ -122,9 +140,12 @@ pub async fn create(
         new_polling_station.address,
         new_polling_station.postal_code,
         new_polling_station.locality,
+        election_id,
     )
-    .fetch_one(conn)
-    .await
+    .fetch_one(&mut *tx)
+    .await?;
+    tx.commit().await?;
+    Ok(res)
 }
 
 /// Create many polling stations for an election
@@ -134,14 +155,20 @@ pub async fn create_many(
     new_polling_stations: Vec<PollingStationRequest>,
 ) -> Result<Vec<PollingStation>, sqlx::Error> {
     let mut stations: Vec<PollingStation> = Vec::new();
-    let mut tx = conn.begin().await?;
+    let mut tx = conn.begin_immediate().await?;
+
+    let committee_session_id =
+        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
+            .await?;
+
     for new_polling_station in new_polling_stations {
         stations.push(
             query_as!(
                 PollingStation,
                 r#"
             INSERT INTO polling_stations (
-                election_id,
+                committee_session_id,
+                id_prev_session,
                 name,
                 number,
                 number_of_voters,
@@ -149,10 +176,12 @@ pub async fn create_many(
                 address,
                 postal_code,
                 locality
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
                 id AS "id: u32",
-                election_id AS "election_id: u32",
+                ? AS "election_id!: u32", -- Workaround to get election_id in the result without a temporary struct
+                committee_session_id AS "committee_session_id: u32",
+                id_prev_session AS "id_prev_session: _",
                 name,
                 number,
                 number_of_voters,
@@ -161,7 +190,8 @@ pub async fn create_many(
                 postal_code,
                 locality
             "#,
-                election_id,
+                committee_session_id,
+                None::<u32> as _,
                 new_polling_station.name,
                 new_polling_station.number,
                 new_polling_station.number_of_voters,
@@ -169,6 +199,7 @@ pub async fn create_many(
                 new_polling_station.address,
                 new_polling_station.postal_code,
                 new_polling_station.locality,
+                election_id,
             )
             .fetch_one(&mut *tx)
             .await?,
@@ -186,7 +217,12 @@ pub async fn update(
     polling_station_id: u32,
     polling_station_update: PollingStationRequest,
 ) -> Result<PollingStation, sqlx::Error> {
-    query_as!(
+    let mut tx = conn.begin_immediate().await?;
+    let committee_session_id =
+        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
+            .await?;
+
+    let res = query_as!(
         PollingStation,
         r#"
         UPDATE polling_stations
@@ -199,10 +235,12 @@ pub async fn update(
             postal_code = ?,
             locality = ?
         WHERE
-            id = ? AND election_id = ?
+            id = ? AND committee_session_id = ?
         RETURNING
             id AS "id: u32",
-            election_id AS "election_id: u32",
+            ? AS "election_id!: u32", -- Workaround to get election_id in the result without a temporary struct
+            committee_session_id AS "committee_session_id: u32",
+            id_prev_session AS "id_prev_session: _",
             name,
             number,
             number_of_voters,
@@ -219,10 +257,13 @@ pub async fn update(
         polling_station_update.postal_code,
         polling_station_update.locality,
         polling_station_id,
+        committee_session_id,
         election_id,
     )
-    .fetch_one(conn)
-    .await
+    .fetch_one(&mut *tx)
+    .await?;
+    tx.commit().await?;
+    Ok(res)
 }
 
 /// Delete a single polling station for an election
@@ -231,14 +272,21 @@ pub async fn delete(
     election_id: u32,
     id: u32,
 ) -> Result<bool, sqlx::Error> {
+    let mut tx = conn.begin_immediate().await?;
+    let committee_session_id =
+        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
+            .await?;
+
     let rows_affected = query!(
-        r#"DELETE FROM polling_stations WHERE id = ? AND election_id = ?"#,
+        r#"DELETE FROM polling_stations WHERE id = ? AND committee_session_id = ?"#,
         id,
-        election_id,
+        committee_session_id,
     )
-    .execute(conn)
+    .execute(&mut *tx)
     .await?
     .rows_affected();
+
+    tx.commit().await?;
 
     Ok(rows_affected > 0)
 }

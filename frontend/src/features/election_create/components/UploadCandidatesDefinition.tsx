@@ -109,7 +109,6 @@ export function UploadCandidatesDefinition() {
         })}
         redactedHash={state.candidateDefinitionRedactedHash}
         error={error}
-        setError={setError}
         onSubmit={(chunks) => void onSubmit(chunks)}
       />
     );

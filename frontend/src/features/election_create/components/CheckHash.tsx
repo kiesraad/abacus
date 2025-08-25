@@ -20,20 +20,11 @@ interface CheckHashProps {
   description: ReactNode;
   redactedHash: RedactedEmlHash;
   error: ReactNode | undefined;
-  setError: (error: string | undefined) => void;
   onSubmit: (chunks: string[]) => void;
 }
 
-export function CheckHash({
-  date,
-  title,
-  header,
-  description,
-  redactedHash,
-  error,
-  setError,
-  onSubmit,
-}: CheckHashProps) {
+export function CheckHash({ date, title, header, description, redactedHash, error, onSubmit }: CheckHashProps) {
+  const [changed, setChanged] = useState<boolean>(true);
   const [stubs, setStubs] = useState<Stub[]>(
     redactedHash.redacted_indexes.map((redacted_index: number) => ({
       selected: false,
@@ -47,12 +38,9 @@ export function CheckHash({
     const stub = newStubs[stubIndex];
     if (stub) {
       stub.selected = highlight;
-      stub.error = "";
     }
     setStubs(newStubs);
-    if (!highlight) {
-      setError(undefined);
-    }
+    setChanged(true);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -69,19 +57,21 @@ export function CheckHash({
         newStub.error = "";
         if (typeof value !== "string" || value.length !== 4) {
           newStub.error = t("election.check_eml.check_hash.hint");
-        } else if (error) {
-          newStub.error = t("error.api_error.InvalidHash");
         } else {
+          if (error) {
+            newStub.error = t("error.api_error.InvalidHash");
+          }
           completeHash[stub.index] = value;
         }
         setStubs(newStubs);
       }
     });
 
-    // Only submit when there are no errors
-    if (stubs.every((stub) => stub.error === "")) {
+    // Only allow submit when a field has been focussed or blurred
+    if (changed) {
       onSubmit(completeHash);
     }
+    setChanged(false);
   }
 
   // If there is an error, add error to stubs

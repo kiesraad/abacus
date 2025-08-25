@@ -273,6 +273,8 @@ describe("Election create pages", () => {
   test("It shows an error on invalid input", async () => {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
     const router = renderWithRouter();
     const user = userEvent.setup();
     await router.navigate("/elections/create");
@@ -291,6 +293,14 @@ describe("Election create pages", () => {
     await user.type(inputPart1, "zxcv");
     const inputPart2 = screen.getByLabelText("Controle deel 2");
     await user.type(inputPart2, "123");
+
+    // Give invalid XML error
+    overrideOnce("post", "/api/elections/import/validate", 400, {
+      error: "Invalid hash",
+      fatal: false,
+      reference: "InvalidXml",
+    });
+
     await user.click(screen.getByText("Volgende"));
 
     // Expect error to be shown

@@ -189,7 +189,7 @@ describe("DataEntryProgress", () => {
       `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/voters_votes_counts`,
     );
 
-    const differencesLink = within(differences).getByRole("link", { name: "Verschillen D&H" });
+    const differencesLink = within(differences).getByRole("link", { name: "Verschillen D & H" });
     expect(differencesLink).toBeVisible();
     expect(differencesLink).toHaveAttribute(
       "href",

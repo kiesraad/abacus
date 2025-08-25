@@ -5,6 +5,8 @@ import { ApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
+import { Form } from "@/components/ui/Form/Form";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 
@@ -97,18 +99,23 @@ export function UploadElectionDefinition() {
 
   return (
     <section className="md">
-      <h2>{t("election.import_election_eml")}</h2>
-      <div className="mt-lg mb-lg">
-        {error && (
-          <Alert type="error" title={t("election.invalid_election_definition.title")} inline>
-            <p>{error}</p>
-          </Alert>
-        )}
-      </div>
-      <p className="mb-lg">{t("election.use_instructions_to_import_eml")}</p>
-      <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
-        {t("select_file")}
-      </FileInput>
+      <Form title={t("election.import_election_eml")}>
+        <FormLayout>
+          <FormLayout.Section>
+            {error && (
+              <Alert type="error" title={t("election.invalid_election_definition.title")} inline>
+                <p>{error}</p>
+              </Alert>
+            )}
+
+            <p>{t("election.use_instructions_to_import_eml")}</p>
+
+            <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
+              {t("select_file")}
+            </FileInput>
+          </FormLayout.Section>
+        </FormLayout>
+      </Form>
     </section>
   );
 }

@@ -20,7 +20,7 @@ interface CheckHashProps {
   description: ReactNode;
   redactedHash: RedactedEmlHash;
   error: ReactNode | undefined;
-  setError: () => void;
+  setError: (error: string | undefined) => void;
   onSubmit: (chunks: string[]) => void;
 }
 
@@ -86,12 +86,12 @@ export function CheckHash({
 
   // If there is an error, add error to stubs
   useEffect(() => {
-    setStubs([
-      ...stubs.map((stub) => {
+    setStubs((prevStubs) =>
+      prevStubs.map((stub) => {
         stub.error = error ? t("error.api_error.InvalidHash") : "";
         return stub;
       }),
-    ]);
+    );
   }, [error]);
 
   return (
@@ -99,29 +99,25 @@ export function CheckHash({
       <Form title={header} onSubmit={handleSubmit}>
         <FormLayout>
           <FormLayout.Section>
-            <FormLayout.Alert>
-              {(stubs.some((stub) => stub.error.length > 0) || error) && (
-                <Alert type="error" title={t("election.check_eml.error.title")} inline>
-                  <p> {t("election.check_eml.error.description")} </p>
-                </Alert>
-              )}
-            </FormLayout.Alert>
-            <p>{description}</p>
-            <FormLayout.Alert>
-              <Alert type="notify" variant="no-icon" margin="mb-md" small>
-                <p>
-                  <strong>{title}</strong>
-                  <br />
-                  <span className="capitalize-first">{formatFullDateWithoutTimezone(new Date(date))}</span>
-                </p>
-                <div>
-                  <span>
-                    <strong>{t("digital_signature")}</strong> ({t("hashcode")}):
-                  </span>
-                  <RedactedHash hash={redactedHash.chunks} stubs={stubs} />
-                </div>
+            {(stubs.some((stub) => stub.error.length > 0) || error) && (
+              <Alert type="error" title={t("election.check_eml.error.title")} inline>
+                <p> {t("election.check_eml.error.description")} </p>
               </Alert>
-            </FormLayout.Alert>
+            )}
+            <p>{description}</p>
+            <Alert type="notify" variant="no-icon" small>
+              <p>
+                <strong>{title}</strong>
+                <br />
+                <span className="capitalize-first">{formatFullDateWithoutTimezone(new Date(date))}</span>
+              </p>
+              <div>
+                <span>
+                  <strong>{t("digital_signature")}</strong> ({t("hashcode")}):
+                </span>
+                <RedactedHash hash={redactedHash.chunks} stubs={stubs} />
+              </div>
+            </Alert>
             <p>{t("election.check_eml.check_hash.description")}</p>
 
             {stubs.map((stub, stubIndex) => (

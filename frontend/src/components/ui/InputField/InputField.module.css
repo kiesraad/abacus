@@ -22,6 +22,10 @@
       width: 10rem;
     }
 
+    &:global(.narrow) ~ span:global(.error) {
+      width: 12rem;
+    }
+
     &:global(.narrowish),
     &:global(.narrowish) ~ span {
       width: 12.25rem;

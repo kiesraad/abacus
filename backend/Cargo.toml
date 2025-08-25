@@ -55,7 +55,7 @@ tracing = "0.1.41"
 tower-http = { version = "0.6", features = ["set-header", "trace"] }
 typst = { version = "0.13.1", optional = true }
 typst-pdf = { version = "0.13.1", optional = true }
-quick-xml = { version = "0.38.1", features = ["serialize"] }
+quick-xml = { version = "0.38.3", features = ["serialize"] }
 sha2 = "0.10.9"
 argon2 = "0.5.3"
 password-hash = { version = "0.5.0", features = ["getrandom"] }

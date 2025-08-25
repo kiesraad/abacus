@@ -81,7 +81,7 @@ __Hoofdscenario:__
 __Uitbreidingen:__  
 2a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
 
-3a. De lijst met stembureaus moet aangepast worden:  
+3a. De stembureaus in de applicatie komen niet overeen met de vooraf gepubliceerde lijst:  
 &emsp; 3a1. De beheerder past de stembureaus aan.
 
 ## De beheerder of coördinator zet de stembureaus in de applicatie (zee)

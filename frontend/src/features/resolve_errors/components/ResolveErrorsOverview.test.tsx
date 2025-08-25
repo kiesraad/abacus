@@ -13,7 +13,7 @@ function getValidationResults(section: HTMLElement | null) {
     within(section!)
       .getAllByRole("listitem")
       // Assume that each list item starts with the validation result code with a dot
-      .map((item) => item.textContent!.split(" ")[0])
+      .map((item) => item.textContent.split(" ")[0])
   );
 }
 

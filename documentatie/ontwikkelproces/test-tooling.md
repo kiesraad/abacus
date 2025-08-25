@@ -84,7 +84,7 @@ Zodra een unit test meerdere modules beslaat of meerdere API calls in de test ze
 
 ### Integratietests
 
-Integratietests beslaan meerdere modules en/of doen meerdere API calls in de test zelf. Ze roepen de backend-code alleen aan via de API.
+Integratietests beslaan meerdere modules en/of doen meerdere API calls in de test zelf. Ze roepen de backend-code alleen aan via de API. Ze gebruiken json voor de requests, nooit de structs.
 
 
 ```mermaid

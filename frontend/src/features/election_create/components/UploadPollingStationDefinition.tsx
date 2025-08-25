@@ -95,12 +95,13 @@ export function UploadPollingStationDefinition() {
               </p>
               <PollingStationsPreview pollingStations={state.pollingStations} />
             </FormLayout.Section>
+            <FormLayout.Controls>
+              <Button type="button" onClick={() => void next()}>
+                {t("next")}
+              </Button>
+            </FormLayout.Controls>
           </FormLayout>
         </Form>
-
-        <p className="mt-lg">
-          <Button onClick={() => void next()}>{t("next")}</Button>
-        </p>
       </section>
     );
   }
@@ -122,15 +123,15 @@ export function UploadPollingStationDefinition() {
             <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
               {t("select_file")}
             </FileInput>
+
+            <FormLayout.Controls>
+              <Button type="button" variant="underlined" size="md" onClick={() => void skip()}>
+                {t("election.polling_stations.skip_step")}
+              </Button>
+            </FormLayout.Controls>
           </FormLayout.Section>
         </FormLayout>
       </Form>
-
-      <p className="mt-lg">
-        <Button variant="underlined" size="md" onClick={() => void skip()}>
-          {t("election.polling_stations.skip_step")}
-        </Button>
-      </p>
     </section>
   );
 }

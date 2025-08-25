@@ -129,7 +129,7 @@ export function CheckHash({
                 hint={t("election.check_eml.check_hash.hint")}
                 error={stub.error}
                 fieldSize="medium"
-                fieldWidth="narrow"
+                fieldWidth="full-field-with-narrow-input"
                 onFocus={() => {
                   highlightStub(stubIndex, true);
                 }}

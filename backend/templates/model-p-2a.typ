@@ -35,18 +35,15 @@
 
 == Proces-verbaal
 
-Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
+#is_municipality[Elke gemeente][Elk openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
 
 #emph_block[
   Het centraal stembureau vermoedt dat er één of meer fouten staan in het
   proces-verbaal van een eerdere zitting van het #location_type. Het centraal stembureau heeft daarom
-  aan het #location_type voor het openbaar lichaam
-  gevraagd de vermeende fouten te onderzoeken in een nieuwe openbare zitting.
+  aan het #location_type gevraagd de vermeende fouten te onderzoeken in een nieuwe openbare zitting.
   Dit document geeft een verslag van deze nieuwe zitting. Als er inderdaad fouten
-  staan in het proces-verbaal van de eerdere zitting, dan verbetert het
-  #location_type voor het openbaar lichaam deze fouten
-  in een corrigendum. Dat corrigendum wordt bij het proces-verbaal van de
-  eerdere zitting gevoegd.
+  staan in het proces-verbaal van de eerdere zitting, dan verbetert het #location_type deze fouten
+  in een corrigendum. Dat corrigendum wordt bij het proces-verbaal van de eerdere zitting gevoegd.
 ]
 
 == Inhoudsopgave

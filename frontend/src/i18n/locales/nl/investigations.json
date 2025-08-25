@@ -1,0 +1,14 @@
+{
+  "investigations_second_entry": "Onderzoeken in tweede zitting",
+  "from_central_polling_station": "Onderzoeksverzoeken vanuit het centraal stembureau",
+  "instructions": "<ul><li>Voer hier alle stembureaus waarvoor op verzoek van het centraal stembureau nader onderzoek moet worden gedaan.</li><li>Print, nadat de aanleiding voor het onderzoek is ingevoerd, het corrigendum formulier.</li></ul>",
+  "add_investigation": "Onderzoek toevoegen",
+  "pick_polling_station": "Voor welk stembureau wordt het onderzoek gedaan?",
+  "multiple_polling_stations": "Zijn er voor meerdere stembureaus onderzoeken aangevraagd? Doorloop de volgende stappen dan voor elk stembureau.",
+  "print_corrigendum": "Print corrigendum",
+  "findings_and_research": "Bevindingen en onderzoek",
+  "back_to_all_investigations": "Terug naar alle onderzoeken",
+  "reason_and_assignment": "Aanleiding en opdracht",
+  "reason_and_assignment_of_central_polling_station": "Aanleiding en opdracht van het centraal stembureau",
+  "reason_and_assignment_instructions": "<ul><li>Waarom worden de resultaten van dit stembureau onderzocht? Denk bijvoorbeeld aan een onverklaard telverschil of een bezwaar.</li><li>Schrijf ook op wat er in opdracht van het centraal stembureau moet worden onderzocht. Bijvoorbeeld: hertel de stembiljetten van lijst 12.</li></ul>"
+}

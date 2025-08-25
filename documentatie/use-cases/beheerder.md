@@ -110,7 +110,7 @@ __Uitbreidingen:__
 
 2a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
 
-4a. De lijst met stembureaus moet aangepast worden:  
+4a. De stembureaus in de applicatie komen niet overeen met de vooraf gepubliceerde lijst:  
 &emsp; 4a1. De beheerder of coördinator past de stembureaus aan.
 
 ## De beheerder exporteert de stembureaus (zee)

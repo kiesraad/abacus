@@ -43,11 +43,9 @@ export function PollingStationsPreview({ pollingStations }: PollingStationsPrevi
               ))}
             </Table.Body>
           </Table>
-          <p className="mt-lg">
-            <Button id="show-more" variant="underlined" size="md" onClick={showAll}>
-              {t("election.polling_stations.show_all", { num: pollingStations.length })}
-            </Button>
-          </p>
+          <Button id="show-more" variant="underlined" size="md" onClick={showAll}>
+            {t("election.polling_stations.show_all", { num: pollingStations.length })}
+          </Button>
         </>
       )}
     </>

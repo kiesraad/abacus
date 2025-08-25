@@ -7,6 +7,10 @@
   margin-top: var(--space-md);
 }
 
+.mt-md-lg {
+  margin-top: var(--space-md-lg);
+}
+
 .mt-lg {
   margin-top: var(--space-lg);
 }

@@ -2,6 +2,7 @@
 
 use std::net::SocketAddr;
 
+use abacus::data_entry::DifferenceCountsCompareVotesCastAdmittedVoters;
 use abacus::{
     committee_session::{
         CommitteeSession, CommitteeSessionListResponse, CommitteeSessionStatusChangeRequest,
@@ -24,11 +25,12 @@ pub fn differences_counts_zero() -> DifferencesCounts {
     DifferencesCounts {
         more_ballots_count: 0,
         fewer_ballots_count: 0,
-        unreturned_ballots_count: 0,
-        too_few_ballots_handed_out_count: 0,
-        too_many_ballots_handed_out_count: 0,
-        other_explanation_count: 0,
-        no_explanation_count: 0,
+        compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+            admitted_voters_equal_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: false,
+            votes_cast_smaller_than_admitted_voters: false,
+        },
+        difference_completely_accounted_for: Default::default(),
     }
 }
 

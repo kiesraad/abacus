@@ -43,11 +43,12 @@ const pollingStationResults = {
   differences_counts: {
     more_ballots_count: 5,
     fewer_ballots_count: 0,
-    no_explanation_count: 0,
-    other_explanation_count: 0,
-    too_few_ballots_handed_out_count: 0,
-    too_many_ballots_handed_out_count: 0,
-    unreturned_ballots_count: 0,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: false,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
+    difference_completely_accounted_for: { yes: false, no: false },
   },
   political_group_votes: [
     {
@@ -187,7 +188,7 @@ describe("DataEntryProgress", () => {
       `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/voters_votes_counts`,
     );
 
-    const differencesLink = within(differences).getByRole("link", { name: "Verschillen" });
+    const differencesLink = within(differences).getByRole("link", { name: "Verschillen D & H" });
     expect(differencesLink).toBeVisible();
     expect(differencesLink).toHaveAttribute(
       "href",

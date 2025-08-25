@@ -41,7 +41,7 @@ describe("ResolveDifferencesTables", () => {
     ]);
 
     const differencesCountsTable = screen.queryByRole("table", {
-      name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen B1-3.3",
     });
     expect(differencesCountsTable).not.toBeInTheDocument();
 

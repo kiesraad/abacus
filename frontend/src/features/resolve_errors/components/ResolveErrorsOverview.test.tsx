@@ -38,7 +38,7 @@ describe("ResolveErrorsOverview", () => {
     expect(getValidationResults(voters_votes_counts)).toEqual(["F.201", "W.201"]);
 
     const differences_counts = screen.queryByRole("region", {
-      name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen B1-3.3",
     });
     expect(differences_counts).not.toBeInTheDocument();
 

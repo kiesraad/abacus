@@ -4,31 +4,22 @@ import { DifferencesCounts } from "@/types/generated/openapi";
 
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
-export type MoreBallotsFields = Pick<
-  DifferencesCounts,
-  "more_ballots_count" | "too_many_ballots_handed_out_count" | "other_explanation_count" | "no_explanation_count"
->;
+export type MoreBallotsFields = Pick<DifferencesCounts, "more_ballots_count">;
 
-export type FewerBallotsFields = Pick<
-  DifferencesCounts,
-  | "fewer_ballots_count"
-  | "unreturned_ballots_count"
-  | "too_few_ballots_handed_out_count"
-  | "other_explanation_count"
-  | "no_explanation_count"
->;
+export type FewerBallotsFields = Pick<DifferencesCounts, "fewer_ballots_count">;
 
 export class DifferencesPage extends DataEntryBasePage {
   readonly fieldset: Locator;
   readonly next: Locator;
 
+  readonly admittedVotersEqualsVotesCastCheckbox: Locator;
+  readonly votesCastGreaterThanAdmittedVotersCheckbox: Locator;
+  readonly votesCastSmallerThanAdmittedVotersCheckbox: Locator;
+  readonly differenceCompletelyAccountedFor: Locator;
+  readonly differenceCompletelyAccountedForYes: Locator;
+  readonly differenceCompletelyAccountedForNo: Locator;
   readonly moreBallotsCount: Locator;
   readonly fewerBallotsCount: Locator;
-  readonly unreturnedBallotsCount: Locator;
-  readonly tooFewBallotsHandedOutCount: Locator;
-  readonly tooManyBallotsHandedOutCount: Locator;
-  readonly otherExplanationCount: Locator;
-  readonly noExplanationCount: Locator;
 
   readonly acceptErrorsAndWarnings: Locator;
   readonly acceptErrorsAndWarningsReminder: Locator;
@@ -37,16 +28,26 @@ export class DifferencesPage extends DataEntryBasePage {
     super(page);
 
     this.fieldset = page.getByRole("group", {
-      name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen B1-3.3",
     });
 
-    this.moreBallotsCount = page.getByRole("textbox", { name: "I Stembiljetten méér geteld" });
-    this.fewerBallotsCount = page.getByRole("textbox", { name: "J Stembiljetten minder geteld" });
-    this.unreturnedBallotsCount = page.getByRole("textbox", { name: "K Niet ingeleverde stembiljetten" });
-    this.tooFewBallotsHandedOutCount = page.getByRole("textbox", { name: "L Te weinig uitgereikte stembiljetten" });
-    this.tooManyBallotsHandedOutCount = page.getByRole("textbox", { name: "M Te veel uitgereikte stembiljetten" });
-    this.otherExplanationCount = page.getByRole("textbox", { name: "N Andere verklaring voor het verschil" });
-    this.noExplanationCount = page.getByRole("textbox", { name: "O Geen verklaring voor het verschil" });
+    this.admittedVotersEqualsVotesCastCheckbox = page.getByRole("checkbox", { name: "D en H zijn gelijk" });
+    this.votesCastGreaterThanAdmittedVotersCheckbox = page.getByRole("checkbox", {
+      name: "H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
+    });
+    this.votesCastSmallerThanAdmittedVotersCheckbox = page.getByRole("checkbox", {
+      name: "H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
+    });
+
+    this.moreBallotsCount = page.getByRole("textbox", { name: "I Aantal méér getelde stemmen" });
+    this.fewerBallotsCount = page.getByRole("textbox", { name: "J Aantal minder getelde stemmen" });
+
+    this.differenceCompletelyAccountedFor = this.fieldset.getByRole("group").filter({
+      hasText:
+        "3.3.2 Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?",
+    });
+    this.differenceCompletelyAccountedForYes = this.differenceCompletelyAccountedFor.getByLabel("Ja");
+    this.differenceCompletelyAccountedForNo = this.differenceCompletelyAccountedFor.getByLabel("Nee");
 
     this.acceptErrorsAndWarnings = page.getByLabel(
       "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
@@ -61,27 +62,46 @@ export class DifferencesPage extends DataEntryBasePage {
   async fillInPageAndClickNext(fields: DifferencesCounts) {
     await this.moreBallotsCount.fill(fields.more_ballots_count.toString());
     await this.fewerBallotsCount.fill(fields.fewer_ballots_count.toString());
-    await this.unreturnedBallotsCount.fill(fields.unreturned_ballots_count.toString());
-    await this.tooFewBallotsHandedOutCount.fill(fields.too_few_ballots_handed_out_count.toString());
-    await this.tooManyBallotsHandedOutCount.fill(fields.too_many_ballots_handed_out_count.toString());
-    await this.otherExplanationCount.fill(fields.other_explanation_count.toString());
-    await this.noExplanationCount.fill(fields.no_explanation_count.toString());
+
+    if (fields.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast) {
+      await this.admittedVotersEqualsVotesCastCheckbox.check();
+    } else {
+      await this.admittedVotersEqualsVotesCastCheckbox.uncheck();
+    }
+
+    if (fields.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters) {
+      await this.votesCastGreaterThanAdmittedVotersCheckbox.check();
+    } else {
+      await this.votesCastGreaterThanAdmittedVotersCheckbox.uncheck();
+    }
+
+    if (fields.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters) {
+      await this.votesCastSmallerThanAdmittedVotersCheckbox.check();
+    } else {
+      await this.votesCastSmallerThanAdmittedVotersCheckbox.uncheck();
+    }
+
+    if (fields.difference_completely_accounted_for.yes) {
+      await this.differenceCompletelyAccountedForYes.check();
+    } else {
+      await this.differenceCompletelyAccountedForYes.uncheck();
+    }
+
+    if (fields.difference_completely_accounted_for.no) {
+      await this.differenceCompletelyAccountedForNo.check();
+    } else {
+      await this.differenceCompletelyAccountedForNo.uncheck();
+    }
+
     await this.next.click();
   }
 
   async fillMoreBallotsFields(fields: MoreBallotsFields) {
     await this.moreBallotsCount.fill(fields.more_ballots_count.toString());
-    await this.tooManyBallotsHandedOutCount.fill(fields.too_many_ballots_handed_out_count.toString());
-    await this.otherExplanationCount.fill(fields.other_explanation_count.toString());
-    await this.noExplanationCount.fill(fields.no_explanation_count.toString());
   }
 
   async fillFewerBallotsFields(fields: FewerBallotsFields) {
     await this.fewerBallotsCount.fill(fields.fewer_ballots_count.toString());
-    await this.unreturnedBallotsCount.fill(fields.unreturned_ballots_count.toString());
-    await this.tooFewBallotsHandedOutCount.fill(fields.too_few_ballots_handed_out_count.toString());
-    await this.otherExplanationCount.fill(fields.other_explanation_count.toString());
-    await this.noExplanationCount.fill(fields.no_explanation_count.toString());
   }
 
   async checkAcceptErrorsAndWarnings() {

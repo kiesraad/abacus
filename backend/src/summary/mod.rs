@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
+use crate::data_entry::YesNo;
 use crate::{
     APIError,
     data_entry::{
@@ -146,14 +147,31 @@ impl ElectionSummary {
 /// Contains a summary of the differences, containing which polling stations had differences.
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(deny_unknown_fields)]
+pub struct SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+    pub admitted_voters_equal_votes_cast: bool,
+    pub votes_cast_greater_than_admitted_voters: bool,
+    pub votes_cast_smaller_than_admitted_voters: bool,
+}
+
+impl SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+    /// Initialize a new differences count with all counts set to zero.
+    pub fn zero() -> SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+        SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+            admitted_voters_equal_votes_cast: Default::default(),
+            votes_cast_greater_than_admitted_voters: Default::default(),
+            votes_cast_smaller_than_admitted_voters: Default::default(),
+        }
+    }
+}
+
+/// Contains a summary of the differences, containing which polling stations had differences.
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct SummaryDifferencesCounts {
     pub more_ballots_count: SumCount,
     pub fewer_ballots_count: SumCount,
-    pub unreturned_ballots_count: SumCount,
-    pub too_few_ballots_handed_out_count: SumCount,
-    pub too_many_ballots_handed_out_count: SumCount,
-    pub other_explanation_count: SumCount,
-    pub no_explanation_count: SumCount,
+    pub compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters,
+    pub difference_completely_accounted_for: YesNo,
 }
 
 impl SummaryDifferencesCounts {
@@ -162,11 +180,9 @@ impl SummaryDifferencesCounts {
         SummaryDifferencesCounts {
             more_ballots_count: SumCount::zero(),
             fewer_ballots_count: SumCount::zero(),
-            unreturned_ballots_count: SumCount::zero(),
-            too_few_ballots_handed_out_count: SumCount::zero(),
-            too_many_ballots_handed_out_count: SumCount::zero(),
-            other_explanation_count: SumCount::zero(),
-            no_explanation_count: SumCount::zero(),
+            compare_votes_cast_admitted_voters:
+                SummaryDifferenceCountsCompareVotesCastAdmittedVoters::zero(),
+            difference_completely_accounted_for: Default::default(),
         }
     }
 
@@ -180,20 +196,6 @@ impl SummaryDifferencesCounts {
             .add(polling_station, differences_counts.more_ballots_count);
         self.fewer_ballots_count
             .add(polling_station, differences_counts.fewer_ballots_count);
-        self.unreturned_ballots_count
-            .add(polling_station, differences_counts.unreturned_ballots_count);
-        self.too_few_ballots_handed_out_count.add(
-            polling_station,
-            differences_counts.too_few_ballots_handed_out_count,
-        );
-        self.too_many_ballots_handed_out_count.add(
-            polling_station,
-            differences_counts.too_many_ballots_handed_out_count,
-        );
-        self.other_explanation_count
-            .add(polling_station, differences_counts.other_explanation_count);
-        self.no_explanation_count
-            .add(polling_station, differences_counts.no_explanation_count);
     }
 }
 
@@ -326,11 +328,6 @@ mod tests {
         assert_eq!(diff.more_ballots_count.count, 1);
         assert_eq!(diff.more_ballots_count.polling_stations, vec![123]);
         assert_eq!(diff.fewer_ballots_count.count, 0);
-        assert_eq!(diff.unreturned_ballots_count.count, 0);
-        assert_eq!(diff.too_few_ballots_handed_out_count.count, 0);
-        assert_eq!(diff.too_many_ballots_handed_out_count.count, 0);
-        assert_eq!(diff.other_explanation_count.count, 0);
-        assert_eq!(diff.no_explanation_count.count, 0);
 
         ps[1].number = 321;
 
@@ -368,16 +365,6 @@ mod tests {
                 .fewer_ballots_count
                 .polling_stations,
             vec![32]
-        );
-
-        // this field should not have any recorded polling stations
-        assert_eq!(totals.differences_counts.no_explanation_count.count, 0);
-        assert!(
-            totals
-                .differences_counts
-                .no_explanation_count
-                .polling_stations
-                .is_empty()
         );
 
         // tests for voters counts

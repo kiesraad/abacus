@@ -54,8 +54,10 @@ describe("votersAndVotesSection", () => {
 describe("differencesSection", () => {
   test("should have correct structure", () => {
     expect(differencesSection.id).toBe("differences_counts");
-    expect(differencesSection.subsections).toHaveLength(1);
-    expect(differencesSection.subsections[0]?.type).toBe("inputGrid");
+    expect(differencesSection.subsections).toHaveLength(3);
+    expect(differencesSection.subsections[0]?.type).toBe("checkboxes");
+    expect(differencesSection.subsections[1]?.type).toBe("inputGrid");
+    expect(differencesSection.subsections[2]?.type).toBe("checkboxes");
   });
 
   test("should have all differences count fields", () => {
@@ -63,11 +65,14 @@ describe("differencesSection", () => {
       const paths = differencesSection.subsections[0].rows.map((row) => row.path);
       expect(paths).toContain("differences_counts.more_ballots_count");
       expect(paths).toContain("differences_counts.fewer_ballots_count");
-      expect(paths).toContain("differences_counts.unreturned_ballots_count");
-      expect(paths).toContain("differences_counts.too_few_ballots_handed_out_count");
-      expect(paths).toContain("differences_counts.too_many_ballots_handed_out_count");
-      expect(paths).toContain("differences_counts.other_explanation_count");
-      expect(paths).toContain("differences_counts.no_explanation_count");
+      expect(paths).toContain("differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast");
+      expect(paths).toContain(
+        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
+      );
+      expect(paths).toContain(
+        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
+      );
+      expect(paths).toContain("differences_counts.difference_completely_accounted_for");
     }
   });
 

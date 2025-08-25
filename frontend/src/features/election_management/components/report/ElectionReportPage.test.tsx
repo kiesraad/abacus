@@ -180,7 +180,7 @@ describe("ElectionReportPage", () => {
       reference: "InvalidCommitteeSessionStatus",
     } satisfies ErrorResponse);
 
-    await router.navigate("/elections/1/report/download");
+    await router.navigate("/elections/1/report/committee-session/1/download");
 
     rtlRender(<Providers router={router} />);
 
@@ -226,7 +226,7 @@ describe("ElectionReportPage", () => {
       ),
     );
 
-    await router.navigate("/elections/1/report/download");
+    await router.navigate("/elections/1/report/committee-session/1/download");
 
     rtlRender(<Providers router={router} />);
 

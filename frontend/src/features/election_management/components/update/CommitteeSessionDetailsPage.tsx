@@ -70,7 +70,7 @@ export function CommitteeSessionDetailsPage() {
         if (isSuccess(result)) {
           if (redirectToReportPage) {
             await refetch();
-            void navigate(`/elections/${election.id}/report/download`);
+            void navigate(`/elections/${election.id}/report/committee-session/${committeeSession.number}/download`);
           } else {
             void navigate("..");
           }

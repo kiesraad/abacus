@@ -30,7 +30,7 @@ export function FinishDataEntryPage() {
   useEffect(() => {
     // Redirect to report download if committee session data entry phase is already finished
     if (committeeSession.status === "data_entry_finished") {
-      void navigate(`/elections/${election.id}/report/download`);
+      void navigate(`/elections/${election.id}/report/committee-session/${committeeSession.number}/download`);
     }
   }, [committeeSession, election, navigate]);
 

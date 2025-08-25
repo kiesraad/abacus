@@ -6,6 +6,7 @@
   "add_the_location": "Vul de plaatsnaam in. Bijvoorbeeld <em>Amersfoort</em>",
   "committee_session_details": "Details van de zitting",
   "custom_committee_session_details": "Details van {sessionLabel}",
+  "requested_investigations": "Aangevraagde onderzoeken",
   "data_entry": "Steminvoer",
   "data_entry_finish_steps_explanation": "<ul><li>In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële telbestanden downloaden.</li><li>Zolang er geen volgende zitting is gestart, kan je nog terug naar de steminvoer.</li></ul>",
   "date": "Datum",

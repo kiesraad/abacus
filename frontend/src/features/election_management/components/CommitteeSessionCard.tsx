@@ -126,6 +126,13 @@ export function CommitteeSessionCard({
     label: t("election_management.committee_session_details"),
     to: "details",
   };
+
+  const investigationsButtonLink: ButtonLink = {
+    id: committeeSession.id,
+    label: t("election_management.requested_investigations"),
+    to: "investigations",
+  };
+
   const deleteButtonLink: ButtonLink = {
     id: committeeSession.id,
     label: t("election_management.delete_session"),
@@ -142,6 +149,7 @@ export function CommitteeSessionCard({
       if (isCoordinator && currentSession) {
         buttonLinks.push(detailsButtonLink);
         if (committeeSession.number > 1) {
+          buttonLinks.push(investigationsButtonLink);
           buttonLinks.push(deleteButtonLink);
         }
       }

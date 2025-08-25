@@ -1,10 +1,10 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { useMessages } from "@/hooks/messages/useMessages";
 import {
   ElectionRequestHandler,
   PollingStationDeleteHandler,
@@ -16,9 +16,6 @@ import { render, renderReturningRouter, screen, spyOnHandler, waitFor, within } 
 import { PollingStation } from "@/types/generated/openapi";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
-
-vi.mock("react-router");
-vi.mock("@/hooks/messages/useMessages");
 
 describe("PollingStationUpdatePage", () => {
   const testPollingStation: PollingStation = {
@@ -37,8 +34,8 @@ describe("PollingStationUpdatePage", () => {
 
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationGetHandler, PollingStationUpdateHandler);
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1" });
-    vi.mocked(useMessages).mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1" });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
   });
 
   test("Shows form", async () => {

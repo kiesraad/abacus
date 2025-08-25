@@ -1,8 +1,8 @@
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { useMessages } from "@/hooks/messages/useMessages";
 import { pollingStationRequestMockData } from "@/testing/api-mocks/PollingStationRequestMockData";
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
@@ -10,15 +10,13 @@ import { render, screen } from "@/testing/test-utils";
 
 import { PollingStationImportPage } from "./PollingStationImportPage";
 
-vi.mock("@/hooks/messages/useMessages");
-
 describe("PollingStationImportPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler);
   });
 
   test("Shows form", async () => {
-    vi.mocked(useMessages).mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
 
     render(
       <ElectionProvider electionId={1}>
@@ -34,7 +32,7 @@ describe("PollingStationImportPage", () => {
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    vi.mocked(useMessages).mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
 
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 400, {
       error: "Invalid XML",
@@ -64,7 +62,7 @@ describe("PollingStationImportPage", () => {
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    vi.mocked(useMessages).mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
 
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 413, {
       error: "12",
@@ -94,7 +92,7 @@ describe("PollingStationImportPage", () => {
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    vi.mocked(useMessages).mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 200, {
       polling_stations: pollingStationRequestMockData,
     });

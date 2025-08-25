@@ -1,5 +1,5 @@
+import * as ReactRouter from "react-router";
 import { ReactNode } from "react";
-import { RouterProvider } from "react-router";
 
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -34,15 +34,6 @@ import { ElectionReportPage } from "./ElectionReportPage";
 
 const navigate = vi.fn();
 
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  Navigate: ({ to }) => {
-    navigate(to);
-    return null;
-  },
-  useNavigate: () => navigate,
-}));
-
 const Providers = ({
   children,
   router = getRouter(children),
@@ -57,7 +48,7 @@ const Providers = ({
       <TestUserProvider userRole="coordinator">
         <ElectionProvider electionId={1}>
           <ElectionStatusProvider electionId={1}>
-            <RouterProvider router={router} />
+            <ReactRouter.RouterProvider router={router} />
           </ElectionStatusProvider>
         </ElectionProvider>
       </TestUserProvider>
@@ -78,6 +69,11 @@ const renderPage = () => {
 describe("ElectionReportPage", () => {
   beforeEach(() => {
     server.use(CommitteeSessionStatusChangeRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
+      navigate(props.to);
+      return null;
+    });
   });
 
   test("Redirects to CommitteeSessionDetailsPage when details are not filled in", async () => {
@@ -154,10 +150,8 @@ describe("ElectionReportPage", () => {
   });
 
   test("Shows error page when resume data entry call returns an error", async () => {
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const router = setupTestRouter([
       {
         Component: null,
@@ -207,10 +201,8 @@ describe("ElectionReportPage", () => {
   });
 
   test("Error when committee session status is not DataEntryFinished", async () => {
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const router = setupTestRouter([
       {
         Component: null,

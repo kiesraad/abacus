@@ -1,20 +1,16 @@
-import { Navigate, RouterProvider, useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { useUser } from "@/hooks/user/useUser";
+import * as useUser from "@/hooks/user/useUser";
 import { setupTestRouter } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
 
-import { useDataEntryContext } from "../hooks/useDataEntryContext";
+import * as useDataEntryContext from "../hooks/useDataEntryContext";
 import { getDefaultDataEntryState, getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
 import { DataEntryStateAndActionsLoaded, Status, SubmitCurrentFormOptions } from "../types/types";
 import { DataEntryNavigation } from "./DataEntryNavigation";
-
-vi.mock("react-router");
-vi.mock("@/hooks/user/useUser");
-vi.mock("../hooks/useDataEntryContext");
 
 const baseMockData = getDefaultDataEntryStateAndActionsLoaded();
 const testPath = `/elections/${baseMockData.election.id}/data-entry/${baseMockData.pollingStationId}/1`;
@@ -23,7 +19,7 @@ function renderComponent(onSubmit: (options?: SubmitCurrentFormOptions) => Promi
   const router = setupTestRouter([
     {
       path: "/",
-      element: <Navigate to={testPath} replace />,
+      element: <ReactRouter.Navigate to={testPath} replace />,
     },
     {
       path: "/elections/:electionId/data-entry/:pollingStationId/:entryNumber",
@@ -36,7 +32,7 @@ function renderComponent(onSubmit: (options?: SubmitCurrentFormOptions) => Promi
     },
   ]);
 
-  render(<RouterProvider router={router} />);
+  render(<ReactRouter.RouterProvider router={router} />);
   return router;
 }
 
@@ -50,10 +46,12 @@ describe("DataEntryNavigation", () => {
           status,
         };
 
-        vi.mocked(useParams).mockReturnValue({ sectionId: "test" });
-        vi.mocked(useDataEntryContext).mockReturnValue(state);
-        vi.mocked(useUser).mockReturnValue(getTypistUser());
+        vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
+        vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+        vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
         const router = renderComponent(vi.fn());
+
         await router.navigate("/test");
         expect(router.state.location.pathname).toBe("/test");
       },
@@ -67,10 +65,12 @@ describe("DataEntryNavigation", () => {
           status,
         };
 
-        vi.mocked(useParams).mockReturnValue({ sectionId: "differences_counts" });
-        vi.mocked(useDataEntryContext).mockReturnValue(state);
-        vi.mocked(useUser).mockReturnValue(getTypistUser());
+        vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "differences_counts" });
+        vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+        vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
         const router = renderComponent(vi.fn());
+
         await router.navigate(testPath + "/differences_counts");
         expect(router.state.location.pathname).toBe(testPath + "/differences_counts");
       },
@@ -94,9 +94,9 @@ describe("DataEntryNavigation", () => {
           status,
         };
 
-        vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
-        vi.mocked(useDataEntryContext).mockReturnValue(state);
-        vi.mocked(useUser).mockReturnValue(getTypistUser());
+        vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
+        vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+        vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
 
         const router = renderComponent(vi.fn());
 
@@ -117,11 +117,13 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "test" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(null);
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(null);
+
       const router = renderComponent(vi.fn());
       await router.navigate("/test");
+
       expect(router.state.location.pathname).toBe("/test");
     });
 
@@ -131,11 +133,13 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "test" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
       const router = renderComponent(vi.fn());
       await router.navigate(testPath);
+
       expect(router.state.location.pathname).toBe(testPath);
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
@@ -158,9 +162,9 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
 
       const router = renderComponent(vi.fn());
 
@@ -186,9 +190,10 @@ describe("DataEntryNavigation", () => {
         return Promise.resolve(true);
       });
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "test" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
       const router = renderComponent(onSubmit);
       await router.navigate("/test");
 
@@ -214,9 +219,10 @@ describe("DataEntryNavigation", () => {
         return Promise.resolve(true);
       });
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "test" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
       const router = renderComponent(onSubmit);
       await router.navigate("/test");
 
@@ -242,9 +248,10 @@ describe("DataEntryNavigation", () => {
         return Promise.resolve(true);
       });
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "save" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "save" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
       const router = renderComponent(onSubmit);
       await router.navigate("/test");
 
@@ -270,9 +277,10 @@ describe("DataEntryNavigation", () => {
         return Promise.resolve(false);
       });
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "test" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
       const router = renderComponent(onSubmit);
       await router.navigate("/test");
 
@@ -295,9 +303,10 @@ describe("DataEntryNavigation", () => {
         return Promise.resolve(true);
       });
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "test" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
       const router = renderComponent(onSubmit);
       await router.navigate("/test");
 
@@ -333,9 +342,9 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
 
       const router = renderComponent(vi.fn());
 
@@ -375,9 +384,9 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
 
       const router = renderComponent(onSubmit);
 
@@ -413,9 +422,9 @@ describe("DataEntryNavigation", () => {
         status: "idle",
       };
 
-      vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
-      vi.mocked(useDataEntryContext).mockReturnValue(state);
-      vi.mocked(useUser).mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
 
       const router = renderComponent(vi.fn());
 

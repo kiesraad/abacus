@@ -1,4 +1,6 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import * as ReactRouter from "react-router";
+
+import { describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
@@ -14,13 +16,6 @@ import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { ResolveErrorsSectionPage } from "./ResolveErrorsSectionPage";
 
-vi.mock("react-router", async (importOriginal) => {
-  return {
-    ...(await importOriginal()),
-    useParams: () => ({ electionId: "1", pollingStationId: "5", sectionId: "voters_votes_counts" }),
-  };
-});
-
 const renderSectionPage = () => {
   return render(
     <TestUserProvider userRole="coordinator">
@@ -34,16 +29,19 @@ const renderSectionPage = () => {
 };
 
 describe("ResolveErrorsSectionPage", () => {
-  beforeEach(() => {
+  test("renders read-only section with valid section id", async () => {
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
       PollingStationDataEntryGetErrorsHandler,
     );
-  });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({
+      electionId: "1",
+      pollingStationId: "5",
+      sectionId: "voters_votes_counts",
+    });
 
-  test("renders read-only section with valid section id", async () => {
     renderSectionPage();
 
     // Verify the section renders with the correct title

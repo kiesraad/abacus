@@ -1,9 +1,11 @@
+import * as ReactRouter from "react-router";
+
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { useMessages } from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   ElectionListRequestHandler,
@@ -20,14 +22,6 @@ import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ResolveErrorsIndexPage } from "./ResolveErrorsIndexPage";
 
 const navigate = vi.fn();
-
-vi.mock("react-router", async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-  useParams: () => ({ pollingStationId: "5" }),
-}));
-
-vi.mock("@/hooks/messages/useMessages");
 
 const renderPage = async () => {
   render(
@@ -48,7 +42,9 @@ describe("ResolveErrorsPage", () => {
   const pushMessage = vi.fn();
 
   beforeEach(() => {
-    vi.mocked(useMessages).mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "5" });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,

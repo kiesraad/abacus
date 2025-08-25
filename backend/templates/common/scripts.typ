@@ -361,6 +361,7 @@
   total: 0,
   values: (),
   continue_on_next_page: "",
+  corrected_cells: 4,
   column_total: (c, v) => [#c: #v],
   sum_total: [(#columns)],
   total_instruction: "",
@@ -429,7 +430,7 @@
             )),
             ..cell_if(with_originals, table.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_votes)))),
             if c.votes == none {
-              table.cell(inset: 1pt, empty_grid(paint: luma(213)))
+              table.cell(inset: 1pt, empty_grid(cells: corrected_cells, paint: luma(213)))
             } else {
               table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes)))
             },
@@ -472,7 +473,7 @@
                 grid.cell(inset: 9pt, align: center)[#column_total #column],
                 ..cell_if(with_originals, grid.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_total)))),
                 grid.vline(stroke: (paint: luma(213), dash: "densely-dotted")),
-                grid.cell(empty_grid(cells: 4, paint: luma(213)), align: center, inset: 0pt),
+                grid.cell(empty_grid(cells: corrected_cells, paint: luma(213)), align: center, inset: 0pt),
               )
 
               votes = 0

@@ -67,14 +67,104 @@ de aantallen in het proces-verbaal.
 
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn
 veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen
-die in de eerste zitting door het gemeentelijke stembureau/stembureau voor het openbaar lichaam zijn
+die in de eerste zitting door #is_municipality[de gemeente][het openbaar lichaam] zijn
 vastgesteld.
 
 == Aantal kiesgerechtigden
+#correction_title_grid()
+#empty_letterbox("Z", cells: 1, original: 10, bold_top_border: true)[Kiesgerechtigden]
+
 == Toegelaten kiezers
-== Uitgebrachte stemmen
+Het totaal van alle getelde geldige stempassen, volmachtbewijzen en kiezerspassen
+#sum(
+  with_correction_title: true,
+  empty_letterbox("A", cells: 1, original: 10, bold_top_border: true)[Stempassen],
+  empty_letterbox("B", cells: 1, original: 10)[Volmachtbewijzen],
+  empty_letterbox("D", cells: 1, original: 10, light: false)[
+    *Totaal toegelaten kiezers (A+B)*
+  ]
+)
+
+== Uitgebrachte stemmen <cast_votes>
+Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
+ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
+
+#if input.election.political_groups.len() > 0 [
+  #sum(
+    with_correction_title: true,
+    sum(
+      ..input.election.political_groups.enumerate().map(((idx, list)) => {
+        empty_letterbox(cells: 1, original: 10, bold_top_border: idx == 0, [E.#list.number])[Totaal lijst #list.number - #list.name]
+      }),
+      empty_letterbox(
+        cells:1,
+        original: 10,
+        "E",
+        light: false,
+      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
+    ),
+    empty_letterbox(cells: 1, original: 10, "F")[Blanco stemmen],
+    empty_letterbox(cells: 1, original: 10, "G")[Ongeldige stemmen],
+    empty_letterbox(
+      cells:1,
+      original: 10,
+      "H",
+      light: false,
+    )[*Totaal uitgebrachte stemmen (E+F+G)*],
+  )
+]
+
+#pagebreak(weak: true)
+
 == Verschillen tussen aantal kiezers en uitgebrachte stemmen
-== Stemmen per lijst en per kandidaat
+
+=== Is bij *alle afzonderlijke stembureaus* in #is_municipality[deze gemeente][dit openbaar lichaam] het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
+
+#checkbox[Ja #sym.arrow.long.r *Ga door naar #ref(<per_list_and_candidate>)*]
+
+#checkbox[Nee, er zijn stembureaus met een verschil]
+
+
+=== Voor de stembureaus met de nummers #TODO[stembureaunummers] zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
+
+#correction_title_grid()
+#empty_letterbox("I", cells: 1, original: 10, bold_top_border: true)[Kiesgerechtigden]
+
+=== Voor de stembureaus met de nummers #TODO[stembureaunummers] zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
+
+#correction_title_grid()
+#empty_letterbox("J", cells: 1, original: 10, bold_top_border: true)[Kiesgerechtigden]
+
+#pagebreak(weak: true)
+
+== Stemmen per lijst en per kandidaat <per_list_and_candidate>
+
+#for political_group in input.election.political_groups {
+  votes_table(
+    with_originals: true,
+    title: [#political_group.number #political_group.name],
+    headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
+    corrected_cells: 1,
+    total: none,
+    values: political_group.candidates.map(candidate => (
+      name: candidate_name(candidate),
+      number: candidate.number,
+      votes: none,
+    )),
+    continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
+    column_total: "Subtotaal kolom",
+    sum_total: columns => [Totaal lijst (kolom #columns)],
+    total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
+    explainer_text: [
+      Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
+    ],
+    break_count: (20, 20, 20, 20)
+  )
+}
+
+#show heading.where(level: 3): it =>[
+    #block(it.body)
+]
 
 #pagebreak(weak: true)
 #emph_block[Deze pagina is expres leeg]

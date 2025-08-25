@@ -223,17 +223,26 @@ pub struct DifferencesCounts {
     #[schema(value_type = u32)]
     pub fewer_ballots_count: Count,
     /// Whether total of admitted voters and total of votes cast match.
+    /// ("Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)")
+    pub compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters,
+    /// Whether the difference between the total of admitted voters and total of votes cast is explained.
+    /// ("Verschil tussen D en H volledig verklaard?")
+    pub difference_completely_accounted_for: YesNo,
+}
+
+/// Compare votes cast admitted voters, part of the differences counts.
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct DifferenceCountsCompareVotesCastAdmittedVoters {
+    /// Whether total of admitted voters and total of votes cast match.
     /// ("D en H zijn gelijk")
-    pub admitted_voters_equals_votes_cast: bool,
+    pub admitted_voters_equal_votes_cast: bool,
     /// Whether total of admitted voters is greater than total of votes cast match.
     /// ("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)")
     pub votes_cast_greater_than_admitted_voters: bool,
     /// Whether total of admitted voters is less than total of votes cast match.
     /// ("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)")
     pub votes_cast_smaller_than_admitted_voters: bool,
-    /// Whether the difference between the total of admitted voters and total of votes cast is explained.
-    /// ("Verschil tussen D en H volledig verklaard?")
-    pub difference_completely_accounted_for: YesNo,
 }
 
 impl DifferencesCounts {
@@ -241,10 +250,8 @@ impl DifferencesCounts {
         DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 0,
-            admitted_voters_equals_votes_cast: Default::default(),
-            votes_cast_greater_than_admitted_voters: Default::default(),
-            votes_cast_smaller_than_admitted_voters: Default::default(),
             difference_completely_accounted_for: Default::default(),
+            compare_votes_cast_admitted_voters: Default::default(),
         }
     }
 }

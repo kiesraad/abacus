@@ -1361,10 +1361,12 @@ export const election_summary: ElectionSummary = {
       count: 0,
       polling_stations: [],
     },
-    admitted_voters_equals_votes_cast: false,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: false,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
     difference_completely_accounted_for: { yes: false, no: false },
-    votes_cast_greater_than_admitted_voters: false,
-    votes_cast_smaller_than_admitted_voters: false,
   },
   political_group_votes: [
     political_group_1_votes,

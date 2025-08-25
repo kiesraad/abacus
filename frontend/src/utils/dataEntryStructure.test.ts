@@ -65,9 +65,13 @@ describe("differencesSection", () => {
       const paths = differencesSection.subsections[0].rows.map((row) => row.path);
       expect(paths).toContain("differences_counts.more_ballots_count");
       expect(paths).toContain("differences_counts.fewer_ballots_count");
-      expect(paths).toContain("differences_counts.admitted_voters_equals_votes_cast");
-      expect(paths).toContain("differences_counts.votes_cast_greater_than_admitted_voters");
-      expect(paths).toContain("differences_counts.votes_cast_smaller_than_admitted_voters");
+      expect(paths).toContain("differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast");
+      expect(paths).toContain(
+        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
+      );
+      expect(paths).toContain(
+        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
+      );
       expect(paths).toContain("differences_counts.difference_completely_accounted_for");
     }
   });

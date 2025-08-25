@@ -63,19 +63,19 @@ export class DifferencesPage extends DataEntryBasePage {
     await this.moreBallotsCount.fill(fields.more_ballots_count.toString());
     await this.fewerBallotsCount.fill(fields.fewer_ballots_count.toString());
 
-    if (fields.admitted_voters_equals_votes_cast) {
+    if (fields.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast) {
       await this.admittedVotersEqualsVotesCastCheckbox.check();
     } else {
       await this.admittedVotersEqualsVotesCastCheckbox.uncheck();
     }
 
-    if (fields.votes_cast_greater_than_admitted_voters) {
+    if (fields.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters) {
       await this.votesCastGreaterThanAdmittedVotersCheckbox.check();
     } else {
       await this.votesCastGreaterThanAdmittedVotersCheckbox.uncheck();
     }
 
-    if (fields.votes_cast_smaller_than_admitted_voters) {
+    if (fields.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters) {
       await this.votesCastSmallerThanAdmittedVotersCheckbox.check();
     } else {
       await this.votesCastSmallerThanAdmittedVotersCheckbox.uncheck();

@@ -1,7 +1,8 @@
 use super::{
-    CandidateVotes, Count, CountingDifferencesPollingStation, DifferencesCounts,
-    ExtraInvestigation, FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-    PollingStationResults, VotersCounts, VotesCounts, YesNo,
+    CandidateVotes, Count, CountingDifferencesPollingStation,
+    DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
+    FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+    VotersCounts, VotesCounts, YesNo,
 };
 
 pub trait Compare {
@@ -195,10 +196,26 @@ impl Compare for DifferencesCounts {
             different_fields,
             &path.field("fewer_ballots_count"),
         );
-        self.admitted_voters_equals_votes_cast.compare(
-            &first_entry.admitted_voters_equals_votes_cast,
+        self.compare_votes_cast_admitted_voters.compare(
+            &first_entry.compare_votes_cast_admitted_voters,
             different_fields,
-            &path.field("admitted_voters_equals_votes_cast"),
+            &path.field("compare_votes_cast_admitted_voters"),
+        );
+
+        self.difference_completely_accounted_for.compare(
+            &first_entry.difference_completely_accounted_for,
+            different_fields,
+            &path.field("difference_completely_accounted_for"),
+        );
+    }
+}
+
+impl Compare for DifferenceCountsCompareVotesCastAdmittedVoters {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        self.admitted_voters_equal_votes_cast.compare(
+            &first_entry.admitted_voters_equal_votes_cast,
+            different_fields,
+            &path.field("admitted_voters_equal_votes_cast"),
         );
         self.votes_cast_greater_than_admitted_voters.compare(
             &first_entry.votes_cast_greater_than_admitted_voters,
@@ -209,11 +226,6 @@ impl Compare for DifferencesCounts {
             &first_entry.votes_cast_smaller_than_admitted_voters,
             different_fields,
             &path.field("votes_cast_smaller_than_admitted_voters"),
-        );
-        self.difference_completely_accounted_for.compare(
-            &first_entry.difference_completely_accounted_for,
-            different_fields,
-            &path.field("difference_completely_accounted_for"),
         );
     }
 }
@@ -319,10 +331,13 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 2,
-                admitted_voters_equals_votes_cast: Default::default(),
-                votes_cast_greater_than_admitted_voters: Default::default(),
-                votes_cast_smaller_than_admitted_voters: Default::default(),
                 difference_completely_accounted_for: Default::default(),
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: Default::default(),
+                        votes_cast_greater_than_admitted_voters: Default::default(),
+                        votes_cast_smaller_than_admitted_voters: Default::default(),
+                    },
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
                 1,
@@ -400,9 +415,12 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 1,
                 fewer_ballots_count: 0,
-                admitted_voters_equals_votes_cast: Default::default(),
-                votes_cast_greater_than_admitted_voters: Default::default(),
-                votes_cast_smaller_than_admitted_voters: Default::default(),
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: Default::default(),
+                        votes_cast_greater_than_admitted_voters: Default::default(),
+                        votes_cast_smaller_than_admitted_voters: Default::default(),
+                    },
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
@@ -491,9 +509,12 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 2,
-                admitted_voters_equals_votes_cast: false,
-                votes_cast_greater_than_admitted_voters: true,
-                votes_cast_smaller_than_admitted_voters: true,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: false,
+                        votes_cast_greater_than_admitted_voters: true,
+                        votes_cast_smaller_than_admitted_voters: true,
+                    },
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
@@ -505,9 +526,11 @@ mod tests {
         second_entry.differences_counts = DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 2,
-            admitted_voters_equals_votes_cast: true,
-            votes_cast_greater_than_admitted_voters: false,
-            votes_cast_smaller_than_admitted_voters: false,
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: true,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: false,
+            },
             difference_completely_accounted_for: Default::default(),
         };
         second_entry.compare(
@@ -518,15 +541,15 @@ mod tests {
         assert_eq!(different_fields.len(), 3);
         assert_eq!(
             different_fields[0],
-            "polling_station_results.differences_counts.admitted_voters_equals_votes_cast"
+            "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"
         );
         assert_eq!(
             different_fields[1],
-            "polling_station_results.differences_counts.votes_cast_greater_than_admitted_voters"
+            "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters"
         );
         assert_eq!(
             different_fields[2],
-            "polling_station_results.differences_counts.votes_cast_smaller_than_admitted_voters"
+            "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters"
         );
     }
 
@@ -645,9 +668,12 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 1,
                 fewer_ballots_count: 0,
-                admitted_voters_equals_votes_cast: Default::default(),
-                votes_cast_greater_than_admitted_voters: Default::default(),
-                votes_cast_smaller_than_admitted_voters: Default::default(),
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: Default::default(),
+                        votes_cast_greater_than_admitted_voters: Default::default(),
+                        votes_cast_smaller_than_admitted_voters: Default::default(),
+                    },
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![

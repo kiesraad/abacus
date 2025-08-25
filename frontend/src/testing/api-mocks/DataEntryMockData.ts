@@ -43,9 +43,11 @@ export const emptyData: PollingStationResults = {
   differences_counts: {
     more_ballots_count: 0,
     fewer_ballots_count: 0,
-    admitted_voters_equals_votes_cast: false,
-    votes_cast_greater_than_admitted_voters: false,
-    votes_cast_smaller_than_admitted_voters: false,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: false,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
     difference_completely_accounted_for: { yes: false, no: false },
   },
   political_group_votes: electionMockData.political_groups.map((group) => ({
@@ -98,9 +100,11 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
     differences_counts: {
       more_ballots_count: 0,
       fewer_ballots_count: 0,
-      admitted_voters_equals_votes_cast: false,
-      votes_cast_greater_than_admitted_voters: false,
-      votes_cast_smaller_than_admitted_voters: false,
+      compare_votes_cast_admitted_voters: {
+        admitted_voters_equal_votes_cast: false,
+        votes_cast_greater_than_admitted_voters: false,
+        votes_cast_smaller_than_admitted_voters: false,
+      },
       difference_completely_accounted_for: { yes: false, no: false },
     },
     political_group_votes: [
@@ -155,9 +159,11 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
     differences_counts: {
       more_ballots_count: 0,
       fewer_ballots_count: 0,
-      admitted_voters_equals_votes_cast: false,
-      votes_cast_greater_than_admitted_voters: false,
-      votes_cast_smaller_than_admitted_voters: false,
+      compare_votes_cast_admitted_voters: {
+        admitted_voters_equal_votes_cast: false,
+        votes_cast_greater_than_admitted_voters: false,
+        votes_cast_smaller_than_admitted_voters: false,
+      },
       difference_completely_accounted_for: { yes: false, no: false },
     },
     political_group_votes: [

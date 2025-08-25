@@ -4627,21 +4627,43 @@
         },
         "additionalProperties": false
       },
+      "DifferenceCountsCompareVotesCastAdmittedVoters": {
+        "type": "object",
+        "description": "Compare votes cast admitted voters, part of the differences counts.",
+        "required": [
+          "admitted_voters_equal_votes_cast",
+          "votes_cast_greater_than_admitted_voters",
+          "votes_cast_smaller_than_admitted_voters"
+        ],
+        "properties": {
+          "admitted_voters_equal_votes_cast": {
+            "type": "boolean",
+            "description": "Whether total of admitted voters and total of votes cast match.\n(\"D en H zijn gelijk\")"
+          },
+          "votes_cast_greater_than_admitted_voters": {
+            "type": "boolean",
+            "description": "Whether total of admitted voters is greater than total of votes cast match.\n(\"H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)\")"
+          },
+          "votes_cast_smaller_than_admitted_voters": {
+            "type": "boolean",
+            "description": "Whether total of admitted voters is less than total of votes cast match.\n(\"H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "DifferencesCounts": {
         "type": "object",
         "description": "Differences counts, part of the polling station results.",
         "required": [
           "more_ballots_count",
           "fewer_ballots_count",
-          "admitted_voters_equals_votes_cast",
-          "votes_cast_greater_than_admitted_voters",
-          "votes_cast_smaller_than_admitted_voters",
+          "compare_votes_cast_admitted_voters",
           "difference_completely_accounted_for"
         ],
         "properties": {
-          "admitted_voters_equals_votes_cast": {
-            "type": "boolean",
-            "description": "Whether total of admitted voters and total of votes cast match.\n(\"D en H zijn gelijk\")"
+          "compare_votes_cast_admitted_voters": {
+            "$ref": "#/components/schemas/DifferenceCountsCompareVotesCastAdmittedVoters",
+            "description": "Whether total of admitted voters and total of votes cast match.\n(\"Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)\")"
           },
           "difference_completely_accounted_for": {
             "$ref": "#/components/schemas/YesNo",
@@ -4658,14 +4680,6 @@
             "format": "int32",
             "description": "Number of more counted ballots (\"Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?\")",
             "minimum": 0
-          },
-          "votes_cast_greater_than_admitted_voters": {
-            "type": "boolean",
-            "description": "Whether total of admitted voters is greater than total of votes cast match.\n(\"H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)\")"
-          },
-          "votes_cast_smaller_than_admitted_voters": {
-            "type": "boolean",
-            "description": "Whether total of admitted voters is less than total of votes cast match.\n(\"H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)\")"
           }
         },
         "additionalProperties": false
@@ -6258,20 +6272,39 @@
         },
         "additionalProperties": false
       },
+      "SummaryDifferenceCountsCompareVotesCastAdmittedVoters": {
+        "type": "object",
+        "description": "Contains a summary of the differences, containing which polling stations had differences.",
+        "required": [
+          "admitted_voters_equal_votes_cast",
+          "votes_cast_greater_than_admitted_voters",
+          "votes_cast_smaller_than_admitted_voters"
+        ],
+        "properties": {
+          "admitted_voters_equal_votes_cast": {
+            "type": "boolean"
+          },
+          "votes_cast_greater_than_admitted_voters": {
+            "type": "boolean"
+          },
+          "votes_cast_smaller_than_admitted_voters": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "SummaryDifferencesCounts": {
         "type": "object",
         "description": "Contains a summary of the differences, containing which polling stations had differences.",
         "required": [
           "more_ballots_count",
           "fewer_ballots_count",
-          "admitted_voters_equals_votes_cast",
-          "votes_cast_greater_than_admitted_voters",
-          "votes_cast_smaller_than_admitted_voters",
+          "compare_votes_cast_admitted_voters",
           "difference_completely_accounted_for"
         ],
         "properties": {
-          "admitted_voters_equals_votes_cast": {
-            "type": "boolean"
+          "compare_votes_cast_admitted_voters": {
+            "$ref": "#/components/schemas/SummaryDifferenceCountsCompareVotesCastAdmittedVoters"
           },
           "difference_completely_accounted_for": {
             "$ref": "#/components/schemas/YesNo"
@@ -6281,12 +6314,6 @@
           },
           "more_ballots_count": {
             "$ref": "#/components/schemas/SumCount"
-          },
-          "votes_cast_greater_than_admitted_voters": {
-            "type": "boolean"
-          },
-          "votes_cast_smaller_than_admitted_voters": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false

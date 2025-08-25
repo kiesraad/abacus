@@ -598,9 +598,15 @@ impl Validate for DifferencesCounts {
 
         // W.301 validate that more_ballots_count == too_many_ballots_handed_out_count + other_explanation_count + no_explanation_count - unreturned_ballots_count - too_few_ballots_handed_out_count
         if self.more_ballots_count != 0
-            && (self.votes_cast_greater_than_admitted_voters
-                && !self.admitted_voters_equals_votes_cast
-                && !self.votes_cast_smaller_than_admitted_voters
+            && (self
+                .compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters
+                && !self
+                    .compare_votes_cast_admitted_voters
+                    .admitted_voters_equal_votes_cast
+                && !self
+                    .compare_votes_cast_admitted_voters
+                    .votes_cast_smaller_than_admitted_voters
                 && !self.difference_completely_accounted_for.yes
                 && self.difference_completely_accounted_for.no)
         {
@@ -611,9 +617,15 @@ impl Validate for DifferencesCounts {
         }
         // W.302 validate that fewer_ballots_count == unreturned_ballots_count + too_few_ballots_handed_out_count + other_explanation_count + no_explanation_count
         if self.fewer_ballots_count != 0
-            && (self.votes_cast_smaller_than_admitted_voters
-                && !self.admitted_voters_equals_votes_cast
-                && !self.votes_cast_greater_than_admitted_voters
+            && (self
+                .compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters
+                && !self
+                    .compare_votes_cast_admitted_voters
+                    .admitted_voters_equal_votes_cast
+                && !self
+                    .compare_votes_cast_admitted_voters
+                    .votes_cast_greater_than_admitted_voters
                 && !self.difference_completely_accounted_for.yes
                 && self.difference_completely_accounted_for.no)
         {
@@ -758,7 +770,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::data_entry::YesNo;
+    use crate::data_entry::{DifferenceCountsCompareVotesCastAdmittedVoters, YesNo};
     use crate::{
         data_entry::PoliticalGroupTotalVotes, election::tests::election_fixture,
         polling_station::structs::tests::polling_station_fixture,
@@ -876,9 +888,12 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0, // F.301 incorrect difference
                 fewer_ballots_count: 0,
-                admitted_voters_equals_votes_cast: true,
-                votes_cast_greater_than_admitted_voters: false,
-                votes_cast_smaller_than_admitted_voters: false,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: true,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
@@ -966,9 +981,12 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 2,  // F.304 should be empty
                 fewer_ballots_count: 0, // F.303 incorrect difference
-                admitted_voters_equals_votes_cast: false,
-                votes_cast_greater_than_admitted_voters: true,
-                votes_cast_smaller_than_admitted_voters: false,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: false,
+                        votes_cast_greater_than_admitted_voters: true,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
                 difference_completely_accounted_for: YesNo {
                     yes: false,
                     no: true,
@@ -1029,9 +1047,12 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,  // F.301 incorrect difference
                 fewer_ballots_count: 2, // F.302 should be empty
-                admitted_voters_equals_votes_cast: true,
-                votes_cast_greater_than_admitted_voters: false,
-                votes_cast_smaller_than_admitted_voters: false,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: true,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
                 difference_completely_accounted_for: YesNo {
                     yes: true,
                     no: false,
@@ -1125,9 +1146,12 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 15, // F.304 should be empty
                 fewer_ballots_count: 0, // F.303 incorrect difference
-                admitted_voters_equals_votes_cast: false,
-                votes_cast_greater_than_admitted_voters: false,
-                votes_cast_smaller_than_admitted_voters: false,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: false,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
@@ -1199,9 +1223,12 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 4, // F.304 should be empty
                 fewer_ballots_count: 4,
-                admitted_voters_equals_votes_cast: false,
-                votes_cast_greater_than_admitted_voters: false,
-                votes_cast_smaller_than_admitted_voters: false,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: false,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
@@ -1267,9 +1294,12 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 4, // F.305 no difference expected
                 fewer_ballots_count: 0,
-                admitted_voters_equals_votes_cast: false,
-                votes_cast_greater_than_admitted_voters: false,
-                votes_cast_smaller_than_admitted_voters: false,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: false,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
@@ -1325,9 +1355,12 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 4, // F.305 no difference expected
-                admitted_voters_equals_votes_cast: false,
-                votes_cast_greater_than_admitted_voters: false,
-                votes_cast_smaller_than_admitted_voters: false,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: false,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes {
@@ -1624,9 +1657,11 @@ mod tests {
         let mut differences_counts = DifferencesCounts {
             more_ballots_count: 1_000_000_002, // correct but out of range
             fewer_ballots_count: 0,
-            admitted_voters_equals_votes_cast: false,
-            votes_cast_greater_than_admitted_voters: false,
-            votes_cast_smaller_than_admitted_voters: false,
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: false,
+            },
             difference_completely_accounted_for: Default::default(),
         };
         let election = election_fixture(&[]);
@@ -1644,9 +1679,11 @@ mod tests {
         differences_counts = DifferencesCounts {
             more_ballots_count: 111, // W.301 incorrect total
             fewer_ballots_count: 0,
-            admitted_voters_equals_votes_cast: false,
-            votes_cast_greater_than_admitted_voters: true,
-            votes_cast_smaller_than_admitted_voters: false,
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: true,
+                votes_cast_smaller_than_admitted_voters: false,
+            },
             difference_completely_accounted_for: YesNo {
                 yes: false,
                 no: true,
@@ -1676,9 +1713,11 @@ mod tests {
         differences_counts = DifferencesCounts {
             more_ballots_count: 5, // W.301 incorrect total
             fewer_ballots_count: 0,
-            admitted_voters_equals_votes_cast: false,
-            votes_cast_greater_than_admitted_voters: true,
-            votes_cast_smaller_than_admitted_voters: false,
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: true,
+                votes_cast_smaller_than_admitted_voters: false,
+            },
             difference_completely_accounted_for: YesNo {
                 yes: false,
                 no: true,
@@ -1708,9 +1747,11 @@ mod tests {
         differences_counts = DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 1, // W.302 incorrect total
-            admitted_voters_equals_votes_cast: false,
-            votes_cast_greater_than_admitted_voters: false,
-            votes_cast_smaller_than_admitted_voters: true,
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: true,
+            },
             difference_completely_accounted_for: YesNo {
                 yes: false,
                 no: true,
@@ -1740,9 +1781,11 @@ mod tests {
         differences_counts = DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 5, // W.302 incorrect total
-            admitted_voters_equals_votes_cast: false,
-            votes_cast_greater_than_admitted_voters: false,
-            votes_cast_smaller_than_admitted_voters: true,
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: true,
+            },
             difference_completely_accounted_for: YesNo {
                 yes: false,
                 no: true,
@@ -1941,9 +1984,11 @@ mod tests {
         let differences_counts = DifferencesCounts {
             more_ballots_count: 10, // W.301 correct total
             fewer_ballots_count: 0,
-            admitted_voters_equals_votes_cast: false,
-            votes_cast_greater_than_admitted_voters: true,
-            votes_cast_smaller_than_admitted_voters: false,
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: true,
+                votes_cast_smaller_than_admitted_voters: false,
+            },
             difference_completely_accounted_for: YesNo {
                 yes: false,
                 no: true,
@@ -1973,9 +2018,11 @@ mod tests {
         let differences_counts = DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 10,
-            admitted_voters_equals_votes_cast: false,
-            votes_cast_greater_than_admitted_voters: false,
-            votes_cast_smaller_than_admitted_voters: false,
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: false,
+            },
             difference_completely_accounted_for: Default::default(),
         };
         differences_counts

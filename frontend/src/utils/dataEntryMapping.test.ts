@@ -20,9 +20,11 @@ const createBasePollingStationResults = (): PollingStationResults => ({
   differences_counts: {
     more_ballots_count: 0,
     fewer_ballots_count: 0,
-    admitted_voters_equals_votes_cast: false,
-    votes_cast_greater_than_admitted_voters: false,
-    votes_cast_smaller_than_admitted_voters: false,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: false,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
     difference_completely_accounted_for: { yes: false, no: false },
   },
   political_group_votes: [],
@@ -260,17 +262,17 @@ describe("mapSectionValues", () => {
           error_message: "Test title",
           options: [
             {
-              path: "differences_counts.admitted_voters_equals_votes_cast",
+              path: "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
               label: "Test Title",
               short_label: "Test short title",
             },
             {
-              path: "differences_counts.votes_cast_greater_than_admitted_voters",
+              path: "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
               label: "Test Title",
               short_label: "Test short title",
             },
             {
-              path: "differences_counts.votes_cast_smaller_than_admitted_voters",
+              path: "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
               label: "Test Title",
               short_label: "Test short title",
             },
@@ -573,9 +575,11 @@ describe("mapResultsToSectionValues", () => {
     results.differences_counts = {
       more_ballots_count: 2,
       fewer_ballots_count: 1,
-      admitted_voters_equals_votes_cast: false,
-      votes_cast_greater_than_admitted_voters: false,
-      votes_cast_smaller_than_admitted_voters: false,
+      compare_votes_cast_admitted_voters: {
+        admitted_voters_equal_votes_cast: false,
+        votes_cast_greater_than_admitted_voters: false,
+        votes_cast_smaller_than_admitted_voters: false,
+      },
       difference_completely_accounted_for: {
         no: false,
         yes: false,
@@ -585,9 +589,15 @@ describe("mapResultsToSectionValues", () => {
     const formValues = mapResultsToSectionValues(differencesSection, results);
     expect(formValues["differences_counts.more_ballots_count"]).toBe("2");
     expect(formValues["differences_counts.fewer_ballots_count"]).toBe("1");
-    expect(formValues["differences_counts.admitted_voters_equals_votes_cast"]).toBe("false");
-    expect(formValues["differences_counts.votes_cast_greater_than_admitted_voters"]).toBe("false");
-    expect(formValues["differences_counts.votes_cast_smaller_than_admitted_voters"]).toBe("false");
+    expect(formValues["differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"]).toBe(
+      "false",
+    );
+    expect(
+      formValues["differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters"],
+    ).toBe("false");
+    expect(
+      formValues["differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters"],
+    ).toBe("false");
     expect(formValues["differences_counts.difference_completely_accounted_for.no"]).toBe("false");
     expect(formValues["differences_counts.difference_completely_accounted_for.yes"]).toBe("false");
   });

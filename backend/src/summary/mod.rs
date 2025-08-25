@@ -147,12 +147,30 @@ impl ElectionSummary {
 /// Contains a summary of the differences, containing which polling stations had differences.
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(deny_unknown_fields)]
+pub struct SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+    pub admitted_voters_equal_votes_cast: bool,
+    pub votes_cast_greater_than_admitted_voters: bool,
+    pub votes_cast_smaller_than_admitted_voters: bool,
+}
+
+impl SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+    /// Initialize a new differences count with all counts set to zero.
+    pub fn zero() -> SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+        SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+            admitted_voters_equal_votes_cast: Default::default(),
+            votes_cast_greater_than_admitted_voters: Default::default(),
+            votes_cast_smaller_than_admitted_voters: Default::default(),
+        }
+    }
+}
+
+/// Contains a summary of the differences, containing which polling stations had differences.
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct SummaryDifferencesCounts {
     pub more_ballots_count: SumCount,
     pub fewer_ballots_count: SumCount,
-    pub admitted_voters_equals_votes_cast: bool,
-    pub votes_cast_greater_than_admitted_voters: bool,
-    pub votes_cast_smaller_than_admitted_voters: bool,
+    pub compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters,
     pub difference_completely_accounted_for: YesNo,
 }
 
@@ -162,9 +180,8 @@ impl SummaryDifferencesCounts {
         SummaryDifferencesCounts {
             more_ballots_count: SumCount::zero(),
             fewer_ballots_count: SumCount::zero(),
-            admitted_voters_equals_votes_cast: Default::default(),
-            votes_cast_greater_than_admitted_voters: Default::default(),
-            votes_cast_smaller_than_admitted_voters: Default::default(),
+            compare_votes_cast_admitted_voters:
+                SummaryDifferenceCountsCompareVotesCastAdmittedVoters::zero(),
             difference_completely_accounted_for: Default::default(),
         }
     }

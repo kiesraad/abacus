@@ -532,12 +532,27 @@ export interface DataEntryStatusResponse {
 }
 
 /**
+ * Compare votes cast admitted voters, part of the differences counts.
+ */
+export interface DifferenceCountsCompareVotesCastAdmittedVoters {
+  /** Whether total of admitted voters and total of votes cast match.
+("D en H zijn gelijk") */
+  admitted_voters_equal_votes_cast: boolean;
+  /** Whether total of admitted voters is greater than total of votes cast match.
+("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)") */
+  votes_cast_greater_than_admitted_voters: boolean;
+  /** Whether total of admitted voters is less than total of votes cast match.
+("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)") */
+  votes_cast_smaller_than_admitted_voters: boolean;
+}
+
+/**
  * Differences counts, part of the polling station results.
  */
 export interface DifferencesCounts {
   /** Whether total of admitted voters and total of votes cast match.
-("D en H zijn gelijk") */
-  admitted_voters_equals_votes_cast: boolean;
+("Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)") */
+  compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters;
   /** Whether the difference between the total of admitted voters and total of votes cast is explained.
 ("Verschil tussen D en H volledig verklaard?") */
   difference_completely_accounted_for: YesNo;
@@ -545,12 +560,6 @@ export interface DifferencesCounts {
   fewer_ballots_count: number;
   /** Number of more counted ballots ("Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?") */
   more_ballots_count: number;
-  /** Whether total of admitted voters is greater than total of votes cast match.
-("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)") */
-  votes_cast_greater_than_admitted_voters: boolean;
-  /** Whether total of admitted voters is less than total of votes cast match.
-("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)") */
-  votes_cast_smaller_than_admitted_voters: boolean;
 }
 
 /**
@@ -1102,13 +1111,20 @@ export interface SumCount {
 /**
  * Contains a summary of the differences, containing which polling stations had differences.
  */
+export interface SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+  admitted_voters_equal_votes_cast: boolean;
+  votes_cast_greater_than_admitted_voters: boolean;
+  votes_cast_smaller_than_admitted_voters: boolean;
+}
+
+/**
+ * Contains a summary of the differences, containing which polling stations had differences.
+ */
 export interface SummaryDifferencesCounts {
-  admitted_voters_equals_votes_cast: boolean;
+  compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters;
   difference_completely_accounted_for: YesNo;
   fewer_ballots_count: SumCount;
   more_ballots_count: SumCount;
-  votes_cast_greater_than_admitted_voters: boolean;
-  votes_cast_smaller_than_admitted_voters: boolean;
 }
 
 export interface UpdateUserRequest {

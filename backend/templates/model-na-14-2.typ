@@ -38,16 +38,14 @@
 
 == Corrigendum
 
-Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was. In dat proces-verbaal kunnen fouten staan. Het corrigendum
+#is_municipality[Elke gemeente][Elk openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was. In dat proces-verbaal kunnen fouten staan. Het corrigendum
 corrigeert de fouten in het proces-verbaal. De aantallen in het corrigendum vervangen
 de aantallen in het proces-verbaal.
 
 #emph_block[
   Dit corrigendum gaat over onderzoeken en eventuele hertellingen. Ook staan hierin
-  correcties op (tel)fouten die in eerdere verslagen zijn gevonden. Het gemeentelijk
-  stembureau/stembureau voor het openbaar lichaam heeft dit onderzoek gedaan op
-  verzoek van het centraal stembureau. Het corrigendum wordt ingevuld door het
-  gemeentelijk stembureau/stembureau voor het openbaar lichaam.
+  correcties op (tel)fouten die in eerdere verslagen zijn gevonden. Het #location_type heeft dit onderzoek gedaan op
+  verzoek van het centraal stembureau. Het corrigendum wordt ingevuld door het #location_type.
 ]
 
 == Inhoudsopgave
@@ -185,7 +183,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[Twee][Vier] eden van het #location_type
+=== #is_municipality[Twee][Vier] leden van het #location_type
 
 #stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 

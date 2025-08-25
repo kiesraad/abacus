@@ -6,7 +6,6 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ApiProvider } from "@/api/ApiProvider";
-import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -30,9 +29,7 @@ const Providers = ({
   return (
     <ApiProvider fetchInitialUser={fetchInitialUser}>
       <TestUserProvider userRole="administrator">
-        <ElectionListProvider>
-          <RouterProvider router={router} />
-        </ElectionListProvider>
+        <RouterProvider router={router} />
       </TestUserProvider>
     </ApiProvider>
   );

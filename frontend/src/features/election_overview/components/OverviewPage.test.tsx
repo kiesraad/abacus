@@ -5,10 +5,9 @@ import { http, HttpResponse } from "msw";
 import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { render, renderReturningRouter, screen, waitFor } from "@/testing/test-utils";
+import { render, renderReturningRouter, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionListResponse } from "@/types/generated/openapi";
 
@@ -26,9 +25,7 @@ describe("OverviewPage", () => {
     const user = userEvent.setup();
     render(
       <TestUserProvider userRole="typist">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -38,13 +35,11 @@ describe("OverviewPage", () => {
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
-      ["Verkiezing", "Gebied", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Je kan invoeren"],
-    ]);
-
     const tableRows = within(table).queryAllByRole("row");
-    await user.click(tableRows[1]!);
+    expect(tableRows[0]).toHaveTextContent(["Verkiezing", "Gebied", "Status"].join(""));
+    const firstRow = tableRows[1]!;
+    expect(firstRow).toHaveTextContent(["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Je kan invoeren"].join(""));
+    await user.click(firstRow);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/data-entry");
@@ -55,9 +50,7 @@ describe("OverviewPage", () => {
     const user = userEvent.setup();
     render(
       <TestUserProvider userRole="coordinator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -67,13 +60,11 @@ describe("OverviewPage", () => {
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
-      ["Verkiezing", "Niveau stembureau", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"],
-    ]);
-
     const tableRows = within(table).queryAllByRole("row");
-    await user.click(tableRows[1]!);
+    expect(tableRows[0]).toHaveTextContent(["Verkiezing", "Niveau stembureau", "Status"].join(""));
+    const firstRow = tableRows[1]!;
+    expect(firstRow).toHaveTextContent(["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"].join(""));
+    await user.click(firstRow);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1");
@@ -84,9 +75,7 @@ describe("OverviewPage", () => {
     const user = userEvent.setup();
     render(
       <TestUserProvider userRole="administrator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -96,13 +85,11 @@ describe("OverviewPage", () => {
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
-      ["Verkiezing", "Niveau stembureau", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"],
-    ]);
-
     const tableRows = within(table).queryAllByRole("row");
-    await user.click(tableRows[1]!);
+    expect(tableRows[0]).toHaveTextContent(["Verkiezing", "Niveau stembureau", "Status"].join(""));
+    const firstRow = tableRows[1]!;
+    expect(firstRow).toHaveTextContent(["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"].join(""));
+    await user.click(firstRow);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1");
@@ -124,9 +111,7 @@ describe("OverviewPage", () => {
 
     render(
       <TestUserProvider userRole="typist">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -155,9 +140,7 @@ describe("OverviewPage", () => {
 
     render(
       <TestUserProvider userRole="coordinator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -187,9 +170,7 @@ describe("OverviewPage", () => {
 
     const router = renderReturningRouter(
       <TestUserProvider userRole="administrator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -208,5 +189,32 @@ describe("OverviewPage", () => {
     await user.click(button);
 
     expect(router.state.location.pathname).toEqual("/create");
+  });
+
+  test("Refetches data every 30 seconds", async () => {
+    vi.useFakeTimers();
+    render(
+      <TestUserProvider userRole="typist">
+        <OverviewPage />
+      </TestUserProvider>,
+    );
+
+    // Wait for the page to be loaded
+    await vi.waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
+    });
+
+    const electionListRequestSpy = spyOnHandler(ElectionListRequestHandler);
+
+    // Test 3 intervals of 30 seconds each
+    for (let i = 1; i <= 3; i++) {
+      vi.advanceTimersByTime(30_000);
+
+      await vi.waitFor(() => {
+        expect(electionListRequestSpy).toHaveBeenCalledTimes(i);
+      });
+    }
+
+    vi.useRealTimers();
   });
 });

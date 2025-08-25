@@ -8,9 +8,9 @@ use abacus::{
         status::CommitteeSessionStatus,
     },
     data_entry::{
-        CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
-        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-        VotersCounts, VotesCounts,
+        CandidateVotes, Count, CountingDifferencesPollingStation, DataEntry, DifferencesCounts,
+        ElectionStatusResponse, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+        PollingStationResults, VotersCounts, VotesCounts, YesNo,
         status::{ClientState, DataEntryStatusName},
     },
     election::{CandidateNumber, PGNumber},
@@ -56,7 +56,10 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
         progress: 60,
         data: PollingStationResults {
             extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            counting_differences_polling_station: CountingDifferencesPollingStation {
+                difference_ballots_per_list: YesNo::no(),
+                unexplained_difference_ballots_voters: YesNo::no(),
+            },
             voters_counts: VotersCounts {
                 poll_card_count: 102,
                 proxy_certificate_count: 2,

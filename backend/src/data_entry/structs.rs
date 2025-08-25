@@ -263,6 +263,23 @@ pub struct YesNo {
     pub no: bool,
 }
 
+impl YesNo {
+    pub fn is_answered(&self) -> bool {
+        self.yes || self.no
+    }
+
+    pub fn is_invalid(&self) -> bool {
+        self.yes && self.no
+    }
+
+    pub fn no() -> Self {
+        Self {
+            yes: false,
+            no: true,
+        }
+    }
+}
+
 /// Extra investigation, part of the polling station results ("B1-1 Extra onderzoek")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -368,11 +385,47 @@ pub struct CandidateVotes {
     pub votes: Count,
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct DataEntryStatusResponse {
+    pub status: DataEntryStatusName,
+}
+
+impl From<PollingStationDataEntry> for DataEntryStatusResponse {
+    fn from(data_entry: PollingStationDataEntry) -> Self {
+        DataEntryStatusResponse {
+            status: data_entry.state.0.status_name(),
+        }
+    }
+}
+
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use test_log::test;
 
     use super::*;
+
+    pub trait ValidDefault {
+        fn valid_default() -> Self;
+    }
+
+    impl ValidDefault for ExtraInvestigation {
+        fn valid_default() -> Self {
+            Self {
+                extra_investigation_other_reason: YesNo::default(),
+                ballots_recounted_extra_investigation: YesNo::default(),
+            }
+        }
+    }
+
+    impl ValidDefault for CountingDifferencesPollingStation {
+        fn valid_default() -> Self {
+            Self {
+                unexplained_difference_ballots_voters: YesNo::no(),
+                difference_ballots_per_list: YesNo::no(),
+            }
+        }
+    }
 
     #[test]
     fn test_votes_addition() {
@@ -469,19 +522,5 @@ mod tests {
         assert_eq!(curr_votes.poll_card_count, 3);
         assert_eq!(curr_votes.proxy_certificate_count, 5);
         assert_eq!(curr_votes.total_admitted_voters_count, 14);
-    }
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-#[serde(deny_unknown_fields)]
-pub struct DataEntryStatusResponse {
-    pub status: DataEntryStatusName,
-}
-
-impl From<PollingStationDataEntry> for DataEntryStatusResponse {
-    fn from(data_entry: PollingStationDataEntry) -> Self {
-        DataEntryStatusResponse {
-            status: data_entry.state.0.status_name(),
-        }
     }
 }

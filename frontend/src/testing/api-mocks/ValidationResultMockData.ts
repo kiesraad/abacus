@@ -5,6 +5,22 @@ type ErrorWarningsMap<Code extends ValidationResultCode> = {
 };
 
 export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = {
+  F101: {
+    fields: ["data.extra_investigation"],
+    code: "F101",
+  },
+  F102: {
+    fields: ["data.extra_investigation"],
+    code: "F102",
+  },
+  F111: {
+    fields: ["data.counting_differences_polling_station"],
+    code: "F111",
+  },
+  F112: {
+    fields: ["data.counting_differences_polling_station"],
+    code: "F112",
+  },
   F201: {
     fields: [
       "data.voters_counts.poll_card_count",

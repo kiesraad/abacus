@@ -1159,6 +1159,10 @@ export interface ValidationResult {
 }
 
 export type ValidationResultCode =
+  | "F101"
+  | "F102"
+  | "F111"
+  | "F112"
   | "F201"
   | "F202"
   | "F203"

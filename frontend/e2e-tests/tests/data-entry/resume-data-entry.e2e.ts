@@ -441,7 +441,7 @@ test.describe("resume data entry flow", () => {
       await expect(countingDifferencesPollingStationPage.differenceBallotsPerListNo).not.toBeChecked();
       await expect(countingDifferencesPollingStationPage.unexplainedDifferenceBallotsVotersYes).not.toBeChecked();
       await expect(countingDifferencesPollingStationPage.unexplainedDifferenceBallotsVotersNo).not.toBeChecked();
-      await countingDifferencesPollingStationPage.next.click();
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
       // voters and votes page should have empty fields
       const votersAndVotesPage = new VotersAndVotesPage(page);

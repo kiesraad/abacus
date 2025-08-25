@@ -948,8 +948,10 @@ export interface PoliticalGroupTotalVotes {
  */
 export interface PollingStation {
   address: string;
+  committee_session_id: number;
   election_id: number;
   id: number;
+  id_prev_session?: number | null;
   locality: string;
   name: string;
   number: number;
@@ -960,8 +962,10 @@ export interface PollingStation {
 
 export interface PollingStationDetails {
   polling_station_address: string;
+  polling_station_committee_session_id: number;
   polling_station_election_id: number;
   polling_station_id: number;
+  polling_station_id_prev_session?: number | null;
   polling_station_locality: string;
   polling_station_name: string;
   polling_station_number: number;

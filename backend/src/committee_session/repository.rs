@@ -255,3 +255,22 @@ pub async fn change_status(
     .fetch_one(conn)
     .await
 }
+
+pub async fn get_current_id_for_election(
+    conn: impl DbConnLike<'_>,
+    election_id: u32,
+) -> Result<u32, Error> {
+    query!(
+        r#"
+        SELECT id AS "id: u32"
+        FROM committee_sessions
+        WHERE election_id = ?
+        ORDER BY number DESC
+        LIMIT 1
+        "#,
+        election_id
+    )
+    .fetch_one(conn)
+    .await
+    .map(|record| record.id)
+}

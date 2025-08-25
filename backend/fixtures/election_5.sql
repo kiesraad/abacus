@@ -308,6 +308,6 @@ INSERT INTO committee_sessions (id, number, election_id, status, location, start
 VALUES (5, 1, 5, 'data_entry_finished', 'Grote Stad', '2026-03-19', '09:15', 2000),
        (6, 2, 5, 'data_entry_in_progress', '', '', '', 2000);
 
-INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
+INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (8, 5, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad');
+VALUES (8, 5, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad');

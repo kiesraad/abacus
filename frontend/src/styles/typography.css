@@ -75,7 +75,7 @@ p.md {
 }
 
 section.sm {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-md-lg);
 
   p,
   ul,

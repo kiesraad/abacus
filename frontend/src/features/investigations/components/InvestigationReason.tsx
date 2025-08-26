@@ -36,7 +36,7 @@ export function InvestigationReason() {
     <Form onSubmit={handleSubmit}>
       <FormLayout>
         <FormLayout.Section>
-          <section>
+          <section className="sm">
             <h2>{t("investigations.reason_and_assignment.central_polling_station")}</h2>
             {tx("investigations.reason_and_assignment.instructions")}
           </section>

@@ -292,13 +292,6 @@ describe("Election create pages", () => {
     const inputPart2 = screen.getByLabelText("Controle deel 2");
     await user.type(inputPart2, "123");
 
-    // Give invalid XML error
-    overrideOnce("post", "/api/elections/import/validate", 400, {
-      error: "Invalid hash",
-      fatal: false,
-      reference: "InvalidXml",
-    });
-
     await user.click(screen.getByText("Volgende"));
 
     // Expect error to be shown

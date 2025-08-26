@@ -27,6 +27,11 @@ export function AbortModal() {
       return false;
     }
 
+    // do not block when navigating after saving
+    if (nextLocation.state && "success" in nextLocation.state) {
+      return false;
+    }
+
     // check if nextLocation is outside the create election flow
     return !isPartOfCreateElectionFlow(nextLocation.pathname);
   });

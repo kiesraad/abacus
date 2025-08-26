@@ -13,7 +13,7 @@ import { t } from "@/i18n/translate";
 const formSections = [
   { key: "reason_and_assigment", label: t("investigations.reason_and_assignment.title"), path: "reason" },
   { key: "print_corrigendum", label: t("investigations.print_corrigendum_short"), path: "print-corrigendum" },
-  { key: "findings_and_investigation", label: t("investigations.findings_and_investigation"), path: "todo" },
+  { key: "investigation_findings", label: t("investigations.findings.investigation_findings"), path: "findings" },
 ];
 
 export function AddInvestigationLayout() {

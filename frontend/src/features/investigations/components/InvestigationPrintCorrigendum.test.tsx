@@ -80,7 +80,7 @@ describe("InvestigationPrintCorrigendum", () => {
       await screen.findByRole("link", { name: "Download corrigendum voor stembureau 1 Na 14-2 Bijlage 1" }),
     ).toBeVisible();
 
-    expect(await screen.findByRole("button", { name: "Verder naar bevindingen" })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Verder naar bevindingen" })).toBeVisible();
   });
 
   test("Navigates to investigation overview when clicking back", async () => {

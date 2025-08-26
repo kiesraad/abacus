@@ -51,9 +51,9 @@ export function InvestigationPrintCorrigendum() {
           <Button.Link size="lg" to={`/elections/${electionId}/investigations`}>
             {t("investigations.back_to_all_investigations")}
           </Button.Link>
-          <Button type="button" size="lg" variant="secondary" /** TODO insert continue URL */>
+          <Button.Link size="lg" variant="secondary" to="../findings">
             {t("investigations.continue_to_findings")}
-          </Button>
+          </Button.Link>
         </FormLayout.Controls>
       </FormLayout>
     </Form>

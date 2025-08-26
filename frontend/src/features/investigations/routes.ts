@@ -2,6 +2,7 @@ import { RouteObject } from "react-router";
 
 import { AddInvestigation } from "./components/AddInvestigation";
 import { AddInvestigationLayout } from "./components/AddInvestigationLayout";
+import { InvestigationFindings } from "./components/InvestigationFindings";
 import { InvestigationPrintCorrigendum } from "./components/InvestigationPrintCorrigendum";
 import { InvestigationReason } from "./components/InvestigationReason";
 import { InvestigationsOverview } from "./components/InvestigationsOverview";
@@ -27,6 +28,10 @@ export const investigationRoutes: RouteObject[] = [
           {
             path: "print-corrigendum",
             Component: InvestigationPrintCorrigendum,
+          },
+          {
+            path: "findings",
+            Component: InvestigationFindings,
           },
         ],
       },

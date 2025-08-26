@@ -22,7 +22,7 @@ import { directDownload } from "../../utils/download";
 import cls from "../ElectionManagement.module.css";
 
 export function ElectionReportPage() {
-  const { committeeSessions, election } = useElection();
+  const { currentCommitteeSession, committeeSessions, election } = useElection();
   const client = useApiClient();
   const navigate = useNavigate();
   const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
@@ -105,14 +105,16 @@ export function ElectionReportPage() {
           </div>
           <FormLayout.Controls>
             <Button.Link to="../..">{t("election_report.back_to_overview")}</Button.Link>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                handleResume(committeeSession);
-              }}
-            >
-              {t("election_report.resume_data_entry")}
-            </Button>
+            {currentCommitteeSession.id === committeeSession.id && (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  handleResume(committeeSession);
+                }}
+              >
+                {t("election_report.resume_data_entry")}
+              </Button>
+            )}
           </FormLayout.Controls>
         </article>
       </main>

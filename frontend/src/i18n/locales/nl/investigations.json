@@ -5,7 +5,7 @@
   "download_corrigendum_link": "Download corrigendum voor stembureau {number}",
   "findings_and_research": "Bevindingen en onderzoek",
   "from_central_polling_station": "Onderzoeksverzoeken vanuit het centraal stembureau",
-  "instructions": "<ul><li>Voer hier alle stembureaus toe, waarvoor op verzoek van het centraal stembureau nader onderzoek moet worden gedaan.</li><li>Print, nadat de aanleiding voor het onderzoek is ingevoerd, het corrigendum formulier.</li></ul>",
+  "instructions": "<ul><li>Voeg hier alle stembureaus toe, waarvoor op verzoek van het centraal stembureau nader onderzoek moet worden gedaan.</li><li>Print, nadat de aanleiding voor het onderzoek is ingevoerd, het corrigendum formulier.</li></ul>",
   "investigations_second_entry": "Onderzoeken in tweede zitting",
   "multiple_polling_stations": "Zijn er voor meerdere stembureaus onderzoeken aangevraagd? Doorloop de volgende stappen dan voor elk stembureau.",
   "pick_polling_station": "Voor welk stembureau wordt het onderzoek gedaan?",

@@ -18,7 +18,7 @@ use super::{
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
-    authentication::{AdminOrCoordinator, Coordinator},
+    authentication::Coordinator,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -37,7 +37,6 @@ impl From<CommitteeSessionError> for APIError {
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
-        .routes(routes!(election_committee_session_list))
         .routes(routes!(committee_session_create))
         .routes(routes!(committee_session_delete))
         .routes(routes!(committee_session_update))
@@ -56,36 +55,6 @@ impl IntoResponse for CommitteeSessionListResponse {
     fn into_response(self) -> Response {
         Json(self).into_response()
     }
-}
-
-/// Get a list of all [CommitteeSession]s of an election
-#[utoipa::path(
-  get,
-  path = "/api/elections/{election_id}/committee_sessions",
-  responses(
-        (status = 200, description = "Committee session list", body = CommitteeSessionListResponse),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-  ),
-  params(
-        ("election_id" = u32, description = "Election database id"),
-  ),
-)]
-pub async fn election_committee_session_list(
-    _user: AdminOrCoordinator,
-    State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
-) -> Result<Json<CommitteeSessionListResponse>, APIError> {
-    crate::election::repository::get(&pool, election_id).await?;
-    let committee_sessions =
-        crate::committee_session::repository::get_election_committee_session_list(
-            &pool,
-            election_id,
-        )
-        .await?;
-    Ok(Json(CommitteeSessionListResponse { committee_sessions }))
 }
 
 /// Create a new [CommitteeSession].

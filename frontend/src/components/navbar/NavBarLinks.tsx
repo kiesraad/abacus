@@ -44,7 +44,7 @@ function DataEntryLinks({ location }: NavBarLinksProps) {
 }
 
 function ElectionManagementLinks({ location }: NavBarLinksProps) {
-  const { committeeSession, election } = useElection();
+  const { currentCommitteeSession, election } = useElection();
 
   if (location.pathname.match(/^\/elections\/\d+\/?$/)) {
     return <></>;
@@ -73,7 +73,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
       {location.pathname.match(/^\/elections\/\d+\/status\/\d+\/(resolve-differences|resolve-errors)$/) && (
         <>
           <IconChevronRight />
-          <Link to={`/elections/${election.id}/status`}>{committeeSessionLabel(committeeSession.number)}</Link>
+          <Link to={`/elections/${election.id}/status`}>{committeeSessionLabel(currentCommitteeSession.number)}</Link>
         </>
       )}
     </>

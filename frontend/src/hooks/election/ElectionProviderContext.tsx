@@ -9,7 +9,8 @@ import {
 } from "@/types/generated/openapi";
 
 export interface iElectionProviderContext {
-  committeeSession: CommitteeSession;
+  currentCommitteeSession: CommitteeSession;
+  committeeSessions: CommitteeSession[];
   election: ElectionWithPoliticalGroups;
   pollingStations: Required<PollingStation[]>;
   refetch: (controller?: AbortController) => Promise<ApiResult<ElectionDetailsResponse>>;

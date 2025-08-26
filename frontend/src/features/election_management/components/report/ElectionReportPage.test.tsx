@@ -74,6 +74,7 @@ describe("ElectionReportPage", () => {
       navigate(props.to);
       return null;
     });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sessionNumber: "1" });
   });
 
   test("Redirects to CommitteeSessionDetailsPage when details are not filled in", async () => {

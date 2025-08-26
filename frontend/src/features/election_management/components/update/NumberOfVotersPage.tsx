@@ -15,7 +15,7 @@ import {
 export function NumberOfVotersPage() {
   const client = useApiClient();
   const navigate = useNavigate();
-  const { committeeSession, election } = useElection();
+  const { currentCommitteeSession, election } = useElection();
   const [submitError, setSubmitError] = useState<AnyApiError | null>(null);
 
   if (submitError) {
@@ -23,7 +23,7 @@ export function NumberOfVotersPage() {
   }
 
   function handleSubmit(numberOfVoters: number) {
-    const path: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/voters`;
+    const path: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/voters`;
     const body: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = { number_of_voters: numberOfVoters };
     client
       .putRequest(path, body)
@@ -55,7 +55,7 @@ export function NumberOfVotersPage() {
       <main>
         <article>
           <NumberOfVotersForm
-            defaultValue={committeeSession.number_of_voters}
+            defaultValue={currentCommitteeSession.number_of_voters}
             instructions={instructions}
             hint={t("election_management.enter_a_number")}
             button={t("save")}

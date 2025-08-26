@@ -1,6 +1,7 @@
 import { FormEvent } from "react";
 import { Form, useNavigate } from "react-router";
 
+import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
@@ -35,8 +36,12 @@ export function InvestigationReason() {
           </FormLayout.Row>
         </FormLayout.Section>
         <FormLayout.Controls>
-          <Button type="submit">{t("next")}</Button>
-          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+          <BottomBar>
+            <BottomBar.Row>
+              <Button type="submit">{t("next")}</Button>
+              <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+            </BottomBar.Row>
+          </BottomBar>
         </FormLayout.Controls>
       </FormLayout>
     </Form>

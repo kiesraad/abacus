@@ -1,0 +1,63 @@
+.DownloadButton {
+  display: flex;
+  width: 100%;
+  max-width: 35.5rem;
+  color: var(--link-default);
+  border-color: var(--bg-gray-darkest);
+  background: var(--button-color-secondary);
+  border-radius: 0.5rem;
+  text-decoration: none;
+
+  display: inline-flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+
+  svg {
+    fill: var(--base-white);
+    stroke: var(--base-brand-blue);
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &.file svg {
+    stroke-width: 0;
+    stroke: var(--base-brand-blue);
+    fill: var(--base-brand-blue);
+  }
+
+  & > span {
+    display: inline-flex;
+    flex-direction: column;
+
+    .title {
+      font-weight: bold;
+    }
+
+    .subtitle {
+      color: var(--gray-600);
+    }
+  }
+
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+
+    & > span .title {
+      color: var(--gray-400);
+    }
+  }
+
+  &:hover {
+    .title {
+      text-decoration: underline;
+    }
+  }
+
+  &:focus,
+  &:focus-visible {
+    .title {
+      text-decoration: underline;
+    }
+  }
+}

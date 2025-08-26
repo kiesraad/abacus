@@ -12,7 +12,7 @@ import { t } from "@/i18n/translate";
 
 const formSections = [
   { key: "reason_and_assigment", label: t("investigations.reason_and_assignment"), path: "reason" },
-  { key: "print_corrigendum", label: t("investigations.print_corrigendum"), path: "print-corrigendum" },
+  { key: "print_corrigendum", label: t("investigations.print_corrigendum_short"), path: "print-corrigendum" },
   { key: "findings_and_research", label: t("investigations.findings_and_research"), path: "todo" },
 ];
 
@@ -29,7 +29,9 @@ export function AddInvestigantionLayout() {
 
   return (
     <>
-      <PageTitle title={`${t("data_entry.title")} ${pollingStation.number} ${pollingStation.name} - Abacus`} />
+      <PageTitle
+        title={`${t("investigations.add_investigation")} ${pollingStation.number} ${pollingStation.name} - Abacus`}
+      />
       <header>
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>

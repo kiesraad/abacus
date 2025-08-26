@@ -1,4 +1,5 @@
 import { Footer } from "@/components/footer/Footer";
+import { PageTitle } from "@/components/page_title/PageTitle";
 import { Table } from "@/components/ui/Table/Table";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
@@ -10,6 +11,7 @@ export function AddInvestigantion() {
 
   return (
     <>
+      <PageTitle title={`${t("investigations.title")} - Abacus`} />
       <header>
         <section>
           <h1>{t("investigations.add_investigation")}</h1>

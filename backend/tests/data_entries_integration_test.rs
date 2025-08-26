@@ -184,11 +184,23 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(errors[4].fields, vec!["data.political_group_votes[1]"]);
 
     let warnings = body.validation_results.warnings;
-    assert_eq!(warnings.len(), 1);
+    assert_eq!(warnings.len(), 3);
     // warning 1
-    assert_eq!(warnings[0].code, ValidationResultCode::W203);
+    assert_eq!(warnings[0].code, ValidationResultCode::W201);
     assert_eq!(
         warnings[0].fields,
+        vec!["data.votes_counts.blank_votes_count",]
+    );
+    // warning 2
+    assert_eq!(warnings[1].code, ValidationResultCode::W202);
+    assert_eq!(
+        warnings[1].fields,
+        vec!["data.votes_counts.invalid_votes_count"]
+    );
+    // warning 3
+    assert_eq!(warnings[2].code, ValidationResultCode::W203);
+    assert_eq!(
+        warnings[2].fields,
         vec![
             "data.votes_counts.total_votes_cast_count",
             "data.voters_counts.total_admitted_voters_count",

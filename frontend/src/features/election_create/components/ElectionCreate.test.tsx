@@ -273,8 +273,6 @@ describe("Election create pages", () => {
   test("It shows an error on invalid input", async () => {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
-    vi.spyOn(console, "error").mockImplementation(() => {});
-
     const router = renderWithRouter();
     const user = userEvent.setup();
     await router.navigate("/elections/create");

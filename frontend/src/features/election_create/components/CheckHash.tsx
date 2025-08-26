@@ -45,10 +45,12 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    let stubsAreValid = true;
 
     const completeHash = redactedHash.chunks;
     const formData = new FormData(event.currentTarget);
-    stubs.forEach((stub, i) => {
+
+    for (const [i, stub] of stubs.entries()) {
       const value = formData.get(stub.index.toString());
       const newStubs = [...stubs];
       const newStub = newStubs[i];
@@ -57,6 +59,7 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
         newStub.error = "";
         if (typeof value !== "string" || value.length !== 4) {
           newStub.error = t("election.check_eml.check_hash.hint");
+          stubsAreValid = false;
         } else {
           if (error) {
             newStub.error = t("error.api_error.InvalidHash");
@@ -65,10 +68,11 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
         }
         setStubs(newStubs);
       }
-    });
+    }
 
     // Only allow submit when a field has been focussed or blurred
-    if (changed) {
+    // and both values are the correct length and type
+    if (changed && stubsAreValid) {
       onSubmit(completeHash);
     }
     setChanged(false);

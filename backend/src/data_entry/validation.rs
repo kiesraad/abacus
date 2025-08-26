@@ -918,19 +918,20 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::data_entry::tests::ValidDefault;
     use crate::{
-        data_entry::PoliticalGroupTotalVotes, election::tests::election_fixture,
+        data_entry::{PoliticalGroupTotalVotes, tests::ValidDefault}, election::tests::election_fixture,
         polling_station::structs::tests::polling_station_fixture,
     };
 
     mod extra_investigation {
-        use crate::data_entry::{
-            DataError, ExtraInvestigation, Validate, ValidationResult, ValidationResultCode,
-            ValidationResults, YesNo,
-        };
-        use crate::election::tests::election_fixture;
-        use crate::polling_station::structs::tests::polling_station_fixture;
+        use crate::{
+            data_entry::{
+                DataError, ExtraInvestigation, Validate, ValidationResult, ValidationResultCode,
+                ValidationResults, YesNo,
+            };
+            election::tests::election_fixture;
+            polling_station::structs::tests::polling_station_fixture;
+        }
 
         fn validate(
             investigation_yes: bool,
@@ -1048,12 +1049,14 @@ mod tests {
     }
 
     mod counting_differences_polling_station {
-        use crate::data_entry::{
-            CountingDifferencesPollingStation, DataError, Validate, ValidationResult,
-            ValidationResultCode, ValidationResults, YesNo,
-        };
-        use crate::election::tests::election_fixture;
-        use crate::polling_station::structs::tests::polling_station_fixture;
+        use crate::{
+            data_entry::{
+                CountingDifferencesPollingStation, DataError, Validate, ValidationResult,
+                ValidationResultCode, ValidationResults, YesNo,
+            };
+            election::tests::election_fixture;
+            polling_station::structs::tests::polling_station_fixture;
+        }
 
         fn validate(
             unexplained_yes: bool,

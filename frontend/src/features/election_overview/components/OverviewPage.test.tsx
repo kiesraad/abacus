@@ -35,11 +35,13 @@ describe("OverviewPage", () => {
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Verkiezing", "Gebied", "Status"],
+      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Je kan invoeren"],
+    ]);
+
     const tableRows = within(table).queryAllByRole("row");
-    expect(tableRows[0]).toHaveTextContent(["Verkiezing", "Gebied", "Status"].join(""));
-    const firstRow = tableRows[1]!;
-    expect(firstRow).toHaveTextContent(["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Je kan invoeren"].join(""));
-    await user.click(firstRow);
+    await user.click(tableRows[1]!);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/data-entry");
@@ -60,11 +62,13 @@ describe("OverviewPage", () => {
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Verkiezing", "Niveau stembureau", "Status"],
+      ["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"],
+    ]);
+
     const tableRows = within(table).queryAllByRole("row");
-    expect(tableRows[0]).toHaveTextContent(["Verkiezing", "Niveau stembureau", "Status"].join(""));
-    const firstRow = tableRows[1]!;
-    expect(firstRow).toHaveTextContent(["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"].join(""));
-    await user.click(firstRow);
+    await user.click(tableRows[1]!);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1");
@@ -85,11 +89,13 @@ describe("OverviewPage", () => {
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Verkiezing", "Niveau stembureau", "Status"],
+      ["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"],
+    ]);
+
     const tableRows = within(table).queryAllByRole("row");
-    expect(tableRows[0]).toHaveTextContent(["Verkiezing", "Niveau stembureau", "Status"].join(""));
-    const firstRow = tableRows[1]!;
-    expect(firstRow).toHaveTextContent(["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"].join(""));
-    await user.click(firstRow);
+    await user.click(tableRows[1]!);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1");

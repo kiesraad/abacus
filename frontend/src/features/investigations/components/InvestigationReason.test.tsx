@@ -1,14 +1,15 @@
 import * as ReactRouter from "react-router";
 
-import { render } from "@testing-library/react";
-import { beforeEach, describe, it, vi } from "vitest";
+import { render, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
-import { setupTestRouter } from "@/testing/test-utils";
+import { screen, setupTestRouter } from "@/testing/test-utils";
 
 import { AddInvestigantionLayout } from "./AddInvestigantionLayout";
 import { InvestigationReason } from "./InvestigationReason";
@@ -45,11 +46,44 @@ async function renderPage() {
 
 describe("InvestigationReason", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler);
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
-  it("renders without crashing", async () => {
+  test("Renders a form", async () => {
     await renderPage();
+
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Aanleiding en opdracht van het centraal stembureau" }),
+    ).toBeVisible();
+    expect(await screen.findByLabelText("Aanleiding en opdracht")).toBeVisible();
+  });
+
+  test("Displays an error message when submitting an empty form", async () => {
+    await renderPage();
+
+    const reason = await screen.findByLabelText("Aanleiding en opdracht");
+    const submitButton = await screen.findByRole("button", { name: "Volgende" });
+
+    submitButton.click();
+
+    await waitFor(() => {
+      expect(reason).toBeInvalid();
+    });
+
+    expect(reason).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+  });
+
+  test("Navigate to the next page when submittin a reason", async () => {
+    await renderPage();
+
+    const reason = await screen.findByLabelText("Aanleiding en opdracht");
+    const submitButton = await screen.findByRole("button", { name: "Volgende" });
+
+    const user = userEvent.setup();
+    await user.type(reason, "Reden voor onderzoek");
+    submitButton.click();
+
+    expect(navigate).toHaveBeenCalledWith("../print-corrigendum");
   });
 });

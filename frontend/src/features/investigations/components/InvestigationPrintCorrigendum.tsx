@@ -1,9 +1,11 @@
+import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
 
 export function InvestigationPrintCorrigendum() {
+  const electionId = useNumericParam("electionId");
   const pollingStationId = useNumericParam("pollingStationId");
 
   return (
@@ -13,17 +15,22 @@ export function InvestigationPrintCorrigendum() {
         download: () => (
           <DownloadButton
             icon="file"
-            href="#" // TODO insert correct download URL
+            href="#" // TODO insert download URL
             title={t("investigations.download_corrigendum_link", { number: pollingStationId })}
             subtitle="Na 14-2 Bijlage 1"
           />
         ),
       })}
-      <nav className="mt-xl">
-        <Button.Link size="lg" to="../../../">
-          {t("investigations.back_to_all_investigations")}
-        </Button.Link>
-      </nav>
+      <BottomBar>
+        <BottomBar.Row>
+          <Button.Link size="lg" to={`/elections/${electionId}/investigations`}>
+            {t("investigations.back_to_all_investigations")}
+          </Button.Link>
+          <Button size="lg" variant="secondary" /** TODO insert continue URL */>
+            {t("investigations.continue_to_findings")}
+          </Button>
+        </BottomBar.Row>
+      </BottomBar>
     </section>
   );
 }

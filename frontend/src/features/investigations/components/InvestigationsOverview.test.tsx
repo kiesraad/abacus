@@ -1,18 +1,14 @@
-import * as ReactRouter from "react-router";
-
-import { render } from "@testing-library/react";
-import { beforeEach, describe, it, vi } from "vitest";
+import { render as rtlRender } from "@testing-library/react";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
-import { setupTestRouter } from "@/testing/test-utils";
+import { screen, setupTestRouter } from "@/testing/test-utils";
 
 import { InvestigationsOverview } from "./InvestigationsOverview";
-
-const navigate = vi.fn();
 
 async function renderPage() {
   const router = setupTestRouter([
@@ -30,7 +26,7 @@ async function renderPage() {
   ]);
 
   await router.navigate("/elections/1/investigations");
-  render(<Providers router={router} />);
+  rtlRender(<Providers router={router} />);
 
   return router;
 }
@@ -38,10 +34,28 @@ async function renderPage() {
 describe("InvestigationsOverview", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler);
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
-  it("renders without crashing", async () => {
+  beforeEach(() => {
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
+  });
+
+  test("Renders the correct headings and button", async () => {
     await renderPage();
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Onderzoeken in tweede zitting" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Onderzoeksverzoeken vanuit het centraal stembureau" }),
+    ).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Onderzoek toevoegen" })).toBeVisible();
+  });
+
+  test("Navigates to the polling station list when clicking the button", async () => {
+    const router = await renderPage();
+
+    const link = await screen.findByRole("link", { name: "Onderzoek toevoegen" });
+    link.click();
+
+    expect(router.state.location.pathname).toEqual("/elections/1/investigations/add");
   });
 });

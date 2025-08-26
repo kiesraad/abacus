@@ -1,18 +1,14 @@
-import * as ReactRouter from "react-router";
-
-import { render } from "@testing-library/react";
-import { beforeEach, describe, it, vi } from "vitest";
+import { render as rtlRender, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
-import { setupTestRouter } from "@/testing/test-utils";
+import { screen, setupTestRouter } from "@/testing/test-utils";
 
 import { AddInvestigantion } from "./AddInvestigantion";
-
-const navigate = vi.fn();
 
 async function renderPage() {
   const router = setupTestRouter([
@@ -22,26 +18,69 @@ async function renderPage() {
       errorElement: <ErrorBoundary />,
       children: [
         {
-          path: "investigations/add",
-          Component: AddInvestigantion,
+          path: "investigations",
+          children: [
+            {
+              path: "add",
+              Component: AddInvestigantion,
+              children: [
+                {
+                  path: ":pollingStationId",
+                  children: [
+                    {
+                      index: true,
+                      path: "reason",
+                      Component: () => "Reason stub",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
       ],
     },
   ]);
 
   await router.navigate("/elections/1/investigations/add");
-  render(<Providers router={router} />);
+  rtlRender(<Providers router={router} />);
 
   return router;
 }
 
 describe("AddInvestigantion", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler);
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
   });
 
-  it("renders without crashing", async () => {
+  test("Renders the correct headings and table", async () => {
     await renderPage();
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Onderzoek toevoegen" })).toBeVisible();
+    const table = await screen.findByRole("table");
+
+    expect(table).toBeInTheDocument();
+    expect(table).toHaveTableContent([
+      ["Nummer", "Stembureau"],
+      ["33", "Op Rolletjes"],
+      ["34", "Testplek"],
+      ["35", "Testschool"],
+      ["36", "Testbuurthuis"],
+      ["37", "Dansschool Oeps nou deed ik het weer"],
+      ["38", "Testmuseum"],
+      ["39", "Test gemeentehuis"],
+      ["40", "Test kerk"],
+    ]);
+  });
+
+  test("It navigates to add investigation when clicking a table row", async () => {
+    const router = await renderPage();
+
+    const row = await screen.findByRole("row", { name: "33 Op Rolletjes" });
+    row.click();
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toEqual("/elections/1/investigations/add/1/reason");
+    });
   });
 });

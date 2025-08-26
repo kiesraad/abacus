@@ -82,3 +82,15 @@ pub struct CommitteeSessionNumberOfVotersChangeRequest {
 pub struct CommitteeSessionStatusChangeRequest {
     pub status: CommitteeSessionStatus,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+pub struct CommitteeSessionInvestigation {
+    id: u32,
+    polling_station_id: u32,
+    reason: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+pub struct CommitteeSessionInvestigationListResponse {
+    pub investigations: Vec<CommitteeSessionInvestigation>,
+}

@@ -1,8 +1,8 @@
 use sqlx::{Error, query, query_as};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
-    status::CommitteeSessionStatus,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionInvestigation,
+    CommitteeSessionUpdateRequest, status::CommitteeSessionStatus,
 };
 
 use crate::DbConnLike;
@@ -116,6 +116,26 @@ pub async fn get_committee_session_for_each_election(
             ) AS row_number FROM committee_sessions
         ) t WHERE t.row_number = 1
         "#,
+    )
+    .fetch_all(conn)
+    .await
+}
+
+pub async fn get_committee_session_investigations(
+    conn: impl DbConnLike<'_>,
+    committee_session_id: u32,
+) -> Result<Vec<CommitteeSessionInvestigation>, Error> {
+    query_as!(
+        CommitteeSessionInvestigation,
+        r#"
+        SELECT
+            id as "id: u32",
+            polling_station_id as "polling_station_id: u32",
+            reason
+        FROM investigations
+        WHERE committee_session_id = ?
+        "#,
+        commitee_session_id
     )
     .fetch_all(conn)
     .await

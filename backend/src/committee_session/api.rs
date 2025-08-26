@@ -11,8 +11,10 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionInvestigation,
+    CommitteeSessionInvestigationListResponse, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
+    repository::get_committee_session_investigations,
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
@@ -304,6 +306,31 @@ pub async fn committee_session_status_change(
     .await?;
 
     Ok(StatusCode::OK)
+}
+
+/// Get the investigations of a certain election
+#[utoipa::path(
+    get,
+    path = "/api/committee_sessions/{committee_session_id}/investigations",
+    responses(
+        (status = 200, description = "Investigation list", body = CommitteeSessionInvestigationListResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("committee_session_id" = u32, description = "Committee session database id"),
+    ),
+)]
+pub async fn committee_session_investigations(
+    _user: Coordinator,
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Path(committee_session_id): Path<u32>,
+) -> Result<Vec<CommitteeSessionInvestigation>, APIError> {
+    Ok(get_committee_session_investigations(&pool, committee_session_id).await?)
 }
 
 #[cfg(test)]

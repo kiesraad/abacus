@@ -4,8 +4,7 @@ use std::net::SocketAddr;
 
 use abacus::{
     committee_session::{
-        CommitteeSession, CommitteeSessionListResponse, CommitteeSessionStatusChangeRequest,
-        status::CommitteeSessionStatus,
+        CommitteeSession, CommitteeSessionStatusChangeRequest, status::CommitteeSessionStatus,
     },
     data_entry::{
         CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
@@ -13,7 +12,7 @@ use abacus::{
         VotersCounts, VotesCounts,
         status::{ClientState, DataEntryStatusName},
     },
-    election::{CandidateNumber, PGNumber},
+    election::{CandidateNumber, ElectionDetailsResponse, PGNumber},
 };
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
@@ -237,7 +236,7 @@ pub async fn get_election_committee_session(
     cookie: &HeaderValue,
     election_id: u32,
 ) -> CommitteeSession {
-    let url = format!("http://{addr}/api/elections/{election_id}/committee_sessions");
+    let url = format!("http://{addr}/api/elections/{election_id}");
     let response = Client::new()
         .get(&url)
         .header("cookie", cookie)
@@ -245,8 +244,8 @@ pub async fn get_election_committee_session(
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: CommitteeSessionListResponse = response.json().await.unwrap();
-    body.committee_sessions.first().unwrap().clone()
+    let body: ElectionDetailsResponse = response.json().await.unwrap();
+    body.current_committee_session.clone()
 }
 
 pub async fn change_status_committee_session(

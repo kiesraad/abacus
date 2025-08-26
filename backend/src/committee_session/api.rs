@@ -2,12 +2,9 @@ use axum::{
     Json,
     extract::{Path, State},
     http::StatusCode,
-    response::{IntoResponse, Response},
 };
 use chrono::NaiveDateTime;
-use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
-use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
@@ -42,19 +39,6 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(committee_session_update))
         .routes(routes!(committee_session_number_of_voters_change))
         .routes(routes!(committee_session_status_change))
-}
-
-/// Committee session list response
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-#[serde(deny_unknown_fields)]
-pub struct CommitteeSessionListResponse {
-    pub committee_sessions: Vec<CommitteeSession>,
-}
-
-impl IntoResponse for CommitteeSessionListResponse {
-    fn into_response(self) -> Response {
-        Json(self).into_response()
-    }
 }
 
 /// Create a new [CommitteeSession].

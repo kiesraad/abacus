@@ -290,3 +290,42 @@ pub async fn delete(
 
     Ok(rows_affected > 0)
 }
+
+pub async fn duplicate_for_committee_session(
+    conn: impl DbConnLike<'_>,
+    from_committee_session_id: u32,
+    to_committee_session_id: u32,
+) -> Result<(), sqlx::Error> {
+    query!(
+        r#"
+        INSERT INTO polling_stations (
+            committee_session_id,
+            id_prev_session,
+            name,
+            number,
+            number_of_voters,
+            polling_station_type,
+            address,
+            postal_code,
+            locality
+        )
+        SELECT
+            ? AS committee_session_id,
+            id AS id_prev_session,
+            name,
+            number,
+            number_of_voters,
+            polling_station_type,
+            address,
+            postal_code,
+            locality
+        FROM polling_stations
+        WHERE committee_session_id = ?
+        "#,
+        to_committee_session_id,
+        from_committee_session_id
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
+}

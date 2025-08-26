@@ -1,4 +1,4 @@
-import * as reactRouter from "react-router";
+import * as ReactRouter from "react-router";
 
 import { UserEvent, userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -20,7 +20,7 @@ import { DataEntryProvider } from "./DataEntryProvider";
 import { DataEntrySection } from "./DataEntrySection";
 
 function renderComponent(sectionId: string) {
-  vi.spyOn(reactRouter, "useParams").mockReturnValue({ sectionId });
+  vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId });
 
   return renderReturningRouter(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>

@@ -76,11 +76,20 @@ flowchart LR
 
 Als de performance van `cargo test` een probleem wordt, kunnen we overstappen op [cargo-nextest](https://nexte.st/index.html).
 
+### Unittests
+
+Unit tests dekken de functionaliteit af van een enkele module. Unit tests mogen de database en API calls gebruiken.
+
+Zodra een unit test meerdere modules beslaat of meerdere API calls in de test zelf doet, moet het een integratietest worden. (Een unit test kan API calls gebruiken voor setup/teardown naast de API call in de test zelf.)
+
+### Integratietests
+
+Integratietests beslaan meerdere modules en/of doen meerdere API calls in de test zelf. Ze roepen de backend-code alleen aan via de API. Ze gebruiken json voor de requests, nooit de structs.
 
 
 ```mermaid
 ---
-title: API integration tests
+title: Integration tests
 ---
 flowchart LR
     be(Backend)

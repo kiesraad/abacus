@@ -24,8 +24,11 @@ export function FatalErrorPage({ title = "error.title", message, code, reference
       <Error title={t(title)} error={error}>
         {(code || reference) && (
           <p>
-            {code && <strong>{code}</strong>}
-            &nbsp;
+            {code && (
+              <>
+                <strong>{code}</strong>&nbsp;
+              </>
+            )}
             {reference && <strong>{t(`error.api_error.${reference}`)}</strong>}
           </p>
         )}

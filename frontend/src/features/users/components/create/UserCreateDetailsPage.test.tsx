@@ -1,5 +1,8 @@
+import * as ReactRouter from "react-router";
+
+import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { overrideOnce } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
@@ -10,15 +13,6 @@ import { UserCreateDetailsPage } from "./UserCreateDetailsPage";
 
 const navigate = vi.fn();
 
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  Navigate: ({ to }) => {
-    navigate(to);
-    return null;
-  },
-  useNavigate: () => navigate,
-}));
-
 function renderPage(context: Partial<IUserCreateContext>) {
   return render(
     <UserCreateContext.Provider value={context as IUserCreateContext}>
@@ -28,9 +22,20 @@ function renderPage(context: Partial<IUserCreateContext>) {
 }
 
 describe("UserCreateDetailsPage", () => {
-  test("Redirect to start when no role in context", () => {
+  beforeEach(() => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
+      navigate(props.to);
+      return null;
+    });
+  });
+
+  test("Redirect to start when no role in context", async () => {
     renderPage({});
-    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create");
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create");
+    });
   });
 
   test("Render empty form", async () => {
@@ -58,6 +63,8 @@ describe("UserCreateDetailsPage", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     const message = "NieuweGebruiker is toegevoegd met de rol Coördinator";
-    expect(navigate).toHaveBeenCalledExactlyOnceWith(`/users?created=${encodeURIComponent(message)}`);
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledExactlyOnceWith(`/users?created=${encodeURIComponent(message)}`);
+    });
   });
 });

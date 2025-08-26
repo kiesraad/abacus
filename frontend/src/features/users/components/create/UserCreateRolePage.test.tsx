@@ -1,5 +1,7 @@
+import * as ReactRouter from "react-router";
+
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
 
@@ -7,11 +9,6 @@ import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateCon
 import { UserCreateRolePage } from "./UserCreateRolePage";
 
 const navigate = vi.fn();
-
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
 
 function renderPage(context: Partial<IUserCreateContext>) {
   return render(
@@ -22,6 +19,10 @@ function renderPage(context: Partial<IUserCreateContext>) {
 }
 
 describe("UserCreateRolePage", () => {
+  beforeEach(() => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+  });
+
   test("Shows initial form", async () => {
     renderPage({});
 

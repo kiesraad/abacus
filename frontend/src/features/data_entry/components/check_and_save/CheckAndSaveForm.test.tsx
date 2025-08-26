@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { UserEvent, userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -23,8 +23,6 @@ import { FormState } from "../../types/types";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
-vi.mock("react-router");
-
 function customFormState(): FormState {
   return {
     ...getDefaultDataEntryState().formState,
@@ -34,7 +32,7 @@ function customFormState(): FormState {
 
 function renderForm() {
   // Mock useParams to provide the sectionId
-  vi.mocked(useParams).mockReturnValue({ sectionId: "save" });
+  vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "save" });
 
   return renderReturningRouter(
     <ElectionProvider electionId={1}>

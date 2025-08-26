@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { useMessages } from "@/hooks/messages/useMessages";
 import { ElectionRequestHandler, PollingStationListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
@@ -9,12 +9,10 @@ import { PollingStationListResponse } from "@/types/generated/openapi";
 
 import { PollingStationListPage } from "./PollingStationListPage";
 
-vi.mock("@/hooks/messages/useMessages");
-
 describe("PollingStationListPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationListRequestHandler);
-    vi.mocked(useMessages).mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
   });
 
   test("Show polling stations", async () => {

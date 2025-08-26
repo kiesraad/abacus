@@ -198,7 +198,15 @@ export function CommitteeSessionCard({
   }
 
   return (
-    <Card icon={icon} label={label} status={status} date={date} button={button} {...props}>
+    <Card
+      icon={icon}
+      label={label}
+      status={status}
+      date={date}
+      button={button}
+      id={`session-${committeeSession.number}`}
+      {...props}
+    >
       {buttonLinks.length > 0 && (
         <ButtonLinkList buttonLinks={buttonLinks} firstRowBold={currentSession && button === undefined} />
       )}

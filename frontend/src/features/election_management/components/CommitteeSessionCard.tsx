@@ -142,14 +142,12 @@ export function CommitteeSessionCard({
 
   switch (committeeSession.status) {
     case "created":
-      // TODO: Add in issue #1716 with link
-      // if (committeeSession.number > 1 && currentSession) {
-      //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.select_polling_stations"), to: ""});
-      // }
       if (isCoordinator && currentSession) {
-        buttonLinks.push(detailsButtonLink);
         if (committeeSession.number > 1) {
           buttonLinks.push(investigationsButtonLink);
+        }
+        buttonLinks.push(detailsButtonLink);
+        if (committeeSession.number > 1) {
           buttonLinks.push(deleteButtonLink);
         }
       }

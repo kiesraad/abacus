@@ -14,10 +14,10 @@ export function InvestigationsOverview() {
         </section>
       </header>
       <main>
-        <section className="md">
+        <section className="sm">
           <h2>{t("investigations.from_central_polling_station")}</h2>
           {tx("investigations.instructions")}
-          <nav className="mt-xl">
+          <nav className="mt-lg">
             <Button.Link to="./add">
               <IconPlus />
               {t("investigations.add_investigation")}

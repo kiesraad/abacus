@@ -11,12 +11,12 @@ import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
 
 const formSections = [
-  { key: "reason_and_assigment", label: t("investigations.reason_and_assignment"), path: "reason" },
+  { key: "reason_and_assigment", label: t("investigations.reason_and_assignment.title"), path: "reason" },
   { key: "print_corrigendum", label: t("investigations.print_corrigendum_short"), path: "print-corrigendum" },
   { key: "findings_and_research", label: t("investigations.findings_and_research"), path: "todo" },
 ];
 
-export function AddInvestigantionLayout() {
+export function AddInvestigationLayout() {
   const location = useLocation();
   const pollingStationId = useNumericParam("pollingStationId");
   const { pollingStation } = useElection(pollingStationId);
@@ -42,7 +42,7 @@ export function AddInvestigantionLayout() {
         <StickyNav>
           <ProgressList>
             {formSections.map((formSection, index) => (
-              <div className="mt-md" key={formSection.key}>
+              <div key={formSection.key}>
                 <ProgressList.Fixed>
                   <ProgressList.Item
                     key={formSection.key}

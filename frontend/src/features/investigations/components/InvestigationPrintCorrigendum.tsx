@@ -11,17 +11,19 @@ export function InvestigationPrintCorrigendum() {
   return (
     <section className="md">
       <h2>{t("investigations.print_corrigendum")}</h2>
-      {tx("investigations.print_corrigendum_instructions", {
-        download: () => (
-          <DownloadButton
-            icon="file"
-            href="#" // TODO insert download URL
-            title={t("investigations.download_corrigendum_link", { number: pollingStationId })}
-            subtitle="Na 14-2 Bijlage 1"
-          />
-        ),
-      })}
-      <BottomBar>
+      <div className="mb-lg">
+        {tx("investigations.print_corrigendum_instructions.download_and_print")}
+        <DownloadButton
+          icon="file"
+          href="#" // TODO insert download URL
+          title={t("investigations.download_corrigendum_link", { number: pollingStationId })}
+          subtitle="Na 14-2 Bijlage 1"
+        />
+        {tx("investigations.print_corrigendum_instructions.after_download_and_print")}
+      </div>
+      <div className="mb-lg">{tx("investigations.print_corrigendum_instructions.conduct_investigation")}</div>
+      <div className="mb-lg">{tx("investigations.print_corrigendum_instructions.after_the_investigation")}</div>
+      <BottomBar type="form">
         <BottomBar.Row>
           <Button.Link size="lg" to={`/elections/${electionId}/investigations`}>
             {t("investigations.back_to_all_investigations")}

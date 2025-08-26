@@ -8,7 +8,7 @@ import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
-import { AddInvestigantion } from "./AddInvestigantion";
+import { AddInvestigation } from "./AddInvestigation";
 
 async function renderPage() {
   const router = setupTestRouter([
@@ -22,7 +22,7 @@ async function renderPage() {
           children: [
             {
               path: "add",
-              Component: AddInvestigantion,
+              Component: AddInvestigation,
               children: [
                 {
                   path: ":pollingStationId",
@@ -48,7 +48,7 @@ async function renderPage() {
   return router;
 }
 
-describe("AddInvestigantion", () => {
+describe("AddInvestigation", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
   });

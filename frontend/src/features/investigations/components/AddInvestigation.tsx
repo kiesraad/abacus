@@ -2,9 +2,9 @@ import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Table } from "@/components/ui/Table/Table";
 import { useElection } from "@/hooks/election/useElection";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 
-export function AddInvestigantion() {
+export function AddInvestigation() {
   const { pollingStations } = useElection();
 
   // TODO fetch investigations for this election and filter pollingStations
@@ -18,9 +18,9 @@ export function AddInvestigantion() {
         </section>
       </header>
       <main>
-        <section className="md">
+        <section className="sm">
           <h2>{t("investigations.pick_polling_station")}</h2>
-          <p className="md">{tx("investigations.multiple_polling_stations")}</p>
+          <p className="mb-xl">{t("investigations.multiple_polling_stations")}</p>
           <Table id="polling_stations">
             <Table.Header>
               <Table.HeaderCell className="text-align-r">{t("number")}</Table.HeaderCell>

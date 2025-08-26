@@ -74,6 +74,16 @@ p.md {
   margin-bottom: 1.5rem;
 }
 
+section.sm {
+  margin-bottom: 2rem;
+
+  p,
+  ul,
+  form {
+    max-width: 32rem;
+  }
+}
+
 section.md {
   margin-bottom: 2rem;
 

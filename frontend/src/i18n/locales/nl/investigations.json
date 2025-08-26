@@ -1,19 +1,26 @@
 {
-  "title": "Onderzoeken",
-  "investigations_second_entry": "Onderzoeken in tweede zitting",
-  "from_central_polling_station": "Onderzoeksverzoeken vanuit het centraal stembureau",
-  "instructions": "<ul><li>Voer hier alle stembureaus waarvoor op verzoek van het centraal stembureau nader onderzoek moet worden gedaan.</li><li>Print, nadat de aanleiding voor het onderzoek is ingevoerd, het corrigendum formulier.</li></ul>",
   "add_investigation": "Onderzoek toevoegen",
-  "pick_polling_station": "Voor welk stembureau wordt het onderzoek gedaan?",
-  "multiple_polling_stations": "Zijn er voor meerdere stembureaus onderzoeken aangevraagd? Doorloop de volgende stappen dan voor elk stembureau.",
-  "print_corrigendum_short": "Corrigendum printen",
-  "print_corrigendum": "Print het corrigendum",
-  "findings_and_research": "Bevindingen en onderzoek",
   "back_to_all_investigations": "Terug naar alle onderzoeken",
-  "reason_and_assignment": "Aanleiding en opdracht",
-  "reason_and_assignment_of_central_polling_station": "Aanleiding en opdracht van het centraal stembureau",
-  "reason_and_assignment_instructions": "<ul><li>Waarom worden de resultaten van dit stembureau onderzocht? Denk bijvoorbeeld aan een onverklaard telverschil of een bezwaar.</li><li>Schrijf ook op wat er in opdracht van het centraal stembureau moet worden onderzocht. Bijvoorbeeld: hertel de stembiljetten van lijst 12.</li></ul>",
-  "print_corrigendum_instructions": "<ul><li><strong>Download het corrigendum en druk het af.</strong></li><li><strong>Tip</strong>: print eerst alleen de eerste pagina. Druk de rest pas af als uit het onderzoek blijkt dat een hertelling moet worden gedaan.</li></ul><download></download><ul><li>In het corrigendum staan de telresultaten van dit stembureau uit de vorige zitting.</li><li>Moeten er voor meerdere stembureau's onderzoeken worden gedaan? Print dan voor ieder stembureau een corrigendum.</li></ul><h3>Voer het onderzoek uit</h3><ul><li>Onderzoek de resultaten van het stembureau en besluit of een hertelling nodig is.</li><li>Moet er herteld worden? Print dan de overige pagina’s van het corrigendum. Daarop worden de gecorrigeerde telresultaten ingevoerd.</li></ul><h3>Na het onderzoek van het gemeentelijk stembureau</h3><ul><li>Voer in de volgende stap de bevindingen van het onderzoek in.</li><li>Geef aan of er voor dit stembureau een nieuwe uitslag is.</li><li>Als er nieuwe telresultaten zijn: laat twee invoerders de nieuwe resultaten invoeren in Abacus.</li></ul>",
+  "continue_to_findings": "Verder naar bevindingen",
   "download_corrigendum_link": "Download corrigendum voor stembureau {number}",
-  "continue_to_findings": "Verder naar bevindingen"
+  "findings_and_research": "Bevindingen en onderzoek",
+  "from_central_polling_station": "Onderzoeksverzoeken vanuit het centraal stembureau",
+  "instructions": "<ul><li>Voer hier alle stembureaus toe, waarvoor op verzoek van het centraal stembureau nader onderzoek moet worden gedaan.</li><li>Print, nadat de aanleiding voor het onderzoek is ingevoerd, het corrigendum formulier.</li></ul>",
+  "investigations_second_entry": "Onderzoeken in tweede zitting",
+  "multiple_polling_stations": "Zijn er voor meerdere stembureaus onderzoeken aangevraagd? Doorloop de volgende stappen dan voor elk stembureau.",
+  "pick_polling_station": "Voor welk stembureau wordt het onderzoek gedaan?",
+  "print_corrigendum": "Print het corrigendum",
+  "print_corrigendum_instructions": {
+    "after_download_and_print": "<ul><li>In het corrigendum staan de telresultaten van dit stembureau uit de vorige zitting.</li><li>Moeten er voor meerdere stembureaus onderzoeken worden gedaan? Print dan voor ieder stembureau een corrigendum.</li></ul>",
+    "after_the_investigation": "<h3>Na het onderzoek van het gemeentelijk stembureau</h3><ul><li>Voer in de volgende stap de bevindingen van het onderzoek in.</li><li>Geef aan of er voor dit stembureau een nieuwe uitslag is.</li><li>Als er nieuwe telresultaten zijn: laat twee invoerders de nieuwe resultaten invoeren in Abacus.</li></ul>",
+    "conduct_investigation": "<h3>Voer het onderzoek uit</h3><ul><li>Onderzoek de resultaten van het stembureau en besluit of een hertelling nodig is.</li><li>Moet er herteld worden? Print dan de overige pagina's van het corrigendum. Daarop worden de gecorrigeerde telresultaten ingevoerd.</li></ul>",
+    "download_and_print": "<ul><li><strong>Download het corrigendum en druk het af.</strong></li><li><strong>Tip</strong>: print eerst alleen de eerste pagina. Druk de rest pas af als uit het onderzoek blijkt dat een hertelling moet worden gedaan.</li></ul>"
+  },
+  "print_corrigendum_short": "Corrigendum printen",
+  "reason_and_assignment": {
+    "central_polling_station": "Aanleiding en opdracht van het centraal stembureau",
+    "instructions": "<ul><li>Waarom worden de resultaten van dit stembureau onderzocht? Denk bijvoorbeeld aan een onverklaard telverschil of een bezwaar.</li><li>Schrijf ook op wat er in opdracht van het centraal stembureau moet worden onderzocht. Bijvoorbeeld: hertel de stembiljetten van lijst 12.</li></ul>",
+    "title": "Aanleiding en opdracht"
+  },
+  "title": "Onderzoeken"
 }

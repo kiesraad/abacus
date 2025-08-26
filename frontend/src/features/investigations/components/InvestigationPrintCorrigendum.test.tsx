@@ -10,7 +10,7 @@ import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
-import { AddInvestigantionLayout } from "./AddInvestigantionLayout";
+import { AddInvestigationLayout } from "./AddInvestigationLayout";
 import { InvestigationPrintCorrigendum } from "./InvestigationPrintCorrigendum";
 
 const navigate = vi.fn();
@@ -34,7 +34,7 @@ async function renderPage() {
               children: [
                 {
                   path: ":pollingStationId",
-                  Component: AddInvestigantionLayout,
+                  Component: AddInvestigationLayout,
                   children: [
                     {
                       index: true,

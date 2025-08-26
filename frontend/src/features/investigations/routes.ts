@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router";
 
-import { AddInvestigantion } from "./components/AddInvestigantion";
-import { AddInvestigantionLayout } from "./components/AddInvestigantionLayout";
+import { AddInvestigation } from "./components/AddInvestigation";
+import { AddInvestigationLayout } from "./components/AddInvestigationLayout";
 import { InvestigationPrintCorrigendum } from "./components/InvestigationPrintCorrigendum";
 import { InvestigationReason } from "./components/InvestigationReason";
 import { InvestigationsOverview } from "./components/InvestigationsOverview";
@@ -13,11 +13,11 @@ export const investigationRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        Component: AddInvestigantion,
+        Component: AddInvestigation,
       },
       {
         path: ":pollingStationId",
-        Component: AddInvestigantionLayout,
+        Component: AddInvestigationLayout,
         children: [
           {
             index: true,

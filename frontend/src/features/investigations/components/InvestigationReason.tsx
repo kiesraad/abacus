@@ -36,16 +36,16 @@ export function InvestigationReason() {
     <Form onSubmit={handleSubmit}>
       <FormLayout>
         <FormLayout.Section>
-          <div>
-            <h2>{t("investigations.reason_and_assignment_of_central_polling_station")}</h2>
-            {tx("investigations.reason_and_assignment_instructions")}
-          </div>
+          <section>
+            <h2>{t("investigations.reason_and_assignment.central_polling_station")}</h2>
+            {tx("investigations.reason_and_assignment.instructions")}
+          </section>
           <FormLayout.Row>
             <InputField
               type="text"
               fieldSize="text-area"
               name="reason"
-              label={t("investigations.reason_and_assignment")}
+              label={t("investigations.reason_and_assignment.title")}
               error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
             />
           </FormLayout.Row>

@@ -5726,6 +5726,7 @@
         "required": [
           "id",
           "election_id",
+          "committee_session_id",
           "name",
           "number",
           "address",
@@ -5736,6 +5737,11 @@
           "address": {
             "type": "string"
           },
+          "committee_session_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
           "election_id": {
             "type": "integer",
             "format": "int32",
@@ -5743,6 +5749,14 @@
           },
           "id": {
             "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "id_prev_session": {
+            "type": [
+              "integer",
+              "null"
+            ],
             "format": "int32",
             "minimum": 0
           },
@@ -5774,6 +5788,7 @@
         "required": [
           "polling_station_id",
           "polling_station_election_id",
+          "polling_station_committee_session_id",
           "polling_station_name",
           "polling_station_number",
           "polling_station_address",
@@ -5784,6 +5799,11 @@
           "polling_station_address": {
             "type": "string"
           },
+          "polling_station_committee_session_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
           "polling_station_election_id": {
             "type": "integer",
             "format": "int32",
@@ -5791,6 +5811,14 @@
           },
           "polling_station_id": {
             "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_station_id_prev_session": {
+            "type": [
+              "integer",
+              "null"
+            ],
             "format": "int32",
             "minimum": 0
           },

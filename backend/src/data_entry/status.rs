@@ -727,6 +727,8 @@ mod tests {
         PollingStation {
             id: 1,
             election_id: 1,
+            committee_session_id: 1,
+            id_prev_session: None,
             name: "Test polling station".to_string(),
             number: 1,
             number_of_voters: None,

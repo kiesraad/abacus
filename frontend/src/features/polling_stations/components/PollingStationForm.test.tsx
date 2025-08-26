@@ -52,6 +52,7 @@ describe("PollingStationForm", () => {
     test("Successful create", async () => {
       const testPollingStation: Omit<PollingStation, "id"> = {
         election_id: 1,
+        committee_session_id: 1,
         number: 1,
         name: "test",
         address: "Teststraat 1",
@@ -124,6 +125,7 @@ describe("PollingStationForm", () => {
 
       const testObj: Omit<PollingStation, "id"> = {
         election_id: 1,
+        committee_session_id: 1,
         number: 42,
         name: "test",
         address: "Teststraat 5A",
@@ -156,6 +158,7 @@ describe("PollingStationForm", () => {
     const testPollingStation: PollingStation = {
       id: 1,
       election_id: 1,
+      committee_session_id: 1,
       number: 1,
       name: "test",
       address: "Teststraat 2",

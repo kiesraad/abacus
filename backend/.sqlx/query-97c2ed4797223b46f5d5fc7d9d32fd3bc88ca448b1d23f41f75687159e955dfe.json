@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO polling_stations (\n            committee_session_id,\n            id_prev_session,\n            name,\n            number,\n            number_of_voters,\n            polling_station_type,\n            address,\n            postal_code,\n            locality\n        )\n        SELECT\n            ? AS committee_session_id,\n            id AS id_prev_session,\n            name,\n            number,\n            number_of_voters,\n            polling_station_type,\n            address,\n            postal_code,\n            locality\n        FROM polling_stations\n        WHERE committee_session_id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "97c2ed4797223b46f5d5fc7d9d32fd3bc88ca448b1d23f41f75687159e955dfe"
+}

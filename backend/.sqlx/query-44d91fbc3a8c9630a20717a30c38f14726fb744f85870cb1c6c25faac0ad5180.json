@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT id AS \"id: u32\"\n        FROM committee_sessions\n        WHERE election_id = ?\n        ORDER BY number DESC\n        LIMIT 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "44d91fbc3a8c9630a20717a30c38f14726fb744f85870cb1c6c25faac0ad5180"
+}

@@ -21,6 +21,7 @@ describe("PollingStationUpdatePage", () => {
   const testPollingStation: PollingStation = {
     id: 1,
     election_id: 1,
+    committee_session_id: 1,
     number: 1,
     name: "test",
     address: "test",

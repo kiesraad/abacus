@@ -20,7 +20,7 @@ export function AddInvestigation() {
       <main>
         <section className="sm">
           <h2>{t("investigations.pick_polling_station")}</h2>
-          <p className="mb-xl">{t("investigations.multiple_polling_stations")}</p>
+          <p className="mb-md-lg">{t("investigations.multiple_polling_stations")}</p>
           <Table id="polling_stations">
             <Table.Header>
               <Table.HeaderCell className="text-align-r">{t("number")}</Table.HeaderCell>

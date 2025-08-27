@@ -1,7 +1,6 @@
 .DownloadButton {
-  display: flex;
   width: 100%;
-  max-width: 35.5rem;
+  max-width: 32rem;
   color: var(--link-default);
   border-color: var(--bg-gray-darkest);
   background: var(--button-color-secondary);
@@ -14,13 +13,8 @@
   cursor: pointer;
 
   svg {
-    fill: var(--base-white);
-    stroke: var(--base-brand-blue);
     width: 1.5rem;
     height: 1.5rem;
-  }
-
-  &.file svg {
     stroke-width: 0;
     stroke: var(--base-brand-blue);
     fill: var(--base-brand-blue);

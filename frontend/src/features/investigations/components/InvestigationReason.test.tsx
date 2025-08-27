@@ -74,7 +74,7 @@ describe("InvestigationReason", () => {
     expect(reason).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
   });
 
-  test("Navigate to the next page when submittin a reason", async () => {
+  test("Navigate to the next page when submitting a reason", async () => {
     await renderPage();
 
     const reason = await screen.findByLabelText("Aanleiding en opdracht");

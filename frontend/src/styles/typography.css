@@ -75,12 +75,14 @@ p.md {
 }
 
 section.sm {
-  margin-bottom: var(--space-md-lg);
-
   p,
   ul,
   form {
     max-width: 32rem;
+  }
+
+  ul {
+    padding-left: 1.5rem;
   }
 }
 

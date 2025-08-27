@@ -1,13 +1,11 @@
 import { FormEvent, useState } from "react";
-import { Form, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
-import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
+import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
-import { t, tx } from "@/i18n/translate";
-import { KeyboardKey } from "@/types/ui";
+import { t } from "@/i18n/translate";
 import { StringFormData } from "@/utils/stringFormData";
 
 export function InvestigationReason() {
@@ -33,30 +31,25 @@ export function InvestigationReason() {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form title={t("investigations.reason_and_assignment.central_polling_station")} onSubmit={handleSubmit}>
       <FormLayout>
         <FormLayout.Section>
           <section className="sm">
-            <h2>{t("investigations.reason_and_assignment.central_polling_station")}</h2>
-            {tx("investigations.reason_and_assignment.instructions")}
+            <ul className="mt-0 mb-0">
+              <li>{t("investigations.reason_and_assignment.why_investigate_results")}</li>
+              <li>{t("investigations.reason_and_assignment.csb_assignment")}</li>
+            </ul>
           </section>
-          <FormLayout.Row>
-            <InputField
-              type="text"
-              fieldSize="text-area"
-              name="reason"
-              label={t("investigations.reason_and_assignment.title")}
-              error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
-            />
-          </FormLayout.Row>
+          <InputField
+            type="text"
+            fieldSize="text-area"
+            name="reason"
+            label={t("investigations.reason_and_assignment.title")}
+            error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
+          />
         </FormLayout.Section>
         <FormLayout.Controls>
-          <BottomBar>
-            <BottomBar.Row>
-              <Button type="submit">{t("next")}</Button>
-              <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
-            </BottomBar.Row>
-          </BottomBar>
+          <Button type="submit">{t("next")}</Button>
         </FormLayout.Controls>
       </FormLayout>
     </Form>

@@ -13,7 +13,7 @@ import { t } from "@/i18n/translate";
 const formSections = [
   { key: "reason_and_assigment", label: t("investigations.reason_and_assignment.title"), path: "reason" },
   { key: "print_corrigendum", label: t("investigations.print_corrigendum_short"), path: "print-corrigendum" },
-  { key: "findings_and_research", label: t("investigations.findings_and_research"), path: "todo" },
+  { key: "findings_and_investigation", label: t("investigations.findings_and_investigation"), path: "todo" },
 ];
 
 export function AddInvestigationLayout() {
@@ -42,6 +42,7 @@ export function AddInvestigationLayout() {
         <StickyNav>
           <ProgressList>
             {formSections.map((formSection, index) => (
+              // TODO: Clicking another Item does not work
               <div key={formSection.key}>
                 <ProgressList.Fixed>
                   <ProgressList.Item

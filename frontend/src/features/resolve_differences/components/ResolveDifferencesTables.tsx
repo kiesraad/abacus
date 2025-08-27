@@ -1,13 +1,19 @@
 import { t } from "@/i18n/translate";
-import { PollingStationResults, ResolveDifferencesAction } from "@/types/generated/openapi";
-import { DataEntrySection, DataEntryStructure, RadioSubsectionOption, SectionValues } from "@/types/types";
+import { ResolveDifferencesAction } from "@/types/generated/openapi";
+import {
+  DataEntryResults,
+  DataEntrySection,
+  DataEntryStructure,
+  RadioSubsectionOption,
+  SectionValues,
+} from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 
 import { DifferencesTable } from "./DifferencesTable";
 
 export interface ResolveDifferencesTablesProps {
-  first: PollingStationResults;
-  second: PollingStationResults;
+  first: DataEntryResults;
+  second: DataEntryResults;
   structure: DataEntryStructure;
   action?: ResolveDifferencesAction;
 }
@@ -24,8 +30,8 @@ export function ResolveDifferencesTables({ first, second, action, structure }: R
 
 interface SectionTableProps {
   section: DataEntrySection;
-  first: PollingStationResults;
-  second: PollingStationResults;
+  first: DataEntryResults;
+  second: DataEntryResults;
   action?: ResolveDifferencesAction;
 }
 

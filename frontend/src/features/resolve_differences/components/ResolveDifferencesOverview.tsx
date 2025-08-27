@@ -1,12 +1,11 @@
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
-import { PollingStationResults } from "@/types/generated/openapi";
-import { DataEntryStructure } from "@/types/types";
+import { DataEntryResults, DataEntryStructure } from "@/types/types";
 
 import { sectionHasDifferences } from "../utils/differences";
 
 interface ResolveDifferencesOverviewProps {
-  first: PollingStationResults;
-  second: PollingStationResults;
+  first: DataEntryResults;
+  second: DataEntryResults;
   structure: DataEntryStructure;
 }
 

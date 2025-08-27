@@ -512,10 +512,7 @@ fn generate_polling_station_results(
             // 3% weight - yes to investigation, no to recount
             3,
             ExtraInvestigation {
-                extra_investigation_other_reason: YesNo {
-                    yes: true,
-                    no: false,
-                },
+                extra_investigation_other_reason: YesNo::yes(),
                 ballots_recounted_extra_investigation: YesNo::no(),
             },
         ),
@@ -523,14 +520,8 @@ fn generate_polling_station_results(
             // 2% weight - yes to both
             2,
             ExtraInvestigation {
-                extra_investigation_other_reason: YesNo {
-                    yes: true,
-                    no: false,
-                },
-                ballots_recounted_extra_investigation: YesNo {
-                    yes: true,
-                    no: false,
-                },
+                extra_investigation_other_reason: YesNo::yes(),
+                ballots_recounted_extra_investigation: YesNo::yes(),
             },
         ),
     ];

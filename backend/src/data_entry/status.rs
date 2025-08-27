@@ -685,7 +685,7 @@ mod tests {
     use crate::{
         data_entry::{
             CandidateVotes, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts,
-            VotesCounts,
+            VotesCounts, structs::tests::ValidDefault,
         },
         election::{
             Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup,
@@ -696,8 +696,8 @@ mod tests {
 
     fn polling_station_result() -> PollingStationResults {
         PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: Default::default(),
             votes_counts: Default::default(),
             differences_counts: Default::default(),
@@ -880,12 +880,14 @@ mod tests {
     #[test]
     fn first_entry_in_progress_to_second_entry_not_started() {
         // Happy path
-        assert!(matches!(
-            first_entry_in_progress()
-                .finalise_first_entry(&polling_station(), &election(), 0)
-                .unwrap(),
-            DataEntryStatus::SecondEntryNotStarted(_)
-        ));
+        let status = first_entry_in_progress()
+            .finalise_first_entry(&polling_station(), &election(), 0)
+            .unwrap();
+
+        assert_eq!(
+            status.status_name(),
+            DataEntryStatusName::SecondEntryNotStarted
+        );
     }
 
     /// FirstEntryInProgress --> FirstEntryInProgress: error when updating as a different user
@@ -1110,13 +1112,11 @@ mod tests {
     /// is_equal --> Definitive: equal? yes
     #[test]
     fn second_entry_in_progress_finalise_equal() {
-        assert!(matches!(
-            second_entry_in_progress()
-                .finalise_second_entry(&polling_station(), &election(), 0)
-                .unwrap()
-                .0,
-            DataEntryStatus::Definitive(_)
-        ));
+        let status = second_entry_in_progress()
+            .finalise_second_entry(&polling_station(), &election(), 0)
+            .unwrap()
+            .0;
+        assert_eq!(status.status_name(), DataEntryStatusName::Definitive);
     }
 
     #[test]
@@ -1343,8 +1343,8 @@ mod tests {
         // Create valid data without errors, so we transition to SecondEntryNotStarted
         let first_entry = polling_station_result();
         let second_entry = PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 1,
                 proxy_certificate_count: 0,

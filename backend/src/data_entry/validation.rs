@@ -4,8 +4,9 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use super::{
-    CandidateVotes, Count, DifferencesCounts, PoliticalGroupCandidateVotes, PollingStationResults,
-    VotersCounts, VotesCounts,
+    CandidateVotes, Count, CountingDifferencesPollingStation, DifferencesCounts,
+    ExtraInvestigation, PoliticalGroupCandidateVotes, PollingStationResults, VotersCounts,
+    VotesCounts,
     comparison::Compare,
     status::{DataEntryStatus, FirstEntryInProgress},
 };
@@ -47,6 +48,14 @@ pub struct ValidationResult {
 #[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum ValidationResultCode {
+    /// CSO: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+    F101,
+    /// CSO: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    F102,
+    /// CSO: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
+    F111,
+    /// CSO: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
+    F112,
     F201,
     F202,
     F203,
@@ -247,6 +256,20 @@ impl Validate for PollingStationResults {
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
+        self.extra_investigation.validate(
+            election,
+            polling_station,
+            validation_results,
+            &path.field("extra_investigation"),
+        )?;
+
+        self.counting_differences_polling_station.validate(
+            election,
+            polling_station,
+            validation_results,
+            &path.field("counting_differences_polling_station"),
+        )?;
+
         let total_votes_count = self.votes_counts.total_votes_cast_count;
 
         self.votes_counts.validate(
@@ -395,6 +418,62 @@ impl Validate for PollingStationResults {
                     path.field("political_group_votes").to_string(),
                 ],
                 code: ValidationResultCode::F202,
+            });
+        }
+        Ok(())
+    }
+}
+
+impl Validate for ExtraInvestigation {
+    fn validate(
+        &self,
+        _election: &ElectionWithPoliticalGroups,
+        _polling_station: &PollingStation,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) -> Result<(), DataError> {
+        if self.extra_investigation_other_reason.is_answered()
+            != self.ballots_recounted_extra_investigation.is_answered()
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.to_string()],
+                code: ValidationResultCode::F101,
+            });
+        }
+        if self.extra_investigation_other_reason.is_invalid()
+            || self.ballots_recounted_extra_investigation.is_invalid()
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.to_string()],
+                code: ValidationResultCode::F102,
+            });
+        }
+        Ok(())
+    }
+}
+
+impl Validate for CountingDifferencesPollingStation {
+    fn validate(
+        &self,
+        _election: &ElectionWithPoliticalGroups,
+        _polling_station: &PollingStation,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) -> Result<(), DataError> {
+        if !self.unexplained_difference_ballots_voters.is_answered()
+            || !self.difference_ballots_per_list.is_answered()
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.to_string()],
+                code: ValidationResultCode::F111,
+            });
+        }
+        if self.unexplained_difference_ballots_voters.is_invalid()
+            || self.difference_ballots_per_list.is_invalid()
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.to_string()],
+                code: ValidationResultCode::F112,
             });
         }
         Ok(())
@@ -772,9 +851,287 @@ mod tests {
     use super::*;
     use crate::data_entry::{DifferenceCountsCompareVotesCastAdmittedVoters, YesNo};
     use crate::{
-        data_entry::PoliticalGroupTotalVotes, election::tests::election_fixture,
+        data_entry::{PoliticalGroupTotalVotes, tests::ValidDefault},
+        election::tests::election_fixture,
         polling_station::structs::tests::polling_station_fixture,
     };
+
+    mod extra_investigation {
+        use crate::{
+            data_entry::{
+                DataError, ExtraInvestigation, Validate, ValidationResult, ValidationResultCode,
+                ValidationResults, YesNo,
+            },
+            election::tests::election_fixture,
+            polling_station::structs::tests::polling_station_fixture,
+        };
+
+        fn validate(
+            investigation_yes: bool,
+            investigation_no: bool,
+            recounted_yes: bool,
+            recounted_no: bool,
+        ) -> Result<ValidationResults, DataError> {
+            let extra_investigation = ExtraInvestigation {
+                extra_investigation_other_reason: YesNo {
+                    yes: investigation_yes,
+                    no: investigation_no,
+                },
+                ballots_recounted_extra_investigation: YesNo {
+                    yes: recounted_yes,
+                    no: recounted_no,
+                },
+            };
+
+            let mut validation_results = ValidationResults::default();
+            extra_investigation.validate(
+                &election_fixture(&[]),
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"extra_investigation".into(),
+            )?;
+
+            assert_eq!(validation_results.warnings.len(), 0);
+            Ok(validation_results)
+        }
+
+        #[test]
+        fn test_no_validation_errors() -> Result<(), DataError> {
+            let validation_results = validate(false, false, false, false)?;
+            assert_eq!(validation_results.errors, []);
+
+            let validation_results = validate(true, false, false, true)?;
+            assert_eq!(validation_results.errors, []);
+
+            Ok(())
+        }
+
+        /// CSO | F.101: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+        #[test]
+        fn test_f101() -> Result<(), DataError> {
+            let validation_results = validate(false, true, false, false)?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F101,
+                    fields: vec!["extra_investigation".into()],
+                }]
+            );
+
+            let validation_results = validate(false, false, false, true)?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F101,
+                    fields: vec!["extra_investigation".into()],
+                }]
+            );
+
+            Ok(())
+        }
+
+        /// CSO | F.102: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+        #[test]
+        fn test_f102() -> Result<(), DataError> {
+            let validation_results = validate(true, true, true, true)?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F102,
+                    fields: vec!["extra_investigation".into()],
+                }]
+            );
+
+            Ok(())
+        }
+
+        #[test]
+        fn test_multiple_errors() -> Result<(), DataError> {
+            let validation_results = validate(true, true, false, false)?;
+            assert_eq!(
+                validation_results.errors,
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F101,
+                        fields: vec!["extra_investigation".into()],
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F102,
+                        fields: vec!["extra_investigation".into()],
+                    }
+                ]
+            );
+
+            let validation_results = validate(false, false, true, true)?;
+            assert_eq!(
+                validation_results.errors,
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F101,
+                        fields: vec!["extra_investigation".into()],
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F102,
+                        fields: vec!["extra_investigation".into()],
+                    }
+                ]
+            );
+
+            Ok(())
+        }
+    }
+
+    mod counting_differences_polling_station {
+        use crate::{
+            data_entry::{
+                CountingDifferencesPollingStation, DataError, Validate, ValidationResult,
+                ValidationResultCode, ValidationResults, YesNo,
+            },
+            election::tests::election_fixture,
+            polling_station::structs::tests::polling_station_fixture,
+        };
+
+        fn validate(
+            unexplained_yes: bool,
+            unexplained_no: bool,
+            ballots_yes: bool,
+            ballots_no: bool,
+        ) -> Result<ValidationResults, DataError> {
+            let counting_differences_polling_station = CountingDifferencesPollingStation {
+                unexplained_difference_ballots_voters: YesNo {
+                    yes: unexplained_yes,
+                    no: unexplained_no,
+                },
+                difference_ballots_per_list: YesNo {
+                    yes: ballots_yes,
+                    no: ballots_no,
+                },
+            };
+
+            let mut validation_results = ValidationResults::default();
+            counting_differences_polling_station.validate(
+                &election_fixture(&[]),
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"counting_differences_polling_station".into(),
+            )?;
+
+            assert_eq!(validation_results.warnings.len(), 0);
+            Ok(validation_results)
+        }
+
+        #[test]
+        fn test_no_validation_errors() -> Result<(), DataError> {
+            let validation_results = validate(false, true, false, true)?;
+            assert_eq!(validation_results.errors, []);
+
+            let validation_results = validate(true, false, true, false)?;
+            assert_eq!(validation_results.errors, []);
+
+            Ok(())
+        }
+
+        /// CSO | F.111: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
+        #[test]
+        fn test_f111() -> Result<(), DataError> {
+            let validation_results = validate(false, true, false, false)?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F111,
+                    fields: vec!["counting_differences_polling_station".into()],
+                }]
+            );
+
+            let validation_results = validate(false, false, false, true)?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F111,
+                    fields: vec!["counting_differences_polling_station".into()],
+                }]
+            );
+
+            let validation_results = validate(false, false, false, false)?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F111,
+                    fields: vec!["counting_differences_polling_station".into()],
+                }]
+            );
+
+            Ok(())
+        }
+
+        // CSO | F.112: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
+        #[test]
+        fn test_f112() -> Result<(), DataError> {
+            let validation_results = validate(true, true, false, true)?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F112,
+                    fields: vec!["counting_differences_polling_station".into()],
+                }]
+            );
+
+            let validation_results = validate(false, true, true, true)?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F112,
+                    fields: vec!["counting_differences_polling_station".into()],
+                }]
+            );
+
+            let validation_results = validate(true, true, true, true)?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F112,
+                    fields: vec!["counting_differences_polling_station".into()],
+                }]
+            );
+
+            Ok(())
+        }
+
+        #[test]
+        fn test_multiple_errors() -> Result<(), DataError> {
+            let validation_results = validate(true, true, false, false)?;
+            assert_eq!(
+                validation_results.errors,
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F111,
+                        fields: vec!["counting_differences_polling_station".into()],
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F112,
+                        fields: vec!["counting_differences_polling_station".into()],
+                    }
+                ]
+            );
+
+            let validation_results = validate(false, false, true, true)?;
+            assert_eq!(
+                validation_results.errors,
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F111,
+                        fields: vec!["counting_differences_polling_station".into()],
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F112,
+                        fields: vec!["counting_differences_polling_station".into()],
+                    }
+                ]
+            );
+
+            Ok(())
+        }
+    }
 
     /// Tests that ValidationResults can be appended together, combining errors and warnings.
     #[test]
@@ -824,8 +1181,8 @@ mod tests {
     fn test_default_values() {
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: Default::default(),
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
@@ -868,8 +1225,8 @@ mod tests {
     fn test_incorrect_total_and_difference() {
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 29,
                 proxy_certificate_count: 2,
@@ -961,8 +1318,8 @@ mod tests {
         // test F.303 incorrect difference & F.304 should be empty
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
@@ -1027,8 +1384,8 @@ mod tests {
         // test F.201 incorrect total, F.203 incorrect total, F.301 incorrect difference, F.302 should be empty & W.203 above threshold in percentage
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 4,
                 proxy_certificate_count: 2,
@@ -1126,8 +1483,8 @@ mod tests {
         // test F.303 incorrect difference, F.304 should be empty & W.203 above threshold in absolute numbers
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
@@ -1203,8 +1560,8 @@ mod tests {
     #[test]
     fn test_differences() {
         let polling_station_results = PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 54,
                 proxy_certificate_count: 2,
@@ -1274,8 +1631,8 @@ mod tests {
     #[test]
     fn test_no_differences_expected() {
         let polling_station_results = PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 50,
                 proxy_certificate_count: 2,
@@ -1335,8 +1692,8 @@ mod tests {
     #[test]
     fn test_no_differences_expected_and_incorrect_total() {
         let polling_station_results = PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 50,
                 proxy_certificate_count: 2,

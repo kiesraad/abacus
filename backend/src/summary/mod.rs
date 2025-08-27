@@ -233,14 +233,15 @@ mod tests {
 
     use super::*;
     use crate::{
-        data_entry::PoliticalGroupTotalVotes, election::tests::election_fixture,
+        data_entry::{PoliticalGroupTotalVotes, tests::ValidDefault},
+        election::tests::election_fixture,
         pdf_gen::tests::polling_stations_fixture,
     };
 
     fn polling_station_results_fixture_a() -> PollingStationResults {
         PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 30,
                 proxy_certificate_count: 5,
@@ -276,8 +277,8 @@ mod tests {
 
     fn polling_station_results_fixture_b() -> PollingStationResults {
         PollingStationResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 49,
                 proxy_certificate_count: 1,

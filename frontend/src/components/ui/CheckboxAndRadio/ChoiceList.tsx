@@ -15,7 +15,11 @@ interface ChoiceListOptionProps extends CheckboxAndRadioProps {
   reference?: RefObject<HTMLInputElement>;
 }
 
-ChoiceList.Legend = ({ children }: { children: ReactNode }) => <legend>{children}</legend>;
+ChoiceList.Legend = ({ children }: { children: ReactNode }) => (
+  <legend>
+    <span>{children}</span>
+  </legend>
+);
 
 ChoiceList.Error = ({ id, children }: { id: string; children: ReactNode }) => (
   <p id={id} className={cls.error}>

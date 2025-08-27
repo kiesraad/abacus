@@ -55,11 +55,12 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
     differences_counts: {
       more_ballots_count: 0,
       fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
+      compare_votes_cast_admitted_voters: {
+        admitted_voters_equal_votes_cast: false,
+        votes_cast_greater_than_admitted_voters: false,
+        votes_cast_smaller_than_admitted_voters: false,
+      },
+      difference_completely_accounted_for: { yes: false, no: false },
     },
     political_group_votes: [
       {
@@ -185,11 +186,12 @@ export const noRecountNoDifferencesDataEntry: PollingStationResults = {
   differences_counts: {
     more_ballots_count: 0,
     fewer_ballots_count: 0,
-    unreturned_ballots_count: 0,
-    too_few_ballots_handed_out_count: 0,
-    too_many_ballots_handed_out_count: 0,
-    other_explanation_count: 0,
-    no_explanation_count: 0,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: true,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
+    difference_completely_accounted_for: { yes: true, no: false },
   },
   political_group_votes: [
     {

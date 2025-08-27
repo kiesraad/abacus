@@ -66,8 +66,12 @@ pub enum ValidationResultCode {
     F303,
     F304,
     F305,
+    /// CSO: 'Kandidaten en lijsttotalen': Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0
     F401,
+    /// CSO: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst (Als totaal aantal stemmen op een lijst niet leeg of 0 is)
     F402,
+    /// CSO: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
+    F403,
 
     W001,
     /// CSO/DSO: 'Aantal kiezers en stemmen': Aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
@@ -434,6 +438,32 @@ impl Validate for CSOFirstSessionResults {
             &path.field("political_group_votes"),
         )?;
 
+        for (i, pgcv) in self.political_group_votes.iter().enumerate() {
+            let pgtv = self
+                .votes_counts
+                .political_group_total_votes
+                .iter()
+                .find(|pgtv| pgtv.number == pgcv.number)
+                .expect("political group total votes should exist");
+
+            if pgcv.total != pgtv.total {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![
+                        path.field("political_group_votes")
+                            .index(i)
+                            .field("total")
+                            .to_string(),
+                        path.field("votes_counts")
+                            .field("political_group_total_votes")
+                            .index(i)
+                            .field("total")
+                            .to_string(),
+                    ],
+                    code: ValidationResultCode::F403,
+                });
+            }
+        }
+
         Ok(())
     }
 }
@@ -489,21 +519,6 @@ impl Validate for CountingDifferencesPollingStation {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F112,
             });
-        }
-        Ok(())
-    }
-}
-
-impl Validate for Count {
-    fn validate(
-        &self,
-        _election: &ElectionWithPoliticalGroups,
-        _polling_station: &PollingStation,
-        _validation_results: &mut ValidationResults,
-        _field_name: &FieldPath,
-    ) -> Result<(), DataError> {
-        if self > &999_999_999 {
-            return Err(DataError::new("count out of range"));
         }
         Ok(())
     }
@@ -773,6 +788,7 @@ impl Validate for PoliticalGroupCandidateVotes {
             if number as usize != i + 1 {
                 return Err(DataError::new("candidate numbers are not consecutive"));
             }
+
             cv.validate(
                 election,
                 polling_station,
@@ -796,16 +812,16 @@ impl Validate for PoliticalGroupCandidateVotes {
             .map(|cv| cv.votes as u64)
             .sum::<u64>();
         if candidate_votes_sum > 0 && self.total == 0 {
-            // F.402 validate whether the total number of votes is empty when there are candidate votes
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.field("total").to_string()],
-                code: ValidationResultCode::F402,
+                code: ValidationResultCode::F401,
             });
-        } else if self.total as u64 != candidate_votes_sum {
-            // F.401 validate whether the total number of votes matches the sum of all candidate votes
+        }
+
+        if self.total != 0 && self.total as u64 != candidate_votes_sum {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
-                code: ValidationResultCode::F401,
+                code: ValidationResultCode::F402,
             });
         }
         Ok(())
@@ -826,6 +842,21 @@ impl Validate for CandidateVotes {
             validation_results,
             &path.field("votes"),
         )
+    }
+}
+
+impl Validate for Count {
+    fn validate(
+        &self,
+        _election: &ElectionWithPoliticalGroups,
+        _polling_station: &PollingStation,
+        _validation_results: &mut ValidationResults,
+        _field_name: &FieldPath,
+    ) -> Result<(), DataError> {
+        if self > &999_999_999 {
+            return Err(DataError::new("count out of range"));
+        }
+        Ok(())
     }
 }
 
@@ -1988,7 +2019,7 @@ mod tests {
     }
 
     /// Tests validation of political group votes including out-of-range values, incorrect totals (F.401),
-    /// missing totals (F.402), and mismatched candidate/group counts.
+    /// missing totals (F.401), and mismatched candidate/group counts.
     #[test]
     fn test_political_group_votes_validation() {
         let mut validation_results = ValidationResults::default();

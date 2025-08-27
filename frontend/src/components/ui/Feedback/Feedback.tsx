@@ -27,7 +27,7 @@ interface FeedbackProps {
 
 export function Feedback({ id, type, data, userRole, shouldFocus = true }: FeedbackProps) {
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
-  const link = (children: ReactElement) => <Link to={`../voters-and-votes`}>{children}</Link>;
+  const link = (children: ReactElement) => <Link to={`../voters_votes_counts`}>{children}</Link>;
   // NOTE: administrator roles are always mapped to coordinator here
   const role = userRole === "administrator" ? "coordinator" : userRole;
 

@@ -45,11 +45,11 @@ export function DataEntrySection() {
   const keyboardHintText = section.id.startsWith("political_group_votes_") ? t("candidates_votes.goto_totals") : null;
 
   // Missing totals error for political group votes form
-  const missingTotalError = formSection.errors.includes("F402");
+  const missingTotalError = formSection.errors.includes("F401");
 
   // Memoize getCodes() results to prevent unnecessary focus triggers in Feedback
   const memoizedErrorCodes = React.useMemo(
-    () => formSection.errors.getCodes().filter((code) => code !== "F402"),
+    () => formSection.errors.getCodes().filter((code) => code !== "F401"),
     [formSection.errors],
   );
   const memoizedWarningCodes = React.useMemo(() => formSection.warnings.getCodes(), [formSection.warnings]);
@@ -116,9 +116,7 @@ export function DataEntrySection() {
         {missingTotalError && (
           <div id="missing-total-error">
             <Alert type="error" small>
-              <p>
-                {t(`feedback.F402.typist.title`)}. {t(`feedback.F402.typist.content`)}
-              </p>
+              <p>{t(`feedback.F401.typist.title`)}</p>
             </Alert>
           </div>
         )}

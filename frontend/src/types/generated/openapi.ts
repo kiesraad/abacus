@@ -1192,6 +1192,7 @@ export type ValidationResultCode =
   | "F305"
   | "F401"
   | "F402"
+  | "F403"
   | "W001"
   | "W201"
   | "W202"

@@ -484,7 +484,7 @@ describe("Test CandidatesVotesForm", () => {
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
 
-    test("F.402 EmptyTotal group total", async () => {
+    test("F.401 EmptyTotal group total", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
@@ -495,7 +495,7 @@ describe("Test CandidatesVotesForm", () => {
 
       await screen.findByTestId("political_group_votes_1_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [validationResultMockData.F402], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F401], warnings: [] },
       });
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });

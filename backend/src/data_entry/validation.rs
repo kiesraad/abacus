@@ -1144,7 +1144,7 @@ mod tests {
         }
     }
 
-    mod voters_count {
+    mod voters_counts {
         use crate::{
             data_entry::{
                 DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
@@ -1199,7 +1199,7 @@ mod tests {
         }
     }
 
-    mod votes_count {
+    mod votes_counts {
         use crate::{
             data_entry::{
                 DataError, PoliticalGroupTotalVotes, Validate, ValidationResult,
@@ -1233,7 +1233,7 @@ mod tests {
 
             let mut validation_results = ValidationResults::default();
             votes_counts.validate(
-                &election_fixture(&[1]),
+                &election_fixture(&[1, 1, 1]),
                 &polling_station_fixture(None),
                 &mut validation_results,
                 &"votes_counts".into(),
@@ -1245,16 +1245,18 @@ mod tests {
         /// CSO/DSO | F.202: 'Aantal kiezers en stemmen': E.1 t/m E.n tellen niet op naar E
         #[test]
         fn test_f202() -> Result<(), DataError> {
-            let validation_results = validate(&[100], 100, 0, 0, 100)?;
+            let validation_results = validate(&[50, 30, 20], 100, 0, 0, 100)?;
             assert!(validation_results.errors.is_empty());
 
-            let validation_results = validate(&[99], 100, 0, 0, 100)?;
+            let validation_results = validate(&[49, 30, 20], 100, 0, 0, 100)?;
             assert_eq!(
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F202,
                     fields: vec![
                         "votes_counts.political_group_total_votes[0].total".into(),
+                        "votes_counts.political_group_total_votes[1].total".into(),
+                        "votes_counts.political_group_total_votes[2].total".into(),
                         "votes_counts.total_votes_candidates_count".into(),
                     ],
                 }]
@@ -1266,10 +1268,10 @@ mod tests {
         /// CSO/DSO | F.203: 'Aantal kiezers en stemmen': stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen
         #[test]
         fn test_f203() -> Result<(), DataError> {
-            let validation_results = validate(&[100], 100, 1, 2, 103)?;
+            let validation_results = validate(&[50, 30, 20], 100, 1, 2, 103)?;
             assert!(validation_results.errors.is_empty());
 
-            let validation_results = validate(&[100], 100, 1, 2, 104)?;
+            let validation_results = validate(&[50, 30, 20], 100, 1, 2, 104)?;
             assert_eq!(
                 validation_results.errors,
                 [ValidationResult {
@@ -1290,11 +1292,11 @@ mod tests {
         #[test]
         fn test_w201() -> Result<(), DataError> {
             // < 3% of blank votes
-            let validation_results = validate(&[71], 71, 29, 0, 100)?;
+            let validation_results = validate(&[40, 20, 11], 71, 29, 0, 100)?;
             assert!(validation_results.errors.is_empty());
 
             // == 3% of blank votes
-            let validation_results = validate(&[70], 70, 30, 0, 100)?;
+            let validation_results = validate(&[40, 20, 10], 70, 30, 0, 100)?;
             assert_eq!(
                 validation_results.warnings,
                 [ValidationResult {
@@ -1304,7 +1306,7 @@ mod tests {
             );
 
             // > 3% of blank votes
-            let validation_results = validate(&[69], 69, 31, 0, 100)?;
+            let validation_results = validate(&[40, 20, 9], 69, 31, 0, 100)?;
             assert_eq!(
                 validation_results.warnings,
                 [ValidationResult {
@@ -1320,11 +1322,11 @@ mod tests {
         #[test]
         fn test_w202() -> Result<(), DataError> {
             // < 3% of invalid votes
-            let validation_results = validate(&[71], 71, 0, 29, 100)?;
+            let validation_results = validate(&[40, 20, 11], 71, 0, 29, 100)?;
             assert!(validation_results.errors.is_empty());
 
             // == 3% of invalid votes
-            let validation_results = validate(&[70], 70, 0, 30, 100)?;
+            let validation_results = validate(&[40, 20, 10], 70, 0, 30, 100)?;
             assert_eq!(
                 validation_results.warnings,
                 [ValidationResult {
@@ -1334,7 +1336,7 @@ mod tests {
             );
 
             // > 3% of invalid votes
-            let validation_results = validate(&[69], 69, 0, 31, 100)?;
+            let validation_results = validate(&[40, 20, 9], 69, 0, 31, 100)?;
             assert_eq!(
                 validation_results.warnings,
                 [ValidationResult {
@@ -1349,10 +1351,10 @@ mod tests {
         /// CSO/DSO | W.205: 'Aantal kiezers en stemmen': Totaal aantal uitgebrachte stemmen leeg of 0
         #[test]
         fn test_w205() -> Result<(), DataError> {
-            let validation_results = validate(&[100], 100, 0, 0, 100)?;
+            let validation_results = validate(&[50, 30, 20], 100, 0, 0, 100)?;
             assert!(validation_results.errors.is_empty());
 
-            let validation_results = validate(&[0], 0, 0, 0, 0)?;
+            let validation_results = validate(&[0, 0, 0], 0, 0, 0, 0)?;
             assert_eq!(
                 validation_results.warnings,
                 [ValidationResult {
@@ -1366,7 +1368,7 @@ mod tests {
 
         #[test]
         fn test_multiple() -> Result<(), DataError> {
-            let validation_results = validate(&[100], 99, 10, 10, 0)?;
+            let validation_results = validate(&[50, 30, 20], 99, 10, 10, 0)?;
             assert_eq!(
                 validation_results.errors,
                 [
@@ -1374,6 +1376,8 @@ mod tests {
                         code: ValidationResultCode::F202,
                         fields: vec![
                             "votes_counts.political_group_total_votes[0].total".into(),
+                            "votes_counts.political_group_total_votes[1].total".into(),
+                            "votes_counts.political_group_total_votes[2].total".into(),
                             "votes_counts.total_votes_candidates_count".into(),
                         ],
                     },

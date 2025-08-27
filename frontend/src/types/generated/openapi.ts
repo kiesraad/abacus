@@ -519,23 +519,34 @@ export interface DataEntryStatusResponse {
 }
 
 /**
+ * Compare votes cast admitted voters, part of the differences counts.
+ */
+export interface DifferenceCountsCompareVotesCastAdmittedVoters {
+  /** Whether total of admitted voters and total of votes cast match.
+("D en H zijn gelijk") */
+  admitted_voters_equal_votes_cast: boolean;
+  /** Whether total of admitted voters is greater than total of votes cast match.
+("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)") */
+  votes_cast_greater_than_admitted_voters: boolean;
+  /** Whether total of admitted voters is less than total of votes cast match.
+("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)") */
+  votes_cast_smaller_than_admitted_voters: boolean;
+}
+
+/**
  * Differences counts, part of the polling station results.
  */
 export interface DifferencesCounts {
+  /** Whether total of admitted voters and total of votes cast match.
+("Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)") */
+  compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters;
+  /** Whether the difference between the total of admitted voters and total of votes cast is explained.
+("Verschil tussen D en H volledig verklaard?") */
+  difference_completely_accounted_for: YesNo;
   /** Number of fewer counted ballots ("Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld") */
   fewer_ballots_count: number;
   /** Number of more counted ballots ("Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?") */
   more_ballots_count: number;
-  /** Number of no explanations ("Hoe vaak is er geen verklaring voor het verschil?") */
-  no_explanation_count: number;
-  /** Number of other explanations ("Hoe vaak is er een andere verklaring voor het verschil?") */
-  other_explanation_count: number;
-  /** Number of fewer ballots handed out ("Hoe vaak is er een stembiljet te weinig uitgereikt?") */
-  too_few_ballots_handed_out_count: number;
-  /** Number of more ballots handed out ("Hoe vaak is er een stembiljet te veel uitgereikt?") */
-  too_many_ballots_handed_out_count: number;
-  /** Number of unreturned ballots ("Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?") */
-  unreturned_ballots_count: number;
 }
 
 /**
@@ -1088,14 +1099,20 @@ export interface SumCount {
 /**
  * Contains a summary of the differences, containing which polling stations had differences.
  */
+export interface SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+  admitted_voters_equal_votes_cast: boolean;
+  votes_cast_greater_than_admitted_voters: boolean;
+  votes_cast_smaller_than_admitted_voters: boolean;
+}
+
+/**
+ * Contains a summary of the differences, containing which polling stations had differences.
+ */
 export interface SummaryDifferencesCounts {
+  compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters;
+  difference_completely_accounted_for: YesNo;
   fewer_ballots_count: SumCount;
   more_ballots_count: SumCount;
-  no_explanation_count: SumCount;
-  other_explanation_count: SumCount;
-  too_few_ballots_handed_out_count: SumCount;
-  too_many_ballots_handed_out_count: SumCount;
-  unreturned_ballots_count: SumCount;
 }
 
 export interface UpdateUserRequest {
@@ -1147,6 +1164,10 @@ export interface ValidationResult {
 }
 
 export type ValidationResultCode =
+  | "F101"
+  | "F102"
+  | "F111"
+  | "F112"
   | "F201"
   | "F202"
   | "F203"

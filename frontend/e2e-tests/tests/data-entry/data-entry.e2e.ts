@@ -72,7 +72,8 @@ test.describe("full data entry flow", () => {
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
-    await expect(differencesPage.moreBallotsCount).toBeFocused();
+    await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
+    await differencesPage.differenceCompletelyAccountedForYes.check();
     await differencesPage.next.click();
 
     const candidatesListPage_1 = new CandidatesListPage(page, 1, "Partijdige Partij");
@@ -244,11 +245,9 @@ test.describe("full data entry flow", () => {
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.fieldset).toBeVisible();
 
+    await differencesPage.differenceCompletelyAccountedForYes.check();
     const moreBallotsFields: MoreBallotsFields = {
       more_ballots_count: 25,
-      too_many_ballots_handed_out_count: 9,
-      other_explanation_count: 6,
-      no_explanation_count: 10,
     };
     await differencesPage.fillMoreBallotsFields(moreBallotsFields);
     await differencesPage.next.click();
@@ -326,10 +325,6 @@ test.describe("full data entry flow", () => {
 
     const fewerBallotsFields: FewerBallotsFields = {
       fewer_ballots_count: 20,
-      unreturned_ballots_count: 6,
-      too_few_ballots_handed_out_count: 3,
-      other_explanation_count: 7,
-      no_explanation_count: 4,
     };
     await differencesPage.fillFewerBallotsFields(fewerBallotsFields);
     await differencesPage.next.click();
@@ -482,7 +477,9 @@ test.describe("full data entry flow", () => {
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
+    await differencesPage.votesCastSmallerThanAdmittedVotersCheckbox.check();
     await differencesPage.fewerBallotsCount.fill(`${voters.poll_card_count - votes.total_votes_cast_count}`);
+    await differencesPage.differenceCompletelyAccountedForNo.check();
     await differencesPage.next.click();
     await differencesPage.checkAcceptErrorsAndWarnings();
     await differencesPage.next.click();

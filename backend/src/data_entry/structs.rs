@@ -177,8 +177,7 @@ impl VotesCounts {
             if !missing_in_self.is_empty() {
                 return Err(APIError::AddError(
                     format!(
-                        "Political group(s) {:?} exist in source but not in target",
-                        missing_in_self
+                        "Political group(s) {missing_in_self:?} exist in source but not in target",
                     ),
                     ErrorReference::InvalidVoteGroup,
                 ));
@@ -186,8 +185,7 @@ impl VotesCounts {
             if !missing_in_other.is_empty() {
                 return Err(APIError::AddError(
                     format!(
-                        "Political group(s) {:?} exist in target but not in source",
-                        missing_in_other
+                        "Political group(s) {missing_in_other:?} exist in target but not in source",
                     ),
                     ErrorReference::InvalidVoteGroup,
                 ));
@@ -224,21 +222,27 @@ pub struct DifferencesCounts {
     /// Number of fewer counted ballots ("Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld")
     #[schema(value_type = u32)]
     pub fewer_ballots_count: Count,
-    /// Number of unreturned ballots ("Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?")
-    #[schema(value_type = u32)]
-    pub unreturned_ballots_count: Count,
-    /// Number of fewer ballots handed out ("Hoe vaak is er een stembiljet te weinig uitgereikt?")
-    #[schema(value_type = u32)]
-    pub too_few_ballots_handed_out_count: Count,
-    /// Number of more ballots handed out ("Hoe vaak is er een stembiljet te veel uitgereikt?")
-    #[schema(value_type = u32)]
-    pub too_many_ballots_handed_out_count: Count,
-    /// Number of other explanations ("Hoe vaak is er een andere verklaring voor het verschil?")
-    #[schema(value_type = u32)]
-    pub other_explanation_count: Count,
-    /// Number of no explanations ("Hoe vaak is er geen verklaring voor het verschil?")
-    #[schema(value_type = u32)]
-    pub no_explanation_count: Count,
+    /// Whether total of admitted voters and total of votes cast match.
+    /// ("Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)")
+    pub compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters,
+    /// Whether the difference between the total of admitted voters and total of votes cast is explained.
+    /// ("Verschil tussen D en H volledig verklaard?")
+    pub difference_completely_accounted_for: YesNo,
+}
+
+/// Compare votes cast admitted voters, part of the differences counts.
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct DifferenceCountsCompareVotesCastAdmittedVoters {
+    /// Whether total of admitted voters and total of votes cast match.
+    /// ("D en H zijn gelijk")
+    pub admitted_voters_equal_votes_cast: bool,
+    /// Whether total of admitted voters is greater than total of votes cast match.
+    /// ("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)")
+    pub votes_cast_greater_than_admitted_voters: bool,
+    /// Whether total of admitted voters is less than total of votes cast match.
+    /// ("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)")
+    pub votes_cast_smaller_than_admitted_voters: bool,
 }
 
 impl DifferencesCounts {
@@ -246,11 +250,8 @@ impl DifferencesCounts {
         DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 0,
-            unreturned_ballots_count: 0,
-            too_few_ballots_handed_out_count: 0,
-            too_many_ballots_handed_out_count: 0,
-            other_explanation_count: 0,
-            no_explanation_count: 0,
+            difference_completely_accounted_for: Default::default(),
+            compare_votes_cast_admitted_voters: Default::default(),
         }
     }
 }
@@ -261,6 +262,23 @@ impl DifferencesCounts {
 pub struct YesNo {
     pub yes: bool,
     pub no: bool,
+}
+
+impl YesNo {
+    pub fn is_answered(&self) -> bool {
+        self.yes || self.no
+    }
+
+    pub fn is_invalid(&self) -> bool {
+        self.yes && self.no
+    }
+
+    pub fn no() -> Self {
+        Self {
+            yes: false,
+            no: true,
+        }
+    }
 }
 
 /// Extra investigation, part of the polling station results ("B1-1 Extra onderzoek")
@@ -368,11 +386,47 @@ pub struct CandidateVotes {
     pub votes: Count,
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct DataEntryStatusResponse {
+    pub status: DataEntryStatusName,
+}
+
+impl From<PollingStationDataEntry> for DataEntryStatusResponse {
+    fn from(data_entry: PollingStationDataEntry) -> Self {
+        DataEntryStatusResponse {
+            status: data_entry.state.0.status_name(),
+        }
+    }
+}
+
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use test_log::test;
 
     use super::*;
+
+    pub trait ValidDefault {
+        fn valid_default() -> Self;
+    }
+
+    impl ValidDefault for ExtraInvestigation {
+        fn valid_default() -> Self {
+            Self {
+                extra_investigation_other_reason: YesNo::default(),
+                ballots_recounted_extra_investigation: YesNo::default(),
+            }
+        }
+    }
+
+    impl ValidDefault for CountingDifferencesPollingStation {
+        fn valid_default() -> Self {
+            Self {
+                unexplained_difference_ballots_voters: YesNo::no(),
+                difference_ballots_per_list: YesNo::no(),
+            }
+        }
+    }
 
     #[test]
     fn test_votes_addition() {
@@ -469,19 +523,5 @@ mod tests {
         assert_eq!(curr_votes.poll_card_count, 3);
         assert_eq!(curr_votes.proxy_certificate_count, 5);
         assert_eq!(curr_votes.total_admitted_voters_count, 14);
-    }
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-#[serde(deny_unknown_fields)]
-pub struct DataEntryStatusResponse {
-    pub status: DataEntryStatusName,
-}
-
-impl From<PollingStationDataEntry> for DataEntryStatusResponse {
-    fn from(data_entry: PollingStationDataEntry) -> Self {
-        DataEntryStatusResponse {
-            status: data_entry.state.0.status_name(),
-        }
     }
 }

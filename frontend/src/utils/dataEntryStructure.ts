@@ -1,4 +1,4 @@
-import { t } from "@/i18n/translate";
+import { t, tx } from "@/i18n/translate";
 import { ElectionWithPoliticalGroups, PoliticalGroup, PollingStationResults } from "@/types/generated/openapi";
 import { DataEntrySection, DataEntryStructure, InputGridSubsectionRow } from "@/types/types";
 import { getCandidateFullName } from "@/utils/candidate";
@@ -78,6 +78,31 @@ export const differencesSection: DataEntrySection = {
   sectionNumber: t("differences_counts.section_number"),
   subsections: [
     {
+      type: "checkboxes",
+      title: tx("differences_counts.compare_votes_cast_admitted_voters.title"),
+      short_title: t("differences_counts.compare_votes_cast_admitted_voters.short_title"),
+      error_path: "differences_counts.compare_votes_cast_admitted_voters",
+      error_message: t("differences_counts.validation_error"),
+      options: [
+        {
+          path: "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
+          label: t("differences_counts.admitted_voters_equal_votes_cast.title"),
+          short_label: t("differences_counts.admitted_voters_equal_votes_cast.short_title"),
+          autoFocusInput: true,
+        },
+        {
+          path: "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
+          label: t("differences_counts.votes_cast_greater_than_admitted_voters.title"),
+          short_label: t("differences_counts.votes_cast_greater_than_admitted_voters.short_title"),
+        },
+        {
+          path: "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
+          label: t("differences_counts.votes_cast_smaller_than_admitted_voters.title"),
+          short_label: t("differences_counts.votes_cast_smaller_than_admitted_voters.short_title"),
+        },
+      ],
+    },
+    {
       type: "inputGrid",
       headers: [t("field"), t("counted_number"), t("description")],
       rows: [
@@ -85,39 +110,30 @@ export const differencesSection: DataEntrySection = {
           code: "I",
           path: "differences_counts.more_ballots_count",
           title: t("differences_counts.differences_counts.more_ballots_count"),
-          autoFocusInput: true,
         },
         {
           code: "J",
           path: "differences_counts.fewer_ballots_count",
           title: t("differences_counts.differences_counts.fewer_ballots_count"),
-          addSeparator: true,
+        },
+      ],
+    },
+    {
+      type: "checkboxes",
+      title: tx("differences_counts.difference_completely_accounted_for.title"),
+      short_title: t("differences_counts.difference_completely_accounted_for.short_title"),
+      error_path: "differences_counts.difference_completely_accounted_for",
+      error_message: t("differences_counts.validation_error"),
+      options: [
+        {
+          path: "differences_counts.difference_completely_accounted_for.yes",
+          label: t("yes"),
+          short_label: t("yes"),
         },
         {
-          code: "K",
-          path: "differences_counts.unreturned_ballots_count",
-          title: t("differences_counts.differences_counts.unreturned_ballots_count"),
-        },
-        {
-          code: "L",
-          path: "differences_counts.too_few_ballots_handed_out_count",
-          title: t("differences_counts.differences_counts.too_few_ballots_handed_out_count"),
-        },
-        {
-          code: "M",
-          path: "differences_counts.too_many_ballots_handed_out_count",
-          title: t("differences_counts.differences_counts.too_many_ballots_handed_out_count"),
-        },
-        {
-          code: "N",
-          path: "differences_counts.other_explanation_count",
-          title: t("differences_counts.differences_counts.other_explanation_count"),
-          addSeparator: true,
-        },
-        {
-          code: "O",
-          path: "differences_counts.no_explanation_count",
-          title: t("differences_counts.differences_counts.no_explanation_count"),
+          path: "differences_counts.difference_completely_accounted_for.no",
+          label: t("no"),
+          short_label: t("no"),
         },
       ],
     },

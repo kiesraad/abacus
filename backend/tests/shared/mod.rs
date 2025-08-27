@@ -2,14 +2,15 @@
 
 use std::net::SocketAddr;
 
+use abacus::data_entry::DifferenceCountsCompareVotesCastAdmittedVoters;
 use abacus::{
     committee_session::{
         CommitteeSession, CommitteeSessionStatusChangeRequest, status::CommitteeSessionStatus,
     },
     data_entry::{
-        CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
-        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-        VotersCounts, VotesCounts,
+        CandidateVotes, Count, CountingDifferencesPollingStation, DataEntry, DifferencesCounts,
+        ElectionStatusResponse, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+        PollingStationResults, VotersCounts, VotesCounts, YesNo,
         status::{ClientState, DataEntryStatusName},
     },
     election::{CandidateNumber, ElectionDetailsResponse, PGNumber},
@@ -23,11 +24,12 @@ pub fn differences_counts_zero() -> DifferencesCounts {
     DifferencesCounts {
         more_ballots_count: 0,
         fewer_ballots_count: 0,
-        unreturned_ballots_count: 0,
-        too_few_ballots_handed_out_count: 0,
-        too_many_ballots_handed_out_count: 0,
-        other_explanation_count: 0,
-        no_explanation_count: 0,
+        compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+            admitted_voters_equal_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: false,
+            votes_cast_smaller_than_admitted_voters: false,
+        },
+        difference_completely_accounted_for: Default::default(),
     }
 }
 
@@ -55,7 +57,10 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
         progress: 60,
         data: PollingStationResults {
             extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            counting_differences_polling_station: CountingDifferencesPollingStation {
+                difference_ballots_per_list: YesNo::no(),
+                unexplained_difference_ballots_voters: YesNo::no(),
+            },
             voters_counts: VotersCounts {
                 poll_card_count: 102,
                 proxy_certificate_count: 2,

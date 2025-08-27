@@ -816,7 +816,7 @@ async fn election_status(
 }
 
 #[cfg(test)]
-pub mod tests {
+mod tests {
     use super::*;
     use crate::{
         authentication::Role,
@@ -826,7 +826,7 @@ pub mod tests {
         },
         data_entry::{
             DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-            VotersCounts, VotesCounts,
+            VotersCounts, VotesCounts, structs::tests::ValidDefault,
         },
     };
     use axum::http::StatusCode;
@@ -834,12 +834,12 @@ pub mod tests {
     use sqlx::{SqlitePool, query, query_as};
     use test_log::test;
 
-    pub fn example_data_entry() -> DataEntry {
+    fn example_data_entry() -> DataEntry {
         DataEntry {
             progress: 100,
             data: PollingStationResults {
-                extra_investigation: Default::default(),
-                counting_differences_polling_station: Default::default(),
+                extra_investigation: ValidDefault::valid_default(),
+                counting_differences_polling_station: ValidDefault::valid_default(),
                 voters_counts: VotersCounts {
                     poll_card_count: 99,
                     proxy_certificate_count: 1,

@@ -49,7 +49,7 @@ describe("DataEntrySection", () => {
     test("displays badge for differences_counts section", async () => {
       renderComponent("differences_counts");
 
-      const title = await screen.findByText("Verschillen tussen toegelaten kiezers en uitgebrachte stemmen");
+      const title = await screen.findByText("Verschillen tussen aantal kiezers en uitgebrachte stemmen");
       expect(title).toBeInTheDocument();
 
       const badge = screen.getByText("B1-3.3");

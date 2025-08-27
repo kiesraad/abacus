@@ -9,7 +9,7 @@ import { INITIAL_FORM_SECTION_ID } from "./reducer";
 export function formSectionComplete(section: FormSection): boolean {
   return (
     section.isSaved &&
-    (section.errors.isEmpty() || section.errors.hasOnlyGlobalValidationResults() || section.acceptErrorsAndWarnings) &&
+    (section.errors.isEmpty() || section.acceptErrorsAndWarnings) &&
     (section.warnings.isEmpty() || section.acceptErrorsAndWarnings)
   );
 }
@@ -229,14 +229,6 @@ export function updateFormStateAfterSubmit(
   //determine the new furthest section, if applicable
   if (continueToNextSection && currentFormSection && formState.furthest === currentFormSection.id) {
     formState.furthest = getNextSectionID(formState, sectionId) ?? formState.furthest;
-  }
-
-  if (formState.furthest !== "save") {
-    //if the entire form is not completed yet, filter out global validation results since they don't have meaning yet.
-    Object.values(formState.sections).forEach((section) => {
-      section.errors.removeGlobalValidationResults();
-      section.warnings.removeGlobalValidationResults();
-    });
   }
 
   return formState;

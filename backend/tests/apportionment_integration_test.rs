@@ -144,7 +144,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
                         number: 1,
-                        total: 592,
+                        total: 600,
                     },
                     PoliticalGroupTotalVotes {
                         number: 2,

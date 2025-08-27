@@ -24,8 +24,8 @@ export function InvestigationsOverview() {
         <section className="sm">
           <h2>{t("investigations.from_central_polling_station")}</h2>
           <ul className="mt-0 mb-0">
-            <li>{t("investigations.add_all_polling_stations_to_investigate")}</li>
-            <li>{t("investigations.print_corrigendum_after_adding_reason")}</li>
+            <li>{t("investigations.add_investigation_for_each_csb_request")}</li>
+            <li>{t("investigations.print_corrigendum_form")}</li>
           </ul>
           <nav className="mt-md-lg">
             <Button.Link to="./add">

@@ -74,7 +74,7 @@ const pollingStationResults: PollingStationResults = {
   ],
 };
 
-const dataEntryStructure = getDataEntryStructure(electionMockData, pollingStationResults);
+const dataEntryStructure = getDataEntryStructure(electionMockData);
 const sectionIds = dataEntryStructure.map((section) => section.id);
 
 type Props = {

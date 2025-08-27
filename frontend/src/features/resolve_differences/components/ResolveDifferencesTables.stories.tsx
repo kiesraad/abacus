@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ResolveDifferencesAction } from "@/types/generated/openapi";
-import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
@@ -15,7 +15,7 @@ type Props = {
 const actions: ResolveDifferencesAction[] = ["keep_first_entry", "keep_second_entry", "discard_both_entries"];
 const first = pollingStationResultsMockData(true);
 const second = pollingStationResultsMockData(false);
-const structure = getDataEntryStructureForDifferences(electionMockData, first, second);
+const structure = getDataEntryStructure(electionMockData);
 
 export const DefaultResolveDifferencesTables: StoryObj<Props> = {
   render: ({ action }) => {

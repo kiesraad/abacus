@@ -1,5 +1,5 @@
 import { t, tx } from "@/i18n/translate";
-import { ElectionWithPoliticalGroups, PoliticalGroup, PollingStationResults } from "@/types/generated/openapi";
+import { ElectionWithPoliticalGroups, PoliticalGroup } from "@/types/generated/openapi";
 import { DataEntrySection, DataEntryStructure, InputGridSubsectionRow } from "@/types/types";
 import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
@@ -308,35 +308,9 @@ function buildDataEntryStructure(election: ElectionWithPoliticalGroups): DataEnt
 /**
  * Returns all data entry sections.
  *
- * The contents of each section can change depending on the polling station results,
- * but the number of sections and their order do not change.
- *
  * @param election ElectionWithPoliticalGroups object
- * @param _pollingStationResults PollingStationResults object (optional)
  * @returns Complete array of all data entry sections
  */
-export function getDataEntryStructure(
-  election: ElectionWithPoliticalGroups,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _pollingStationResults?: PollingStationResults,
-): DataEntryStructure {
-  return buildDataEntryStructure(election);
-}
-
-/**
- * Returns all data entry sections for differences rendering (with two data entries).
- *
- * @param election ElectionWithPoliticalGroups object
- * @param _firstEntry First data entry
- * @param _secondEntry Second data entry
- * @returns Complete array of all data entry sections
- */
-export function getDataEntryStructureForDifferences(
-  election: ElectionWithPoliticalGroups,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _firstEntry: PollingStationResults,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _secondEntry: PollingStationResults,
-): DataEntryStructure {
+export function getDataEntryStructure(election: ElectionWithPoliticalGroups): DataEntryStructure {
   return buildDataEntryStructure(election);
 }

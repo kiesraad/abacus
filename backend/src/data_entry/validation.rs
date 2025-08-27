@@ -311,7 +311,6 @@ impl Validate for PollingStationResults {
             &voters_counts_path,
         )?;
 
-        // W.203 validate that the difference between total_voters_count and total_votes_count is lower than 2% and lower than 15
         if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
             total_voters_count,
             total_votes_count,
@@ -1579,7 +1578,6 @@ mod tests {
         assert_eq!(validation_results.errors.len(), 1);
         assert_eq!(validation_results.warnings.len(), 1);
 
-        // Assert errors
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F301
@@ -1589,7 +1587,6 @@ mod tests {
             vec!["polling_station_results.differences_counts.more_ballots_count"]
         );
 
-        // Assert warnings
         assert_eq!(
             validation_results.warnings[0].code,
             ValidationResultCode::W203
@@ -2009,13 +2006,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.errors[0].fields,
-            vec![
-                "polling_station_results.differences_counts.fewer_ballots_count",
-                "polling_station_results.differences_counts.unreturned_ballots_count",
-                "polling_station_results.differences_counts.too_few_ballots_handed_out_count",
-                "polling_station_results.differences_counts.other_explanation_count",
-                "polling_station_results.differences_counts.no_explanation_count"
-            ]
+            vec!["polling_station_results.differences_counts.fewer_ballots_count"]
         );
     }
 

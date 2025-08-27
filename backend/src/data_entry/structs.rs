@@ -213,20 +213,21 @@ impl VotesCounts {
 }
 
 /// Differences counts, part of the polling station results.
+/// (B1-3.3 "Verschillen tussen aantal kiezers en uitgebrachte stemmen")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct DifferencesCounts {
-    /// Number of more counted ballots ("Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?")
+    /// Whether total of admitted voters and total of votes cast match.
+    /// (B1-3.3.1 "Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)")
+    pub compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters,
+    /// Number of more counted ballots ("Aantal méér getelde stemmen (bereken: H min D)")
     #[schema(value_type = u32)]
     pub more_ballots_count: Count,
-    /// Number of fewer counted ballots ("Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld")
+    /// Number of fewer counted ballots ("Aantal minder getelde stemmen (bereken: D min H)")
     #[schema(value_type = u32)]
     pub fewer_ballots_count: Count,
-    /// Whether total of admitted voters and total of votes cast match.
-    /// ("Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)")
-    pub compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters,
     /// Whether the difference between the total of admitted voters and total of votes cast is explained.
-    /// ("Verschil tussen D en H volledig verklaard?")
+    /// (B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?")
     pub difference_completely_accounted_for: YesNo,
 }
 

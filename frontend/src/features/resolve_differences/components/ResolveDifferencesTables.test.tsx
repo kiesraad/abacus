@@ -12,7 +12,7 @@ import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 describe("ResolveDifferencesTables", () => {
   const first = pollingStationResultsMockData(true);
   const second = pollingStationResultsMockData(false);
-  const structure = getDataEntryStructureForDifferences(electionMockData, first, second);
+  const structure = getDataEntryStructureForDifferences(electionMockData);
 
   test("renders the resolve differences tables", async () => {
     render(<ResolveDifferencesTables first={first} second={second} structure={structure} />);

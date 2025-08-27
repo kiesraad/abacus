@@ -63,9 +63,7 @@ export function usePollingStationDataEntryDifferences(
   }
 
   const differences = requestState.status === "success" ? requestState.data : null;
-  const dataEntryStructure = differences
-    ? getDataEntryStructureForDifferences(election, differences.first_entry, differences.second_entry)
-    : null;
+  const dataEntryStructure = differences ? getDataEntryStructureForDifferences(election) : null;
 
   const onSubmit = async () => {
     if (action === undefined) {

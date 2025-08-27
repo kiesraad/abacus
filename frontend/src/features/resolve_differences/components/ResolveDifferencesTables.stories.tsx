@@ -15,7 +15,7 @@ type Props = {
 const actions: ResolveDifferencesAction[] = ["keep_first_entry", "keep_second_entry", "discard_both_entries"];
 const first = pollingStationResultsMockData(true);
 const second = pollingStationResultsMockData(false);
-const structure = getDataEntryStructureForDifferences(electionMockData, first, second);
+const structure = getDataEntryStructureForDifferences(electionMockData);
 
 export const DefaultResolveDifferencesTables: StoryObj<Props> = {
   render: ({ action }) => {

@@ -8,7 +8,7 @@ import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure"
 describe("Resolve differences, differences util", () => {
   const first = pollingStationResultsMockData(true);
   const second = pollingStationResultsMockData(false);
-  const structure = getDataEntryStructureForDifferences(electionMockData, first, second);
+  const structure = getDataEntryStructureForDifferences(electionMockData);
 
   test.each([
     { sectionId: "voters_votes_counts", expected: true },

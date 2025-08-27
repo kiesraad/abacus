@@ -308,22 +308,9 @@ function buildDataEntryStructure(election: ElectionWithPoliticalGroups): DataEnt
 /**
  * Returns all data entry sections.
  *
- * The contents of each section can change depending on the polling station results,
- * but the number of sections and their order do not change.
- *
  * @param election ElectionWithPoliticalGroups object
  * @returns Complete array of all data entry sections
  */
 export function getDataEntryStructure(election: ElectionWithPoliticalGroups): DataEntryStructure {
-  return buildDataEntryStructure(election);
-}
-
-/**
- * Returns all data entry sections for differences rendering (with two data entries).
- *
- * @param election ElectionWithPoliticalGroups object
- * @returns Complete array of all data entry sections
- */
-export function getDataEntryStructureForDifferences(election: ElectionWithPoliticalGroups): DataEntryStructure {
   return buildDataEntryStructure(election);
 }

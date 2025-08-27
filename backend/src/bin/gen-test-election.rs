@@ -11,8 +11,9 @@ use abacus::{
     },
     create_sqlite_pool,
     data_entry::{
-        CandidateVotes, DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-        PollingStationResults, VotersCounts, VotesCounts,
+        CandidateVotes, CountingDifferencesPollingStation, DifferencesCounts, ExtraInvestigation,
+        FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+        Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
     election::{
@@ -170,10 +171,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .expect("Failed to update committee session status");
     }
 
+    let number_of_voters = rng.random_range(args.voters.clone());
+    committee_session.number_of_voters = number_of_voters;
     abacus::committee_session::repository::change_number_of_voters(
         &pool,
         committee_session.id,
-        rng.random_range(args.voters.clone()),
+        number_of_voters,
     )
     .await
     .expect("Failed to update number of voters of committee session");
@@ -412,6 +415,26 @@ async fn generate_data_entry(
                 candidate_slope,
             );
 
+            // Validate the generated results to catch issues early
+            let mut validation_results = ValidationResults::default();
+            if let Err(e) = results.validate(
+                election,
+                ps,
+                &mut validation_results,
+                &FieldPath::new("data".to_string()),
+            ) {
+                panic!(
+                    "Failed to validate generated results for polling station {}: {}",
+                    ps.number, e
+                );
+            }
+            if validation_results.has_errors() {
+                panic!(
+                    "Generated invalid polling station results for station {}: {:?}",
+                    ps.number, validation_results.errors
+                );
+            }
+
             if rng.random_ratio(second_entry_chance, 100) {
                 // generate a definitive data entry
                 let state = DataEntryStatus::Definitive(Definitive {
@@ -466,9 +489,73 @@ fn generate_polling_station_results(
 
     // distribute the remaining votes for this polling station randomly according to a power law distribution
     let pg_votes = distribute_fill_weights(rng, group_weights, remaining_votes, false);
+
+    // Define weighted options for extra_investigation (most common: both "no")
+    let extra_investigation_options = [
+        (
+            // 85% weight - both unanswered
+            85,
+            ExtraInvestigation {
+                extra_investigation_other_reason: YesNo::default(),
+                ballots_recounted_extra_investigation: YesNo::default(),
+            },
+        ),
+        (
+            // 10% weight - no to both
+            10,
+            ExtraInvestigation {
+                extra_investigation_other_reason: YesNo::no(),
+                ballots_recounted_extra_investigation: YesNo::no(),
+            },
+        ),
+        (
+            // 3% weight - yes to investigation, no to recount
+            3,
+            ExtraInvestigation {
+                extra_investigation_other_reason: YesNo {
+                    yes: true,
+                    no: false,
+                },
+                ballots_recounted_extra_investigation: YesNo::no(),
+            },
+        ),
+        (
+            // 2% weight - yes to both
+            2,
+            ExtraInvestigation {
+                extra_investigation_other_reason: YesNo {
+                    yes: true,
+                    no: false,
+                },
+                ballots_recounted_extra_investigation: YesNo {
+                    yes: true,
+                    no: false,
+                },
+            },
+        ),
+    ];
+
+    let extra_investigation = extra_investigation_options
+        .choose_weighted(rng, |item| item.0)
+        .expect("Weighted random selection for extra_investigation should never fail with valid weights")
+        .1
+        .clone();
+
     PollingStationResults {
-        extra_investigation: Default::default(),
-        counting_differences_polling_station: Default::default(),
+        extra_investigation,
+        counting_differences_polling_station: CountingDifferencesPollingStation {
+            // 90% chance of "no", 10% chance of "yes" for each field
+            unexplained_difference_ballots_voters: if rng.random_bool(0.9) {
+                YesNo::no()
+            } else {
+                YesNo::yes()
+            },
+            difference_ballots_per_list: if rng.random_bool(0.9) {
+                YesNo::no()
+            } else {
+                YesNo::yes()
+            },
+        },
         voters_counts: VotersCounts {
             poll_card_count: number_of_votes,
             proxy_certificate_count: 0,

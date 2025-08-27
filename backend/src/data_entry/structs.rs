@@ -273,6 +273,13 @@ impl YesNo {
         self.yes && self.no
     }
 
+    pub fn yes() -> Self {
+        Self {
+            yes: true,
+            no: false,
+        }
+    }
+
     pub fn no() -> Self {
         Self {
             yes: false,

@@ -1,12 +1,15 @@
 import { render as rtlRender } from "@testing-library/react";
+import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData.ts";
+import { ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
+import { ElectionDetailsResponse } from "@/types/generated/openapi.ts";
 
 import { InvestigationsOverview } from "./InvestigationsOverview";
 
@@ -33,11 +36,13 @@ async function renderPage() {
 
 describe("InvestigationsOverview", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler);
-  });
-
-  beforeEach(() => {
-    server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
+    server.use(ElectionStatusRequestHandler);
+    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
   });
 
   test("Renders the correct headings and button", async () => {

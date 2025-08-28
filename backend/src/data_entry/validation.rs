@@ -1698,10 +1698,7 @@ mod tests {
                         votes_cast_greater_than_admitted_voters: false,
                         votes_cast_smaller_than_admitted_voters: false,
                     },
-                difference_completely_accounted_for: YesNo {
-                    yes: true,
-                    no: false,
-                },
+                difference_completely_accounted_for: YesNo::yes(),
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(1, &[3])],
         };

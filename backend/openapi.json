@@ -4653,32 +4653,32 @@
       },
       "DifferencesCounts": {
         "type": "object",
-        "description": "Differences counts, part of the polling station results.",
+        "description": "Differences counts, part of the polling station results.\n(B1-3.3 \"Verschillen tussen aantal kiezers en uitgebrachte stemmen\")",
         "required": [
+          "compare_votes_cast_admitted_voters",
           "more_ballots_count",
           "fewer_ballots_count",
-          "compare_votes_cast_admitted_voters",
           "difference_completely_accounted_for"
         ],
         "properties": {
           "compare_votes_cast_admitted_voters": {
             "$ref": "#/components/schemas/DifferenceCountsCompareVotesCastAdmittedVoters",
-            "description": "Whether total of admitted voters and total of votes cast match.\n(\"Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)\")"
+            "description": "Whether total of admitted voters and total of votes cast match.\n(B1-3.3.1 \"Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)\")"
           },
           "difference_completely_accounted_for": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether the difference between the total of admitted voters and total of votes cast is explained.\n(\"Verschil tussen D en H volledig verklaard?\")"
+            "description": "Whether the difference between the total of admitted voters and total of votes cast is explained.\n(B1-3.3.2 \"Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?\")"
           },
           "fewer_ballots_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of fewer counted ballots (\"Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld\")",
+            "description": "Number of fewer counted ballots (\"Aantal minder getelde stemmen (bereken: D min H)\")",
             "minimum": 0
           },
           "more_ballots_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of more counted ballots (\"Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?\")",
+            "description": "Number of more counted ballots (\"Aantal méér getelde stemmen (bereken: H min D)\")",
             "minimum": 0
           }
         },

@@ -16,7 +16,7 @@ pub struct PollingStation {
     pub id: u32,
     pub election_id: u32,
     pub name: String,
-    pub number: i64,
+    pub number: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub number_of_voters: Option<i64>,

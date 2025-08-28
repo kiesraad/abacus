@@ -206,7 +206,7 @@ impl SummaryDifferencesCounts {
 pub struct SumCount {
     #[schema(value_type = u32)]
     pub count: Count,
-    pub polling_stations: Vec<i64>,
+    pub polling_stations: Vec<u32>,
 }
 
 impl SumCount {

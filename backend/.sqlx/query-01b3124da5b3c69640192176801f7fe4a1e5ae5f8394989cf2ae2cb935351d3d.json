@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id AS \"id: u32\",\n            election_id AS \"election_id: u32\",\n            name,\n            number,\n            number_of_voters,\n            polling_station_type AS \"polling_station_type: _\",\n            address,\n            postal_code,\n            locality\n        FROM polling_stations\n        WHERE election_id = $1\n        ",
+  "query": "\n            INSERT INTO polling_stations (\n                election_id,\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                address,\n                postal_code,\n                locality\n            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id AS \"id: u32\",\n                election_id AS \"election_id: u32\",\n                name,\n                number AS \"number: u32\",\n                number_of_voters,\n                polling_station_type AS \"polling_station_type: _\",\n                address,\n                postal_code,\n                locality\n            ",
   "describe": {
     "columns": [
       {
@@ -19,7 +19,7 @@
         "type_info": "Text"
       },
       {
-        "name": "number",
+        "name": "number: u32",
         "ordinal": 3,
         "type_info": "Integer"
       },
@@ -50,7 +50,7 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 8
     },
     "nullable": [
       false,
@@ -64,5 +64,5 @@
       false
     ]
   },
-  "hash": "e4749ca7979428a4aa42dee40305bbe7f938951ccad7d320e7e301461852344a"
+  "hash": "01b3124da5b3c69640192176801f7fe4a1e5ae5f8394989cf2ae2cb935351d3d"
 }

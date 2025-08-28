@@ -61,6 +61,35 @@ pub async fn get(conn: impl DbConnLike<'_>, id: u32) -> Result<PollingStation, s
     .await
 }
 
+pub async fn get_by_previous_id(
+    conn: impl DbConnLike<'_>,
+    previous_id: u32,
+) -> Result<PollingStation, sqlx::Error> {
+    query_as!(
+        PollingStation,
+        r#"
+        SELECT
+            p.id AS "id: u32",
+            c.election_id AS "election_id: u32",
+            p.committee_session_id AS "committee_session_id: u32",
+            p.id_prev_session AS "id_prev_session: _",
+            p.name,
+            p.number,
+            p.number_of_voters,
+            p.polling_station_type AS "polling_station_type: _",
+            p.address,
+            p.postal_code,
+            p.locality
+        FROM polling_stations AS p
+        JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        WHERE p.id_prev_session = $1
+        "#,
+        previous_id
+    )
+    .fetch_one(conn)
+    .await
+}
+
 /// Get a single polling station for an election
 pub async fn get_for_election(
     conn: impl DbConnLike<'_>,

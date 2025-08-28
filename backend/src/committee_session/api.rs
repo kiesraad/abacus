@@ -16,7 +16,7 @@ use super::{
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
-    APIError, AppState, DbConnLike, ErrorResponse,
+    APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{AdminOrCoordinator, Coordinator},
 };
@@ -116,8 +116,7 @@ pub async fn committee_session_create(
         .await?;
     if current_committee_session.status == CommitteeSessionStatus::DataEntryFinished {
         // retrieve the polling stations from the last committee session
-        let mut tx = pool.begin_immediate().await?;
-        let next_committee_session = crate::committee_session::repository::create(&mut *tx, {
+        let next_committee_session = crate::committee_session::repository::create(&pool, {
             CommitteeSessionCreateRequest {
                 election_id: request.election_id,
                 number: current_committee_session.number + 1,
@@ -125,13 +124,6 @@ pub async fn committee_session_create(
             }
         })
         .await?;
-        crate::polling_station::repository::duplicate_for_committee_session(
-            &mut *tx,
-            current_committee_session.id,
-            next_committee_session.id,
-        )
-        .await?;
-        tx.commit().await?;
 
         audit_service
             .log(

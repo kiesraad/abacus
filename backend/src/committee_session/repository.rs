@@ -125,7 +125,12 @@ pub async fn create(
     conn: impl DbConnLike<'_>,
     committee_session: CommitteeSessionCreateRequest,
 ) -> Result<CommitteeSession, Error> {
-    query_as!(
+    let mut tx = conn.begin_immediate().await?;
+
+    let current_committee_session_id =
+        get_current_id_for_election(&mut *tx, committee_session.election_id).await?;
+
+    let next_committee_session = query_as!(
         CommitteeSession,
         r#"
         INSERT INTO committee_sessions (
@@ -153,8 +158,17 @@ pub async fn create(
         "",
         committee_session.number_of_voters,
     )
-    .fetch_one(conn)
-    .await
+    .fetch_one(&mut *tx)
+    .await?;
+
+    crate::polling_station::repository::duplicate_for_committee_session(
+        &mut *tx,
+        current_committee_session_id,
+        next_committee_session.id,
+    )
+    .await?;
+
+    Ok(next_committee_session)
 }
 
 /// Delete a committee session

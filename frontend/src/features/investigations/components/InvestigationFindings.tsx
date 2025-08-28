@@ -66,7 +66,7 @@ export function InvestigationFindings() {
             <ChoiceList.Legend>{t("investigations.findings.corrected_result")}</ChoiceList.Legend>
             {radioError && (
               <ChoiceList.Error id="corrected_results_error">
-                {t("investigations.pick_corrected_result")}
+                {t("investigations.findings.pick_corrected_result")}
               </ChoiceList.Error>
             )}
             <ChoiceList.Radio id="corrected_results_yes" name="corrected_results" value="yes" label={t("yes")}>

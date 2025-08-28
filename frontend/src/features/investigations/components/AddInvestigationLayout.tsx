@@ -12,8 +12,8 @@ import { t } from "@/i18n/translate";
 
 const formSections = [
   { key: "reason_and_assigment", label: t("investigations.reason_and_assignment.title"), path: "reason" },
-  { key: "print_corrigendum", label: t("investigations.print_corrigendum_short"), path: "print-corrigendum" },
-  { key: "investigation_findings", label: t("investigations.findings.investigation_findings"), path: "findings" },
+  { key: "print_corrigendum", label: t("investigations.print_corrigendum.nav_title"), path: "print-corrigendum" },
+  { key: "investigation_findings", label: t("investigations.findings.nav_title"), path: "findings" },
 ];
 
 export function AddInvestigationLayout() {

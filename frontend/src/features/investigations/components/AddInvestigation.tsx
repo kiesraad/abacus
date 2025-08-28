@@ -19,7 +19,7 @@ export function AddInvestigation() {
       </header>
       <main>
         <section className="sm">
-          <h2>{t("investigations.pick_polling_station")}</h2>
+          <h2>{t("investigations.investigate_which_polling_station")}</h2>
           <p className="mb-md-lg">{t("investigations.multiple_polling_stations")}</p>
           <Table id="polling_stations">
             <Table.Header>

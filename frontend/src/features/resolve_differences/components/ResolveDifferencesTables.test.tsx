@@ -4,7 +4,7 @@ import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { render, screen } from "@/testing/test-utils";
 import { PollingStationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
-import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
@@ -12,7 +12,7 @@ import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 describe("ResolveDifferencesTables", () => {
   const first = pollingStationResultsMockData(true);
   const second = pollingStationResultsMockData(false);
-  const structure = getDataEntryStructureForDifferences(electionMockData, first, second);
+  const structure = getDataEntryStructure(electionMockData);
 
   test("renders the resolve differences tables", async () => {
     render(<ResolveDifferencesTables first={first} second={second} structure={structure} />);
@@ -41,7 +41,7 @@ describe("ResolveDifferencesTables", () => {
     ]);
 
     const differencesCountsTable = screen.queryByRole("table", {
-      name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen B1-3.3",
     });
     expect(differencesCountsTable).not.toBeInTheDocument();
 

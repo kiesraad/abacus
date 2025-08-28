@@ -3,15 +3,13 @@ import { RouterProvider } from "react-router";
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useElection from "@/hooks/election/useElection";
 import { ApiResponseStatus } from "@/api/ApiResult";
-import { useElection } from "@/hooks/election/useElection";
 import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
 import { AbortDataEntryControl } from "./AbortDataEntryControl";
-
-vi.mock("@/hooks/election/useElection");
 
 function renderComponent() {
   const router = setupTestRouter([
@@ -31,7 +29,7 @@ function renderComponent() {
 
 describe("AbortDataEntryControl", () => {
   beforeEach(() => {
-    vi.mocked(useElection).mockReturnValue({
+    vi.spyOn(useElection, "useElection").mockReturnValue({
       committeeSession: committeeSessionMockData,
       election: electionMockData,
       pollingStations: [],

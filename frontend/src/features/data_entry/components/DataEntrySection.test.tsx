@@ -1,4 +1,4 @@
-import * as reactRouter from "react-router";
+import * as ReactRouter from "react-router";
 
 import { UserEvent, userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -20,7 +20,7 @@ import { DataEntryProvider } from "./DataEntryProvider";
 import { DataEntrySection } from "./DataEntrySection";
 
 function renderComponent(sectionId: string) {
-  vi.spyOn(reactRouter, "useParams").mockReturnValue({ sectionId });
+  vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId });
 
   return renderReturningRouter(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
@@ -49,7 +49,7 @@ describe("DataEntrySection", () => {
     test("displays badge for differences_counts section", async () => {
       renderComponent("differences_counts");
 
-      const title = await screen.findByText("Verschillen tussen toegelaten kiezers en uitgebrachte stemmen");
+      const title = await screen.findByText("Verschillen tussen aantal kiezers en uitgebrachte stemmen");
       expect(title).toBeInTheDocument();
 
       const badge = screen.getByText("B1-3.3");

@@ -107,7 +107,7 @@ describe("CreateFirstAdminForm", () => {
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
 
     await user.click(submitButton);
-    expect(screen.getByRole("alert")).toHaveTextContent(
+    expect(await screen.findByRole("alert")).toHaveTextContent(
       "De applicatie is al geconfigureerd. Je kan geen nieuwe beheerder aanmaken.",
     );
   });

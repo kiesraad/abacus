@@ -1,14 +1,9 @@
-import { useSearchParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { act, renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { useQueryParam } from "./useQueryParam";
-
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useSearchParams: vi.fn(),
-}));
 
 describe("useQueryParam", () => {
   const mockGet = vi.fn();
@@ -19,8 +14,10 @@ describe("useQueryParam", () => {
       const params = { delete: mockDelete };
       (callback as (p: typeof params) => void)(params);
     });
-
-    (useSearchParams as Mock).mockReturnValue([{ get: mockGet }, mockSetParams]);
+    vi.spyOn(ReactRouter, "useSearchParams").mockImplementation(() => [
+      { get: mockGet } as Partial<URLSearchParams> as URLSearchParams,
+      mockSetParams,
+    ]);
   });
 
   test("retrieve parameter", () => {

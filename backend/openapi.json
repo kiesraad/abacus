@@ -4627,59 +4627,58 @@
         },
         "additionalProperties": false
       },
-      "DifferencesCounts": {
+      "DifferenceCountsCompareVotesCastAdmittedVoters": {
         "type": "object",
-        "description": "Differences counts, part of the polling station results.",
+        "description": "Compare votes cast admitted voters, part of the differences counts.",
         "required": [
-          "more_ballots_count",
-          "fewer_ballots_count",
-          "unreturned_ballots_count",
-          "too_few_ballots_handed_out_count",
-          "too_many_ballots_handed_out_count",
-          "other_explanation_count",
-          "no_explanation_count"
+          "admitted_voters_equal_votes_cast",
+          "votes_cast_greater_than_admitted_voters",
+          "votes_cast_smaller_than_admitted_voters"
         ],
         "properties": {
+          "admitted_voters_equal_votes_cast": {
+            "type": "boolean",
+            "description": "Whether total of admitted voters and total of votes cast match.\n(\"D en H zijn gelijk\")"
+          },
+          "votes_cast_greater_than_admitted_voters": {
+            "type": "boolean",
+            "description": "Whether total of admitted voters is greater than total of votes cast match.\n(\"H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)\")"
+          },
+          "votes_cast_smaller_than_admitted_voters": {
+            "type": "boolean",
+            "description": "Whether total of admitted voters is less than total of votes cast match.\n(\"H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)\")"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DifferencesCounts": {
+        "type": "object",
+        "description": "Differences counts, part of the polling station results.\n(B1-3.3 \"Verschillen tussen aantal kiezers en uitgebrachte stemmen\")",
+        "required": [
+          "compare_votes_cast_admitted_voters",
+          "more_ballots_count",
+          "fewer_ballots_count",
+          "difference_completely_accounted_for"
+        ],
+        "properties": {
+          "compare_votes_cast_admitted_voters": {
+            "$ref": "#/components/schemas/DifferenceCountsCompareVotesCastAdmittedVoters",
+            "description": "Whether total of admitted voters and total of votes cast match.\n(B1-3.3.1 \"Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)\")"
+          },
+          "difference_completely_accounted_for": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether the difference between the total of admitted voters and total of votes cast is explained.\n(B1-3.3.2 \"Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?\")"
+          },
           "fewer_ballots_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of fewer counted ballots (\"Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld\")",
+            "description": "Number of fewer counted ballots (\"Aantal minder getelde stemmen (bereken: D min H)\")",
             "minimum": 0
           },
           "more_ballots_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of more counted ballots (\"Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?\")",
-            "minimum": 0
-          },
-          "no_explanation_count": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Number of no explanations (\"Hoe vaak is er geen verklaring voor het verschil?\")",
-            "minimum": 0
-          },
-          "other_explanation_count": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Number of other explanations (\"Hoe vaak is er een andere verklaring voor het verschil?\")",
-            "minimum": 0
-          },
-          "too_few_ballots_handed_out_count": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Number of fewer ballots handed out (\"Hoe vaak is er een stembiljet te weinig uitgereikt?\")",
-            "minimum": 0
-          },
-          "too_many_ballots_handed_out_count": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Number of more ballots handed out (\"Hoe vaak is er een stembiljet te veel uitgereikt?\")",
-            "minimum": 0
-          },
-          "unreturned_ballots_count": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Number of unreturned ballots (\"Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?\")",
+            "description": "Number of more counted ballots (\"Aantal méér getelde stemmen (bereken: H min D)\")",
             "minimum": 0
           }
         },
@@ -6273,38 +6272,47 @@
         },
         "additionalProperties": false
       },
+      "SummaryDifferenceCountsCompareVotesCastAdmittedVoters": {
+        "type": "object",
+        "description": "Contains a summary of the differences, containing which polling stations had differences.",
+        "required": [
+          "admitted_voters_equal_votes_cast",
+          "votes_cast_greater_than_admitted_voters",
+          "votes_cast_smaller_than_admitted_voters"
+        ],
+        "properties": {
+          "admitted_voters_equal_votes_cast": {
+            "type": "boolean"
+          },
+          "votes_cast_greater_than_admitted_voters": {
+            "type": "boolean"
+          },
+          "votes_cast_smaller_than_admitted_voters": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "SummaryDifferencesCounts": {
         "type": "object",
         "description": "Contains a summary of the differences, containing which polling stations had differences.",
         "required": [
           "more_ballots_count",
           "fewer_ballots_count",
-          "unreturned_ballots_count",
-          "too_few_ballots_handed_out_count",
-          "too_many_ballots_handed_out_count",
-          "other_explanation_count",
-          "no_explanation_count"
+          "compare_votes_cast_admitted_voters",
+          "difference_completely_accounted_for"
         ],
         "properties": {
+          "compare_votes_cast_admitted_voters": {
+            "$ref": "#/components/schemas/SummaryDifferenceCountsCompareVotesCastAdmittedVoters"
+          },
+          "difference_completely_accounted_for": {
+            "$ref": "#/components/schemas/YesNo"
+          },
           "fewer_ballots_count": {
             "$ref": "#/components/schemas/SumCount"
           },
           "more_ballots_count": {
-            "$ref": "#/components/schemas/SumCount"
-          },
-          "no_explanation_count": {
-            "$ref": "#/components/schemas/SumCount"
-          },
-          "other_explanation_count": {
-            "$ref": "#/components/schemas/SumCount"
-          },
-          "too_few_ballots_handed_out_count": {
-            "$ref": "#/components/schemas/SumCount"
-          },
-          "too_many_ballots_handed_out_count": {
-            "$ref": "#/components/schemas/SumCount"
-          },
-          "unreturned_ballots_count": {
             "$ref": "#/components/schemas/SumCount"
           }
         },
@@ -6468,6 +6476,10 @@
       "ValidationResultCode": {
         "type": "string",
         "enum": [
+          "F101",
+          "F102",
+          "F111",
+          "F112",
           "F201",
           "F202",
           "F203",

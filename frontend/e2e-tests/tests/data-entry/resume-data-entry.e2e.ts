@@ -266,12 +266,7 @@ test.describe("resume data entry flow", () => {
           },
         },
         validation_results: {
-          errors: [
-            {
-              fields: ["data.votes_counts.total_votes_candidates_count", "data.political_group_votes"],
-              code: "F202",
-            },
-          ],
+          errors: [],
           warnings: [
             {
               fields: ["data.votes_counts.blank_votes_count"],
@@ -441,7 +436,7 @@ test.describe("resume data entry flow", () => {
       await expect(countingDifferencesPollingStationPage.differenceBallotsPerListNo).not.toBeChecked();
       await expect(countingDifferencesPollingStationPage.unexplainedDifferenceBallotsVotersYes).not.toBeChecked();
       await expect(countingDifferencesPollingStationPage.unexplainedDifferenceBallotsVotersNo).not.toBeChecked();
-      await countingDifferencesPollingStationPage.next.click();
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
       // voters and votes page should have empty fields
       const votersAndVotesPage = new VotersAndVotesPage(page);

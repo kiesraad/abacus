@@ -1,10 +1,10 @@
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useUser from "@/hooks/user/useUser";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { useUser } from "@/hooks/user/useUser";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
@@ -14,8 +14,6 @@ import { render, renderReturningRouter, screen, waitFor, within } from "@/testin
 import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
 
 import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
-
-vi.mock("@/hooks/user/useUser");
 
 async function renderPollingStationChoiceForm() {
   const router = renderReturningRouter(
@@ -41,7 +39,7 @@ const testUser: LoginResponse = {
 describe("Test PollingStationChoiceForm", () => {
   beforeEach(() => {
     // mock a current logged in user
-    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
+    vi.spyOn(useUser, "useUser").mockReturnValue(testUser);
     server.use(ElectionStatusRequestHandler);
   });
 

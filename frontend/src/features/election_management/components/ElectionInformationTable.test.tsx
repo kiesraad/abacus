@@ -1,12 +1,14 @@
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
+import { TestUserProvider } from "@/testing/TestUserProvider.tsx";
+import { Role } from "@/types/generated/openapi.ts";
 
 import { ElectionInformationTable } from "./ElectionInformationTable";
 
-describe("ElectionInformationTable", () => {
-  test("renders a table with the election information", async () => {
-    render(
+const renderTable = (userRole: Role) => {
+  render(
+    <TestUserProvider userRole={userRole}>
       <ElectionInformationTable
         election={{
           id: 1,
@@ -38,8 +40,14 @@ describe("ElectionInformationTable", () => {
         }}
         numberOfPollingStations={1}
         numberOfVoters={0}
-      />,
-    );
+      />
+    </TestUserProvider>,
+  );
+};
+
+describe("ElectionInformationTable", () => {
+  test("renders a table with the election information for coordinator", async () => {
+    renderTable("coordinator");
 
     const election_information_table = await screen.findByTestId("election-information-table");
     expect(election_information_table).toBeVisible();
@@ -48,6 +56,22 @@ describe("ElectionInformationTable", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
       ["Aantal kiesgerechtigden", "Nog invullen"],
+      ["Invoer doen voor", "Gemeentelijk stembureau"],
+      ["Stembureaus", "1 stembureau"],
+      ["Type stemopneming", "Decentrale stemopneming"],
+    ]);
+  });
+
+  test("renders a table with the election information for administrator", async () => {
+    renderTable("administrator");
+
+    const election_information_table = await screen.findByTestId("election-information-table");
+    expect(election_information_table).toBeVisible();
+    expect(election_information_table).toHaveTableContent([
+      ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
+      ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+      ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
+      ["Aantal kiesgerechtigden", "Nog in te vullen door een coördinator"],
       ["Invoer doen voor", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],

@@ -9,7 +9,6 @@ import {
   doesValidationResultApplyToSection,
   dottedCode,
   getValidationResultSetForSection,
-  isGlobalValidationResult,
   mapValidationResultSetsToFields,
   ValidationResultSet,
 } from "./ValidationResults";
@@ -19,25 +18,6 @@ describe("ValidationResultSet", () => {
     const validationResults = new ValidationResultSet([validationResultMockData.F201, validationResultMockData.F203]);
     expect(validationResults.includes("F201")).toBe(true);
     expect(validationResults.includes("F202")).toBe(false);
-  });
-
-  test("hasOnlyGlobalValidationResults", () => {
-    const onlyGlobalResults = new ValidationResultSet([validationResultMockData.F202]);
-    expect(onlyGlobalResults.hasOnlyGlobalValidationResults()).toBe(true);
-
-    const onlyLocalResults = new ValidationResultSet([validationResultMockData.W201, validationResultMockData.W202]);
-    expect(onlyLocalResults.hasOnlyGlobalValidationResults()).toBe(false);
-
-    const mixedResults = new ValidationResultSet([validationResultMockData.F202, validationResultMockData.W201]);
-    expect(mixedResults.hasOnlyGlobalValidationResults()).toBe(false);
-  });
-});
-
-describe("isGlobalValidationResult", () => {
-  test("should check if validation result is global", () => {
-    expect(isGlobalValidationResult(validationResultMockData.F202)).toBe(true);
-    expect(isGlobalValidationResult(validationResultMockData.F303)).toBe(false);
-    expect(isGlobalValidationResult(validationResultMockData.F301)).toBe(false);
   });
 });
 
@@ -94,13 +74,12 @@ describe("doesValidationResultApplyToSection", () => {
 
     const votersVotesSection = dataEntryStructure.find((s) => s.id === "voters_votes_counts")!;
     expect(doesValidationResultApplyToSection(validationResultMockData.F201, votersVotesSection)).toBe(true);
-    expect(doesValidationResultApplyToSection(validationResultMockData.F203, votersVotesSection)).toBe(true);
     expect(doesValidationResultApplyToSection(validationResultMockData.F202, votersVotesSection)).toBe(true);
+    expect(doesValidationResultApplyToSection(validationResultMockData.F203, votersVotesSection)).toBe(true);
     expect(doesValidationResultApplyToSection(validationResultMockData.W203, votersVotesSection)).toBe(true);
 
     const politicalGroupSection1 = dataEntryStructure.find((s) => s.id === "political_group_votes_1")!;
     expect(doesValidationResultApplyToSection(validationResultMockData.F401, politicalGroupSection1)).toBe(true);
-    expect(doesValidationResultApplyToSection(validationResultMockData.F202, politicalGroupSection1)).toBe(true);
   });
 
   test("should return false when validation result does not apply to section", () => {
@@ -140,9 +119,9 @@ describe("getValidationResultSetForSection", () => {
 
     const validationResults = [
       validationResultMockData.F201, // voters_counts
+      validationResultMockData.F202, // votes_counts
       validationResultMockData.F203, // votes_counts
       validationResultMockData.W203, // votes_counts and voters_counts
-      validationResultMockData.F202, // votes_counts and political_group_votes
       validationResultMockData.F301, // differences_counts
       validationResultMockData.F401, // political_group_votes
     ];
@@ -178,15 +157,13 @@ describe("getValidationResultSetForSection", () => {
 
     const validationResults = [
       validationResultMockData.F401, // political_group_votes[0]
-      validationResultMockData.F202, // includes political_group_votes[0].total
       validationResultMockData.F301, // differences_counts
     ];
 
     const resultSet = getValidationResultSetForSection(validationResults, politicalGroupSection);
 
-    expect(resultSet.size()).toBe(2);
+    expect(resultSet.size()).toBe(1);
     expect(resultSet.includes("F401")).toBe(true);
-    expect(resultSet.includes("F202")).toBe(true);
     expect(resultSet.includes("F301")).toBe(false);
   });
 });

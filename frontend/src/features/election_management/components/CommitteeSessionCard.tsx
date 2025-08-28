@@ -188,7 +188,7 @@ export function CommitteeSessionCard({
         buttonLinks.push({
           id: committeeSession.id,
           label: t("election_management.results_and_documents"),
-          to: `report/committee-session/${committeeSession.number}/download`,
+          to: `report/committee-session/${committeeSession.id}/download`,
         });
       }
       if (currentSession) {

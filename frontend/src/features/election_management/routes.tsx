@@ -21,7 +21,7 @@ export const electionManagementRoutes: RouteObject[] = [
         Component: FinishDataEntryPage,
       },
       {
-        path: "committee-session/:sessionNumber/download",
+        path: "committee-session/:committeeSessionId/download",
         children: [
           {
             index: true,

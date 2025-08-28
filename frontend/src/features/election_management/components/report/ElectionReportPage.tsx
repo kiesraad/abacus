@@ -27,8 +27,8 @@ export function ElectionReportPage() {
   const navigate = useNavigate();
   const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
 
-  const committeeSessionNumber = useNumericParam("sessionNumber");
-  const committeeSession = committeeSessions.find((session) => session.number === committeeSessionNumber);
+  const committeeSessionId = useNumericParam("committeeSessionId");
+  const committeeSession = committeeSessions.find((session) => session.id === committeeSessionId);
 
   if (!committeeSession) {
     throw new NotFoundError("error.not_found");

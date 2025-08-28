@@ -99,11 +99,13 @@ pub async fn election_details(
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = crate::election::repository::get(&pool, id).await?;
     let polling_stations = crate::polling_station::repository::list(&pool, id).await?;
-    let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(&pool, id).await?;
     let committee_sessions =
         crate::committee_session::repository::get_election_committee_session_list(&pool, id)
             .await?;
+    let current_committee_session = committee_sessions
+        .first()
+        .expect("There is always one committee session")
+        .clone();
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,
         committee_sessions,

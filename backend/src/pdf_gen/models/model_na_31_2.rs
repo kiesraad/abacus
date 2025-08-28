@@ -41,8 +41,7 @@ impl ToPdfFileModel for ModelNa31_2Bijlage1Input {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs::File;
-    use std::io::BufReader;
+    use std::{fs::File, io::BufReader};
 
     #[test]
     fn test_main_json_matches_struct() {

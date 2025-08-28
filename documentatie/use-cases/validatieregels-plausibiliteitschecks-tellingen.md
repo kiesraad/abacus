@@ -226,7 +226,7 @@ Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"
 
 > Invoerder: **Controleer je antwoorden** (F.304)
 
-> Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.304)
+> Coördinator: **Deze vraag moet precies één antwoord hebben** (F.304)
 
 Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"
 
@@ -234,7 +234,7 @@ Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"
 
 > Invoerder: **Controleer je antwoorden** (F.354)
 
-> Coördinator: **Er moet precies 1 antwoord op deze vraag gegeven zijn** (F.354)  
+> Coördinator: **Deze vraag moet precies één antwoord hebben** (F.354)  
 > Is op het proces-verbaal duidelijk aangegeven welk van de opties bedoeld is?
 > - Zo ja: laat dat dan overnemen in Abacus.
 > - Zo nee: maak een corrigendum waarin de juiste optie geselecteerd wordt.

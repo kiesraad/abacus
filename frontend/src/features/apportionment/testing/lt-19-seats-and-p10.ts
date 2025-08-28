@@ -778,12 +778,11 @@ export const election_summary: ElectionSummary = {
       count: 0,
       polling_stations: [],
     },
-    compare_votes_cast_admitted_voters: {
-      admitted_voters_equal_votes_cast: false,
-      votes_cast_greater_than_admitted_voters: false,
-      votes_cast_smaller_than_admitted_voters: false,
-    },
-    difference_completely_accounted_for: { yes: false, no: false },
+  },
+  polling_station_investigations: {
+    admitted_voters_recounted: [],
+    ballots_recounted: [],
+    investigated_other_reason: [],
   },
   political_group_votes: [
     {

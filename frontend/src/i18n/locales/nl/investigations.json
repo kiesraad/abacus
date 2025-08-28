@@ -5,14 +5,15 @@
   "continue_to_findings": "Verder naar bevindingen",
   "download_corrigendum_link": "Download corrigendum voor stembureau {number}",
   "findings": {
+    "corrected_result": "Is er een gecorrigeerde uitslag?",
+    "corrected_result_no": "Het stembureau hoeft niet in Abacus te worden ingevoerd.",
+    "corrected_result_yes": "Vul de nieuwe telresultaten in op het corrigendum proces-verbaal van het stembureau. Laat daarna het corrigendum invoeren in Abacus.",
+    "hint": "Deze verklaring wordt opgenomen in het proces-verbaal van het gemeentelijk stembureau",
+    "indicate_how_result_was_determined": "Geef ook aan wat het gemeentelijk stembureau heeft gedaan om tot deze uitkomst te komen.",
     "investigation_findings_title": "Bevindingen van het onderzoek door het gemeentelijk stembureau",
     "investigation_findings": "Bevindingen onderzoek",
-    "instructions": "<ul><li>Noteer de uitkomst van het onderzoek door het gemeentelijk stembureau.</li><li>Geef ook aan wat het gemeentelijk stembureau heeft gedaan om tot deze uitkomst te komen.</li></ul>",
-    "hint": "Deze verklaring wordt opgenomen in het proces-verbaal van het gemeentelijk stembureau",
-    "title": "Bevindingen",
-    "corrected_result": "Is er een gecorrigeerde uitslag?",
-    "corrected_result_no": "Het stembureau hoeft niet in Abacus te worden ingevuld.",
-    "corrected_result_yes": "Vul de nieuwe telresultaten in op het corrigendum proces-verbaal van het stembureau. Laat daarna het corrigendum invoer in Abacus."
+    "note_investigation_result": "Noteer de uitkomst van het onderzoek door het gemeentelijk stembureau.",
+    "title": "Bevindingen"
   },
   "from_central_polling_station": "Onderzoeksverzoeken vanuit het centraal stembureau",
   "investigations_in_committee_session": "Onderzoeken in {sessionLabel}",

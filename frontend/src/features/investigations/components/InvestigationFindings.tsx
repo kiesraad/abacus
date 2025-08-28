@@ -1,12 +1,12 @@
 import { FormEvent, useState } from "react";
-import { Form, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
-import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
+import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import { StringFormData } from "@/utils/stringFormData";
 
 export function InvestigationFindings() {
@@ -16,6 +16,9 @@ export function InvestigationFindings() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    setNonEmptyError(false);
+    setRadioError(false);
 
     const formData = new StringFormData(event.currentTarget);
     const findings = formData.getString("findings");
@@ -37,9 +40,6 @@ export function InvestigationFindings() {
       return;
     }
 
-    setNonEmptyError(false);
-    setRadioError(false);
-
     // TODO: Handle form submission
     // const correctedResults = correctedResultsChoice === "yes";
     // console.log({ findings, correctedResults });
@@ -47,46 +47,38 @@ export function InvestigationFindings() {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form title={t("investigations.findings.investigation_findings_title")} onSubmit={handleSubmit}>
       <FormLayout>
         <FormLayout.Section>
-          <div>
-            <h2>{t("investigations.findings.investigation_findings_title")}</h2>
-            {tx("investigations.findings.instructions")}
-          </div>
-          <FormLayout.Row>
-            <InputField
-              type="text"
-              fieldSize="text-area"
-              name="findings"
-              label={t("investigations.findings.title")}
-              error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
-              hint={t("investigations.findings.hint")}
-            />
-          </FormLayout.Row>
-          <FormLayout.Row>
-            <ChoiceList>
-              <ChoiceList.Legend>{t("investigations.findings.corrected_result")}</ChoiceList.Legend>
-              {radioError && (
-                <ChoiceList.Error id="corrected_results_error">
-                  {t("investigations.pick_corrected_result")}
-                </ChoiceList.Error>
-              )}
-              <ChoiceList.Radio id="corrected_results_yes" name="corrected_results" value="yes" label={t("yes")}>
-                {t("investigations.findings.corrected_result_yes")}
-              </ChoiceList.Radio>
-              <ChoiceList.Radio id="corrected_results_no" name="corrected_results" value="no" label={t("no")}>
-                {t("investigations.findings.corrected_result_no")}
-              </ChoiceList.Radio>
-            </ChoiceList>
-          </FormLayout.Row>
+          <ul className="mt-0 mb-0">
+            <li>{t("investigations.findings.note_investigation_result")}</li>
+            <li>{t("investigations.findings.indicate_how_result_was_determined")}</li>
+          </ul>
+          <InputField
+            type="text"
+            fieldSize="text-area"
+            name="findings"
+            label={t("investigations.findings.title")}
+            error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
+            hint={t("investigations.findings.hint")}
+          />
+          <ChoiceList>
+            <ChoiceList.Legend>{t("investigations.findings.corrected_result")}</ChoiceList.Legend>
+            {radioError && (
+              <ChoiceList.Error id="corrected_results_error">
+                {t("investigations.pick_corrected_result")}
+              </ChoiceList.Error>
+            )}
+            <ChoiceList.Radio id="corrected_results_yes" name="corrected_results" value="yes" label={t("yes")}>
+              {t("investigations.findings.corrected_result_yes")}
+            </ChoiceList.Radio>
+            <ChoiceList.Radio id="corrected_results_no" name="corrected_results" value="no" label={t("no")}>
+              {t("investigations.findings.corrected_result_no")}
+            </ChoiceList.Radio>
+          </ChoiceList>
         </FormLayout.Section>
         <FormLayout.Controls>
-          <BottomBar>
-            <BottomBar.Row>
-              <Button type="submit">{t("save")}</Button>
-            </BottomBar.Row>
-          </BottomBar>
+          <Button type="submit">{t("save")}</Button>
         </FormLayout.Controls>
       </FormLayout>
     </Form>

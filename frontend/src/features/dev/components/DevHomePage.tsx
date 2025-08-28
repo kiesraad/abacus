@@ -25,11 +25,14 @@ function Links() {
   }
   const electionList = getElections.data.elections;
 
-  if (isAdministrator || isCoordinator) {
-    return <AdministratorCoordinatorLinks electionList={electionList} />;
-  } else if (isTypist) {
-    return <TypistLinks electionList={electionList} />;
-  }
+  return (
+    <>
+      {(__API_MSW__ || isAdministrator || isCoordinator) && (
+        <AdministratorCoordinatorLinks electionList={electionList} />
+      )}
+      {(__API_MSW__ || isTypist) && <TypistLinks electionList={electionList} />}
+    </>
+  );
 }
 
 interface LinksProps {

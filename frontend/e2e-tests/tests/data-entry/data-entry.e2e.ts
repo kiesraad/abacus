@@ -472,7 +472,9 @@ test.describe("full data entry flow", () => {
       total_votes_cast_count: 10,
     };
     await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
-
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
+    await expect(votersAndVotesPage.error).toContainText("F.202");
+    await expect(votersAndVotesPage.error).toContainText("F.203");
     await votersAndVotesPage.checkAcceptErrorsAndWarnings();
     await votersAndVotesPage.next.click();
 
@@ -481,13 +483,16 @@ test.describe("full data entry flow", () => {
     await differencesPage.fewerBallotsCount.fill(`${voters.poll_card_count - votes.total_votes_cast_count}`);
     await differencesPage.differenceCompletelyAccountedForNo.check();
     await differencesPage.next.click();
+    await expect(differencesPage.fieldset).toBeVisible();
+    await expect(differencesPage.warning).toContainText("W.302");
     await differencesPage.checkAcceptErrorsAndWarnings();
     await differencesPage.next.click();
 
     const candidatesListPage_1 = new CandidatesListPage(page, 1, "Partijdige Partij");
     await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 891);
     await candidatesListPage_1.next.click();
-    await expect(candidatesListPage_1.error).toBeVisible();
+    await expect(candidatesListPage_1.fieldset).toBeVisible();
+    await expect(candidatesListPage_1.error).toContainText("F.401");
     await candidatesListPage_1.checkAcceptErrorsAndWarnings();
     await candidatesListPage_1.next.click();
 
@@ -497,16 +502,6 @@ test.describe("full data entry flow", () => {
 
     const candidatesListPage_3 = new CandidatesListPage(page, 3, "Partij voor de Stemmer");
     await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
-    await candidatesListPage_3.next.click();
-
-    await expect(candidatesListPage_2.fieldset).toBeVisible();
-    await expect(candidatesListPage_2.error).toContainText("F.202");
-    await candidatesListPage_2.checkAcceptErrorsAndWarnings();
-    await candidatesListPage_2.next.click();
-
-    await expect(candidatesListPage_3.fieldset).toBeVisible();
-    await expect(candidatesListPage_3.error).toContainText("F.202");
-    await candidatesListPage_3.checkAcceptErrorsAndWarnings();
     await candidatesListPage_3.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
@@ -519,11 +514,7 @@ test.describe("full data entry flow", () => {
     ]);
     await expect(checkAndSavePage.summaryListItemDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
     await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes1).toHaveText([
-      "F.202 Controleer de stemmen op lijsten en totaal stemmen op kandidaten",
       "F.401 Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.",
-    ]);
-    await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes2).toHaveText([
-      "F.202 Controleer de stemmen op lijsten en totaal stemmen op kandidaten",
     ]);
 
     await expect(checkAndSavePage.complete).toBeVisible();
@@ -774,78 +765,6 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.fieldset).toBeVisible();
 
     await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
-  });
-
-  test("correct error F.202", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
-
-    // fill extra investigation section without errors or warnings
-    const extraInvestigationPage = new ExtraInvestigationPage(page);
-    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
-
-    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
-    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
-
-    const votersAndVotesPage = new VotersAndVotesPage(page);
-    const voters = {
-      poll_card_count: 99,
-      proxy_certificate_count: 1,
-      total_admitted_voters_count: 100,
-    };
-    const votes = {
-      political_group_total_votes: [{ number: 1, total: 100 }],
-      total_votes_candidates_count: 100,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 100,
-    };
-    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
-
-    const differencesPage = new DifferencesPage(page);
-    await expect(differencesPage.fieldset).toBeVisible();
-    await differencesPage.next.click();
-
-    const candidatesListPage_1 = new CandidatesListPage(page, 1, "Partijdige Partij");
-    // fill counts of List 1 with data that does not match the total votes on candidates
-    await candidatesListPage_1.fillCandidatesAndTotal([2, 1], 3);
-    await candidatesListPage_1.next.click();
-
-    // fill counts of List 2 with 0 so correcting the error is easier
-    const candidatesListPage_2 = new CandidatesListPage(page, 2, "Lijst van de Kandidaten");
-    await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
-    await candidatesListPage_2.next.click();
-
-    // fill counts of List 3 with 0 so correcting the error is easier
-    const candidatesListPage_3 = new CandidatesListPage(page, 3, "Partij voor de Stemmer");
-    await candidatesListPage_3.fillCandidatesAndTotal([0, 0], 0);
-    await candidatesListPage_3.next.click();
-
-    await expect(votersAndVotesPage.fieldset).toBeVisible();
-    await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
-    await expect(votersAndVotesPage.error).toContainText("F.202");
-    await expect(votersAndVotesPage.error).toContainText(
-      "Controleer de stemmen op lijsten en totaal stemmen op kandidaten",
-    );
-    await expect(votersAndVotesPage.warning).toBeHidden();
-
-    await votersAndVotesPage.progressList.list(1).click();
-    await expect(candidatesListPage_1.fieldset).toBeVisible();
-    // fill counts of List 1 with data that does match the total votes on candidates
-    await candidatesListPage_1.fillCandidatesAndTotal([70, 30], 100);
-    await candidatesListPage_1.next.click();
-
-    await expect(candidatesListPage_2.fieldset).toBeVisible();
-    await candidatesListPage_2.next.click();
-
-    await expect(candidatesListPage_3.fieldset).toBeVisible();
-    await candidatesListPage_3.next.click();
-
-    const checkAndSavePage = new CheckAndSavePage(page);
-    await expect(checkAndSavePage.fieldset).toBeVisible();
-    await checkAndSavePage.save.click();
-
-    const dataEntryHomePage = new DataEntryHomePage(page);
-    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
   });
 
   test("correct warning on voters and votes page", async ({ page, pollingStation }) => {
@@ -1120,7 +1039,7 @@ test.describe("navigation", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        political_group_total_votes: [{ number: 1, total: 100 }],
+        political_group_total_votes: [{ number: 1, total: 90 }],
         total_votes_candidates_count: 90,
         blank_votes_count: 10,
         invalid_votes_count: 0,

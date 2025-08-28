@@ -50,7 +50,7 @@ export function ResolveErrorsIndexPage() {
     return <Loader />;
   }
 
-  const structure = getDataEntryStructure(election, dataEntry.finalised_first_entry);
+  const structure = getDataEntryStructure(election);
 
   return (
     <>

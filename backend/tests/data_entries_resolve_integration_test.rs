@@ -14,7 +14,7 @@ pub mod utils;
 fn data_entry_with_error() -> DataEntry {
     let mut data_entry = shared::example_data_entry(None);
     // Introduce error F.203
-    data_entry.data.votes_counts.invalid_votes_count = 10;
+    data_entry.data.votes_counts.invalid_votes_count = 2;
     data_entry
 }
 

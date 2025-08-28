@@ -37,3 +37,17 @@ impl ToPdfFileModel for ModelNa31_2Bijlage1Input {
         PdfFileModel::new(file_name, PdfModel::ModelNa21_2Bijlage1(Box::new(self)))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::BufReader;
+
+    #[test]
+    fn test_main_json_matches_struct() {
+        let reader = BufReader::new(File::open("templates/inputs/model-na-31-2.json").unwrap());
+        serde_json::from_reader::<_, ModelNa31_2Input>(reader)
+            .expect("model-na-31-2.json should deserialize to struct ModelNa31_2Input");
+    }
+}

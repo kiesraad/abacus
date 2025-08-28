@@ -4,6 +4,7 @@ import { Navigate, useNavigate } from "react-router";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
@@ -32,46 +33,50 @@ export function CountingMethodType() {
 
   return (
     <section className="md">
-      <h2>
-        {t("election.voting_method_type.title")} {state.election.location}
-      </h2>
-      <p className="mt-lg mb-xl">
-        {t("election.voting_method_type.description", {
-          election: state.election.name,
-          location: state.election.location,
-        })}
-      </p>
-      <Form onSubmit={(e) => void handleSubmit(e)}>
-        <ChoiceList>
-          <ChoiceList.Radio
-            id="cso"
-            label={t("election.voting_method_type.cso")}
-            checked={true}
-            onChange={() => {
-              /*
+      <Form
+        title={t("election.voting_method_type.title") + " " + state.election.location}
+        onSubmit={(e) => void handleSubmit(e)}
+      >
+        <FormLayout>
+          <FormLayout.Section>
+            <p>
+              {t("election.voting_method_type.description", {
+                election: state.election.name,
+                location: state.election.location,
+              })}
+            </p>
+
+            <ChoiceList>
+              <ChoiceList.Radio
+                id="cso"
+                label={t("election.voting_method_type.cso")}
+                checked={true}
+                onChange={() => {
+                  /*
               We need this to suppress an error because we explicitly set the `checked` property.
               We'll actually implement this handler once we support DSO
             */
-            }}
-          >
-            {t("election.voting_method_type.cso_description")}
-          </ChoiceList.Radio>
-          <ChoiceList.Radio
-            id="dso"
-            label={
-              <span>
-                {t("election.voting_method_type.dso")} (<b>{t("election.voting_method_type.dso_not_supported")}</b>)
-              </span>
-            }
-            checked={false}
-            disabled
-          >
-            {t("election.voting_method_type.dso_description")}
-          </ChoiceList.Radio>
-        </ChoiceList>
-        <div className="mt-lg">
+                }}
+              >
+                {t("election.voting_method_type.cso_description")}
+              </ChoiceList.Radio>
+              <ChoiceList.Radio
+                id="dso"
+                label={
+                  <span>
+                    {t("election.voting_method_type.dso")} (<b>{t("election.voting_method_type.dso_not_supported")}</b>)
+                  </span>
+                }
+                checked={false}
+                disabled
+              >
+                {t("election.voting_method_type.dso_description")}
+              </ChoiceList.Radio>
+            </ChoiceList>
+          </FormLayout.Section>
+
           <Button type="submit">{t("next")}</Button>
-        </div>
+        </FormLayout>
       </Form>
     </section>
   );

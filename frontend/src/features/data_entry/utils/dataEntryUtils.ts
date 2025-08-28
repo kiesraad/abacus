@@ -1,5 +1,5 @@
-import { PollingStationResults, ValidationResult, ValidationResults } from "@/types/generated/openapi";
-import { DataEntryStructure, FormSectionId } from "@/types/types";
+import { ValidationResult, ValidationResults } from "@/types/generated/openapi";
+import { DataEntryResults, DataEntryStructure, FormSectionId } from "@/types/types";
 import { extractFieldInfoFromSection, getValueAtPath } from "@/utils/dataEntryMapping";
 import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
 
@@ -44,7 +44,7 @@ export function getNextSectionID(formState: FormState, currentSectionId: FormSec
 export function isFormSectionEmpty(
   dataEntryStructure: DataEntryStructure,
   section: FormSection,
-  values: PollingStationResults,
+  results: DataEntryResults,
 ): boolean {
   const dataEntrySection = dataEntryStructure.find((s) => s.id === section.id);
   if (!dataEntrySection) {
@@ -54,7 +54,7 @@ export function isFormSectionEmpty(
 
   const fieldInfoMap = extractFieldInfoFromSection(dataEntrySection);
   for (const [path, fieldType] of fieldInfoMap) {
-    const value = getValueAtPath(values, path);
+    const value = getValueAtPath(results, path);
 
     switch (fieldType) {
       case "boolean":

@@ -1,11 +1,10 @@
-import { PollingStationResults } from "@/types/generated/openapi";
-import { DataEntrySection } from "@/types/types";
+import { DataEntryResults, DataEntrySection } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 
 export function sectionHasDifferences(
   section: DataEntrySection,
-  first: PollingStationResults,
-  second: PollingStationResults,
+  first: DataEntryResults,
+  second: DataEntryResults,
 ): boolean {
   const firstValues = mapResultsToSectionValues(section, first);
   const secondValues = mapResultsToSectionValues(section, second);

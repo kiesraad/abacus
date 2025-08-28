@@ -95,3 +95,5 @@ export interface DataEntrySection {
 }
 
 export type DataEntryStructure = DataEntrySection[];
+
+export type DataEntryResults = object;

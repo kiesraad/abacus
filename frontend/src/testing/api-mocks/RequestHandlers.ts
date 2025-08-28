@@ -12,6 +12,11 @@ import {
   AUDIT_LOG_LIST_USERS_REQUEST_PATH,
   AuditLogListResponse,
   ClaimDataEntryResponse,
+  COMMITTEE_SESSION_CREATE_REQUEST_BODY,
+  COMMITTEE_SESSION_CREATE_REQUEST_PARAMS,
+  COMMITTEE_SESSION_CREATE_REQUEST_PATH,
+  COMMITTEE_SESSION_DELETE_REQUEST_PARAMS,
+  COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
@@ -21,6 +26,7 @@ import {
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
   COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS,
   COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
+  CommitteeSession,
   CommitteeSessionListResponse,
   CREATE_FIRST_ADMIN_REQUEST_BODY,
   CREATE_FIRST_ADMIN_REQUEST_PARAMS,
@@ -105,7 +111,7 @@ import {
   WHOAMI_REQUEST_PATH,
 } from "@/types/generated/openapi";
 
-import { committeeSessionListMockResponse } from "./CommitteeSessionMockData";
+import { committeeSessionListMockResponse, getCommitteeSessionMockData } from "./CommitteeSessionMockData";
 import {
   claimDataEntryResponse,
   dataEntryGetErrorsMockResponse,
@@ -196,6 +202,23 @@ export const CommitteeSessionUpdateHandler = http.put<
   null,
   COMMITTEE_SESSION_UPDATE_REQUEST_PATH
 >("/api/committee_sessions/1", () => new HttpResponse(null, { status: 200 }));
+
+export const CommitteeSessionCreateHandler = http.post<
+  ParamsToString<COMMITTEE_SESSION_CREATE_REQUEST_PARAMS>,
+  COMMITTEE_SESSION_CREATE_REQUEST_BODY,
+  CommitteeSession,
+  COMMITTEE_SESSION_CREATE_REQUEST_PATH
+>("/api/committee_sessions", () => {
+  const response: CommitteeSession = getCommitteeSessionMockData({ id: 2, number: 2, status: "created" });
+  return HttpResponse.json(response, { status: 201 });
+});
+
+export const CommitteeSessionDeleteHandler = http.delete<
+  ParamsToString<COMMITTEE_SESSION_DELETE_REQUEST_PARAMS>,
+  null,
+  null,
+  COMMITTEE_SESSION_DELETE_REQUEST_PATH
+>("/api/committee_sessions/2", () => new HttpResponse(null, { status: 200 }));
 
 // get election list handler
 export const ElectionListRequestHandler = http.get<
@@ -419,12 +442,17 @@ export const handlers: HttpHandler[] = [
   LogRequestHandler,
   LogUsersRequestHandler,
   ElectionCommitteeSessionListRequestHandler,
+  CommitteeSessionStatusChangeRequestHandler,
+  CommitteeSessionChangeNumberOfVotersHandler,
+  CommitteeSessionUpdateHandler,
+  CommitteeSessionCreateHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   ElectionImportRequestHandler,
   ElectionImportValidateRequestHandler,
   LoginHandler,
+  InitialisedHandler,
   PollingStationDataEntryGetDifferencesHandler,
   PollingStationDataEntryGetErrorsHandler,
   PollingStationDataEntryResolveDifferencesHandler,
@@ -439,6 +467,8 @@ export const handlers: HttpHandler[] = [
   PollingStationUpdateHandler,
   PollingStationGetHandler,
   UserCreateRequestHandler,
+  CreateFirstAdminRequestHandler,
+  AdminExistsRequestHandler,
   UserGetRequestHandler,
   UserListRequestHandler,
   UserUpdateRequestHandler,

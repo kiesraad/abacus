@@ -6,7 +6,7 @@ import { PollingStationListEmptyPgObj } from "../page-objects/polling_station/Po
 import { PollingStationListPgObj } from "../page-objects/polling_station/PollingStationListPgObj";
 
 test.use({
-  storageState: "e2e-tests/state/admin.json",
+  storageState: "e2e-tests/state/admin1.json",
 });
 
 test.describe("Polling station CRUD", () => {

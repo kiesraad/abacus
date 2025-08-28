@@ -1,5 +1,4 @@
 .inputGrid {
-  margin-top: 1rem;
   width: 100%;
   border-spacing: 0;
   th {
@@ -34,6 +33,7 @@
         border-right: 1px solid var(--bg-gray-darkest);
         text-align: right;
         color: var(--color-help-text);
+        font-weight: bold;
       }
 
       /* Input */
@@ -93,9 +93,6 @@
         background-color: var(--bg-highlight);
         color: var(--base-black);
       }
-      td:first-of-type {
-        font-weight: bold;
-      }
     }
 
     &:global(.list_total) {
@@ -127,5 +124,4 @@
 
 div:global(#missing-total-error) {
   padding-left: 6.5rem;
-  padding-top: 1.5rem;
 }

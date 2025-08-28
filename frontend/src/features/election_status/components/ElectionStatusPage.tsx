@@ -81,39 +81,42 @@ export function ElectionStatusPage() {
   function getLink() {
     if (committeeSession.status === "data_entry_not_started") {
       return (
-        <button
+        <Button
           key="start"
-          className="link"
+          variant="underlined"
+          size="md"
           onClick={() => {
             handleStatusChange("data_entry_in_progress");
           }}
         >
           {t("election_status.start")}
-        </button>
+        </Button>
       );
     } else if (committeeSession.status === "data_entry_in_progress") {
       return (
-        <button
+        <Button
           key="pause"
-          className="link"
+          variant="underlined"
+          size="md"
           onClick={() => {
             togglePauseModal();
           }}
         >
           {t("election_status.pause")}
-        </button>
+        </Button>
       );
     } else if (committeeSession.status === "data_entry_paused") {
       return (
-        <button
+        <Button
           key="resume"
-          className="link"
+          variant="underlined"
+          size="md"
           onClick={() => {
             handleStatusChange("data_entry_in_progress");
           }}
         >
           {t("election_status.resume")}
-        </button>
+        </Button>
       );
     }
   }

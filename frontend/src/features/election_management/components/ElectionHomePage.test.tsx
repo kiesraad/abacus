@@ -11,23 +11,28 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { getCommitteeSessionListMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
+import {
+  getCommitteeSessionListMockData,
+  getCommitteeSessionMockData,
+} from "@/testing/api-mocks/CommitteeSessionMockData";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
+  CommitteeSessionCreateHandler,
+  CommitteeSessionDeleteHandler,
   ElectionCommitteeSessionListRequestHandler,
   ElectionRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
-import { expectConflictErrorPage, render, screen, setupTestRouter, within } from "@/testing/test-utils";
+import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { CommitteeSessionListResponse, ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
+import { CommitteeSessionListResponse, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
 
 import { ElectionHomePage } from "./ElectionHomePage";
 
-const renderPage = async () => {
+const renderPage = async (userRole: Role) => {
   render(
-    <TestUserProvider userRole="coordinator">
+    <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
           <ElectionHomePage />
@@ -44,22 +49,34 @@ const renderPage = async () => {
 describe("ElectionHomePage", () => {
   beforeEach(() => {
     server.use(ElectionCommitteeSessionListRequestHandler);
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [],
+    });
   });
 
   test("Shows committee session card(s) and election information table", async () => {
     server.use(ElectionRequestHandler);
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [],
-    });
 
-    await renderPage();
+    await renderPage("coordinator");
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByText("Tweede zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer bezig")).toBeInTheDocument();
-    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeInTheDocument();
+
+    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
+      /Vierde zitting — Steminvoer bezig/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
+      /Derde zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
+      /Tweede zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
+
+    expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
     expect(await screen.findByRole("heading", { level: 3, name: "Over deze verkiezing" })).toBeVisible();
     const election_information_table = await screen.findByTestId("election-information-table");
@@ -75,11 +92,184 @@ describe("ElectionHomePage", () => {
     ]);
   });
 
+  test("Shows create new committee session button and clicking it creates a new committee session", async () => {
+    const user = userEvent.setup();
+    server.use(CommitteeSessionCreateHandler);
+    const sessionCreateRequestSpy = spyOnHandler(CommitteeSessionCreateHandler);
+    const electionData = getElectionMockData({}, { status: "data_entry_finished" });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+    const committeeSessionData = getCommitteeSessionMockData({ status: "data_entry_finished" });
+    server.use(
+      http.get("/api/elections/1/committee_sessions", () =>
+        HttpResponse.json({ committee_sessions: [committeeSessionData] } satisfies CommitteeSessionListResponse, {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    const committee_session_cards = await screen.findByTestId("committee-session-cards");
+    expect(committee_session_cards).toBeVisible();
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
+    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+
+    const createButton = screen.getByRole("button", { name: "Nieuwe zitting voorbereiden" });
+    expect(createButton).toBeVisible();
+
+    await user.click(createButton);
+
+    const modal = await screen.findByRole("dialog");
+    expect(modal).toBeVisible();
+    const title = within(modal).getByText("Onderzoek in opdracht van het CSB?");
+    expect(title).toBeVisible();
+
+    const addButton = within(modal).getByRole("button", { name: "Ja, zitting toevoegen" });
+    expect(addButton).toBeVisible();
+    await user.click(addButton);
+
+    expect(sessionCreateRequestSpy).toHaveBeenCalledWith({ election_id: 1 });
+  });
+
+  test("Does not show create new committee session button for administrator", async () => {
+    const electionData = getElectionMockData({}, { status: "data_entry_finished" });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+    const committeeSessionData = getCommitteeSessionMockData({ status: "data_entry_finished" });
+    server.use(
+      http.get("/api/elections/1/committee_sessions", () =>
+        HttpResponse.json({ committee_sessions: [committeeSessionData] } satisfies CommitteeSessionListResponse, {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage("administrator");
+
+    const committee_session_cards = await screen.findByTestId("committee-session-cards");
+    expect(committee_session_cards).toBeVisible();
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
+
+    expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Over deze verkiezing" })).toBeVisible();
+    const election_information_table = await screen.findByTestId("election-information-table");
+    expect(election_information_table).toBeVisible();
+    expect(election_information_table).toHaveTableContent([
+      ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
+      ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+      ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
+      ["Aantal kiesgerechtigden", "2.000"],
+      ["Invoer doen voor", "Gemeentelijk stembureau"],
+      ["Stembureaus", "8 stembureaus"],
+      ["Type stemopneming", "Centrale stemopneming"],
+    ]);
+  });
+
+  test("Shows delete committee session button and clicking it deletes the current committee session", async () => {
+    const user = userEvent.setup();
+    server.use(CommitteeSessionDeleteHandler);
+    const sessionDeleteRequestSpy = spyOnHandler(CommitteeSessionDeleteHandler);
+    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+    server.use(
+      http.get("/api/elections/1/committee_sessions", () =>
+        HttpResponse.json(getCommitteeSessionListMockData({ status: "created" }), {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    const committee_session_cards = await screen.findByTestId("committee-session-cards");
+    expect(committee_session_cards).toBeVisible();
+    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
+      /Vierde zitting — Zitting voorbereiden/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
+      /Derde zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
+      /Tweede zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
+    expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+
+    const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
+    expect(deleteButton).toBeVisible();
+
+    await user.click(deleteButton);
+
+    const modal = await screen.findByRole("dialog");
+    expect(modal).toBeVisible();
+    const title = within(modal).getByText("Zitting verwijderen?");
+    expect(title).toBeVisible();
+
+    const confirmButton = within(modal).getByRole("button", { name: "Verwijder zitting" });
+    expect(confirmButton).toBeVisible();
+    await user.click(confirmButton);
+
+    expect(sessionDeleteRequestSpy).toHaveBeenCalledOnce();
+  });
+
+  test("Does not show delete committee session button for administrator", async () => {
+    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+    server.use(
+      http.get("/api/elections/1/committee_sessions", () =>
+        HttpResponse.json(getCommitteeSessionListMockData({ status: "created" }), {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage("administrator");
+
+    const committee_session_cards = await screen.findByTestId("committee-session-cards");
+    expect(committee_session_cards).toBeVisible();
+    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
+      /Vierde zitting — Zitting voorbereiden/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
+      /Derde zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
+      /Tweede zitting — Steminvoer afgerond/,
+    );
+    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+      /Eerste zitting — Steminvoer afgerond/,
+    );
+
+    expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+  });
+
   test("Shows error page when start data entry call returns an error", async () => {
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const Providers = ({
       children,
       router = getRouter(children),
@@ -126,10 +316,7 @@ describe("ElectionHomePage", () => {
         HttpResponse.json(committeeSessionsData satisfies CommitteeSessionListResponse, { status: 200 }),
       ),
     );
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [],
-    });
-    overrideOnce("put", "/api/committee_sessions/2/status", 409, {
+    overrideOnce("put", "/api/committee_sessions/4/status", 409, {
       error: "Invalid committee session status",
       fatal: true,
       reference: "InvalidCommitteeSessionStatus",
@@ -146,12 +333,10 @@ describe("ElectionHomePage", () => {
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByText("Tweede zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Klaar voor steminvoer")).toBeInTheDocument();
-    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeInTheDocument();
+    const session4 = within(committee_session_cards).getByTestId("session-4");
+    expect(session4).toHaveTextContent(/Vierde zitting — Klaar voor steminvoer/);
 
-    const startButton = screen.getByRole("button", { name: "Start steminvoer" });
+    const startButton = within(session4).getByRole("button", { name: "Start steminvoer" });
     expect(startButton).toBeVisible();
 
     await user.click(startButton);
@@ -168,11 +353,8 @@ describe("ElectionHomePage", () => {
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
       ),
     );
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [],
-    });
 
-    await renderPage();
+    await renderPage("coordinator");
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Geen stembureaus");
@@ -184,10 +366,6 @@ describe("ElectionHomePage", () => {
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByText("Tweede zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer bezig")).toBeInTheDocument();
-    expect(within(committee_session_cards).getByText("Eerste zitting")).toBeVisible();
-    expect(within(committee_session_cards).getByText("— Steminvoer afgerond")).toBeInTheDocument();
 
     expect(await screen.findByRole("heading", { level: 3, name: "Over deze verkiezing" })).toBeVisible();
     const election_information_table = await screen.findByTestId("election-information-table");
@@ -201,5 +379,38 @@ describe("ElectionHomePage", () => {
       ["Stembureaus", "0 stembureaus"],
       ["Type stemopneming", "Centrale stemopneming"],
     ]);
+  });
+
+  test("Shows empty documents section for first committee session", async () => {
+    const electionDataFirstSession = getElectionMockData({}, { number: 1 });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    expect(
+      await screen.findByRole("heading", { level: 3, name: "Lege documenten voor deze verkiezing" }),
+    ).toBeVisible();
+    expect(screen.getByText("Na 31-2 Bijlage 1")).toBeVisible();
+    expect(screen.getByText("N 10-2")).toBeVisible();
+  });
+
+  test("Does not show empty documents section for second committee session", async () => {
+    const electionDataSecondSession = getElectionMockData({}, { number: 2 });
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    expect(
+      screen.queryByRole("heading", { level: 3, name: "Lege documenten voor deze verkiezing" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
   });
 });

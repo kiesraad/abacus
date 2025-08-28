@@ -6,7 +6,6 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ApiProvider } from "@/api/ApiProvider";
-import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -30,9 +29,7 @@ const Providers = ({
   return (
     <ApiProvider fetchInitialUser={fetchInitialUser}>
       <TestUserProvider userRole="administrator">
-        <ElectionListProvider>
-          <RouterProvider router={router} />
-        </ElectionListProvider>
+        <RouterProvider router={router} />
       </TestUserProvider>
     </ApiProvider>
   );
@@ -291,6 +288,7 @@ describe("Election create pages", () => {
     await user.type(inputPart1, "zxcv");
     const inputPart2 = screen.getByLabelText("Controle deel 2");
     await user.type(inputPart2, "123");
+
     await user.click(screen.getByText("Volgende"));
 
     // Expect error to be shown
@@ -403,7 +401,7 @@ describe("Election create pages", () => {
     const button = screen.getByText("Afbreken");
     expect(button).toBeVisible();
     await user.click(button);
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
   });
 
   test("It shows the confirmation modal when attempting to navigate away", async () => {
@@ -432,7 +430,7 @@ describe("Election create pages", () => {
     await user.click(button);
 
     // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
   });
 
   test("It does not show the confirmation modal when attempting to navigate away if nothing was done", async () => {
@@ -482,7 +480,7 @@ describe("Election create pages", () => {
     await user.click(button);
 
     // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
     // Close button should keep us at the import page
     const closeButton = screen.getByText("Annuleren");
@@ -517,7 +515,7 @@ describe("Election create pages", () => {
     await user.click(button);
 
     // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
     // Delete button should move away from the import page
     const deleteButton = screen.getByText("Verkiezing niet opslaan");
@@ -552,7 +550,7 @@ describe("Election create pages", () => {
     await user.click(button);
 
     // The modal should have triggered
-    expect(await screen.findByRole("heading", { level: 2, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
     // Delete button should move away from the import page
     const closeButton = screen.getByTitle("Annuleren");

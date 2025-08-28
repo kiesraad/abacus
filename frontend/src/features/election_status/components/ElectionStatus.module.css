@@ -10,8 +10,7 @@
   padding: 0;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  align-self: stretch;
+  align-items: center;
 
   h2 {
     font-size: 1.5rem;

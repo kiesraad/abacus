@@ -2,6 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
+import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { CommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { IconPlus } from "@/components/generated/icons";
@@ -10,12 +11,12 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
-import { useElectionList } from "@/hooks/election/useElectionList";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t, tx } from "@/i18n/translate";
-import { Election } from "@/types/generated/openapi";
+import { Election, ELECTION_LIST_REQUEST_PATH, ElectionListResponse } from "@/types/generated/openapi";
 
 function AddFirstElection() {
   const { isAdministrator } = useUserRole();
@@ -36,22 +37,40 @@ function AddFirstElection() {
 export function OverviewPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { committeeSessionList, electionList, refetch } = useElectionList();
-  const { isAdministrator, isCoordinator } = useUserRole();
+  const { requestState: getElections, refetch: refetchElections } = useInitialApiGet<ElectionListResponse>(
+    `/api/elections` satisfies ELECTION_LIST_REQUEST_PATH,
+  );
+  const { isTypist, isAdministrator, isCoordinator } = useUserRole();
 
   const isNewAccount = location.hash === "#new-account";
   const isAdminOrCoordinator = isAdministrator || isCoordinator;
 
-  // re-fetch statuses when component mounts
+  // re-fetch elections every 30 seconds
   useEffect(() => {
     const abortController = new AbortController();
 
-    void refetch(abortController);
+    const refetch = () => {
+      void refetchElections(abortController);
+    };
+
+    const refetchInterval = setInterval(refetch, 30_000);
 
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
+      clearInterval(refetchInterval);
     };
-  }, [refetch]);
+  }, [refetchElections]);
+
+  if (getElections.status === "api-error") {
+    throw getElections.error;
+  }
+
+  if (getElections.status === "loading") {
+    return <Loader />;
+  }
+
+  const committeeSessionList = getElections.data.committee_sessions;
+  const electionList = getElections.data.elections;
 
   interface ElectionRowProps {
     election: Election;
@@ -62,7 +81,7 @@ export function OverviewPage() {
       return (
         <>
           <Table.Cell>{election.name}</Table.Cell>
-          <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
+          <Table.Cell>{isTypist ? election.location : ""}</Table.Cell>
           <Table.Cell>{committeeSessionStatus}</Table.Cell>
         </>
       );
@@ -110,7 +129,7 @@ export function OverviewPage() {
       <NavBar />
       <header>
         <section>
-          <h1>{isAdminOrCoordinator ? t("election.manage") : t("election.title.plural")}</h1>
+          <h1>{isAdministrator ? t("election.manage") : t("election.title.plural")}</h1>
         </section>
       </header>
       {isNewAccount && (
@@ -122,28 +141,30 @@ export function OverviewPage() {
       <main>
         <article>
           {!electionList.length ? (
-            isAdminOrCoordinator ? (
+            isAdministrator ? (
               <AddFirstElection />
             ) : (
               <>
                 <h2 className="mb-lg">{t("election.not_ready_for_use")}</h2>
-                <p className="md form-paragraph">{t("election.please_wait_for_coordinator")}</p>
+                <p className="md">
+                  {t("election.configuration_not_finished")} {isTypist && t("election.you_cannot_start_data_entry_yet")}
+                </p>
               </>
             )
           ) : (
             <>
-              <Toolbar>
-                {isAdministrator && (
+              {isAdministrator && (
+                <Toolbar>
                   <Button.Link variant="secondary" size="sm" to={"./create"}>
                     <IconPlus /> {t("election.create")}
                   </Button.Link>
-                )}
-              </Toolbar>
+                </Toolbar>
+              )}
               <Table id="overview">
                 <Table.Header>
                   <Table.HeaderCell>{t("election.title.singular")}</Table.HeaderCell>
                   <Table.HeaderCell>
-                    {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
+                    {isTypist ? t("election.location") : t("election.level_polling_station")}
                   </Table.HeaderCell>
                   <Table.HeaderCell>{t("election_status.label")}</Table.HeaderCell>
                 </Table.Header>

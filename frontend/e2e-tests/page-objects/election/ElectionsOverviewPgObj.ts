@@ -1,7 +1,8 @@
 import { type Locator, type Page } from "@playwright/test";
 
-export class OverviewPgObj {
+export class ElectionsOverviewPgObj {
   readonly main: Locator;
+  readonly adminHeader: Locator;
   readonly header: Locator;
   readonly alert: Locator;
   readonly create: Locator;
@@ -9,7 +10,8 @@ export class OverviewPgObj {
 
   constructor(protected readonly page: Page) {
     this.main = page.getByRole("main");
-    this.header = page.getByRole("heading", { name: "Beheer verkiezingen" });
+    this.adminHeader = page.getByRole("heading", { name: "Verkiezingen beheren" });
+    this.header = page.getByRole("heading", { name: "Verkiezingen" });
     this.alert = page.getByRole("alert").filter({ hasText: "Je account is ingesteld" });
     this.create = page.getByRole("link", { name: "Verkiezing toevoegen" });
     this.elections = page.getByTestId("overview").locator("tbody").getByRole("row");
@@ -17,5 +19,9 @@ export class OverviewPgObj {
 
   findElectionRowById(electionId: number) {
     return this.page.getByTestId(`election-row-${electionId}`);
+  }
+
+  getLastElectionRow() {
+    return this.elections.last();
   }
 }

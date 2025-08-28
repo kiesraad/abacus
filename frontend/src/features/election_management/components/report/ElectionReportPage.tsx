@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-import { AnyApiError, ApiResponseStatus, FatalApiError, isSuccess } from "@/api/ApiResult.ts";
+import { AnyApiError, ApplicationError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -32,12 +32,7 @@ export function ElectionReportPage() {
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
   if (committeeSession.status !== "data_entry_finished") {
-    throw new FatalApiError(
-      ApiResponseStatus.ClientError,
-      409,
-      "Invalid committee session status",
-      "InvalidCommitteeSessionStatus",
-    );
+    throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }
 
   if (changeStatusError) {

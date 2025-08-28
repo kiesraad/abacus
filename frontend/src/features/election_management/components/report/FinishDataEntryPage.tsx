@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, isSuccess } from "@/api/ApiResult.ts";
+import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";

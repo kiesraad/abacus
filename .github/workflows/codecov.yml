@@ -26,7 +26,7 @@ jobs:
       SQLX_OFFLINE: "true"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       # Branch coverage requires Rust nightly: https://github.com/taiki-e/cargo-llvm-cov/issues/8
@@ -41,7 +41,7 @@ jobs:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@79e4beb1e02f733a26129a6bf26c37dab4ab3307 # main
+        uses: cargo-bins/cargo-binstall@0dca8cf8dfb40cb77a29cece06933ce674674523 # main
       - name: Install cargo-llvm-cov
         run: cargo binstall cargo-llvm-cov
       - name: Install Nextest
@@ -60,7 +60,7 @@ jobs:
       - name: Create code coverage report
         run: cargo llvm-cov report --cobertura --output-path ./target/llvm-cov-target/codecov.json
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5
+        uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Backend Nextest Coverage
@@ -76,7 +76,7 @@ jobs:
         working-directory: frontend
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Setup Node
@@ -103,7 +103,7 @@ jobs:
           disable_search: true
           fail_ci_if_error: true
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5
+        uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Frontend Vitest Coverage

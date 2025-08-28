@@ -1,10 +1,11 @@
 import { describe, expect, test } from "vitest";
 
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { PollingStationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 
 import { mapResultsToSectionValues, mapSectionValues } from "./dataEntryMapping";
-import { differencesSection, votersAndVotesSection } from "./dataEntryStructure";
+import { createVotersAndVotesSection, differencesSection } from "./dataEntryStructure";
 
 // Helper function to create a base PollingStationResults object for testing
 const createBasePollingStationResults = (): PollingStationResults => ({
@@ -19,11 +20,12 @@ const createBasePollingStationResults = (): PollingStationResults => ({
   differences_counts: {
     more_ballots_count: 0,
     fewer_ballots_count: 0,
-    unreturned_ballots_count: 0,
-    too_few_ballots_handed_out_count: 0,
-    too_many_ballots_handed_out_count: 0,
-    other_explanation_count: 0,
-    no_explanation_count: 0,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: false,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
+    difference_completely_accounted_for: { yes: false, no: false },
   },
   political_group_votes: [],
   voters_counts: {
@@ -32,7 +34,8 @@ const createBasePollingStationResults = (): PollingStationResults => ({
     total_admitted_voters_count: 0,
   },
   votes_counts: {
-    votes_candidates_count: 0,
+    political_group_total_votes: [],
+    total_votes_candidates_count: 0,
     blank_votes_count: 0,
     invalid_votes_count: 0,
     total_votes_cast_count: 0,
@@ -207,7 +210,7 @@ describe("mapSectionValues", () => {
   test("should handle votes_counts fields", () => {
     const current = createBasePollingStationResults();
     const formValues = {
-      "votes_counts.votes_candidates_count": "200",
+      "votes_counts.total_votes_candidates_count": "200",
       "votes_counts.blank_votes_count": "5",
       "votes_counts.invalid_votes_count": "3",
       "votes_counts.total_votes_cast_count": "208",
@@ -222,7 +225,7 @@ describe("mapSectionValues", () => {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
-            { code: "A", path: "votes_counts.votes_candidates_count", title: "Test Title" },
+            { code: "A", path: "votes_counts.total_votes_candidates_count", title: "Test Title" },
             { code: "B", path: "votes_counts.blank_votes_count", title: "Test Title" },
             { code: "C", path: "votes_counts.invalid_votes_count", title: "Test Title" },
             { code: "D", path: "votes_counts.total_votes_cast_count", title: "Test Title" },
@@ -233,7 +236,7 @@ describe("mapSectionValues", () => {
 
     const result = mapSectionValues(current, formValues, votesCountsSection);
 
-    expect(result.votes_counts.votes_candidates_count).toBe(200);
+    expect(result.votes_counts.total_votes_candidates_count).toBe(200);
     expect(result.votes_counts.blank_votes_count).toBe(5);
     expect(result.votes_counts.invalid_votes_count).toBe(3);
     expect(result.votes_counts.total_votes_cast_count).toBe(208);
@@ -244,11 +247,6 @@ describe("mapSectionValues", () => {
     const formValues = {
       "differences_counts.more_ballots_count": "2",
       "differences_counts.fewer_ballots_count": "1",
-      "differences_counts.unreturned_ballots_count": "0",
-      "differences_counts.too_few_ballots_handed_out_count": "0",
-      "differences_counts.too_many_ballots_handed_out_count": "1",
-      "differences_counts.other_explanation_count": "0",
-      "differences_counts.no_explanation_count": "2",
     };
 
     const differencesCountsSection: DataEntrySection = {
@@ -257,16 +255,54 @@ describe("mapSectionValues", () => {
       short_title: "Differences Counts",
       subsections: [
         {
+          type: "checkboxes",
+          title: "Test title",
+          short_title: "Test title",
+          error_path: "Test title",
+          error_message: "Test title",
+          options: [
+            {
+              path: "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
+              label: "Test Title",
+              short_label: "Test short title",
+            },
+            {
+              path: "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
+              label: "Test Title",
+              short_label: "Test short title",
+            },
+            {
+              path: "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
+              label: "Test Title",
+              short_label: "Test short title",
+            },
+          ],
+        },
+        {
           type: "inputGrid",
           headers: ["field", "counted_number", "description"],
           rows: [
             { code: "A", path: "differences_counts.more_ballots_count", title: "Test Title" },
             { code: "B", path: "differences_counts.fewer_ballots_count", title: "Test Title" },
-            { code: "C", path: "differences_counts.unreturned_ballots_count", title: "Test Title" },
-            { code: "D", path: "differences_counts.too_few_ballots_handed_out_count", title: "Test Title" },
-            { code: "E", path: "differences_counts.too_many_ballots_handed_out_count", title: "Test Title" },
-            { code: "F", path: "differences_counts.other_explanation_count", title: "Test Title" },
-            { code: "G", path: "differences_counts.no_explanation_count", title: "Test Title" },
+          ],
+        },
+        {
+          type: "checkboxes",
+          title: "Test title",
+          short_title: "Test title",
+          error_path: "Test title",
+          error_message: "Test title",
+          options: [
+            {
+              path: "differences_counts.difference_completely_accounted_for.yes",
+              label: "Test Title",
+              short_label: "Test short title",
+            },
+            {
+              path: "differences_counts.difference_completely_accounted_for.no",
+              label: "Test Title",
+              short_label: "Test short title",
+            },
           ],
         },
       ],
@@ -276,11 +312,6 @@ describe("mapSectionValues", () => {
 
     expect(result.differences_counts.more_ballots_count).toBe(2);
     expect(result.differences_counts.fewer_ballots_count).toBe(1);
-    expect(result.differences_counts.unreturned_ballots_count).toBe(0);
-    expect(result.differences_counts.too_few_ballots_handed_out_count).toBe(0);
-    expect(result.differences_counts.too_many_ballots_handed_out_count).toBe(1);
-    expect(result.differences_counts.other_explanation_count).toBe(0);
-    expect(result.differences_counts.no_explanation_count).toBe(2);
   });
 
   test("should handle political_group_votes candidate votes", () => {
@@ -294,7 +325,7 @@ describe("mapSectionValues", () => {
       "political_group_votes[1].total": "50",
     };
 
-    const politicalGroupVotesSection: DataEntrySection = {
+    const politicalGroupCandidateVotesSection: DataEntrySection = {
       id: "political_group_votes_1",
       title: "Political Group Votes Section",
       short_title: "Political Group Votes",
@@ -314,7 +345,7 @@ describe("mapSectionValues", () => {
       ],
     };
 
-    const result = mapSectionValues(current, formValues, politicalGroupVotesSection);
+    const result = mapSectionValues(current, formValues, politicalGroupCandidateVotesSection);
 
     expect(result.political_group_votes).toHaveLength(2);
     expect(result.political_group_votes[0]?.candidate_votes).toHaveLength(2);
@@ -334,7 +365,7 @@ describe("mapSectionValues", () => {
       "political_group_votes[2].total": "12",
     };
 
-    const sparsePoliticalGroupVotesSection: DataEntrySection = {
+    const sparsePoliticalGroupCandidateVotesSection: DataEntrySection = {
       id: "political_group_votes_1",
       title: "Sparse Political Group Votes Section",
       short_title: "Sparse Political Group Votes",
@@ -350,7 +381,7 @@ describe("mapSectionValues", () => {
       ],
     };
 
-    const result = mapSectionValues(current, formValues, sparsePoliticalGroupVotesSection);
+    const result = mapSectionValues(current, formValues, sparsePoliticalGroupCandidateVotesSection);
 
     expect(result.political_group_votes).toHaveLength(3);
     expect(result.political_group_votes[2]?.candidate_votes).toHaveLength(6);
@@ -362,7 +393,7 @@ describe("mapSectionValues", () => {
     const current = createBasePollingStationResults();
     const formValues = {
       "voters_counts.poll_card_count": "1234",
-      "votes_counts.votes_candidates_count": "2567",
+      "votes_counts.total_votes_candidates_count": "2567",
       "political_group_votes[0].candidate_votes[0].votes": "89",
     };
 
@@ -376,7 +407,7 @@ describe("mapSectionValues", () => {
           headers: ["field", "counted_number", "description"],
           rows: [
             { code: "A", path: "voters_counts.poll_card_count", title: "Test Title" },
-            { code: "B", path: "votes_counts.votes_candidates_count", title: "Test Title" },
+            { code: "B", path: "votes_counts.total_votes_candidates_count", title: "Test Title" },
             { code: "C", path: "political_group_votes[0].candidate_votes[0].votes", title: "Test Title" },
           ],
         },
@@ -386,7 +417,7 @@ describe("mapSectionValues", () => {
     const result = mapSectionValues(current, formValues, numbersSection);
 
     expect(result.voters_counts.poll_card_count).toBe(1234);
-    expect(result.votes_counts.votes_candidates_count).toBe(2567);
+    expect(result.votes_counts.total_votes_candidates_count).toBe(2567);
     expect(result.political_group_votes[0]?.candidate_votes[0]?.votes).toBe(89);
   });
 
@@ -513,13 +544,17 @@ describe("mapResultsToSectionValues", () => {
       total_admitted_voters_count: 235,
     };
     results.votes_counts = {
-      votes_candidates_count: 200,
+      political_group_total_votes: [
+        { number: 1, total: 50 },
+        { number: 2, total: 150 },
+      ],
+      total_votes_candidates_count: 200,
       blank_votes_count: 5,
       invalid_votes_count: 3,
       total_votes_cast_count: 208,
     };
 
-    const formValues = mapResultsToSectionValues(votersAndVotesSection, results);
+    const formValues = mapResultsToSectionValues(createVotersAndVotesSection(electionMockData), results);
 
     // Check voters_counts fields
     expect(formValues["voters_counts.poll_card_count"]).toBe("123");
@@ -527,7 +562,9 @@ describe("mapResultsToSectionValues", () => {
     expect(formValues["voters_counts.total_admitted_voters_count"]).toBe("235");
 
     // Check votes_counts fields
-    expect(formValues["votes_counts.votes_candidates_count"]).toBe("200");
+    expect(formValues["votes_counts.political_group_total_votes[0].total"]).toBe("50");
+    expect(formValues["votes_counts.political_group_total_votes[1].total"]).toBe("150");
+    expect(formValues["votes_counts.total_votes_candidates_count"]).toBe("200");
     expect(formValues["votes_counts.blank_votes_count"]).toBe("5");
     expect(formValues["votes_counts.invalid_votes_count"]).toBe("3");
     expect(formValues["votes_counts.total_votes_cast_count"]).toBe("208");
@@ -538,22 +575,31 @@ describe("mapResultsToSectionValues", () => {
     results.differences_counts = {
       more_ballots_count: 2,
       fewer_ballots_count: 1,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 1,
-      other_explanation_count: 0,
-      no_explanation_count: 2,
+      compare_votes_cast_admitted_voters: {
+        admitted_voters_equal_votes_cast: false,
+        votes_cast_greater_than_admitted_voters: false,
+        votes_cast_smaller_than_admitted_voters: false,
+      },
+      difference_completely_accounted_for: {
+        no: false,
+        yes: false,
+      },
     };
 
     const formValues = mapResultsToSectionValues(differencesSection, results);
-
     expect(formValues["differences_counts.more_ballots_count"]).toBe("2");
     expect(formValues["differences_counts.fewer_ballots_count"]).toBe("1");
-    expect(formValues["differences_counts.unreturned_ballots_count"]).toBe("");
-    expect(formValues["differences_counts.too_few_ballots_handed_out_count"]).toBe("");
-    expect(formValues["differences_counts.too_many_ballots_handed_out_count"]).toBe("1");
-    expect(formValues["differences_counts.other_explanation_count"]).toBe("");
-    expect(formValues["differences_counts.no_explanation_count"]).toBe("2");
+    expect(formValues["differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"]).toBe(
+      "false",
+    );
+    expect(
+      formValues["differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters"],
+    ).toBe("false");
+    expect(
+      formValues["differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters"],
+    ).toBe("false");
+    expect(formValues["differences_counts.difference_completely_accounted_for.no"]).toBe("false");
+    expect(formValues["differences_counts.difference_completely_accounted_for.yes"]).toBe("false");
   });
 
   test("should extract political group section fields", () => {
@@ -663,7 +709,7 @@ describe("mapResultsToSectionValues", () => {
   test("should handle zero values", () => {
     const results = createBasePollingStationResults();
 
-    const formValues = mapResultsToSectionValues(votersAndVotesSection, results);
+    const formValues = mapResultsToSectionValues(createVotersAndVotesSection(electionMockData), results);
 
     expect(formValues["voters_counts.poll_card_count"]).toBe("");
     expect(formValues["votes_counts.blank_votes_count"]).toBe("");

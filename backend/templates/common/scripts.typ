@@ -61,14 +61,6 @@
   )
 }
 
-/// Add dashes to a text every `every` characters
-#let add-dashes(text, every: 4) = {
-  if text == none {
-    return
-  }
-
-  text.clusters().chunks(every).map(c => c.join("")).join("-")
-}
 
 /// Format a number with thousands separator
 #let fmt-number(

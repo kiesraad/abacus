@@ -12,8 +12,8 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
-    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-    status::change_committee_session_status,
+    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
+    status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
     APIError, AppState, ErrorResponse,
@@ -39,6 +39,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(election_committee_session_list))
         .routes(routes!(committee_session_create))
+        .routes(routes!(committee_session_delete))
         .routes(routes!(committee_session_update))
         .routes(routes!(committee_session_number_of_voters_change))
         .routes(routes!(committee_session_status_change))
@@ -91,12 +92,13 @@ pub async fn election_committee_session_list(
 #[utoipa::path(
     post,
     path = "/api/committee_sessions",
-    request_body = CommitteeSessionCreateRequest,
+    request_body = NewCommitteeSessionRequest,
     responses(
         (status = 201, description = "Committee session created", body = CommitteeSession),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -104,19 +106,83 @@ pub async fn committee_session_create(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Json(committee_session_request): Json<CommitteeSessionCreateRequest>,
+    Json(request): Json<NewCommitteeSessionRequest>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
-    let committee_session =
-        crate::committee_session::repository::create(&pool, committee_session_request).await?;
-
-    audit_service
-        .log(
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
-            None,
-        )
+    let committee_session = crate::committee_session::repository::get_election_committee_session(
+        &pool,
+        request.election_id,
+    )
+    .await?;
+    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        let committee_session = crate::committee_session::repository::create(&pool, {
+            CommitteeSessionCreateRequest {
+                election_id: request.election_id,
+                number: committee_session.number + 1,
+                number_of_voters: committee_session.number_of_voters,
+            }
+        })
         .await?;
 
-    Ok((StatusCode::CREATED, committee_session))
+        audit_service
+            .log(
+                &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+                None,
+            )
+            .await?;
+
+        Ok((StatusCode::CREATED, committee_session))
+    } else {
+        Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ))
+    }
+}
+
+/// Delete a [CommitteeSession].
+#[utoipa::path(
+    delete,
+    path = "/api/committee_sessions/{committee_session_id}",
+    responses(
+        (status = 200, description = "Committee session deleted successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("committee_session_id" = u32, description = "Committee session database id"),
+    ),
+)]
+pub async fn committee_session_delete(
+    _user: Coordinator,
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Path(committee_session_id): Path<u32>,
+) -> Result<StatusCode, APIError> {
+    // Check if the committee session exists, will respond with NOT_FOUND otherwise
+    let committee_session =
+        crate::committee_session::repository::get(&pool, committee_session_id).await?;
+
+    if committee_session.number > 1
+        && (committee_session.status == CommitteeSessionStatus::Created
+            || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
+    {
+        crate::committee_session::repository::delete(&pool, committee_session_id).await?;
+
+        audit_service
+            .log(
+                &AuditEvent::CommitteeSessionDeleted(committee_session.clone().into()),
+                None,
+            )
+            .await?;
+
+        Ok(StatusCode::OK)
+    } else {
+        Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ))
+    }
 }
 
 /// Update a [CommitteeSession].

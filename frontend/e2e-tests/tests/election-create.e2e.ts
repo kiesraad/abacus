@@ -10,25 +10,24 @@ import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/c
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
 import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
+import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
-import { OverviewPgObj } from "e2e-tests/page-objects/election/OverviewPgObj";
+import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
-
-import { Election } from "@/types/generated/openapi";
 
 import { test } from "../fixtures";
 import { eml110a, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
 
 test.use({
-  storageState: "e2e-tests/state/admin.json",
+  storageState: "e2e-tests/state/admin1.json",
 });
 
 test.describe("Election creation", () => {
   test("it uploads an election file, candidate list and polling stations", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -40,22 +39,44 @@ test.describe("Election creation", () => {
     // upload polling stations
     await uploadPollingStations(page);
 
-    // Now we should be at the counting method page
+    // Counting method page
     const countingMethodPage = new CountingMethodTypePgObj(page);
     await expect(countingMethodPage.header).toBeVisible();
     await countingMethodPage.next.click();
 
+    // Number of voters page
+    const numberOfVotersPage = new NumberOfVotersPgObj(page);
+    await expect(numberOfVotersPage.header).toBeVisible();
+    await expect(numberOfVotersPage.hint).toBeVisible();
+    await numberOfVotersPage.next.click();
+
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
+    await expect(checkAndSavePage.numberOfVoters).toContainText("612.694");
 
-    const responsePromise = page.waitForResponse(`/api/elections/import`);
-    await checkAndSavePage.save.click();
-    await expect(overviewPage.header).toBeVisible();
+    // Now go back and fill the number of voters with a custom value
+    await page.goBack();
+    await expect(numberOfVotersPage.header).toBeVisible();
+    await expect(numberOfVotersPage.hint).toBeVisible();
+    await numberOfVotersPage.input.fill("1234");
+    await numberOfVotersPage.next.click();
 
-    const response = await responsePromise;
-    expect(response.status()).toBe(201);
-    const election = (await response.json()) as Election;
+    // Check that the value is updated
+    await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.numberOfVoters).toContainText("1.234");
+
+    // Go back another time to check that the hint is gone (since now it's not an imported value anymore)
+    // It should also still show the updated value
+    await page.goBack();
+    await expect(numberOfVotersPage.input).toHaveValue("1234");
+    await expect(numberOfVotersPage.hint).toBeHidden();
+    await numberOfVotersPage.next.click();
+
+    // Back to the check and save page to test saving the election
+    const election = await checkAndSavePage.saveElection();
+    await expect(overviewPage.adminHeader).toBeVisible();
 
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();
@@ -65,7 +86,7 @@ test.describe("Election creation", () => {
 
   test("it uploads an election file, candidate list but skips polling stations", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -79,22 +100,28 @@ test.describe("Election creation", () => {
     await expect(uploadPollingStationsPage.header).toBeVisible();
     await uploadPollingStationsPage.skipButton.click();
 
-    // Now we should be at the check and save page
+    // Counting method page
     const countingMethodPage = new CountingMethodTypePgObj(page);
     await expect(countingMethodPage.header).toBeVisible();
     await countingMethodPage.next.click();
+
+    // Number of voters page
+    const numberOfVotersPage = new NumberOfVotersPgObj(page);
+    await expect(numberOfVotersPage.header).toBeVisible();
+    await expect(numberOfVotersPage.hint).toBeHidden();
+    await numberOfVotersPage.next.click();
+
+    // Expect error, input a value and try clicking Next again
+    await expect(numberOfVotersPage.error).toBeVisible();
+    await numberOfVotersPage.input.fill("1234");
+    await numberOfVotersPage.next.click();
 
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
 
-    const responsePromise = page.waitForResponse(`/api/elections/import`);
-    await checkAndSavePage.save.click();
-    await expect(overviewPage.header).toBeVisible();
-
-    const response = await responsePromise;
-    expect(response.status()).toBe(201);
-    const election = (await response.json()) as Election;
+    const election = await checkAndSavePage.saveElection();
+    await expect(overviewPage.adminHeader).toBeVisible();
 
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();
@@ -104,7 +131,7 @@ test.describe("Election creation", () => {
 
   test("it fails on incorrect hash", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // Upload election
@@ -121,7 +148,7 @@ test.describe("Election creation", () => {
 
   test("it fails on valid, but incorrect file", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // Incorrect file
@@ -133,7 +160,7 @@ test.describe("Election creation", () => {
 
   test("it fails on incorrect hash for candidate list", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -153,7 +180,7 @@ test.describe("Election creation", () => {
 
   test("it fails on valid, but incorrect file for candidate list", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -168,7 +195,7 @@ test.describe("Election creation", () => {
 
   test("warning modal close button should stay on page", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
@@ -193,7 +220,7 @@ test.describe("Election creation", () => {
 
   test("warning modal cancel button should stay on page", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
@@ -218,7 +245,7 @@ test.describe("Election creation", () => {
 
   test("warning modal delete button should continue navigation", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
@@ -238,12 +265,12 @@ test.describe("Election creation", () => {
 
     // Click delete, assert we are back at the overview
     await abortModal.deleteButton.click();
-    await expect(overviewPage.header).toBeVisible();
+    await expect(overviewPage.adminHeader).toBeVisible();
   });
 
   test("uploading a candidate list, then navigating should trigger the modal", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -265,7 +292,7 @@ test.describe("Election creation", () => {
 
   test("after election upload, moving back to election page resets election", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -284,7 +311,7 @@ test.describe("Election creation", () => {
 
   test("after candidate upload, moving back to candidate page resets candidates", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -325,7 +352,7 @@ test.describe("Election creation", () => {
   // use browser back button should redirect back to election
   test("after resetting an election upload, the back button should redirect to the beginning", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -353,7 +380,7 @@ test.describe("Election creation", () => {
     page,
   }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -370,13 +397,18 @@ test.describe("Election creation", () => {
     await expect(countingMethodPage.header).toBeVisible();
     await countingMethodPage.next.click();
 
+    // Number of voters page
+    const numberOfVotersPage = new NumberOfVotersPgObj(page);
+    await expect(numberOfVotersPage.header).toBeVisible();
+    await numberOfVotersPage.next.click();
+
     // Now we should be at the check and save page
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
     await checkAndSavePage.save.click();
 
     // Redefine the Overview page, so we can locate the newly
-    await expect(overviewPage.header).toBeVisible();
+    await expect(overviewPage.adminHeader).toBeVisible();
 
     // Back button
     await page.goBack();
@@ -388,7 +420,7 @@ test.describe("Election creation", () => {
 
   test("it fails on valid, but incorrect polling station file", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -407,7 +439,7 @@ test.describe("Election creation", () => {
 
   test("show more button should show full list of polling stations", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash
@@ -436,7 +468,7 @@ test.describe("Election creation", () => {
 
   test("no show more button should be visible is <10 polling stations", async ({ page }) => {
     await page.goto("/elections");
-    const overviewPage = new OverviewPgObj(page);
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     // upload election and check hash

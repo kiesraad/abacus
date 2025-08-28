@@ -65,19 +65,9 @@ function Body({ children, className }: { children: React.ReactNode; className?: 
   return <tbody className={className}>{children}</tbody>;
 }
 
-function Row({
-  id,
-  children,
-  increasedPadding,
-  className,
-}: {
-  id?: string;
-  children: React.ReactNode;
-  increasedPadding?: boolean;
-  className?: string;
-}) {
+function Row({ id, children, className }: { id?: string; children: React.ReactNode; className?: string }) {
   return (
-    <tr id={id} className={cn(increasedPadding && cls.increasedPadding, className)}>
+    <tr id={id} className={className}>
       {children}
     </tr>
   );

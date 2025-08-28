@@ -65,13 +65,13 @@ type Fixtures = {
 
 export const test = base.extend<Fixtures>({
   coordinator: async ({ browser }, use) => {
-    const context = await browser.newContext({ storageState: "e2e-tests/state/coordinator.json" });
+    const context = await browser.newContext({ storageState: "e2e-tests/state/coordinator1.json" });
     const page = await context.newPage();
     await use({ page: page, request: context.request });
     await context.close();
   },
   typistOne: async ({ browser }, use) => {
-    const context = await browser.newContext({ storageState: "e2e-tests/state/typist.json" });
+    const context = await browser.newContext({ storageState: "e2e-tests/state/typist1.json" });
     const page = await context.newPage();
     await use({ page: page, request: context.request });
     await context.close();
@@ -101,6 +101,8 @@ export const test = base.extend<Fixtures>({
         election_hash: eml110a.fullHash,
         candidate_data,
         candidate_hash: eml230b.fullHash,
+        number_of_voters: 1234,
+        counting_method: "CSO",
       },
     });
     expect(electionResponse.ok()).toBeTruthy();

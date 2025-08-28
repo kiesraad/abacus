@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { action } from "storybook/actions";
+import { expect, fn, userEvent, within } from "storybook/test";
 
 import { Alert } from "./Alert";
 
@@ -38,11 +39,20 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const DefaultAlert = {
+export const DefaultAlert: Story = {
   args: {},
-} satisfies Story;
 
-export const ClosableAlert = {
+  play: async ({ canvas }) => {
+    const alert = canvas.getByRole("alert");
+    await expect(within(alert).getByRole("img")).toBeVisible();
+    await expect(within(alert).getByRole("heading", { level: 2, name: "Nog niet ingesteld" })).toBeVisible();
+    await expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+      "Deze computer is nog niet ingesteld voor gebruik. Log in als beheerder of verkiezingsleider en stel in hoe deze computer gebruikt gaat worden.",
+    );
+  },
+};
+
+export const ClosableAlert: Story = {
   args: {
     type: "error",
     children: (
@@ -51,9 +61,22 @@ export const ClosableAlert = {
         <p>This is an error message with a close button.</p>
       </>
     ),
-    onClose: action("on-close"),
+    onClose: fn(),
   },
-} satisfies Story;
+
+  play: async ({ args, canvas }) => {
+    const alert = canvas.getByRole("alert");
+    await expect(within(alert).getByRole("heading", { level: 2, name: "Error Title" })).toBeVisible();
+    await expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+      "This is an error message with a close button.",
+    );
+
+    const closeButton = within(alert).getByTitle("Melding sluiten");
+    await expect(closeButton).toBeVisible();
+    await userEvent.click(closeButton);
+    await expect(args.onClose).toHaveBeenCalled();
+  },
+};
 
 export const SmallAlert = {
   args: {
@@ -63,13 +86,19 @@ export const SmallAlert = {
   },
 } satisfies Story;
 
-export const NoIconAlert = {
+export const NoIconAlert: Story = {
   args: {
     type: "success",
     variant: "no-icon",
     children: <p>This is a success alert without an icon.</p>,
   },
-} satisfies Story;
+
+  play: async ({ canvas }) => {
+    const alert = canvas.getByRole("alert");
+    await expect(within(alert).queryByRole("img")).not.toBeInTheDocument();
+    await expect(within(alert).getByRole("paragraph")).toHaveTextContent("This is a success alert without an icon.");
+  },
+};
 
 export const InlineAlert = {
   args: {

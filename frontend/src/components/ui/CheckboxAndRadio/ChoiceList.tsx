@@ -15,7 +15,11 @@ interface ChoiceListOptionProps extends CheckboxAndRadioProps {
   reference?: RefObject<HTMLInputElement>;
 }
 
-ChoiceList.Title = ({ children }: { children: ReactNode }) => <legend>{children}</legend>;
+ChoiceList.Legend = ({ children }: { children: ReactNode }) => (
+  <legend>
+    <span>{children}</span>
+  </legend>
+);
 
 ChoiceList.Error = ({ id, children }: { id: string; children: ReactNode }) => (
   <p id={id} className={cls.error}>
@@ -29,6 +33,7 @@ ChoiceList.Checkbox = ({
   label,
   children,
   disabled,
+  autoFocus,
   defaultChecked,
   hasError,
   reference,
@@ -40,6 +45,7 @@ ChoiceList.Checkbox = ({
     name={name}
     label={label}
     disabled={disabled}
+    autoFocus={autoFocus}
     defaultChecked={defaultChecked}
     hasError={hasError}
     ref={reference}

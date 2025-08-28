@@ -9,7 +9,7 @@ import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 import { test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/typist.json",
+  storageState: "e2e-tests/state/typist1.json",
 });
 
 test.describe("data entry - api error responses", () => {

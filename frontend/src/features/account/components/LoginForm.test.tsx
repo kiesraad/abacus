@@ -1,5 +1,7 @@
+import * as ReactRouter from "react-router";
+
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { InitialisedHandler, LoginHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
@@ -10,12 +12,11 @@ import { LoginForm } from "./LoginForm";
 
 const navigate = vi.fn();
 
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 describe("LoginForm", () => {
+  beforeEach(() => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+  });
+
   const loginUrl: LOGIN_REQUEST_PATH = "/api/user/login";
 
   test("Successful login", async () => {
@@ -78,7 +79,7 @@ describe("LoginForm", () => {
     await user.type(await screen.findByLabelText("Wachtwoord"), "Wachtwoord");
     await user.click(await screen.findByRole("button", { name: "Inloggen" }));
 
-    expect(navigate).toHaveBeenCalledWith("../setup");
+    expect(navigate).toHaveBeenCalledWith("/account/setup");
   });
 
   test("Navigate to account setup when fullname has to be entered", async () => {
@@ -97,7 +98,7 @@ describe("LoginForm", () => {
     await user.type(await screen.findByLabelText("Wachtwoord"), "Wachtwoord");
     await user.click(await screen.findByRole("button", { name: "Inloggen" }));
 
-    expect(navigate).toHaveBeenCalledWith("../setup");
+    expect(navigate).toHaveBeenCalledWith("/account/setup");
   });
 
   test("Navigate to data entry when no account setup needed", async () => {

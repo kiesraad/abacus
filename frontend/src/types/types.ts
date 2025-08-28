@@ -1,3 +1,5 @@
+import { ReactElement } from "react";
+
 export type FormSectionId = string;
 export type PollingStationResultsPath = string;
 
@@ -48,7 +50,7 @@ export interface CheckboxesSubsectionOption {
 export interface CheckboxesSubsection {
   type: "checkboxes";
   /** Title to display above the checkboxes */
-  title?: string;
+  title?: string | ReactElement;
   /** Description to display above the checkboxes */
   description?: string;
   /** Short title for differences view */
@@ -93,3 +95,5 @@ export interface DataEntrySection {
 }
 
 export type DataEntryStructure = DataEntrySection[];
+
+export type DataEntryResults = object;

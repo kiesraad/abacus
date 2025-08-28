@@ -1,14 +1,14 @@
+import * as ReactRouter from "react-router";
 import { ReactNode } from "react";
-import { RouterProvider } from "react-router";
 
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ApiProvider } from "@/api/ApiProvider.tsx";
-import { ErrorBoundary } from "@/components/error/ErrorBoundary.tsx";
-import { electionManagementRoutes } from "@/features/election_management/routes.tsx";
+import { ApiProvider } from "@/api/ApiProvider";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
@@ -17,7 +17,7 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { getRouter, Router } from "@/testing/router.tsx";
+import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import {
   expectConflictErrorPage,
@@ -27,17 +27,12 @@ import {
   spyOnHandler,
   waitFor,
 } from "@/testing/test-utils";
-import { TestUserProvider } from "@/testing/TestUserProvider.tsx";
-import { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi.ts";
+import { TestUserProvider } from "@/testing/TestUserProvider";
+import { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { FinishDataEntryPage } from "./FinishDataEntryPage";
 
 const navigate = vi.fn();
-
-vi.mock("react-router", async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
 
 const renderPage = async () => {
   const router = renderReturningRouter(
@@ -54,6 +49,7 @@ const renderPage = async () => {
 describe("FinishDataEntryPage", () => {
   beforeEach(() => {
     server.use(CommitteeSessionStatusChangeRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
   test("Shows page and click on finish data entry phase", async () => {
@@ -80,10 +76,8 @@ describe("FinishDataEntryPage", () => {
   });
 
   test("Shows error page when finish data entry call returns an error", async () => {
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const Providers = ({
       children,
       router = getRouter(children),
@@ -98,7 +92,7 @@ describe("FinishDataEntryPage", () => {
           <TestUserProvider userRole="coordinator">
             <ElectionProvider electionId={1}>
               <ElectionStatusProvider electionId={1}>
-                <RouterProvider router={router} />
+                <ReactRouter.RouterProvider router={router} />
               </ElectionStatusProvider>
             </ElectionProvider>
           </TestUserProvider>

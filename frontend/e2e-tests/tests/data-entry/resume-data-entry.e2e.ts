@@ -15,13 +15,13 @@ import {
 } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 
-import { PollingStation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
+import { ClaimDataEntryResponse, PollingStation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
 import { emptyDataEntryResponse } from "../../test-data/request-response-templates";
 
 test.use({
-  storageState: "e2e-tests/state/typist.json",
+  storageState: "e2e-tests/state/typist1.json",
 });
 
 test.describe("resume data entry flow", () => {
@@ -42,7 +42,8 @@ test.describe("resume data entry flow", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_count: 100,
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -100,7 +101,8 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.proxyCertificateCount).toHaveValue("1");
       await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveValue("100");
 
-      await expect(votersAndVotesPage.votesCandidatesCount).toHaveValue("100");
+      await expect(votersAndVotesPage.politicalGroupTotalVotes.nth(0)).toHaveValue("100");
+      await expect(votersAndVotesPage.totalVotesCandidatesCount).toHaveValue("100");
       await expect(votersAndVotesPage.blankVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.invalidVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.totalVotesCastCount).toHaveValue("100");
@@ -145,9 +147,8 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       await votersAndVotesPage.proxyCertificateCount.fill("1000");
       await votersAndVotesPage.next.click();
-      await expect(votersAndVotesPage.error).toContainText(
-        "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
-      );
+      await expect(votersAndVotesPage.error).toContainText("F.201");
+      await expect(votersAndVotesPage.error).toContainText("Controleer toegelaten kiezers");
 
       await votersAndVotesPage.abortInput.click();
 
@@ -215,15 +216,19 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 50,
+        political_group_total_votes: [
+          { number: 1, total: 50 },
+          { number: 2, total: 0 },
+          { number: 3, total: 0 },
+        ],
+        total_votes_candidates_count: 50,
         blank_votes_count: 50, // exceeds threshold
         invalid_votes_count: 0,
         total_votes_cast_count: 100,
       };
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
-      await expect(votersAndVotesPage.warning).toContainText(
-        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      );
+      await expect(votersAndVotesPage.warning).toContainText("W.201");
+      await expect(votersAndVotesPage.warning).toContainText("Controleer aantal blanco stemmen");
 
       await votersAndVotesPage.abortInput.click();
 
@@ -240,7 +245,7 @@ test.describe("resume data entry flow", () => {
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
-          ...emptyDataEntryResponse.data,
+          ...emptyDataEntryResponse.data!,
           extra_investigation: noExtraInvestigation,
           counting_differences_polling_station: noDifferences,
           voters_counts: {
@@ -249,19 +254,19 @@ test.describe("resume data entry flow", () => {
             total_admitted_voters_count: 100,
           },
           votes_counts: {
-            votes_candidates_count: 50,
+            political_group_total_votes: [
+              { number: 1, total: 50 },
+              { number: 2, total: 0 },
+              { number: 3, total: 0 },
+            ],
+            total_votes_candidates_count: 50,
             blank_votes_count: 50,
             invalid_votes_count: 0,
             total_votes_cast_count: 100,
           },
         },
         validation_results: {
-          errors: [
-            {
-              fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
-              code: "F204",
-            },
-          ],
+          errors: [],
           warnings: [
             {
               fields: ["data.votes_counts.blank_votes_count"],
@@ -269,7 +274,7 @@ test.describe("resume data entry flow", () => {
             },
           ],
         },
-      });
+      } satisfies Partial<ClaimDataEntryResponse>);
 
       await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -354,7 +359,12 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 3607,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 3572,
+        political_group_total_votes: [
+          { number: 1, total: 3536 },
+          { number: 2, total: 36 },
+          { number: 3, total: 0 },
+        ],
+        total_votes_candidates_count: 3572,
         blank_votes_count: 20,
         invalid_votes_count: 15,
         total_votes_cast_count: 3607,
@@ -426,7 +436,7 @@ test.describe("resume data entry flow", () => {
       await expect(countingDifferencesPollingStationPage.differenceBallotsPerListNo).not.toBeChecked();
       await expect(countingDifferencesPollingStationPage.unexplainedDifferenceBallotsVotersYes).not.toBeChecked();
       await expect(countingDifferencesPollingStationPage.unexplainedDifferenceBallotsVotersNo).not.toBeChecked();
-      await countingDifferencesPollingStationPage.next.click();
+      await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
       // voters and votes page should have empty fields
       const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -485,15 +495,19 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 50,
+        political_group_total_votes: [
+          { number: 1, total: 50 },
+          { number: 2, total: 0 },
+          { number: 3, total: 0 },
+        ],
+        total_votes_candidates_count: 50,
         blank_votes_count: 50, // exceeds threshold
         invalid_votes_count: 0,
         total_votes_cast_count: 100,
       };
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
-      await expect(votersAndVotesPage.warning).toContainText(
-        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      );
+      await expect(votersAndVotesPage.warning).toContainText("W.201");
+      await expect(votersAndVotesPage.warning).toContainText("Controleer aantal blanco stemmen");
 
       await votersAndVotesPage.abortInput.click();
 
@@ -528,7 +542,12 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 3607,
       };
       const votes: VotesCounts = {
-        votes_candidates_count: 3572,
+        political_group_total_votes: [
+          { number: 1, total: 3536 },
+          { number: 2, total: 36 },
+          { number: 3, total: 0 },
+        ],
+        total_votes_candidates_count: 3572,
         blank_votes_count: 20,
         invalid_votes_count: 15,
         total_votes_cast_count: 3607,

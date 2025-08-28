@@ -3,12 +3,12 @@ import { describe, expect, test } from "vitest";
 import { pollingStationResultsMockData } from "@/features/resolve_differences/testing/polling-station-results";
 import { sectionHasDifferences } from "@/features/resolve_differences/utils/differences";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 describe("Resolve differences, differences util", () => {
   const first = pollingStationResultsMockData(true);
   const second = pollingStationResultsMockData(false);
-  const structure = getDataEntryStructureForDifferences(electionMockData, first, second);
+  const structure = getDataEntryStructure(electionMockData);
 
   test.each([
     { sectionId: "voters_votes_counts", expected: true },

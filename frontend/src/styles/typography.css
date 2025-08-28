@@ -65,19 +65,13 @@ p {
   margin-top: 0;
   font-size: var(--font-size-md);
   margin-bottom: 0;
-  line-height: 1.75rem;
   color: var(--text-color-body);
 }
 
 p.md {
+  width: 39.5rem;
   font-size: var(--font-size-md);
-  margin-bottom: 2rem;
-  line-height: 1.5rem;
-}
-
-p.form-paragraph {
-  width: 37.5rem;
-  margin-top: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 section.md {
@@ -87,14 +81,6 @@ section.md {
   form {
     max-width: 38rem;
   }
-}
-
-/* Link styling */
-.link {
-  all: unset;
-  text-decoration: underline;
-  cursor: pointer;
-  color: var(--link-default);
 }
 
 a {

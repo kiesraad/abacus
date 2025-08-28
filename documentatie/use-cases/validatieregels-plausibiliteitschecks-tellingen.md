@@ -505,6 +505,8 @@ Veld markeren: G
 - 2% of meer: abs(toegelaten kiezers - uitgebrachte stemmen) / uitgebrachte stemmen \>= 0.02
 - 15 of meer: abs(toegelaten kiezers - uitgebrachte stemmen) \>= 15
 
+_N.B. Voor "2% of meer" delen we door uitgebrachte stemmen, consistent met de berekening van W.201 (blanco stemmen) en W.202 (ongeldige stemmen). Het is dus niet nodig de 2% ook te berekenen door te delen door toegelaten kiezers._
+
 > Invoerder: **Controleer D en H** (W.203)
 
 > Coördinator: **Groot verschil tussen D en H** (W.203)  

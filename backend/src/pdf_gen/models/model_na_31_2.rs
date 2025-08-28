@@ -50,4 +50,13 @@ mod tests {
         serde_json::from_reader::<_, ModelNa31_2Input>(reader)
             .expect("model-na-31-2.json should deserialize to struct ModelNa31_2Input");
     }
+
+    #[test]
+    fn test_bijlage_json_matches_struct() {
+        let reader =
+            BufReader::new(File::open("templates/inputs/model-na-31-2-bijlage1.json").unwrap());
+        serde_json::from_reader::<_, ModelNa31_2Bijlage1Input>(reader).expect(
+            "model-na-31-2-bijlage1.json should deserialize to struct ModelNa31_2Bijlage1Input",
+        );
+    }
 }

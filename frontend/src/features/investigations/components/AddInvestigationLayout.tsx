@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router";
+import { Link, Outlet, useLocation } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -19,7 +19,7 @@ const formSections = [
 export function AddInvestigationLayout() {
   const location = useLocation();
   const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation } = useElection(pollingStationId);
+  const { election, pollingStation } = useElection(pollingStationId);
 
   const currentFormSection = formSections.findIndex((formSection) => location.pathname.endsWith(formSection.path));
 
@@ -42,7 +42,6 @@ export function AddInvestigationLayout() {
         <StickyNav>
           <ProgressList>
             {formSections.map((formSection, index) => (
-              // TODO: Clicking another Item does not work
               <div key={formSection.key}>
                 <ProgressList.Fixed>
                   <ProgressList.Item
@@ -51,7 +50,15 @@ export function AddInvestigationLayout() {
                     disabled={index > currentFormSection}
                     active={currentFormSection === index}
                   >
-                    <span>{formSection.label}</span>
+                    {index >= currentFormSection ? (
+                      <span>{formSection.label}</span>
+                    ) : (
+                      <Link
+                        to={`/elections/${election.id}/investigations/add/${pollingStation.id}/${formSection.path}`}
+                      >
+                        <span>{formSection.label}</span>
+                      </Link>
+                    )}
                   </ProgressList.Item>
                 </ProgressList.Fixed>
               </div>

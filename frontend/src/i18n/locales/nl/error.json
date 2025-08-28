@@ -21,7 +21,7 @@
     "InternalServerError": "Er is een interne fout opgetreden",
     "InvalidCommitteeSessionStatus": "De zitting is niet in de juiste status voor deze actie",
     "InvalidData": "De invoer is niet geldig",
-    "InvalidHash": "Code komt niet overeen",
+    "InvalidHash": "De hash is niet geldig",
     "InvalidJson": "De JSON is niet geldig",
     "InvalidPassword": "Het opgegeven wachtwoord is onjuist",
     "InvalidPoliticalGroup": "De politieke partij is niet geldig",

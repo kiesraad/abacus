@@ -1,4 +1,4 @@
-import { FormEvent, ReactNode, useEffect, useState } from "react";
+import { FormEvent, ReactNode, useState } from "react";
 
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -61,32 +61,19 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
           newStub.error = t("election.check_eml.check_hash.hint");
           stubsAreValid = false;
         } else {
-          if (error) {
-            newStub.error = t("error.api_error.InvalidHash");
-          }
           completeHash[stub.index] = value;
         }
         setStubs(newStubs);
       }
     }
 
-    // Only allow submit when a field has been focussed or blurred
+    // Only allow form submit when a field has been focussed or blurred
     // and both values are the correct length and type
     if (changed && stubsAreValid) {
       onSubmit(completeHash);
     }
     setChanged(false);
   }
-
-  // If there is an error, add error to stubs
-  useEffect(() => {
-    setStubs((prevStubs) =>
-      prevStubs.map((stub) => {
-        stub.error = error ? t("error.api_error.InvalidHash") : "";
-        return stub;
-      }),
-    );
-  }, [error]);
 
   return (
     <section className="md">
@@ -134,7 +121,6 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
               />
             ))}
           </FormLayout.Section>
-
           <FormLayout.Controls>
             <Button type="submit">{t("next")}</Button>
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

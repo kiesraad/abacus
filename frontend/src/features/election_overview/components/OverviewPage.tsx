@@ -17,6 +17,9 @@ import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t, tx } from "@/i18n/translate";
 import { Election, ELECTION_LIST_REQUEST_PATH, ElectionListResponse } from "@/types/generated/openapi";
+import { committeeSessionLabel } from "@/utils/committeeSession";
+
+import cls from "./OverviewPage.module.css";
 
 function AddFirstElection() {
   const { isAdministrator } = useUserRole();
@@ -81,8 +84,18 @@ export function OverviewPage() {
       return (
         <>
           <Table.Cell>{election.name}</Table.Cell>
-          <Table.Cell>{isTypist ? election.location : ""}</Table.Cell>
-          <Table.Cell>{committeeSessionStatus}</Table.Cell>
+          {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+          <Table.Cell>{isTypist ? election.location : `GSB - ${election.location} (${election.domain_id})`}</Table.Cell>
+          <Table.Cell>
+            {isTypist ? (
+              committeeSessionStatus
+            ) : (
+              <div className={cls.status}>
+                {committeeSessionStatus}
+                {committeeSessionString && `— ${committeeSessionString}`}
+              </div>
+            )}
+          </Table.Cell>
         </>
       );
     }
@@ -91,6 +104,7 @@ export function OverviewPage() {
     );
     let electionLink = null;
     let committeeSessionStatus = <></>;
+    let committeeSessionString = "";
     if (isAdminOrCoordinator) {
       electionLink = `/elections/${election.id}`;
     } else if (committeeSession && committeeSession.status === "data_entry_in_progress") {
@@ -103,6 +117,7 @@ export function OverviewPage() {
           userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
         />
       );
+      committeeSessionString = committeeSessionLabel(committeeSession.number);
     }
     if (electionLink) {
       return (

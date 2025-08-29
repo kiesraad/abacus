@@ -1,14 +1,15 @@
 import { Button } from "@/components/ui/Button/Button";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { Form } from "@/components/ui/Form/Form";
-import { FormLayout } from "@/components/ui/Form/FormLayout.tsx";
-import { useNumericParam } from "@/hooks/useNumericParam";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
 
-export function InvestigationPrintCorrigendum() {
-  const electionId = useNumericParam("electionId");
-  const pollingStationId = useNumericParam("pollingStationId");
+interface InvestigationPrintCorrigendumProps {
+  electionId: number;
+  pollingStationId: number;
+}
 
+export function InvestigationPrintCorrigendum({ electionId, pollingStationId }: InvestigationPrintCorrigendumProps) {
   return (
     <Form title={t("investigations.print_corrigendum.title")}>
       <FormLayout>

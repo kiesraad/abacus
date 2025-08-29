@@ -2,44 +2,30 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { DownloadButton } from "./DownloadButton";
 
-type Props = {
-  label: string;
-  icon: "file" | "download";
-};
+const meta = {
+  component: DownloadButton,
+  globals: {
+    backgrounds: { value: "light" },
+  },
+} satisfies Meta<typeof DownloadButton>;
 
-export const DefaultDownloadButton: StoryObj<Props> = {
-  render: ({ label, icon }) => (
-    <DownloadButton
-      href="#"
-      title="Download definitieve documenten eerste zitting"
-      subtitle="Zip bestand, 225kb"
-      icon={icon}
-      aria-label={label}
-    />
-  ),
-};
+export default meta;
+type Story = StoryObj<typeof meta>;
 
-export const DisabledDownloadButton: StoryObj<Props> = {
-  render: ({ label, icon }) => (
-    <DownloadButton
-      href="#"
-      title="Bekijk een preview van het proces verbaal"
-      icon={icon}
-      aria-label={label}
-      isDisabled
-    />
-  ),
-};
-
-export default {
+export const Default: Story = {
   args: {
-    label: "Invoer",
+    icon: "download",
+    href: "#",
+    title: "Download definitieve documenten eerste zitting",
+    subtitle: "Zip bestand, 225kb",
   },
-  argTypes: {
-    icon: {
-      required: true,
-      options: ["file", "download"],
-      control: { type: "radio", defaultValue: "file" },
-    },
+};
+
+export const Disabled: Story = {
+  args: {
+    icon: "file",
+    href: "#",
+    title: "Bekijk een preview van het proces verbaal",
+    isDisabled: true,
   },
-} satisfies Meta<Props>;
+};

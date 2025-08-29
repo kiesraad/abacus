@@ -1,6 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router";
 
-import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
@@ -69,7 +68,6 @@ export function AddInvestigationLayout() {
           <Outlet />
         </article>
       </main>
-      <Footer />
     </>
   );
 }

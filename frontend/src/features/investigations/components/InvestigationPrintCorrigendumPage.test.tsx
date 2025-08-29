@@ -11,7 +11,7 @@ import { server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
 import { AddInvestigationLayout } from "./AddInvestigationLayout";
-import { InvestigationPrintCorrigendum } from "./InvestigationPrintCorrigendum";
+import { InvestigationPrintCorrigendumPage } from "./InvestigationPrintCorrigendumPage";
 
 const navigate = vi.fn();
 
@@ -43,7 +43,7 @@ async function renderPage() {
                     },
                     {
                       path: "print-corrigendum",
-                      Component: InvestigationPrintCorrigendum,
+                      Component: InvestigationPrintCorrigendumPage,
                     },
                   ],
                 },
@@ -61,7 +61,7 @@ async function renderPage() {
   return router;
 }
 
-describe("InvestigationPrintCorrigendum", () => {
+describe("InvestigationPrintCorrigendumPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);

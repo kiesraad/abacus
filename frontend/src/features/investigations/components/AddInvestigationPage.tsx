@@ -1,10 +1,9 @@
-import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Table } from "@/components/ui/Table/Table";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 
-export function AddInvestigation() {
+export function AddInvestigationPage() {
   const { pollingStations } = useElection();
 
   // TODO fetch investigations for this election and filter pollingStations
@@ -37,7 +36,6 @@ export function AddInvestigation() {
           </Table>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

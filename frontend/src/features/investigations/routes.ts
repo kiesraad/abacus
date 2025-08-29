@@ -1,37 +1,43 @@
 import { RouteObject } from "react-router";
 
-import { AddInvestigation } from "./components/AddInvestigation";
 import { AddInvestigationLayout } from "./components/AddInvestigationLayout";
+import { AddInvestigationPage } from "./components/AddInvestigationPage.tsx";
 import { InvestigationFindings } from "./components/InvestigationFindings";
-import { InvestigationPrintCorrigendum } from "./components/InvestigationPrintCorrigendum";
+import { InvestigationPrintCorrigendumPage } from "./components/InvestigationPrintCorrigendumPage";
 import { InvestigationReason } from "./components/InvestigationReason";
-import { InvestigationsOverview } from "./components/InvestigationsOverview";
+import { InvestigationsLayout } from "./components/InvestigationsLayout";
+import { InvestigationsOverviewPage } from "./components/InvestigationsOverviewPage.tsx";
 
 export const investigationRoutes: RouteObject[] = [
-  { index: true, Component: InvestigationsOverview },
   {
-    path: "add",
+    Component: InvestigationsLayout,
     children: [
+      { index: true, Component: InvestigationsOverviewPage },
       {
-        index: true,
-        Component: AddInvestigation,
-      },
-      {
-        path: ":pollingStationId",
-        Component: AddInvestigationLayout,
+        path: "add",
         children: [
           {
             index: true,
-            path: "reason",
-            Component: InvestigationReason,
+            Component: AddInvestigationPage,
           },
           {
-            path: "print-corrigendum",
-            Component: InvestigationPrintCorrigendum,
-          },
-          {
-            path: "findings",
-            Component: InvestigationFindings,
+            path: ":pollingStationId",
+            Component: AddInvestigationLayout,
+            children: [
+              {
+                index: true,
+                path: "reason",
+                Component: InvestigationReason,
+              },
+              {
+                path: "print-corrigendum",
+                Component: InvestigationPrintCorrigendumPage,
+              },
+              {
+                path: "findings",
+                Component: InvestigationFindings,
+              },
+            ],
           },
         ],
       },

@@ -18,7 +18,7 @@ import { committeeSessionLabel } from "@/utils/committeeSession";
 import cls from "../ElectionManagement.module.css";
 
 export function FinishDataEntryPage() {
-  const { committeeSession, election, refetch } = useElection();
+  const { currentCommitteeSession, election, refetch } = useElection();
   const client = useApiClient();
   const navigate = useNavigate();
   const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
@@ -29,13 +29,13 @@ export function FinishDataEntryPage() {
 
   useEffect(() => {
     // Redirect to report download if committee session data entry phase is already finished
-    if (committeeSession.status === "data_entry_finished") {
-      void navigate(`/elections/${election.id}/report/download`);
+    if (currentCommitteeSession.status === "data_entry_finished") {
+      void navigate(`/elections/${election.id}/report/committee-session/${currentCommitteeSession.id}/download`);
     }
-  }, [committeeSession, election, navigate]);
+  }, [currentCommitteeSession, election, navigate]);
 
   function handleFinish() {
-    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
+    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
     void client
       .putRequest(url, body)
@@ -55,7 +55,7 @@ export function FinishDataEntryPage() {
       <header>
         <section>
           <h1>
-            {t("election_management.data_entry")} {committeeSessionLabel(committeeSession.number).toLowerCase()}{" "}
+            {t("election_management.data_entry")} {committeeSessionLabel(currentCommitteeSession.number).toLowerCase()}{" "}
             {t("complete").toLowerCase()}
           </h1>
         </section>

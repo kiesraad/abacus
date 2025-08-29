@@ -71,7 +71,7 @@ describe("FinishDataEntryPage", () => {
 
     expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_finished" });
     await waitFor(() => {
-      expect(navigate).toHaveBeenCalledWith("/elections/1/report/download");
+      expect(navigate).toHaveBeenCalledWith("/elections/1/report/committee-session/1/download");
     });
   });
 
@@ -168,7 +168,7 @@ describe("FinishDataEntryPage", () => {
     await renderPage();
 
     await waitFor(() => {
-      expect(navigate).toHaveBeenCalledWith("/elections/1/report/download");
+      expect(navigate).toHaveBeenCalledWith("/elections/1/report/committee-session/1/download");
     });
   });
 });

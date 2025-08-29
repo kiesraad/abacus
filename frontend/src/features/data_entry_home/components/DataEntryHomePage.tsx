@@ -16,7 +16,7 @@ import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
+  const { currentCommitteeSession, election, pollingStations, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
 
   // re-fetch statuses when component mounts
@@ -71,7 +71,7 @@ export function DataEntryHomePage() {
           <h1>{election.name}</h1>
         </section>
       </header>
-      {committeeSession.status === "data_entry_paused" && <CommitteeSessionPausedModal />}
+      {currentCommitteeSession.status === "data_entry_paused" && <CommitteeSessionPausedModal />}
       {dataEntryDone && (
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
           <strong className="heading-md">{t("data_entry.entry_saved")}</strong>

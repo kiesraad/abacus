@@ -38,11 +38,11 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.elections.len(), 2);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/2");
+    let url = format!("http://{addr}/api/elections/5");
     let typist_cookie = shared::typist_login(&addr).await;
     let response = reqwest::Client::new()
         .get(&url)
@@ -55,15 +55,16 @@ async fn test_election_details_works(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionDetailsResponse = response.json().await.unwrap();
     assert_eq!(
-        body.committee_session.status,
+        body.current_committee_session.status,
         CommitteeSessionStatus::DataEntryInProgress
     );
-    assert_eq!(body.election.name, "Municipal Election");
-    assert_eq!(body.polling_stations.len(), 2);
+    assert_eq!(body.committee_sessions.len(), 2);
+    assert_eq!(body.election.name, "Test Election >= 19 seats");
+    assert_eq!(body.polling_stations.len(), 1);
     assert!(
         body.polling_stations
             .iter()
-            .any(|ps| ps.name == "Op Rolletjes")
+            .any(|ps| ps.name == "Testgebouw")
     );
 }
 

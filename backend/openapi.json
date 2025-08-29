@@ -728,77 +728,6 @@
         }
       }
     },
-    "/api/elections/{election_id}/committee_sessions": {
-      "get": {
-        "summary": "Get a list of all [CommitteeSession]s of an election",
-        "operationId": "election_committee_session_list",
-        "parameters": [
-          {
-            "name": "election_id",
-            "in": "path",
-            "description": "Election database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Committee session list",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommitteeSessionListResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/elections/{election_id}/download_n_10_2": {
       "get": {
         "operationId": "election_download_n_10_2",
@@ -4342,22 +4271,6 @@
         },
         "additionalProperties": false
       },
-      "CommitteeSessionListResponse": {
-        "type": "object",
-        "description": "Committee session list response",
-        "required": [
-          "committee_sessions"
-        ],
-        "properties": {
-          "committee_sessions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CommitteeSession"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "CommitteeSessionNumberOfVotersChangeRequest": {
         "type": "object",
         "description": "Committee session number of voters change request",
@@ -4941,14 +4854,21 @@
       },
       "ElectionDetailsResponse": {
         "type": "object",
-        "description": "Election details response, including the election's candidate list (political groups),\nits polling stations and the current committee session",
+        "description": "Election details response, including the election's candidate list (political groups),\nits polling stations and its committee sessions and current committee session",
         "required": [
-          "committee_session",
+          "current_committee_session",
+          "committee_sessions",
           "election",
           "polling_stations"
         ],
         "properties": {
-          "committee_session": {
+          "committee_sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommitteeSession"
+            }
+          },
+          "current_committee_session": {
             "$ref": "#/components/schemas/CommitteeSession"
           },
           "election": {

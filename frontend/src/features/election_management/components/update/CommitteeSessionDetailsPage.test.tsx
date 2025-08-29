@@ -239,7 +239,7 @@ describe("CommitteeSessionDetailsPage", () => {
       start_date: "2026-03-18",
       start_time: "21:36",
     });
-    expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/report/download");
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/report/committee-session/1/download");
   });
 
   test("Shows form for sixth committee session, cancel and navigate", async () => {

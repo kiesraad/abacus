@@ -194,7 +194,7 @@ export function CommitteeSessionCard({
         buttonLinks.push({
           id: committeeSession.id,
           label: t("election_management.results_and_documents"),
-          to: "report/download", // TODO: change link in #1791 when reports are linked to committee sessions
+          to: `report/committee-session/${committeeSession.id}/download`,
         });
       }
       if (currentSession) {

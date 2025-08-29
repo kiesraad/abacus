@@ -9,7 +9,8 @@ import {
 export function useElectionDataRequest(electionId: number) {
   const path: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${electionId}`;
   return useInitialApiGetWithErrors<{
-    committee_session: CommitteeSession;
+    current_committee_session: CommitteeSession;
+    committee_sessions: CommitteeSession[];
     election: ElectionWithPoliticalGroups;
     polling_stations: PollingStation[];
   }>(path);

@@ -314,6 +314,6 @@ describe("UI component: CommitteeSessionCard", () => {
     await user.click(reportButton);
 
     expect(statusChange).not.toHaveBeenCalled();
-    expect(navigate).toHaveBeenCalledWith("report/download", {});
+    expect(navigate).toHaveBeenCalledWith("report/committee-session/1/download", {});
   });
 });

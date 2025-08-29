@@ -1,6 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router";
 
-import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
@@ -12,8 +11,8 @@ import { t } from "@/i18n/translate";
 
 const formSections = [
   { key: "reason_and_assigment", label: t("investigations.reason_and_assignment.title"), path: "reason" },
-  { key: "print_corrigendum", label: t("investigations.print_corrigendum_short"), path: "print-corrigendum" },
-  { key: "findings_and_investigation", label: t("investigations.findings_and_investigation"), path: "todo" },
+  { key: "print_corrigendum", label: t("investigations.print_corrigendum.nav_title"), path: "print-corrigendum" },
+  { key: "investigation_findings", label: t("investigations.findings.nav_title"), path: "findings" },
 ];
 
 export function AddInvestigationLayout() {
@@ -69,7 +68,6 @@ export function AddInvestigationLayout() {
           <Outlet />
         </article>
       </main>
-      <Footer />
     </>
   );
 }

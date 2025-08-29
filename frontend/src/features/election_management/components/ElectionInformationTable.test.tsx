@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
-import { TestUserProvider } from "@/testing/TestUserProvider.tsx";
-import { Role } from "@/types/generated/openapi.ts";
+import { TestUserProvider } from "@/testing/TestUserProvider";
+import { Role } from "@/types/generated/openapi";
 
 import { ElectionInformationTable } from "./ElectionInformationTable";
 

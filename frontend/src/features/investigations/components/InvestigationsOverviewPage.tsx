@@ -1,12 +1,11 @@
-import { Footer } from "@/components/footer/Footer";
 import { IconPlus } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
-import { useElection } from "@/hooks/election/useElection.ts";
+import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 
-export function InvestigationsOverview() {
+export function InvestigationsOverviewPage() {
   const { committeeSession } = useElection();
   return (
     <>
@@ -35,7 +34,6 @@ export function InvestigationsOverview() {
           </nav>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

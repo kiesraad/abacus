@@ -20,6 +20,15 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    backgrounds: {
+      options: {
+        dark: { name: "Dark", value: "#333" },
+        light: { name: "Light", value: "#f9fafb" },
+      },
+    },
+  },
+  initialGlobals: {
+    backgrounds: { value: "light" },
   },
   decorators: [
     // Router decorator - make things using react-router work

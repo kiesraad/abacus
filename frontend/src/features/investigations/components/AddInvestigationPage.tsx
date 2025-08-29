@@ -1,10 +1,9 @@
-import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Table } from "@/components/ui/Table/Table";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 
-export function AddInvestigation() {
+export function AddInvestigationPage() {
   const { pollingStations } = useElection();
 
   // TODO fetch investigations for this election and filter pollingStations
@@ -19,7 +18,7 @@ export function AddInvestigation() {
       </header>
       <main>
         <section className="sm">
-          <h2>{t("investigations.pick_polling_station")}</h2>
+          <h2>{t("investigations.investigate_which_polling_station")}</h2>
           <p className="mb-md-lg">{t("investigations.multiple_polling_stations")}</p>
           <Table id="polling_stations">
             <Table.Header>
@@ -37,7 +36,6 @@ export function AddInvestigation() {
           </Table>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

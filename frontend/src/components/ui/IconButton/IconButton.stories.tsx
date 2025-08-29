@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import { IconCross } from "@/components/generated/icons";
 import { ButtonVariant, Size } from "@/types/ui";
@@ -24,6 +25,9 @@ export const DefaultIconButton: StoryObj<Props> = {
       isRound={isRound}
     />
   ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button")).toBeEnabled();
+  },
 };
 
 export const DisabledIconButton: StoryObj<Props> = {
@@ -39,6 +43,27 @@ export const DisabledIconButton: StoryObj<Props> = {
       isDisabled
     />
   ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button")).toBeDisabled();
+  },
+};
+
+export const IsLoadingIconButton: StoryObj<Props> = {
+  render: ({ label, variant, size, isRound }) => (
+    <IconButton
+      role="button"
+      title="Icon Button"
+      icon={<IconCross />}
+      aria-label={label}
+      variant={variant}
+      size={size}
+      isRound={isRound}
+      isLoading
+    />
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button")).toBeDisabled();
+  },
 };
 
 export default {

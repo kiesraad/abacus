@@ -4,9 +4,6 @@ import { DownloadButton } from "./DownloadButton";
 
 const meta = {
   component: DownloadButton,
-  globals: {
-    backgrounds: { value: "light" },
-  },
 } satisfies Meta<typeof DownloadButton>;
 
 export default meta;

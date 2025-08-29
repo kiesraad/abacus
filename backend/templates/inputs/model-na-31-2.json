@@ -1,16 +1,25 @@
 {
+  "committee_session": {
+    "id": 1,
+    "number": 1,
+    "election_id": 2,
+    "location": "Juinen",
+    "start_date": "12-01-2035",
+    "start_time": "09:00",
+    "status": "data_entry_finished",
+    "number_of_voters": 129261
+  },
   "election": {
     "id": 2,
     "name": "Gemeenteraad Juinen 2035",
+    "counting_method": "CSO",
     "election_id": "Juinen_2035",
     "location": "Juinen",
     "domain_id": "0263",
-    "number_of_voters": 129261,
     "category": "Municipal",
     "number_of_seats": 29,
     "election_date": "2035-01-08",
     "nomination_date": "2034-12-15",
-    "status": "DataEntryInProgress",
     "political_groups": [
       {
         "number": 1,
@@ -2547,7 +2556,45 @@
       "total_admitted_voters_count": 93477
     },
     "votes_counts": {
-      "votes_candidates_count": 91788,
+      "political_group_total_votes": [
+        {
+          "number": 1,
+          "total": 40290
+        },
+        {
+          "number": 2,
+          "total": 43736
+        },
+        {
+          "number": 3,
+          "total": 901
+        },
+        {
+          "number": 4,
+          "total": 2270
+        },
+        {
+          "number": 5,
+          "total": 459
+        },
+        {
+          "number": 6,
+          "total": 444
+        },
+        {
+          "number": 7,
+          "total": 2809
+        },
+        {
+          "number": 8,
+          "total": 487
+        },
+        {
+          "number": 9,
+          "total": 392
+        }
+      ],
+      "total_votes_candidates_count": 91788,
       "blank_votes_count": 856,
       "invalid_votes_count": 833,
       "total_votes_cast_count": 93477
@@ -2558,28 +2605,10 @@
         "polling_stations": []
       },
       "fewer_ballots_count": {
-        "count": 0,
-        "polling_stations": []
-      },
-      "compare_votes_cast_admitted_voters": {
-        "admitted_voters_equal_votes_cast": false,
-        "votes_cast_greater_than_admitted_voters": false,
-        "votes_cast_smaller_than_admitted_voters": false
-      },
-      "difference_completely_accounted_for": {
-        "yes": false,
-        "no": false
+        "count": 2,
+        "polling_stations": [1, 3, 5]
       }
     },
-    "recounted_polling_stations": [
-      15,
-      48,
-      70,
-      90,
-      125,
-      126,
-      147
-    ],
     "political_group_votes": [
       {
         "number": 1,
@@ -3867,7 +3896,12 @@
           }
         ]
       }
-    ]
+    ],
+    "polling_station_investigations": {
+      "admitted_voters_recounted": [1, 5],
+      "investigated_other_reason": [3],
+      "ballots_recounted": [1]
+    }
   },
   "polling_stations": [
     {

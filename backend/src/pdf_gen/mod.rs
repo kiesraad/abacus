@@ -43,7 +43,7 @@ pub(crate) mod tests {
                 id: u32::try_from(idx).unwrap(),
                 election_id: election.id,
                 name: format!("Testplek {idx}"),
-                number: idx as i64 + 30,
+                number: u32::try_from(idx).unwrap() + 30,
                 number_of_voters: if *voter_count < 0 {
                     None
                 } else {

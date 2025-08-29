@@ -2,16 +2,16 @@
 
 use std::net::SocketAddr;
 
-use abacus::data_entry::DifferenceCountsCompareVotesCastAdmittedVoters;
 use abacus::{
     committee_session::{
         CommitteeSession, CommitteeSessionListResponse, CommitteeSessionStatusChangeRequest,
         status::CommitteeSessionStatus,
     },
     data_entry::{
-        CandidateVotes, Count, CountingDifferencesPollingStation, DataEntry, DifferencesCounts,
-        ElectionStatusResponse, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-        PollingStationResults, VotersCounts, VotesCounts, YesNo,
+        CandidateVotes, Count, CountingDifferencesPollingStation, DataEntry,
+        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ElectionStatusResponse,
+        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+        VotersCounts, VotesCounts, YesNo,
         status::{ClientState, DataEntryStatusName},
     },
     election::{CandidateNumber, PGNumber},

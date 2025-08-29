@@ -158,7 +158,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
     letterbox(
       "B",
       value: input.summary.voters_counts.proxy_certificate_count,
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas],
+    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
     letterbox(
       "D",
       light: false,

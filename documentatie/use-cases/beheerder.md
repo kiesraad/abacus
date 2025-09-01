@@ -35,8 +35,6 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ De Kiesraad maakt de applicatie beschikbaar.
-
 __Hoofdscenario:__
 
 1. De beheerder bereidt één computer als Abacus-server voor.

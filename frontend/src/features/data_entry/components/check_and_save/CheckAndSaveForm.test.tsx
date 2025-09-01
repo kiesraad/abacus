@@ -199,9 +199,7 @@ describe("Test CheckAndSaveForm", () => {
 
     expect(summaryList).toBeDefined();
     expect(within(await summaryList).getByText("Controleer je antwoorden")).toBeInTheDocument();
-    expect(
-      within(await summaryList).getByText("Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen"),
-    ).toBeInTheDocument();
+    expect(within(await summaryList).getByText("Controleer D en H")).toBeInTheDocument();
   });
 
   describe("CheckAndSaveForm accept warnings", () => {

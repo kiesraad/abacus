@@ -88,7 +88,6 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Precondities:__
 
-- De lijst met gepubliceerde stembureaus is beschikbaar.
 - De stembureaus zijn niet tijdens [het inrichten van de applicatie](#de-beheerder-richt-de-applicatie-in-voor-gsb-enof-csb-wolk) ingevoerd.
 - De invoerfase van de zitting is nog niet gestart. Na het starten van de invoerfase kan alleen de [coördinator nog wijzigingen in de lijst met stembureaus aanbrengen](./gsb-eerste-zitting.md#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-eerste-of-nieuwe-zitting-zee).
 

@@ -50,10 +50,6 @@ __Uitbreidingen:__
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
-__Precondities:__
-
-- De coördinator GSB is ingelogd in de applicatie.
-
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
@@ -121,10 +117,6 @@ __Uitbreidingen:__
 ## De eerste of tweede invoerder voert de resultaten van de telling in (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
-
-__Precondities:__
-
-- De invoerder is ingelogd in de applicatie.
 
 ### Hoofdscenario en uitbreidingen
 

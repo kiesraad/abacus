@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { InvestigationsOverviewPage } from "./InvestigationsOverviewPage.tsx";
+import { InvestigationsOverviewPage } from "./InvestigationsOverviewPage";
 
 const meta = {
   component: InvestigationsOverviewPage,

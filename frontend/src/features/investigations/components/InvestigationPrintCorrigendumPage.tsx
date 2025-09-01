@@ -1,10 +1,17 @@
+import { Loader } from "@/components/ui/Loader/Loader";
+import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 
 import { InvestigationPrintCorrigendum } from "./InvestigationPrintCorrigendum";
 
 export function InvestigationPrintCorrigendumPage() {
-  const electionId = useNumericParam("electionId");
   const pollingStationId = useNumericParam("pollingStationId");
 
-  return <InvestigationPrintCorrigendum electionId={electionId} pollingStationId={pollingStationId} />;
+  const { election, pollingStation } = useElection(pollingStationId);
+
+  if (!pollingStation) {
+    return <Loader />;
+  }
+
+  return <InvestigationPrintCorrigendum electionId={election.id} pollingStationNumber={pollingStation.number} />;
 }

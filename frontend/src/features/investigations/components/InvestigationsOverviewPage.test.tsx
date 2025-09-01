@@ -11,7 +11,7 @@ import { server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 import { ElectionDetailsResponse } from "@/types/generated/openapi";
 
-import { InvestigationsOverviewPage } from "./InvestigationsOverviewPage.tsx";
+import { InvestigationsOverviewPage } from "./InvestigationsOverviewPage";
 
 async function renderPage() {
   const router = setupTestRouter([

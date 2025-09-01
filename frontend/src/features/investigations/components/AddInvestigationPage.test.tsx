@@ -8,7 +8,7 @@ import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
-import { AddInvestigationPage } from "./AddInvestigationPage.tsx";
+import { AddInvestigationPage } from "./AddInvestigationPage";
 
 async function renderPage() {
   const router = setupTestRouter([

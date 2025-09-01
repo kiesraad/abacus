@@ -6,10 +6,13 @@ import { t, tx } from "@/i18n/translate";
 
 interface InvestigationPrintCorrigendumProps {
   electionId: number;
-  pollingStationId: number;
+  pollingStationNumber: number;
 }
 
-export function InvestigationPrintCorrigendum({ electionId, pollingStationId }: InvestigationPrintCorrigendumProps) {
+export function InvestigationPrintCorrigendum({
+  electionId,
+  pollingStationNumber,
+}: InvestigationPrintCorrigendumProps) {
   return (
     <Form title={t("investigations.print_corrigendum.title")}>
       <FormLayout>
@@ -22,7 +25,7 @@ export function InvestigationPrintCorrigendum({ electionId, pollingStationId }: 
             <DownloadButton
               icon="download"
               href="#" // TODO insert download URL
-              title={t("investigations.print_corrigendum.download_corrigendum_link", { number: pollingStationId })}
+              title={t("investigations.print_corrigendum.download_corrigendum_link", { number: pollingStationNumber })}
               subtitle="Na 14-2 Bijlage 1"
             />
             <ul className="mb-0">

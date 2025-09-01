@@ -374,7 +374,7 @@ async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_election_import_save(pool: SqlitePool) {
+async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
@@ -414,6 +414,44 @@ async fn test_election_import_save(pool: SqlitePool) {
         committee_session.status,
         CommitteeSessionStatus::DataEntryNotStarted,
     );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/import");
+    let admin_cookie = shared::admin_login(&addr).await;
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", &admin_cookie)
+        .json(&serde_json::json!({
+            "election_hash": [
+                "4291", "a4e7", "c76e", "ed19",
+                "476b", "ae90", "3882", "c2dc",
+                "9162", "1950", "0e13", "0651",
+                "34ff", "c0de", "340a", "4a38"
+            ],
+            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_hash": [
+                "146d", "3784", "efa2", "93b5",
+                "721a", "7578", "a43f", "0636",
+                "7281", "66a0", "acf1", "55d3",
+                "ab25", "083c", "c000", "7096"
+            ],
+            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
+            "number_of_voters": 1234,
+            "counting_method": "CSO",
+        }))
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::CREATED);
+    let body: ElectionWithPoliticalGroups = response.json().await.unwrap();
+    let committee_session =
+        shared::get_election_committee_session(&addr, &admin_cookie, body.id).await;
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created,);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

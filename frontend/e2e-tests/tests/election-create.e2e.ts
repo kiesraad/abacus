@@ -81,7 +81,7 @@ test.describe("Election creation", () => {
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();
     await expect(electionRow).toContainText("Gemeenteraad Test 2022");
-    await expect(electionRow).toContainText("Zitting voorbereiden");
+    await expect(electionRow).toContainText("Klaar voor steminvoer");
   });
 
   test("it uploads an election file, candidate list but skips polling stations", async ({ page }) => {

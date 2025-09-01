@@ -155,162 +155,163 @@ export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBo
 export const AccountUpdateRequestHandler = http.put<
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_BODY,
-  LoginResponse,
-  ACCOUNT_UPDATE_REQUEST_PATH
->("/api/user/account", () => HttpResponse.json(loginResponseMockData, { status: 200 }));
+  LoginResponse
+>("/api/user/account" satisfies ACCOUNT_UPDATE_REQUEST_PATH, () =>
+  HttpResponse.json(loginResponseMockData, { status: 200 }),
+);
 
-export const LogRequestHandler = http.get<
-  ParamsToString<AUDIT_LOG_LIST_REQUEST_PARAMS>,
-  null,
-  AuditLogListResponse,
-  AUDIT_LOG_LIST_REQUEST_PATH
->("/api/log", () => HttpResponse.json(logMockResponse, { status: 200 }));
+export const LogRequestHandler = http.get<ParamsToString<AUDIT_LOG_LIST_REQUEST_PARAMS>, null, AuditLogListResponse>(
+  "/api/log" satisfies AUDIT_LOG_LIST_REQUEST_PATH,
+  () => HttpResponse.json(logMockResponse, { status: 200 }),
+);
 
-export const LogUsersRequestHandler = http.get<
-  ParamsToString<AUDIT_LOG_LIST_USERS_REQUEST_PARAMS>,
-  null,
-  User[],
-  AUDIT_LOG_LIST_USERS_REQUEST_PATH
->("/api/log-users", () => HttpResponse.json(userMockData, { status: 200 }));
+export const LogUsersRequestHandler = http.get<ParamsToString<AUDIT_LOG_LIST_USERS_REQUEST_PARAMS>, null, User[]>(
+  "/api/log-users" satisfies AUDIT_LOG_LIST_USERS_REQUEST_PATH,
+  () => HttpResponse.json(userMockData, { status: 200 }),
+);
 
 // get election committee session list handler
 export const ElectionCommitteeSessionListRequestHandler = http.get<
   ParamsToString<ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS>,
   null,
-  CommitteeSessionListResponse | ErrorResponse,
-  ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH
->("/api/elections/1/committee_sessions", () => HttpResponse.json(committeeSessionListMockResponse, { status: 200 }));
+  CommitteeSessionListResponse | ErrorResponse
+>("/api/elections/1/committee_sessions" satisfies ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH, () =>
+  HttpResponse.json(committeeSessionListMockResponse, { status: 200 }),
+);
 
 // committee session status change handler
 export const CommitteeSessionStatusChangeRequestHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS>,
-  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
-  null,
-  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH
->("/api/committee_sessions/1/status", () => HttpResponse.json(null, { status: 200 }));
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY
+>("/api/committee_sessions/1/status" satisfies COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH, () =>
+  HttpResponse.json(null, { status: 200 }),
+);
 
 export const CommitteeSessionChangeNumberOfVotersHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS>,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
-  null,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH
->("/api/committee_sessions/1/voters", () => new HttpResponse(null, { status: 200 }));
+  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY
+>(
+  "/api/committee_sessions/1/voters" satisfies COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 200 }),
+);
 
 export const CommitteeSessionUpdateHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS>,
-  COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
-  null,
-  COMMITTEE_SESSION_UPDATE_REQUEST_PATH
->("/api/committee_sessions/1", () => new HttpResponse(null, { status: 200 }));
+  COMMITTEE_SESSION_UPDATE_REQUEST_BODY
+>(
+  "/api/committee_sessions/1" satisfies COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 200 }),
+);
 
 export const CommitteeSessionCreateHandler = http.post<
   ParamsToString<COMMITTEE_SESSION_CREATE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_CREATE_REQUEST_BODY,
-  CommitteeSession,
-  COMMITTEE_SESSION_CREATE_REQUEST_PATH
->("/api/committee_sessions", () => {
+  CommitteeSession
+>("/api/committee_sessions" satisfies COMMITTEE_SESSION_CREATE_REQUEST_PATH, () => {
   const response: CommitteeSession = getCommitteeSessionMockData({ id: 2, number: 2, status: "created" });
   return HttpResponse.json(response, { status: 201 });
 });
 
-export const CommitteeSessionDeleteHandler = http.delete<
-  ParamsToString<COMMITTEE_SESSION_DELETE_REQUEST_PARAMS>,
-  null,
-  null,
-  COMMITTEE_SESSION_DELETE_REQUEST_PATH
->("/api/committee_sessions/2", () => new HttpResponse(null, { status: 200 }));
+export const CommitteeSessionDeleteHandler = http.delete<ParamsToString<COMMITTEE_SESSION_DELETE_REQUEST_PARAMS>>(
+  "/api/committee_sessions/2" satisfies COMMITTEE_SESSION_DELETE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 200 }),
+);
 
 // get election list handler
 export const ElectionListRequestHandler = http.get<
   ParamsToString<ELECTION_LIST_REQUEST_PARAMS>,
   null,
-  ElectionListResponse,
-  ELECTION_LIST_REQUEST_PATH
->("/api/elections", () => HttpResponse.json(electionListMockResponse, { status: 200 }));
+  ElectionListResponse
+>("/api/elections" satisfies ELECTION_LIST_REQUEST_PATH, () =>
+  HttpResponse.json(electionListMockResponse, { status: 200 }),
+);
 
 // get election details handler
 export const ElectionRequestHandler = http.get<
   ParamsToString<ELECTION_DETAILS_REQUEST_PARAMS>,
   null,
-  ElectionDetailsResponse | ErrorResponse,
-  ELECTION_DETAILS_REQUEST_PATH
->("/api/elections/1", () => HttpResponse.json(electionDetailsMockResponse, { status: 200 }));
+  ElectionDetailsResponse | ErrorResponse
+>("/api/elections/1" satisfies ELECTION_DETAILS_REQUEST_PATH, () =>
+  HttpResponse.json(electionDetailsMockResponse, { status: 200 }),
+);
 
 // get election status handler
 export const ElectionStatusRequestHandler = http.get<
   ParamsToString<ELECTION_STATUS_REQUEST_PARAMS>,
   null,
-  ElectionStatusResponse,
-  ELECTION_STATUS_REQUEST_PATH
->("/api/elections/1/status", () => HttpResponse.json(statusResponseMock, { status: 200 }));
+  ElectionStatusResponse
+>("/api/elections/1/status" satisfies ELECTION_STATUS_REQUEST_PATH, () =>
+  HttpResponse.json(statusResponseMock, { status: 200 }),
+);
 
 export const ElectionImportRequestHandler = http.post<
   ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
   ELECTION_IMPORT_REQUEST_BODY,
-  ElectionWithPoliticalGroups,
-  ELECTION_IMPORT_REQUEST_PATH
->("/api/elections/import", () => HttpResponse.json(electionImportMockResponse, { status: 201 }));
+  ElectionWithPoliticalGroups
+>("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
+  HttpResponse.json(electionImportMockResponse, { status: 201 }),
+);
 
 export const ElectionImportValidateRequestHandler = http.post<
   ParamsToString<ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS>,
   ELECTION_IMPORT_VALIDATE_REQUEST_BODY,
-  ElectionDefinitionValidateResponse,
-  ELECTION_IMPORT_VALIDATE_REQUEST_PATH
->("/api/elections/import/validate", () => HttpResponse.json(electionImportValidateMockResponse, { status: 200 }));
+  ElectionDefinitionValidateResponse
+>("/api/elections/import/validate" satisfies ELECTION_IMPORT_VALIDATE_REQUEST_PATH, () =>
+  HttpResponse.json(electionImportValidateMockResponse, { status: 200 }),
+);
 
-export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse, LOGIN_REQUEST_PATH>(
-  "/api/user/login",
+export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse>(
+  "/api/user/login" satisfies LOGIN_REQUEST_PATH,
   () => HttpResponse.json(loginResponseMockData, { status: 200 }),
 );
 
-export const InitialisedHandler = http.get<INITIALISED_REQUEST_PARAMS, null, null, INITIALISED_REQUEST_PATH>(
-  "/api/initialised",
+export const InitialisedHandler = http.get<INITIALISED_REQUEST_PARAMS>(
+  "/api/initialised" satisfies INITIALISED_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
 );
 
 export const PollingStationDataEntryGetDifferencesHandler = http.get<
   ParamsToString<POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS>,
   null,
-  DataEntryGetDifferencesResponse,
-  POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH
->("/api/polling_stations/3/data_entries/resolve_differences", () =>
-  HttpResponse.json(dataEntryStatusDifferences, { status: 200 }),
+  DataEntryGetDifferencesResponse
+>(
+  "/api/polling_stations/3/data_entries/resolve_differences" satisfies POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH,
+  () => HttpResponse.json(dataEntryStatusDifferences, { status: 200 }),
 );
 
 export const PollingStationDataEntryGetErrorsHandler = http.get<
   ParamsToString<POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PARAMS>,
   null,
-  DataEntryGetErrorsResponse,
-  POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH
->("/api/polling_stations/5/data_entries/resolve_errors", () =>
-  HttpResponse.json(dataEntryGetErrorsMockResponse, { status: 200 }),
+  DataEntryGetErrorsResponse
+>(
+  "/api/polling_stations/5/data_entries/resolve_errors" satisfies POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH,
+  () => HttpResponse.json(dataEntryGetErrorsMockResponse, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveDifferencesHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
-  DataEntryStatusResponse,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH
->("/api/polling_stations/3/data_entries/resolve_differences", () =>
-  HttpResponse.json({ status: "first_entry_not_started" }, { status: 200 }),
+  DataEntryStatusResponse
+>(
+  "/api/polling_stations/3/data_entries/resolve_differences" satisfies POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
+  () => HttpResponse.json({ status: "first_entry_not_started" }, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveErrorsHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY,
-  DataEntryStatusResponse,
-  POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH
->("/api/polling_stations/5/data_entries/resolve_errors", () =>
-  HttpResponse.json({ status: "first_entry_not_started" }, { status: 200 }),
+  DataEntryStatusResponse
+>(
+  "/api/polling_stations/5/data_entries/resolve_errors" satisfies POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH,
+  () => HttpResponse.json({ status: "first_entry_not_started" }, { status: 200 }),
 );
 
 // get polling stations
 export const PollingStationListRequestHandler = http.get<
   ParamsToString<POLLING_STATION_LIST_REQUEST_PARAMS>,
   null,
-  PollingStationListResponse,
-  POLLING_STATION_LIST_REQUEST_PATH
->("/api/elections/1/polling_stations", () => {
+  PollingStationListResponse
+>("/api/elections/1/polling_stations" satisfies POLLING_STATION_LIST_REQUEST_PATH, () => {
   const response: PollingStationListResponse = { polling_stations: pollingStationMockData };
   return HttpResponse.json(response, { status: 200 });
 });
@@ -319,116 +320,108 @@ export const PollingStationListRequestHandler = http.get<
 export const PollingStationDataEntrySaveHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  SaveDataEntryResponse | ErrorResponse,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH
->("/api/polling_stations/1/data_entries/1", () => HttpResponse.json(saveDataEntryResponse, { status: 200 }));
+  SaveDataEntryResponse | ErrorResponse
+>("/api/polling_stations/1/data_entries/1" satisfies POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH, () =>
+  HttpResponse.json(saveDataEntryResponse, { status: 200 }),
+);
 
 // get data entry handler
 export const PollingStationDataEntryClaimHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PARAMS>,
   null,
-  ClaimDataEntryResponse | ErrorResponse,
-  POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH
->("/api/polling_stations/1/data_entries/1/claim", () => HttpResponse.json(claimDataEntryResponse, { status: 200 }));
+  ClaimDataEntryResponse | ErrorResponse
+>("/api/polling_stations/1/data_entries/1/claim" satisfies POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH, () =>
+  HttpResponse.json(claimDataEntryResponse, { status: 200 }),
+);
 
 // delete data entry handler
 export const PollingStationDataEntryDeleteHandler = http.delete<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS>,
-  null,
-  null,
-  POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH
->("/api/polling_stations/1/data_entries/1", () => new HttpResponse(null, { status: 204 }));
+  ParamsToString<POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS>
+>(
+  "/api/polling_stations/1/data_entries/1" satisfies POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 204 }),
+);
 
 // finalise data entry handler
 export const PollingStationDataEntryFinaliseHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS>,
   null,
-  DataEntryStatusResponse | ErrorResponse,
-  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH
->("/api/polling_stations/1/data_entries/1/finalise", () =>
+  DataEntryStatusResponse | ErrorResponse
+>("/api/polling_stations/1/data_entries/1/finalise" satisfies POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH, () =>
   HttpResponse.json({ status: "second_entry_not_started" }, { status: 200 }),
 );
 
 export const PollingStationCreateHandler = http.post<
   ParamsToString<POLLING_STATION_CREATE_REQUEST_PARAMS>,
   POLLING_STATION_CREATE_REQUEST_BODY,
-  PollingStation,
-  POLLING_STATION_LIST_REQUEST_PATH
->("/api/elections/1/polling_stations", () => HttpResponse.json(pollingStationMockData[1], { status: 201 }));
+  PollingStation
+>("/api/elections/1/polling_stations" satisfies POLLING_STATION_LIST_REQUEST_PATH, () =>
+  HttpResponse.json(pollingStationMockData[1], { status: 201 }),
+);
 
-export const PollingStationDeleteHandler = http.delete<
-  ParamsToString<POLLING_STATION_DELETE_REQUEST_PARAMS>,
-  null,
-  null,
-  POLLING_STATION_DELETE_REQUEST_PATH
->("/api/elections/1/polling_stations/1", () => new HttpResponse(null, { status: 200 }));
+export const PollingStationDeleteHandler = http.delete<ParamsToString<POLLING_STATION_DELETE_REQUEST_PARAMS>>(
+  "/api/elections/1/polling_stations/1" satisfies POLLING_STATION_DELETE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 200 }),
+);
 
 export const PollingStationUpdateHandler = http.put<
   ParamsToString<POLLING_STATION_UPDATE_REQUEST_PARAMS>,
   POLLING_STATION_UPDATE_REQUEST_BODY,
-  PollingStation,
-  POLLING_STATION_UPDATE_REQUEST_PATH
->("/api/elections/1/polling_stations/1", () => HttpResponse.json(pollingStationMockData[1], { status: 200 }));
+  PollingStation
+>("/api/elections/1/polling_stations/1" satisfies POLLING_STATION_UPDATE_REQUEST_PATH, () =>
+  HttpResponse.json(pollingStationMockData[1], { status: 200 }),
+);
 
 export const PollingStationGetHandler = http.get<
   ParamsToString<POLLING_STATION_GET_REQUEST_PARAMS>,
   null,
-  PollingStation,
-  POLLING_STATION_GET_REQUEST_PATH
->("/api/elections/1/polling_stations/1", () => HttpResponse.json(pollingStationMockData[0], { status: 200 }));
+  PollingStation
+>("/api/elections/1/polling_stations/1" satisfies POLLING_STATION_GET_REQUEST_PATH, () =>
+  HttpResponse.json(pollingStationMockData[0], { status: 200 }),
+);
 
-export const UserCreateRequestHandler = http.post<
-  USER_CREATE_REQUEST_PARAMS,
-  USER_CREATE_REQUEST_BODY,
-  User,
-  USER_CREATE_REQUEST_PATH
->("/api/user", () => HttpResponse.json(userMockData[0], { status: 200 }));
+export const UserCreateRequestHandler = http.post<USER_CREATE_REQUEST_PARAMS, USER_CREATE_REQUEST_BODY, User>(
+  "/api/user" satisfies USER_CREATE_REQUEST_PATH,
+  () => HttpResponse.json(userMockData[0], { status: 200 }),
+);
 
 export const CreateFirstAdminRequestHandler = http.post<
   ParamsToString<CREATE_FIRST_ADMIN_REQUEST_PARAMS>,
   CREATE_FIRST_ADMIN_REQUEST_BODY,
-  User,
-  CREATE_FIRST_ADMIN_REQUEST_PATH
->("/api/initialise/first-admin", () => HttpResponse.json(userMockData[0], { status: 200 }));
+  User
+>("/api/initialise/first-admin" satisfies CREATE_FIRST_ADMIN_REQUEST_PATH, () =>
+  HttpResponse.json(userMockData[0], { status: 200 }),
+);
 
-export const AdminExistsRequestHandler = http.get<
-  ParamsToString<ADMIN_EXISTS_REQUEST_PARAMS>,
-  null,
-  null,
-  ADMIN_EXISTS_REQUEST_PATH
->("/api/initialise/admin-exists", () => new HttpResponse(null, { status: 404 }));
+export const AdminExistsRequestHandler = http.get<ParamsToString<ADMIN_EXISTS_REQUEST_PARAMS>>(
+  "/api/initialise/admin-exists" satisfies ADMIN_EXISTS_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 404 }),
+);
 
-export const UserGetRequestHandler = http.get<
-  ParamsToString<USER_GET_REQUEST_PARAMS>,
-  null,
-  User,
-  USER_GET_REQUEST_PATH
->("/api/user/1", () => HttpResponse.json(userMockData[0], { status: 200 }));
+export const UserGetRequestHandler = http.get<ParamsToString<USER_GET_REQUEST_PARAMS>>(
+  "/api/user/1" satisfies USER_GET_REQUEST_PATH,
+  () => HttpResponse.json(userMockData[0], { status: 200 }),
+);
 
-export const UserListRequestHandler = http.get<
-  USER_LIST_REQUEST_PARAMS,
-  null,
-  UserListResponse,
-  USER_LIST_REQUEST_PATH
->("/api/user", () => HttpResponse.json({ users: userMockData }, { status: 200 }));
+export const UserListRequestHandler = http.get<USER_LIST_REQUEST_PARAMS, null, UserListResponse>(
+  "/api/user" satisfies USER_LIST_REQUEST_PATH,
+  () => HttpResponse.json({ users: userMockData }, { status: 200 }),
+);
 
 export const UserUpdateRequestHandler = http.put<
   ParamsToString<USER_UPDATE_REQUEST_PARAMS>,
   USER_UPDATE_REQUEST_BODY,
-  User,
-  USER_UPDATE_REQUEST_PATH
->("/api/user/1", () => HttpResponse.json(userMockData[0], { status: 200 }));
+  User
+>("/api/user/1" satisfies USER_UPDATE_REQUEST_PATH, () => HttpResponse.json(userMockData[0], { status: 200 }));
 
-export const UserDeleteRequestHandler = http.delete<
-  ParamsToString<USER_DELETE_REQUEST_PARAMS>,
-  null,
-  undefined,
-  USER_DELETE_REQUEST_PATH
->("/api/user/1", () => new HttpResponse(null, { status: 200 }));
+export const UserDeleteRequestHandler = http.delete<ParamsToString<USER_DELETE_REQUEST_PARAMS>>(
+  "/api/user/1" satisfies USER_DELETE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 200 }),
+);
 
 // get user handler
-export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginResponse, WHOAMI_REQUEST_PATH>(
-  "/api/user/whoami",
+export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginResponse>(
+  "/api/user/whoami" satisfies WHOAMI_REQUEST_PATH,
   () =>
     HttpResponse.json(loginResponseMockData, {
       status: 200,

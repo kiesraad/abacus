@@ -4,7 +4,8 @@
       "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden. Als er geen extra onderzoek is gedaan, moeten deze vragen overgeslagen worden."
+      "title": "Beide vragen moeten beantwoord ofwel overgeslagen zijn",
+      "content": "Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden.\nAls er geen extra onderzoek is gedaan, moeten deze vragen overgeslagen worden."
     }
   },
   "F102": {
@@ -12,7 +13,7 @@
       "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Er mag maar één antwoord per vraag worden gegeven."
+      "title": "Er mag maar één antwoord per vraag worden gegeven"
     }
   },
   "F111": {
@@ -20,7 +21,7 @@
       "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Bij beide vragen moet een antwoord gegeven worden."
+      "title": "Bij beide vragen moet een antwoord gegeven worden"
     }
   },
   "F112": {
@@ -28,36 +29,38 @@
       "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Er mag maar één antwoord per vraag worden gegeven."
+      "title": "Er mag maar één antwoord per vraag worden gegeven"
     }
   },
   "F201": {
     "typist": {
-      "title": "Controleer toegelaten kiezers",
-      "content": "De invoer bij A, B of D klopt niet."
+      "title": "Controleer je antwoorden"
     },
     "coordinator": {
       "title": "A en B tellen niet op tot D",
-      "content": "Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.\nZo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.\nZo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is."
+      "content": "Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.",
+      "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
     }
   },
   "F202": {
     "typist": {
-      "title": "Controleer de stemmen op lijsten en totaal stemmen op kandidaten"
+      "title": "Controleer je antwoorden"
     },
     "coordinator": {
       "title": "De stemmen op lijsten tellen niet op tot E",
-      "content": "Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en H worden ingevuld.\nZo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.\nZo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is."
+      "content": "Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en H worden ingevuld.",
+      "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
     }
   },
   "F203": {
     "typist": {
-      "title": "Controleer uitgebrachte stemmen",
+      "title": "Controleer je antwoorden",
       "content": "De invoer bij E, F, G of H klopt niet."
     },
     "coordinator": {
       "title": "E, F en G tellen niet op tot H",
-      "content": "Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij H wordt ingevuld.\nZo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.\nZo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is."
+      "content": "Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij H wordt ingevuld.",
+      "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
     }
   },
   "F301": {
@@ -248,6 +251,6 @@
   "errors": "foutmeldingen",
   "warnings": "waarschuwingen",
   "multiple_action_title": "Voor alle {type} geldt het volgende:",
-  "made_a_mistake": "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
-  "error_or_warning_remains": "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder."
+  "coordinator_actions": "<ul><li>Controleer of de invoer in Abacus goed is overgenomen van het papieren proces-verbaal.</li><li>Zit de fout ook in het papieren proces-verbaal? Los de fout dan daar op.</li></ul>",
+  "typist_actions": "<ul><li>Heb je iets niet goed overgenomen? Herstel de fout en ga verder.</li><li>Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.</li></ul>"
 }

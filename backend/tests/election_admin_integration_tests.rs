@@ -1,10 +1,12 @@
 #![cfg(test)]
 
+use abacus::{
+    committee_session::status::CommitteeSessionStatus, election::ElectionWithPoliticalGroups,
+};
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
-use utils::serve_api;
-
 use test_log::test;
+use utils::serve_api;
 
 pub mod shared;
 pub mod utils;
@@ -379,7 +381,7 @@ async fn test_election_import_save(pool: SqlitePool) {
     let admin_cookie = shared::admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
-        .header("cookie", admin_cookie)
+        .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -405,6 +407,13 @@ async fn test_election_import_save(pool: SqlitePool) {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::CREATED);
+    let body: ElectionWithPoliticalGroups = response.json().await.unwrap();
+    let committee_session =
+        shared::get_election_committee_session(&addr, &admin_cookie, body.id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryNotStarted,
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

@@ -17,7 +17,10 @@ use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     authentication::{Admin, User},
-    committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest,
+        status::{CommitteeSessionStatus, change_committee_session_status},
+    },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{PollingStation, PollingStationRequest},
 };
@@ -294,6 +297,23 @@ pub async fn election_import(
         .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
         .await?;
 
+    // Create first committee session for the election
+    let committee_session = crate::committee_session::repository::create(
+        &pool,
+        CommitteeSessionCreateRequest {
+            number: 1,
+            election_id: election.id,
+            number_of_voters: edu.number_of_voters,
+        },
+    )
+    .await?;
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+            None,
+        )
+        .await?;
+
     // Create polling stations
     if let Some(places) = polling_places {
         let number_of_polling_stations = places.len();
@@ -312,24 +332,15 @@ pub async fn election_import(
                 None,
             )
             .await?;
-    }
 
-    // Create first committee session for the election
-    let committee_session = crate::committee_session::repository::create(
-        &pool,
-        CommitteeSessionCreateRequest {
-            number: 1,
-            election_id: election.id,
-            number_of_voters: edu.number_of_voters,
-        },
-    )
-    .await?;
-    audit_service
-        .log(
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
-            None,
+        change_committee_session_status(
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryNotStarted,
+            pool.clone(),
+            audit_service,
         )
         .await?;
+    }
 
     Ok((StatusCode::CREATED, Json(election)))
 }

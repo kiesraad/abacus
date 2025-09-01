@@ -98,9 +98,9 @@ pub async fn election_details(
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = crate::election::repository::get(&pool, id).await?;
-    let polling_stations = crate::polling_station::repository::list(&pool, id).await?;
     let committee_session =
         crate::committee_session::repository::get_election_committee_session(&pool, id).await?;
+    let polling_stations = crate::polling_station::repository::list(&pool, id).await?;
     Ok(Json(ElectionDetailsResponse {
         committee_session,
         election,

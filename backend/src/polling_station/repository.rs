@@ -9,6 +9,12 @@ pub async fn list(
     conn: impl DbConnLike<'_>,
     election_id: u32,
 ) -> Result<Vec<PollingStation>, sqlx::Error> {
+    let mut tx = conn.begin_immediate().await?;
+    let committee_session_id =
+        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
+            .await?
+            .ok_or(sqlx::Error::RowNotFound)?;
+
     query_as!(
         PollingStation,
         r#"
@@ -26,11 +32,11 @@ pub async fn list(
             p.locality
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
-        WHERE c.election_id = $1
+        WHERE c.id = $1
         "#,
-        election_id
+        committee_session_id
     )
-    .fetch_all(conn)
+    .fetch_all(&mut *tx)
     .await
 }
 
@@ -96,6 +102,12 @@ pub async fn get_for_election(
     election_id: u32,
     id: u32,
 ) -> Result<PollingStation, sqlx::Error> {
+    let mut conn = conn.acquire().await?;
+    let committee_session_id =
+        crate::committee_session::repository::get_current_id_for_election(&mut *conn, election_id)
+            .await?
+            .ok_or(sqlx::Error::RowNotFound)?;
+
     query_as!(
         PollingStation,
         r#"
@@ -113,12 +125,12 @@ pub async fn get_for_election(
             p.locality
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
-        WHERE p.id = $1 AND c.election_id = $2
+        WHERE p.id = $1 AND c.id = $2
         "#,
         id,
-        election_id
+        committee_session_id
     )
-    .fetch_one(conn)
+    .fetch_one(&mut *conn)
     .await
 }
 

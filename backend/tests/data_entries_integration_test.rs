@@ -62,8 +62,8 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
           "ballots_recounted_extra_investigation": { "yes": false, "no": false },
         },
         "counting_differences_polling_station": {
-          "unexplained_difference_ballots_voters": { "yes": false, "no": false },
-          "difference_ballots_per_list": { "yes": false, "no": false },
+          "unexplained_difference_ballots_voters": { "yes": false, "no": true },
+          "difference_ballots_per_list": { "yes": false, "no": true },
         },
         "voters_counts": {
           "poll_card_count": 4,
@@ -71,7 +71,17 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
           "total_admitted_voters_count": 4
         },
         "votes_counts": {
-          "votes_candidates_count": 5,
+          "political_group_total_votes": [
+            {
+              "number": 1,
+              "total": 11,
+            },
+            {
+              "number": 2,
+              "total": 11,
+            }
+          ],
+          "total_votes_candidates_count": 5,
           "blank_votes_count": 6,
           "invalid_votes_count": 7,
           "total_votes_cast_count": 8
@@ -79,11 +89,12 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         "differences_counts": {
           "more_ballots_count": 4,
           "fewer_ballots_count": 0,
-          "unreturned_ballots_count": 0,
-          "too_few_ballots_handed_out_count": 0,
-          "too_many_ballots_handed_out_count": 2,
-          "other_explanation_count": 1,
-          "no_explanation_count": 1,
+          "compare_votes_cast_admitted_voters": {
+            "admitted_voters_equal_votes_cast": false,
+            "votes_cast_greater_than_admitted_voters": false,
+            "votes_cast_smaller_than_admitted_voters": false
+          },
+          "difference_completely_accounted_for": { "yes": false, "no": false },
         },
         "political_group_votes": [
           {
@@ -149,19 +160,20 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         errors[1].fields,
         vec![
-            "data.votes_counts.votes_candidates_count",
-            "data.votes_counts.blank_votes_count",
-            "data.votes_counts.invalid_votes_count",
-            "data.votes_counts.total_votes_cast_count",
+            "data.votes_counts.political_group_total_votes[0].total",
+            "data.votes_counts.political_group_total_votes[1].total",
+            "data.votes_counts.total_votes_candidates_count"
         ]
     );
     // error 3
-    assert_eq!(errors[2].code, ValidationResultCode::F204);
+    assert_eq!(errors[2].code, ValidationResultCode::F203);
     assert_eq!(
         errors[2].fields,
         vec![
-            "data.votes_counts.votes_candidates_count",
-            "data.political_group_votes"
+            "data.votes_counts.total_votes_candidates_count",
+            "data.votes_counts.blank_votes_count",
+            "data.votes_counts.invalid_votes_count",
+            "data.votes_counts.total_votes_cast_count",
         ]
     );
     // error 4
@@ -172,11 +184,23 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(errors[4].fields, vec!["data.political_group_votes[1]"]);
 
     let warnings = body.validation_results.warnings;
-    assert_eq!(warnings.len(), 1);
+    assert_eq!(warnings.len(), 3);
     // warning 1
-    assert_eq!(warnings[0].code, ValidationResultCode::W203);
+    assert_eq!(warnings[0].code, ValidationResultCode::W201);
     assert_eq!(
         warnings[0].fields,
+        vec!["data.votes_counts.blank_votes_count",]
+    );
+    // warning 2
+    assert_eq!(warnings[1].code, ValidationResultCode::W202);
+    assert_eq!(
+        warnings[1].fields,
+        vec!["data.votes_counts.invalid_votes_count"]
+    );
+    // warning 3
+    assert_eq!(warnings[2].code, ValidationResultCode::W203);
+    assert_eq!(
+        warnings[2].fields,
         vec![
             "data.votes_counts.total_votes_cast_count",
             "data.voters_counts.total_admitted_voters_count",

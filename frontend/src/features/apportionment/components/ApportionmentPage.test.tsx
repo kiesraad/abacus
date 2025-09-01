@@ -59,7 +59,7 @@ describe("ApportionmentPage", () => {
       ["Getelde stembiljetten", "1.205", "Opkomst: 60.25%"],
       ["Blanco stemmen", "3", "0.25%"],
       ["Ongeldige stemmen", "2", "0.17%"],
-      ["Stemmen op kandidaten", "1.200", ""],
+      ["Totaal stemmen op kandidaten", "1.200", ""],
       ["Aantal raadszetels", "15", ""],
       ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
       ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
@@ -222,10 +222,8 @@ describe("ApportionmentPage", () => {
     });
 
     test("Internal Server Error renders error page", async () => {
-      // Since we test what happens after an error, we want vitest to ignore them
-      vi.spyOn(console, "error").mockImplementation(() => {
-        /* do nothing */
-      });
+      // error is expected
+      vi.spyOn(console, "error").mockImplementation(() => {});
       const router = setupTestRouter([
         {
           Component: null,

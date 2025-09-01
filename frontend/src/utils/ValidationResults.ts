@@ -34,22 +34,6 @@ export class ValidationResultSet {
   getFields(): Set<string> {
     return new Set(Array.from(this.entries).flatMap((entry) => entry.fields));
   }
-
-  hasOnlyGlobalValidationResults(): boolean {
-    return Array.from(this.entries).every((entry) => isGlobalValidationResult(entry));
-  }
-
-  removeGlobalValidationResults(): void {
-    this.entries = new Set(Array.from(this.entries).filter((entry) => !isGlobalValidationResult(entry)));
-  }
-}
-
-/*
- * Is a validation result a global validation result?
- * Global validation results are only shown when the entire data entry form is completed.
- */
-export function isGlobalValidationResult(validationResult: ValidationResult): boolean {
-  return validationResult.code === "F204";
 }
 
 /*

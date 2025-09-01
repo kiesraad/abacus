@@ -174,3 +174,8 @@ The OpenAPI JSON specification is available in the repository at `openapi.json` 
 The Swagger UI is available at [/api-docs](http://localhost:8080/api-docs).
 
 To update `openapi.json` in the repository, run the command `cargo run --bin gen-openapi`.
+
+### Test data generation
+You can fill the database with test data and (optionally) export the election definition files with `gen-test-election.rs`.
+
+Run `cargo run --bin gen-test-election -- --help` to see all command-line options.

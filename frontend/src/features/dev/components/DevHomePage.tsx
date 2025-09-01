@@ -3,18 +3,43 @@ import { Link } from "react-router";
 
 import { ApiResult, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
+import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { MockTest } from "@/components/dev/MockTest";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
-import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
-import { useElectionList } from "@/hooks/election/useElectionList";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import { LoginResponse } from "@/types/generated/openapi";
+import { Election, ELECTION_LIST_REQUEST_PATH, ElectionListResponse, LoginResponse } from "@/types/generated/openapi";
 
-function TypistLinks() {
-  const { electionList } = useElectionList();
+function Links() {
+  const { isTypist, isAdministrator, isCoordinator } = useUserRole();
+  const { requestState: getElections } = useInitialApiGet<ElectionListResponse>(
+    `/api/elections` satisfies ELECTION_LIST_REQUEST_PATH,
+  );
+  if (getElections.status === "api-error") {
+    throw getElections.error;
+  }
+  if (getElections.status === "loading") {
+    return <Loader />;
+  }
+  const electionList = getElections.data.elections;
 
+  return (
+    <>
+      {(__API_MSW__ || isAdministrator || isCoordinator) && (
+        <AdministratorCoordinatorLinks electionList={electionList} />
+      )}
+      {(__API_MSW__ || isTypist) && <TypistLinks electionList={electionList} />}
+    </>
+  );
+}
+
+interface LinksProps {
+  electionList: Election[];
+}
+
+function TypistLinks({ electionList }: LinksProps) {
   return (
     <>
       <strong>{t("typist")}</strong>
@@ -34,8 +59,7 @@ function TypistLinks() {
   );
 }
 
-function AdministratorCoordinatorLinks() {
-  const { electionList } = useElectionList();
+function AdministratorCoordinatorLinks({ electionList }: LinksProps) {
   const { isAdministrator, isCoordinator } = useUserRole();
 
   return (
@@ -84,7 +108,6 @@ function AdministratorCoordinatorLinks() {
 
 function DevLinks() {
   const { user, login, logout } = useApiState();
-  const { isTypist, isAdministrator, isCoordinator } = useUserRole();
   const [response, setResponse] = useState<ApiResult<LoginResponse> | null>(null);
 
   if (response !== null && isError(response)) {
@@ -194,16 +217,7 @@ function DevLinks() {
           </ul>
         </>
       )}
-      {(__API_MSW__ || isAdministrator || isCoordinator) && (
-        <ElectionListProvider>
-          <AdministratorCoordinatorLinks />
-        </ElectionListProvider>
-      )}
-      {(__API_MSW__ || isTypist) && (
-        <ElectionListProvider>
-          <TypistLinks />
-        </ElectionListProvider>
-      )}
+      {(__API_MSW__ || user) && <Links />}
     </>
   );
 }

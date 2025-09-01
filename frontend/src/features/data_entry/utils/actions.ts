@@ -1,6 +1,11 @@
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResult, isSuccess } from "@/api/ApiResult";
-import { DataEntry, DataEntryStatusResponse, SaveDataEntryResponse } from "@/types/generated/openapi";
+import {
+  DataEntry,
+  DataEntryStatusResponse,
+  PollingStationResults,
+  SaveDataEntryResponse,
+} from "@/types/generated/openapi";
 import { FormSectionId, SectionValues } from "@/types/types";
 import { mapSectionValues } from "@/utils/dataEntryMapping";
 
@@ -88,7 +93,8 @@ export function onSubmitForm(
 
     const response: ApiResult<SaveDataEntryResponse> = await client.postRequest(requestPath, {
       progress,
-      data,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      data: data as PollingStationResults,
       client_state: clientState,
     } satisfies DataEntry);
 

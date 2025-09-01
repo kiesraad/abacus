@@ -1,18 +1,16 @@
 import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import { Message } from "@/hooks/messages/MessagesContext";
-import { useMessages } from "@/hooks/messages/useMessages";
 
 import { Messages } from "./Messages";
-
-vi.mock("@/hooks/messages/useMessages");
 
 describe("Messages component", () => {
   const popMessages: Mock<() => Message[]> = vi.fn(() => []);
 
   beforeEach(() => {
-    vi.mocked(useMessages).mockReturnValue({ pushMessage: vi.fn(), popMessages });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages });
   });
 
   test("should render message", async () => {

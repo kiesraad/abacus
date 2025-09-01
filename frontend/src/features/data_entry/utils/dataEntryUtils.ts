@@ -1,5 +1,5 @@
-import { PollingStationResults, ValidationResult, ValidationResults } from "@/types/generated/openapi";
-import { DataEntryStructure, FormSectionId } from "@/types/types";
+import { ValidationResult, ValidationResults } from "@/types/generated/openapi";
+import { DataEntryResults, DataEntryStructure, FormSectionId } from "@/types/types";
 import { extractFieldInfoFromSection, getValueAtPath } from "@/utils/dataEntryMapping";
 import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
 
@@ -9,7 +9,7 @@ import { INITIAL_FORM_SECTION_ID } from "./reducer";
 export function formSectionComplete(section: FormSection): boolean {
   return (
     section.isSaved &&
-    (section.errors.isEmpty() || section.errors.hasOnlyGlobalValidationResults() || section.acceptErrorsAndWarnings) &&
+    (section.errors.isEmpty() || section.acceptErrorsAndWarnings) &&
     (section.warnings.isEmpty() || section.acceptErrorsAndWarnings)
   );
 }
@@ -44,7 +44,7 @@ export function getNextSectionID(formState: FormState, currentSectionId: FormSec
 export function isFormSectionEmpty(
   dataEntryStructure: DataEntryStructure,
   section: FormSection,
-  values: PollingStationResults,
+  results: DataEntryResults,
 ): boolean {
   const dataEntrySection = dataEntryStructure.find((s) => s.id === section.id);
   if (!dataEntrySection) {
@@ -54,7 +54,7 @@ export function isFormSectionEmpty(
 
   const fieldInfoMap = extractFieldInfoFromSection(dataEntrySection);
   for (const [path, fieldType] of fieldInfoMap) {
-    const value = getValueAtPath(values, path);
+    const value = getValueAtPath(results, path);
 
     switch (fieldType) {
       case "boolean":
@@ -229,14 +229,6 @@ export function updateFormStateAfterSubmit(
   //determine the new furthest section, if applicable
   if (continueToNextSection && currentFormSection && formState.furthest === currentFormSection.id) {
     formState.furthest = getNextSectionID(formState, sectionId) ?? formState.furthest;
-  }
-
-  if (formState.furthest !== "save") {
-    //if the entire form is not completed yet, filter out global validation results since they don't have meaning yet.
-    Object.values(formState.sections).forEach((section) => {
-      section.errors.removeGlobalValidationResults();
-      section.warnings.removeGlobalValidationResults();
-    });
   }
 
   return formState;

@@ -4,11 +4,11 @@ import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useUser from "@/hooks/user/useUser";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { useUser } from "@/hooks/user/useUser";
 import { electionDetailsMockResponse, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionListRequestHandler,
@@ -24,8 +24,6 @@ import { ElectionDetailsResponse, ElectionStatusResponse } from "@/types/generat
 import { dataEntryHomeRoutes } from "../routes";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
-vi.mock("@/hooks/user/useUser");
-
 const renderDataEntryHomePage = () =>
   render(
     <ElectionProvider electionId={1}>
@@ -37,7 +35,7 @@ const renderDataEntryHomePage = () =>
 
 describe("DataEntryHomePage", () => {
   beforeEach(() => {
-    vi.mocked(useUser).mockReturnValue(getTypistUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
     server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   });

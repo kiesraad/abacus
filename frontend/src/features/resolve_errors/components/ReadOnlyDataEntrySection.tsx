@@ -2,8 +2,8 @@ import { DataEntrySubsections } from "@/components/data_entry/DataEntrySubsectio
 import { SectionNumber } from "@/components/ui/Badge/SectionNumber";
 import { Feedback } from "@/components/ui/Feedback/Feedback";
 import { Form } from "@/components/ui/Form/Form";
-import { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
-import { DataEntrySection, SectionValues } from "@/types/types";
+import { ValidationResults } from "@/types/generated/openapi";
+import { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 import { getValidationResultSetForSection, mapValidationResultSetsToFields } from "@/utils/ValidationResults";
 
@@ -11,7 +11,7 @@ import cls from "./ReadOnlyDataEntrySection.module.css";
 
 interface ReadOnlyDataEntrySectionProps {
   section: DataEntrySection;
-  data: PollingStationResults;
+  data: DataEntryResults;
   validationResults: ValidationResults;
 }
 

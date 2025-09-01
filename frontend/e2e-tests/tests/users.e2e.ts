@@ -10,7 +10,7 @@ import { UserListPgObj } from "../page-objects/users/UserListPgObj";
 import { UserUpdatePgObj } from "../page-objects/users/UserUpdatePgObj";
 
 test.use({
-  storageState: "e2e-tests/state/admin.json",
+  storageState: "e2e-tests/state/admin1.json",
 });
 
 test.describe("Users", () => {

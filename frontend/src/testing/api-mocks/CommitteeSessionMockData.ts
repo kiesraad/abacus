@@ -23,15 +23,28 @@ export const getCommitteeSessionListMockData = (
 ): CommitteeSessionListResponse => {
   return {
     committee_sessions: [
+      // backend returns committee sessions sorted by number, descending
       {
         ...committeeSessionMockData,
+        id: 4,
+        number: 4,
+        ...committeeSession,
+      },
+      {
+        ...committeeSessionMockData,
+        id: 3,
+        number: 3,
         status: "data_entry_finished",
       },
       {
         ...committeeSessionMockData,
         id: 2,
         number: 2,
-        ...committeeSession,
+        status: "data_entry_finished",
+      },
+      {
+        ...committeeSessionMockData,
+        status: "data_entry_finished",
       },
     ],
   };

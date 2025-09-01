@@ -1,3 +1,5 @@
+import * as ReactRouter from "react-router";
+
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -13,11 +15,6 @@ import { NumberOfVotersPage } from "./NumberOfVotersPage";
 
 const navigate = vi.fn();
 
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 async function renderPage() {
   render(
     <ElectionProvider electionId={1}>
@@ -32,6 +29,7 @@ async function renderPage() {
 describe("NumberOfVotersPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, CommitteeSessionChangeNumberOfVotersHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
   test("save and navigate on submit", async () => {

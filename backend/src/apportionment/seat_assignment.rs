@@ -5,7 +5,9 @@ use tracing::{debug, info};
 use utoipa::ToSchema;
 
 use super::Fraction;
-use crate::{data_entry::PoliticalGroupVotes, election::PGNumber, summary::ElectionSummary};
+use crate::{
+    data_entry::PoliticalGroupCandidateVotes, election::PGNumber, summary::ElectionSummary,
+};
 
 /// The result of the seat assignment procedure. This contains the number of seats and the quota
 /// that was used. It then contains the initial standing after full seats were assigned,
@@ -82,7 +84,7 @@ pub struct PoliticalGroupStanding {
 impl PoliticalGroupStanding {
     /// Create a new instance computing the whole number of seats that
     /// were assigned to a political group.
-    fn new(pg: &PoliticalGroupVotes, quota: Fraction) -> Self {
+    fn new(pg: &PoliticalGroupCandidateVotes, quota: Fraction) -> Self {
         let votes_cast = Fraction::from(pg.total);
         let pg_seats = if votes_cast > Fraction::ZERO {
             u32::try_from((votes_cast / quota).integer_part()).expect("pg_seats fit in u32")
@@ -313,7 +315,7 @@ pub enum ApportionmentError {
 
 /// Initial construction of the data required per political group
 fn initial_full_seats_per_political_group(
-    pg_votes: &[PoliticalGroupVotes],
+    pg_votes: &[PoliticalGroupCandidateVotes],
     quota: Fraction,
 ) -> Vec<PoliticalGroupStanding> {
     pg_votes
@@ -435,7 +437,7 @@ fn reassign_residual_seat_for_absolute_majority(
     standings: Vec<PoliticalGroupStanding>,
 ) -> Result<(Vec<PoliticalGroupStanding>, Option<SeatChange>), ApportionmentError> {
     let half_of_votes_count: Fraction =
-        Fraction::from(totals.votes_counts.votes_candidates_count) * Fraction::new(1, 2);
+        Fraction::from(totals.votes_counts.total_votes_candidates_count) * Fraction::new(1, 2);
 
     // Find political group with an absolute majority of votes. Return early if we find none
     let Some(majority_pg_votes) = totals
@@ -592,14 +594,15 @@ pub fn seat_assignment(
     info!("Seat assignment");
     info!("Seats: {}", seats);
 
-    if totals.votes_counts.votes_candidates_count == 0 {
+    if totals.votes_counts.total_votes_candidates_count == 0 {
         info!("No votes on candidates cast");
         return Err(ApportionmentError::ZeroVotesCast);
     }
 
     // [Artikel P 5 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_5&z=2025-02-12&g=2025-02-12)
     // Calculate electoral quota (kiesdeler) as a proper fraction
-    let quota = Fraction::from(totals.votes_counts.votes_candidates_count) / Fraction::from(seats);
+    let quota =
+        Fraction::from(totals.votes_counts.total_votes_candidates_count) / Fraction::from(seats);
     info!("Quota: {}", quota);
 
     // [Artikel P 6 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_6&z=2025-02-12&g=2025-02-12)

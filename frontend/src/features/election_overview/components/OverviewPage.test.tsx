@@ -1,12 +1,13 @@
+import * as ReactRouter from "react-router";
+
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ElectionListProvider } from "@/hooks/election/ElectionListProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { render, renderReturningRouter, screen, waitFor } from "@/testing/test-utils";
+import { render, renderReturningRouter, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionListResponse } from "@/types/generated/openapi";
 
@@ -14,23 +15,17 @@ import { OverviewPage } from "./OverviewPage";
 
 const navigate = vi.fn();
 
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 describe("OverviewPage", () => {
   beforeEach(() => {
     server.use(ElectionListRequestHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
   test("Renders elections for typist", async () => {
     const user = userEvent.setup();
     render(
       <TestUserProvider userRole="typist">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -57,9 +52,7 @@ describe("OverviewPage", () => {
     const user = userEvent.setup();
     render(
       <TestUserProvider userRole="coordinator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -71,7 +64,7 @@ describe("OverviewPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Verkiezing", "Niveau stembureau", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"],
+      ["Gemeenteraadsverkiezingen 2026", "GSB - Heemdamseburg (0035)", "Steminvoer bezig — Eerste zitting"],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -86,9 +79,7 @@ describe("OverviewPage", () => {
     const user = userEvent.setup();
     render(
       <TestUserProvider userRole="administrator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -100,7 +91,7 @@ describe("OverviewPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Verkiezing", "Niveau stembureau", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"],
+      ["Gemeenteraadsverkiezingen 2026", "GSB - Heemdamseburg (0035)", "Steminvoer bezig — Eerste zitting"],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -126,9 +117,7 @@ describe("OverviewPage", () => {
 
     render(
       <TestUserProvider userRole="typist">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -157,9 +146,7 @@ describe("OverviewPage", () => {
 
     render(
       <TestUserProvider userRole="coordinator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -189,9 +176,7 @@ describe("OverviewPage", () => {
 
     const router = renderReturningRouter(
       <TestUserProvider userRole="administrator">
-        <ElectionListProvider>
-          <OverviewPage />
-        </ElectionListProvider>
+        <OverviewPage />
       </TestUserProvider>,
     );
 
@@ -210,5 +195,32 @@ describe("OverviewPage", () => {
     await user.click(button);
 
     expect(router.state.location.pathname).toEqual("/create");
+  });
+
+  test("Refetches data every 30 seconds", async () => {
+    vi.useFakeTimers();
+    render(
+      <TestUserProvider userRole="typist">
+        <OverviewPage />
+      </TestUserProvider>,
+    );
+
+    // Wait for the page to be loaded
+    await vi.waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
+    });
+
+    const electionListRequestSpy = spyOnHandler(ElectionListRequestHandler);
+
+    // Test 3 intervals of 30 seconds each
+    for (let i = 1; i <= 3; i++) {
+      vi.advanceTimersByTime(30_000);
+
+      await vi.waitFor(() => {
+        expect(electionListRequestSpy).toHaveBeenCalledTimes(i);
+      });
+    }
+
+    vi.useRealTimers();
   });
 });

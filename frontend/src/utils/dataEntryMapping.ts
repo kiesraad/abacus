@@ -1,5 +1,4 @@
-import { PollingStationResults } from "@/types/generated/openapi";
-import { DataEntrySection, SectionValues } from "@/types/types";
+import { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
 import { parseIntUserInput } from "@/utils/strings";
 
 type PathSegment = string | number;
@@ -34,20 +33,24 @@ export function extractFieldInfoFromSection(section: DataEntrySection): Map<stri
   return fieldInfoMap;
 }
 
-export function mapSectionValues<T>(current: T, formValues: SectionValues, section: DataEntrySection): T {
-  const mappedValues: T = structuredClone(current);
+export function mapSectionValues<T extends DataEntryResults>(
+  currentResults: T,
+  formValues: SectionValues,
+  section: DataEntrySection,
+): T {
+  const newResults: T = structuredClone(currentResults);
 
   const fieldInfoMap = extractFieldInfoFromSection(section);
 
   Object.entries(formValues).forEach(([path, value]) => {
     const valueType = fieldInfoMap.get(path);
-    setValueAtPath(mappedValues, path, value, valueType);
+    setValueAtPath(newResults, path, value, valueType);
   });
 
-  return mappedValues;
+  return newResults;
 }
 
-export function mapResultsToSectionValues(section: DataEntrySection, results: unknown): SectionValues {
+export function mapResultsToSectionValues(section: DataEntrySection, results: DataEntryResults): SectionValues {
   const formValues: SectionValues = {};
 
   const fieldInfoMap = extractFieldInfoFromSection(section);
@@ -59,16 +62,16 @@ export function mapResultsToSectionValues(section: DataEntrySection, results: un
   return formValues;
 }
 
-export function getStringValueAtPath(results: PollingStationResults, path: string): string {
-  const value = getValueAtPath(results, path);
-  return valueToString(value);
-}
-
-function setValueAtPath(obj: unknown, path: string, value: string, valueType: "boolean" | "number" | undefined): void {
+function setValueAtPath(
+  results: DataEntryResults,
+  path: string,
+  value: string,
+  valueType: "boolean" | "number" | undefined,
+): void {
   const segments = parsePathSegments(path);
   const processedValue = processValue(value, valueType);
 
-  let current = obj;
+  let current: unknown = results;
 
   for (let i = 0; i < segments.length - 1; i++) {
     const segment = segments[i];
@@ -97,7 +100,7 @@ function setValueAtPath(obj: unknown, path: string, value: string, valueType: "b
   }
 }
 
-export function getValueAtPath(obj: unknown, path: string): PathValue {
+export function getValueAtPath(results: DataEntryResults, path: string): PathValue {
   const segments = parsePathSegments(path);
 
   const result = segments.reduce<unknown>((current, segment) => {
@@ -108,7 +111,7 @@ export function getValueAtPath(obj: unknown, path: string): PathValue {
     } else {
       return isRecord(current) && segment in current ? current[segment] : undefined;
     }
-  }, obj);
+  }, results);
 
   return isPathValue(result) ? result : undefined;
 }

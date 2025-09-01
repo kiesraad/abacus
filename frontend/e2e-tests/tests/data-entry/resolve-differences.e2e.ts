@@ -6,7 +6,7 @@ import { test } from "../../fixtures";
 import { ResolveErrorsPgObj } from "../../page-objects/election/ResolveErrorsPgObj";
 
 test.use({
-  storageState: "e2e-tests/state/coordinator.json",
+  storageState: "e2e-tests/state/coordinator1.json",
 });
 
 test.describe("resolve differences", () => {

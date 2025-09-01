@@ -1,4 +1,4 @@
-use std::ops::AddAssign;
+use std::{collections::HashSet, ops::AddAssign};
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -68,7 +68,7 @@ pub struct PollingStationResults {
     /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
     pub differences_counts: DifferencesCounts,
     /// Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat")
-    pub political_group_votes: Vec<PoliticalGroupVotes>,
+    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
 impl PollingStationResults {
@@ -76,10 +76,10 @@ impl PollingStationResults {
     /// for the given political groups, with all votes set to 0.
     pub fn default_political_group_votes(
         political_groups: &[PoliticalGroup],
-    ) -> Vec<PoliticalGroupVotes> {
+    ) -> Vec<PoliticalGroupCandidateVotes> {
         political_groups
             .iter()
-            .map(|pg| PoliticalGroupVotes {
+            .map(|pg| PoliticalGroupCandidateVotes {
                 number: pg.number,
                 total: 0,
                 candidate_votes: pg
@@ -90,6 +90,19 @@ impl PollingStationResults {
                         votes: 0,
                     })
                     .collect(),
+            })
+            .collect()
+    }
+
+    /// Create a default value for `political_group_total_votes` in `votes_counts`
+    pub fn default_political_group_total_votes(
+        political_groups: &[PoliticalGroup],
+    ) -> Vec<PoliticalGroupTotalVotes> {
+        political_groups
+            .iter()
+            .map(|pg| PoliticalGroupTotalVotes {
+                number: pg.number,
+                total: 0,
             })
             .collect()
     }
@@ -121,58 +134,116 @@ impl AddAssign<&VotersCounts> for VotersCounts {
 }
 
 /// Votes counts, part of the polling station results.
+/// Following the fields in Model CSO Na 31-2 Bijlage 1.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct VotesCounts {
-    /// Number of valid votes on candidates
-    /// ("Aantal stembiljetten met een geldige stem op een kandidaat")
+    /// Total votes per list
+    pub political_group_total_votes: Vec<PoliticalGroupTotalVotes>,
+    /// Total number of valid votes on candidates
+    /// ("Totaal stemmen op kandidaten")
     #[schema(value_type = u32)]
-    pub votes_candidates_count: Count,
-    /// Number of blank votes ("Aantal blanco stembiljetten")
+    pub total_votes_candidates_count: Count,
+    /// Number of blank votes ("Blanco stembiljetten")
     #[schema(value_type = u32)]
     pub blank_votes_count: Count,
-    /// Number of invalid votes ("Aantal ongeldige stembiljetten")
+    /// Number of invalid votes ("Ongeldige stembiljetten")
     #[schema(value_type = u32)]
     pub invalid_votes_count: Count,
-    /// Total number of votes cast ("Totaal aantal getelde stemmen")
+    /// Total number of votes cast ("Totaal uitgebrachte stemmen")
     #[schema(value_type = u32)]
     pub total_votes_cast_count: Count,
 }
 
-impl AddAssign<&VotesCounts> for VotesCounts {
-    fn add_assign(&mut self, other: &Self) {
-        self.votes_candidates_count += other.votes_candidates_count;
+impl VotesCounts {
+    pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
+        // Get sets of political group numbers from both collections
+        let self_numbers: HashSet<_> = self
+            .political_group_total_votes
+            .iter()
+            .map(|pg| pg.number)
+            .collect();
+        let other_numbers: HashSet<_> = other
+            .political_group_total_votes
+            .iter()
+            .map(|pg| pg.number)
+            .collect();
+
+        // Check that both have exactly the same political groups
+        if self_numbers != other_numbers {
+            let missing_in_self: Vec<_> = other_numbers.difference(&self_numbers).collect();
+            let missing_in_other: Vec<_> = self_numbers.difference(&other_numbers).collect();
+
+            if !missing_in_self.is_empty() {
+                return Err(APIError::AddError(
+                    format!(
+                        "Political group(s) {missing_in_self:?} exist in source but not in target",
+                    ),
+                    ErrorReference::InvalidVoteGroup,
+                ));
+            }
+            if !missing_in_other.is_empty() {
+                return Err(APIError::AddError(
+                    format!(
+                        "Political group(s) {missing_in_other:?} exist in target but not in source",
+                    ),
+                    ErrorReference::InvalidVoteGroup,
+                ));
+            }
+        }
+
+        // Add totals of political groups with the same number
+        for pg in &other.political_group_total_votes {
+            if let Some(existing) = self
+                .political_group_total_votes
+                .iter_mut()
+                .find(|e| e.number == pg.number)
+            {
+                existing.total += pg.total;
+            }
+        }
+
+        self.total_votes_candidates_count += other.total_votes_candidates_count;
         self.blank_votes_count += other.blank_votes_count;
         self.invalid_votes_count += other.invalid_votes_count;
         self.total_votes_cast_count += other.total_votes_cast_count;
+
+        Ok(())
     }
 }
 
 /// Differences counts, part of the polling station results.
+/// (B1-3.3 "Verschillen tussen aantal kiezers en uitgebrachte stemmen")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct DifferencesCounts {
-    /// Number of more counted ballots ("Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?")
+    /// Whether total of admitted voters and total of votes cast match.
+    /// (B1-3.3.1 "Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)")
+    pub compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters,
+    /// Number of more counted ballots ("Aantal méér getelde stemmen (bereken: H min D)")
     #[schema(value_type = u32)]
     pub more_ballots_count: Count,
-    /// Number of fewer counted ballots ("Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld")
+    /// Number of fewer counted ballots ("Aantal minder getelde stemmen (bereken: D min H)")
     #[schema(value_type = u32)]
     pub fewer_ballots_count: Count,
-    /// Number of unreturned ballots ("Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?")
-    #[schema(value_type = u32)]
-    pub unreturned_ballots_count: Count,
-    /// Number of fewer ballots handed out ("Hoe vaak is er een stembiljet te weinig uitgereikt?")
-    #[schema(value_type = u32)]
-    pub too_few_ballots_handed_out_count: Count,
-    /// Number of more ballots handed out ("Hoe vaak is er een stembiljet te veel uitgereikt?")
-    #[schema(value_type = u32)]
-    pub too_many_ballots_handed_out_count: Count,
-    /// Number of other explanations ("Hoe vaak is er een andere verklaring voor het verschil?")
-    #[schema(value_type = u32)]
-    pub other_explanation_count: Count,
-    /// Number of no explanations ("Hoe vaak is er geen verklaring voor het verschil?")
-    #[schema(value_type = u32)]
-    pub no_explanation_count: Count,
+    /// Whether the difference between the total of admitted voters and total of votes cast is explained.
+    /// (B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?")
+    pub difference_completely_accounted_for: YesNo,
+}
+
+/// Compare votes cast admitted voters, part of the differences counts.
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct DifferenceCountsCompareVotesCastAdmittedVoters {
+    /// Whether total of admitted voters and total of votes cast match.
+    /// ("D en H zijn gelijk")
+    pub admitted_voters_equal_votes_cast: bool,
+    /// Whether total of admitted voters is greater than total of votes cast match.
+    /// ("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)")
+    pub votes_cast_greater_than_admitted_voters: bool,
+    /// Whether total of admitted voters is less than total of votes cast match.
+    /// ("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)")
+    pub votes_cast_smaller_than_admitted_voters: bool,
 }
 
 impl DifferencesCounts {
@@ -180,11 +251,8 @@ impl DifferencesCounts {
         DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 0,
-            unreturned_ballots_count: 0,
-            too_few_ballots_handed_out_count: 0,
-            too_many_ballots_handed_out_count: 0,
-            other_explanation_count: 0,
-            no_explanation_count: 0,
+            difference_completely_accounted_for: Default::default(),
+            compare_votes_cast_admitted_voters: Default::default(),
         }
     }
 }
@@ -195,6 +263,30 @@ impl DifferencesCounts {
 pub struct YesNo {
     pub yes: bool,
     pub no: bool,
+}
+
+impl YesNo {
+    pub fn is_answered(&self) -> bool {
+        self.yes || self.no
+    }
+
+    pub fn is_invalid(&self) -> bool {
+        self.yes && self.no
+    }
+
+    pub fn yes() -> Self {
+        Self {
+            yes: true,
+            no: false,
+        }
+    }
+
+    pub fn no() -> Self {
+        Self {
+            yes: false,
+            no: true,
+        }
+    }
 }
 
 /// Extra investigation, part of the polling station results ("B1-1 Extra onderzoek")
@@ -224,7 +316,7 @@ pub struct CountingDifferencesPollingStation {
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
-pub struct PoliticalGroupVotes {
+pub struct PoliticalGroupCandidateVotes {
     #[schema(value_type = u32)]
     pub number: PGNumber,
     #[schema(value_type = u32)]
@@ -232,7 +324,7 @@ pub struct PoliticalGroupVotes {
     pub candidate_votes: Vec<CandidateVotes>,
 }
 
-impl PoliticalGroupVotes {
+impl PoliticalGroupCandidateVotes {
     pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
         if self.number != other.number {
             return Err(APIError::AddError(
@@ -266,10 +358,10 @@ impl PoliticalGroupVotes {
         Ok(())
     }
 
-    /// Create `PoliticalGroupVotes` from test data with candidate numbers automatically generated starting from 1.
+    /// Create `PoliticalGroupCandidateVotes` from test data with candidate numbers automatically generated starting from 1.
     #[cfg(test)]
     pub fn from_test_data_auto(number: PGNumber, candidate_votes: &[Count]) -> Self {
-        PoliticalGroupVotes {
+        PoliticalGroupCandidateVotes {
             number,
             total: candidate_votes.iter().sum(),
             candidate_votes: candidate_votes
@@ -284,6 +376,15 @@ impl PoliticalGroupVotes {
     }
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct PoliticalGroupTotalVotes {
+    #[schema(value_type = u32)]
+    pub number: PGNumber,
+    #[schema(value_type = u32)]
+    pub total: Count,
+}
+
 #[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CandidateVotes {
@@ -293,32 +394,124 @@ pub struct CandidateVotes {
     pub votes: Count,
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct DataEntryStatusResponse {
+    pub status: DataEntryStatusName,
+}
+
+impl From<PollingStationDataEntry> for DataEntryStatusResponse {
+    fn from(data_entry: PollingStationDataEntry) -> Self {
+        DataEntryStatusResponse {
+            status: data_entry.state.0.status_name(),
+        }
+    }
+}
+
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use test_log::test;
 
     use super::*;
 
+    pub trait ValidDefault {
+        fn valid_default() -> Self;
+    }
+
+    impl ValidDefault for ExtraInvestigation {
+        fn valid_default() -> Self {
+            Self {
+                extra_investigation_other_reason: YesNo::default(),
+                ballots_recounted_extra_investigation: YesNo::default(),
+            }
+        }
+    }
+
+    impl ValidDefault for CountingDifferencesPollingStation {
+        fn valid_default() -> Self {
+            Self {
+                unexplained_difference_ballots_voters: YesNo::no(),
+                difference_ballots_per_list: YesNo::no(),
+            }
+        }
+    }
+
     #[test]
     fn test_votes_addition() {
         let mut curr_votes = VotesCounts {
-            votes_candidates_count: 2,
+            political_group_total_votes: vec![
+                PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 10,
+                },
+                PoliticalGroupTotalVotes {
+                    number: 2,
+                    total: 20,
+                },
+            ],
+            total_votes_candidates_count: 2,
             blank_votes_count: 3,
             invalid_votes_count: 4,
             total_votes_cast_count: 9,
         };
 
-        curr_votes += &VotesCounts {
-            votes_candidates_count: 1,
-            blank_votes_count: 2,
-            invalid_votes_count: 3,
-            total_votes_cast_count: 5,
-        };
+        curr_votes
+            .add(&VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 11,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 12,
+                    },
+                ],
+                total_votes_candidates_count: 1,
+                blank_votes_count: 2,
+                invalid_votes_count: 3,
+                total_votes_cast_count: 5,
+            })
+            .unwrap();
 
-        assert_eq!(curr_votes.votes_candidates_count, 3);
+        assert_eq!(curr_votes.political_group_total_votes.len(), 2);
+        assert_eq!(curr_votes.political_group_total_votes[0].total, 21);
+        assert_eq!(curr_votes.political_group_total_votes[1].total, 32);
+
+        assert_eq!(curr_votes.total_votes_candidates_count, 3);
         assert_eq!(curr_votes.blank_votes_count, 5);
         assert_eq!(curr_votes.invalid_votes_count, 7);
         assert_eq!(curr_votes.total_votes_cast_count, 14);
+    }
+
+    #[test]
+    fn test_votes_addition_error() {
+        let mut curr_votes = VotesCounts {
+            political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                number: 1,
+                total: 10,
+            }],
+            total_votes_candidates_count: 2,
+            blank_votes_count: 3,
+            invalid_votes_count: 4,
+            total_votes_cast_count: 9,
+        };
+
+        let result = curr_votes.add(&VotesCounts {
+            political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                number: 2,
+                total: 20,
+            }],
+            total_votes_candidates_count: 1,
+            blank_votes_count: 2,
+            invalid_votes_count: 3,
+            total_votes_cast_count: 5,
+        });
+        assert!(result.is_err());
+        assert!(matches!(
+            result,
+            Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
+        ));
     }
 
     #[test]
@@ -338,19 +531,5 @@ mod tests {
         assert_eq!(curr_votes.poll_card_count, 3);
         assert_eq!(curr_votes.proxy_certificate_count, 5);
         assert_eq!(curr_votes.total_admitted_voters_count, 14);
-    }
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-#[serde(deny_unknown_fields)]
-pub struct DataEntryStatusResponse {
-    pub status: DataEntryStatusName,
-}
-
-impl From<PollingStationDataEntry> for DataEntryStatusResponse {
-    fn from(data_entry: PollingStationDataEntry) -> Self {
-        DataEntryStatusResponse {
-            status: data_entry.state.0.status_name(),
-        }
     }
 }

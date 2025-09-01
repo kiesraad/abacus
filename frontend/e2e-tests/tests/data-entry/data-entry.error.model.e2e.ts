@@ -320,17 +320,13 @@ test.describe("Data entry model test - errors", () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
-            await expect(votersAndVotesPage.error).toContainText(
-              "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.",
-            );
+            await expect(votersAndVotesPage.error).toContainText("Controleer je antwoordenF.201");
           },
           votersVotesPageChangedToErrorSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
-            await expect(votersAndVotesPage.error).toContainText(
-              "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.",
-            );
+            await expect(votersAndVotesPage.error).toContainText("Controleer je antwoordenF.201");
           },
           votersVotesPageCorrected: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -347,9 +343,7 @@ test.describe("Data entry model test - errors", () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
-            await expect(votersAndVotesPage.error).toContainText(
-              "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.",
-            );
+            await expect(votersAndVotesPage.error).toContainText("Controleer je antwoordenF.201");
           },
           votersVotesPageWarningSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();

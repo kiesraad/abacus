@@ -131,7 +131,8 @@ pub async fn create(
     let mut tx = conn.begin_immediate().await?;
     let committee_session_id =
         crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
-            .await?;
+            .await?
+            .ok_or(sqlx::Error::RowNotFound)?;
 
     let res = query_as!(
         PollingStation,
@@ -188,7 +189,8 @@ pub async fn create_many(
 
     let committee_session_id =
         crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
-            .await?;
+            .await?
+            .ok_or(sqlx::Error::RowNotFound)?;
 
     for new_polling_station in new_polling_stations {
         stations.push(
@@ -249,7 +251,8 @@ pub async fn update(
     let mut tx = conn.begin_immediate().await?;
     let committee_session_id =
         crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
-            .await?;
+            .await?
+            .ok_or(sqlx::Error::RowNotFound)?;
 
     let res = query_as!(
         PollingStation,
@@ -304,7 +307,8 @@ pub async fn delete(
     let mut tx = conn.begin_immediate().await?;
     let committee_session_id =
         crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
-            .await?;
+            .await?
+            .ok_or(sqlx::Error::RowNotFound)?;
 
     let rows_affected = query!(
         r#"DELETE FROM polling_stations WHERE id = ? AND committee_session_id = ?"#,

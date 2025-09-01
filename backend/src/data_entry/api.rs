@@ -1171,8 +1171,12 @@ mod tests {
         )
         .await;
 
+        let new_ps = crate::polling_station::repository::get_by_previous_id(&pool, 1)
+            .await
+            .unwrap();
+
         // Claim the same polling station again
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), new_ps.id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that a new row was created

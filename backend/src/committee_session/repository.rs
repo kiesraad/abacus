@@ -161,22 +161,43 @@ pub async fn create(
     .fetch_one(&mut *tx)
     .await?;
 
-    crate::polling_station::repository::duplicate_for_committee_session(
-        &mut *tx,
-        current_committee_session_id,
-        next_committee_session.id,
-    )
-    .await?;
+    if let Some(current_committee_session_id) = current_committee_session_id {
+        crate::polling_station::repository::duplicate_for_committee_session(
+            &mut *tx,
+            current_committee_session_id,
+            next_committee_session.id,
+        )
+        .await?;
+    }
+
+    tx.commit().await?;
 
     Ok(next_committee_session)
 }
 
 /// Delete a committee session
 pub async fn delete(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, Error> {
-    let rows_affected = query!(r#"DELETE FROM committee_sessions WHERE id = ?"#, id,)
-        .execute(conn)
+    let mut tx = conn.begin_immediate().await?;
+
+    query!(
+        "DELETE FROM polling_stations WHERE committee_session_id = ?",
+        id,
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    let rows_affected = query!(r#"DELETE FROM committee_sessions WHERE id = ?"#, id)
+        .execute(&mut *tx)
         .await?
         .rows_affected();
+
+    // something weird is happening, rollback
+    if rows_affected != 1 {
+        tx.rollback().await?;
+        return Ok(false);
+    }
+
+    tx.commit().await?;
 
     Ok(rows_affected > 0)
 }
@@ -273,7 +294,7 @@ pub async fn change_status(
 pub async fn get_current_id_for_election(
     conn: impl DbConnLike<'_>,
     election_id: u32,
-) -> Result<u32, Error> {
+) -> Result<Option<u32>, Error> {
     query!(
         r#"
         SELECT id AS "id: u32"
@@ -284,7 +305,7 @@ pub async fn get_current_id_for_election(
         "#,
         election_id
     )
-    .fetch_one(conn)
+    .fetch_optional(conn)
     .await
-    .map(|record| record.id)
+    .map(|record| record.map(|r| r.id))
 }

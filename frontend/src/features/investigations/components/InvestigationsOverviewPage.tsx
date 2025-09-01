@@ -6,7 +6,7 @@ import { t } from "@/i18n/translate";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 
 export function InvestigationsOverviewPage() {
-  const { committeeSession } = useElection();
+  const { currentCommitteeSession } = useElection();
   return (
     <>
       <PageTitle title={`${t("investigations.title")} - Abacus`} />
@@ -14,7 +14,7 @@ export function InvestigationsOverviewPage() {
         <section>
           <h1>
             {t("investigations.investigations_in_committee_session", {
-              sessionLabel: committeeSessionLabel(committeeSession.number).toLowerCase(),
+              sessionLabel: committeeSessionLabel(currentCommitteeSession.number).toLowerCase(),
             })}
           </h1>
         </section>

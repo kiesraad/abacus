@@ -4,13 +4,11 @@ import { Link, Location, Navigate, useLocation, useNavigate } from "react-router
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
-import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { Footer } from "@/components/footer/Footer";
 import { IconTrash } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
-import { Loader } from "@/components/ui/Loader/Loader";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { Table } from "@/components/ui/Table/Table";
 import { useElection } from "@/hooks/election/useElection";
@@ -20,8 +18,6 @@ import {
   COMMITTEE_SESSION_CREATE_REQUEST_BODY,
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
-  CommitteeSessionListResponse,
-  ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
@@ -40,11 +36,7 @@ export function ElectionHomePage() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const location = useLocation() as Location<null | ShowDeleteModalState>;
   const navigate = useNavigate();
-  const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
-  const { requestState: getCommitteeSessions, refetch: refetchCommitteeSessions } =
-    useInitialApiGet<CommitteeSessionListResponse>(
-      `/api/elections/${election.id}/committee_sessions` satisfies ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
-    );
+  const { currentCommitteeSession, committeeSessions, election, pollingStations, refetch } = useElection();
   const { isTypist, isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const [createCommitteeSessionError, setCreateCommitteeSessionError] = useState<AnyApiError | null>(null);
@@ -62,24 +54,14 @@ export function ElectionHomePage() {
   useEffect(() => {
     const abortController = new AbortController();
 
-    void refetchElection(abortController);
-    void refetchCommitteeSessions(abortController);
+    void refetch(abortController);
 
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
-  }, [refetchElection, refetchCommitteeSessions]);
+  }, [refetch]);
 
-  if (getCommitteeSessions.status === "api-error") {
-    throw getCommitteeSessions.error;
-  }
-
-  if (getCommitteeSessions.status === "loading") {
-    return <Loader />;
-  }
-
-  const committeeSessions = getCommitteeSessions.data.committee_sessions;
-  const isFirstCommitteeSession = committeeSession.number === 1;
+  const isFirstCommitteeSession = currentCommitteeSession.number === 1;
 
   if (isTypist) {
     return <Navigate to="data-entry" />;
@@ -96,8 +78,7 @@ export function ElectionHomePage() {
       .postRequest(url, body)
       .then(async (result) => {
         if (isSuccess(result)) {
-          await refetchElection();
-          await refetchCommitteeSessions();
+          await refetch();
         } else {
           throw result;
         }
@@ -110,13 +91,12 @@ export function ElectionHomePage() {
   }
 
   function handleCommitteeSessionDelete() {
-    const url: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}`;
+    const url: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}`;
     void client
       .deleteRequest(url)
       .then(async (result) => {
         if (isSuccess(result)) {
-          await refetchElection();
-          await refetchCommitteeSessions();
+          await refetch();
         } else {
           throw result;
         }
@@ -157,7 +137,7 @@ export function ElectionHomePage() {
         <Modal title={`${t("election_management.delete_session")}?`} onClose={toggleDeleteCommitteeSessionModal}>
           <p>
             {t("election_management.delete_session_are_you_sure", {
-              sessionLabel: committeeSessionLabel(committeeSession.number, true).toLowerCase(),
+              sessionLabel: committeeSessionLabel(currentCommitteeSession.number, true).toLowerCase(),
             })}
           </p>
           <nav>
@@ -209,23 +189,23 @@ export function ElectionHomePage() {
                 />
               ))}
             </div>
-            {isCoordinator && committeeSession.status === "data_entry_finished" && (
+            {isCoordinator && currentCommitteeSession.status === "data_entry_finished" && (
               <Button variant="secondary" size="sm" onClick={toggleAddCommitteeSessionModal}>
                 {t("election_management.prepare_new_session")}
               </Button>
             )}
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>
-          <div className="mb-xl">
+          <div>
             <h3 className={cls.tableTitle}>{t("election_management.about_this_election")}</h3>
             <ElectionInformationTable
               election={election}
               numberOfPollingStations={pollingStations.length}
-              numberOfVoters={committeeSession.number_of_voters}
+              numberOfVoters={currentCommitteeSession.number_of_voters}
             />
           </div>
           {isFirstCommitteeSession && (
-            <div className={cls.downloadModels}>
+            <div className={cn(cls.downloadModels, "mt-xl")}>
               <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
               <p>{t("election_management.empty_documents_description")}</p>
               <Table className={cn(cls.electionInformationTable)} variant="information">

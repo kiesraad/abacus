@@ -18,4 +18,8 @@ export class ElectionHome {
     this.downloadBijlage1 = page.getByRole("cell", { name: "Na 31-2 Bijlage 1" });
     this.downloadN10_2 = page.getByRole("cell", { name: "N 10-2" });
   }
+
+  getCommitteeSessionCard(number: number) {
+    return this.page.getByTestId(`session-${number}`);
+  }
 }

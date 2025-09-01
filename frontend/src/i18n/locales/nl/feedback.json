@@ -184,8 +184,8 @@
       "content": "Check of je de gemarkeerde velden goed hebt overgenomen van het papieren proces-verbaal."
     },
     "coordinator": {
-      "title": "",
-      "content": ""
+      "title": "W.001 is er alleen voor invoerders",
+      "content": "Voor de coördinator hebben we het scherm 'verschillen oplossen'"
     }
   },
   "W201": {
@@ -218,34 +218,14 @@
       "content": "Er is een groot verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H). Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitslag per lijst.Verklaar in het proces-verbaal van het GSB (rubriek 1.2) zo goed mogelijk wat de oorzaak van de opmerkelijke uitslag is.Schrijf ook op welke stappen het GSB heeft gezet om deze te hertellen en onderzoeken."
     }
   },
-  "W205": {
+  "W204": {
     "typist": {
-      "title": "Controleer aantal uitgebrachte stemmen",
-      "content": "Check of je het papieren proces-verbaal goed hebt overgenomen."
+      "title": "Controleer H"
     },
     "coordinator": {
       "title": "Het totaal aantal uitgebrachte stemmen (H) is nul",
-      "content": "Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.Zo nee: Verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.Zo ja: Verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht."
-    }
-  },
-  "W301": {
-    "typist": {
-      "title": "Controleer ingevulde verschillen",
-      "content": "De invoer bij I, K, L, M, N of O klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    },
-    "coordinator": {
-      "title": "Controleer ingevulde verschillen",
-      "content": "De invoer bij I, K, L, M, N of O klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    }
-  },
-  "W302": {
-    "typist": {
-      "title": "Controleer ingevulde verschillen",
-      "content": "De invoer bij J, K, L, M, N of O klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-    },
-    "coordinator": {
-      "title": "Controleer ingevulde verschillen",
-      "content": "De invoer bij J, K, L, M, N of O klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
+      "content": "Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.",
+      "action": ""
     }
   },
   "errors": "foutmeldingen",

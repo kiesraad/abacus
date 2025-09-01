@@ -199,6 +199,6 @@ export const dataEntryGetErrorsMockResponse: DataEntryGetErrorsResponse = {
   first_entry_user_id: 3,
   validation_results: {
     errors: [validationResultMockData.F201],
-    warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W301],
+    warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W202],
   },
 };

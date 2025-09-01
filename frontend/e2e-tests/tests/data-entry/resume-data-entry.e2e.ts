@@ -189,7 +189,7 @@ test.describe("resume data entry flow", () => {
           warnings: [
             {
               fields: ["data.votes_counts.total_votes_cast_count"],
-              code: "W205",
+              code: "W204",
             },
           ],
         },

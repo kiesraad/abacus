@@ -275,7 +275,7 @@ describe("Test CheckAndSaveForm summary", () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
       pollingStationResults: getInitialValues(),
-      validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W301] },
+      validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W201] },
     });
     renderForm();
 
@@ -289,20 +289,16 @@ describe("Test CheckAndSaveForm summary", () => {
     expect(votersItem).toHaveTextContent("heeft blokkerende fouten");
     expect(within(votersItem).getByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
 
-    const differencesItem = screen.getByTestId("section-status-differences_counts");
-    expect(differencesItem).toHaveTextContent("Controleer waarschuwingen bij");
-    expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
-
     expect(screen.getByTestId("form-cannot-be-saved")).toBeInTheDocument();
   });
 
   test("Accepted with warnings", async () => {
     const formState = customFormState();
-    formState.sections.differences_counts!.acceptErrorsAndWarnings = true;
+    formState.sections.voters_votes_counts!.acceptErrorsAndWarnings = true;
     overrideServerClaimDataEntryResponse({
       formState: formState,
       pollingStationResults: getInitialValues(),
-      validationResults: { errors: [], warnings: [validationResultMockData.W301] },
+      validationResults: { errors: [], warnings: [validationResultMockData.W201] },
     });
     renderForm();
 
@@ -312,16 +308,16 @@ describe("Test CheckAndSaveForm summary", () => {
       ),
     ).toBeInTheDocument();
 
-    const differencesItem = screen.getByTestId("section-status-differences_counts");
-    expect(differencesItem).toHaveTextContent("heeft geaccepteerde waarschuwingen");
-    expect(within(differencesItem).getByRole("img", { name: "opgeslagen" })).toBeInTheDocument();
+    const votersItem = screen.getByTestId("section-status-voters_votes_counts");
+    expect(votersItem).toHaveTextContent("heeft geaccepteerde waarschuwingen");
+    expect(within(votersItem).getByRole("img", { name: "opgeslagen" })).toBeInTheDocument();
   });
 
   test("Unaccepted warnings", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
       pollingStationResults: getEmptyDataEntryRequest().data,
-      validationResults: { errors: [], warnings: [validationResultMockData.W301] },
+      validationResults: { errors: [], warnings: [validationResultMockData.W201] },
     });
     renderForm();
 
@@ -331,9 +327,9 @@ describe("Test CheckAndSaveForm summary", () => {
       ),
     ).toBeInTheDocument();
 
-    const differencesItem = screen.getByTestId("section-status-differences_counts");
-    expect(differencesItem).toHaveTextContent("Controleer waarschuwingen bij");
-    expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
+    const votersItem = screen.getByTestId("section-status-voters_votes_counts");
+    expect(votersItem).toHaveTextContent("Controleer waarschuwingen bij");
+    expect(within(votersItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
   });
 
   test("Alert when committee session is paused is shown on save and then logs out", async () => {

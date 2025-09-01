@@ -458,7 +458,7 @@ De foutmelding die wordt getoond bestaat uit dezelfde onderdelen als bij de vali
 > - Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.
 
 > Coördinator:
-> Er is geen standaard handelingspersepctief voor de coördinator.
+> Er is geen standaard handelingsperspectief voor de coördinator.
 
 ### Checks voor alle velden (reeks W.0xx)
 
@@ -467,8 +467,8 @@ De foutmelding die wordt getoond bestaat uit dezelfde onderdelen als bij de vali
 > Invoerder: **Extra controle nodig** (W.001)  
 > De gemarkeerde velden zijn anders dan in de eerste invoer.
 
-> Coördinator:
-> W.001 is er alleen voor invoerders. Voor de coördinator hebben we het scherm 'verschillen oplossen'.
+> Coördinator: W.001 is er alleen voor invoerders
+> Voor de coördinator hebben we het scherm 'verschillen oplossen'.
 
 Velden markeren: alle velden met een verschil
 
@@ -517,11 +517,11 @@ _N.B. Voor "2% of meer" delen we door uitgebrachte stemmen, consistent met de be
 
 Velden markeren: D en H
 
-#### CSO en DSO | W.205 Totaal aantal uitgebrachte stemmen leeg of 0
+#### CSO en DSO | W.204 Totaal aantal uitgebrachte stemmen leeg of 0
 
-> Invoerder: **Controleer H** (W.205)
+> Invoerder: **Controleer H** (W.204)
 
-> Coördinator: **Het totaal aantal uitgebrachte stemmen (H) is nul** (W.205)  
+> Coördinator: **Het totaal aantal uitgebrachte stemmen (H) is nul** (W.204)  
 > Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.
 > - Zo ja: Verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht.
 > - Zo nee: Verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.

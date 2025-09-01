@@ -27,14 +27,14 @@ export function CommitteeSessionDetailsPage() {
   const client = useApiClient();
   const location = useLocation();
   const navigate = useNavigate();
-  const { committeeSession, election, refetch } = useElection();
+  const { currentCommitteeSession, election, refetch } = useElection();
   const [submitError, setSubmitError] = useState<AnyApiError | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
   const [errorAlert, setErrorAlert] = useState<string | null>(null);
   const redirectToReportPage = location.hash === "#redirect-to-report";
-  const sessionLabel = committeeSessionLabel(committeeSession.number, true).toLowerCase();
-  const defaultDate = committeeSession.start_date
-    ? new Date(committeeSession.start_date).toLocaleDateString(t("date_locale"), {
+  const sessionLabel = committeeSessionLabel(currentCommitteeSession.number, true).toLowerCase();
+  const defaultDate = currentCommitteeSession.start_date
+    ? new Date(currentCommitteeSession.start_date).toLocaleDateString(t("date_locale"), {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
@@ -63,14 +63,14 @@ export function CommitteeSessionDetailsPage() {
 
     details.start_date = convertNLDateToISODate(details.start_date);
 
-    const path: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}`;
+    const path: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}`;
     client
       .putRequest(path, details)
       .then(async (result) => {
         if (isSuccess(result)) {
           if (redirectToReportPage) {
             await refetch();
-            void navigate(`/elections/${election.id}/report/download`);
+            void navigate(`/elections/${election.id}/report/committee-session/${currentCommitteeSession.id}/download`);
           } else {
             void navigate("..");
           }
@@ -142,7 +142,7 @@ export function CommitteeSessionDetailsPage() {
                   hint={tx("election_management.add_the_location")}
                   fieldWidth="wide"
                   error={validationErrors?.location}
-                  defaultValue={committeeSession.location || ""}
+                  defaultValue={currentCommitteeSession.location || ""}
                 />
               </FormLayout.Section>
               <FormLayout.Section title={t("election_management.session_start")}>
@@ -164,7 +164,7 @@ export function CommitteeSessionDetailsPage() {
                     hint={t("election_management.time_hint")}
                     fieldWidth="narrowish"
                     error={validationErrors?.start_time}
-                    defaultValue={committeeSession.start_time || ""}
+                    defaultValue={currentCommitteeSession.start_time || ""}
                     placeholder="uu:mm"
                   />
                 </FormLayout.Row>

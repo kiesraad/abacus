@@ -11,22 +11,18 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import {
-  getCommitteeSessionListMockData,
-  getCommitteeSessionMockData,
-} from "@/testing/api-mocks/CommitteeSessionMockData";
+import { getCommitteeSessionListMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
-  ElectionCommitteeSessionListRequestHandler,
   ElectionRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { CommitteeSessionListResponse, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
+import { CommitteeSession, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
 
 import { ElectionHomePage } from "./ElectionHomePage";
 
@@ -48,14 +44,25 @@ const renderPage = async (userRole: Role) => {
 
 describe("ElectionHomePage", () => {
   beforeEach(() => {
-    server.use(ElectionCommitteeSessionListRequestHandler);
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [],
     });
   });
 
   test("Shows committee session card(s) and election information table", async () => {
-    server.use(ElectionRequestHandler);
+    const committeeSessionData: Partial<CommitteeSession> = {
+      status: "data_entry_in_progress",
+      location: "Den Haag",
+      start_date: "2026-03-18",
+      start_time: "21:36",
+    };
+    const electionData = getElectionMockData({}, committeeSessionData);
+    electionData.committee_sessions = getCommitteeSessionListMockData(committeeSessionData);
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
 
     await renderPage("coordinator");
 
@@ -102,14 +109,6 @@ describe("ElectionHomePage", () => {
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
       ),
     );
-    const committeeSessionData = getCommitteeSessionMockData({ status: "data_entry_finished" });
-    server.use(
-      http.get("/api/elections/1/committee_sessions", () =>
-        HttpResponse.json({ committee_sessions: [committeeSessionData] } satisfies CommitteeSessionListResponse, {
-          status: 200,
-        }),
-      ),
-    );
 
     await renderPage("coordinator");
 
@@ -144,14 +143,6 @@ describe("ElectionHomePage", () => {
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
       ),
     );
-    const committeeSessionData = getCommitteeSessionMockData({ status: "data_entry_finished" });
-    server.use(
-      http.get("/api/elections/1/committee_sessions", () =>
-        HttpResponse.json({ committee_sessions: [committeeSessionData] } satisfies CommitteeSessionListResponse, {
-          status: 200,
-        }),
-      ),
-    );
 
     await renderPage("administrator");
 
@@ -182,17 +173,12 @@ describe("ElectionHomePage", () => {
     const user = userEvent.setup();
     server.use(CommitteeSessionDeleteHandler);
     const sessionDeleteRequestSpy = spyOnHandler(CommitteeSessionDeleteHandler);
-    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" });
+    const committeeSessionData: Partial<CommitteeSession> = { id: 4, number: 4, status: "created" };
+    const electionData = getElectionMockData({}, committeeSessionData);
+    electionData.committee_sessions = getCommitteeSessionListMockData(committeeSessionData);
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
-      ),
-    );
-    server.use(
-      http.get("/api/elections/1/committee_sessions", () =>
-        HttpResponse.json(getCommitteeSessionListMockData({ status: "created" }), {
-          status: 200,
-        }),
       ),
     );
 
@@ -232,17 +218,12 @@ describe("ElectionHomePage", () => {
   });
 
   test("Does not show delete committee session button for administrator", async () => {
-    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" });
+    const committeeSessionData: Partial<CommitteeSession> = { status: "created" };
+    const electionData = getElectionMockData({}, committeeSessionData);
+    electionData.committee_sessions = getCommitteeSessionListMockData(committeeSessionData);
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
-      ),
-    );
-    server.use(
-      http.get("/api/elections/1/committee_sessions", () =>
-        HttpResponse.json(getCommitteeSessionListMockData({ status: "created" }), {
-          status: 200,
-        }),
       ),
     );
 
@@ -304,16 +285,12 @@ describe("ElectionHomePage", () => {
       },
     ]);
     const user = userEvent.setup();
-    const electionData = getElectionMockData({}, { status: "data_entry_not_started" });
+    const committeeSessionData: Partial<CommitteeSession> = { status: "data_entry_not_started" };
+    const electionData = getElectionMockData({}, committeeSessionData);
+    electionData.committee_sessions = getCommitteeSessionListMockData(committeeSessionData);
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
-      ),
-    );
-    const committeeSessionsData = getCommitteeSessionListMockData({ status: "data_entry_not_started" });
-    server.use(
-      http.get("/api/elections/1/committee_sessions", () =>
-        HttpResponse.json(committeeSessionsData satisfies CommitteeSessionListResponse, { status: 200 }),
       ),
     );
     overrideOnce("put", "/api/committee_sessions/4/status", 409, {
@@ -382,12 +359,7 @@ describe("ElectionHomePage", () => {
   });
 
   test("Shows empty documents section for first committee session", async () => {
-    const electionDataFirstSession = getElectionMockData({}, { number: 1 });
-    server.use(
-      http.get("/api/elections/1", () =>
-        HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
-      ),
-    );
+    server.use(ElectionRequestHandler);
 
     await renderPage("coordinator");
 
@@ -399,7 +371,8 @@ describe("ElectionHomePage", () => {
   });
 
   test("Does not show empty documents section for second committee session", async () => {
-    const electionDataSecondSession = getElectionMockData({}, { number: 2 });
+    const electionDataSecondSession = getElectionMockData({}, { id: 2, number: 2 });
+    electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(2, 3);
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),

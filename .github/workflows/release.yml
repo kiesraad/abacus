@@ -62,7 +62,7 @@ jobs:
       - name: Build
         run: cargo --locked build --release --features memory-serve,embed-typst --target=${{ matrix.target.name }}
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: ${{ matrix.target.binary }}
       - uses: actions/upload-artifact@v4

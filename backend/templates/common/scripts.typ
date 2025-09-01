@@ -48,7 +48,7 @@
 }
 
 #let prefilled_text(value) = {
-  text(font: "Geist Mono", value)
+  text(font: "Geist Mono", features: ("ss09", ), value)
 }
 
 /// Display a checkmark for usage in a checkbox

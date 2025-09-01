@@ -1610,7 +1610,7 @@ mod tests {
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 2);
-        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F303

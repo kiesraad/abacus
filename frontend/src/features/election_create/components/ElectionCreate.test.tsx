@@ -288,6 +288,7 @@ describe("Election create pages", () => {
     await user.type(inputPart1, "zxcv");
     const inputPart2 = screen.getByLabelText("Controle deel 2");
     await user.type(inputPart2, "123");
+
     await user.click(screen.getByText("Volgende"));
 
     // Expect error to be shown

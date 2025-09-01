@@ -155,14 +155,14 @@ describe("ResolveDifferencesTables", () => {
           yes: true,
           no: true,
         },
-      } as unknown as PollingStationResults;
+      };
 
       const secondResults = {
         test: {
           yes: false,
           no: false,
         },
-      } as unknown as PollingStationResults;
+      };
 
       render(<ResolveDifferencesTables first={firstResults} second={secondResults} structure={[checkboxSection]} />);
 

@@ -10,6 +10,7 @@
 
   legend,
   p,
+  ul,
   :global(.choiceList) {
     width: 32rem;
   }

@@ -15,6 +15,7 @@ import { electionManagementRoutes } from "@/features/election_management/routes"
 import { OverviewLayout } from "@/features/election_overview/components/OverviewLayout";
 import { OverviewPage } from "@/features/election_overview/components/OverviewPage";
 import { electionStatusRoutes } from "@/features/election_status/routes";
+import { investigationRoutes } from "@/features/investigations/routes";
 import { logsRoutes } from "@/features/logs/routes";
 import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
@@ -78,6 +79,10 @@ export const routes: RouteObject[] = [
                     children: resolveErrorsRoutes,
                   },
                 ],
+              },
+              {
+                path: "investigations",
+                children: investigationRoutes,
               },
             ],
           },

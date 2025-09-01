@@ -330,9 +330,8 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer toegelaten kiezers",
+        "Controleer je antwoorden",
         "F.201",
-        "De invoer bij A, B of D klopt niet.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");
@@ -372,7 +371,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer uitgebrachte stemmen",
+        "Controleer je antwoorden",
         "F.203",
         "De invoer bij E, F, G of H klopt niet.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
@@ -750,9 +749,8 @@ describe("Test VotersAndVotesForm", () => {
       await userEvent.click(submitButton);
 
       const errorFeedbackMessage = [
-        "Controleer toegelaten kiezers",
+        "Controleer je antwoorden",
         "F.201",
-        "De invoer bij A, B of D klopt niet.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");

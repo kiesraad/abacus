@@ -198,7 +198,7 @@ describe("Test CheckAndSaveForm", () => {
     const summaryList = screen.findByTestId(`save-form-summary-list-voters_votes_counts`);
 
     expect(summaryList).toBeDefined();
-    expect(within(await summaryList).getByText("Controleer toegelaten kiezers")).toBeInTheDocument();
+    expect(within(await summaryList).getByText("Controleer je antwoorden")).toBeInTheDocument();
     expect(
       within(await summaryList).getByText("Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen"),
     ).toBeInTheDocument();

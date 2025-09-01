@@ -508,8 +508,8 @@ test.describe("full data entry flow", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
 
     await expect(checkAndSavePage.summaryListItemVotersAndVotes).toHaveText([
-      "F.202 Controleer de stemmen op lijsten en totaal stemmen op kandidaten",
-      "F.203 Controleer uitgebrachte stemmen",
+      "F.202 Controleer je antwoorden",
+      "F.203 Controleer je antwoorden",
       "W.203 Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     ]);
     await expect(checkAndSavePage.summaryListItemDifferences).toHaveText(["W.302 Controleer ingevulde verschillen"]);
@@ -746,7 +746,7 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.error).toContainText("F.201");
-    await expect(votersAndVotesPage.error).toContainText("Controleer toegelaten kiezers");
+    await expect(votersAndVotesPage.error).toContainText("Controleer je antwoorden");
     await expect(votersAndVotesPage.warning).toBeHidden();
 
     // fill form with corrected data (no errors, no warnings)
@@ -902,7 +902,7 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
 
     await expect(votersAndVotesPage.error).toContainText("F.203");
-    await expect(votersAndVotesPage.error).toContainText("Controleer uitgebrachte stemmen");
+    await expect(votersAndVotesPage.error).toContainText("Controleer je antwoorden");
 
     await votersAndVotesPage.acceptErrorsAndWarnings.click();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeChecked();

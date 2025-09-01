@@ -148,7 +148,7 @@ test.describe("resume data entry flow", () => {
       await votersAndVotesPage.proxyCertificateCount.fill("1000");
       await votersAndVotesPage.next.click();
       await expect(votersAndVotesPage.error).toContainText("F.201");
-      await expect(votersAndVotesPage.error).toContainText("Controleer toegelaten kiezers");
+      await expect(votersAndVotesPage.error).toContainText("Controleer je antwoorden");
 
       await votersAndVotesPage.abortInput.click();
 

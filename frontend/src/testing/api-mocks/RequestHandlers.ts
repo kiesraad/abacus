@@ -27,15 +27,12 @@ import {
   COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS,
   COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   CommitteeSession,
-  CommitteeSessionListResponse,
   CREATE_FIRST_ADMIN_REQUEST_BODY,
   CREATE_FIRST_ADMIN_REQUEST_PARAMS,
   CREATE_FIRST_ADMIN_REQUEST_PATH,
   DataEntryGetDifferencesResponse,
   DataEntryGetErrorsResponse,
   DataEntryStatusResponse,
-  ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS,
-  ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PARAMS,
   ELECTION_DETAILS_REQUEST_PATH,
   ELECTION_IMPORT_REQUEST_BODY,
@@ -111,7 +108,7 @@ import {
   WHOAMI_REQUEST_PATH,
 } from "@/types/generated/openapi";
 
-import { committeeSessionListMockResponse, getCommitteeSessionMockData } from "./CommitteeSessionMockData";
+import { getCommitteeSessionMockData } from "./CommitteeSessionMockData";
 import {
   claimDataEntryResponse,
   dataEntryGetErrorsMockResponse,
@@ -170,15 +167,6 @@ export const LogUsersRequestHandler = http.get<ParamsToString<AUDIT_LOG_LIST_USE
   () => HttpResponse.json(userMockData, { status: 200 }),
 );
 
-// get election committee session list handler
-export const ElectionCommitteeSessionListRequestHandler = http.get<
-  ParamsToString<ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS>,
-  null,
-  CommitteeSessionListResponse | ErrorResponse
->("/api/elections/1/committee_sessions" satisfies ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH, () =>
-  HttpResponse.json(committeeSessionListMockResponse, { status: 200 }),
-);
-
 // committee session status change handler
 export const CommitteeSessionStatusChangeRequestHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS>,
@@ -213,7 +201,7 @@ export const CommitteeSessionCreateHandler = http.post<
 });
 
 export const CommitteeSessionDeleteHandler = http.delete<ParamsToString<COMMITTEE_SESSION_DELETE_REQUEST_PARAMS>>(
-  "/api/committee_sessions/2" satisfies COMMITTEE_SESSION_DELETE_REQUEST_PATH,
+  "/api/committee_sessions/4" satisfies COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
 );
 
@@ -434,7 +422,6 @@ export const handlers: HttpHandler[] = [
   AccountUpdateRequestHandler,
   LogRequestHandler,
   LogUsersRequestHandler,
-  ElectionCommitteeSessionListRequestHandler,
   CommitteeSessionStatusChangeRequestHandler,
   CommitteeSessionChangeNumberOfVotersHandler,
   CommitteeSessionUpdateHandler,

@@ -373,7 +373,6 @@ describe("Test VotersAndVotesForm", () => {
       const feedbackMessage = [
         "Controleer je antwoorden",
         "F.203",
-        "De invoer bij E, F, G of H klopt niet.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");

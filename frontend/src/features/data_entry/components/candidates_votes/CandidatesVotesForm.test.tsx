@@ -501,10 +501,8 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage = [
-        "Controleer ingevoerde aantallen. De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
-      ].join("");
+      const feedbackMessage =
+        "Controleer ingevoerde aantallen. De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.";
 
       expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();

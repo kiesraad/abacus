@@ -131,11 +131,11 @@
   )
 }
 
-#let empty_letterbox(letter, cells: 5, light: true, original: none, bold_top_border: false, content) = {
+#let empty_letterbox(letter, cells: 5, light: true, original: none, corrected: (), bold_top_border: false, wide_cells: false, content) = {
   let bg_grey = luma(213)
   let bg = if light { bg_grey } else { black }
   let fill = if light { black } else { white }
-  let cell_width = range(0, cells).map(_ => 2em)
+  let cell_width = range(0, cells).map(_ => if wide_cells { 8em } else { 2em })
   let total_cell_width = cell_width.sum()
   let additional_width = (3.5em, 1fr)
   let grid_columns = if original != none {
@@ -158,13 +158,14 @@
       grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: right, fill: bg_grey, prefilled_number(original)),
       grid.vline(stroke: (thickness: 0.5pt, dash: "solid"))
     )),
-    ..range(0, cells).map(cell => {
+    ..range(0, cells).enumerate().map(cell => {
+      let (index, c) = cell;
       grid.cell(
         stroke: (
           y: 0.5pt + black,
           x: (paint: black, thickness: 0.5pt, dash: "densely-dotted"),
         ) + top_border_stroke,
-        " ",
+        prefilled_number(corrected.at(index, default: " "))
       )
     }),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),

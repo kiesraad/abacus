@@ -69,19 +69,24 @@ die in de eerste zitting door #is_municipality[de gemeente][het openbaar lichaam
 vastgesteld.
 
 == Aantal kiesgerechtigden
-#correction_title_grid()
-#empty_letterbox("Z", cells: 1, original: 10, bold_top_border: true)[Kiesgerechtigden]
+#grid(
+  rows: auto,
+  correction_title_grid(),
+  empty_letterbox("Z", cells: 1, original: 10, corrected: (), bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
+)
 
 == Toegelaten kiezers
 Het totaal van alle getelde geldige stempassen, volmachtbewijzen en kiezerspassen
 #sum(
   with_correction_title: true,
-  empty_letterbox("A", cells: 1, original: 10, bold_top_border: true)[Stempassen],
-  empty_letterbox("B", cells: 1, original: 10)[Volmachtbewijzen],
-  empty_letterbox("D", cells: 1, original: 10, light: false)[
+  empty_letterbox("A", cells: 1, original: 10, bold_top_border: true, wide_cells: true)[Stempassen],
+  empty_letterbox("B", cells: 1, original: 10, wide_cells: true)[Volmachtbewijzen],
+  empty_letterbox("D", cells: 1, original: 10, wide_cells: true, light: false)[
     *Totaal toegelaten kiezers (A+B)*
   ]
 )
+
+#pagebreak(weak: true)
 
 == Uitgebrachte stemmen <cast_votes>
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
@@ -92,22 +97,24 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
     with_correction_title: true,
     sum(
       ..input.election.political_groups.enumerate().map(((idx, list)) => {
-        empty_letterbox(cells: 1, original: 10, bold_top_border: idx == 0, [E.#list.number])[Totaal lijst #list.number - #list.name]
+        empty_letterbox(cells: 1, original: 10, bold_top_border: idx == 0, [E.#list.number], wide_cells: true)[Totaal lijst #list.number - #list.name]
       }),
       empty_letterbox(
         cells:1,
         original: 10,
         "E",
         light: false,
+        wide_cells: true
       )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
     ),
-    empty_letterbox(cells: 1, original: 10, "F")[Blanco stemmen],
-    empty_letterbox(cells: 1, original: 10, "G")[Ongeldige stemmen],
+    empty_letterbox(cells: 1, original: 10, "F", wide_cells: true)[Blanco stemmen],
+    empty_letterbox(cells: 1, original: 10, "G", wide_cells: true)[Ongeldige stemmen],
     empty_letterbox(
       cells:1,
       original: 10,
       "H",
       light: false,
+      wide_cells: true
     )[*Totaal uitgebrachte stemmen (E+F+G)*],
   )
 ]
@@ -126,12 +133,12 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 === Voor de stembureaus met de nummers #TODO[stembureaunummers] zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
 
 #correction_title_grid()
-#empty_letterbox("I", cells: 1, original: 10, bold_top_border: true)[Kiesgerechtigden]
+#empty_letterbox("I", cells: 1, original: 10, bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
 
 === Voor de stembureaus met de nummers #TODO[stembureaunummers] zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
 
 #correction_title_grid()
-#empty_letterbox("J", cells: 1, original: 10, bold_top_border: true)[Kiesgerechtigden]
+#empty_letterbox("J", cells: 1, original: 10, bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
 
 #pagebreak(weak: true)
 

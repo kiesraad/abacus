@@ -10,7 +10,7 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    NewElection,
+    NewElection, VoteCountingMethod,
     structs::{Election, ElectionWithPoliticalGroups},
 };
 use crate::{
@@ -18,7 +18,6 @@ use crate::{
     audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     authentication::{Admin, User},
     committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
-    election::VoteCountingMethod,
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{PollingStation, PollingStationRequest},
 };
@@ -43,11 +42,12 @@ pub struct ElectionListResponse {
 }
 
 /// Election details response, including the election's candidate list (political groups),
-/// its polling stations and the current committee session
+/// its polling stations and its committee sessions and current committee session
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionDetailsResponse {
-    pub committee_session: CommitteeSession,
+    pub current_committee_session: CommitteeSession,
+    pub committee_sessions: Vec<CommitteeSession>,
     pub election: ElectionWithPoliticalGroups,
     pub polling_stations: Vec<PollingStation>,
 }
@@ -98,11 +98,18 @@ pub async fn election_details(
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = crate::election::repository::get(&pool, id).await?;
-    let committee_session =
-        crate::committee_session::repository::get_election_committee_session(&pool, id).await?;
+    let committee_sessions =
+        crate::committee_session::repository::get_election_committee_session_list(&pool, id)
+            .await?;
+    let current_committee_session = committee_sessions
+        .first()
+        .expect("There is always one committee session")
+        .clone();
     let polling_stations = crate::polling_station::repository::list(&pool, id).await?;
+
     Ok(Json(ElectionDetailsResponse {
-        committee_session,
+        current_committee_session,
+        committee_sessions,
         election,
         polling_stations,
     }))

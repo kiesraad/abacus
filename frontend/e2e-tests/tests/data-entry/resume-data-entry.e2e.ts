@@ -228,7 +228,7 @@ test.describe("resume data entry flow", () => {
       };
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
       await expect(votersAndVotesPage.warning).toContainText("W.201");
-      await expect(votersAndVotesPage.warning).toContainText("Controleer aantal blanco stemmen");
+      await expect(votersAndVotesPage.warning).toContainText("Controleer F");
 
       await votersAndVotesPage.abortInput.click();
 
@@ -507,7 +507,7 @@ test.describe("resume data entry flow", () => {
       };
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
       await expect(votersAndVotesPage.warning).toContainText("W.201");
-      await expect(votersAndVotesPage.warning).toContainText("Controleer aantal blanco stemmen");
+      await expect(votersAndVotesPage.warning).toContainText("Controleer F");
 
       await votersAndVotesPage.abortInput.click();
 

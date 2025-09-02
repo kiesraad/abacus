@@ -2132,9 +2132,9 @@ mod tests {
         assert!(!result2.has_errors());
     }
 
-    /// Tests that when fewer_ballots_count exactly matches the calculated difference, warning W.302 is avoided.
+    /// Tests that when fewer_ballots_count exactly matches the calculated difference.
     #[test]
-    fn test_exact_correct_count_avoids_w302() {
+    fn test_exact_correct_count() {
         let election = election_fixture(&[]);
         let polling_station = polling_station_fixture(None);
         let mut validation_results = ValidationResults::default();

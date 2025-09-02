@@ -387,7 +387,7 @@
 
   set text(size: 8pt)
 
-  columns(2, {
+  columns(1, {
     while rc < total_rows {
       let rows_in_column = calc.min(break_count.at(column, default: 15), total_rows - rc)
 

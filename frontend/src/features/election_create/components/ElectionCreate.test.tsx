@@ -516,6 +516,7 @@ describe("Election create pages", () => {
 
     // The modal should have triggered
     expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
 
     // Delete button should move away from the import page
     const deleteButton = screen.getByText("Verkiezing niet opslaan");

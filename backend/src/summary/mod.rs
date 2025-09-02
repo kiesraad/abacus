@@ -182,7 +182,10 @@ impl SummaryDifferencesCounts {
             fewer_ballots_count: SumCount::zero(),
             compare_votes_cast_admitted_voters:
                 SummaryDifferenceCountsCompareVotesCastAdmittedVoters::zero(),
-            difference_completely_accounted_for: Default::default(),
+            difference_completely_accounted_for: YesNo {
+                yes: false,
+                no: false,
+            },
         }
     }
 
@@ -196,6 +199,29 @@ impl SummaryDifferencesCounts {
             .add(polling_station, differences_counts.more_ballots_count);
         self.fewer_ballots_count
             .add(polling_station, differences_counts.fewer_ballots_count);
+
+        self.compare_votes_cast_admitted_voters
+            .votes_cast_greater_than_admitted_voters = differences_counts
+            .compare_votes_cast_admitted_voters
+            .votes_cast_greater_than_admitted_voters;
+
+        self.compare_votes_cast_admitted_voters
+            .votes_cast_smaller_than_admitted_voters = differences_counts
+            .compare_votes_cast_admitted_voters
+            .votes_cast_smaller_than_admitted_voters;
+
+        self.compare_votes_cast_admitted_voters
+            .admitted_voters_equal_votes_cast = differences_counts
+            .compare_votes_cast_admitted_voters
+            .admitted_voters_equal_votes_cast;
+
+        self.difference_completely_accounted_for.yes =
+            differences_counts.difference_completely_accounted_for.yes;
+        self.difference_completely_accounted_for.no =
+            differences_counts.difference_completely_accounted_for.no;
+        // self.compare_votes_cast_admitted_voters
+        //     .admitted_voters_equal_votes_cast = true;
+        // self.difference_completely_accounted_for.yes = true;
     }
 }
 
@@ -264,8 +290,11 @@ mod tests {
                 total_votes_cast_count: 36,
             },
             differences_counts: {
-                let mut tmp = DifferencesCounts::zero();
+                let mut tmp = DifferencesCounts::valid_default();
                 tmp.more_ballots_count = 1;
+                tmp.difference_completely_accounted_for.yes = true;
+                tmp.compare_votes_cast_admitted_voters
+                    .votes_cast_greater_than_admitted_voters = true;
                 tmp
             },
             political_group_votes: vec![
@@ -301,8 +330,11 @@ mod tests {
                 total_votes_cast_count: 48,
             },
             differences_counts: {
-                let mut tmp = DifferencesCounts::zero();
+                let mut tmp = DifferencesCounts::valid_default();
                 tmp.fewer_ballots_count = 2;
+                tmp.difference_completely_accounted_for.yes = true;
+                tmp.compare_votes_cast_admitted_voters
+                    .votes_cast_smaller_than_admitted_voters = true;
                 tmp
             },
             political_group_votes: vec![
@@ -316,8 +348,11 @@ mod tests {
     fn test_differences_counts_addition() {
         let mut diff = SummaryDifferencesCounts::zero();
         let diff2 = {
-            let mut tmp = DifferencesCounts::zero();
+            let mut tmp = DifferencesCounts::valid_default();
             tmp.more_ballots_count = 1;
+            tmp.difference_completely_accounted_for.yes = true;
+            tmp.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
             tmp
         };
 
@@ -327,6 +362,12 @@ mod tests {
         diff.add_polling_station_results(&ps[0], &diff2);
 
         assert_eq!(diff.more_ballots_count.count, 1);
+        assert_eq!(diff.difference_completely_accounted_for.yes, true);
+        assert_eq!(
+            diff.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters,
+            true
+        );
         assert_eq!(diff.more_ballots_count.polling_stations, vec![123]);
         assert_eq!(diff.fewer_ballots_count.count, 0);
 

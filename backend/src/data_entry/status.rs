@@ -682,6 +682,9 @@ mod tests {
     use test_log::test;
 
     use super::*;
+    use crate::data_entry::{
+        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, YesNo,
+    };
     use crate::{
         data_entry::{
             CandidateVotes, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts,
@@ -700,7 +703,7 @@ mod tests {
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: Default::default(),
             votes_counts: Default::default(),
-            differences_counts: Default::default(),
+            differences_counts: ValidDefault::valid_default(),
             political_group_votes: vec![],
         }
     }
@@ -946,7 +949,12 @@ mod tests {
                 invalid_votes_count: 0,
                 total_votes_cast_count: 20,
             },
-            differences_counts: Default::default(),
+            differences_counts: DifferencesCounts {
+                compare_votes_cast_admitted_voters: Default::default(),
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                difference_completely_accounted_for: Default::default(),
+            },
             political_group_votes: vec![],
         };
 
@@ -1357,7 +1365,20 @@ mod tests {
                 invalid_votes_count: 0,
                 total_votes_cast_count: 1,
             },
-            differences_counts: Default::default(),
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: true,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
+                difference_completely_accounted_for: YesNo {
+                    yes: true,
+                    no: false,
+                },
+            },
             political_group_votes: vec![],
         };
 

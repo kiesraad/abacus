@@ -818,6 +818,7 @@ async fn election_status(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::data_entry::{DifferenceCountsCompareVotesCastAdmittedVoters, YesNo};
     use crate::{
         authentication::Role,
         committee_session::{
@@ -861,7 +862,20 @@ mod tests {
                     invalid_votes_count: 2,
                     total_votes_cast_count: 100,
                 },
-                differences_counts: DifferencesCounts::zero(),
+                differences_counts: DifferencesCounts {
+                    more_ballots_count: 0,
+                    fewer_ballots_count: 0,
+                    compare_votes_cast_admitted_voters:
+                        DifferenceCountsCompareVotesCastAdmittedVoters {
+                            admitted_voters_equal_votes_cast: true,
+                            votes_cast_greater_than_admitted_voters: false,
+                            votes_cast_smaller_than_admitted_voters: false,
+                        },
+                    difference_completely_accounted_for: YesNo {
+                        yes: true,
+                        no: false,
+                    },
+                },
                 political_group_votes: vec![
                     PoliticalGroupCandidateVotes::from_test_data_auto(1, &[36, 20]),
                     PoliticalGroupCandidateVotes::from_test_data_auto(2, &[30, 10]),

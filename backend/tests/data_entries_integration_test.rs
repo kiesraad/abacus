@@ -91,10 +91,10 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
           "fewer_ballots_count": 0,
           "compare_votes_cast_admitted_voters": {
             "admitted_voters_equal_votes_cast": false,
-            "votes_cast_greater_than_admitted_voters": false,
+            "votes_cast_greater_than_admitted_voters": true,
             "votes_cast_smaller_than_admitted_voters": false
           },
-          "difference_completely_accounted_for": { "yes": false, "no": false },
+          "difference_completely_accounted_for": { "yes": true, "no": false },
         },
         "political_group_votes": [
           {

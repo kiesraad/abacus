@@ -20,7 +20,7 @@ export const AllBadges: StoryObj = {
     return (
       <>
         {badgeTypes.map((type) => (
-          <div id={type} key={type} data-testid={type}>
+          <div id={type} key={type}>
             <Badge type={type} showIcon />
           </div>
         ))}

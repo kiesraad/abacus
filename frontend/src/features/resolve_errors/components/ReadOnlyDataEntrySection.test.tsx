@@ -73,6 +73,10 @@ describe("ReadOnlyDataEntrySection", () => {
       errors: [],
       warnings: [
         validationResultMockData.W201, // blank_votes_count warning
+        {
+          fields: ["data.differences_counts.more_ballots_count"],
+          code: "W204",
+        }, // set imaginary warning on field on other page (should not show)
       ],
     };
 
@@ -80,6 +84,7 @@ describe("ReadOnlyDataEntrySection", () => {
 
     const warningFeedback = screen.getByTestId("feedback-warning");
     expect(within(warningFeedback).getByText("W.201")).toBeInTheDocument();
+    expect(screen.queryByText("W.204")).not.toBeInTheDocument();
   });
 
   test("shows both error and warning feedback when present", () => {

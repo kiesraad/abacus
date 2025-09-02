@@ -2,17 +2,18 @@
 
 use std::net::SocketAddr;
 
+use abacus::data_entry::DifferenceCountsCompareVotesCastAdmittedVoters;
 use abacus::{
     committee_session::{
-        CommitteeSession, CommitteeSessionListResponse, CommitteeSessionStatusChangeRequest,
-        status::CommitteeSessionStatus,
+        CommitteeSession, CommitteeSessionStatusChangeRequest, status::CommitteeSessionStatus,
     },
     data_entry::{
-        CandidateVotes, Count, DataEntry, DifferencesCounts, ElectionStatusResponse,
-        PoliticalGroupVotes, PollingStationResults, VotersCounts, VotesCounts,
+        CandidateVotes, Count, CountingDifferencesPollingStation, DataEntry, DifferencesCounts,
+        ElectionStatusResponse, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+        PollingStationResults, VotersCounts, VotesCounts, YesNo,
         status::{ClientState, DataEntryStatusName},
     },
-    election::{CandidateNumber, PGNumber},
+    election::{CandidateNumber, ElectionDetailsResponse, PGNumber},
 };
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
@@ -23,19 +24,20 @@ pub fn differences_counts_zero() -> DifferencesCounts {
     DifferencesCounts {
         more_ballots_count: 0,
         fewer_ballots_count: 0,
-        unreturned_ballots_count: 0,
-        too_few_ballots_handed_out_count: 0,
-        too_many_ballots_handed_out_count: 0,
-        other_explanation_count: 0,
-        no_explanation_count: 0,
+        compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+            admitted_voters_equal_votes_cast: false,
+            votes_cast_greater_than_admitted_voters: false,
+            votes_cast_smaller_than_admitted_voters: false,
+        },
+        difference_completely_accounted_for: Default::default(),
     }
 }
 
 pub fn political_group_votes_from_test_data_auto(
     number: PGNumber,
     candidate_votes: &[Count],
-) -> PoliticalGroupVotes {
-    PoliticalGroupVotes {
+) -> PoliticalGroupCandidateVotes {
+    PoliticalGroupCandidateVotes {
         number,
         total: candidate_votes.iter().sum(),
         candidate_votes: candidate_votes
@@ -55,14 +57,27 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
         progress: 60,
         data: PollingStationResults {
             extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+            counting_differences_polling_station: CountingDifferencesPollingStation {
+                difference_ballots_per_list: YesNo::no(),
+                unexplained_difference_ballots_voters: YesNo::no(),
+            },
             voters_counts: VotersCounts {
                 poll_card_count: 102,
                 proxy_certificate_count: 2,
                 total_admitted_voters_count: 104,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 102,
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 60,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 42,
+                    },
+                ],
+                total_votes_candidates_count: 102,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,
@@ -226,7 +241,7 @@ pub async fn get_election_committee_session(
     cookie: &HeaderValue,
     election_id: u32,
 ) -> CommitteeSession {
-    let url = format!("http://{addr}/api/elections/{election_id}/committee_sessions");
+    let url = format!("http://{addr}/api/elections/{election_id}");
     let response = Client::new()
         .get(&url)
         .header("cookie", cookie)
@@ -234,8 +249,8 @@ pub async fn get_election_committee_session(
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: CommitteeSessionListResponse = response.json().await.unwrap();
-    body.committee_sessions.first().unwrap().clone()
+    let body: ElectionDetailsResponse = response.json().await.unwrap();
+    body.current_committee_session.clone()
 }
 
 pub async fn change_status_committee_session(

@@ -18,16 +18,16 @@ import {
   ResolveDifferencesAction,
 } from "@/types/generated/openapi";
 import { DataEntryStructure } from "@/types/types";
-import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-interface PollingStationDataEntryStatus {
+interface PollingStationDataEntryDifferences {
   action: ResolveDifferencesAction | undefined;
   setAction: (action: ResolveDifferencesAction | undefined) => void;
   pollingStation: PollingStation;
   election: ElectionWithPoliticalGroups;
   loading: boolean;
   differences: DataEntryGetDifferencesResponse | null;
-  dataEntryStructure: DataEntryStructure | null;
+  dataEntryStructure: DataEntryStructure;
   onSubmit: () => Promise<void>;
   validationError: string | undefined;
 }
@@ -35,7 +35,7 @@ interface PollingStationDataEntryStatus {
 export function usePollingStationDataEntryDifferences(
   pollingStationId: number,
   afterSave: (status: DataEntryStatusName, firstEntryUserId: number | undefined) => void,
-): PollingStationDataEntryStatus {
+): PollingStationDataEntryDifferences {
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
@@ -63,9 +63,7 @@ export function usePollingStationDataEntryDifferences(
   }
 
   const differences = requestState.status === "success" ? requestState.data : null;
-  const dataEntryStructure = differences
-    ? getDataEntryStructureForDifferences(election, differences.first_entry, differences.second_entry)
-    : null;
+  const dataEntryStructure = getDataEntryStructure(election);
 
   const onSubmit = async () => {
     if (action === undefined) {

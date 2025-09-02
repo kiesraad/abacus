@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
-import { ValidationResult } from "@/types/generated/openapi";
+import { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
@@ -216,7 +216,12 @@ describe("addValidationResultToFormState", () => {
     formState.sections.voters_votes_counts!.isSaved = true;
     if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
 
-    const validationResults: ValidationResult[] = [validationResultMockData.F204];
+    const validationResults: ValidationResult[] = [
+      {
+        fields: ["data.votes_counts.total_votes_candidates_count", "data.political_group_votes[0].total"],
+        code: "F000" as ValidationResultCode,
+      },
+    ];
 
     addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 

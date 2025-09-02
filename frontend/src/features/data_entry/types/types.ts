@@ -5,10 +5,9 @@ import {
   ClaimDataEntryResponse,
   DataEntryStatusResponse,
   ElectionWithPoliticalGroups,
-  PollingStationResults,
   ValidationResults,
 } from "@/types/generated/openapi";
-import { DataEntryStructure, FormSectionId, SectionValues } from "@/types/types";
+import { DataEntryResults, DataEntryStructure, FormSectionId, SectionValues } from "@/types/types";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 export interface DataEntryState {
@@ -21,7 +20,7 @@ export interface DataEntryState {
   error: AnyApiError | null;
 
   // backend data structure
-  pollingStationResults: PollingStationResults | null;
+  pollingStationResults: DataEntryResults | null;
 
   // state of the forms excl. data
   dataEntryStructure: DataEntryStructure;
@@ -46,7 +45,7 @@ export interface DataEntryStateAndActions extends DataEntryState {
 }
 
 export interface DataEntryStateAndActionsLoaded extends DataEntryStateAndActions {
-  pollingStationResults: PollingStationResults;
+  pollingStationResults: DataEntryResults;
 }
 
 export type DataEntryDispatch = Dispatch<DataEntryAction>;
@@ -70,7 +69,7 @@ export type DataEntryAction =
     }
   | {
       type: "FORM_SAVED";
-      data: PollingStationResults;
+      data: DataEntryResults;
       validationResults: ValidationResults;
       sectionId: FormSectionId;
       aborting: boolean;

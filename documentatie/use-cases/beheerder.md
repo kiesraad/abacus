@@ -7,14 +7,23 @@ _Niveau:_ hoog-over, wolk, ☁️
 ### Hoofdscenario en uitbreidingen
 
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
-2. [De beheerder zet de verkiezingen in de applicatie.](#de-beheerder-zet-de-verkiezingen-in-de-applicatie-zee)
-3. De beheerder leest de kandidatenlijst in.
-4. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
-5. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
+2. De beheerder maakt voor zichzelf een eerste account en wachtwoord aan.
+3. [De beheerder zet de verkiezingen in de applicatie.](#de-beheerder-zet-de-verkiezingen-in-de-applicatie-vis)
+4. De beheerder leest de kandidatenlijst in.
+5. [De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden in.](#de-beheerder-leest-het-bestand-met-stembureaus-en-aantal-kiesgerechtigden-in-vis)
+6. De beheerder selecteert het type stemopneming.
+7. De beheerder bevestigt het aantal kiesgerechtigden in de gemeente.
+8. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
 
 __Uitbreidingen:__  
 
-3a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
+4a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
+
+5a. De beheerder slaat het invoeren van stembureaus over:  
+&emsp; 5a1. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
+
+7a. Het aantal kiesgerechtigden stond niet in het EML-bestand met stembureaus:  
+&emsp; 7a1. De beheerder voert het aantal kiesgerechtigden handmatig in.
 
 ### Niet in scope
 
@@ -26,26 +35,23 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ De Kiesraad maakt de applicatie beschikbaar.
-
 __Hoofdscenario:__
 
 1. De beheerder bereidt één computer als Abacus-server voor.
 2. De beheerder downloadt de applicatie.
 3. De beheerder plaatst de applicatie op de server.
 4. De beheerder start de applicatie.
-5. De beheerder maakt een eerste account en wachtwoord aan.
-6. (voor elk invoerstation) De beheerder bereidt de computer als invoerstation voor.
-7. (voor elk invoerstation) De beheerder zorgt dat het invoerstation met de server kan verbinden.
+5. (voor elk invoerstation) De beheerder bereidt de computer als invoerstation voor.
+6. (voor elk invoerstation) De beheerder zorgt dat het invoerstation met de server kan verbinden.
 
 __Uitbreidingen:__  
 1a. De beheerder bereidt één of meerdere reserve-servers voor:
 
 4a. De applicatie geeft een foutmelding tijdens het starten:
 
-## De beheerder zet de verkiezingen in de applicatie (zee)
+## De beheerder zet de verkiezingen in de applicatie (vis)
 
-__Niveau:__ gebruikersdoel, zee, 🌊
+__Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
@@ -57,7 +63,24 @@ __Hoofdscenario:__
 __Uitbreidingen:__  
 1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
 
-2a. De hash van de verkiezingsdefinitie klopt niet.
+2a. De hash van de verkiezingsdefinitie klopt niet:
+
+## De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden in (vis)
+
+__Niveau:__ subfunctie, vis, 🐟
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__
+1. De beheerder importeert het bestand met de stembureaus en het aantal kiesgerechtigden op gemeenteniveau.
+2. De applicatie stelt vast dat het bestand aan de validatieregels voldoet.
+3. De beheerder stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
+
+__Uitbreidingen:__  
+2a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
+
+3a. De stembureaus in de applicatie komen niet overeen met de vooraf gepubliceerde lijst:  
+&emsp; 3a1. De beheerder past de stembureaus aan.
 
 ## De beheerder of coördinator zet de stembureaus in de applicatie (zee)
 
@@ -65,29 +88,27 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Precondities:__
 
-- De lijst met gepubliceerde stembureaus is beschikbaar.
+- De stembureaus zijn niet tijdens [het inrichten van de applicatie](#de-beheerder-richt-de-applicatie-in-voor-gsb-enof-csb-wolk) ingevoerd.
 - De invoerfase van de zitting is nog niet gestart. Na het starten van de invoerfase kan alleen de [coördinator nog wijzigingen in de lijst met stembureaus aanbrengen](./gsb-eerste-zitting.md#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-eerste-of-nieuwe-zitting-zee).
 
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
 
-1. De beheerder selecteert de verkiezing.
-2. De beheerder importeert het EML_NL-bestand met de stembureaus.
-3. De applicatie stelt vast dat de stembureaus aan de validatieregels voldoen.
+1. De beheerder importeert het bestand met de stembureaus en het aantal kiesgerechtigden op gemeenteniveau.
+2. De applicatie stelt vast dat het bestand aan de validatieregels voldoet.
+3. De applicatie negeert het aantal kiesgerechtigden in het bestand.
 4. De beheerder stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
 __Uitbreidingen:__  
 
-1a. De beheerder selecteert een andere verkiezing dan van het EML_NL-bestand en de lijst met gepubliceerde stembureaus:
+1a. Er is geen te importeren bestand met stembureaus:  
+&emsp; 1a1. De beheerder of coördinator voert de stembureaus handmatig in.
 
-2a. Er is geen te importeren bestand met stembureaus:  
-&emsp; 2a1. De beheerder voert de stembureaus handmatig in.
+2a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
 
-3a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus.
-
-4a. De lijst met stembureaus moet aangepast worden:  
-&emsp; 4a1. De beheerder past de stembureaus aan.
+4a. De stembureaus in de applicatie komen niet overeen met de vooraf gepubliceerde lijst:  
+&emsp; 4a1. De beheerder of coördinator past de stembureaus aan.
 
 ## De beheerder exporteert de stembureaus (zee)
 

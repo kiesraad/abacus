@@ -9,7 +9,7 @@ use super::{
     },
 };
 use crate::{
-    data_entry::{PoliticalGroupVotes, PollingStationResults},
+    data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
     polling_station::PollingStation,
     summary::ElectionSummary,
 };
@@ -154,7 +154,7 @@ impl TotalVotes {
                 &summary.political_group_votes,
             ),
             cast: summary.votes_counts.total_votes_cast_count as u64,
-            total_counted: summary.votes_counts.votes_candidates_count as u64,
+            total_counted: summary.votes_counts.total_votes_candidates_count as u64,
             rejected_votes: vec![
                 RejectedVotes::new(
                     RejectedVotesReason::Blank,
@@ -185,32 +185,6 @@ impl TotalVotes {
                 UncountedVotes::new(
                     UncountedVotesReason::FewerBallots,
                     summary.differences_counts.fewer_ballots_count.count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::UnreturnedBallots,
-                    summary.differences_counts.unreturned_ballots_count.count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::TooFewBallotsHandedOut,
-                    summary
-                        .differences_counts
-                        .too_few_ballots_handed_out_count
-                        .count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::TooManyBallotsHandedOut,
-                    summary
-                        .differences_counts
-                        .too_many_ballots_handed_out_count
-                        .count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::OtherExplanation,
-                    summary.differences_counts.other_explanation_count.count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::NoExplanation,
-                    summary.differences_counts.no_explanation_count.count as u64,
                 ),
             ],
         }
@@ -251,7 +225,7 @@ impl ReportingUnitVotes {
                 &results.political_group_votes,
             ),
             cast: results.votes_counts.total_votes_cast_count as u64,
-            total_counted: results.votes_counts.votes_candidates_count as u64,
+            total_counted: results.votes_counts.total_votes_candidates_count as u64,
             rejected_votes: vec![
                 RejectedVotes::new(
                     RejectedVotesReason::Blank,
@@ -282,26 +256,6 @@ impl ReportingUnitVotes {
                 UncountedVotes::new(
                     UncountedVotesReason::FewerBallots,
                     results.differences_counts.fewer_ballots_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::UnreturnedBallots,
-                    results.differences_counts.unreturned_ballots_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::TooFewBallotsHandedOut,
-                    results.differences_counts.too_few_ballots_handed_out_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::TooManyBallotsHandedOut,
-                    results.differences_counts.too_many_ballots_handed_out_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::OtherExplanation,
-                    results.differences_counts.other_explanation_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::NoExplanation,
-                    results.differences_counts.no_explanation_count as u64,
                 ),
             ],
         }
@@ -381,16 +335,14 @@ pub enum UncountedVotesReason {
     MoreBallots,
     #[serde(rename = "minder getelde stembiljetten")]
     FewerBallots,
-    #[serde(rename = "meegenomen stembiljetten")]
-    UnreturnedBallots,
-    #[serde(rename = "te weinig uitgereikte stembiljetten")]
-    TooFewBallotsHandedOut,
-    #[serde(rename = "te veel uitgereikte stembiljetten")]
-    TooManyBallotsHandedOut,
-    #[serde(rename = "andere verklaring")]
-    OtherExplanation,
-    #[serde(rename = "geen verklaring")]
-    NoExplanation,
+    #[serde(rename = "D en H zijn gelijk")]
+    VotesCastGreaterThanAdmittedVoters,
+    #[serde(rename = "H is groter dan D")]
+    VotesCastSmallerThanAdmittedVoters,
+    #[serde(rename = "H is kleiner dan D")]
+    DifferenceCompletelyAccountedFor,
+    #[serde(rename = "Verschil tussen D en H volledig verklaard?")]
+    AdmittedVotersEqualsVotesCast,
 }
 
 /// Identifier for a reporting unit
@@ -415,7 +367,7 @@ pub struct Selection {
 impl Selection {
     pub fn from_political_group_votes(
         election: &crate::election::ElectionWithPoliticalGroups,
-        votes: &[PoliticalGroupVotes],
+        votes: &[PoliticalGroupCandidateVotes],
     ) -> Vec<Selection> {
         let mut selections = vec![];
         for pg in votes {

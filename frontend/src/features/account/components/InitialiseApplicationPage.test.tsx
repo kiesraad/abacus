@@ -1,5 +1,7 @@
+import * as ReactRouter from "react-router";
+
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   AdminExistsRequestHandler,
@@ -13,23 +15,26 @@ import { InitialiseApplicationPage } from "./InitialiseApplicationPage";
 
 const navigate = vi.fn();
 
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 describe("InitialiseApplicationPage", () => {
+  beforeEach(() => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+  });
+
   test("Enter form field values", async () => {
     server.use(CreateFirstAdminRequestHandler, AdminExistsRequestHandler, LoginHandler);
 
     render(<InitialiseApplicationPage />);
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Welkom bij Abacus");
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Welkom bij Abacus");
+    });
 
     const nextButton = screen.getByRole("button", { name: "Account voor beheerder aanmaken" });
     await userEvent.click(nextButton);
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Account voor beheerder aanmaken");
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Account voor beheerder aanmaken");
+    });
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
@@ -40,12 +45,16 @@ describe("InitialiseApplicationPage", () => {
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Inloggen met account van beheerder");
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Inloggen met account van beheerder");
+    });
 
     const back = screen.getByText("Stel het account van de beheerder opnieuw in.");
     await user.click(back);
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Account voor beheerder aanmaken");
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Account voor beheerder aanmaken");
+    });
 
     await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
     await user.type(screen.getByLabelText("Gebruikersnaam"), "firstlast");
@@ -55,7 +64,9 @@ describe("InitialiseApplicationPage", () => {
     const submitButton2 = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton2);
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Inloggen met account van beheerder");
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Inloggen met account van beheerder");
+    });
 
     await user.type(screen.getByLabelText("Gebruikersnaam"), "username");
     await user.type(screen.getByLabelText("Wachtwoord"), "password*password");

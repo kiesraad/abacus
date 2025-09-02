@@ -22,10 +22,8 @@ describe("routes", () => {
   beforeEach(() => {
     server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
 
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   test("Non existing route results in not found page", async () => {

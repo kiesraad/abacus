@@ -10,16 +10,11 @@
       "blank_votes_count": "Blanco stemmen",
       "invalid_votes_count": "Ongeldige stemmen",
       "total_votes_cast_count": "Totaal uitgebrachte stemmen",
-      "votes_candidates_count": "Stemmen op kandidaten"
+      "total_votes_candidates_count": "Totaal stemmen op kandidaten"
     },
     "differences_counts": {
-      "fewer_ballots_count": "Stembiljetten minder geteld",
-      "more_ballots_count": "Stembiljetten méér geteld",
-      "no_explanation_count": "Geen verklaring voor het verschil",
-      "other_explanation_count": "Andere verklaring voor het verschil",
-      "too_few_ballots_handed_out_count": "Te weinig uitgereikte stembiljetten",
-      "too_many_ballots_handed_out_count": "Te veel uitgereikte stembiljetten",
-      "unreturned_ballots_count": "Niet ingeleverde stembiljetten"
+      "fewer_ballots_count": "Aantal minder getelde stemmen",
+      "more_ballots_count": "Aantal méér getelde stemmen"
     }
   }
 }

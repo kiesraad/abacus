@@ -1,9 +1,9 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { userEvent, UserEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { useUser } from "@/hooks/user/useUser";
+import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -11,8 +11,19 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
-import { getUrlMethodAndBody, render, screen, userTypeInputs, waitFor } from "@/testing/test-utils";
-import { LoginResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import {
+  getUrlMethodAndBody,
+  render,
+  screen,
+  userTypeInputs,
+  userTypeInputsArray,
+  waitFor,
+} from "@/testing/test-utils";
+import {
+  LoginResponse,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  PollingStationResults,
+} from "@/types/generated/openapi";
 
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
@@ -25,9 +36,6 @@ import {
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
 
-vi.mock("@/hooks/user/useUser");
-vi.mock("react-router");
-
 const testUser: LoginResponse = {
   username: "test-user-1",
   user_id: 1,
@@ -36,7 +44,7 @@ const testUser: LoginResponse = {
 };
 
 function renderForm() {
-  vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
+  vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
 
   return render(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
@@ -52,7 +60,9 @@ const votersFieldIds = {
 };
 
 const votesFieldIds = {
-  votesCandidatesCount: "data.votes_counts.votes_candidates_count",
+  politicalGroup1TotalVotes: "data.votes_counts.political_group_total_votes[0].total",
+  politicalGroup2TotalVotes: "data.votes_counts.political_group_total_votes[1].total",
+  totalVotesCandidatesCount: "data.votes_counts.total_votes_candidates_count",
   blankVotesCount: "data.votes_counts.blank_votes_count",
   invalidVotesCount: "data.votes_counts.invalid_votes_count",
   totalVotesCastCount: "data.votes_counts.total_votes_cast_count",
@@ -60,7 +70,7 @@ const votesFieldIds = {
 
 describe("Test VotersAndVotesForm", () => {
   beforeEach(() => {
-    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
+    vi.spyOn(useUser, "useUser").mockReturnValue(testUser);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 
@@ -147,10 +157,28 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const votesOnCandidates = screen.getByRole("textbox", { name: "E Stemmen op kandidaten" });
-      expect(votesOnCandidates).toHaveFocus();
-      await user.type(votesOnCandidates, "12");
-      expect(votesOnCandidates).toHaveValue("12");
+      const totalVotesOnPoliticalParty1 = screen.getByRole("textbox", {
+        name: "E.1 Totaal Lijst 1 - Vurige Vleugels Partij",
+      });
+      expect(totalVotesOnPoliticalParty1).toHaveFocus();
+      await user.type(totalVotesOnPoliticalParty1, "12");
+      expect(totalVotesOnPoliticalParty1).toHaveValue("12");
+
+      await user.keyboard("{enter}");
+
+      const totalVotesOnPoliticalParty2 = screen.getByRole("textbox", {
+        name: "E.2 Totaal Lijst 2 - Wijzen van Water en Wind",
+      });
+      expect(totalVotesOnPoliticalParty2).toHaveFocus();
+      await user.type(totalVotesOnPoliticalParty2, "34");
+      expect(totalVotesOnPoliticalParty2).toHaveValue("34");
+
+      await user.keyboard("{enter}");
+
+      const totalVotesOnCandidates = screen.getByRole("textbox", { name: "E Totaal stemmen op kandidaten" });
+      expect(totalVotesOnCandidates).toHaveFocus();
+      await user.type(totalVotesOnCandidates, "56");
+      expect(totalVotesOnCandidates).toHaveValue("56");
 
       await user.keyboard("{enter}");
 
@@ -192,12 +220,16 @@ describe("Test VotersAndVotesForm", () => {
             total_admitted_voters_count: 6,
           },
           votes_counts: {
-            votes_candidates_count: 4,
+            political_group_total_votes: [
+              { number: 1, total: 3 },
+              { number: 2, total: 1 },
+            ],
+            total_votes_candidates_count: 4,
             blank_votes_count: 5,
             invalid_votes_count: 6,
             total_votes_cast_count: 15,
           },
-        },
+        } satisfies PollingStationResults,
         client_state: {},
       };
 
@@ -209,7 +241,15 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       await userTypeInputs(user, expectedRequest.data.voters_counts, "data.voters_counts.");
-      await userTypeInputs(user, expectedRequest.data.votes_counts, "data.votes_counts.");
+
+      const { political_group_total_votes, ...votes_counts } = expectedRequest.data.votes_counts;
+      await userTypeInputs(user, votes_counts, "data.votes_counts.");
+      await userTypeInputsArray(
+        user,
+        political_group_total_votes,
+        "data.votes_counts.political_group_total_votes",
+        "total",
+      );
 
       const spy = vi.spyOn(global, "fetch");
 
@@ -289,8 +329,13 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.201",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [
@@ -299,7 +344,9 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.totalAdmittedVotersCount,
       ];
       const expectedValidFieldIds = [
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
@@ -310,30 +357,38 @@ describe("Test VotersAndVotesForm", () => {
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
-    test("F.202 IncorrectTotal Votes counts", async () => {
+    test("F.203 IncorrectTotal Votes counts", async () => {
       const user = userEvent.setup();
 
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [validationResultMockData.F202], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F203], warnings: [] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.203",
+        "De invoer bij E, F, G of H klopt niet.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFieldIds = [
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
       const expectedValidFieldIds = [
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
@@ -359,8 +414,14 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer aantal blanco stemmen",
+        "W.201",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
@@ -369,7 +430,9 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
@@ -445,8 +508,14 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer aantal blanco stemmen",
+        "W.201",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFieldIds = [votesFieldIds.blankVotesCount];
@@ -454,7 +523,9 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
@@ -480,8 +551,14 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer aantal ongeldige stemmen",
+        "W.202",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFieldIds = [votesFieldIds.invalidVotesCount];
@@ -489,7 +566,9 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
@@ -512,15 +591,23 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmenW.203Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
+        "W.203",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFieldIds = [votesFieldIds.totalVotesCastCount, votersFieldIds.totalAdmittedVotersCount];
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
       ];
@@ -543,8 +630,14 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer aantal uitgebrachte stemmenW.205Het totaal aantal uitgebrachte stemmen (H) is nul.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const feedbackMessage = [
+        "Controleer aantal uitgebrachte stemmen",
+        "W.205",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFieldIds = [votesFieldIds.totalVotesCastCount];
@@ -552,7 +645,9 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.totalAdmittedVotersCount,
-        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.politicalGroup1TotalVotes,
+        votesFieldIds.politicalGroup2TotalVotes,
+        votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
       ];
@@ -653,10 +748,20 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await userEvent.click(submitButton);
 
-      const errorFeedbackMessage =
-        "Controleer toegelaten kiezersF.201De invoer bij A, B of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
-      const warningFeedbackMessage =
-        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      const errorFeedbackMessage = [
+        "Controleer je antwoorden",
+        "F.201",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
+      const warningFeedbackMessage = [
+        "Controleer aantal blanco stemmen",
+        "W.201",
+        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(errorFeedbackMessage);
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(warningFeedbackMessage);

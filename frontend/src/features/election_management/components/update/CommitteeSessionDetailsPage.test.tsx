@@ -1,5 +1,5 @@
+import * as ReactRouter from "react-router";
 import { ReactNode } from "react";
-import { RouterProvider } from "react-router";
 
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -22,11 +22,6 @@ import { CommitteeSessionDetailsPage } from "./CommitteeSessionDetailsPage";
 
 const navigate = vi.fn();
 
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 const Providers = ({
   children,
   router = getRouter(children),
@@ -40,7 +35,7 @@ const Providers = ({
     <ApiProvider fetchInitialUser={fetchInitialUser}>
       <TestUserProvider userRole="coordinator">
         <ElectionProvider electionId={1}>
-          <RouterProvider router={router} />
+          <ReactRouter.RouterProvider router={router} />
         </ElectionProvider>
       </TestUserProvider>
     </ApiProvider>
@@ -73,6 +68,7 @@ function renderPage() {
 describe("CommitteeSessionDetailsPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, CommitteeSessionUpdateHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
   test("Shows empty form for first committee session and working validation", async () => {
@@ -243,7 +239,7 @@ describe("CommitteeSessionDetailsPage", () => {
       start_date: "2026-03-18",
       start_time: "21:36",
     });
-    expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/report/download");
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/report/committee-session/1/download");
   });
 
   test("Shows form for sixth committee session, cancel and navigate", async () => {
@@ -319,10 +315,8 @@ describe("CommitteeSessionDetailsPage", () => {
   });
 
   test("Shows error page when change details call returns a 404 error", async () => {
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const user = userEvent.setup();
     const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
     overrideOnce("put", "/api/committee_sessions/1", 404, {

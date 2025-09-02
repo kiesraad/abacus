@@ -60,12 +60,4 @@ export default {
       control: { type: "radio" },
     },
   },
-  parameters: {
-    backgrounds: {
-      light: { name: "light", value: "#f9fafb" },
-    },
-  },
-  globals: {
-    backgrounds: { value: "light" },
-  },
 } satisfies Meta;

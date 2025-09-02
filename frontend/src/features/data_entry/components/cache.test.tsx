@@ -1,8 +1,8 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
-import { describe, expect, Mock, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
-import { useUser } from "@/hooks/user/useUser";
+import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -13,15 +13,11 @@ import { render, screen } from "@/testing/test-utils";
 import { LoginResponse } from "@/types/generated/openapi";
 import { SectionValues } from "@/types/types";
 
-import { useDataEntryContext } from "../hooks/useDataEntryContext";
+import * as useDataEntryContext from "../hooks/useDataEntryContext";
 import { getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
 import { DataEntryStateAndActionsLoaded } from "../types/types";
 import { DataEntryProvider } from "./DataEntryProvider";
 import { DataEntrySection } from "./DataEntrySection";
-
-vi.mock("../hooks/useDataEntryContext");
-vi.mock("@/hooks/user/useUser");
-vi.mock("react-router");
 
 const testUser: LoginResponse = {
   username: "test-user-1",
@@ -32,14 +28,16 @@ const testUser: LoginResponse = {
 
 describe("Data Entry cache behavior", () => {
   test("VotersAndVotesForm with cache", async () => {
-    (useUser as Mock).mockReturnValue(testUser satisfies LoginResponse);
+    vi.spyOn(useUser, "useUser").mockReturnValue(testUser);
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
 
     const cacheData: SectionValues = {
       "voters_counts.poll_card_count": "100",
       "voters_counts.proxy_certificate_count": "200",
       "voters_counts.total_admitted_voters_count": "600",
-      "votes_counts.votes_candidates_count": "400",
+      "votes_counts.political_group_total_votes[0].total": "150",
+      "votes_counts.political_group_total_votes[1].total": "250",
+      "votes_counts.total_votes_candidates_count": "400",
       "votes_counts.blank_votes_count": "500",
       "votes_counts.invalid_votes_count": "600",
       "votes_counts.total_votes_cast_count": "150",
@@ -53,8 +51,8 @@ describe("Data Entry cache behavior", () => {
         data: cacheData,
       },
     };
-    vi.mocked(useDataEntryContext).mockReturnValue(state);
-    vi.mocked(useParams).mockReturnValue({ sectionId: "voters_votes_counts" });
+    vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
 
     render(
       <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
@@ -71,8 +69,14 @@ describe("Data Entry cache behavior", () => {
     const totalAdmittedVoters = screen.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
     expect(totalAdmittedVoters).toHaveValue("600");
 
-    const votesOnCandidates = screen.getByRole("textbox", { name: "E Stemmen op kandidaten" });
-    expect(votesOnCandidates).toHaveValue("400");
+    const totalVotesOnParty1 = screen.getByRole("textbox", { name: "E.1 Totaal Lijst 1 - Vurige Vleugels Partij" });
+    expect(totalVotesOnParty1).toHaveValue("150");
+
+    const totalVotesOnParty2 = screen.getByRole("textbox", { name: "E.2 Totaal Lijst 2 - Wijzen van Water en Wind" });
+    expect(totalVotesOnParty2).toHaveValue("250");
+
+    const totalVotesOnCandidates = screen.getByRole("textbox", { name: "E Totaal stemmen op kandidaten" });
+    expect(totalVotesOnCandidates).toHaveValue("400");
 
     const blankVotes = screen.getByRole("textbox", { name: "F Blanco stemmen" });
     expect(blankVotes).toHaveValue("500");

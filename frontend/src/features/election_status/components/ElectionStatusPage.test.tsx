@@ -1,12 +1,14 @@
+import * as ReactRouter from "react-router";
+
 import { render as rtlRender, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useUser from "@/hooks/user/useUser";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
-import { useUser } from "@/hooks/user/useUser";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
@@ -35,12 +37,6 @@ import {
 import { electionStatusRoutes } from "../routes";
 
 const navigate = vi.fn();
-
-vi.mock("@/hooks/user/useUser");
-vi.mock("react-router", async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
 
 async function renderPage() {
   // Set up router and navigate to the election data entry status page
@@ -74,12 +70,13 @@ describe("ElectionStatusPage", () => {
       ElectionStatusRequestHandler,
       UserListRequestHandler,
     );
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
   test.each<LoginResponse>([getCoordinatorUser(), getAdminUser()])(
     "Page render when committee session status is created for user: %s",
     async (loginResponse) => {
-      vi.mocked(useUser).mockReturnValue(loginResponse);
+      vi.spyOn(useUser, "useUser").mockReturnValue(loginResponse);
       const user = userEvent.setup();
       server.use(
         http.get("/api/elections/1", () =>
@@ -109,7 +106,7 @@ describe("ElectionStatusPage", () => {
   );
 
   test("Page render when committee session status is data_entry_not_started for coordinator", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     server.use(
@@ -140,7 +137,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Page render when committee session status is data_entry_not_started for administrator", async () => {
-    vi.mocked(useUser).mockReturnValue(getAdminUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(
@@ -163,7 +160,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Page render when committee session status is data_entry_in_progress for coordinator", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
@@ -200,7 +197,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Page render when committee session status is data_entry_in_progress for administrator", async () => {
-    vi.mocked(useUser).mockReturnValue(getAdminUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
 
     await renderPage();
 
@@ -215,7 +212,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input alert visible when data entry has finished for coordinator", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     server.use(
       http.get("/api/elections/1/status", () =>
@@ -247,7 +244,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input alert not visible when data entry has finished for administrator", async () => {
-    vi.mocked(useUser).mockReturnValue(getAdminUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { polling_station_id: 1, status: "definitive" },
@@ -265,7 +262,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input alert visible when data entry has finished and data entry is paused for coordinator", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     server.use(
       http.get("/api/elections/1", () =>
@@ -302,7 +299,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Page render when committee session status is data_entry_paused for coordinator", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     server.use(
@@ -337,7 +334,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Page render when committee session status is data_entry_paused for administrator", async () => {
-    vi.mocked(useUser).mockReturnValue(getAdminUser());
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(getElectionMockData({}, { status: "data_entry_paused" }) satisfies ElectionDetailsResponse, {
@@ -361,7 +358,7 @@ describe("ElectionStatusPage", () => {
   test.each<LoginResponse>([getCoordinatorUser(), getAdminUser()])(
     "Page render when committee session status is data_entry_finished for role: %s",
     async (loginResponse) => {
-      vi.mocked(useUser).mockReturnValue(loginResponse);
+      vi.spyOn(useUser, "useUser").mockReturnValue(loginResponse);
       server.use(
         http.get("/api/elections/1", () =>
           HttpResponse.json(
@@ -390,11 +387,9 @@ describe("ElectionStatusPage", () => {
   );
 
   test("Shows error page when user is not allowed to view the page", async () => {
-    vi.mocked(useUser).mockReturnValue(getTypistUser());
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
     overrideOnce("get", "/api/user", 403, {
       error: "Forbidden",
       fatal: true,
@@ -407,11 +402,9 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Shows error page when election status change call returns an error", async () => {
-    vi.mocked(useUser).mockReturnValue(getCoordinatorUser());
-    // Since we test what happens after an error, we want vitest to ignore them
-    vi.spyOn(console, "error").mockImplementation(() => {
-      /* do nothing */
-    });
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     server.use(

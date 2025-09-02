@@ -5,19 +5,20 @@ import { Candidate, ElectionWithPoliticalGroups } from "@/types/generated/openap
 
 import {
   createPoliticalGroupSections,
+  createVotersAndVotesSection,
   differencesSection,
   getDataEntryStructure,
-  votersAndVotesSection,
 } from "./dataEntryStructure";
 
 describe("votersAndVotesSection", () => {
   test("should have correct structure", () => {
+    const votersAndVotesSection = createVotersAndVotesSection(electionMockData);
     expect(votersAndVotesSection.id).toBe("voters_votes_counts");
     expect(votersAndVotesSection.subsections).toHaveLength(1);
     expect(votersAndVotesSection.subsections[0]?.type).toBe("inputGrid");
 
     if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
-      expect(votersAndVotesSection.subsections[0].rows).toHaveLength(7);
+      expect(votersAndVotesSection.subsections[0].rows).toHaveLength(9);
       // Check that it has the basic voter and vote count rows
       expect(
         votersAndVotesSection.subsections[0].rows.some((row) => row.path === "voters_counts.poll_card_count"),
@@ -25,19 +26,27 @@ describe("votersAndVotesSection", () => {
       expect(
         votersAndVotesSection.subsections[0].rows.some((row) => row.path === "votes_counts.total_votes_cast_count"),
       ).toBe(true);
+      // Check that it has the correct amount of political group rows
+      expect(
+        votersAndVotesSection.subsections[0].rows.filter((row) =>
+          row.path.startsWith("votes_counts.political_group_total_votes["),
+        ).length,
+      ).toBe(2);
     }
   });
 
   test("should have autoFocusInput on first row", () => {
+    const votersAndVotesSection = createVotersAndVotesSection(electionMockData);
     if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
       expect(votersAndVotesSection.subsections[0].rows[0]?.autoFocusInput).toBe(true);
     }
   });
 
   test("should have correct row codes", () => {
+    const votersAndVotesSection = createVotersAndVotesSection(electionMockData);
     if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
       const codes = votersAndVotesSection.subsections[0].rows.map((row) => row.code);
-      expect(codes).toEqual(["A", "B", "D", "E", "F", "G", "H"]);
+      expect(codes).toEqual(["A", "B", "D", "E.1", "E.2", "E", "F", "G", "H"]);
     }
   });
 });
@@ -45,8 +54,10 @@ describe("votersAndVotesSection", () => {
 describe("differencesSection", () => {
   test("should have correct structure", () => {
     expect(differencesSection.id).toBe("differences_counts");
-    expect(differencesSection.subsections).toHaveLength(1);
-    expect(differencesSection.subsections[0]?.type).toBe("inputGrid");
+    expect(differencesSection.subsections).toHaveLength(3);
+    expect(differencesSection.subsections[0]?.type).toBe("checkboxes");
+    expect(differencesSection.subsections[1]?.type).toBe("inputGrid");
+    expect(differencesSection.subsections[2]?.type).toBe("checkboxes");
   });
 
   test("should have all differences count fields", () => {
@@ -54,11 +65,14 @@ describe("differencesSection", () => {
       const paths = differencesSection.subsections[0].rows.map((row) => row.path);
       expect(paths).toContain("differences_counts.more_ballots_count");
       expect(paths).toContain("differences_counts.fewer_ballots_count");
-      expect(paths).toContain("differences_counts.unreturned_ballots_count");
-      expect(paths).toContain("differences_counts.too_few_ballots_handed_out_count");
-      expect(paths).toContain("differences_counts.too_many_ballots_handed_out_count");
-      expect(paths).toContain("differences_counts.other_explanation_count");
-      expect(paths).toContain("differences_counts.no_explanation_count");
+      expect(paths).toContain("differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast");
+      expect(paths).toContain(
+        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
+      );
+      expect(paths).toContain(
+        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
+      );
+      expect(paths).toContain("differences_counts.difference_completely_accounted_for");
     }
   });
 

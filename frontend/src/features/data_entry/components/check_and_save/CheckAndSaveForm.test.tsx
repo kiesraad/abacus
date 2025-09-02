@@ -1,6 +1,6 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
-import { userEvent } from "@testing-library/user-event";
+import { UserEvent, userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
@@ -23,8 +23,6 @@ import { FormState } from "../../types/types";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
-vi.mock("react-router");
-
 function customFormState(): FormState {
   return {
     ...getDefaultDataEntryState().formState,
@@ -34,7 +32,7 @@ function customFormState(): FormState {
 
 function renderForm() {
   // Mock useParams to provide the sectionId
-  vi.mocked(useParams).mockReturnValue({ sectionId: "save" });
+  vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "save" });
 
   return renderReturningRouter(
     <ElectionProvider electionId={1}>
@@ -200,56 +198,72 @@ describe("Test CheckAndSaveForm", () => {
     const summaryList = screen.findByTestId(`save-form-summary-list-voters_votes_counts`);
 
     expect(summaryList).toBeDefined();
-    expect(within(await summaryList).getByText("Controleer toegelaten kiezers")).toBeInTheDocument();
+    expect(within(await summaryList).getByText("Controleer je antwoorden")).toBeInTheDocument();
     expect(
       within(await summaryList).getByText("Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen"),
     ).toBeInTheDocument();
   });
 
-  test("Can't complete data entry without accepting errors", async () => {
-    const defaultState = customFormState();
-    const mockFormState: FormState = {
-      ...defaultState,
-      sections: {
-        ...defaultState.sections,
-        voters_votes_counts: {
-          ...defaultState.sections.voters_votes_counts!,
-          errors: new ValidationResultSet([validationResultMockData.F201]),
-          warnings: new ValidationResultSet([validationResultMockData.W203]),
-          acceptErrorsAndWarnings: true,
+  describe("CheckAndSaveForm accept warnings", () => {
+    let user: UserEvent;
+    let completeButton: HTMLButtonElement;
+    let acceptErrorsCheckbox: HTMLInputElement;
+
+    beforeEach(async () => {
+      const defaultState = customFormState();
+      const mockFormState: FormState = {
+        ...defaultState,
+        sections: {
+          ...defaultState.sections,
+          voters_votes_counts: {
+            ...defaultState.sections.voters_votes_counts!,
+            errors: new ValidationResultSet([validationResultMockData.F201]),
+            warnings: new ValidationResultSet([validationResultMockData.W203]),
+            acceptErrorsAndWarnings: true,
+          },
         },
-      },
-    };
+      };
 
-    const defaultValues = getEmptyDataEntryRequest().data;
-    overrideServerClaimDataEntryResponse({
-      formState: mockFormState,
-      pollingStationResults: defaultValues,
-      validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W203] },
+      const defaultValues = getEmptyDataEntryRequest().data;
+      overrideServerClaimDataEntryResponse({
+        formState: mockFormState,
+        pollingStationResults: defaultValues,
+        validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W203] },
+      });
+      renderForm();
+
+      user = userEvent.setup();
+      completeButton = await screen.findByRole("button", { name: "Afronden" });
+      expect(completeButton).toBeInTheDocument();
+
+      acceptErrorsCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de fouten besproken met de coördinator",
+      });
+      expect(acceptErrorsCheckbox).toBeInTheDocument();
     });
-    renderForm();
 
-    const completeButton = await screen.findByRole("button", { name: "Afronden" });
-    expect(completeButton).toBeInTheDocument();
+    test("hitting shift+enter should focus checkbox", async () => {
+      expect(acceptErrorsCheckbox).not.toHaveFocus();
 
-    const acceptErrorsCheckbox = screen.getByRole("checkbox", {
-      name: "Ik heb de fouten besproken met de coördinator",
+      await user.keyboard("{shift>}{enter}{/shift}");
+      expect(acceptErrorsCheckbox).toHaveFocus();
     });
-    expect(acceptErrorsCheckbox).toBeInTheDocument();
 
-    await userEvent.click(completeButton);
+    test("Can't complete data entry without accepting errors", async () => {
+      await userEvent.click(completeButton);
 
-    const errorMessage = await screen.findByRole("alert");
-    expect(errorMessage).toHaveTextContent("Je kan alleen verder als je dit met de coördinator hebt overlegd.");
+      const errorMessage = await screen.findByRole("alert");
+      expect(errorMessage).toHaveTextContent("Je kan alleen verder als je dit met de coördinator hebt overlegd.");
 
-    await userEvent.click(acceptErrorsCheckbox);
+      await userEvent.click(acceptErrorsCheckbox);
 
-    expect(acceptErrorsCheckbox).toBeChecked();
-    const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
+      expect(acceptErrorsCheckbox).toBeChecked();
+      const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
 
-    await userEvent.click(completeButton);
+      await userEvent.click(completeButton);
 
-    expect(finalise).toHaveBeenCalledOnce();
+      expect(finalise).toHaveBeenCalledOnce();
+    });
   });
 });
 

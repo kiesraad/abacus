@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -10,8 +10,6 @@ import { DataEntryStructure } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { ResolveErrorsNavigation } from "./ResolveErrorsNavigation";
-
-vi.mock("react-router");
 
 describe("ResolveErrorsNavigation", () => {
   const electionMockData = getElectionMockData().election;
@@ -37,7 +35,7 @@ describe("ResolveErrorsNavigation", () => {
   };
 
   beforeEach(() => {
-    vi.mocked(useParams).mockReturnValue({
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({
       electionId: "1",
       pollingStationId: "5",
       sectionId: undefined,
@@ -49,7 +47,7 @@ describe("ResolveErrorsNavigation", () => {
 
     expect(screen.getByRole("link", { name: "Fouten en waarschuwingen" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Verschillen" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Verschillen D & H" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Lijst 2 - Wijzen van Water en Wind/ })).toBeInTheDocument();
   });
@@ -66,7 +64,7 @@ describe("ResolveErrorsNavigation", () => {
     const votersAndVotesItem = screen.getByRole("link", { name: "Aantal kiezers en stemmen" }).closest("li")!;
     expect(within(votersAndVotesItem).getByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
 
-    const differencesItem = screen.getByRole("link", { name: "Verschillen" }).closest("li")!;
+    const differencesItem = screen.getByRole("link", { name: "Verschillen D & H" }).closest("li")!;
     expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
 
     const politicalGroup1Item = screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ }).closest("li")!;
@@ -85,7 +83,7 @@ describe("ResolveErrorsNavigation", () => {
   });
 
   test("shows overview link as active when sectionId param is null", () => {
-    vi.mocked(useParams).mockReturnValue({
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({
       electionId: "1",
       pollingStationId: "5",
       sectionId: undefined,
@@ -98,7 +96,7 @@ describe("ResolveErrorsNavigation", () => {
   });
 
   test("shows section link as active when sectionId param is not null", () => {
-    vi.mocked(useParams).mockReturnValue({
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({
       electionId: "1",
       pollingStationId: "5",
       sectionId: "voters_votes_counts",

@@ -4,7 +4,7 @@ import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { render, screen } from "@/testing/test-utils";
 import { PollingStationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
-import { getDataEntryStructureForDifferences } from "@/utils/dataEntryStructure";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
@@ -12,7 +12,7 @@ import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 describe("ResolveDifferencesTables", () => {
   const first = pollingStationResultsMockData(true);
   const second = pollingStationResultsMockData(false);
-  const structure = getDataEntryStructureForDifferences(electionMockData, first, second);
+  const structure = getDataEntryStructure(electionMockData);
 
   test("renders the resolve differences tables", async () => {
     render(<ResolveDifferencesTables first={first} second={second} structure={structure} />);
@@ -33,13 +33,15 @@ describe("ResolveDifferencesTables", () => {
     expect(votersVotesCountsTable).toBeVisible();
     expect(votersVotesCountsTable).toHaveTableContent([
       ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
-      ["E", "42", "44", "Stemmen op kandidaten"],
+      ["E.1", "1.512", "1.481", "Totaal Lijst 1 - Vurige Vleugels Partij"],
       [""],
-      ["H", "42", "44", "Totaal uitgebrachte stemmen"],
+      ["E", "1.514", "1.483", "Totaal stemmen op kandidaten"],
+      [""],
+      ["H", "1.514", "1.483", "Totaal uitgebrachte stemmen"],
     ]);
 
     const differencesCountsTable = screen.queryByRole("table", {
-      name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen B1-3.3",
     });
     expect(differencesCountsTable).not.toBeInTheDocument();
 
@@ -153,14 +155,14 @@ describe("ResolveDifferencesTables", () => {
           yes: true,
           no: true,
         },
-      } as unknown as PollingStationResults;
+      };
 
       const secondResults = {
         test: {
           yes: false,
           no: false,
         },
-      } as unknown as PollingStationResults;
+      };
 
       render(<ResolveDifferencesTables first={firstResults} second={secondResults} structure={[checkboxSection]} />);
 

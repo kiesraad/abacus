@@ -7,6 +7,8 @@ import { PollingStationsPreview } from "@/components/polling_station/PollingStat
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
+import { Form } from "@/components/ui/Form/Form";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 
@@ -83,48 +85,53 @@ export function UploadPollingStationDefinition() {
 
     return (
       <section className="md">
-        <h2>{t("election.polling_stations.check.title")}</h2>
-        <p className="mb-lg">
-          {tx("election.polling_stations.check.description", {
-            file: () => <strong>{state.pollingStationDefinitionFileName}</strong>,
-          })}
-        </p>
-
-        <PollingStationsPreview pollingStations={state.pollingStations} />
-
-        <div className="mt-xl">
-          <Button onClick={() => void next()}>{t("next")}</Button>
-        </div>
+        <Form title={t("election.polling_stations.check.title")}>
+          <FormLayout>
+            <FormLayout.Section>
+              <p>
+                {tx("election.polling_stations.check.description", {
+                  file: () => <strong>{state.pollingStationDefinitionFileName}</strong>,
+                })}
+              </p>
+              <PollingStationsPreview pollingStations={state.pollingStations} />
+            </FormLayout.Section>
+            <FormLayout.Controls>
+              <Button type="button" onClick={() => void next()}>
+                {t("next")}
+              </Button>
+            </FormLayout.Controls>
+          </FormLayout>
+        </Form>
       </section>
     );
   }
 
   return (
     <section className="md">
-      {state.election && (
-        <h2>
-          {t("election.import_polling_station_eml", {
-            location: state.election.location,
-          })}
-        </h2>
-      )}
-      <div className="mt-lg mb-lg">
-        {error && (
-          <Alert type="error" title={t("election.invalid_polling_station_definition.title")} inline>
-            <p>{error}</p>
-          </Alert>
-        )}
-      </div>
-      <p className="mb-lg">{t("election.use_instructions_to_import_polling_stations_eml")}</p>
-      <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
-        {t("select_file")}
-      </FileInput>
+      <Form
+        title={state.election ? t("election.import_polling_station_eml", { location: state.election.location }) : ""}
+      >
+        <FormLayout>
+          <FormLayout.Section>
+            {error && (
+              <Alert type="error" title={t("election.invalid_polling_station_definition.title")} inline>
+                <p>{error}</p>
+              </Alert>
+            )}
 
-      <p className="mt-lg">
-        <Button variant="underlined" size="md" onClick={() => void skip()}>
-          {t("election.polling_stations.skip_step")}
-        </Button>
-      </p>
+            <p>{t("election.use_instructions_to_import_polling_stations_eml")}</p>
+            <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
+              {t("select_file")}
+            </FileInput>
+
+            <FormLayout.Controls>
+              <Button type="button" variant="underlined" size="md" onClick={() => void skip()}>
+                {t("election.polling_stations.skip_step")}
+              </Button>
+            </FormLayout.Controls>
+          </FormLayout.Section>
+        </FormLayout>
+      </Form>
     </section>
   );
 }

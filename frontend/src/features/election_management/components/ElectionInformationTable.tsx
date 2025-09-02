@@ -1,4 +1,5 @@
 import { Table } from "@/components/ui/Table/Table";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
@@ -28,6 +29,8 @@ export function ElectionInformationTable({
   numberOfPollingStations,
   numberOfVoters,
 }: ElectionInformationTableProps) {
+  const { isCoordinator } = useUserRole();
+
   return (
     <Table
       id="election-information-table"
@@ -58,14 +61,25 @@ export function ElectionInformationTable({
           </Table.HeaderCell>
           <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
-        <Table.LinkRow to={"number-of-voters"}>
-          <Table.HeaderCell scope="row" className="normal">
-            {t("number_of_voters")}
-          </Table.HeaderCell>
-          <Table.Cell className="underlined">
-            {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input")}
-          </Table.Cell>
-        </Table.LinkRow>
+        {isCoordinator ? (
+          <Table.LinkRow to={"number-of-voters"}>
+            <Table.HeaderCell scope="row" className="normal">
+              {t("number_of_voters")}
+            </Table.HeaderCell>
+            <Table.Cell className="underlined">
+              {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input")}
+            </Table.Cell>
+          </Table.LinkRow>
+        ) : (
+          <Table.Row>
+            <Table.HeaderCell scope="row" className="normal">
+              {t("number_of_voters")}
+            </Table.HeaderCell>
+            <Table.Cell>
+              {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input_by_a_coordinator")}
+            </Table.Cell>
+          </Table.Row>
+        )}
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.to_do_data_entry_for")}

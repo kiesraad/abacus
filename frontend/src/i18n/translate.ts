@@ -25,7 +25,7 @@ function getTranslation(path: string): string | undefined {
 }
 
 // check if the given path key exists in the translations
-export function hasTranslation(path: string): boolean {
+export function hasTranslation(path: string): path is TranslationPath {
   const value = getTranslation(path);
 
   return typeof value === "string";

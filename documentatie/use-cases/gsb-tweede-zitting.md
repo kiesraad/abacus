@@ -8,8 +8,6 @@ __Niveau:__ hoog-over, wolk, ☁️
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ één of meer stembureaus moeten herteld worden n.a.v. verzoek CSB
-
 __Hoofdscenario:__  
 1. Het GSB ontvangt één of meerdere verzoeken tot onderzoek/hertelling van het CSB.
 2. [De coördinator GSB bereidt de documenten voor de zitting voor.](#de-coördinator-gsb-bereidt-de-documenten-voor-de-zitting-voor-zee)
@@ -42,7 +40,6 @@ __Uitbreidingen:__
 &emsp; 7a1. Het GSB stelt het bezwaar vast.  
 &emsp; 7a2. Het GSB gaat over tot hertelling.
 
-
 ## De coördinator GSB bereidt de documenten voor de zitting voor (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
@@ -60,16 +57,22 @@ __Uitbreidingen:__
 1a. Het GSB besluit om n.a.v. een verzoek additionele stembureaus te onderzoeken:  
 &emsp; 1a1. De coördinator GSB selecteert een stembureau en voert "Aanleiding van het onderzoek" (vrije tekst) in de applicatie in.  
 
-1b. De coördinator GSB ontdekt dat een stembureau dat op de vooraf gepubliceerde lijst staat niet in Abacus is opgenomen.  
+1b. De coördinator GSB ontdekt dat een stembureau dat op de vooraf gepubliceerde lijst staat niet in Abacus is opgenomen:  
 &emsp; 1b1. De coördinator GSB voegt het stembureau toe.  
 &emsp; 1b2. Abacus maakt melding op het PV dat het stembureau is toegevoegd.  
 &emsp; 1b3. Het corrigendum corrigeert het aantal stemmen bij dit stembureau van 0 naar het werkelijke aantal.  
 
-1c. De coördinator GSB ontdekt dat het stembureau niet onder de goede naam in Abacus is opgenomen.  
-&emsp; 1c1. De coördinator GSB corrigeert de typfouten.  
+1c. De coördinator GSB ontdekt dat het nummer van een stembureau niet correct in Abacus is opgenomen:  
+&emsp; 1c1. De coördinator zorgt dat de fout vermeld wordt in het PV.
 
-1d. De coördinator GSB ontdekt dat een stembureau ten onrechte is meegenomen in een eerdere zitting.  
-&emsp; 1d1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau.  
+1d. De coördinator GSB ontdekt dat de gegevens van een stembureau niet correct in Abacus zijn opgenomen:  
+&emsp; 1d1. De applicatie laat niet toe dat het nummer van het stembureau wordt aangepast.  
+&emsp; 1d2. De coördinator GSB corrigeert de stembureaugegevens.  
+&emsp; 1d3. De applicatie slaat de gecorrigeerde stembureaugegevens op, alleen voor de huidige zitting.  
+&emsp; 1d4. De coördinator GSB zorgt dat de correctie vermeld wordt in het PV.  
+
+1e. De coördinator GSB ontdekt dat een stembureau ten onrechte is meegenomen in een eerdere zitting:  
+&emsp; 1e1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau.  
 
 
 ## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)
@@ -97,3 +100,7 @@ __Uitbreidingen:__
 4a. Het GSB bevestigt het oorspronkelijke resultaat in de hertelling:  
 &emsp; 4a1. De coördinator GSB voert de uitkomst van het onderzoek in de applicatie in.  
 &emsp; 4a2. Het GSB voegt het corrigendum toe aan de PV's van de zitting.  
+
+6a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
+&emsp; 6a1. De coördinator GSB pauzeert de invoer.  
+&emsp; 6a2. De applicatie blokkeert verdere invoer.  

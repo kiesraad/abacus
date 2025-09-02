@@ -13,6 +13,10 @@ export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
 }
 export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
+export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 
 // /api/committee_sessions/{committee_session_id}/status
 export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
@@ -53,12 +57,6 @@ export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
-
-// /api/elections/{election_id}/committee_sessions
-export interface ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS {
-  election_id: number;
-}
-export type ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
 
 // /api/elections/{election_id}/download_n_10_2
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
@@ -290,6 +288,7 @@ export type AuditEvent =
   | (UserDetails & { event_type: "UserDeleted" })
   | (ElectionDetails & { event_type: "ElectionCreated" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionCreated" })
+  | (CommitteeSessionDetails & { event_type: "CommitteeSessionDeleted" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
   | (PollingStationDetails & { event_type: "PollingStationCreated" })
@@ -414,13 +413,6 @@ export interface CommitteeSessionDetails {
 }
 
 /**
- * Committee session list response
- */
-export interface CommitteeSessionListResponse {
-  committee_sessions: CommitteeSession[];
-}
-
-/**
  * Committee session number of voters change request
  */
 export interface CommitteeSessionNumberOfVotersChangeRequest {
@@ -527,23 +519,35 @@ export interface DataEntryStatusResponse {
 }
 
 /**
+ * Compare votes cast admitted voters, part of the differences counts.
+ */
+export interface DifferenceCountsCompareVotesCastAdmittedVoters {
+  /** Whether total of admitted voters and total of votes cast match.
+("D en H zijn gelijk") */
+  admitted_voters_equal_votes_cast: boolean;
+  /** Whether total of admitted voters is greater than total of votes cast match.
+("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)") */
+  votes_cast_greater_than_admitted_voters: boolean;
+  /** Whether total of admitted voters is less than total of votes cast match.
+("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)") */
+  votes_cast_smaller_than_admitted_voters: boolean;
+}
+
+/**
  * Differences counts, part of the polling station results.
+ * (B1-3.3 "Verschillen tussen aantal kiezers en uitgebrachte stemmen")
  */
 export interface DifferencesCounts {
-  /** Number of fewer counted ballots ("Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld") */
+  /** Whether total of admitted voters and total of votes cast match.
+(B1-3.3.1 "Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)") */
+  compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters;
+  /** Whether the difference between the total of admitted voters and total of votes cast is explained.
+(B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?") */
+  difference_completely_accounted_for: YesNo;
+  /** Number of fewer counted ballots ("Aantal minder getelde stemmen (bereken: D min H)") */
   fewer_ballots_count: number;
-  /** Number of more counted ballots ("Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?") */
+  /** Number of more counted ballots ("Aantal méér getelde stemmen (bereken: H min D)") */
   more_ballots_count: number;
-  /** Number of no explanations ("Hoe vaak is er geen verklaring voor het verschil?") */
-  no_explanation_count: number;
-  /** Number of other explanations ("Hoe vaak is er een andere verklaring voor het verschil?") */
-  other_explanation_count: number;
-  /** Number of fewer ballots handed out ("Hoe vaak is er een stembiljet te weinig uitgereikt?") */
-  too_few_ballots_handed_out_count: number;
-  /** Number of more ballots handed out ("Hoe vaak is er een stembiljet te veel uitgereikt?") */
-  too_many_ballots_handed_out_count: number;
-  /** Number of unreturned ballots ("Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?") */
-  unreturned_ballots_count: number;
 }
 
 /**
@@ -620,10 +624,11 @@ export interface ElectionDetails {
 
 /**
  * Election details response, including the election's candidate list (political groups),
- * its polling stations and the current committee session
+ * its polling stations and its committee sessions and current committee session
  */
 export interface ElectionDetailsResponse {
-  committee_session: CommitteeSession;
+  committee_sessions: CommitteeSession[];
+  current_committee_session: CommitteeSession;
   election: ElectionWithPoliticalGroups;
   polling_stations: PollingStation[];
 }
@@ -673,7 +678,7 @@ export interface ElectionSummary {
   /** The differences between voters and votes */
   differences_counts: SummaryDifferencesCounts;
   /** The summary votes for each political group (and each candidate within) */
-  political_group_votes: PoliticalGroupVotes[];
+  political_group_votes: PoliticalGroupCandidateVotes[];
   /** The total number of voters */
   voters_counts: VotersCounts;
   /** The total number of votes */
@@ -708,8 +713,8 @@ export interface ErrorDetails {
  */
 export type ErrorReference =
   | "AirgapViolation"
-  | "NotInitialised"
   | "AllListsExhausted"
+  | "AlreadyInitialised"
   | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "CommitteeSessionPaused"
   | "DatabaseError"
@@ -733,6 +738,7 @@ export type ErrorReference =
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
   | "InvalidXml"
+  | "NotInitialised"
   | "OwnAccountCannotBeDeleted"
   | "PasswordRejection"
   | "PdfGenerationError"
@@ -873,6 +879,12 @@ export interface PoliticalGroupCandidateNomination {
   updated_candidate_ranking: Candidate[];
 }
 
+export interface PoliticalGroupCandidateVotes {
+  candidate_votes: CandidateVotes[];
+  number: number;
+  total: number;
+}
+
 /**
  * Contains information about the final assignment of seats for a specific political group.
  */
@@ -914,8 +926,7 @@ export interface PoliticalGroupStanding {
   votes_cast: number;
 }
 
-export interface PoliticalGroupVotes {
-  candidate_votes: CandidateVotes[];
+export interface PoliticalGroupTotalVotes {
   number: number;
   total: number;
 }
@@ -998,7 +1009,7 @@ export interface PollingStationResults {
   /** Extra investigation ("B1-1 Extra onderzoek") */
   extra_investigation: ExtraInvestigation;
   /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
-  political_group_votes: PoliticalGroupVotes[];
+  political_group_votes: PoliticalGroupCandidateVotes[];
   /** Voters counts ("1. Aantal toegelaten kiezers") */
   voters_counts: VotersCounts;
   /** Votes counts ("2. Aantal getelde stembiljetten") */
@@ -1089,14 +1100,20 @@ export interface SumCount {
 /**
  * Contains a summary of the differences, containing which polling stations had differences.
  */
+export interface SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+  admitted_voters_equal_votes_cast: boolean;
+  votes_cast_greater_than_admitted_voters: boolean;
+  votes_cast_smaller_than_admitted_voters: boolean;
+}
+
+/**
+ * Contains a summary of the differences, containing which polling stations had differences.
+ */
 export interface SummaryDifferencesCounts {
+  compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters;
+  difference_completely_accounted_for: YesNo;
   fewer_ballots_count: SumCount;
   more_ballots_count: SumCount;
-  no_explanation_count: SumCount;
-  other_explanation_count: SumCount;
-  too_few_ballots_handed_out_count: SumCount;
-  too_many_ballots_handed_out_count: SumCount;
-  unreturned_ballots_count: SumCount;
 }
 
 export interface UpdateUserRequest {
@@ -1148,9 +1165,13 @@ export interface ValidationResult {
 }
 
 export type ValidationResultCode =
+  | "F101"
+  | "F102"
+  | "F111"
+  | "F112"
   | "F201"
   | "F202"
-  | "F204"
+  | "F203"
   | "F301"
   | "F302"
   | "F303"
@@ -1187,17 +1208,20 @@ export interface VotersCounts {
 
 /**
  * Votes counts, part of the polling station results.
+ * Following the fields in Model CSO Na 31-2 Bijlage 1.
  */
 export interface VotesCounts {
-  /** Number of blank votes ("Aantal blanco stembiljetten") */
+  /** Number of blank votes ("Blanco stembiljetten") */
   blank_votes_count: number;
-  /** Number of invalid votes ("Aantal ongeldige stembiljetten") */
+  /** Number of invalid votes ("Ongeldige stembiljetten") */
   invalid_votes_count: number;
-  /** Total number of votes cast ("Totaal aantal getelde stemmen") */
+  /** Total votes per list */
+  political_group_total_votes: PoliticalGroupTotalVotes[];
+  /** Total number of valid votes on candidates
+("Totaal stemmen op kandidaten") */
+  total_votes_candidates_count: number;
+  /** Total number of votes cast ("Totaal uitgebrachte stemmen") */
   total_votes_cast_count: number;
-  /** Number of valid votes on candidates
-("Aantal stembiljetten met een geldige stem op een kandidaat") */
-  votes_candidates_count: number;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -15,8 +15,6 @@ import { overrideServerClaimDataEntryResponse } from "../testing/test.utils";
 import { FormState } from "../types/types";
 import { DataEntryProgress } from "./DataEntryProgress";
 import { DataEntryProvider } from "./DataEntryProvider";
-
-vi.mock("react-router");
 
 function renderForm() {
   return render(
@@ -45,11 +43,12 @@ const pollingStationResults = {
   differences_counts: {
     more_ballots_count: 5,
     fewer_ballots_count: 0,
-    no_explanation_count: 0,
-    other_explanation_count: 0,
-    too_few_ballots_handed_out_count: 0,
-    too_many_ballots_handed_out_count: 0,
-    unreturned_ballots_count: 0,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: false,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
+    difference_completely_accounted_for: { yes: false, no: false },
   },
   political_group_votes: [
     {
@@ -68,11 +67,10 @@ const pollingStationResults = {
 describe("DataEntryProgress", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler);
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });
   });
 
   test("shows different states for entries", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
     const formState = getDefaultFormState();
 
     formState.furthest = "political_group_votes_2";
@@ -126,7 +124,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("Prioritise errors over warnings", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
     const formState = getDefaultFormState();
 
     formState.furthest = "political_group_votes_2";
@@ -158,7 +156,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("shows links to other pages when on last page", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "save" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "save" });
     const formState = getDefaultFormState();
 
     formState.furthest = "save";
@@ -190,7 +188,7 @@ describe("DataEntryProgress", () => {
       `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/voters_votes_counts`,
     );
 
-    const differencesLink = within(differences).getByRole("link", { name: "Verschillen" });
+    const differencesLink = within(differences).getByRole("link", { name: "Verschillen D & H" });
     expect(differencesLink).toBeVisible();
     expect(differencesLink).toHaveAttribute(
       "href",
@@ -206,7 +204,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("shows links when navigating to earlier page", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_1" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_1" });
     const formState = getDefaultFormState();
 
     formState.furthest = "save";
@@ -250,7 +248,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("Mismatch between election data and formState", async () => {
-    vi.mocked(useParams).mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });
     const formState = getDefaultFormState();
     delete formState.sections.political_group_votes_2;
     formState.sections.political_group_votes_3 = getDefaultFormSection("political_group_votes_3", 6);

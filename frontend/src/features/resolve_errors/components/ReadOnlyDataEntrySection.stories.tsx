@@ -23,7 +23,11 @@ const pollingStationResults: PollingStationResults = {
     total_admitted_voters_count: 205,
   },
   votes_counts: {
-    votes_candidates_count: 198,
+    political_group_total_votes: [
+      { number: 1, total: 142 },
+      { number: 2, total: 56 },
+    ],
+    total_votes_candidates_count: 198,
     blank_votes_count: 4,
     invalid_votes_count: 2,
     total_votes_cast_count: 204,
@@ -31,11 +35,15 @@ const pollingStationResults: PollingStationResults = {
   differences_counts: {
     more_ballots_count: 0,
     fewer_ballots_count: 2,
-    unreturned_ballots_count: 1,
-    too_few_ballots_handed_out_count: 0,
-    too_many_ballots_handed_out_count: 0,
-    other_explanation_count: 0,
-    no_explanation_count: 1,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: false,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
+    difference_completely_accounted_for: {
+      no: true,
+      yes: true,
+    },
   },
   political_group_votes: [
     {
@@ -66,7 +74,7 @@ const pollingStationResults: PollingStationResults = {
   ],
 };
 
-const dataEntryStructure = getDataEntryStructure(electionMockData, pollingStationResults);
+const dataEntryStructure = getDataEntryStructure(electionMockData);
 const sectionIds = dataEntryStructure.map((section) => section.id);
 
 type Props = {

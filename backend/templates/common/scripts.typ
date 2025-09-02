@@ -48,7 +48,7 @@
 }
 
 #let prefilled_text(value) = {
-  text(font: "Geist Mono", value)
+  text(font: "Geist Mono", features: ("ss09", ), value)
 }
 
 /// Display a checkmark for usage in a checkbox
@@ -85,14 +85,6 @@
   )
 }
 
-/// Add dashes to a text every `every` characters
-#let add-dashes(text, every: 4) = {
-  if text == none {
-    return
-  }
-
-  text.clusters().chunks(every).map(c => c.join("")).join("-")
-}
 
 /// Format a number with thousands separator
 #let fmt-number(
@@ -405,7 +397,7 @@
         columns: (1fr, 2.5em) + if with_originals { (6em, 8em) } else { (8em,) },
         rows: (auto,) + range(0, rows_in_column).map(_ => 23pt) + (8pt, 23pt),
         inset: (x: 4pt, y: 8pt),
-        stroke: 0.5pt + silver,
+        stroke: 0.5pt + gray,
         fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
         table.hline(stroke: none),
         table.header(

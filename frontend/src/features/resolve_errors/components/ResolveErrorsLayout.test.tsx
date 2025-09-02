@@ -1,4 +1,6 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import * as ReactRouter from "react-router";
+
+import { describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
@@ -15,14 +17,6 @@ import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { ResolveErrorsLayout } from "./ResolveErrorsLayout";
 
-vi.mock("react-router", async (importOriginal) => {
-  return {
-    ...(await importOriginal()),
-    Outlet: () => <div data-testid="outlet">Outlet Content</div>,
-    useParams: () => ({ electionId: "1", pollingStationId: "5" }),
-  };
-});
-
 const renderLayout = () => {
   return render(
     <TestUserProvider userRole="coordinator">
@@ -38,16 +32,16 @@ const renderLayout = () => {
 };
 
 describe("ResolveErrorsLayout", () => {
-  beforeEach(() => {
+  test("renders layout with polling station header and navigation", async () => {
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
       PollingStationDataEntryGetErrorsHandler,
     );
-  });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "5" });
+    vi.spyOn(ReactRouter, "Outlet").mockReturnValue(<div>Outlet Content</div>);
 
-  test("renders layout with polling station header and navigation", async () => {
     renderLayout();
 
     const banner = await screen.findByRole("banner");

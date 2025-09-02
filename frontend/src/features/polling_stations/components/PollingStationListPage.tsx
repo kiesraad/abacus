@@ -1,4 +1,4 @@
-import { IconPlus } from "@/components/generated/icons";
+import { IconFilePlus, IconPlus } from "@/components/generated/icons";
 import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
@@ -48,9 +48,14 @@ export function PollingStationListPage() {
             <p className="mb-lg">{t("polling_station.message.no_polling_stations")}</p>
 
             <Toolbar>
-              <Button.Link variant="secondary" size="sm" to="./create">
-                <IconPlus /> {t("manual_input")}
-              </Button.Link>
+              <Toolbar.Section>
+                <Button.Link variant="primary" size="md" to="./import">
+                  <IconFilePlus /> {t("import_from_file")}
+                </Button.Link>
+                <Button.Link variant="secondary" size="md" to="./create">
+                  <IconPlus /> {t("manual_input")}
+                </Button.Link>
+              </Toolbar.Section>
             </Toolbar>
           </article>
         ) : (

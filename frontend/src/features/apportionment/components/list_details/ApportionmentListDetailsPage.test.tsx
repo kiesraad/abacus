@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import * as ReactRouter from "react-router";
 
 import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
@@ -16,8 +16,6 @@ import { candidate_nomination, election, election_summary, seat_assignment } fro
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentListDetailsPage } from "./ApportionmentListDetailsPage";
 
-vi.mock("react-router");
-
 const renderApportionmentPage = () =>
   render(
     <ElectionProvider electionId={1}>
@@ -29,7 +27,7 @@ const renderApportionmentPage = () =>
 
 describe("ApportionmentListDetailsPage", () => {
   test("All tables visible", async () => {
-    vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "1" });
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment,
@@ -121,7 +119,7 @@ describe("ApportionmentListDetailsPage", () => {
   });
 
   test("No tables visible because 0 seats assigned", async () => {
-    vi.mocked(useParams).mockReturnValue({ pgNumber: "5" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "5" });
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment,
@@ -170,7 +168,7 @@ describe("ApportionmentListDetailsPage", () => {
 
   describe("Apportionment not yet available", () => {
     test("Not available until data entry is finalised", async () => {
-      vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "1" });
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 412, {
         error: "Election data entry first needs to be finalised",
@@ -195,7 +193,7 @@ describe("ApportionmentListDetailsPage", () => {
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
-      vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "1" });
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
@@ -220,7 +218,7 @@ describe("ApportionmentListDetailsPage", () => {
     });
 
     test("Not possible because all lists are exhausted", async () => {
-      vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "1" });
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "All lists are exhausted, not enough candidates to fill all seats",
@@ -247,11 +245,9 @@ describe("ApportionmentListDetailsPage", () => {
     });
 
     test("Internal Server Error renders error page", async () => {
-      vi.mocked(useParams).mockReturnValue({ pgNumber: "1" });
-      // Since we test what happens after an error, we want vitest to ignore them
-      vi.spyOn(console, "error").mockImplementation(() => {
-        /* do nothing */
-      });
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "1" });
+      // error is expected
+      vi.spyOn(console, "error").mockImplementation(() => {});
       const router = setupTestRouter([
         {
           Component: null,

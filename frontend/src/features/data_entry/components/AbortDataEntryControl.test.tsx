@@ -3,15 +3,13 @@ import { RouterProvider } from "react-router";
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useElection from "@/hooks/election/useElection";
 import { ApiResponseStatus } from "@/api/ApiResult";
-import { useElection } from "@/hooks/election/useElection";
 import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
 import { AbortDataEntryControl } from "./AbortDataEntryControl";
-
-vi.mock("@/hooks/election/useElection");
 
 function renderComponent() {
   const router = setupTestRouter([
@@ -31,8 +29,9 @@ function renderComponent() {
 
 describe("AbortDataEntryControl", () => {
   beforeEach(() => {
-    vi.mocked(useElection).mockReturnValue({
-      committeeSession: committeeSessionMockData,
+    vi.spyOn(useElection, "useElection").mockReturnValue({
+      currentCommitteeSession: committeeSessionMockData,
+      committeeSessions: [committeeSessionMockData],
       election: electionMockData,
       pollingStations: [],
       pollingStation: undefined,
@@ -40,7 +39,12 @@ describe("AbortDataEntryControl", () => {
         Promise.resolve({
           status: ApiResponseStatus.Success,
           code: 200,
-          data: { committee_session: committeeSessionMockData, election: electionMockData, polling_stations: [] },
+          data: {
+            current_committee_session: committeeSessionMockData,
+            committee_sessions: [committeeSessionMockData],
+            election: electionMockData,
+            polling_stations: [],
+          },
         }),
     });
   });

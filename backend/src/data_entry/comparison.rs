@@ -1,7 +1,8 @@
 use super::{
-    CandidateVotes, Count, CountingDifferencesPollingStation, DifferencesCounts,
-    ExtraInvestigation, FieldPath, PoliticalGroupVotes, PollingStationResults, VotersCounts,
-    VotesCounts, YesNo,
+    CandidateVotes, Count, CountingDifferencesPollingStation,
+    DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
+    FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+    VotersCounts, VotesCounts, YesNo,
 };
 
 pub trait Compare {
@@ -139,11 +140,17 @@ impl Compare for VotersCounts {
 
 impl Compare for VotesCounts {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        // compare all counts
-        self.votes_candidates_count.compare(
-            &first_entry.votes_candidates_count,
+        self.political_group_total_votes.compare(
+            &first_entry.political_group_total_votes,
             different_fields,
-            &path.field("votes_candidates_count"),
+            &path.field("political_group_total_votes"),
+        );
+
+        // compare all counts
+        self.total_votes_candidates_count.compare(
+            &first_entry.total_votes_candidates_count,
+            different_fields,
+            &path.field("total_votes_candidates_count"),
         );
         self.blank_votes_count.compare(
             &first_entry.blank_votes_count,
@@ -163,6 +170,19 @@ impl Compare for VotesCounts {
     }
 }
 
+impl Compare for Vec<PoliticalGroupTotalVotes> {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        // compare total of each political group
+        for (i, pgv) in self.iter().enumerate() {
+            pgv.total.compare(
+                &first_entry[i].total,
+                different_fields,
+                &path.index(i).field("total"),
+            );
+        }
+    }
+}
+
 impl Compare for DifferencesCounts {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         // compare all counts
@@ -176,35 +196,41 @@ impl Compare for DifferencesCounts {
             different_fields,
             &path.field("fewer_ballots_count"),
         );
-        self.unreturned_ballots_count.compare(
-            &first_entry.unreturned_ballots_count,
+        self.compare_votes_cast_admitted_voters.compare(
+            &first_entry.compare_votes_cast_admitted_voters,
             different_fields,
-            &path.field("unreturned_ballots_count"),
+            &path.field("compare_votes_cast_admitted_voters"),
         );
-        self.too_few_ballots_handed_out_count.compare(
-            &first_entry.too_few_ballots_handed_out_count,
+
+        self.difference_completely_accounted_for.compare(
+            &first_entry.difference_completely_accounted_for,
             different_fields,
-            &path.field("too_few_ballots_handed_out_count"),
-        );
-        self.too_many_ballots_handed_out_count.compare(
-            &first_entry.too_many_ballots_handed_out_count,
-            different_fields,
-            &path.field("too_many_ballots_handed_out_count"),
-        );
-        self.other_explanation_count.compare(
-            &first_entry.other_explanation_count,
-            different_fields,
-            &path.field("other_explanation_count"),
-        );
-        self.no_explanation_count.compare(
-            &first_entry.no_explanation_count,
-            different_fields,
-            &path.field("no_explanation_count"),
+            &path.field("difference_completely_accounted_for"),
         );
     }
 }
 
-impl Compare for Vec<PoliticalGroupVotes> {
+impl Compare for DifferenceCountsCompareVotesCastAdmittedVoters {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        self.admitted_voters_equal_votes_cast.compare(
+            &first_entry.admitted_voters_equal_votes_cast,
+            different_fields,
+            &path.field("admitted_voters_equal_votes_cast"),
+        );
+        self.votes_cast_greater_than_admitted_voters.compare(
+            &first_entry.votes_cast_greater_than_admitted_voters,
+            different_fields,
+            &path.field("votes_cast_greater_than_admitted_voters"),
+        );
+        self.votes_cast_smaller_than_admitted_voters.compare(
+            &first_entry.votes_cast_smaller_than_admitted_voters,
+            different_fields,
+            &path.field("votes_cast_smaller_than_admitted_voters"),
+        );
+    }
+}
+
+impl Compare for Vec<PoliticalGroupCandidateVotes> {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         // compare each political group
         for (i, pgv) in self.iter().enumerate() {
@@ -213,7 +239,7 @@ impl Compare for Vec<PoliticalGroupVotes> {
     }
 }
 
-impl Compare for PoliticalGroupVotes {
+impl Compare for PoliticalGroupCandidateVotes {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         // compare all candidates
         for (i, cv) in self.candidate_votes.iter().enumerate() {
@@ -256,13 +282,20 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
+                total_votes_candidates_count: 100,
                 blank_votes_count: 3,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 105,
             },
             differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let second_entry = first_entry.clone();
         second_entry.compare(
@@ -286,7 +319,11 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
+                total_votes_candidates_count: 100,
                 blank_votes_count: 1,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 103,
@@ -294,13 +331,18 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 2,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 2,
-                no_explanation_count: 0,
+                difference_completely_accounted_for: Default::default(),
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: Default::default(),
+                        votes_cast_greater_than_admitted_voters: Default::default(),
+                        votes_cast_smaller_than_admitted_voters: Default::default(),
+                    },
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let second_entry = first_entry.clone();
         second_entry.compare(
@@ -324,13 +366,20 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
+                total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 104,
             },
             differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let second_entry = first_entry.clone();
         second_entry.compare(
@@ -354,7 +403,11 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
+                total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 3,
                 total_votes_cast_count: 105,
@@ -362,13 +415,18 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 1,
                 fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 1,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: Default::default(),
+                        votes_cast_greater_than_admitted_voters: Default::default(),
+                        votes_cast_smaller_than_admitted_voters: Default::default(),
+                    },
+                difference_completely_accounted_for: Default::default(),
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let second_entry = first_entry.clone();
         second_entry.compare(
@@ -392,13 +450,20 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
+                total_votes_candidates_count: 100,
                 blank_votes_count: 3,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 105,
             },
             differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let mut second_entry = first_entry.clone();
         second_entry.voters_counts.poll_card_count = 101;
@@ -432,7 +497,11 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
+                total_votes_candidates_count: 100,
                 blank_votes_count: 1,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 103,
@@ -440,23 +509,29 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 2,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 2,
-                no_explanation_count: 0,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: false,
+                        votes_cast_greater_than_admitted_voters: true,
+                        votes_cast_smaller_than_admitted_voters: true,
+                    },
+                difference_completely_accounted_for: Default::default(),
             },
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let mut second_entry = first_entry.clone();
         second_entry.differences_counts = DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 2,
-            unreturned_ballots_count: 0,
-            too_few_ballots_handed_out_count: 1,
-            too_many_ballots_handed_out_count: 0,
-            other_explanation_count: 0,
-            no_explanation_count: 1,
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: true,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: false,
+            },
+            difference_completely_accounted_for: Default::default(),
         };
         second_entry.compare(
             &first_entry,
@@ -466,15 +541,15 @@ mod tests {
         assert_eq!(different_fields.len(), 3);
         assert_eq!(
             different_fields[0],
-            "polling_station_results.differences_counts.too_few_ballots_handed_out_count"
+            "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"
         );
         assert_eq!(
             different_fields[1],
-            "polling_station_results.differences_counts.other_explanation_count"
+            "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters"
         );
         assert_eq!(
             different_fields[2],
-            "polling_station_results.differences_counts.no_explanation_count"
+            "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters"
         );
     }
 
@@ -491,13 +566,20 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                }],
+                total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 104,
             },
             differences_counts: DifferencesCounts::zero(),
-            political_group_votes: vec![PoliticalGroupVotes::from_test_data_auto(1, &[100])],
+            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
+                1,
+                &[100],
+            )],
         };
         let mut second_entry = first_entry.clone();
         second_entry.voters_counts = VotersCounts {
@@ -506,17 +588,21 @@ mod tests {
             total_admitted_voters_count: 102,
         };
         second_entry.votes_counts = VotesCounts {
-            votes_candidates_count: 100,
+            political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                number: 1,
+                total: 101,
+            }],
+            total_votes_candidates_count: 101,
             blank_votes_count: 1,
             invalid_votes_count: 1,
-            total_votes_cast_count: 102,
+            total_votes_cast_count: 103,
         };
         second_entry.compare(
             &first_entry,
             &mut different_fields,
             &"polling_station_results".into(),
         );
-        assert_eq!(different_fields.len(), 6);
+        assert_eq!(different_fields.len(), 8);
         assert_eq!(
             different_fields[0],
             "polling_station_results.voters_counts.poll_card_count"
@@ -531,14 +617,22 @@ mod tests {
         );
         assert_eq!(
             different_fields[3],
-            "polling_station_results.votes_counts.blank_votes_count"
+            "polling_station_results.votes_counts.political_group_total_votes[0].total"
         );
         assert_eq!(
             different_fields[4],
-            "polling_station_results.votes_counts.invalid_votes_count"
+            "polling_station_results.votes_counts.total_votes_candidates_count"
         );
         assert_eq!(
             different_fields[5],
+            "polling_station_results.votes_counts.blank_votes_count"
+        );
+        assert_eq!(
+            different_fields[6],
+            "polling_station_results.votes_counts.invalid_votes_count"
+        );
+        assert_eq!(
+            different_fields[7],
             "polling_station_results.votes_counts.total_votes_cast_count"
         );
     }
@@ -556,7 +650,17 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 100,
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 100,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 0,
+                    },
+                ],
+                total_votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 3,
                 total_votes_cast_count: 105,
@@ -564,21 +668,23 @@ mod tests {
             differences_counts: DifferencesCounts {
                 more_ballots_count: 1,
                 fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 1,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: Default::default(),
+                        votes_cast_greater_than_admitted_voters: Default::default(),
+                        votes_cast_smaller_than_admitted_voters: Default::default(),
+                    },
+                difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, &[100, 0]),
-                PoliticalGroupVotes::from_test_data_auto(2, &[0]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[100, 0]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[0]),
             ],
         };
         let mut second_entry = first_entry.clone();
         second_entry.political_group_votes = vec![
-            PoliticalGroupVotes::from_test_data_auto(1, &[50, 30]),
-            PoliticalGroupVotes::from_test_data_auto(2, &[20]),
+            PoliticalGroupCandidateVotes::from_test_data_auto(1, &[50, 30]),
+            PoliticalGroupCandidateVotes::from_test_data_auto(2, &[20]),
         ];
         second_entry.compare(
             &first_entry,

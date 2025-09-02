@@ -21,12 +21,17 @@ export const electionManagementRoutes: RouteObject[] = [
         Component: FinishDataEntryPage,
       },
       {
-        path: "download",
-        element: __API_MSW__ ? (
-          <NotAvailableInMock title={`${t("election.title.finish_data_entry")} - Abacus`} />
-        ) : (
-          <ElectionReportPage />
-        ),
+        path: "committee-session/:committeeSessionId/download",
+        children: [
+          {
+            index: true,
+            element: __API_MSW__ ? (
+              <NotAvailableInMock title={`${t("election.title.finish_data_entry")} - Abacus`} />
+            ) : (
+              <ElectionReportPage />
+            ),
+          },
+        ],
       },
     ],
   },

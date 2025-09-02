@@ -12,4 +12,10 @@ export class LoginPgObj {
     this.loginBtn = page.getByRole("button", { name: "Inloggen" });
     this.alert = page.getByRole("alert");
   }
+
+  async login(username: string, password: string) {
+    await this.username.fill(username);
+    await this.password.fill(password);
+    await this.loginBtn.click();
+  }
 }

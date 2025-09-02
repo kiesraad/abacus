@@ -62,7 +62,7 @@ export function DataEntrySection() {
         acceptCheckboxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       });
     }
-  }, [formSection.acceptErrorsAndWarningsError]);
+  }, [formSection]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

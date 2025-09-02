@@ -11,4 +11,19 @@ export const DefaultFileInput: StoryObj = {
   },
 };
 
+export const FileSelectedFileInput: StoryObj = {
+  render: () => {
+    const myFile = new File(["file contents"], "my-file.txt");
+    return (
+      <FileInput id="test" file={myFile}>
+        Bestand kiezen
+      </FileInput>
+    );
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByLabelText("Bestand kiezen")).toBeInTheDocument();
+    await expect(canvas.getByLabelText("my-file.txt")).toBeInTheDocument();
+  },
+};
+
 export default {} satisfies Meta;

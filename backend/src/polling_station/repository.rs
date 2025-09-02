@@ -59,7 +59,11 @@ pub async fn get(conn: impl DbConnLike<'_>, id: u32) -> Result<PollingStation, s
             p.locality
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
-        WHERE p.id = $1
+        WHERE p.id = $1 AND c.number = (
+            SELECT MAX(c2.number)
+            FROM committee_sessions AS c2
+            WHERE c2.election_id = c.election_id
+        )
         "#,
         id
     )
@@ -67,6 +71,7 @@ pub async fn get(conn: impl DbConnLike<'_>, id: u32) -> Result<PollingStation, s
     .await
 }
 
+#[cfg(test)]
 pub async fn get_by_previous_id(
     conn: impl DbConnLike<'_>,
     previous_id: u32,

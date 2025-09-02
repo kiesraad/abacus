@@ -1171,6 +1171,10 @@ mod tests {
         )
         .await;
 
+        // Claim the same polling station again
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+
         let new_ps = crate::polling_station::repository::get_by_previous_id(&pool, 1)
             .await
             .unwrap();

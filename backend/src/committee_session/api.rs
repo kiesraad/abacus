@@ -68,7 +68,6 @@ pub async fn committee_session_create(
         )
         .await?;
     if current_committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-        // retrieve the polling stations from the last committee session
         let next_committee_session = crate::committee_session::repository::create(&pool, {
             CommitteeSessionCreateRequest {
                 election_id: request.election_id,

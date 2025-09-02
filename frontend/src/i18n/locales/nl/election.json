@@ -94,5 +94,13 @@
     "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
     "title": "Type stemopneming in"
   },
+  "polling_station_type": {
+    "title": "Rol van het stembureau",
+    "description": "Voor welke rollen wil je deze Abacus installatie gebruiken?",
+    "gsb": "Gemeentelijk stembureau (GSB)",
+    "csb": "Centraal stembureau (CSB)",
+    "csb_not_supported": "Niet beschikbaar in deze versie",
+    "choose": "Kies een rol"
+  },
   "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."
 }

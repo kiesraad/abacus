@@ -1421,6 +1421,218 @@ mod tests {
         }
     }
 
+    mod political_group_votes {
+        use crate::{
+            data_entry::{
+                CandidateVotes, DataError, PoliticalGroupCandidateVotes, Validate,
+                ValidationResult, ValidationResultCode, ValidationResults,
+            },
+            election::{ElectionWithPoliticalGroups, PGNumber, tests::election_fixture},
+            polling_station::structs::tests::polling_station_fixture,
+        };
+
+        /// Takes a list of tuples where each tuple contains:
+        /// - Candidate vote counts for the political group
+        /// - The total votes for that political group (could be different for test purposes)
+        fn create_test_data(
+            candidate_votes_and_totals: &[(&[u32], u32)],
+        ) -> (
+            Vec<PoliticalGroupCandidateVotes>,
+            ElectionWithPoliticalGroups,
+        ) {
+            let political_group_votes = candidate_votes_and_totals
+                .iter()
+                .enumerate()
+                .map(|(index, (candidate_votes, list_total))| {
+                    let mut pg = PoliticalGroupCandidateVotes::from_test_data_auto(
+                        PGNumber::try_from(index + 1).unwrap(),
+                        candidate_votes,
+                    );
+
+                    // Set given total instead of summing votes
+                    pg.total = *list_total;
+                    pg
+                })
+                .collect();
+
+            let candidate_counts_per_group = candidate_votes_and_totals
+                .iter()
+                .map(|(votes, _)| u32::try_from(votes.len()).unwrap())
+                .collect::<Vec<_>>();
+            let election = election_fixture(&candidate_counts_per_group);
+
+            (political_group_votes, election)
+        }
+
+        fn validate(
+            candidate_votes_totals: &[(&[u32], u32)],
+        ) -> Result<ValidationResults, DataError> {
+            let (political_group_votes, election) = create_test_data(candidate_votes_totals);
+
+            let mut validation_results = ValidationResults::default();
+            political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            )?;
+
+            Ok(validation_results)
+        }
+
+        /// CSO | F.401: 'Kandidaten en lijsttotalen': Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0
+        #[test]
+        fn test_f401() -> Result<(), DataError> {
+            let validation_results = validate(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)])?;
+            assert!(validation_results.errors.is_empty());
+
+            let validation_results = validate(&[(&[10, 20, 30], 60), (&[5, 10, 15], 0)])?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["political_group_votes[1].total".into(),],
+                }]
+            );
+
+            Ok(())
+        }
+
+        /// CSO | F.402: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst (Als totaal aantal stemmen op een lijst niet leeg of 0 is)
+        #[test]
+        fn test_f402() -> Result<(), DataError> {
+            let validation_results = validate(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)])?;
+            assert!(validation_results.errors.is_empty());
+
+            // When list total is empty, don't expect F.402, but F.401
+            let validation_results = validate(&[(&[10, 20, 30], 60), (&[5, 10, 15], 0)])?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["political_group_votes[1].total".into(),],
+                }]
+            );
+
+            // Expect F.402 when list total doesn't match candidate votes
+            let validation_results = validate(&[(&[10, 20, 30], 60), (&[5, 10, 15], 29)])?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F402,
+                    fields: vec!["political_group_votes[1]".into(),],
+                }]
+            );
+
+            Ok(())
+        }
+
+        #[test]
+        fn test_err_list_incorrect_length() {
+            let (political_group_votes, mut election) =
+                create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
+
+            // Remove first political group from election
+            election.political_groups.remove(0);
+
+            let mut validation_results = ValidationResults::default();
+            let result = political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            );
+
+            assert!(result.is_err());
+            assert!(
+                result
+                    .unwrap_err()
+                    .message
+                    .eq("list of political groups does not have correct length"),
+            );
+        }
+
+        #[test]
+        fn test_err_political_group_numbers_not_consecutive() {
+            let (mut political_group_votes, election) =
+                create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
+
+            // Change number of the first list
+            political_group_votes[0].number = 3;
+
+            let mut validation_results = ValidationResults::default();
+            let result: Result<(), DataError> = political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            );
+
+            assert!(result.is_err());
+            assert!(
+                result
+                    .unwrap_err()
+                    .message
+                    .eq("political group numbers are not consecutive"),
+            );
+        }
+
+        #[test]
+        fn test_err_incorrect_number_of_candidates() {
+            let (mut political_group_votes, election) =
+                create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
+
+            // Add one extra candidate to the first list
+            political_group_votes[0]
+                .candidate_votes
+                .push(CandidateVotes {
+                    number: 4,
+                    votes: 0,
+                });
+
+            let mut validation_results = ValidationResults::default();
+            let result = political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            );
+
+            assert!(result.is_err());
+            assert!(
+                result
+                    .unwrap_err()
+                    .message
+                    .eq("incorrect number of candidates"),
+            );
+        }
+
+        #[test]
+        fn test_err_candidate_numbers_not_consecutive() {
+            let (mut political_group_votes, election) =
+                create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
+
+            // Change number of the second candidate on the first list
+            political_group_votes[0].candidate_votes[1].number = 5;
+
+            let mut validation_results = ValidationResults::default();
+            let result = political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            );
+
+            assert!(result.is_err());
+            assert!(
+                result
+                    .unwrap_err()
+                    .message
+                    .eq("candidate numbers are not consecutive"),
+            );
+        }
+    }
+
     /// Tests that ValidationResults can be appended together, combining errors and warnings.
     #[test]
     fn test_validation_result_append() {
@@ -2018,134 +2230,6 @@ mod tests {
         );
     }
 
-    /// Tests validation of political group votes including out-of-range values, incorrect totals (F.401),
-    /// missing totals (F.401), and mismatched candidate/group counts.
-    #[test]
-    fn test_political_group_votes_validation() {
-        let mut validation_results = ValidationResults::default();
-        // create a valid political group votes with two groups and two candidates each
-        let mut political_group_votes = vec![
-            PoliticalGroupCandidateVotes {
-                number: 1,
-                total: 25,
-                candidate_votes: vec![
-                    CandidateVotes {
-                        number: 1,
-                        votes: 14,
-                    },
-                    CandidateVotes {
-                        number: 2,
-                        votes: 11,
-                    },
-                ],
-            },
-            PoliticalGroupCandidateVotes {
-                number: 2,
-                total: 1_000_000_000, // out of range
-                candidate_votes: vec![
-                    CandidateVotes {
-                        number: 1,
-                        votes: 0,
-                    },
-                    CandidateVotes {
-                        number: 2,
-                        votes: 1_000_000_000, // out of range
-                    },
-                ],
-            },
-        ];
-        let mut election = election_fixture(&[2, 2]);
-        let polling_station = polling_station_fixture(None);
-
-        // validate out of range number of candidates
-        let res = political_group_votes.validate(
-            &election,
-            &polling_station,
-            &mut validation_results,
-            &"political_group_votes".into(),
-        );
-        assert!(res.is_err());
-
-        // validate with correct in range votes for second political group but incorrect total for first political group
-        validation_results = ValidationResults::default();
-        political_group_votes[1].candidate_votes[1].votes = 20;
-        political_group_votes[1].total = 20;
-        political_group_votes[0].total = 20;
-        political_group_votes
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"political_group_votes".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
-        assert_eq!(validation_results.warnings.len(), 0);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F401
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec!["political_group_votes[0]"]
-        );
-
-        // validate with missing total for second political group
-        validation_results = ValidationResults::default();
-        political_group_votes[0].total = 0;
-        political_group_votes
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"political_group_votes".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
-        assert_eq!(validation_results.warnings.len(), 0);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F402
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec!["political_group_votes[0].total"]
-        );
-
-        // validate with incorrect number of candidates for the first political group
-        validation_results = ValidationResults::default();
-        election = election_fixture(&[3, 2]);
-        political_group_votes[0].total = 25;
-        let res = political_group_votes.validate(
-            &election,
-            &polling_station,
-            &mut validation_results,
-            &"political_group_votes".into(),
-        );
-        assert!(res.is_err());
-
-        // validate with incorrect number of political groups
-        validation_results = ValidationResults::default();
-        election = election_fixture(&[2, 2, 2]);
-        let res = political_group_votes.validate(
-            &election,
-            &polling_station,
-            &mut validation_results,
-            &"political_group_votes".into(),
-        );
-        assert!(res.is_err());
-
-        // validate with correct number of political groups but mixed up numbers
-        validation_results = ValidationResults::default();
-        election = election_fixture(&[2, 2]);
-        political_group_votes[0].number = 2;
-        let res = political_group_votes.validate(
-            &election,
-            &polling_station,
-            &mut validation_results,
-            &"political_group_votes".into(),
-        );
-        assert!(res.is_err());
     }
 
     /// Tests the has_errors() and has_warnings() helper methods on ValidationResults.
